@@ -15,18 +15,39 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+      with:
+        submodules: 'recursive'
     
     - name: Set up Rust
       uses: actions-rs/toolchain@v1
       with:
         profile: minimal
         toolchain: stable
+        components: rustfmt, clippy
+        
+    - name: Cache dependencies
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+          target
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+        
+    - name: Check formatting
+      run: cargo fmt -- --check
+        
+    - name: Lint with clippy
+      run: cargo clippy -- -D warnings
         
     - name: Build
       run: cargo build --verbose
       
-    - name: Run tests
+    - name: Run unit tests
       run: cargo test --verbose
+      
+    - name: Run integration tests
+      run: cargo test --test '*' --features integration
       
     - name: Security audit
       run: |
@@ -34,14 +55,39 @@ jobs:
         cargo audit
         
     - name: Documentation
-      run: cargo doc --no-deps
+      run: cargo doc --no-deps --document-private-items
 
-  deploy:
+  deploy-staging:
     needs: build
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Deploy to staging
+      run: |
+        echo "Deploying to staging environment..."
+        # Add staging deployment steps here
+        
+    - name: Run smoke tests
+      run: |
+        echo "Running smoke tests..."
+        # Add smoke test commands here
+
+  deploy-production:
+    needs: deploy-staging
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    environment:
+      name: production
+      url: https://api.example.com
     
     steps:
     - name: Deploy to production
       run: |
         echo "Deploying to production..."
+        # Add production deployment steps here
+        
+    - name: Verify deployment
+      run: |
+        echo "Verifying production deployment..."
+        # Add verification steps here
