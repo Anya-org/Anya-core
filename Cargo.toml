@@ -1,3 +1,9 @@
+[package]
+name = "anya"
+version = "0.1.0"
+edition = "2021"
+description = "Unified Bitcoin development platform with integrated mobile and enterprise features"
+
 [workspace]
 members = [
     ".",
@@ -7,16 +13,11 @@ members = [
     "dependencies/anya-web5",
     "anya-bitcoin",
     "dash33",
-    "mobile"
+    "mobile",
+    "src/core",
+    "src/mobile",
+    "packages/dash33",
 ]
-resolver = "2"
-
-[workspace.package]
-version = "0.2.0"
-edition = "2021"
-authors = ["Botshelo Mokoka <botshelomokoka@gmail.com>"]
-license = "MIT"
-repository = "https://github.com/botshelomokoka/anya"
 
 [workspace.dependencies]
 # Core dependencies
@@ -58,13 +59,29 @@ criterion = "0.5.1"
 proptest = "1.2.0"
 test-log = { version = "0.2.14", features = ["trace"] }
 
-[package]
-name = "anya"
-version.workspace = true
-edition.workspace = true
-description = "Decentralized AI Governance System"
-authors.workspace = true
-license.workspace = true
+# Bitcoin Core Dependencies
+bitcoin = "0.30.0"
+bitcoin-wallet = "0.3.0"
+rust-bitcoin = "0.30.0"
+lightning = "0.0.116"
+
+# Smart Contract Dependencies
+rgb-core = "0.10"
+rsk = "0.1.0"
+taproot = "0.1.0"
+
+# Web5 and DID Dependencies
+web5 = "0.1.0"
+did-key = "0.2"
+handshake-client = "0.1.0"
+
+# Mobile Dependencies
+react-native-rust = "0.1.0"
+uniffi = "0.24"
+
+# Common Dependencies
+tokio = { version = "1.0", features = ["full"] }
+serde = { version = "1.0", features = ["derive"] }
 
 [dependencies]
 # Core Dependencies
@@ -118,6 +135,16 @@ data-encoding = "2.5.0"
 jsonwebtoken = "9.2.0"
 totp-rs = "5.4.0"
 
+# Bitcoin Core Dependencies
+bitcoin = { workspace = true }
+rust-bitcoin = { workspace = true }
+lightning = { workspace = true }
+rgb-core = { workspace = true }
+taproot = { workspace = true }
+web5 = { workspace = true }
+tokio = { workspace = true }
+serde = { workspace = true }
+
 [dev-dependencies]
 tokio-test = { workspace = true }
 mockall = { workspace = true }
@@ -129,9 +156,12 @@ proptest = { workspace = true }
 tonic-build = "0.10.2"
 
 [features]
-default = ["std"]
+default = ["std", "bitcoin", "mobile", "web5"]
 std = []
 nightly = []
+mobile = []
+enterprise = []
+full = ["mobile", "enterprise"]
 
 [profile.release]
 lto = true
