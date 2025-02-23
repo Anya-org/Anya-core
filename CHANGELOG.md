@@ -2,6 +2,50 @@
 
 All notable changes to the Anya Core project will be documented in this file.
 
+## [1.5.0] - 2025-02-08
+
+### Added
+- 🏗️ Repository Restructuring
+  * Unified repository structure
+  * Integrated mobile functionality
+  * Dashboard module setup
+  * Development scripts
+  * Git hooks
+
+- 📱 Mobile Integration
+  * React Native setup
+  * Mobile-specific Bitcoin operations
+  * Cross-platform support
+  * Secure key management
+  * Offline-first architecture
+
+- 📊 Dashboard Implementation
+  * Real-time monitoring foundation
+  * Analytics framework
+  * User interface components
+  * Performance metrics
+  * Data visualization
+
+### Changed
+- Updated project structure
+- Enhanced CI/CD pipelines
+- Improved documentation
+- Optimized build process
+- Unified dependency management
+
+### Deprecated
+- Separate anya-mobile repository
+- Individual dependency repositories
+- Legacy build scripts
+- Old documentation structure
+
+### Security
+- Enhanced git hooks
+- Updated dependencies
+- Improved test coverage
+- Added security checks
+- Implemented audit logging
+
 ## [1.4.0] - 2024-12-27
 
 ### Added
@@ -295,4 +339,4 @@ All notable changes to the Anya Core project will be documented in this file.
 - Versions follow semantic versioning (MAJOR.MINOR.PATCH)
 - Security updates are highlighted separately
 
-*Last updated: 2024-12-27*
+*Last updated: 2025-02-08*
