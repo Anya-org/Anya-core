@@ -87,7 +87,7 @@ thiserror = { workspace = true }
 async-trait = { workspace = true }
 
 # Web5 Integration
-web5 = { workspace = true }
+web5 = { workspace = true, optional = true }
 jsonschema = { workspace = true }
 
 # Blockchain Integration
@@ -148,6 +148,7 @@ std = []
 nightly = []
 bitcoin_integration = ["bitcoin"]
 mobile = []
+web5 = ["dep:web5"]
 enterprise = []
 full = ["mobile", "enterprise"]
 
