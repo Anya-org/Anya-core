@@ -1,9 +1,9 @@
 [package]
 name = "anya-extensions"
-version.workspace = true
-edition.workspace = true
-authors.workspace = true
-license.workspace = true
+version = "0.1.0"
+edition = "2021"
+authors = ["Anya Contributors"]
+license = "MIT OR Apache-2.0"
 description = "Extensions for Anya Core"
 
 [lib]
@@ -26,7 +26,7 @@ bitcoincore-rpc = { workspace = true }
 web5 = { workspace = true }
 
 # Internal Dependencies
-anya-core = { path = "../anya-core" }
+anya-core = { path = "../../../" }
 
 [features]
 default = ["standard"]

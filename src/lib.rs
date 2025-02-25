@@ -45,6 +45,7 @@ pub mod ml;
 pub mod web5;
 pub mod bitcoin;
 pub mod dao;
+pub mod extensions;
 
 /// Core error type for the Anya system
 #[derive(Debug)]
@@ -244,6 +245,17 @@ pub mod utils {
     /// Log a message
     pub fn log(msg: &str) {
         println!("[{}] {}", chrono::Utc::now(), msg);
+    }
+}
+
+pub fn version() -> &'static str {
+    env!("CARGO_PKG_VERSION")
+}
+
+#[cfg(feature = "bitcoin_integration")]
+pub mod integration {
+    pub fn bitcoin_enabled() -> bool {
+        true
     }
 }
 
