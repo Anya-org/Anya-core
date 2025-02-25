@@ -1,6 +1,8 @@
 use std::sync::Arc;
 use tokio::sync::{RwLock, Mutex};
 use serde::{Serialize, Deserialize};
+use chrono::{DateTime, Utc};
+use std::collections::HashMap;
 
 /// Bitcoin-Inspired AGT Governance Model
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -74,6 +76,9 @@ pub struct DAOGovernance {
 
     /// Governance token protocol
     pub token_protocol: Arc<Mutex<AGTGovernanceProtocol>>,
+
+    /// Delegation mapping (voter -> delegate)
+    pub delegations: RwLock<HashMap<String, String>>,
 }
 
 impl DAOGovernance {
@@ -84,6 +89,7 @@ impl DAOGovernance {
             quorum_percentage: 0.3, // 30% participation required
             active_proposals: RwLock::new(Vec::new()),
             token_protocol: Arc::new(Mutex::new(AGTGovernanceProtocol::new())),
+            delegations: RwLock::new(HashMap::new()),
         }
     }
 
@@ -100,12 +106,38 @@ impl DAOGovernance {
         Ok(())
     }
 
-    /// Cast a vote on a proposal
-    pub async fn cast_vote(&self, proposal_id: u64, voter: String, vote: Vote) -> Result<(), String> {
+    /// Calculate the cost of votes based on quadratic voting
+    pub fn calculate_vote_cost(&self, num_votes: u64) -> u64 {
+        num_votes * num_votes // Quadratic cost
+    }
+
+    /// Calculate the weight of a vote based on its timestamp
+    pub fn calculate_time_weighted_vote(&self, vote: &Vote, voting_start: DateTime<Utc>, voting_end: DateTime<Utc>) -> f64 {
+        let total_duration = (voting_end - voting_start).num_seconds() as f64;
+        let time_elapsed = (vote.timestamp - voting_start).num_seconds() as f64;
+        let time_weight = 1.0 - (time_elapsed / total_duration);
+        vote.voting_power as f64 * time_weight
+    }
+
+    /// Cast a time-weighted vote on a proposal
+    pub async fn cast_time_weighted_vote(&self, proposal_id: u64, voter: String, decision: VoteDecision, num_votes: u64, timestamp: DateTime<Utc>) -> Result<(), String> {
+        let cost = self.calculate_vote_cost(num_votes);
+
+        // Check if voter has enough voting power
+        if cost > 100 { // Assume 100 is the voter's available voting power
+            return Err("Insufficient voting power".to_string());
+        }
+
         let mut proposals = self.active_proposals.write().await;
-        
+
         if let Some(proposal) = proposals.iter_mut().find(|p| p.id == proposal_id) {
-            proposal.votes.push(vote);
+            proposal.votes.push(Vote {
+                voter,
+                decision,
+                voting_power: cost,
+                num_votes,
+                timestamp,
+            });
             Ok(())
         } else {
             Err("Proposal not found".to_string())
@@ -137,6 +169,102 @@ impl DAOGovernance {
             Err("Proposal not found".to_string())
         }
     }
+
+    /// Adjust the voting threshold based on historical participation data
+    pub async fn adjust_voting_threshold(&self) -> Result<(), String> {
+        let proposals = self.active_proposals.read().await;
+        let total_proposals = proposals.len() as f64;
+        if total_proposals == 0.0 {
+            return Ok(()); // No proposals to analyze
+        }
+
+        // Calculate average participation rate
+        let total_votes: u64 = proposals.iter().flat_map(|p| p.votes.iter()).map(|v| v.voting_power).sum();
+        let average_participation = total_votes as f64 / total_proposals;
+
+        // Adjust voting threshold based on average participation
+        // Example: Increase threshold if participation is high, decrease if low
+        if average_participation > self.quorum_percentage * 1.5 {
+            self.voting_threshold = (self.voting_threshold + 0.05).min(0.8); // Cap at 80%
+        } else if average_participation < self.quorum_percentage * 0.5 {
+            self.voting_threshold = (self.voting_threshold - 0.05).max(0.5); // Floor at 50%
+        }
+
+        Ok(())
+    }
+
+    /// Perform sentiment analysis on a proposal's description
+    pub fn analyze_sentiment(&self, description: &str) -> f64 {
+        // Placeholder for sentiment analysis integration
+        // In a real implementation, this would involve calling a sentiment analysis API or library
+        // For now, we'll use a simple heuristic: positive words increase score, negative words decrease it
+        let positive_words = vec!["good", "excellent", "positive", "beneficial", "advantageous"];
+        let negative_words = vec!["bad", "poor", "negative", "detrimental", "disadvantageous"];
+
+        let mut score = 0.0;
+        for word in description.split_whitespace() {
+            if positive_words.contains(&word.to_lowercase().as_str()) {
+                score += 1.0;
+            } else if negative_words.contains(&word.to_lowercase().as_str()) {
+                score -= 1.0;
+            }
+        }
+
+        score
+    }
+
+    /// Use sentiment analysis in proposal scoring
+    pub async fn score_proposals_with_sentiment(&self) -> Result<(), String> {
+        let proposals = self.active_proposals.read().await;
+
+        for proposal in proposals.iter() {
+            let sentiment_score = self.analyze_sentiment(&proposal.description);
+            println!("Sentiment score for proposal '{}': {}", proposal.title, sentiment_score);
+        }
+
+        Ok(())
+    }
+
+    /// Transition a proposal to the next stage
+    pub async fn transition_proposal_stage(&self, proposal_id: u64) -> Result<(), String> {
+        let mut proposals = self.active_proposals.write().await;
+
+        if let Some(proposal) = proposals.iter_mut().find(|p| p.id == proposal_id) {
+            match proposal.status {
+                ProposalStatus::Draft => proposal.status = ProposalStatus::Review,
+                ProposalStatus::Review => proposal.status = ProposalStatus::Voting,
+                ProposalStatus::Voting => proposal.status = ProposalStatus::Executed,
+                _ => return Err("Proposal cannot be transitioned from its current state".to_string()),
+            }
+            Ok(())
+        } else {
+            Err("Proposal not found".to_string())
+        }
+    }
+
+    /// Delegate voting power to another user
+    pub async fn delegate_vote(&self, voter: String, delegate: String) -> Result<(), String> {
+        let mut delegations = self.delegations.write().await;
+        delegations.insert(voter, delegate);
+        Ok(())
+    }
+
+    /// Revoke delegation of voting power
+    pub async fn revoke_delegation(&self, voter: String) -> Result<(), String> {
+        let mut delegations = self.delegations.write().await;
+        delegations.remove(&voter);
+        Ok(())
+    }
+
+    /// Get the effective voter (considering delegation)
+    pub async fn get_effective_voter(&self, voter: &str) -> String {
+        let delegations = self.delegations.read().await;
+        if let Some(delegate) = delegations.get(voter) {
+            delegate.clone()
+        } else {
+            voter.to_string()
+        }
+    }
 }
 
 /// Proposal data structure
@@ -149,6 +277,10 @@ pub struct Proposal {
     pub proposer_token_balance: u64,
     pub votes: Vec<Vote>,
     pub status: ProposalStatus,
+    /// Categories for the proposal
+    pub categories: Vec<String>,
+    /// Tags for the proposal
+    pub tags: Vec<String>,
 }
 
 /// Vote representation
@@ -157,15 +289,21 @@ pub struct Vote {
     pub voter: String,
     pub decision: VoteDecision,
     pub voting_power: u64,
+    /// Number of votes cast (for quadratic voting)
+    pub num_votes: u64,
+    /// Timestamp of the vote
+    pub timestamp: DateTime<Utc>,
 }
 
 /// Proposal status enum
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub enum ProposalStatus {
-    Active,
+    Draft,
+    Review,
+    Voting,
+    Executed,
     Passed,
     Failed,
-    Executed,
 }
 
 /// Vote decision enum
