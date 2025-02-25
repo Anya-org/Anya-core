@@ -4,57 +4,13 @@ version = "0.1.0"
 edition = "2021"
 description = "Unified Bitcoin development platform with integrated mobile and enterprise features"
 
-resolver = "2"
-
-# Core dependencies
-pyo3 = { version = "0.19.2", features = ["extension-module"] }
-serde_yaml = "0.9.25"
-async-trait = "0.1"
-
-# Web5 Integration
-jsonschema = "0.17.1"
-
-# Blockchain Integration
-bitcoin-wallet = "1.1.0"
-
-# Networking
-libp2p = { version = "0.53.1", features = ["full"] }
-
-# Logging and Metrics
-tracing-subscriber = { version = "0.3.18", features = ["env-filter", "json"] }
-tracing-futures = "0.2.5"
-
-# Cryptography
-curve25519-dalek = { version = "4.1.3", features = ["digest", "rand_core", "serde"] }
-
-# Testing
-criterion = "0.5.1"
-proptest = "1.2.0"
-test-log = { version = "0.2.14", features = ["trace"] }
-
-# Bitcoin Core Dependencies
-lightning = "0.0.116"
-
-# Smart Contract Dependencies
-rgb-core = "0.10"
-rsk = "0.1.0"
-taproot = "0.1.0"
-
-# Web5 and DID Dependencies
-did-key = "0.2"
-handshake-client = "0.1.0"
-
-# Mobile Dependencies
-react-native-rust = "0.1.0"
-uniffi = "0.24"
-
 [dependencies]
 # Core Dependencies
 tokio = { workspace = true }
 futures = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
-serde_yaml = "0.9.25"
+serde_yaml = { workspace = true }
 anyhow = { workspace = true }
 thiserror = { workspace = true }
 async-trait = { workspace = true }
@@ -74,10 +30,10 @@ libp2p = { workspace = true }
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
 tracing-futures = "0.2.5"
-metrics = { version = "0.21" }
+metrics = { workspace = true }
 
 # Time and Date
-chrono = { version = "0.4", features = ["serde"] }
+chrono = { workspace = true }
 
 # Terminal Detection
 is-terminal = "0.4.9"
@@ -87,7 +43,7 @@ curve25519-dalek = { workspace = true }
 
 # Utilities
 uuid = { version = "1.8.0", features = ["v4"] }
-rand = "0.8"
+rand = { workspace = true }
 base64 = "0.21.7"
 hex = "0.4.3"
 sha2 = "0.10.8"
@@ -97,12 +53,29 @@ argon2 = "0.5.3"
 x509-parser = "0.15.1"
 rustls = "0.22.1"
 data-encoding = "2.5.0"
+jsonwebtoken = { workspace = true }
 totp-rs = "5.4.0"
 
 # Bitcoin Core Dependencies
 lightning = { workspace = true }
 rgb-core = { workspace = true }
+rsk = { workspace = true }
 taproot = { workspace = true }
+
+# Additional dependencies from original anya package
+pyo3 = { version = "0.19.2", features = ["extension-module"] }
+did-key = "0.2"
+handshake-client = "0.1.0"
+react-native-rust = "0.1.0"
+uniffi = "0.24"
+
+[[bin]]
+name = "anya"
+path = "src/bin/main.rs"
+
+[lib]
+name = "anya"
+path = "src/lib.rs"
 
 [dev-dependencies]
 tokio-test = { workspace = true }
@@ -110,6 +83,7 @@ mockall = { workspace = true }
 tempfile = "3.9.0"
 criterion = { workspace = true }
 proptest = { workspace = true }
+test-log = { version = "0.2.14", features = ["trace"] }
 
 [build-dependencies]
 tonic-build = "0.10.2"
