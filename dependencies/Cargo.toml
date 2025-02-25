@@ -7,17 +7,6 @@ license = "MIT OR Apache-2.0"
 repository = "https://github.com/botshelomokoka/anya-core"
 description = "Core dependencies and shared components for the Anya Bitcoin Platform"
 
-[workspace]
-members = [
-    "anya-bitcoin",
-    "anya-core",
-    "anya-enterprise",
-    "anya-extensions",
-    "anya-lightning",
-    "anya-ml",
-    "anya-web5",
-    "dash33"
-]
 resolver = "2"
 
 [workspace.package]
