@@ -2,10 +2,17 @@
 name = "anya-extensions"
 version = "0.1.0"
 edition = "2021"
+authors = ["Anya Extensions Contributors"]
+description = "Core extensions for Anya Platform"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/botshelomokoka/anya-core"
+
+[lib]
+name = "anya_extensions"
+path = "src/lib.rs"
 
 [dependencies]
-bitcoin = { workspace = true }
+anya-core = { path = "../../.." }
 tokio = { workspace = true }
-anyhow = { workspace = true }
 serde = { workspace = true }
 
