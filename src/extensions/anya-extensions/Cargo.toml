@@ -18,13 +18,15 @@ serde_json = { workspace = true }
 anyhow = { workspace = true }
 
 # Blockchain Integration
-bitcoin = { workspace = true, features = ["rand"] }
+bitcoin = { workspace = true }
+secp256k1 = { workspace = true }
+bitcoincore-rpc = { workspace = true }
 
 # Web5 Integration
 web5 = { workspace = true }
 
 # Internal Dependencies
-anya-core = { path = "../dependencies/anya-core", version = "0.2.0" }
+anya-core = { path = "../anya-core" }
 
 [features]
 default = ["standard"]

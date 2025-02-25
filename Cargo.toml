@@ -60,9 +60,6 @@ proptest = "1.2.0"
 test-log = { version = "0.2.14", features = ["trace"] }
 
 # Bitcoin Core Dependencies
-bitcoin = "0.30.0"
-bitcoin-wallet = "0.3.0"
-rust-bitcoin = "0.30.0"
 lightning = "0.0.116"
 
 # Smart Contract Dependencies
@@ -71,17 +68,12 @@ rsk = "0.1.0"
 taproot = "0.1.0"
 
 # Web5 and DID Dependencies
-web5 = "0.1.0"
 did-key = "0.2"
 handshake-client = "0.1.0"
 
 # Mobile Dependencies
 react-native-rust = "0.1.0"
 uniffi = "0.24"
-
-# Common Dependencies
-tokio = { version = "1.0", features = ["full"] }
-serde = { version = "1.0", features = ["derive"] }
 
 [dependencies]
 # Core Dependencies
@@ -99,7 +91,7 @@ web5 = { workspace = true }
 jsonschema = { workspace = true }
 
 # Blockchain Integration
-bitcoin = { workspace = true }
+bitcoin = { workspace = true, optional = true }
 bitcoincore-rpc = { workspace = true }
 
 # Networking
@@ -136,14 +128,9 @@ jsonwebtoken = "9.2.0"
 totp-rs = "5.4.0"
 
 # Bitcoin Core Dependencies
-bitcoin = { workspace = true }
-rust-bitcoin = { workspace = true }
 lightning = { workspace = true }
 rgb-core = { workspace = true }
 taproot = { workspace = true }
-web5 = { workspace = true }
-tokio = { workspace = true }
-serde = { workspace = true }
 
 [dev-dependencies]
 tokio-test = { workspace = true }
@@ -156,9 +143,10 @@ proptest = { workspace = true }
 tonic-build = "0.10.2"
 
 [features]
-default = ["std", "bitcoin", "mobile", "web5"]
+default = ["std", "bitcoin_integration", "mobile", "web5"]
 std = []
 nightly = []
+bitcoin_integration = ["bitcoin"]
 mobile = []
 enterprise = []
 full = ["mobile", "enterprise"]
@@ -173,4 +161,3 @@ panic = "abort"
 [profile.dev]
 opt-level = 0
 debug = true
-G
