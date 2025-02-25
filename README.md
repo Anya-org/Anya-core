@@ -12,7 +12,7 @@ Anya Core is a powerful platform combining Bitcoin/crypto functionality, ML-base
 
 ## Project Structure
 
-```
+```text
 anya-core/
 ├── src/                  # Core source code
 │   ├── bitcoin/          # Bitcoin protocol integration
@@ -39,17 +39,20 @@ anya-core/
 ### Installation
 
 1. Clone the repository:
+
    ```bash
    git clone https://github.com/anya/anya-core.git
    cd anya-core
    ```
 
 2. Build the library:
+
    ```bash
    cargo build --release
    ```
 
 3. Run tests:
+
    ```bash
    cargo test
    ```
@@ -131,6 +134,7 @@ To create a distributable package:
 This will create a package in the `dist` directory, including all necessary libraries, binaries, and documentation.
 
 Options:
+
 - `--version VERSION`: Set package version
 - `--output-dir DIR`: Set output directory
 - `--name NAME`: Set package name
@@ -176,6 +180,7 @@ Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for det
 ## License
 
 This project is licensed under either of:
+
 - Apache License, Version 2.0
 - MIT License
 
@@ -184,9 +189,11 @@ at your option.
 ## Acknowledgments
 
 Special thanks to our contributors and the following projects:
+
 - Bitcoin Core
 - Lightning Network Daemon
 - Web5/TBD
 - TensorFlow/PyTorch
 
-*Last updated: 2025-02-24* 
+## Last Updated
+2025-02-24

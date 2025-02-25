@@ -1,8 +1,25 @@
 # Anya System Documentation
 
+**Version**: {{VERSION}}  
+**Commit**: {{COMMIT}}  
+**Build Date**: {{DATE}}
+
 ## Overview
 
-Anya is an advanced integrated system combining Bitcoin/crypto functionality, ML-based analytics, and Web5 decentralized data management with enterprise-grade security and revenue tracking. Built on a hexagonal architecture, it provides a robust, scalable, and secure platform for institutional-grade operations.
+Anya is an advanced integrated system combining:
+
+- Bitcoin/crypto functionality
+- ML-based analytics
+- Web5 decentralized data management
+- Enterprise-grade security
+- Revenue tracking
+
+Built on a hexagonal architecture, it provides:
+
+- Robust infrastructure
+- Scalable platform
+- Secure environment
+- Institutional-grade operations
 
 ## Core Components
 
@@ -210,10 +227,48 @@ cargo test --all-features
 
 ### Next Steps
 
-- Review the [Security Guide](SECURITY.md)
-- Configure [ML Models](ML_SETUP.md)
-- Set up [Monitoring](MONITORING.md)
-- Deploy [Web5 Nodes](WEB5_SETUP.md)
-- Configure [Revenue Tracking](REVENUE_SETUP.md)
+After completing these tutorials, you might want to:
 
-*Last updated: 2024-12-07*
+1. **Review Security Settings**  
+
+   ```bash
+   ./scripts/security-audit.sh
+   ```
+
+2. **Explore Advanced Configurations**  
+
+   ```bash
+   ./scripts/advanced-config.sh
+   ```
+
+3. **Join Community Discussions**  
+
+   ```bash
+   ./scripts/join-community.sh
+   ```
+
+## Final Verification
+
+```bash
+./scripts/final-check.sh
+```
+
+**Last Updated**: 2025-02-24
+
+### Security Audit
+
+```bash
+./scripts/security-check.sh
+```
+
+### Performance Testing
+
+```bash
+./scripts/benchmark.sh
+```
+
+### Documentation Generation
+
+```bash
+./scripts/generate-docs.sh
+```
