@@ -1,60 +1,62 @@
 [package]
-name = "anya"
+name = "anya-core"
 version = "0.1.0"
 edition = "2021"
 description = "Unified Bitcoin development platform with integrated mobile and enterprise features"
 
-[workspace]
-members = [
-    ".",
-    "anya-enterprise",
-    "anya-extensions", 
-    "dependencies/anya-core",
-    "dependencies/anya-web5",
-    "anya-bitcoin",
-    "dash33",
-    "mobile",
-    "src/core",
-    "src/mobile",
-    "packages/dash33",
-]
+resolver = "2"
 
 [workspace.dependencies]
-# Core dependencies
 tokio = { version = "1.41.1", features = ["full"] }
-futures = "0.3.30"
+async-trait = "0.1.77"
 serde = { version = "1.0.215", features = ["derive"] }
 serde_json = "1.0.133"
-serde_yaml = "0.9.25"
-anyhow = "1.0.75"
-thiserror = "1.0.69"
-async-trait = "0.1.77"
-pyo3 = { version = "0.19.2", features = ["extension-module"] }
-
-# Web5 Integration
+chrono = { version = "0.4.31", features = ["serde"] }
+tracing = "0.1.40"
+metrics = "0.21.1"
+actix-web = "4.4.0"
+prometheus = "0.13"
+reqwest = { version = "0.11", features = ["json"] }
 web5 = { git = "https://github.com/TBD54566975/web5-rs", package = "web5", tag = "v4.0.0" }
-jsonschema = "0.17.1"
-
-# Blockchain Integration
+thiserror = "1.0.69"
+anyhow = "1.0.75"
+log = "0.4.20"
+env_logger = "0.10.1"
+ndarray = "0.15.6"
+tch = "0.13"
+rand = "0.8.5"
+futures = "0.3.30"
+ring = "0.17.8"
+jsonwebtoken = "9.2.0"
+mockall = "0.11.4"
+tokio-test = "0.4.3"
 bitcoin = { version = "0.32.1", features = ["rand"] }
 bitcoincore-rpc = "0.17.0"
 secp256k1 = { version = "0.27.0", features = ["rand"] }
+http = "0.2"
+
+# Core dependencies
+pyo3 = { version = "0.19.2", features = ["extension-module"] }
+serde_yaml = "0.9.25"
+async-trait = "0.1"
+
+# Web5 Integration
+jsonschema = "0.17.1"
+
+# Blockchain Integration
 bitcoin-wallet = "1.1.0"
 
 # Networking
 libp2p = { version = "0.53.1", features = ["full"] }
 
 # Logging and Metrics
-tracing = { version = "0.1.40", features = ["attributes", "async-await"] }
 tracing-subscriber = { version = "0.3.18", features = ["env-filter", "json"] }
-metrics = "0.21.1"
+tracing-futures = "0.2.5"
 
 # Cryptography
 curve25519-dalek = { version = "4.1.3", features = ["digest", "rand_core", "serde"] }
 
 # Testing
-tokio-test = "0.4.3"
-mockall = "0.11.4"
 criterion = "0.5.1"
 proptest = "1.2.0"
 test-log = { version = "0.2.14", features = ["trace"] }
@@ -81,14 +83,14 @@ tokio = { workspace = true }
 futures = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
-serde_yaml = { workspace = true }
+serde_yaml = "0.9.25"
 anyhow = { workspace = true }
 thiserror = { workspace = true }
 async-trait = { workspace = true }
 
 # Web5 Integration
 web5 = { workspace = true, optional = true }
-jsonschema = { workspace = true }
+jsonschema = "0.17.1"
 
 # Blockchain Integration
 bitcoin = { workspace = true, optional = true }
@@ -101,10 +103,10 @@ libp2p = { workspace = true }
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
 tracing-futures = "0.2.5"
-metrics = { version = "0.21.1" }
+metrics = { version = "0.21" }
 
 # Time and Date
-chrono = { version = "0.4.31", features = ["serde"], default-features = false }
+chrono = { version = "0.4", features = ["serde"] }
 
 # Terminal Detection
 is-terminal = "0.4.9"
@@ -114,7 +116,7 @@ curve25519-dalek = { workspace = true }
 
 # Utilities
 uuid = { version = "1.8.0", features = ["v4"] }
-rand = "0.8.5"
+rand = "0.8"
 base64 = "0.21.7"
 hex = "0.4.3"
 sha2 = "0.10.8"
@@ -124,7 +126,6 @@ argon2 = "0.5.3"
 x509-parser = "0.15.1"
 rustls = "0.22.1"
 data-encoding = "2.5.0"
-jsonwebtoken = "9.2.0"
 totp-rs = "5.4.0"
 
 # Bitcoin Core Dependencies

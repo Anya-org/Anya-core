@@ -43,7 +43,7 @@ utoipa-swagger-ui = { version = "5.0.0", features = ["actix-web"] }
 ndarray = "0.15.6"
 
 # Internal Dependencies
-anya-core = { path = "../dependencies/anya-core", version = "0.2.0", features = ["enterprise"] }
+anya-core = { path = "../../" }
 
 [features]
 default = []
