@@ -1,11 +1,13 @@
 # Anya System Documentation
 
 ## Overview
+
 Anya is an advanced integrated system combining Bitcoin/crypto functionality, ML-based analytics, and Web5 decentralized data management with enterprise-grade security and revenue tracking. Built on a hexagonal architecture, it provides a robust, scalable, and secure platform for institutional-grade operations.
 
 ## Core Components
 
 ### 1. Authentication & Security
+
 - **Multi-factor Authentication**
   - Hardware security keys (FIDO2/WebAuthn)
   - Biometric verification
@@ -28,6 +30,7 @@ Anya is an advanced integrated system combining Bitcoin/crypto functionality, ML
   - Role-based access control (RBAC)
 
 ### 2. Machine Learning & Analytics
+
 - **Advanced Model Architecture**
   - NPU/RISC-V optimization
   - Federated learning support
@@ -50,6 +53,7 @@ Anya is an advanced integrated system combining Bitcoin/crypto functionality, ML
   - Deployment automation
 
 ### 3. Web5 Integration
+
 - **Decentralized Web Nodes (DWN)**
   - Protocol definitions
   - Data synchronization
@@ -72,6 +76,7 @@ Anya is an advanced integrated system combining Bitcoin/crypto functionality, ML
   - Protocol versioning
 
 ### 4. Revenue System
+
 - **ML-based Analytics**
   - Revenue prediction
   - Cost optimization
@@ -94,6 +99,7 @@ Anya is an advanced integrated system combining Bitcoin/crypto functionality, ML
   - Efficiency metrics
 
 ### 5. Monitoring & Metrics
+
 - **System Health**
   - Real-time monitoring
   - Performance tracking
@@ -118,6 +124,7 @@ Anya is an advanced integrated system combining Bitcoin/crypto functionality, ML
 ## Getting Started
 
 ### Prerequisites
+
 - **System Requirements**
   - CPU: 8+ cores recommended
   - RAM: 16GB+ recommended
@@ -133,9 +140,10 @@ Anya is an advanced integrated system combining Bitcoin/crypto functionality, ML
   - Bitcoin Core 24.0+
   - Python 3.10+ (for ML components)
 
-### Installation
+## Installation
 
 1. **System Setup**
+
 ```bash
 # Clone the repository
 git clone https://github.com/anya/anya-enterprise.git
@@ -149,6 +157,7 @@ cp .env.example .env
 ```
 
 2. **Configuration**
+
 ```env
 # Core Settings
 DATABASE_URL=postgres://user:password@localhost/anya
@@ -174,6 +183,7 @@ TRACING_ENDPOINT=http://localhost:4317
 ```
 
 3. **Build & Deploy**
+
 ```bash
 # Build the project
 cargo build --release
@@ -186,6 +196,7 @@ cargo test --all-features
 ```
 
 4. **Verify Installation**
+
 ```bash
 # Check system health
 ./scripts/health-check.sh
@@ -198,6 +209,7 @@ cargo test --all-features
 ```
 
 ### Next Steps
+
 - Review the [Security Guide](SECURITY.md)
 - Configure [ML Models](ML_SETUP.md)
 - Set up [Monitoring](MONITORING.md)
