@@ -8,7 +8,7 @@ license = "MIT OR Apache-2.0"
 repository = "https://github.com/botshelomokoka/anya-core"
 
 [dependencies]
-anya-core = { path = "../../../" }
+anya-core = { path = "../../anya-core" }
 bitcoin = { workspace = true }
 secp256k1 = { workspace = true }
 bitcoincore-rpc = { workspace = true }

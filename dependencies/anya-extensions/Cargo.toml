@@ -12,7 +12,7 @@ name = "anya_extensions"
 path = "src/lib.rs"
 
 [dependencies]
-anya-core = { path = "../../.." }
+anya-core = { path = "../../../anya-core", version = "0.1.0" }
 tokio = { workspace = true }
 serde = { workspace = true }
 
