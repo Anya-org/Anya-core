@@ -8,6 +8,7 @@ graph TB
         Core[Core Components]
         AI[AI Engine]
         Security[Security Layer]
+        Bitcoin[Bitcoin & Lightning]
     end
 
     subgraph Submodules[Primary Submodules]
@@ -26,6 +27,7 @@ graph TB
     %% Core Connections
     Core --> AI
     Core --> Security
+    Core --> Bitcoin
     AI --> Security
 
     %% Submodule Connections
@@ -33,6 +35,7 @@ graph TB
     enterprise --> Core
     mobile --> API
     web5 --> Security
+    Bitcoin --> Security
 
     %% Integration Layer
     API --> Security
@@ -60,6 +63,56 @@ graph TB
    - Encryption
    - Audit logging
    - Policy enforcement
+   
+4. **Bitcoin & Lightning**
+   - Bitcoin protocol implementation
+   - Lightning Network integration
+   - Payment channels
+   - Wallet management
+
+### Bitcoin & Lightning Architecture
+```mermaid
+graph TB
+    subgraph Bitcoin[Bitcoin Layer]
+        Core[Bitcoin Core]
+        Wallet[Wallet]
+        Network[Network]
+        Transactions[Transactions]
+    end
+
+    subgraph Lightning[Lightning Layer]
+        LNode[Lightning Node]
+        Channels[Channel Management]
+        Payments[Payment Processing]
+        Bridge[Bitcoin-Lightning Bridge]
+    end
+
+    subgraph Integration[Integration Layer]
+        API[Bitcoin/Lightning API]
+        Events[Event Handling]
+        Security[Security & Encryption]
+    end
+
+    %% Connections
+    Core --> Wallet
+    Core --> Network
+    Core --> Transactions
+    
+    LNode --> Channels
+    LNode --> Payments
+    Bridge --> Channels
+    
+    Wallet --> Bridge
+    Network --> Bridge
+    Transactions --> Bridge
+    
+    API --> Core
+    API --> LNode
+    Events --> Core
+    Events --> LNode
+    Security --> Core
+    Security --> LNode
+```
 
 ### Submodules
 
@@ -124,15 +177,68 @@ sequenceDiagram
     participant Core
     participant dash33
     participant Web5
+    participant Lightning
 
-    User->>Mobile: Request
+    User->>Mobile: Payment Request
     Mobile->>Core: Process
     Core->>dash33: Analyze
     dash33-->>Core: Decision
-    Core->>Web5: Store
+    Core->>Lightning: Create Invoice
+    Lightning-->>Core: Invoice
+    Core-->>Mobile: BOLT11 Invoice
+    Mobile-->>User: Display QR Code
+    User->>Mobile: Confirm
+    Mobile->>Core: Pay
+    Core->>Lightning: Execute Payment
+    Lightning-->>Core: Payment Confirmation
+    Core->>Web5: Store Receipt
     Web5-->>Core: Confirm
-    Core-->>Mobile: Response
+    Core-->>Mobile: Success
     Mobile-->>User: Result
+```
+
+## Lightning Network Component Flow
+
+```mermaid
+graph TB
+    subgraph LightningNode[Lightning Node]
+        NodeInfo[Node Management]
+        PeerConn[Peer Connections]
+        ChannelMgmt[Channel Management]
+        InvoiceMgmt[Invoice Management]
+        PaymentMgmt[Payment Management]
+    end
+
+    subgraph Bridge[Bitcoin-Lightning Bridge]
+        Funding[Channel Funding]
+        Monitoring[Blockchain Monitoring]
+        Closing[Channel Closing]
+    end
+
+    subgraph BitcoinIntegration[Bitcoin Integration]
+        Wallet[Bitcoin Wallet]
+        UTXO[UTXO Management]
+        TxBroadcast[Transaction Broadcasting]
+    end
+
+    %% Connections
+    NodeInfo --> PeerConn
+    PeerConn --> ChannelMgmt
+    ChannelMgmt --> Bridge
+    ChannelMgmt --> InvoiceMgmt
+    InvoiceMgmt --> PaymentMgmt
+    
+    Bridge --> Funding
+    Bridge --> Monitoring
+    Bridge --> Closing
+    
+    Funding --> BitcoinIntegration
+    Closing --> BitcoinIntegration
+    Monitoring --> BitcoinIntegration
+    
+    BitcoinIntegration --> Wallet
+    BitcoinIntegration --> UTXO
+    BitcoinIntegration --> TxBroadcast
 ```
 
 ## Security Model
@@ -151,6 +257,7 @@ graph TB
         AI[AI Engine]
         Data[Data Layer]
         API[API Layer]
+        Bitcoin[Bitcoin & Lightning]
     end
 
     Security --> Components
@@ -164,22 +271,27 @@ graph LR
         Mobile[Mobile]
         Web[Web]
         API[API]
+        Payment[Payment Channels]
     end
 
     subgraph Processing[Processing Layer]
         Core[Core Engine]
         dash33[dash33 AI]
         Analytics[Analytics]
+        LightningNode[Lightning Node]
     end
 
     subgraph Storage[Storage Layer]
         Web5[Web5 Storage]
         Local[Local Storage]
         Cache[Cache]
+        ChannelDB[Channel State DB]
     end
 
     Input --> Processing
     Processing --> Storage
+    Payment --> LightningNode
+    LightningNode --> ChannelDB
 ```
 
 ## Development Workflow
@@ -205,20 +317,25 @@ graph TB
         Perf[Performance]
         Usage[Usage]
         Errors[Errors]
+        LightningMetrics[Lightning Metrics]
     end
 
     subgraph Analysis[Analysis]
         AI[AI Processing]
         Stats[Statistics]
         Alerts[Alerts]
+        ChannelHealth[Channel Health]
     end
 
     subgraph Actions[Actions]
         Scale[Auto-scaling]
         Notify[Notifications]
         Log[Logging]
+        ChannelBalancing[Channel Balancing]
     end
 
     Collection --> Analysis
     Analysis --> Actions
+    LightningMetrics --> ChannelHealth
+    ChannelHealth --> ChannelBalancing
 ```
