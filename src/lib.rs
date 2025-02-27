@@ -46,6 +46,7 @@ pub mod web5;
 pub mod bitcoin;
 pub mod dao;
 pub mod extensions;
+pub mod config;
 
 /// Core error type for the Anya system
 #[derive(Debug)]
@@ -276,5 +277,22 @@ mod tests {
     fn test_error_display() {
         let err = AnyaError::ML("test error".to_string());
         assert_eq!(err.to_string(), "ML error: test error");
+    }
+}
+
+// Initialize all modules
+pub fn init() {
+    // Initialize Bitcoin module
+    bitcoin::init();
+}
+
+// Library version
+pub const VERSION: &str = env!("CARGO_PKG_VERSION");
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn it_works() {
+        assert_eq!(2 + 2, 4);
     }
 } 

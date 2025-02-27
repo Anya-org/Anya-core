@@ -8,6 +8,7 @@ use crate::AnyaResult;
 use std::collections::HashMap;
 use std::sync::Arc;
 use std::time::{Duration, SystemTime};
+use serde::{Serialize, Deserialize};
 
 mod identity;
 mod data;
@@ -34,6 +35,10 @@ pub struct Web5Config {
     pub identity_rotation_days: u32,
     /// Whether to enable protocol verification
     pub protocol_verification: bool,
+    /// DID method to use (e.g., "ion", "key", "web")
+    pub did_method: String,
+    /// Default protocols to enable
+    pub default_protocols: Vec<String>,
 }
 
 impl Default for Web5Config {
@@ -44,6 +49,8 @@ impl Default for Web5Config {
             storage_path: Some("./data/web5".to_string()),
             identity_rotation_days: 90,
             protocol_verification: true,
+            did_method: "ion".to_string(),
+            default_protocols: vec!["profile".to_string(), "messaging".to_string()],
         }
     }
 }
@@ -194,7 +201,7 @@ pub mod identity {
         /// Creation time
         pub created_at: SystemTime,
         /// Document containing public keys and services
-        pub document: HashMap<String, String>,
+        pub document: DIDDocument,
     }
     
     /// Identity manager
@@ -230,7 +237,31 @@ pub mod identity {
                 method: method.to_string(),
                 id,
                 created_at: SystemTime::now(),
-                document: HashMap::new(),
+                document: DIDDocument {
+                    context: vec!["https://www.w3.org/ns/did/v1".to_string()],
+                    id: did_string,
+                    verification_method: vec![VerificationMethod {
+                        id: format!("{}#keys-1", did_string),
+                        vm_type: "JsonWebKey2020".to_string(),
+                        controller: did_string,
+                        public_key_jwk: Some(JWK {
+                            kty: "EC".to_string(),
+                            crv: Some("secp256k1".to_string()),
+                            x: Some(base64_encode(&[1, 2, 3, 4])),
+                            y: Some(base64_encode(&[5, 6, 7, 8])),
+                            kid: Some("keys-1".to_string()),
+                        }),
+                        public_key_multibase: None,
+                    }],
+                    authentication: vec![format!("{}#keys-1", did_string)],
+                    assertion_method: vec![format!("{}#keys-1", did_string)],
+                    key_agreement: vec![],
+                    service: vec![Service {
+                        id: format!("{}#dwn", did_string),
+                        service_type: "DecentralizedWebNode".to_string(),
+                        service_endpoint: "https://dwn.anya.ai".to_string(),
+                    }],
+                },
             };
             
             Ok(did)
@@ -254,7 +285,31 @@ pub mod identity {
                 method,
                 id,
                 created_at: SystemTime::now(),
-                document: HashMap::new(),
+                document: DIDDocument {
+                    context: vec!["https://www.w3.org/ns/did/v1".to_string()],
+                    id: did.to_string(),
+                    verification_method: vec![VerificationMethod {
+                        id: format!("{}#keys-1", did),
+                        vm_type: "JsonWebKey2020".to_string(),
+                        controller: did.clone(),
+                        public_key_jwk: Some(JWK {
+                            kty: "EC".to_string(),
+                            crv: Some("secp256k1".to_string()),
+                            x: Some(base64_encode(&[1, 2, 3, 4])),
+                            y: Some(base64_encode(&[5, 6, 7, 8])),
+                            kid: Some("keys-1".to_string()),
+                        }),
+                        public_key_multibase: None,
+                    }],
+                    authentication: vec![format!("{}#keys-1", did)],
+                    assertion_method: vec![format!("{}#keys-1", did)],
+                    key_agreement: vec![],
+                    service: vec![Service {
+                        id: format!("{}#dwn", did),
+                        service_type: "DecentralizedWebNode".to_string(),
+                        service_endpoint: "https://dwn.anya.ai".to_string(),
+                    }],
+                },
             };
             
             Ok(did_obj)
@@ -574,4 +629,91 @@ pub mod storage {
             Ok(())
         }
     }
+}
+
+/// DID Document
+/// 
+/// Represents a DID Document as defined in the W3C DID specification.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct DIDDocument {
+    /// DID URI
+    #[serde(rename = "@context")]
+    pub context: Vec<String>,
+    /// DID URI
+    pub id: String,
+    /// Verification methods
+    #[serde(default)]
+    pub verification_method: Vec<VerificationMethod>,
+    /// Authentication methods
+    #[serde(default)]
+    pub authentication: Vec<String>,
+    /// Assertion methods
+    #[serde(default)]
+    pub assertion_method: Vec<String>,
+    /// Key agreement methods
+    #[serde(default)]
+    pub key_agreement: Vec<String>,
+    /// Service endpoints
+    #[serde(default)]
+    pub service: Vec<Service>,
+}
+
+/// Verification Method
+/// 
+/// Represents a verification method in a DID Document.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct VerificationMethod {
+    /// ID of the verification method
+    pub id: String,
+    /// Type of the verification method
+    #[serde(rename = "type")]
+    pub vm_type: String,
+    /// Controller of the verification method
+    pub controller: String,
+    /// Public key in JWK format
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub public_key_jwk: Option<JWK>,
+    /// Public key in multibase format
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub public_key_multibase: Option<String>,
+}
+
+/// JSON Web Key (JWK)
+/// 
+/// Represents a cryptographic key in JWK format.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct JWK {
+    /// Key type
+    pub kty: String,
+    /// Curve (for EC keys)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub crv: Option<String>,
+    /// X coordinate (for EC keys)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub x: Option<String>,
+    /// Y coordinate (for EC keys)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub y: Option<String>,
+    /// Key ID
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub kid: Option<String>,
+}
+
+/// Service
+/// 
+/// Represents a service endpoint in a DID Document.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Service {
+    /// ID of the service
+    pub id: String,
+    /// Type of the service
+    #[serde(rename = "type")]
+    pub service_type: String,
+    /// Service endpoint URL
+    pub service_endpoint: String,
+}
+
+/// Base64 encode bytes
+fn base64_encode(bytes: &[u8]) -> String {
+    base64::encode(bytes)
 }
