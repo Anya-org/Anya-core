@@ -2,6 +2,13 @@
 
 This document outlines the development roadmap for the Anya Core project, providing a timeline for planned features and improvements.
 
+## Project Information
+
+- **Repository**: [github.com/Anya-org/anya-core](https://github.com/Anya-org/anya-core)
+- **Documentation**: [github.com/Anya-org/anya-core/docs](https://github.com/Anya-org/anya-core/docs)
+- **Issues**: [github.com/Anya-org/anya-core/issues](https://github.com/Anya-org/anya-core/issues)
+- **Discussions**: [github.com/Anya-org/anya-core/discussions](https://github.com/Anya-org/anya-core/discussions)
+
 ## Current Version: 0.2.0 (February 2025)
 
 ### Q1 2025 (Completed)
@@ -80,3 +87,13 @@ This document outlines the development roadmap for the Anya Core project, provid
 - [ ] Advanced privacy features
 - [ ] Enterprise deployment tools
 - [ ] Governance mechanisms for decentralized applications
+
+## Contributing
+
+We welcome contributions from the community! Please see our [Contributing Guidelines](https://github.com/Anya-org/anya-core/blob/main/CONTRIBUTING.md) for more information on how to get involved.
+
+## License
+
+Anya Core is licensed under the MIT License. See the [LICENSE](https://github.com/Anya-org/anya-core/blob/main/LICENSE) file for details.
+
+*Last updated: 2025-02-27*
