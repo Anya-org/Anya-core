@@ -120,14 +120,59 @@ The Liquid module provides integration with the Liquid sidechain, including:
 
 ### Installation
 
-   ```bash
+#### Option 1: Using the Unified Installer (Recommended)
+
+The unified installer automates the entire setup process, including dependencies, configuration, and testing.
+
+```bash
 # Clone the repository
 git clone https://github.com/Anya-org/anya-core.git
-   cd anya-core
+cd anya-core
+
+# Build the installer
+cargo build --bin installer --release
+
+# Run the installer (with guided setup)
+./target/release/installer install
+
+# Configure the installation
+./target/release/installer configure --network testnet
+
+# Run tests to verify installation
+./target/release/installer test --report
+```
+
+#### Option 2: Manual Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/Anya-org/anya-core.git
+cd anya-core
 
 # Build the project
-   cargo build --release
-   ```
+cargo build --release
+```
+
+### Installation Options
+
+The unified installer supports the following options:
+
+```
+# Show help
+./target/release/installer --help
+
+# Install only core components
+./target/release/installer install --core-only
+
+# Dry run (no changes)
+./target/release/installer install --dry-run
+
+# Configure with specific options
+./target/release/installer configure --network mainnet --log-level debug --data-dir /path/to/data
+
+# Test specific components
+./target/release/installer test --component bitcoin
+```
 
 ### Configuration
 
