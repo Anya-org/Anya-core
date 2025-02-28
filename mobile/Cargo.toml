@@ -5,7 +5,7 @@ edition = "2021"
 authors = ["Anya Mobile Contributors"]
 description = "Mobile platform integration for Anya Core"
 license = "MIT OR Apache-2.0"
-repository = "https://github.com/botshelomokoka/anya-core"
+repository = "https://github.com/Anya-org/anya-mobile"
 
 [dependencies]
 anya-core = { path = "../../anya-core", version = "0.1.0" }
@@ -21,4 +21,4 @@ crate-type = ["cdylib", "staticlib"]
 [features]
 default = []
 offline-mode = []
-low-memory = [] 
+low-memory = []
