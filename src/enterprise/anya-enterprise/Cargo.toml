@@ -1,7 +1,7 @@
 [package]
 name = "anya-enterprise"
-version.workspace = true
-edition.workspace = true
+version = "0.1.0"
+edition = "2021"
 authors = ["Anya Enterprise Contributors"]
 description = "Advanced features for Anya Core (Enterprise Edition)"
 license = "Commercial"
