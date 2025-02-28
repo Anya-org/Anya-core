@@ -120,14 +120,14 @@ The Liquid module provides integration with the Liquid sidechain, including:
 
 ### Installation
 
-```bash
+   ```bash
 # Clone the repository
-git clone https://github.com/your-org/anya-core.git
-cd anya-core
+git clone https://github.com/Anya-org/anya-core.git
+   cd anya-core
 
 # Build the project
-cargo build --release
-```
+   cargo build --release
+   ```
 
 ### Configuration
 
@@ -269,6 +269,7 @@ Anya Core follows a hexagonal architecture pattern, which separates the core bus
 - **Adapters**: Implementations of the ports that connect to external systems
 
 This architecture ensures:
+
 - Decentralized component management
 - Protocol-level interoperability
 - Real-time system observability
