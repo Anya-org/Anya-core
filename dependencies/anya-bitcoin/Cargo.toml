@@ -8,15 +8,27 @@ license = "MIT OR Apache-2.0"
 repository = "https://github.com/botshelomokoka/anya-core"
 
 [dependencies]
-anya-core = { path = "../../anya-core" }
-bitcoin = { workspace = true }
-secp256k1 = { workspace = true }
-bitcoincore-rpc = { workspace = true }
-tokio = { workspace = true }
-serde = { workspace = true }
-serde_json = { workspace = true }
-thiserror = { workspace = true }
-log = { workspace = true }
+bitcoin = { version = "0.32.1", features = ["rand", "serde"] }
+secp256k1 = { version = "0.28.0", features = ["rand", "serde"] }
+bitcoincore-rpc = "0.17.0"
+tokio = { version = "1.41.1", features = ["full"] }
+serde = { version = "1.0.215", features = ["derive"] }
+serde_json = "1.0.133"
+thiserror = "1.0"
+log = "0.4"
+anyhow = "1.0"
+tracing = "0.1.40"
+rand = "0.8"
+hex = "0.4.3"
+bincode = "1.3.3"
+async-trait = "0.1.77"
+secp256k1-zkp = "0.7.0"
+sha2 = "0.10.8"
+tempfile = "3.8.1"
+
+[dev-dependencies]
+tokio-test = "0.4"
+tracing-subscriber = "0.3.17"
 
 [lib]
 name = "anya_bitcoin"
