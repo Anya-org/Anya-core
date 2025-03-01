@@ -202,7 +202,7 @@ impl BitcoinWallet {
         let mut wallet = self.inner.lock().await;
         
         // Create transaction using the TxBuilder
-        let (psbt, _details) = {
+        let (mut psbt, _details) = {
             wallet.build_tx()
                 .add_recipient(recipient.script_pubkey(), amount_sats)
                 .enable_rbf()
@@ -210,7 +210,8 @@ impl BitcoinWallet {
                 .finish()?
         };
         
-        debug!("PSBT created: {}", psbt.to_string());
+        // Sign the transaction
+        wallet.sign(&mut psbt, None)?;
         
         Ok(psbt)
     }
@@ -474,24 +475,6 @@ impl BitcoinWallet {
             Err(e) => Err(anyhow!("Error retrieving transaction: {}", e)),
         }
     }
-    
-    /// Generate a new mnemonic phrase
-    pub fn generate_mnemonic() -> Result<String> {
-        let mnemonic = Mnemonic::new(&mut rand::thread_rng(), WordCount::Words12);
-        Ok(mnemonic.to_string())
-    }
-    
-    /// Backup the wallet to a file
-    pub async fn backup(&self, backup_path: &Path) -> Result<()> {
-        let wallet = self.inner.lock().await;
-        
-        // For now we just backup the database file
-        // TODO: Implement more sophisticated backup
-        std::fs::copy(&self.config.database_path, backup_path)?;
-        
-        info!("Wallet backed up to {}", backup_path.display());
-        Ok(())
-    }
 }
 
 /// Detailed information about a Bitcoin transaction
@@ -565,4 +548,22 @@ mod tests {
         let address_info = address.unwrap();
         assert!(address_info.address.starts_with("tb1p")); // Testnet taproot address
     }
+}
+
+/// Generate a new mnemonic phrase
+pub fn generate_mnemonic() -> Result<String> {
+    let mnemonic = Mnemonic::new(&mut rand::thread_rng(), WordCount::Words12);
+    Ok(mnemonic.to_string())
+}
+
+/// Backup the wallet to a file
+pub async fn backup(&self, backup_path: &Path) -> Result<()> {
+    let wallet = self.inner.lock().await;
+    
+    // For now we just backup the database file
+    // TODO: Implement more sophisticated backup
+    std::fs::copy(&self.config.database_path, backup_path)?;
+    
+    info!("Wallet backed up to {}", backup_path.display());
+    Ok(())
 }

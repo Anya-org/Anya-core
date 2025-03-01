@@ -240,6 +240,43 @@ cd anya-core
 
 # Build the project
 cargo build --release
+
+### Installation Options
+
+The unified installer supports the following options:
+
+```
+# Show help
+./target/release/installer --help
+
+# Install only core components
+./target/release/installer install --core-only
+
+# Dry run (no changes)
+./target/release/installer install --dry-run
+
+# Configure with specific options
+./target/release/installer configure --network mainnet --log-level debug --data-dir /path/to/data
+
+# Test specific components
+./target/release/installer test --component bitcoin
+```
+
+### Configuration
+
+Create a `.env` file in the project root with the following configuration:
+
+```
+BITCOIN_NETWORK=testnet
+BITCOIN_RPC_URL=http://localhost:18332
+BITCOIN_RPC_USER=your_rpc_username
+BITCOIN_RPC_PASS=your_rpc_password
+ENABLED_FEATURES=taproot,lightning,dlc,web5,liquid
+WEB5_DID_METHOD=ion
+WEB5_DWN_ENDPOINT=https://dwn.tbddev.org
+LIQUID_RPC_URL=http://localhost:7041
+LIQUID_RPC_USER=your_liquid_rpc_username
+LIQUID_RPC_PASS=your_liquid_rpc_password
 ```
 
 ## Usage

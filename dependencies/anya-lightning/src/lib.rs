@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (C) 2023-2025 Anya Project Contributors
+
 //! Anya Lightning Implementation
 //! 
 //! This module provides Lightning Network functionality for the Anya project.
