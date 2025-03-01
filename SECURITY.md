@@ -64,12 +64,76 @@
 - Network-level attacks
 - Implementation vulnerabilities
 
-### 5. Compliance and Auditing
+### 5. RGB Asset Security
+
+#### RGB Asset Transfer with Metadata
+
+- All RGB asset transfers must use secure cryptographic commitment schemes
+- Metadata must be encrypted when containing sensitive information
+- Private keys for RGB assets must be stored securely using hardware security modules when possible
+- Metadata size must be limited to prevent resource exhaustion attacks
+- Batch transfers must validate each recipient independently
+- Transfer validation must occur before acceptance of assets
+
+#### Asset Verification
+
+- Asset verification must validate both the asset itself and the transfer history
+- Verification must include cryptographic checks of schema compliance
+- Double-spend protection must be enforced for all RGB assets
+- Metadata integrity must be verified independently of transfer validity
+
+### 6. Wallet Security
+
+#### Multi-Output PSBT
+
+- All PSBTs must be validated for correctness before signing
+- Hardware wallet interfaces must sanitize inputs to prevent attacks
+- Support for multiple hardware wallet vendors must ensure proper key isolation
+- PSBT serialization and deserialization must be robust against malformed inputs
+- Fee estimation must have bounds to prevent economic attacks
+
+#### PSBT Signing
+
+- Signing operations must implement constant-time algorithms
+- Key storage must adhere to best practices for cold and hot storage
+- Transaction visualization must be available before signing
+- Hardware wallet communication must be encrypted where possible
+
+### 7. Web5 Security Considerations
+
+#### DWN with Bitcoin Anchoring
+
+- Decentralized Web Nodes (DWN) security relies on cryptographic verification of Bitcoin transaction confirmations
+- All DWN message anchoring must be verified against Bitcoin blockchain before being considered immutable
+- DWN node authenticity must be verified using DID-based authentication
+- Encrypted data stored in DWNs must implement forward secrecy
+- Message anchoring must be verified against a minimum of 3 confirmations for production environments
+- Key management for DWN message signing follows hardware security module (HSM) best practices
+
+#### DID Resolution Caching
+
+- Cached DID documents must have appropriate time-to-live (TTL) settings
+- Cache invalidation must occur on DID update events
+- Cache poisoning protection must be implemented
+- Signature verification must occur even for cached DID documents
+- Cache must be secured against enumeration attacks
+
+#### Verifiable Credentials
+
+- All credential issuance and verification follows W3C standards
+- Bitcoin-anchored credentials require transaction confirmation verification
+- Credential revocation status must be checked against Bitcoin blockchain and cached with time-based expiry
+- Privacy considerations include zero-knowledge proofs for selective disclosure
+- Credential schemas must be versioned and backward compatible
+
+### 8. Compliance and Auditing
 
 - Annual comprehensive security audit
 - Continuous integration security scanning
 - Regular dependency vulnerability checks
 - Third-party penetration testing
+- Web5 DWN storage auditing for compliance with data protection regulations
+- RGB asset implementation auditing for correctness and security
 
 ## Bug Bounty Program
 
@@ -99,7 +163,7 @@
 - No legal action against good-faith researchers
 - Compliance with responsible disclosure principles
 
-**Last Updated**: [Current Date]
+**Last Updated**: 2025-03-01
 **Version**: 1.0.0
 
-*Last updated: 2024-12-07*
+*Last updated: 2025-03-01*

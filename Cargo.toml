@@ -52,7 +52,8 @@ lightning-net-tokio = { version = "0.0.116" }
 # Cross-chain dependencies
 rgb-core = "0.10"
 rsk = "0.1.0"
-taproot = "0.1.0"
+# taproot = "0.1.0"  # Commented out - unavailable dependency
+# taproot = { git = "https://github.com/rust-bitcoin/taproot.git", branch = "master" } # Commented out - unavailable repository
 elements = "0.22.0"  # Liquid/Elements dependency
 elements-rpc = "0.1.0"  # Liquid/Elements RPC client
 

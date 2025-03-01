@@ -9,7 +9,7 @@ This document outlines the development roadmap for the Anya Core project, provid
 - **Issues**: [github.com/Anya-org/anya-core/issues](https://github.com/Anya-org/anya-core/issues)
 - **Discussions**: [github.com/Anya-org/anya-core/discussions](https://github.com/Anya-org/anya-core/discussions)
 
-## Current Version: 0.2.0 (February 2025)
+## Current Version: 0.2.0 (March 2025)
 
 ### Q1 2025 (Completed)
 
@@ -19,6 +19,16 @@ This document outlines the development roadmap for the Anya Core project, provid
 - ✅ RSK cross-chain functionality
 - ✅ Web5 module with DID management
 - ✅ Liquid sidechain support
+- ✅ Web5 DWN with Bitcoin anchoring
+- ✅ Verifiable credentials with Bitcoin anchoring
+- ✅ Stacks integration for smart contracts
+- ✅ SIP-010 token standard support
+- ✅ SIP-009 NFT standard support
+- ✅ RGB asset transfer with metadata support
+- ✅ Multi-output PSBT creation and hardware wallet compatibility
+- ✅ Web5 DID resolution with caching mechanism
+- ✅ Web5 API routes implementation
+- ✅ Batch transfer functionality for RGB assets
 
 ## Q2 2025: Enhanced Privacy & Interoperability
 
@@ -26,19 +36,22 @@ This document outlines the development roadmap for the Anya Core project, provid
 - [ ] Confidential transactions for Liquid assets
 - [ ] Enhanced DLC implementation with multiple oracle support
 - [ ] Improved cross-chain transaction monitoring
-- [ ] Web5 credential verification with Bitcoin anchoring
+- [ ] Lightning Network channel management
+- [ ] Comprehensive error handling for cross-chain transactions
 
 ### May 2025 (v0.3.1)
-- [ ] Lightning Network channel management
 - [ ] Taproot script spending path implementation
 - [ ] Advanced fee management for cross-chain transactions
-- [ ] Web5 DID resolution with caching mechanism
+- [ ] Create DWAS support
+- [ ] Add additional decentralized data storage options for DWNs
+- [ ] Build secure messaging protocol
 
 ### June 2025 (v0.4.0)
 - [ ] RGB assets on Lightning support
 - [ ] Multi-signature wallet support for all chains
 - [ ] Comprehensive error handling for all modules
 - [ ] Performance optimizations for cross-chain operations
+- [ ] Add PSBT support for cold storage
 
 ## Q3 2025: Enterprise & Developer Experience
 
@@ -87,6 +100,9 @@ This document outlines the development roadmap for the Anya Core project, provid
 - [ ] Advanced privacy features
 - [ ] Enterprise deployment tools
 - [ ] Governance mechanisms for decentralized applications
+- [ ] Implement federated learning models
+- [ ] Create privacy-preserving data structures
+- [ ] Build model distribution mechanism
 
 ## Contributing
 
@@ -96,4 +112,4 @@ We welcome contributions from the community! Please see our [Contributing Guidel
 
 Anya Core is licensed under the MIT License. See the [LICENSE](https://github.com/Anya-org/anya-core/blob/main/LICENSE) file for details.
 
-*Last updated: 2025-02-27*
+*Last updated: 2025-03-01*

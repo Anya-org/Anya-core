@@ -11,7 +11,7 @@ use std::sync::Arc;
 use std::path::{Path, PathBuf};
 
 use anyhow::{anyhow, Result};
-use bitcoin::{Address, Network, Transaction, Txid, Script, ScriptBuf};
+use bitcoin::{Address, Network, Transaction, Txid, Script, ScriptBuf, BlockHash};
 use bitcoin::consensus::encode;
 use bitcoin::psbt::PartiallySignedTransaction as Psbt;
 use bdk::{
@@ -202,7 +202,7 @@ impl BitcoinWallet {
         let mut wallet = self.inner.lock().await;
         
         // Create transaction using the TxBuilder
-        let (mut psbt, _details) = {
+        let (psbt, _details) = {
             wallet.build_tx()
                 .add_recipient(recipient.script_pubkey(), amount_sats)
                 .enable_rbf()
@@ -210,32 +210,269 @@ impl BitcoinWallet {
                 .finish()?
         };
         
-        // Sign the transaction
-        wallet.sign(&mut psbt, None)?;
+        debug!("PSBT created: {}", psbt.to_string());
         
         Ok(psbt)
+    }
+    
+    /// Create a PSBT with multiple outputs
+    pub async fn create_multi_output_psbt(
+        &self,
+        outputs: Vec<(String, u64)>,
+        fee_rate: Option<f32>,
+    ) -> Result<Psbt> {
+        // Set default fee rate if not provided
+        let fee_rate = fee_rate.unwrap_or(1.0);
+        
+        let mut wallet = self.inner.lock().await;
+        
+        // Start creating transaction
+        let mut builder = wallet.build_tx();
+        
+        // Add all outputs
+        for (address, amount) in outputs {
+            let recipient = Address::from_str(&address)?
+                .require_network(self.config.network)?;
+            
+            builder.add_recipient(recipient.script_pubkey(), amount);
+        }
+        
+        // Set fee rate and enable RBF
+        builder.enable_rbf().fee_rate(FeeRate::from_sat_per_vb(fee_rate));
+        
+        // Finish building the PSBT
+        let (psbt, _details) = builder.finish()?;
+        
+        debug!("Multi-output PSBT created with {} outputs", outputs.len());
+        
+        Ok(psbt)
+    }
+    
+    /// Enhance a PSBT with metadata for hardware wallet compatibility
+    pub async fn enhance_psbt_for_hardware(&self, psbt: &mut Psbt) -> Result<()> {
+        let wallet = self.inner.lock().await;
+        
+        // Add UTXO information for each input
+        for input in psbt.inputs.iter_mut() {
+            if input.non_witness_utxo.is_none() && input.witness_utxo.is_none() {
+                // Find the originating transaction for this input
+                if let Some(utxo) = wallet.get_utxo(input.previous_txid, input.previous_output_index as u32)? {
+                    // For SegWit inputs, add witness UTXO
+                    if utxo.txout.script_pubkey.is_witness_program() {
+                        input.witness_utxo = Some(utxo.txout.clone());
+                    } else {
+                        // For non-SegWit, add the full transaction
+                        let tx = self.get_transaction(&utxo.outpoint.txid).await?;
+                        input.non_witness_utxo = Some(tx);
+                    }
+                }
+                
+                // Add BIP32 derivation paths
+                wallet.fill_signature_info(input)?;
+            }
+        }
+        
+        debug!("Enhanced PSBT for hardware wallet compatibility");
+        
+        Ok(())
+    }
+    
+    /// Sign a PSBT with the wallet's private keys
+    pub async fn sign_psbt_internal(&self, psbt: &mut Psbt) -> Result<bool> {
+        let mut wallet = self.inner.lock().await;
+        let signed = wallet.sign(psbt, None)?;
+        
+        debug!("PSBT signed: {}", signed);
+        
+        Ok(signed)
+    }
+    
+    /// Import a PSBT from base64 string
+    pub async fn import_psbt(&self, psbt_base64: &str) -> Result<Psbt> {
+        let psbt = Psbt::from_str(psbt_base64)?;
+        Ok(psbt)
+    }
+    
+    /// Export a PSBT as base64 string
+    pub async fn export_psbt(&self, psbt: &Psbt) -> Result<String> {
+        Ok(psbt.to_string())
     }
     
     /// Import a PSBT, verify, sign and return
     pub async fn sign_psbt(&self, psbt_base64: &str) -> Result<Psbt> {
-        let mut psbt: Psbt = encode::deserialize(&base64::decode(psbt_base64)?)?;
+        // Parse the PSBT from base64
+        let mut psbt = Psbt::from_str(psbt_base64)?;
         
+        // Sign the transaction
         let mut wallet = self.inner.lock().await;
-        wallet.sign(&mut psbt, None)?;
+        let finalized = wallet.sign(&mut psbt, None)?;
+        
+        if finalized {
+            debug!("PSBT is finalized and ready for broadcast");
+        } else {
+            debug!("PSBT signed but may require additional signatures");
+        }
         
         Ok(psbt)
     }
     
+    /// Finalize a PSBT by extracting the final transaction
+    pub async fn finalize_psbt(&self, psbt: &mut Psbt) -> Result<Transaction> {
+        // Attempt to finalize inputs that are not yet finalized
+        let mut wallet = self.inner.lock().await;
+        
+        // Try to finalize any inputs that might be ready
+        for i in 0..psbt.inputs.len() {
+            if psbt.inputs[i].final_script_sig.is_none() && psbt.inputs[i].final_script_witness.is_none() {
+                wallet.finalize_psbt(psbt, i)?;
+            }
+        }
+        
+        // Extract the transaction
+        match psbt.extract_tx() {
+            Ok(tx) => {
+                debug!("PSBT finalized successfully: {}", tx.txid());
+                Ok(tx)
+            },
+            Err(e) => {
+                error!("Failed to finalize PSBT: {}", e);
+                Err(anyhow!("PSBT is not fully signed or has incomplete information: {}", e))
+            }
+        }
+    }
+    
     /// Broadcast a finalized PSBT
     pub async fn broadcast_psbt(&self, psbt: Psbt) -> Result<Txid> {
-        // Extract the transaction
-        let tx = psbt.extract_tx();
+        // Extract the final transaction
+        let tx = match psbt.extract_tx() {
+            Ok(tx) => tx,
+            Err(e) => return Err(anyhow!("Cannot extract transaction from PSBT: {}", e)),
+        };
         
         // Broadcast the transaction
         let txid = self.blockchain.broadcast(&tx)?;
         
         info!("Transaction broadcast: {}", txid);
+        
         Ok(txid)
+    }
+    
+    /// Simulate hardware wallet flow for PSBT
+    pub async fn hardware_wallet_flow(&self, outputs: Vec<(String, u64)>, fee_rate: Option<f32>) -> Result<String> {
+        // 1. Create PSBT
+        let mut psbt = self.create_multi_output_psbt(outputs, fee_rate).await?;
+        
+        // 2. Enhance PSBT with hardware wallet metadata
+        self.enhance_psbt_for_hardware(&mut psbt).await?;
+        
+        // 3. Export PSBT for hardware wallet (in a real scenario, user would sign this with their device)
+        let psbt_base64 = self.export_psbt(&psbt).await?;
+        
+        // 4. In a real scenario, the user would sign with hardware wallet and return the signed PSBT
+        // Here we just return the unsigned PSBT
+        debug!("PSBT ready for hardware wallet signing: {}", psbt_base64);
+        
+        Ok(psbt_base64)
+    }
+    
+    /// Check if a PSBT is fully signed and ready to broadcast
+    pub async fn is_psbt_finalized(&self, psbt: &Psbt) -> Result<bool> {
+        match psbt.extract_tx() {
+            Ok(_) => Ok(true),
+            Err(_) => {
+                // Count how many inputs are finalized
+                let finalized_inputs = psbt.inputs.iter()
+                    .filter(|input| input.final_script_sig.is_some() || input.final_script_witness.is_some())
+                    .count();
+                
+                let all_finalized = finalized_inputs == psbt.inputs.len();
+                
+                debug!("PSBT finalization status: {}/{} inputs finalized", 
+                    finalized_inputs, psbt.inputs.len());
+                
+                Ok(all_finalized)
+            }
+        }
+    }
+    
+    /// Send an OP_RETURN transaction to the Bitcoin blockchain
+    /// 
+    /// This is used for anchoring data (like credential hashes) to the blockchain
+    /// in a provable way without storing sensitive data directly.
+    pub async fn send_op_return(&self, script: &Script, fee_rate: Option<f32>) -> Result<Txid> {
+        let mut wallet = self.inner.lock().await;
+        
+        // Use default fee rate if not specified
+        let fee_rate = fee_rate.unwrap_or(1.0);
+        
+        // Create transaction using the TxBuilder with OP_RETURN output
+        let script_buf = ScriptBuf::from_script(script);
+        let (psbt, _details) = {
+            wallet.build_tx()
+                .add_data(script_buf)
+                .enable_rbf()
+                .fee_rate(FeeRate::from_sat_per_vb(fee_rate))
+                .finish()?
+        };
+        
+        // Sign the transaction
+        let finalized = wallet.sign(psbt, None)?;
+        
+        // Broadcast the transaction
+        let raw_tx = finalized.extract_tx();
+        let txid = self.blockchain.broadcast(&raw_tx)?;
+        
+        info!("OP_RETURN transaction sent: {}", txid);
+        Ok(txid)
+    }
+    
+    /// Get detailed information about a transaction
+    pub async fn get_transaction_info(&self, txid: &Txid) -> Result<TransactionInfo> {
+        let tx = self.get_transaction(txid).await?;
+        
+        // Get blockchain information about this transaction
+        let tx_result = self.blockchain.get_tx(txid)?;
+        
+        let info = match tx_result {
+            Some(tx_result) => {
+                TransactionInfo {
+                    txid: *txid,
+                    transaction: tx,
+                    confirmations: tx_result.confirmation_time.as_ref().map(|ct| ct.height as u32).unwrap_or(0),
+                    block_hash: tx_result.confirmation_time.as_ref().map(|ct| ct.block_hash),
+                    block_height: tx_result.confirmation_time.as_ref().map(|ct| ct.height as u32),
+                    timestamp: tx_result.confirmation_time.as_ref().map(|ct| ct.timestamp),
+                    confirmed: tx_result.confirmation_time.is_some(),
+                }
+            },
+            None => {
+                // Transaction exists but is not confirmed
+                TransactionInfo {
+                    txid: *txid,
+                    transaction: tx,
+                    confirmations: 0,
+                    block_hash: None,
+                    block_height: None,
+                    timestamp: None,
+                    confirmed: false,
+                }
+            }
+        };
+        
+        Ok(info)
+    }
+    
+    /// Get a transaction by its ID
+    pub async fn get_transaction(&self, txid: &Txid) -> Result<Transaction> {
+        // First check if it's in our wallet
+        let wallet = self.inner.lock().await;
+        
+        // Try to get from the blockchain directly
+        match self.blockchain.get_raw_tx(txid) {
+            Ok(Some(tx)) => Ok(tx),
+            Ok(None) => Err(anyhow!("Transaction not found: {}", txid)),
+            Err(e) => Err(anyhow!("Error retrieving transaction: {}", e)),
+        }
     }
     
     /// Generate a new mnemonic phrase
@@ -255,6 +492,31 @@ impl BitcoinWallet {
         info!("Wallet backed up to {}", backup_path.display());
         Ok(())
     }
+}
+
+/// Detailed information about a Bitcoin transaction
+#[derive(Debug, Clone)]
+pub struct TransactionInfo {
+    /// Transaction ID
+    pub txid: Txid,
+    
+    /// The full transaction
+    pub transaction: Transaction,
+    
+    /// Number of confirmations
+    pub confirmations: u32,
+    
+    /// Block hash where the transaction was confirmed (if any)
+    pub block_hash: Option<BlockHash>,
+    
+    /// Block height where the transaction was confirmed (if any)
+    pub block_height: Option<u32>,
+    
+    /// Timestamp of the block where the transaction was confirmed (if any)
+    pub timestamp: Option<u64>,
+    
+    /// Whether the transaction is confirmed
+    pub confirmed: bool,
 }
 
 #[cfg(test)]
