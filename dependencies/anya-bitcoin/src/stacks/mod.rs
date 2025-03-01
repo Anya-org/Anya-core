@@ -13,6 +13,16 @@ use std::collections::HashMap;
 use std::path::PathBuf;
 use std::time::Duration;
 
+mod sip009;
+mod sip010;
+mod contract_call;
+mod post_conditions;
+
+pub use sip009::Sip009NftManager;
+pub use sip010::Sip010TokenManager;
+pub use contract_call::ContractCallBuilder;
+pub use post_conditions::{PostCondition, PostConditionMode};
+
 /// Stacks network type
 #[derive(Debug, Clone, PartialEq)]
 pub enum StacksNetwork {
@@ -30,6 +40,9 @@ pub struct StacksManager {
     client: Client,
     data_dir: PathBuf,
     session: Option<Session>,
+    // Add SIP token managers
+    sip010_manager: Option<Sip010TokenManager>,
+    sip009_manager: Option<Sip009NftManager>,
 }
 
 /// Contract deployment result
@@ -99,7 +112,37 @@ impl StacksManager {
             client,
             data_dir: stacks_data_dir,
             session: None,
+            sip010_manager: None,
+            sip009_manager: None,
         })
+    }
+    
+    /// Initialize SIP-010 token manager
+    pub fn init_sip010_manager(&mut self) -> Result<&mut Sip010TokenManager> {
+        if self.sip010_manager.is_none() {
+            let manager = sip010::Sip010TokenManager::new(
+                self.stacks_network.clone(),
+                self.api_url.clone(),
+                self.client.clone(),
+            )?;
+            self.sip010_manager = Some(manager);
+        }
+        
+        Ok(self.sip010_manager.as_mut().unwrap())
+    }
+    
+    /// Initialize SIP-009 NFT manager
+    pub fn init_sip009_manager(&mut self) -> Result<&mut Sip009NftManager> {
+        if self.sip009_manager.is_none() {
+            let manager = sip009::Sip009NftManager::new(
+                self.stacks_network.clone(),
+                self.api_url.clone(),
+                self.client.clone(),
+            )?;
+            self.sip009_manager = Some(manager);
+        }
+        
+        Ok(self.sip009_manager.as_mut().unwrap())
     }
     
     /// Initialize local Clarity session for testing and simulation
@@ -200,18 +243,26 @@ impl StacksManager {
         contract_id: &str,
         function_name: &str,
         function_args: &[Value],
-        sender_address: &str,
-    ) -> Result<ContractCallResult> {
-        let url = self.api_url.join(&format!(
+        sender_address: Option<&str>,
+    ) -> Result<Value> {
+        let mut url = self.api_url.join(&format!(
             "v2/contracts/call-read/{}/{}",
-            contract_id,
-            function_name
+            contract_id, function_name
         ))?;
         
-        let payload = json!({
-            "sender": sender_address,
-            "arguments": function_args
+        // Convert function args to Clarity format
+        let args: Vec<Value> = function_args
+            .iter()
+            .map(|arg| json!({"type": arg["type"].as_str().unwrap_or(""), "value": arg["value"].clone()}))
+            .collect();
+        
+        let mut payload = json!({
+            "arguments": args,
         });
+        
+        if let Some(sender) = sender_address {
+            payload["sender"] = json!(sender);
+        }
         
         let response = self.client
             .post(url)
@@ -225,11 +276,7 @@ impl StacksManager {
         
         let result = response.json::<Value>().await?;
         
-        Ok(ContractCallResult {
-            tx_id: None,
-            result,
-            sender: sender_address.to_string(),
-        })
+        Ok(result)
     }
     
     /// Call a contract function (mutating)
@@ -257,6 +304,7 @@ impl StacksManager {
         });
         
         // For demonstration, we're showing what the API call might look like
+        // In a real implementation, this would be replaced with proper transaction creation
         let url = self.api_url.join("v2/contracts/call")?;
         
         let response = self.client
@@ -271,11 +319,14 @@ impl StacksManager {
         
         let result = response.json::<Value>().await?;
         
-        Ok(ContractCallResult {
-            tx_id: Some(result["txid"].as_str().unwrap_or("").to_string()),
-            result,
+        // Create call result
+        let call_result = ContractCallResult {
+            tx_id: result["txid"].as_str().map(|s| s.to_string()),
+            result: result,
             sender: sender_address.to_string(),
-        })
+        };
+        
+        Ok(call_result)
     }
     
     /// Simulate a contract deployment using local Clarity session
@@ -285,21 +336,22 @@ impl StacksManager {
         contract_source: &str,
         sender_address: &str,
     ) -> Result<()> {
-        // Ensure session is initialized
-        if self.session.is_none() {
-            self.init_clarity_session()?;
-        }
+        let session = self.session.as_mut()
+            .ok_or_else(|| anyhow!("Clarity session not initialized. Call init_clarity_session() first."))?;
         
-        let session = self.session.as_mut().unwrap();
+        // Parse the sender address into a PrincipalData
+        let sender = PrincipalData::from_str(sender_address)
+            .map_err(|_| anyhow!("Invalid sender address"))?;
         
-        // Parse sender address as principal
-        let sender = PrincipalData::parse_standard_principal(sender_address)?;
+        // Create a QualifiedContractIdentifier from the sender and contract name
+        let contract_id = QualifiedContractIdentifier::new(
+            sender.clone().into(),
+            contract_name.to_string(),
+        );
         
-        // Create contract identifier
-        let contract_id = QualifiedContractIdentifier::new(sender, contract_name.to_string());
-        
-        // Deploy contract in session
-        session.deploy_contract(contract_id, contract_source)?;
+        // Deploy the contract in the session
+        session.deploy_contract(&contract_id, contract_source)
+            .map_err(|e| anyhow!("Failed to deploy contract: {}", e))?;
         
         Ok(())
     }
@@ -312,82 +364,116 @@ impl StacksManager {
         function_args: &[ClarityValue],
         sender_address: &str,
     ) -> Result<ClarityValue> {
-        // Ensure session is initialized
-        if self.session.is_none() {
-            self.init_clarity_session()?;
-        }
+        let session = self.session.as_mut()
+            .ok_or_else(|| anyhow!("Clarity session not initialized. Call init_clarity_session() first."))?;
         
-        let session = self.session.as_mut().unwrap();
+        // Parse the sender address into a PrincipalData
+        let sender = PrincipalData::from_str(sender_address)
+            .map_err(|_| anyhow!("Invalid sender address"))?;
         
-        // Parse sender address as principal
-        let sender = PrincipalData::parse_standard_principal(sender_address)?;
+        // Create a QualifiedContractIdentifier from the sender and contract name
+        let contract_id = QualifiedContractIdentifier::new(
+            sender.clone().into(),
+            contract_name.to_string(),
+        );
         
-        // Create contract identifier
-        let contract_id = QualifiedContractIdentifier::new(sender.clone(), contract_name.to_string());
-        
-        // Call function
+        // Call the function in the session
         let result = session.call_contract_func(
             &contract_id,
             function_name,
             function_args,
-            &sender
-        )?;
+        ).map_err(|e| anyhow!("Failed to call contract function: {}", e))?;
         
         Ok(result)
     }
     
+    /// Create a new contract call builder for this Stacks manager
+    pub fn create_contract_call_builder(&self, contract_address: &str, contract_name: &str) -> contract_call::ContractCallBuilder {
+        contract_call::ContractCallBuilder::new(
+            self.stacks_network.clone(),
+            self.api_url.clone(),
+            self.client.clone(),
+            contract_address,
+            contract_name,
+        )
+    }
+    
     /// Test the Stacks integration
-    pub async fn test(&mut self) -> Result<()> {
-        println!("Testing Stacks smart contract integration...");
+    pub fn test(&mut self) -> Result<()> {
+        println!("Testing Stacks integration...");
         
-        // Test local simulation
-        self.init_clarity_session()?;
-        
-        println!("✓ Initialized local Clarity session");
-        
-        // Simulate contract deployment
-        let test_contract = "
-            (define-data-var counter uint u0)
-            
-            (define-public (get-counter)
-                (ok (var-get counter)))
-            
-            (define-public (increment)
-                (begin
-                    (var-set counter (+ (var-get counter) u1))
-                    (ok (var-get counter))))
-        ";
-        
-        let test_address = "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM";
-        
-        self.simulate_contract_deploy("counter", test_contract, test_address)?;
-        
-        println!("✓ Successfully simulated contract deployment");
-        
-        // Simulate contract call
-        let result = self.simulate_contract_call(
-            "counter",
-            "increment",
-            &[],
-            test_address
-        )?;
-        
-        println!("✓ Successfully simulated contract call: {:?}", result);
-        
-        // Try to connect to Stacks API if available
-        match self.get_node_info().await {
-            Ok(info) => {
-                println!("✓ Connected to Stacks node: {}", 
-                    info["stacks_tip_height"].as_u64().unwrap_or(0));
-            },
-            Err(e) => {
-                println!("ℹ Could not connect to Stacks API: {}", e);
-                println!("ℹ This is expected if running without a Stacks node");
-            }
+        // Initialize Clarity session for local testing
+        if self.session.is_none() {
+            self.init_clarity_session()?;
         }
         
-        println!("✓ Stacks integration test complete");
+        // Try getting node info
+        match self.get_node_info() {
+            Ok(info) => println!("Connected to Stacks node: {:?}", info),
+            Err(e) => println!("Could not connect to Stacks node: {}", e),
+        }
         
+        // Test a simple contract deployment (local)
+        let contract_name = "counter";
+        let contract_source = r#"
+            ;; Simple counter contract
+            (define-data-var counter uint u0)
+            
+            (define-read-only (get-counter)
+              (var-get counter))
+            
+            (define-public (increment)
+              (begin
+                (var-set counter (+ (var-get counter) u1))
+                (ok (var-get counter))))
+        "#;
+        
+        // Test deploying the contract locally
+        self.simulate_contract_deploy(
+            contract_name,
+            contract_source,
+            "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM",
+        )?;
+        
+        println!("Successfully deployed counter contract in simulation");
+        
+        // Test calling the contract locally
+        let result = self.simulate_contract_call(
+            contract_name,
+            "get-counter",
+            &[],
+            "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM",
+        )?;
+        
+        println!("Counter value: {:?}", result);
+        
+        // Test SIP-010 token functionality
+        let sip010 = self.init_sip010_manager()?;
+        sip010.test()?;
+        
+        // Test SIP-009 NFT functionality
+        let sip009 = self.init_sip009_manager()?;
+        sip009.test()?;
+        
+        // Test contract call builder and post conditions
+        let builder = self.create_contract_call_builder(
+            "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM", 
+            contract_name
+        );
+        println!("Created contract call builder for contract: {}.{}", 
+            "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM", 
+            contract_name
+        );
+        
+        // Test post conditions
+        let post_condition = post_conditions::PostCondition::stx(
+            post_conditions::PrincipalType::Origin,
+            post_conditions::ConditionCode::SentLe,
+            1000,
+        );
+        println!("Created post condition for transaction: {:?}", post_condition);
+        
+        println!("Stacks integration tests completed successfully!");
         Ok(())
     }
 }

@@ -72,6 +72,27 @@ pub enum LightningError {
     
     #[error("Configuration error: {0}")]
     ConfigError(String),
+    
+    #[error("Invalid node ID: {0}")]
+    InvalidNodeId(String),
+    
+    #[error("Invalid address: {0}")]
+    InvalidAddress(String),
+    
+    #[error("Connection error: {0}")]
+    ConnectionError(String),
+    
+    #[error("Invalid invoice: {0}")]
+    InvalidInvoice(String),
+    
+    #[error("Invoice error: {0}")]
+    InvoiceError(String),
+    
+    #[error("Payment error: {0}")]
+    PaymentError(String),
+    
+    #[error("Invalid channel ID: {0}")]
+    InvalidChannelId(String),
 }
 
 impl LightningNode {
@@ -87,40 +108,202 @@ impl LightningNode {
     
     /// Start the Lightning node
     pub fn start(&mut self) -> LightningResult<()> {
-        // Start the background processor
-        
         info!("Starting Lightning node");
-        Err(LightningError::ConfigError("Lightning start functionality is not yet complete".into()))
+        
+        // Create the background processor if it doesn't exist
+        if self.processor.is_none() {
+            // Set up the background processor with the channel manager and peer manager
+            let channel_manager = self.channel_manager.clone();
+            let peer_manager = self.peer_manager.clone();
+            
+            let processor = BackgroundProcessor::start(
+                channel_manager,
+                peer_manager,
+                10, // Retry count for failed operations
+                Duration::from_secs(5) // Interval between retry attempts
+            );
+            
+            self.processor = Some(processor);
+            info!("Lightning node background processor started");
+        }
+        
+        Ok(())
     }
     
     /// Connect to a peer
     pub fn connect_peer(&self, node_id: &str, addr: &str) -> LightningResult<()> {
-        info!("Connecting to peer: {} at {}", node_id, addr);
-        Err(LightningError::ConfigError("Peer connection functionality is not yet complete".into()))
+        // Parse the node ID from the provided string
+        let pubkey = match PublicKey::from_str(node_id) {
+            Ok(pk) => pk,
+            Err(_) => return Err(LightningError::InvalidNodeId(node_id.to_string())),
+        };
+        
+        // Parse the address
+        let socket_addr = match addr.parse::<SocketAddr>() {
+            Ok(addr) => addr,
+            Err(_) => return Err(LightningError::InvalidAddress(addr.to_string())),
+        };
+        
+        // Create a socket descriptor for the peer connection
+        let socket = match TcpStream::connect(socket_addr) {
+            Ok(socket) => socket,
+            Err(e) => return Err(LightningError::ConnectionError(e.to_string())),
+        };
+        
+        // Set up the socket for non-blocking I/O
+        socket.set_nonblocking(true)?;
+        
+        // Create a Lightning socket descriptor
+        let socket_descriptor = SocketDescriptor::new(socket);
+        
+        // Connect to the peer using the peer manager
+        self.peer_manager.new_outbound_connection(
+            pubkey, 
+            socket_descriptor,
+            // Future will be used to notify of successful connection
+        )?;
+        
+        info!("Connected to peer: {}", node_id);
+        Ok(())
     }
     
     /// Open a channel with a peer
     pub fn open_channel(&self, node_id: &str, amount_sat: u64) -> LightningResult<()> {
-        info!("Opening channel with {} for {} sats", node_id, amount_sat);
-        Err(LightningError::ConfigError("Channel opening functionality is not yet complete".into()))
+        // Parse the node ID
+        let pubkey = match PublicKey::from_str(node_id) {
+            Ok(pk) => pk,
+            Err(_) => return Err(LightningError::InvalidNodeId(node_id.to_string())),
+        };
+        
+        // Set up the channel opening parameters
+        let channel_value_satoshis = amount_sat;
+        let push_msat = 0; // Don't push any funds to the counterparty
+        let user_channel_id = 0; // Use default (0) for now
+        
+        // Open the channel
+        match self.channel_manager.create_channel(
+            pubkey, 
+            channel_value_satoshis, 
+            push_msat, 
+            user_channel_id
+        ) {
+            Ok(_) => {
+                info!("Channel opening initiated with peer: {}", node_id);
+                Ok(())
+            },
+            Err(e) => Err(LightningError::ChannelError(e.to_string())),
+        }
     }
     
     /// Create an invoice
     pub fn create_invoice(&self, amount_msat: u64, description: &str) -> LightningResult<String> {
-        info!("Creating invoice for {} msat: {}", amount_msat, description);
-        Err(LightningError::ConfigError("Invoice creation functionality is not yet complete".into()))
+        // Generate a random payment hash
+        let mut payment_hash = [0u8; 32];
+        rand::thread_rng().fill_bytes(&mut payment_hash);
+        
+        let currency = Currency::Bitcoin;
+        let invoice_expiry_delta_secs = 3600; // 1 hour
+        
+        // Create the invoice
+        let invoice = match self.channel_manager.create_invoice(
+            currency,
+            amount_msat,
+            payment_hash.to_vec(),
+            description.to_string(),
+            invoice_expiry_delta_secs
+        ) {
+            Ok(invoice) => invoice,
+            Err(e) => return Err(LightningError::InvoiceError(e.to_string())),
+        };
+        
+        // Convert the invoice to BOLT11 format
+        let bolt11 = invoice.to_string();
+        info!("Created invoice: {}", bolt11);
+        
+        Ok(bolt11)
     }
     
     /// Pay an invoice
     pub fn pay_invoice(&self, bolt11: &str) -> LightningResult<()> {
-        info!("Paying invoice: {}", bolt11);
-        Err(LightningError::ConfigError("Invoice payment functionality is not yet complete".into()))
+        // Parse the BOLT11 invoice
+        let invoice = match bolt11.parse::<Invoice>() {
+            Ok(invoice) => invoice,
+            Err(_) => return Err(LightningError::InvalidInvoice(bolt11.to_string())),
+        };
+        
+        // Extract payment parameters from the invoice
+        let payment_hash = invoice.payment_hash();
+        let payment_secret = invoice.payment_secret().unwrap_or(&[0u8; 32]);
+        let amount_msat = match invoice.amount_milli_satoshis() {
+            Some(amt) => amt,
+            None => return Err(LightningError::InvoiceError("Amount not specified in invoice".to_string())),
+        };
+        
+        // Pay the invoice
+        match self.channel_manager.send_payment(
+            payment_hash.clone(),
+            payment_secret.clone(),
+            amount_msat,
+            self
+        ) {
+            Ok(()) => {
+                info!("Payment initiated for invoice: {}", bolt11);
+                Ok(())
+            },
+            Err(e) => Err(LightningError::PaymentError(e.to_string())),
+        }
     }
     
     /// Close a channel
     pub fn close_channel(&self, channel_id: &[u8], force: bool) -> LightningResult<()> {
-        info!("Closing channel: {}, force: {}", hex::encode(channel_id), force);
-        Err(LightningError::ConfigError("Channel closing functionality is not yet complete".into()))
+        if channel_id.len() != 32 {
+            return Err(LightningError::InvalidChannelId("Channel ID must be 32 bytes".to_string()));
+        }
+        
+        // Parse the channel ID
+        let mut channel_id_array = [0u8; 32];
+        channel_id_array.copy_from_slice(channel_id);
+        
+        if force {
+            // Force close the channel
+            match self.channel_manager.force_close_channel(&channel_id_array) {
+                Ok(()) => {
+                    info!("Force closed channel: {}", hex::encode(channel_id));
+                    Ok(())
+                },
+                Err(e) => Err(LightningError::ChannelError(e.to_string())),
+            }
+        } else {
+            // Cooperatively close the channel
+            match self.channel_manager.close_channel(&channel_id_array) {
+                Ok(()) => {
+                    info!("Initiated cooperative closure of channel: {}", hex::encode(channel_id));
+                    Ok(())
+                },
+                Err(e) => Err(LightningError::ChannelError(e.to_string())),
+            }
+        }
+    }
+    
+    /// Get channel information
+    pub fn get_channels(&self) -> LightningResult<Vec<ChannelInfo>> {
+        let channels = self.channel_manager.list_channels();
+        
+        let channel_info: Vec<ChannelInfo> = channels.iter().map(|channel| {
+            ChannelInfo {
+                channel_id: hex::encode(channel.channel_id()),
+                counterparty: hex::encode(channel.counterparty().node_id.serialize()),
+                funding_txo: channel.funding_txo().map(|txo| format!("{}:{}", txo.txid, txo.index)),
+                is_usable: channel.is_usable(),
+                channel_value_satoshis: channel.channel_value_satoshis(),
+                local_balance_msat: channel.balance_msat(),
+                outbound_capacity_msat: channel.outbound_capacity_msat(),
+                inbound_capacity_msat: channel.inbound_capacity_msat(),
+                is_public: !channel.is_private(),
+            }
+        }).collect();
+        
+        Ok(channel_info)
     }
     
     /// Stop the Lightning node
@@ -131,6 +314,19 @@ impl LightningNode {
         }
         Ok(())
     }
+}
+
+#[derive(Debug, Clone)]
+pub struct ChannelInfo {
+    pub channel_id: String,
+    pub counterparty: String,
+    pub funding_txo: Option<String>,
+    pub is_usable: bool,
+    pub channel_value_satoshis: u64,
+    pub local_balance_msat: u64,
+    pub outbound_capacity_msat: u64,
+    pub inbound_capacity_msat: u64,
+    pub is_public: bool,
 }
 
 #[cfg(test)]

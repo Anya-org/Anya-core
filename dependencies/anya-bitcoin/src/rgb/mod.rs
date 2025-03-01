@@ -177,6 +177,111 @@ impl RgbManager {
         Ok(txid)
     }
     
+    /// Complete RGB asset functionality to enable transferring assets with metadata
+    pub fn transfer_asset_with_metadata(
+        &self,
+        wallet: &BitcoinWallet,
+        contract_id: &str,
+        recipient_address: &str,
+        amount: u64,
+        metadata: HashMap<String, String>,
+    ) -> Result<String> {
+        let contract_id = ContractId::from_str(contract_id)?;
+        let mut inventory = self.open_inventory()?;
+        
+        // Parse recipient address
+        let recipient = Address::from_str(recipient_address)?;
+        
+        // Create the RGB runtime
+        let mut rgb = Rgb::new(self.network)?;
+        
+        // Create a transfer with metadata
+        let invoice = Invoice::for_transfer(contract_id, amount, recipient.script_pubkey())?;
+        
+        // Add metadata to the transfer
+        let mut transfer_builder = rgb.transfer_builder(invoice);
+        for (key, value) in metadata {
+            transfer_builder.add_metadata(key, value);
+        }
+        
+        // Execute the transfer
+        let transfer = transfer_builder.finalize(
+            &self.secp,
+            &mut inventory,
+        )?;
+        
+        // Create and sign transaction
+        let txid = wallet.broadcast_rgb_transaction(transfer)?;
+        
+        // Update the RGB state
+        rgb.update_state(&mut inventory)?;
+        
+        Ok(txid.to_string())
+    }
+    
+    /// Batch transfer multiple assets in a single transaction
+    pub fn batch_transfer_assets(
+        &self,
+        wallet: &BitcoinWallet,
+        transfers: Vec<(String, String, u64)>, // (contract_id, recipient, amount)
+    ) -> Result<String> {
+        if transfers.is_empty() {
+            return Err(anyhow!("No transfers provided"));
+        }
+        
+        let mut inventory = self.open_inventory()?;
+        let mut rgb = Rgb::new(self.network)?;
+        
+        // Create batch transfer
+        let mut batch_builder = rgb.batch_transfer_builder();
+        
+        // Add all transfers to the batch
+        for (contract_id_str, recipient_address, amount) in transfers {
+            let contract_id = ContractId::from_str(&contract_id_str)?;
+            let recipient = Address::from_str(&recipient_address)?;
+            
+            let invoice = Invoice::for_transfer(
+                contract_id, 
+                amount, 
+                recipient.script_pubkey()
+            )?;
+            
+            batch_builder.add_transfer(invoice)?;
+        }
+        
+        // Finalize the batch transfer
+        let batch_transfer = batch_builder.finalize(
+            &self.secp,
+            &mut inventory,
+        )?;
+        
+        // Create and sign transaction
+        let txid = wallet.broadcast_rgb_transaction(batch_transfer)?;
+        
+        // Update the RGB state
+        rgb.update_state(&mut inventory)?;
+        
+        Ok(txid.to_string())
+    }
+    
+    /// Verify asset ownership based on the RGB state
+    pub fn verify_asset_ownership(
+        &self,
+        contract_id: &str,
+        address: &str,
+    ) -> Result<bool> {
+        let contract_id = ContractId::from_str(contract_id)?;
+        let address = Address::from_str(address)?;
+        
+        let inventory = self.open_inventory()?;
+        let contract = inventory.get_contract(contract_id)?;
+        
+        // Check if the address owns any of this asset
+        let ownership = contract.verify_ownership(address.script_pubkey())?;
+        
+        Ok(ownership > 0)
+    }
+    
     /// Validate contract status
     pub fn validate_contract(&self, contract_id: &str) -> Result<ValidationStatus> {
         let contract_id = ContractId::from_str(contract_id)?;

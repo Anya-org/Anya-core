@@ -13,11 +13,13 @@
 //! - Verifiable Credentials for privacy-preserving attestations
 //! - Decentralized Web Nodes (DWNs) for personal data storage
 //! - Handshake integration for decentralized DNS
+//! - Bitcoin anchoring for data integrity and provenance
 
 pub mod did;
 pub mod credential;
 pub mod dwn;
 pub mod handshake;
+pub mod enhanced_dwn;
 
 use anyhow::Result;
 use std::sync::Arc;
@@ -26,6 +28,7 @@ use bitcoin::Network;
 use crate::wallet::BitcoinWallet;
 use did::{DidManager, DidDocument};
 use credential::{CredentialManager, VerifiableCredential};
+use enhanced_dwn::{EnhancedDwnManager, EnhancedDwnOptions, AnchoringStatus};
 
 /// Web5 manager for coordinating all Web5 components
 pub struct Web5Manager {
@@ -35,6 +38,9 @@ pub struct Web5Manager {
     /// Credential manager for verifiable credentials
     credential_manager: Arc<CredentialManager>,
     
+    /// Enhanced DWN manager for decentralized data storage with Bitcoin anchoring
+    dwn_manager: Arc<EnhancedDwnManager>,
+    
     /// Bitcoin network
     network: Network,
 }
@@ -42,12 +48,22 @@ pub struct Web5Manager {
 impl Web5Manager {
     /// Create a new Web5 manager
     pub fn new(wallet: Arc<BitcoinWallet>, network: Network) -> Self {
-        let did_manager = Arc::new(DidManager::new(wallet, network));
-        let credential_manager = Arc::new(CredentialManager::new(did_manager.clone()));
+        let did_manager = Arc::new(DidManager::new(wallet.clone(), network));
+        let credential_manager = Arc::new(CredentialManager::with_bitcoin_anchoring(
+            did_manager.clone(),
+            wallet.clone(),
+            network
+        ));
+        let dwn_manager = Arc::new(EnhancedDwnManager::new(
+            did_manager.clone(),
+            wallet.clone(),
+            network
+        ));
         
         Self {
             did_manager,
             credential_manager,
+            dwn_manager,
             network,
         }
     }
@@ -80,6 +96,29 @@ impl Web5Manager {
         ).await
     }
     
+    /// Issue a verifiable credential anchored to Bitcoin
+    pub async fn issue_anchored_credential(
+        &self,
+        issuer_did: &str,
+        subject_did: &str,
+        credential_type: &str,
+        claims: std::collections::HashMap<String, serde_json::Value>,
+        valid_for_days: Option<u32>,
+    ) -> Result<VerifiableCredential> {
+        self.credential_manager.issue_anchored_credential(
+            issuer_did,
+            subject_did,
+            credential_type,
+            claims,
+            valid_for_days,
+        ).await
+    }
+    
+    /// Update the anchoring status of a credential
+    pub async fn update_anchoring_status(&self, credential: &mut VerifiableCredential) -> Result<()> {
+        self.credential_manager.update_anchoring_status(credential).await
+    }
+    
     /// Verify a credential
     pub async fn verify_credential(&self, credential: &VerifiableCredential) -> Result<bool> {
         self.credential_manager.verify_credential(credential).await
@@ -97,6 +136,81 @@ impl Web5Manager {
     /// Verify a presentation
     pub async fn verify_presentation(&self, presentation: &credential::VerifiablePresentation) -> Result<bool> {
         self.credential_manager.verify_presentation(presentation).await
+    }
+    
+    /// Revoke a credential
+    pub async fn revoke_credential(&self, credential_id: &str, issuer_did: &str) -> Result<()> {
+        self.credential_manager.revoke_credential(credential_id, issuer_did).await
+    }
+    
+    /// Revoke a credential with Bitcoin anchoring
+    pub async fn revoke_credential_with_bitcoin(&self, credential_id: &str, issuer_did: &str) -> Result<String> {
+        self.credential_manager.revoke_credential_with_bitcoin(credential_id, issuer_did).await
+    }
+    
+    /// Check if a credential has been revoked
+    pub async fn check_credential_revocation(&self, credential_id: &str) -> Result<bool> {
+        self.credential_manager.check_credential_revocation(credential_id).await
+    }
+    
+    /// Create a DWN for a DID
+    pub async fn create_dwn(&self, owner_did: &str) -> Result<()> {
+        self.dwn_manager.create_dwn(owner_did).await
+    }
+    
+    /// Process a DWN message
+    pub async fn process_dwn_message(&self, owner_did: &str, message: dwn::DwnMessage) -> Result<dwn::MessageResult> {
+        self.dwn_manager.process_message(owner_did, message).await
+    }
+    
+    /// Process a DWN message with Bitcoin anchoring
+    pub async fn process_dwn_message_with_anchoring(
+        &self,
+        owner_did: &str,
+        message: dwn::DwnMessage,
+        options: EnhancedDwnOptions,
+    ) -> Result<dwn::MessageResult> {
+        self.dwn_manager.process_message_enhanced(owner_did, message, options).await
+    }
+    
+    /// Query DWN with Bitcoin anchoring verification
+    pub async fn query_dwn_with_anchoring(
+        &self,
+        owner_did: &str,
+        query: dwn::DwnQueryMessage,
+        min_confirmations: u32,
+    ) -> Result<Vec<dwn::DwnMessage>> {
+        self.dwn_manager.query_with_anchoring(owner_did, query, min_confirmations).await
+    }
+    
+    /// Anchor a DWN message to Bitcoin
+    pub async fn anchor_dwn_message(&self, owner_did: &str, message_id: &str) -> Result<AnchoringStatus> {
+        self.dwn_manager.anchor_message(owner_did, message_id).await
+    }
+    
+    /// Get anchoring status for a DWN message
+    pub async fn get_dwn_anchoring_status(&self, owner_did: &str, message_id: &str) -> Result<Option<AnchoringStatus>> {
+        self.dwn_manager.get_anchoring_status(owner_did, message_id).await
+    }
+    
+    /// Verify Bitcoin anchoring for a DWN message
+    pub async fn verify_dwn_anchoring(&self, owner_did: &str, message_id: &str) -> Result<bool> {
+        self.dwn_manager.verify_anchoring(owner_did, message_id).await
+    }
+    
+    /// Get the DID manager
+    pub fn did_manager(&self) -> Arc<DidManager> {
+        self.did_manager.clone()
+    }
+    
+    /// Get the credential manager
+    pub fn credential_manager(&self) -> Arc<CredentialManager> {
+        self.credential_manager.clone()
+    }
+    
+    /// Get the DWN manager
+    pub fn dwn_manager(&self) -> Arc<EnhancedDwnManager> {
+        self.dwn_manager.clone()
     }
 }
 
