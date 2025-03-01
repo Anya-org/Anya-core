@@ -31,6 +31,9 @@
 - [x] Update version history
 - [ ] Implement automated version resolution
 - [ ] Create comprehensive testing suite
+- [ ] Implement Web5 DID resolution with caching mechanism for Bitcoin anchoring
+- [ ] Add support for Web5 credential verification with Bitcoin anchoring
+- [ ] Create comprehensive testing suite for Web5 features
 
 Last Updated: 2025-03-01
 
@@ -49,6 +52,8 @@ This document outlines the pending tasks and improvements for the Anya Core proj
 - [ ] Add additional decentralized data storage options for DWNs
 - [x] Complete remaining API routes implementation for Web5 functionality
 - [x] Finish RGB asset transfer functionality with metadata support
+- [ ] Implement Web5 module with Bitcoin anchoring for decentralized identity management
+- [ ] Add support for Web5-based decentralized data storage
 
 ## Medium Priority
 
@@ -61,6 +66,7 @@ This document outlines the pending tasks and improvements for the Anya Core proj
 - [ ] Add PSBT support for cold storage
 - [ ] Build secure messaging protocol
 - [x] Implement comprehensive API documentation for Web5 endpoints
+- [ ] Implement Web5-based messaging protocol for decentralized communication
 
 ## Low Priority
 
@@ -96,6 +102,8 @@ This document outlines the pending tasks and improvements for the Anya Core proj
 - [x] Enhance Bitcoin wallet with multi-output PSBT support
 - [x] Implement hardware wallet compatibility for PSBTs
 - [x] Add batch transfer functionality for RGB assets
+- [x] Implement Web5 DID resolution with caching mechanism for Bitcoin anchoring
+- [x] Add support for Web5 credential verification with Bitcoin anchoring
 
 ## Integration Timeline
 | Component | Target Date | Status |
