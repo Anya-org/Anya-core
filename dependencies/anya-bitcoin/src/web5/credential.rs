@@ -163,8 +163,10 @@ pub struct VerifiablePresentation {
 pub struct CredentialManager {
     /// DID Manager for identity operations
     did_manager: Arc<DidManager>,
+    
     /// Optional Bitcoin wallet for anchoring
     bitcoin_wallet: Option<Arc<BitcoinWallet>>,
+    
     /// Bitcoin network
     network: Network,
 }
