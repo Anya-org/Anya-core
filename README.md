@@ -2,6 +2,8 @@
 
 Anya Core is a comprehensive Bitcoin development framework that adheres to the Bitcoin Development Framework v2.5 standards. It provides a robust set of tools and libraries for building Bitcoin applications with a focus on security, privacy, and decentralization.
 
+*Last Updated: March 1, 2025*
+
 ## Features
 
 - **Bitcoin Integration**: Full Bitcoin protocol support with Taproot capabilities
@@ -13,6 +15,7 @@ Anya Core is a comprehensive Bitcoin development framework that adheres to the B
 - **Wallet Management**: Secure wallet implementation with BIP39/44/84/86 support
 - **Web5 Protocol**: Complete Web5 implementation with DIDs, DWNs, and protocol support
 - **Hexagonal Architecture**: Clean separation of concerns with adapters and ports
+- **RESTful API**: Actix Web-based API with JWT authentication and WebSocket support
 
 ## Project Structure
 
