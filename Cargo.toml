@@ -54,12 +54,10 @@ rgb-core = "0.10"
 rsk = "0.1.0"
 taproot = "0.1.0"
 elements = "0.22.0"  # Liquid/Elements dependency
-elements-rpc = "0.17.0"  # Liquid/Elements RPC client
+elements-rpc = "0.1.0"  # Liquid/Elements RPC client
 
 # Web5 dependencies
-did_resolver = "0.5.0"
-did-key = "0.2.1"
-did-ion = "0.1.0"
+web5 = { git = "https://github.com/decentralized-identity/web5-rs", package = "web5" }
 base64 = "0.21.7"
 sha2 = "0.10.8"
 ed25519-dalek = "2.1.1"
@@ -76,9 +74,6 @@ env_logger = "0.10.0"
 actix-web.workspace = true
 actix-cors.workspace = true
 clap.workspace = true
-
-# Web5 and DID
-web5 = { git = "https://github.com/TBD54566975/web5-rs", package = "web5", tag = "v4.0.0" }
 
 # DLC specific
 secp256k1-zkp = { version = "0.7.0", features = ["global-context"] }
