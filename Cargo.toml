@@ -117,6 +117,8 @@ rustls = "0.22.1"
 data-encoding = "2.5.0"
 jsonwebtoken = "9.2.0"
 totp-rs = "5.4.0"
+async-io-mini = "*"
+darling = "*"
 
 [dev-dependencies]
 tokio-test = { workspace = true }
