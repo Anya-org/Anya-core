@@ -1,12 +1,10 @@
 import 'dart:convert';
-
-import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
+import 'package:mockito/mockito.dart';
 import 'package:web5/web5.dart';
-
+import '../../lib/src/core/storage/dwn_store.dart';
 import '../../lib/src/core/config/web5_config.dart';
 import '../../lib/src/core/errors/storage_errors.dart';
-import '../../lib/src/core/storage/dwn_store.dart';
 
 class MockWeb5 extends Mock implements Web5 {}
 

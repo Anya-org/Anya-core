@@ -1,0 +1,132 @@
+name: Automated Checkpoint Creation
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*'
+  pull_request:
+    types: [closed]
+    branches:
+      - main
+
+jobs:
+  create-checkpoint:
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.merged == true)
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0  # Fetch all history and tags
+    
+    - name: Set up PowerShell
+      shell: pwsh
+      run: |
+        # Make sure scripts directory exists
+        New-Item -ItemType Directory -Force -Path "scripts"
+        
+    - name: Set environment variables
+      shell: pwsh
+      run: |
+        # Get event details
+        if ("${{ github.event_name }}" -eq "pull_request") {
+          echo "EVENT_TYPE=pr_merge" | Out-File -Append -FilePath $env:GITHUB_ENV
+          echo "BRANCH_NAME=${{ github.event.pull_request.head.ref }}" | Out-File -Append -FilePath $env:GITHUB_ENV
+          echo "EVENT_TITLE=${{ github.event.pull_request.title }}" | Out-File -Append -FilePath $env:GITHUB_ENV
+        } else {
+          echo "EVENT_TYPE=push" | Out-File -Append -FilePath $env:GITHUB_ENV
+          echo "BRANCH_NAME=${{ github.ref_name }}" | Out-File -Append -FilePath $env:GITHUB_ENV
+          
+          # Extract last commit message
+          $commitMsg = git log -1 --pretty=format:"%s"
+          echo "EVENT_TITLE=$commitMsg" | Out-File -Append -FilePath $env:GITHUB_ENV
+        }
+        
+        # Extract AI Label if present
+        $aiLabels = @("AIR", "AIS", "AIT", "AIM", "AIP", "AIE")
+        $eventTitle = "${{ github.event.pull_request.title }}"
+        if ("${{ github.event_name }}" -eq "push") {
+          $eventTitle = $commitMsg
+        }
+        
+        $aiLabel = ""
+        foreach ($label in $aiLabels) {
+          if ($eventTitle -match "\[$label-(\d{3})\]") {
+            $aiLabel = "$label-$($matches[1])"
+            break
+          }
+        }
+        
+        echo "AI_LABEL=$aiLabel" | Out-File -Append -FilePath $env:GITHUB_ENV
+    
+    - name: Create checkpoint
+      shell: pwsh
+      run: |
+        # Create a descriptive name for the checkpoint
+        $checkpointName = ""
+        $message = ""
+        
+        if ("${{ env.EVENT_TYPE }}" -eq "pr_merge") {
+          $branchName = "${{ env.BRANCH_NAME }}" -replace "feature/", "" -replace "AIP-\d{3}-", ""
+          $checkpointName = "merge_${branchName}"
+          $message = "Automated checkpoint after merging PR: ${{ env.EVENT_TITLE }}"
+        } else {
+          $checkpointName = "push_${{ github.sha }}"
+          $message = "Automated checkpoint after push to ${{ env.BRANCH_NAME }}: ${{ env.EVENT_TITLE }}"
+        }
+        
+        # Create directories if they don't exist
+        New-Item -ItemType Directory -Force -Path "docs/checkpoints"
+        
+        # Create checkpoint file
+        $timestamp = Get-Date -Format "yyyy-MM-dd_HH-mm-ss"
+        $checkpointFile = "docs/checkpoints/${checkpointName}-${timestamp}.md"
+        
+        # Prepare content
+        $content = @"
+# Checkpoint: $checkpointName
+**Created**: $timestamp
+**AI Label**: ${{ env.AI_LABEL }}
+**Message**: $message
+
+## Commit Information
+$(git log -1 --pretty=format:"Commit: %H%nAuthor: %an <%ae>%nDate: %ad%n%n%s%n%n%b")
+
+## Files Changed in Last Commit
+$(git show --name-status HEAD)
+
+## Repository Status at Checkpoint
+$(git status)
+"@
+        
+        # Write to file
+        $content | Out-File -FilePath $checkpointFile -Encoding utf8
+        
+        # Create Git tag
+        $tagName = $checkpointName -replace '[^a-zA-Z0-9_\-\.]', '_'
+        git config --global user.name "GitHub Action"
+        git config --global user.email "action@github.com"
+        
+        $tagMessage = $message
+        if ("${{ env.AI_LABEL }}" -ne "") {
+          $tagMessage = "[${{ env.AI_LABEL }}] $message"
+        }
+        
+        git tag -a "$tagName" -m "$tagMessage (Created at $timestamp)"
+        
+        # Commit the checkpoint file
+        git add $checkpointFile
+        git commit -m "Add checkpoint documentation for $tagName"
+        
+        # Set outputs
+        echo "CHECKPOINT_NAME=$tagName" | Out-File -Append -FilePath $env:GITHUB_ENV
+        echo "CHECKPOINT_FILE=$checkpointFile" | Out-File -Append -FilePath $env:GITHUB_ENV
+    
+    - name: Push changes
+      shell: pwsh
+      run: |
+        git push origin HEAD
+        git push origin "${{ env.CHECKPOINT_NAME }}"
