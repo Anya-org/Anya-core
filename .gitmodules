@@ -5,23 +5,9 @@
 	update = merge
 	fetchRecurseSubmodules = true
 
-[submodule "dash33"]
-	path = dash33
-	url = https://github.com/Anya-org/Anya-dash33.git
-	branch = main
-	update = merge
-	fetchRecurseSubmodules = true
-
 [submodule "dependencies"]
 	path = dependencies
 	url = https://github.com/Anya-org/Anya-dependencies.git
-	branch = main
-	update = merge
-	fetchRecurseSubmodules = true
-
-[submodule "mobile"]
-	path = mobile
-	url = https://github.com/Anya-org/Anya-mobile.git
 	branch = main
 	update = merge
 	fetchRecurseSubmodules = true
