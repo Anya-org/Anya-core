@@ -12,8 +12,8 @@ opentelemetry = { version = "0.21.0", features = ["rt-tokio"], optional = true }
 
 [features]
 default = ["standard-security"]
-standard-security = []
-advanced-security = []
+standard-security = ["dependency1", "dependency2"]
+advanced-security = ["dependency3", "dependency4"]
 enterprise = ["advanced-security", "hardware-wallet", "metrics"]
 hardware-wallet = []
 metrics = ["dep:opentelemetry"]
