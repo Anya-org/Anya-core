@@ -5,6 +5,7 @@ The Enterprise component provides advanced business operations with comprehensiv
 ## Architecture
 
 ### Repository Layer (`repository.rs`)
+
 - CRUD operations for enterprise operations
 - Status tracking
 - Compliance monitoring
@@ -12,6 +13,7 @@ The Enterprise component provides advanced business operations with comprehensiv
 - Risk assessment
 
 ### Service Layer (`service.rs`)
+
 - Operation processing
 - Business logic
 - Security integration
@@ -19,6 +21,7 @@ The Enterprise component provides advanced business operations with comprehensiv
 - Metrics collection
 
 ### Handler Layer (`handler.rs`)
+
 - Request/response processing
 - Input validation
 - Error handling
@@ -28,6 +31,7 @@ The Enterprise component provides advanced business operations with comprehensiv
 ## Features
 
 ### Operation Types
+
 - Atomic Swaps
 - Liquid Transfers
 - DLC Contracts
@@ -36,6 +40,7 @@ The Enterprise component provides advanced business operations with comprehensiv
 - Portfolio Rebalancing
 
 ### Risk Management
+
 - Risk assessment
 - Exposure limits
 - Compliance checks
@@ -43,6 +48,7 @@ The Enterprise component provides advanced business operations with comprehensiv
 - Policy enforcement
 
 ### Compliance & Audit
+
 - Transaction monitoring
 - Audit trail
 - Reporting
@@ -91,6 +97,7 @@ cargo test --package anya-core --test enterprise_integration
 ## Metrics
 
 The component exports the following metrics:
+
 - `enterprise_operation_time`: Histogram of operation execution times
 - `enterprise_risk_scores`: Histogram of risk scores
 - `enterprise_errors`: Counter of operation errors
@@ -99,6 +106,7 @@ The component exports the following metrics:
 ## Health Checks
 
 Health monitoring includes:
+
 - Service availability
 - Operation performance
 - Risk levels
@@ -108,6 +116,7 @@ Health monitoring includes:
 ## Security
 
 Security measures include:
+
 - Input validation
 - Access control
 - Risk limits

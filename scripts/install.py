@@ -113,10 +113,20 @@ def main():
     parser = argparse.ArgumentParser(description="Anya Project Installer")
     parser.add_argument('--project-root', type=Path,
                        help='Project root directory')
+    parser.add_argument('--dry-run', action='store_true',
+                       help='Simulate installation without making changes')
     args = parser.parse_args()
     
     installer = AnyaInstaller(args.project_root)
-    installer.install()
+    if args.dry_run:
+        print("=== DRY RUN MODE ===")
+        print("The following actions would be performed:")
+        print("1. Check system requirements")
+        print("2. Setup development environment")
+        print("3. Setup project configuration")
+        print("No changes will be made to your system.")
+    else:
+        installer.install()
 
 if __name__ == '__main__':
     main()

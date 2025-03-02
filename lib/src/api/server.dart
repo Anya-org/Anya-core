@@ -1,116 +1,107 @@
-// Copyright (c) 2024 Anya Project. All rights reserved.
-// SPDX-License-Identifier: MIT
-
-import 'dart:async';
 import 'dart:convert';
-import 'package:meta/meta.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
 import 'package:shelf_router/shelf_router.dart';
-import '../core/bitcoin/wallet.dart';
-import '../core/web5/identity.dart';
-import '../utils/logging.dart';
-import '../utils/validation.dart';
+import 'package:logging/logging.dart';
 
-/// AnyaServer implements a RESTful API server with Bitcoin and Web5 capabilities.
-///
-/// Features:
-/// - Bitcoin wallet management (BIP compliance)
-/// - Decentralized identity (DID) operations
-/// - IPFS integration
-/// - Material Design 3 UI endpoints
-///
-/// Follows platform-agnostic design patterns and accessibility standards.
-///
-/// Example:
-/// ```dart
-/// final wallet = BitcoinWallet();
-/// final identity = IdentityManager();
-/// final server = AnyaServer(wallet, identity);
-/// await server.start();
-/// ```
-@immutable
+import '../core/web5/identity.dart';
+
+/// API server implementation for the Anya Bitcoin Infrastructure Platform
 class AnyaServer {
   final Router _router = Router();
-  final BitcoinWallet _wallet;
   final IdentityManager _identity;
-  final Logger _logger;
+  final Logger _logger = Logger('AnyaServer');
 
-  /// Creates a new instance of [AnyaServer].
-  ///
-  /// Requires initialized [BitcoinWallet] and [IdentityManager] instances.
-  /// Throws [ArgumentError] if any parameter is null.
-  AnyaServer(this._wallet, this._identity) : _logger = Logger('AnyaServer') {
+  AnyaServer({
+    required IdentityManager identity,
+  }) : _identity = identity {
     _setupRoutes();
   }
 
-  // TODO(framework)[high]: Add rate limiting and request validation
   void _setupRoutes() {
-    _router
-      ..post('/wallet', _createWallet)
-      ..get('/wallet/<id>', _getWallet)
-      ..post('/did', _createDID)
-      ..get('/did/<id>', _getDID);
-  }
-
-  Future<Response> _createWallet(Request request) async {
-    try {
-      final walletId = await _wallet.createWallet();
-      return Response.ok({'wallet_id': walletId});
-    } catch (e) {
-      return Response.internalServerError(
-        body: {'error': e.toString()},
-      );
-    }
-  }
-
-  Future<Response> _getWallet(Request request) async {
-    // TODO(framework)[high]: Implement wallet retrieval
-    return Response.notImplemented();
+    // Identity endpoints
+    _router.post('/did', _createDID);
+    _router.get('/did/<did>', _resolveDID);
+    
+    // Health check
+    _router.get('/health', _healthCheck);
   }
 
   Future<Response> _createDID(Request request) async {
     try {
+      _logger.info('Creating new DID');
       final did = await _identity.createDID();
-      return Response.ok({'did': did});
-    } catch (e) {
+      return Response.ok(
+        jsonEncode({'did': did}),
+        headers: {'content-type': 'application/json'},
+      );
+    } catch (e, stack) {
+      _logger.severe('Error creating DID', e, stack);
       return Response.internalServerError(
-        body: {'error': e.toString()},
+        body: jsonEncode({'error': 'Failed to create DID: $e'}),
+        headers: {'content-type': 'application/json'},
       );
     }
   }
 
-  Future<Response> _getDID(Request request) async {
-    // TODO(framework)[high]: Implement DID retrieval
-    return Response.notImplemented();
+  Future<Response> _resolveDID(Request request, String did) async {
+    try {
+      _logger.info('Resolving DID: $did');
+      final resolution = await _identity.resolveDID(did);
+      return Response.ok(
+        jsonEncode(resolution),
+        headers: {'content-type': 'application/json'},
+      );
+    } catch (e, stack) {
+      _logger.severe('Error resolving DID', e, stack);
+      return Response.internalServerError(
+        body: jsonEncode({'error': 'Failed to resolve DID: $e'}),
+        headers: {'content-type': 'application/json'},
+      );
+    }
   }
 
-  Future<void> start({String host = 'localhost', int port = 8080}) async {
-    final handler = const Pipeline()
-        .addMiddleware(logRequests())
-        .addMiddleware(_handleCors())
-        .addHandler(_router);
-
-    await shelf_io.serve(handler, host, port);
+  Future<Response> _healthCheck(Request request) async {
+    return Response.ok(
+      jsonEncode({
+        'status': 'healthy',
+        'timestamp': DateTime.now().toIso8601String(),
+      }),
+      headers: {'content-type': 'application/json'},
+    );
   }
 
   Middleware _handleCors() {
+    const corsHeaders = {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Access-Control-Allow-Headers': 'Origin, Content-Type',
+    };
+
     return createMiddleware(
-      requestHandler: (Request request) {
+      requestHandler: (request) {
         if (request.method == 'OPTIONS') {
-          return Response.ok('', headers: _corsHeaders);
+          return Response.ok('', headers: corsHeaders);
         }
         return null;
       },
-      responseHandler: (Response response) {
-        return response.change(headers: _corsHeaders);
+      responseHandler: (response) {
+        return response.change(headers: corsHeaders);
       },
     );
   }
 
-  final _corsHeaders = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-    'Access-Control-Allow-Headers': 'Origin, Content-Type',
-  };
+  /// Start the server
+  Future<void> start({
+    String host = 'localhost',
+    int port = 8080,
+  }) async {
+    final handler = Pipeline()
+        .addMiddleware(logRequests())
+        .addMiddleware(_handleCors())
+        .addHandler(_router.call);
+
+    final server = await shelf_io.serve(handler, host, port);
+    _logger.info('Server running on http://${server.address.host}:${server.port}');
+  }
 }
