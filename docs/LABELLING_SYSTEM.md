@@ -47,9 +47,10 @@ Windows-compatible PowerShell version of the batch commit script.
 - `-Type "TYPE"`: Commit type (default: feat)
 - `-Scope "SCOPE"`: Commit scope (optional)
 - `-Labels "LABELS"`: Comma-separated labels (required)
-- `-Repos "REPOSITORIES"`: Comma-separated repository list (default: all)
+- `-Repos "REPOSITORIES"`: Comma-separated repository list (default: auto-detected)
 - `-Validate`: Validate labels before committing
 - `-DryRun`: Show what would be committed without making changes
+- `-RootDir "PATH"`: Root directory containing all repositories (optional)
 - `-Help`: Show help message
 
 ### 2. Label Synchronization Script
@@ -86,11 +87,12 @@ Windows-compatible PowerShell version of the synchronization script.
 ##### Parameters:
 
 - `-Source "REPO"`: Source repository for label standards (default: anya-core)
-- `-Target "REPOS"`: Target repositories (comma-separated, default: all repositories)
+- `-Target "REPOS"`: Target repositories (comma-separated, default: auto-detected)
 - `-CheckOnly`: Only check for differences without making changes
 - `-DryRun`: Show what would be done without making actual changes
 - `-NoCommit`: Do not commit changes after synchronization
 - `-BatchCommit`: Use batch_commit.ps1 for committing changes
+- `-RootDir "PATH"`: Root directory containing all repositories (optional)
 - `-Help`: Show help message
 
 ### 3. GitHub Actions Workflow
@@ -105,6 +107,51 @@ The labeling system is designed to work seamlessly across different operating sy
 - **Windows**: Use the PowerShell scripts (`.ps1` extension)
 
 Both versions provide identical functionality with platform-appropriate syntax and error handling.
+
+### Windows-Specific Setup
+
+When running the PowerShell scripts on Windows:
+
+1. Ensure PowerShell execution policy allows running scripts:
+   ```powershell
+   Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
+   ```
+
+2. Always run the scripts from the repository's root directory:
+   ```powershell
+   cd C:\path\to\anya-core
+   ./scripts/batch_commit.ps1 -Help
+   ```
+
+3. If repositories are not in the expected location (i.e., not all in the same parent directory), use the `-RootDir` parameter:
+   ```powershell
+   ./scripts/batch_commit.ps1 -Message "Update" -Type "fix" -Labels "AIR-3,AIS-2" -RootDir "C:\Projects"
+   ```
+
+## Repository Structure
+
+The scripts expect a specific repository structure:
+
+```
+parent-directory/
+├── anya-core/
+│   ├── .git/
+│   ├── scripts/
+│   │   ├── batch_commit.ps1
+│   │   ├── batch_commit.sh
+│   │   ├── sync_labelling.ps1
+│   │   └── sync_labelling.py
+│   └── AI_LABELLING.md
+├── anya-bitcoin/
+│   ├── .git/
+│   └── AI_LABELLING.md
+├── anya-web5/
+│   ├── .git/
+│   └── AI_LABELLING.md
+└── ... other repositories
+```
+
+If your repositories are organized differently, use the `-RootDir` parameter to specify the parent directory containing all repositories.
 
 ## Labeling System Details
 
@@ -195,8 +242,19 @@ On Windows systems:
 
 1. Make sure PowerShell execution policy allows running scripts (`Set-ExecutionPolicy RemoteSigned`)
 2. Use the `.ps1` versions of the scripts
-3. If encountering path issues, ensure paths use proper Windows separators
+3. If encountering path issues, ensure proper repository structure or use the `-RootDir` parameter
 4. For Git operations, verify that Git is in your PATH environment variable
+5. If you receive errors with `-l` parameter, make sure you're using the PowerShell script (.ps1) not the Bash script (.sh)
+
+### Common Errors and Solutions
+
+| Error | Solution |
+|-------|----------|
+| `The term './scripts/batch_commit.sh' is not recognized...` | Use PowerShell script (`batch_commit.ps1`) on Windows |
+| `The term '-l' is not recognized...` | Use PowerShell parameter format: `-Labels` instead of `-l` |
+| Repository not found | Use `-RootDir` to specify the correct parent directory |
+| Git not found | Install Git and ensure it's in the PATH environment variable |
+| Failed to commit changes | Check Git error message and fix the issue (e.g., configuration problems) |
 
 ## Best Practices
 
@@ -206,6 +264,8 @@ On Windows systems:
 4. **Regular Audits**: Periodically audit repositories for label compliance
 5. **Stay Updated**: Keep up with changes to the labeling system
 6. **Cross-Platform Testing**: Test label operations on both Unix and Windows systems
+7. **Use Auto-Detection**: Let the scripts auto-detect repositories where possible
+8. **Check Results**: Always verify that commits were successful in the output summary
 
 ## Examples
 
@@ -216,7 +276,10 @@ On Windows systems:
 ./scripts/batch_commit.ps1 -Message "Update ML models" -Type "feat" -Scope "ml" -Labels "AIR-3,AIS-2,AIT-3,AIM-2"
 
 # Batch commit with validation and specific repositories
-./scripts/batch_commit.ps1 -Message "Fix security issues" -Type "fix" -Scope "security" -Labels "AIR-3,AIS-3" -Repos "anya-core,anya-web5" -Validate
+./scripts/batch_commit.ps1 -Message "Fix security issues" -Type "fix" -Scope "security" -Labels "AIR-3,AIS-3" -Repos "anya-core,anya-bitcoin" -Validate
+
+# Batch commit with custom root directory
+./scripts/batch_commit.ps1 -Message "Update configs" -Type "chore" -Labels "AIR-3,AIS-2" -RootDir "C:\Projects\Anya"
 
 # Synchronize labels across all repositories
 ./scripts/sync_labelling.ps1
@@ -225,7 +288,7 @@ On Windows systems:
 ./scripts/sync_labelling.ps1 -CheckOnly
 
 # Synchronize labels to specific repositories
-./scripts/sync_labelling.ps1 -Target "anya-web5,anya-mobile" -DryRun
+./scripts/sync_labelling.ps1 -Target "anya-web5,anya-bitcoin" -DryRun
 ```
 
 ### Bash Examples
@@ -235,7 +298,7 @@ On Windows systems:
 ./scripts/batch_commit.sh -m "Update ML models" -t "feat" -s "ml" -l "AIR-3,AIS-2,AIT-3,AIM-2"
 
 # Batch commit with validation and specific repositories
-./scripts/batch_commit.sh -m "Fix security issues" -t "fix" -s "security" -l "AIR-3,AIS-3" -r "anya-core,anya-web5" -v
+./scripts/batch_commit.sh -m "Fix security issues" -t "fix" -s "security" -l "AIR-3,AIS-3" -r "anya-core,anya-bitcoin" -v
 
 # Synchronize labels across all repositories
 python scripts/sync_labelling.py
@@ -244,7 +307,7 @@ python scripts/sync_labelling.py
 python scripts/sync_labelling.py --check-only
 
 # Synchronize labels to specific repositories
-python scripts/sync_labelling.py --target "anya-web5,anya-mobile" --dry-run
+python scripts/sync_labelling.py --target "anya-web5,anya-bitcoin" --dry-run
 ```
 
 ## Additional Resources
