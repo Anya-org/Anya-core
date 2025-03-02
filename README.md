@@ -1,480 +1,478 @@
-# Anya Core Platform
+# Anya Core
 
-A powerful platform combining Bitcoin/crypto functionality, ML-based analytics, and Web5 decentralized data management.
+Anya Core is a comprehensive Bitcoin development framework that adheres to the Bitcoin Development Framework v2.5 standards. It provides a robust set of tools and libraries for building Bitcoin applications with a focus on security, privacy, and decentralization.
 
-> For Enterprise features and capabilities, please see our [Enterprise Platform Documentation](./enterprise/README.md)
+*Last Updated: March 1, 2025*
 
-![Anya Architecture](docs/images/anya_architecture.png)
+## Features
 
-## Licensing
+- **Bitcoin Integration**: Full Bitcoin protocol support with Taproot capabilities
+  - **Enhanced Wallet**: Multi-output PSBT creation and management
+  - **Hardware Wallet Support**: Compatible with major hardware wallet vendors
+  - **Transaction Management**: Advanced fee management and PSBT handling
+- **Lightning Network**: LDK-based Lightning Network implementation
+- **Discrete Log Contracts (DLCs)**: Privacy-preserving DLCs using non-interactive oracle patterns
+- **Cross-Chain Functionality**: Support for sidechains and Layer 2 solutions
+  - **RSK**: Bitcoin-RSK bridge with SPV proofs
+  - **Liquid**: Bitcoin-Liquid bridge with asset issuance and transfer
+- **RGB Assets**: Complete RGB asset management
+  - **Asset Issuance**: Create and issue RGB assets with customizable parameters
+  - **Asset Transfer**: Transfer assets with metadata and batch transfers
+  - **Asset Verification**: Verify asset ownership and validity
+- **Wallet Management**: Secure wallet implementation with BIP39/44/84/86 support
+- **Web5 Protocol**: Complete Web5 implementation with DIDs, DWNs, and protocol support
+  - **Bitcoin-Anchored DWNs**: Enhanced data integrity using Bitcoin anchoring
+  - **Bitcoin-Anchored Verifiable Credentials**: Credentials secured by Bitcoin's immutability
+  - **Decentralized Identity**: Support for multiple DID methods with caching mechanism
+  - **Advanced DWN Capabilities**: Secure, private, and encrypted data storage
+  - **Comprehensive API**: Full suite of Web5 endpoints with WebSocket support
+- **Hexagonal Architecture**: Clean separation of concerns with adapters and ports
+- **RESTful API**: Actix Web-based API with JWT authentication and WebSocket support
 
-This core platform is released under the [MIT License](LICENSE.md), allowing for free use, modification, and distribution. However, please note that the [Enterprise features](./enterprise/README.md) are subject to a separate proprietary license with different terms, including revenue sharing requirements. See the [Enterprise License](./enterprise/LICENSE) for details.
+## Project Structure
 
-## Core Features
-
-### Hexagonal Architecture
-- Clean separation of concerns with ports and adapters
-- Domain-driven design principles
-- Advanced error handling and telemetry
-- Circuit breaker pattern implementation
-- Comprehensive health monitoring
-- Thread-safe caching layer
-
-### Blockchain Integration
-- Bitcoin Core & Lightning Network support
-- DLC (Discreet Log Contracts)
-- Taproot/Schnorr signatures
-- Layer 2 solutions
-- Cross-chain capabilities
-- Custom chain support
-
-### Machine Learning & AI
-- Model optimization
-- Federated learning
-- Pipeline optimization
-- Basic analytics
-- Prediction models
-
-### Web5 Integration & Storage
-- Decentralized Web Nodes (DWN)
-- Decentralized data storage
-- Protocol-based data management
-- Identity-centric storage
-- Secure data encryption
-- Record-based storage
-- Automated data replication
-- Protocol optimization
-- Identity management
-- Custom protocols
-
-### Decentralized Communication
-- Nostr protocol integration (NIPs 01, 02, 04, 05, 13, 15, 20)
-- End-to-end encrypted messaging
-- Multi-relay support with health monitoring
-- Automatic relay selection and load balancing
-- Simple key subscription system
-- Secure key management and backup
-
-### Monitoring & Metrics
-- Distributed tracing
-- Performance metrics
-- Resource monitoring
-- Health checks
-- Basic dashboards
-
-## Technical Stack
-
-### Prerequisites
-- Rust 1.70+
-- Bitcoin Core 24.0+
-- Web5 DWN Node
-
-### Core Dependencies
-```toml
-[dependencies]
-tokio = { version = "1.34", features = ["full"] }
-bitcoin = { version = "0.31.0", features = ["rand"] }
-tracing = { version = "0.1", features = ["attributes"] }
-metrics = "0.21"
-web5 = { version = "0.1.0", features = ["storage"] }
-ml-core = { version = "0.1.0" }
+```
+anya-core/
+├── src/
+│   ├── bitcoin/             # Bitcoin module
+│   │   ├── adapters/        # Bitcoin implementation adapters
+│   │   ├── anya-bitcoin/    # Core Bitcoin functionality
+│   │   ├── cross_chain/     # Cross-chain integration
+│   │   │   ├── rsk.rs       # RSK bridge implementation
+│   │   │   ├── liquid.rs    # Liquid bridge implementation
+│   │   │   └── mod.rs       # Cross-chain module entry point
+│   │   ├── dlc/             # Discrete Log Contracts
+│   │   ├── interface/       # Bitcoin interface definitions
+│   │   ├── layer2/          # Layer 2 solutions
+│   │   ├── sidechains/      # Sidechain implementations
+│   │   ├── taproot/         # Taproot assets and functionality
+│   │   ├── wallet/          # Wallet implementation
+│   │   ├── lightning.rs     # Lightning Network implementation
+│   │   └── mod.rs           # Bitcoin module entry point
+│   ├── web5/                # Web5 module
+│   │   ├── identity.rs      # DID implementation
+│   │   ├── dwn.rs           # Decentralized Web Node implementation
+│   │   ├── anchoring.rs     # Bitcoin anchoring implementation
+│   │   ├── protocols.rs     # Protocol handling
+│   │   ├── credentials.rs   # Verifiable credentials implementation
+│   │   └── mod.rs           # Web5 module entry point
+│   ├── rgb/                 # RGB module
+│   │   ├── assets.rs        # RGB asset implementation
+│   │   ├── transfer.rs      # Asset transfer functionality
+│   │   ├── metadata.rs      # Metadata handling for assets
+│   │   ├── verification.rs  # Asset verification
+│   │   └── mod.rs           # RGB module entry point
+│   ├── config.rs            # Configuration module
+│   └── lib.rs               # Library entry point
+├── Cargo.toml               # Project dependencies and configuration
+└── README.md                # This file
 ```
 
-## Quick Start
+## Bitcoin Module
 
-1. **Clone and Setup**
+The Bitcoin module provides a comprehensive implementation of Bitcoin functionality, including:
+
+### Core Components
+
+- **Interface**: Defines the core Bitcoin interfaces and traits
+- **Adapters**: Implements the interfaces for different Bitcoin backends
+- **Wallet**: Secure wallet implementation with support for various address types
+  - **Multi-Output PSBT**: Create PSBTs with multiple outputs
+  - **PSBT Enhancement**: Add metadata and hardware wallet compatibility
+  - **PSBT Signing**: Sign PSBTs with various key types
+  - **PSBT Import/Export**: Import and export PSBTs to/from various formats
+- **Taproot**: Taproot assets and functionality
+- **Lightning**: Lightning Network implementation using LDK
+- **DLC**: Discrete Log Contracts implementation
+- **Cross-Chain**: Support for cross-chain functionality
+  - **RSK Bridge**: Bitcoin-RSK bridge with SPV proofs
+  - **Liquid Bridge**: Bitcoin-Liquid bridge with asset issuance and transfer
+
+### BIP Compliance
+
+The Bitcoin module adheres to the following BIPs:
+
+- BIP 341/342 (Taproot)
+- BIP 174 (PSBT)
+- BIP 39/44/84/86 (HD Wallets)
+- BIP 32 (Hierarchical Deterministic Wallets)
+- BIP 340 (Schnorr Signatures)
+
+## RGB Module
+
+The RGB module provides a complete implementation of the RGB protocol for asset issuance and management:
+
+### Core Components
+
+- **Asset Issuance**: Create and issue RGB assets with customizable parameters
+- **Asset Transfer**: Transfer assets with metadata and batch transfers
+  - **Metadata Support**: Attach metadata to asset transfers
+  - **Batch Transfers**: Transfer assets to multiple recipients in a single operation
+  - **Transfer Verification**: Verify transfer validity and authenticity
+- **Asset Verification**: Verify asset ownership and validity
+  - **Ownership Verification**: Verify ownership of assets
+  - **Asset History**: Track asset transfer history
+  - **Metadata Verification**: Verify metadata integrity
+
+## Web5 Module
+
+The Web5 module provides a complete implementation of the Web5 protocol, including:
+
+### Core Components
+
+- **DID Management**: Create, resolve, and manage Decentralized Identifiers
+  - **Resolution Caching**: Cache DID resolutions for improved performance
+  - **Multiple DID Methods**: Support for various DID methods
+- **DWN Integration**: Store and retrieve data from Decentralized Web Nodes
+  - **Bitcoin Anchoring**: Anchor DWN messages to Bitcoin blockchain for enhanced data integrity
+  - **Encrypted Storage**: End-to-end encrypted data storage in DWNs
+  - **Query Capabilities**: Advanced query functionality for DWN records
+  - **Permissions**: Granular permission system for DWN records
+  - **Replication**: Data replication across multiple DWNs
+- **Protocol Support**: Define and handle Web5 protocols
+- **Credential Management**: Issue, verify, and revoke verifiable credentials
+  - **Bitcoin Anchoring**: Anchor credentials to Bitcoin blockchain
+  - **Revocation**: Credential revocation with Bitcoin transactions
+  - **Status Verification**: Verify credential status using blockchain confirmation
+  - **Credential Updates**: Update credentials with new claims while preserving history
+- **Messaging**: Secure messaging between DIDs
+
+### Bitcoin Anchoring
+
+The Web5 module provides Bitcoin anchoring for both DWN messages and verifiable credentials:
+
+- **Anchoring Process**:
+  1. Generate a commitment hash of the DWN message or credential
+  2. Create a Bitcoin transaction with the commitment hash in an OP_RETURN output
+  3. Submit the transaction to the Bitcoin network
+  4. Monitor transaction confirmations
+  5. Update record/credential status based on confirmation status
+
+- **Verification Process**:
+  1. Extract the commitment hash from the DWN message or credential
+  2. Retrieve the Bitcoin transaction using the provided transaction ID
+  3. Verify the commitment hash matches the OP_RETURN data
+  4. Check the number of confirmations
+  5. Return verification status
+
+- **Security Benefits**:
+  - Immutability: Data integrity guaranteed by Bitcoin's immutability
+  - Timestamping: Proof of existence at a specific Bitcoin block height
+  - Non-repudiation: Cryptographic proof that the data existed at a specific time
+  - Censorship resistance: Data verification does not rely on centralized services
+
+### Standards Compliance
+
+The Web5 module adheres to the following standards:
+
+- W3C DID Core Specification
+- W3C Verifiable Credentials Data Model
+- DIF DWN Specification
+- TBD Web5 Protocol Specification
+
+## Liquid Support
+
+The Liquid module provides integration with the Liquid sidechain, including:
+
+### Core Components
+
+- **Liquid Bridge**: Transfer Bitcoin to and from the Liquid sidechain
+- **Asset Issuance**: Issue and manage custom assets on Liquid
+- **Confidential Transactions**: Support for Liquid's confidential transaction features
+- **SPV Proofs**: Verify Bitcoin transactions on Liquid using SPV proofs
+
+### Features
+
+- **L-BTC Management**: Send, receive, and manage L-BTC (Liquid Bitcoin)
+- **Asset Management**: Issue, transfer, and manage custom assets
+- **Confidential Transactions**: Privacy-preserving transactions with blinded amounts and asset types
+- **Multi-signature Support**: Advanced multi-signature capabilities for enhanced security
+
+## Recent Updates
+
+### March 2025 (v0.2.0)
+
+- Added comprehensive RGB asset transfer functionality with metadata support
+- Enhanced wallet implementation with multi-output PSBT creation and hardware wallet compatibility
+- Implemented Web5 credential verification with Bitcoin anchoring
+- Added Web5 DID resolution caching for improved performance
+- Completed API routes for Web5 functionality
+- Added batch transfer functionality for RGB assets
+
+## Getting Started
+
+### Prerequisites
+
+- Rust 1.70.0 or higher
+- Bitcoin Core 24.0 or higher (for certain functionality)
+- Liquid/Elements Core 22.0 or higher (for Liquid functionality)
+
+### Installation
+
+#### Option 1: Using the Unified Installer (Recommended)
+
+The unified installer automates the entire setup process, including dependencies, configuration, and testing.
+
 ```bash
 # Clone the repository
-git clone https://github.com/anya/anya-core.git
+git clone https://github.com/Anya-org/anya-core.git
 cd anya-core
 
-# Install dependencies
-./scripts/setup.sh
+# Build the installer
+cargo build --bin installer --release
+
+# Run the installer (with guided setup)
+./target/release/installer install
+
+# Configure the installation
+./target/release/installer configure --network testnet
+
+# Run tests to verify installation
+./target/release/installer test --report
+```
+
+#### Option 2: Manual Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/Anya-org/anya-core.git
+cd anya-core
 
 # Build the project
 cargo build --release
+
+### Installation Options
+
+The unified installer supports the following options:
+
 ```
+# Show help
+./target/release/installer --help
 
-2. **Configuration**
-```env
-# Web5 Settings
-WEB5_DWN_URL=http://localhost:3000
-WEB5_STORAGE_PATH=/path/to/web5/data
+# Install only core components
+./target/release/installer install --core-only
 
-# Bitcoin Settings
-BITCOIN_RPC_URL=http://localhost:8332
-BITCOIN_RPC_USER=user
-BITCOIN_RPC_PASS=password
+# Dry run (no changes)
+./target/release/installer install --dry-run
 
-# ML Settings
-ML_MODEL_PATH=/path/to/models
-NPU_ENABLED=true
+# Configure with specific options
+./target/release/installer configure --network mainnet --log-level debug --data-dir /path/to/data
 
-# Monitoring
-METRICS_ENDPOINT=http://localhost:9090
-TRACING_ENDPOINT=http://localhost:4317
+# Test specific components
+./target/release/installer test --component bitcoin
 ```
-
-## Documentation
-
-### System Architecture
-- [Architecture Overview](docs/ARCHITECTURE.md)
-- [Hexagonal Design](docs/HEXAGONAL.md)
-- [Error Handling](docs/ERROR_HANDLING.md)
-- [ML System](docs/ML_SYSTEM_ARCHITECTURE.md)
-- [Web5 Integration](docs/WEB5_INTEGRATION.md)
-
-### Development
-- [API Reference](docs/API.md)
-- [Contributing Guide](CONTRIBUTING.md)
-- [Security Guidelines](docs/SECURITY.md)
-- [Testing Strategy](docs/TESTING.md)
-
-### Deployment
-- [Deployment Guide](docs/DEPLOYMENT.md)
-- [Configuration Guide](docs/CONFIGURATION.md)
-- [Monitoring Setup](docs/MONITORING.md)
-
-## Core Components
-
-### ML Component
-- Advanced model management and execution
-- Real-time inference with metrics tracking
-- Model versioning and selection
-- Validation and error handling
-- Performance monitoring and optimization
-- Support for distributed training
-- Model A/B testing capabilities
-
-### Security Component
-- Comprehensive security operations
-  - Authentication and authorization
-  - Encryption and decryption
-  - Digital signatures and verification
-- Strong audit trail implementation
-- Security event monitoring
-- Rate limiting and threat detection
-- Policy management and enforcement
-- Compliance tracking and reporting
-
-### Protocol Component
-- Advanced transaction handling
-  - Multiple operation types (Create, Sign, Broadcast)
-  - Input/output validation
-  - Fee estimation and management
-- Support for various script types
-  - P2PKH, P2SH, P2WPKH, P2WSH, P2TR
-- Transaction monitoring and tracking
-- Mempool management
-- PSBT support
-- Multi-signature operations
-
-### Enterprise Component
-- Comprehensive business operations
-  - Atomic swaps
-  - Liquid transfers
-  - DLC contracts
-  - State chain transfers
-  - Multi-party computation
-  - Portfolio rebalancing
-- Risk management and compliance
-- Audit trail and reporting
-- SLA monitoring and enforcement
-- Batch operation support
-- Workflow management
-
-## System Architecture
-
-### Core Design Principles
-1. **Memory Safety**
-   - Rust's ownership system
-   - Thread-safe primitives
-   - Resource management
-   
-2. **Error Handling**
-   - Comprehensive error types
-   - Validation at multiple layers
-   - Error aggregation and analysis
-   - Retry strategies
-
-3. **Metrics & Monitoring**
-   - Unified metrics collection
-   - Health checks
-   - Performance tracking
-   - Alerting system
-
-4. **Security**
-   - Context validation
-   - Audit logging
-   - Threat detection
-   - Security event correlation
-
-### Implementation Details
-
-#### Repository Layer
-- CRUD operations
-- Data validation
-- Caching support
-- Transaction management
-- Audit logging
-
-#### Service Layer
-- Business logic
-- Operation processing
-- Security checks
-- Metrics collection
-- Health monitoring
-
-#### Handler Layer
-- Request/response mapping
-- Input validation
-- Error handling
-- Metrics tracking
-- Security enforcement
-
-## Testing Strategy
-
-### Unit Testing
-- Component-level tests
-- Mock implementations
-- Error case coverage
-- Performance benchmarks
-
-### Integration Testing
-- Cross-component testing
-- End-to-end scenarios
-- Performance testing
-- Security testing
-
-### Property Testing
-- Invariant verification
-- Fuzz testing
-- Boundary testing
-- Concurrency testing
-
-## Performance Optimization
-
-### Caching
-- In-memory caching
-- Distributed caching
-- Cache invalidation
-- Cache metrics
-
-### Concurrency
-- Async operations
-- Thread pooling
-- Resource management
-- Deadlock prevention
-
-### Monitoring
-- Performance metrics
-- Resource utilization
-- Bottleneck detection
-- Trend analysis
-
-## Deployment
-
-### Requirements
-- Rust 1.70+
-- Bitcoin Core 24.0+
-- Web5 DWN Node
-- PostgreSQL 14+
-- Redis 7+
 
 ### Configuration
-```env
-# Core Settings
-RUST_LOG=info
-RUST_BACKTRACE=1
 
-# Database
-DATABASE_URL=postgresql://user:pass@localhost/anya
-REDIS_URL=redis://localhost:6379
+Create a `.env` file in the project root with the following configuration:
 
-# Bitcoin Core
-BTC_RPC_URL=http://localhost:8332
-BTC_RPC_USER=user
-BTC_RPC_PASS=pass
-
-# Web5
-WEB5_DWN_URL=http://localhost:3000
-
-# Security
-ENCRYPTION_KEY=<secure-key>
-JWT_SECRET=<jwt-secret>
+```
+BITCOIN_NETWORK=testnet
+BITCOIN_RPC_URL=http://localhost:18332
+BITCOIN_RPC_USER=your_rpc_username
+BITCOIN_RPC_PASS=your_rpc_password
+ENABLED_FEATURES=taproot,lightning,dlc,web5,liquid
+WEB5_DID_METHOD=ion
+WEB5_DWN_ENDPOINT=https://dwn.tbddev.org
+LIQUID_RPC_URL=http://localhost:7041
+LIQUID_RPC_USER=your_liquid_rpc_username
+LIQUID_RPC_PASS=your_liquid_rpc_password
 ```
 
-## Configuration
+## Usage
 
-The Anya platform uses a flexible configuration system that supports multiple configuration sources:
+### Bitcoin Example
 
-1. **Configuration Files** (`config/`)
-   - `default.yaml`: Default configuration values
-   - Environment-specific configs (e.g., `development.yaml`, `production.yaml`)
+```rust
+use anya_core::{bitcoin, config};
 
-2. **Environment Variables**
-   - All configuration can be overridden using environment variables
-   - Variables are prefixed with `ANYA_`
-   - Example: `ANYA_NETWORK_CAPACITY=2000`
-
-3. **Secure Credentials**
-   - Sensitive data is stored securely using encryption
-   - Credentials are managed through the `CredentialManager`
-   - Never commit `.env` files containing secrets
-
-### Configuration Structure
-
-```yaml
-network:
-  capacity: 1000
-  node_connection_limit: 100
-  performance_threshold: 0.6
-
-dao:
-  contract_name: "anya-dao"
-  proposal_threshold: 100000000
-  voting_period_blocks: 1008
-
-features:
-  experimental_ml: false
-  advanced_optimization: false
-  quantum_resistant: false
+fn main() {
+    // Load configuration
+    let config = config::Config::from_env();
+    
+    // Initialize Bitcoin module
+    bitcoin::init();
+    
+    // Create a wallet
+    let wallet = bitcoin::wallet::create_wallet(&config);
+    
+    // Generate a new address
+    let address = wallet.generate_address();
+    println!("New address: {}", address);
+}
 ```
 
-### Dynamic Configuration
+### Web5 Example with Bitcoin Anchoring
 
-The platform supports dynamic configuration updates:
-- Network limits adjust based on system resources
-- Timelock periods scale with network activity
-- Performance thresholds adapt to usage patterns
+```rust
+use anya_core::{web5, bitcoin, config};
 
-### Security
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    // Load configuration
+    let config = config::Config::from_env();
+    
+    // Initialize Bitcoin module
+    bitcoin::init();
+    
+    // Create a wallet for anchoring
+    let wallet = bitcoin::wallet::create_wallet(&config);
+    
+    // Initialize Web5 module with Bitcoin anchoring
+    let web5_config = web5::Web5Config {
+        did_method: "ion".to_string(),
+        dwn_endpoint: "https://dwn.tbddev.org".to_string(),
+        enable_anchoring: true,
+        min_confirmations: 3,
+        enable_credential_anchoring: true,
+        ..Default::default()
+    };
+    
+    let web5_manager = web5::Web5Manager::new(web5_config, Some(wallet))?;
+    
+    // Create a DID
+    let did = web5_manager.create_did()?;
+    println!("Created DID: {}", did.id);
+    
+    // Store data in a DWN with Bitcoin anchoring
+    let data = serde_json::json!({
+        "name": "Alice",
+        "email": "alice@example.com"
+    });
+    
+    // Create and anchor the record
+    let record_id = web5_manager.create_record_with_anchoring(
+        &did.id, 
+        "https://schema.org/Person", 
+        data
+    ).await?;
+    
+    println!("Stored record: {}", record_id);
+    
+    // Check anchoring status
+    let status = web5_manager.get_record_anchoring_status(&record_id).await?;
+    println!("Anchoring status: {:?}", status);
+    
+    // Wait for confirmation (in a real app, you would poll periodically)
+    if status.confirmations < 3 {
+        println!("Waiting for more confirmations...");
+    }
+    
+    // Issue a verifiable credential with Bitcoin anchoring
+    let credential = web5_manager.issue_credential_with_anchoring(
+        &did.id,
+        "https://example.com/credentials/examples/v1",
+        serde_json::json!({
+            "id": "did:example:ebfeb1f712ebc6f1c276e12ec21",
+            "name": "Alice Smith",
+            "degree": {
+                "type": "BachelorDegree",
+                "name": "Bachelor of Science and Arts"
+            }
+        })
+    ).await?;
+    
+    println!("Issued credential: {}", credential.id);
+    
+    // Verify a credential with Bitcoin confirmation check
+    let verification = web5_manager.verify_credential_with_anchoring(&credential.id).await?;
+    println!("Credential verification result: {:?}", verification);
+    
+    Ok(())
+}
+```
 
-- Sensitive configuration is encrypted at rest
-- Credentials are stored securely using the `SecureStorage` module
-- Environment-specific secrets are managed via `.env` files (not committed to VCS)
+### Liquid Example
 
-## Decentralized Governance (DAO)
+```rust
+use anya_core::{bitcoin, config};
 
-### Governance Token (AGT)
-- **Total Supply**: 21,000,000 AGT
-- **Emission Model**: Bitcoin-inspired halving mechanism
-- **Voting Mechanism**: 
-  - Quadratic voting
-  - Time-weighted participation
-  - Expertise-based multipliers
+fn main() {
+    // Load configuration
+    let config = config::Config::from_env();
+    
+    // Initialize Bitcoin module (includes Liquid)
+    bitcoin::init();
+    
+    // Create a Liquid bridge
+    let mut bridge = bitcoin::cross_chain::create_bridge(
+        "Bitcoin-Liquid Bridge",
+        "Liquid",
+        100000, // 0.001 BTC minimum
+        None,   // No maximum
+        102,    // 102 confirmations required
+        10,     // 0.1% fee
+    );
+    
+    // Create a transaction to Liquid
+    let mut transaction = bitcoin::cross_chain::create_transaction(
+        &mut bridge,
+        "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4", // Bitcoin sender
+        "VJL7xGMPkX4BoKYvCBNqYUNLd3UcguxHyA",         // Liquid recipient
+        1000000, // 0.01 BTC
+    ).unwrap();
+    
+    // Execute the transaction
+    let txid = bitcoin::cross_chain::execute_transaction(&mut bridge, &mut transaction).unwrap();
+    println!("Transaction created: {}", txid);
+    
+    // Issue a custom asset on Liquid
+    let asset = bitcoin::cross_chain::liquid::issue_liquid_asset(
+        "My Token",
+        "TKN",
+        8,          // 8 decimal places
+        1_000_000,  // 1 million tokens
+        true,       // Reissuable
+        &[1, 2, 3, 4], // Private key (simplified)
+    ).unwrap();
+    
+    println!("Asset issued: {}", asset.asset_id);
+}
+```
 
-### Governance Features
-- **Proposal Framework**
-  - Low barrier to entry (100 AGT proposal threshold)
-  - Multi-dimensional proposal evaluation
-  - ML-driven proposal scoring
-  - Adaptive governance parameters
+## Testing
 
-### Governance Intelligence
-- **Machine Learning Enhanced**
-  - Predictive proposal outcome analysis
-  - Risk assessment modeling
-  - Sentiment analysis integration
-  - Dynamic governance optimization
+```bash
+# Run all tests
+cargo test
 
-### Cross-Platform Governance
-- **Multi-Chain Compatibility**
-  - Stacks Blockchain Integration
-  - Web5 Decentralized Identity Support
-  - Interoperability Protocols
+# Run Bitcoin module tests
+cargo test --package anya-core --lib bitcoin
 
-### Governance Security
-- **Advanced Protection Mechanisms**
-  - Multi-signature proposal execution
-  - Intelligent threat detection
-  - Automated security audits
-  - Zero-knowledge proof governance
+# Run Web5 module tests
+cargo test --package anya-core --lib web5
 
-### Compliance and Ethics
-- **Governance Principles**
-  - Transparent decision-making
-  - Privacy-preserving technologies
-  - Ethical AI governance
-  - Continuous improvement mechanisms
+# Run Web5 Bitcoin anchoring tests
+cargo test --package anya-core --lib web5::anchoring
 
-### Technical Specifications
-- **Supported Platforms**:
-  - Rust (Core Implementation)
-  - Dart (Mobile/Web Interfaces)
-  - Web5 Decentralized Infrastructure
+# Run Liquid module tests
+cargo test --package anya-core --lib bitcoin::cross_chain::liquid
+```
 
-### Version Information
-- **Current Version**: 3.1.0
-- **Last Updated**: 2024-02-15
-- **Compatibility**: 
-  - Stacks v2.4
-  - Web5 Protocol v1.0
-  - Bitcoin Core Compatibility
+## Hexagonal Architecture
 
-### Governance Manifesto
-*"Intelligence is our governance, decentralization is our method, and human potential is our ultimate goal."*
+Anya Core follows a hexagonal architecture pattern, which separates the core business logic from external concerns:
 
-## Storage Architecture
+- **Core Domain**: The central business logic
+- **Ports**: Interfaces that the core domain exposes
+- **Adapters**: Implementations of the ports that connect to external systems
 
-Anya uses Web5's Decentralized Web Nodes (DWN) for all data storage, providing:
+This architecture ensures:
 
-### Features
-- **Decentralized Storage**: Data is stored across the DWN network
-- **Identity-Based Access**: Data access is controlled by DIDs
-- **Protocol-Driven**: Data schemas and interactions defined by protocols
-- **Encrypted by Default**: All data and communications are encrypted
-- **Automatic Replication**: Data is replicated across nodes
-- **Flexible Querying**: Rich query capabilities for data retrieval
-
-### Data Types
-- User profiles and preferences
-- Transaction records
-- Analytics data
-- Machine learning models
-- System configurations
-- Audit logs
-
-### Benefits
-- No central database dependency
-- Built-in encryption and security
-- Automatic data replication
-- Identity-based access control
-- Protocol-based data validation
-- Offline-first capability
-
-## Contributing
-
-We welcome contributions! See our [Contributing Guide](CONTRIBUTING.md) for details.
-
-## Project Status
-
-- **Current Version**: 1.0.0
-- **Status**: Production/Stable
-- **Last Update**: 2024-01-05
+- Decentralized component management
+- Protocol-level interoperability
+- Real-time system observability
+- Backward-compatible upgrades
 
 ## License
 
-This project is licensed under either of:
-- Apache License, Version 2.0
-- MIT License
+This project is licensed under the MIT License - see the LICENSE file for details.
 
-at your option.
+## Contributing
 
-## Links
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-- [Documentation](https://docs.anya.ai)
-- [API Reference](https://api.anya.ai)
-- [Community Forum](https://community.anya.ai)
-- [Development Blog](https://blog.anya.ai)
-
-## Acknowledgments
-
-Special thanks to our contributors and the following projects:
-- Bitcoin Core
-- Lightning Network
-- Web5
-- TBD
-- Block
-
-*Last updated: 2024-12-07*
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request

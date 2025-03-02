@@ -1,0 +1,19 @@
+[package]
+name = "anya-enterprise"
+version = "0.1.0"
+edition = "2021"
+authors = ["Anya Enterprise Contributors"]
+description = "Enterprise features for Anya Core"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/botshelomokoka/anya-core"
+
+[dependencies]
+anya-core = { path = "../../anya-core", version = "0.1.0" }
+tokio = { workspace = true }
+serde = { workspace = true }
+
+[features]
+default = []
+advanced-security = []
+compliance = []
+audit-logging = []
