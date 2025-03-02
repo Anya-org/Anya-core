@@ -330,4 +330,5 @@ All notable changes to the Anya Core project will be documented in this file.
 - *Security updates are highlighted separately*
 
 ### Last updated
+
 *2024-12-27*

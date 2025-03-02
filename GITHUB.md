@@ -66,6 +66,7 @@ Pull requests are welcome! Please follow these guidelines:
 5. Open a Pull Request
 
 All pull requests should:
+
 - Include tests for new functionality
 - Update documentation as needed
 - Follow the code style guidelines
@@ -85,6 +86,7 @@ The repository uses GitHub Actions for continuous integration and deployment:
 Discussions are available at [github.com/Anya-org/anya-core/discussions](https://github.com/Anya-org/anya-core/discussions).
 
 Use discussions for:
+
 - Questions about the project
 - Ideas for new features
 - Community announcements
@@ -110,4 +112,4 @@ Anya Core is licensed under the MIT License. See the [LICENSE](https://github.co
 
 If you have any questions or feedback, please open an issue or start a discussion on GitHub.
 
-*Last updated: 2025-02-27* 
+*Last updated: 2025-02-27*
