@@ -1,19 +1,19 @@
 # Anya Core Platform
 
-A powerful platform combining Bitcoin/crypto functionality, ML-based analytics, 
+A powerful platform combining Bitcoin/crypto functionality, ML-based analytics,
 and Web5 decentralized data management.
 
-> For Enterprise features and capabilities, please see our 
+> For Enterprise features and capabilities, please see our
 > [Enterprise Platform Documentation](./enterprise/README.md)
 
 ![Anya Architecture](docs/images/anya_architecture.png)
 
 ## Licensing
 
-This core platform is released under the [MIT License](LICENSE.md), allowing for 
-free use, modification, and distribution. However, please note that the 
-[Enterprise features](./enterprise/README.md) are subject to a separate 
-proprietary license with different terms, including revenue sharing requirements. 
+This core platform is released under the [MIT License](LICENSE.md), allowing for
+free use, modification, and distribution. However, please note that the
+[Enterprise features](./enterprise/README.md) are subject to a separate
+proprietary license with different terms, including revenue sharing requirements.
 See the [Enterprise License](./enterprise/LICENSE) for details.
 
 ## Core Features
@@ -351,18 +351,18 @@ JWT_SECRET=<jwt-secret>
 
 ## Configuration System
 
-The Anya platform uses a flexible configuration system that supports multiple 
+The Anya platform uses a flexible configuration system that supports multiple
 configuration sources:
 
 1. **Configuration Files** (`config/`)
    - `default.yaml`: Default configuration values
    - Environment-specific configs (e.g., `development.yaml`, `production.yaml`)
-   
+
 2. **Environment Variables**
    - All configuration can be overridden using environment variables
    - Variables are prefixed with `ANYA_`
    - Example: `ANYA_NETWORK_CAPACITY=2000`
-   
+
 3. **Secure Credentials**
    - Sensitive data is stored securely using encryption
    - Credentials are managed through the `CredentialManager`
@@ -408,68 +408,68 @@ The platform supports dynamic configuration updates:
 - **Total Supply**: 21,000,000 AGT
 - **Emission Model**: Bitcoin-inspired halving mechanism
 - **Voting Mechanism**:
-   - Quadratic voting
-   - Time-weighted participation
-   - Expertise-based multipliers
+  - Quadratic voting
+  - Time-weighted participation
+  - Expertise-based multipliers
 
 ### Governance System Features
 
 - **Proposal Framework**:
-   - Low barrier to entry (100 AGT proposal threshold)
-   - Multi-dimensional proposal evaluation
-   - ML-driven proposal scoring
-   - Adaptive governance parameters
+  - Low barrier to entry (100 AGT proposal threshold)
+  - Multi-dimensional proposal evaluation
+  - ML-driven proposal scoring
+  - Adaptive governance parameters
 
 ### Governance Intelligence
 
 - **Machine Learning Enhanced**:
-   - Predictive proposal outcome analysis
-   - Risk assessment modeling
-   - Sentiment analysis integration
-   - Dynamic governance optimization
+  - Predictive proposal outcome analysis
+  - Risk assessment modeling
+  - Sentiment analysis integration
+  - Dynamic governance optimization
 
 ### Cross-Platform Governance
 
 - **Multi-Chain Compatibility**:
-   - Stacks Blockchain Integration
-   - Web5 Decentralized Identity Support
-   - Interoperability Protocols
+  - Stacks Blockchain Integration
+  - Web5 Decentralized Identity Support
+  - Interoperability Protocols
 
 ### Governance Security Measures
 
 - **Advanced Protection Mechanisms**:
-   - Multi-signature proposal execution
-   - Intelligent threat detection
-   - Automated security audits
-   - Zero-knowledge proof governance
+  - Multi-signature proposal execution
+  - Intelligent threat detection
+  - Automated security audits
+  - Zero-knowledge proof governance
 
 ### Compliance and Ethics Framework
 
 - **Governance Principles**:
-   - Transparent decision-making
-   - Privacy-preserving technologies
-   - Ethical AI governance
-   - Continuous improvement mechanisms
+  - Transparent decision-making
+  - Privacy-preserving technologies
+  - Ethical AI governance
+  - Continuous improvement mechanisms
 
 ### Technical Specifications
 
 - **Supported Platforms**:
-   - Rust (Core Implementation)
-   - Dart (Mobile/Web Interfaces)
-   - Web5 Decentralized Infrastructure
+  - Rust (Core Implementation)
+  - Dart (Mobile/Web Interfaces)
+  - Web5 Decentralized Infrastructure
 
 ### Version Information
 
 - **Current Version**: 3.1.0
 - **Last Updated**: 2024-02-15
 - **Compatibility**:
-   - Stacks v2.4
-   - Web5 Protocol v1.0
-   - Bitcoin Core Compatibility
+  - Stacks v2.4
+  - Web5 Protocol v1.0
+  - Bitcoin Core Compatibility
 
 ### Governance Manifesto
 
-> "Intelligence is our governance, decentralization is our method, and 
+> "Intelligence is our governance, decentralization is our method, and
 > human potential is our ultimate goal."
 
 ## Storage Architecture
