@@ -110,17 +110,17 @@ ml-core = { version = "0.1.0" }
 
 ### 1. Clone and Setup
 
-```bash
+   ```bash
 # Clone the repository
-git clone https://github.com/anya/anya-core.git
-cd anya-core
+   git clone https://github.com/anya/anya-core.git
+   cd anya-core
 
 # Install dependencies
 ./scripts/setup.sh
 
 # Build the project
-cargo build --release
-```
+   cargo build --release
+   ```
 
 ### 2. Configuration
 
