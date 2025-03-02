@@ -4,7 +4,7 @@ All notable changes to the Anya Core project will be documented in this file.
 
 ## [1.4.0] - 2024-12-27
 
-### Added
+### Added in 1.4.0
 
 - 🧠 Advanced ML Component
   - Real-time prediction pipeline (80% complete)
@@ -48,7 +48,7 @@ All notable changes to the Anya Core project will be documented in this file.
   - Development milestone tracking
   - GitHub workflow integration
 
-### Changed
+### Changed in 1.4.0
 
 - Updated ML pipeline architecture
 - Enhanced security protocols
@@ -57,7 +57,7 @@ All notable changes to the Anya Core project will be documented in this file.
 - Enhanced enterprise features
 - Improved development workflow with checkpoints
 
-### Security
+### Security in 1.4.0
 
 - Implemented post-quantum cryptography
 - Enhanced privacy features
@@ -67,7 +67,7 @@ All notable changes to the Anya Core project will be documented in this file.
 
 ## [1.3.0] - 2024-11-30
 
-### Added
+### Added in 1.3.0
 
 - 🔐 Comprehensive Nostr Integration
   - Decentralized communication system
@@ -98,7 +98,7 @@ All notable changes to the Anya Core project will be documented in this file.
   - NIP compliance (01, 02, 04, 05, 13, 15, 20)
   - Enhanced privacy controls
 
-### Changed
+### Changed in 1.3.0
 
 - Refactored notification system to use Nostr as primary channel
 - Enhanced enterprise communication with decentralized approach
@@ -106,7 +106,7 @@ All notable changes to the Anya Core project will be documented in this file.
 - Updated relay selection strategy
 - Enhanced error handling and retry mechanisms
 
-### Security
+### Security in 1.3.0
 
 - Implemented end-to-end encryption for all private messages
 - Added secure key backup and recovery mechanisms
@@ -116,7 +116,7 @@ All notable changes to the Anya Core project will be documented in this file.
 
 ## [1.2.0] - 2024-11-29
 
-### Added
+### Added in 1.2.0
 
 - Comprehensive enterprise analytics system
   - Financial metrics tracking
@@ -143,7 +143,7 @@ All notable changes to the Anya Core project will be documented in this file.
   - Digital transformation metrics
   - IP portfolio management
 
-### Enhanced
+### Enhanced in 1.2.0
 
 - Business agent with enterprise capabilities
 - Analytics engine with predictive modeling
@@ -153,7 +153,7 @@ All notable changes to the Anya Core project will be documented in this file.
 - Performance monitoring tools
 - Market analysis capabilities
 
-### Security
+### Security in 1.2.0
 
 - Enhanced risk assessment protocols
 - Advanced compliance monitoring
@@ -163,7 +163,7 @@ All notable changes to the Anya Core project will be documented in this file.
 
 ## [1.1.0] - 2024-11-15
 
-### Added
+### Added in 1.1.0
 
 - Protocol versioning system with semantic versioning support
 - Role-based access control for Web5 protocols
@@ -176,7 +176,7 @@ All notable changes to the Anya Core project will be documented in this file.
 - Federated learning checkpointing
 - Batch operation capabilities
 
-### Enhanced
+### Enhanced in 1.1.0
 
 - Web5 protocol definitions with versioning
 - Security measures with granular permissions
@@ -186,7 +186,7 @@ All notable changes to the Anya Core project will be documented in this file.
 - Metrics collection and monitoring
 - Documentation for enterprise features
 
-### Fixed
+### Fixed in 1.1.0
 
 - Merge conflicts in dependency management
 - Workspace inheritance configuration
@@ -195,7 +195,7 @@ All notable changes to the Anya Core project will be documented in this file.
 - Error recovery procedures
 - Build system configuration
 
-### Security
+### Security in 1.1.0
 
 - Enhanced protocol access control
 - Improved audit logging
@@ -205,7 +205,7 @@ All notable changes to the Anya Core project will be documented in this file.
 
 ## [1.0.0] - 2024-11-06
 
-### Added
+### Added in 1.0.0
 
 - Complete Bitcoin Core integration with advanced features
 - Lightning Network support with automatic channel management
@@ -218,7 +218,7 @@ All notable changes to the Anya Core project will be documented in this file.
 - Cross-chain interoperability framework
 - Quantum resistance implementation (beta)
 
-### Changed
+### Changed in 1.0.0
 
 - Optimized async setup functions
 - Consolidated duplicate functions in main_system.rs
@@ -226,7 +226,7 @@ All notable changes to the Anya Core project will be documented in this file.
 - Enhanced security configurations
 - Updated documentation structure
 
-### Fixed
+### Fixed in 1.0.0
 
 - Duplicate function declarations in main system
 - Async setup function optimization
@@ -234,7 +234,7 @@ All notable changes to the Anya Core project will be documented in this file.
 - Security configuration updates
 - Documentation improvements
 
-### Security
+### Security in 1.0.0
 
 - Implemented advanced encryption
 - Added secure key management
@@ -244,7 +244,7 @@ All notable changes to the Anya Core project will be documented in this file.
 
 ## [0.9.0] - 2023-11-1
 
-### Added
+### Added in 0.9.0
 
 - Initial Bitcoin integration
 - Basic Lightning Network support
@@ -254,14 +254,14 @@ All notable changes to the Anya Core project will be documented in this file.
 - Basic security features
 - Initial documentation
 
-### Changed
+### Changed in 0.9.0
 
 - Restructured project architecture
 - Updated dependency management
 - Improved build system
 - Enhanced testing framework
 
-### Removed
+### Removed in 0.9.0
 
 - Legacy networking code
 - Deprecated security measures
@@ -269,7 +269,7 @@ All notable changes to the Anya Core project will be documented in this file.
 
 ## [0.8.0] - 2023-10-15
 
-### Added
+### Added in 0.8.0
 
 - Project foundation
 - Basic architecture
@@ -278,7 +278,7 @@ All notable changes to the Anya Core project will be documented in this file.
 
 ## [0.3.0] - 2024-10-05
 
-### Added
+### Added in 0.3.0
 
 - 🤖 Comprehensive automation system
   - Workflow orchestration with `AutomationOrchestrator`
@@ -298,7 +298,7 @@ All notable changes to the Anya Core project will be documented in this file.
   - GitHub Actions workflows
   - Cross-platform scripts
 
-### Changed
+### Changed in 0.3.0
 
 - ⚡️ Improved DWN store performance
 - 🔒 Enhanced security mechanisms
@@ -309,14 +309,14 @@ All notable changes to the Anya Core project will be documented in this file.
   - Better cross-referencing
   - Comprehensive examples
 
-### Fixed
+### Fixed in 0.3.0
 
 - 🐛 Cross-platform compatibility issues
 - 🔧 Dependency conflicts
 - 📝 Documentation inconsistencies
 - 🔍 Search functionality improvements
 
-### Security
+### Security in 0.3.0
 
 - 🔐 Enhanced encryption mechanisms
 - 🛡️ Improved access controls
@@ -327,6 +327,7 @@ All notable changes to the Anya Core project will be documented in this file.
 
 - All dates are in YYYY-MM-DD format
 - Versions follow semantic versioning (MAJOR.MINOR.PATCH)
-- Security updates are highlighted separately
+- *Security updates are highlighted separately*
 
-*Last updated: 2024-12-27*
+### Last updated
+*2024-12-27*
