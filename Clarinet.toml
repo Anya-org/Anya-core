@@ -30,8 +30,8 @@ bitcoin_node = "https://blockstream.info/api"
 [settings]
 token_name = "Anya Governance Token"
 token_symbol = "AGT"
-total_supply = 21000000
-initial_block_reward = 50
+total_supply = 21000000000
+initial_block_reward = 5000
 halving_interval = 210000
 
 [governance]

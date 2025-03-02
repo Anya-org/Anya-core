@@ -1,15 +1,16 @@
 # Anya Tokenomics System Architecture
 
-This document outlines the tokenomics architecture of the Anya DAO system, including the hybrid Bitcoin-style issuance model, DEX integration, and related components.
+This document outlines the tokenomics architecture of the Anya DAO system, including the Bitcoin-style issuance model, DEX integration, and related components.
 
 ## System Overview
 
-The Anya tokenomics system implements a hybrid token issuance model that combines:
+The Anya tokenomics system implements a pure Bitcoin-style token issuance model with specialized distribution rules:
 
-1. An initial 6-month distribution phase releasing 45% of the total supply
-2. A Bitcoin-like halving schedule after the initial period
+1. Bitcoin-style issuance from genesis with higher initial rewards
+2. Strategic token distribution to DEX (30%), dev team (15%), and DAO/community (55%)
+3. Varying developer team allocation based on work contribution
 
-This model provides a balanced approach that ensures sufficient initial token distribution for governance while maintaining the long-term supply controls inspired by Bitcoin's monetary policy.
+This model ensures proper market liquidity through DEX allocation, rewards contributors fairly, and maintains the long-term supply control mechanism inspired by Bitcoin's monetary policy.
 
 ## Component Architecture
 
@@ -33,23 +34,34 @@ anya-core/
 
 ## Issuance Model
 
-### 1. Initial Distribution Phase (6 Months)
+### Bitcoin-Style Issuance with Specialized Distribution
 
-- **Duration**: ~240,000 blocks (assuming 10-minute block times)
-- **Allocation**: 45% of the total supply (9.45 million AGT)
-- **Distribution**: Linear release over the 6-month period
-- **Purpose**: Ensure sufficient tokens for early governance and ecosystem bootstrapping
-
-### 2. Bitcoin-Style Phase (Post-Initial)
-
-- **Starting Block Reward**: 50 AGT per block
-- **Halving Interval**: Every 210,000 blocks (~4 years)
-- **Supply Cap**: 21 million AGT (matching Bitcoin's supply)
+- **Total Supply**: 21 billion AGT (with 8 decimal places)
+- **Initial Block Reward**: 5,000 AGT per block (higher than Bitcoin)
+- **Halving Interval**: Every 210,000 blocks (~4 years with 10-minute blocks)
 - **Halving Schedule**:
-  - First 210,000 blocks post-initial: 50 AGT per block
-  - Next 210,000 blocks: 25 AGT per block
-  - Next 210,000 blocks: 12.5 AGT per block
+  - First 210,000 blocks: 5,000 AGT per block
+  - Next 210,000 blocks: 2,500 AGT per block
+  - Next 210,000 blocks: 1,250 AGT per block
   - And so on...
+
+### Distribution Allocation
+
+For each block reward:
+
+- **DEX Allocation**: 30% of issuance for liquidity provision
+- **Developer Team**: 15% of issuance distributed to 10 team members
+- **DAO/Community**: 55% of issuance for governance and community
+
+### Developer Team Allocation
+
+The 15% allocation to the development team is distributed among 10 team members based on work contribution:
+
+- **Top Performer**: 40% of the team allocation
+- **Lowest Performer**: 5% of the team allocation
+- **Other Members**: Distributed on a sliding scale between 40% and 5%
+
+Team member allocations are configurable by administrators but must always sum to 100% of the team allocation.
 
 ## DEX Integration
 
@@ -58,6 +70,7 @@ The DEX adapter provides liquidity management and trading capabilities for the A
 ### Key Features
 
 1. **Liquidity Provision**
+   - DEX receives 30% of all token issuance
    - Users can provide STX/AGT liquidity to earn trading fees
    - Liquidity providers receive LP tokens representing their share
 
@@ -105,10 +118,10 @@ The DEX adapter provides liquidity management and trading capabilities for the A
 
 2. **Issuance & Token**
    - The Bitcoin issuance contract mints tokens according to the schedule
-   - It directs new tokens to the DAO treasury or other designated recipients
+   - It directs new tokens to the DEX, team members, and DAO as per allocation rules
 
 3. **DEX & Token**
-   - The DEX adapter manages trading between STX and AGT
+   - The DEX receives 30% of all newly minted tokens for liquidity
    - It implements the `dex-integration-trait` interface
 
 4. **DAO & DEX Integration**
@@ -121,7 +134,8 @@ The DAO governance system has control over several tokenomics parameters:
 
 1. **Issuance Controls**
    - Initialization of the issuance schedule
-   - Distribution of newly issued tokens
+   - Setting team member allocations
+   - Configuration of contract addresses
 
 2. **DEX Controls**
    - Fee percentage adjustment
@@ -153,8 +167,8 @@ To deploy and initialize the system:
 1. Deploy all contracts in Clarinet.toml
 2. Initialize the governance token
 3. Initialize the DAO with the token address
-4. Initialize the Bitcoin issuance contract with start block and token address
-5. Initialize the DEX adapter with DAO and token addresses
+4. Initialize the Bitcoin issuance contract with start block, token, DAO, and DEX addresses
+5. Set the team member allocations using the `set-team-allocations` function
 6. Configure the DAO as an administrator of the issuance and DEX contracts
 
 ## Tokenomics Parameters
@@ -163,10 +177,12 @@ Current tokenomics parameters are set as follows:
 
 | Parameter | Value | Description |
 |-----------|-------|-------------|
-| Total Supply | 21,000,000 AGT | Maximum supply cap |
-| Initial Release | 45% | Percentage released in first 6 months |
-| Initial Block Reward | 50 AGT | Block reward after initial period |
+| Total Supply | 21,000,000,000 AGT | Maximum supply cap |
+| Initial Block Reward | 5,000 AGT | Block reward with 8 decimal places |
 | Halving Interval | 210,000 blocks | ~4 years with 10-minute blocks |
+| DEX Allocation | 30% | Percentage of block rewards allocated to DEX |
+| Team Allocation | 15% | Percentage of block rewards allocated to dev team |
+| DAO Allocation | 55% | Percentage of block rewards allocated to DAO/community |
 | DEX Fee | 0.3% | Trading fee percentage |
 | Proposal Threshold | 100 AGT | Minimum tokens to submit a proposal |
 | Voting Threshold | 60% | Percentage needed to pass a proposal |
