@@ -13,6 +13,7 @@ This core platform is released under the [MIT License](LICENSE.md), allowing for
 ## Core Features
 
 ### Hexagonal Architecture
+
 - Clean separation of concerns with ports and adapters
 - Domain-driven design principles
 - Advanced error handling and telemetry
@@ -21,6 +22,7 @@ This core platform is released under the [MIT License](LICENSE.md), allowing for
 - Thread-safe caching layer
 
 ### Blockchain Integration
+
 - Bitcoin Core & Lightning Network support
 - DLC (Discreet Log Contracts)
 - Taproot/Schnorr signatures
@@ -29,6 +31,7 @@ This core platform is released under the [MIT License](LICENSE.md), allowing for
 - Custom chain support
 
 ### Machine Learning & AI
+
 - Model optimization
 - Federated learning
 - Pipeline optimization
@@ -36,6 +39,7 @@ This core platform is released under the [MIT License](LICENSE.md), allowing for
 - Prediction models
 
 ### Web5 Integration & Storage
+
 - Decentralized Web Nodes (DWN)
 - Decentralized data storage
 - Protocol-based data management
@@ -48,6 +52,7 @@ This core platform is released under the [MIT License](LICENSE.md), allowing for
 - Custom protocols
 
 ### Decentralized Communication
+
 - Nostr protocol integration (NIPs 01, 02, 04, 05, 13, 15, 20)
 - End-to-end encrypted messaging
 - Multi-relay support with health monitoring
@@ -55,7 +60,16 @@ This core platform is released under the [MIT License](LICENSE.md), allowing for
 - Simple key subscription system
 - Secure key management and backup
 
+### Development Infrastructure
+
+- Comprehensive checkpoint system
+- AI labeling integration (AIR, AIS, AIT, AIM, AIP, AIE)
+- Automated checkpoint creation (merges, thresholds)
+- Development milestone tracking
+- GitHub Actions workflow integration
+
 ### Monitoring & Metrics
+
 - Distributed tracing
 - Performance metrics
 - Resource monitoring
@@ -65,11 +79,13 @@ This core platform is released under the [MIT License](LICENSE.md), allowing for
 ## Technical Stack
 
 ### Prerequisites
+
 - Rust 1.70+
 - Bitcoin Core 24.0+
 - Web5 DWN Node
 
 ### Core Dependencies
+
 ```toml
 [dependencies]
 tokio = { version = "1.34", features = ["full"] }
@@ -83,6 +99,7 @@ ml-core = { version = "0.1.0" }
 ## Quick Start
 
 1. **Clone and Setup**
+
 ```bash
 # Clone the repository
 git clone https://github.com/anya/anya-core.git
@@ -96,6 +113,7 @@ cargo build --release
 ```
 
 2. **Configuration**
+
 ```env
 # Web5 Settings
 WEB5_DWN_URL=http://localhost:3000
@@ -118,6 +136,7 @@ TRACING_ENDPOINT=http://localhost:4317
 ## Documentation
 
 ### System Architecture
+
 - [Architecture Overview](docs/ARCHITECTURE.md)
 - [Hexagonal Design](docs/HEXAGONAL.md)
 - [Error Handling](docs/ERROR_HANDLING.md)
@@ -125,12 +144,16 @@ TRACING_ENDPOINT=http://localhost:4317
 - [Web5 Integration](docs/WEB5_INTEGRATION.md)
 
 ### Development
+
 - [API Reference](docs/API.md)
 - [Contributing Guide](CONTRIBUTING.md)
 - [Security Guidelines](docs/SECURITY.md)
 - [Testing Strategy](docs/TESTING.md)
+- [Checkpoint System](docs/CHECKPOINT_SYSTEM.md)
+- [Checkpoint Guide](docs/CHECKPOINT_GUIDE.md)
 
 ### Deployment
+
 - [Deployment Guide](docs/DEPLOYMENT.md)
 - [Configuration Guide](docs/CONFIGURATION.md)
 - [Monitoring Setup](docs/MONITORING.md)
@@ -138,6 +161,7 @@ TRACING_ENDPOINT=http://localhost:4317
 ## Core Components
 
 ### ML Component
+
 - Advanced model management and execution
 - Real-time inference with metrics tracking
 - Model versioning and selection
@@ -147,6 +171,7 @@ TRACING_ENDPOINT=http://localhost:4317
 - Model A/B testing capabilities
 
 ### Security Component
+
 - Comprehensive security operations
   - Authentication and authorization
   - Encryption and decryption
@@ -158,6 +183,7 @@ TRACING_ENDPOINT=http://localhost:4317
 - Compliance tracking and reporting
 
 ### Protocol Component
+
 - Advanced transaction handling
   - Multiple operation types (Create, Sign, Broadcast)
   - Input/output validation
@@ -170,6 +196,7 @@ TRACING_ENDPOINT=http://localhost:4317
 - Multi-signature operations
 
 ### Enterprise Component
+
 - Comprehensive business operations
   - Atomic swaps
   - Liquid transfers
@@ -186,11 +213,12 @@ TRACING_ENDPOINT=http://localhost:4317
 ## System Architecture
 
 ### Core Design Principles
+
 1. **Memory Safety**
    - Rust's ownership system
    - Thread-safe primitives
    - Resource management
-   
+
 2. **Error Handling**
    - Comprehensive error types
    - Validation at multiple layers
@@ -212,6 +240,7 @@ TRACING_ENDPOINT=http://localhost:4317
 ### Implementation Details
 
 #### Repository Layer
+
 - CRUD operations
 - Data validation
 - Caching support
@@ -219,6 +248,7 @@ TRACING_ENDPOINT=http://localhost:4317
 - Audit logging
 
 #### Service Layer
+
 - Business logic
 - Operation processing
 - Security checks
@@ -226,6 +256,7 @@ TRACING_ENDPOINT=http://localhost:4317
 - Health monitoring
 
 #### Handler Layer
+
 - Request/response mapping
 - Input validation
 - Error handling
@@ -235,18 +266,21 @@ TRACING_ENDPOINT=http://localhost:4317
 ## Testing Strategy
 
 ### Unit Testing
+
 - Component-level tests
 - Mock implementations
 - Error case coverage
 - Performance benchmarks
 
 ### Integration Testing
+
 - Cross-component testing
 - End-to-end scenarios
 - Performance testing
 - Security testing
 
 ### Property Testing
+
 - Invariant verification
 - Fuzz testing
 - Boundary testing
@@ -255,18 +289,21 @@ TRACING_ENDPOINT=http://localhost:4317
 ## Performance Optimization
 
 ### Caching
+
 - In-memory caching
 - Distributed caching
 - Cache invalidation
 - Cache metrics
 
 ### Concurrency
+
 - Async operations
 - Thread pooling
 - Resource management
 - Deadlock prevention
 
 ### Monitoring
+
 - Performance metrics
 - Resource utilization
 - Bottleneck detection
@@ -275,6 +312,7 @@ TRACING_ENDPOINT=http://localhost:4317
 ## Deployment
 
 ### Requirements
+
 - Rust 1.70+
 - Bitcoin Core 24.0+
 - Web5 DWN Node
@@ -282,6 +320,7 @@ TRACING_ENDPOINT=http://localhost:4317
 - Redis 7+
 
 ### Configuration
+
 ```env
 # Core Settings
 RUST_LOG=info
@@ -344,6 +383,7 @@ features:
 ### Dynamic Configuration
 
 The platform supports dynamic configuration updates:
+
 - Network limits adjust based on system resources
 - Timelock periods scale with network activity
 - Performance thresholds adapt to usage patterns
@@ -357,14 +397,16 @@ The platform supports dynamic configuration updates:
 ## Decentralized Governance (DAO)
 
 ### Governance Token (AGT)
+
 - **Total Supply**: 21,000,000 AGT
 - **Emission Model**: Bitcoin-inspired halving mechanism
-- **Voting Mechanism**: 
+- **Voting Mechanism**:
   - Quadratic voting
   - Time-weighted participation
   - Expertise-based multipliers
 
 ### Governance Features
+
 - **Proposal Framework**
   - Low barrier to entry (100 AGT proposal threshold)
   - Multi-dimensional proposal evaluation
@@ -372,6 +414,7 @@ The platform supports dynamic configuration updates:
   - Adaptive governance parameters
 
 ### Governance Intelligence
+
 - **Machine Learning Enhanced**
   - Predictive proposal outcome analysis
   - Risk assessment modeling
@@ -379,12 +422,14 @@ The platform supports dynamic configuration updates:
   - Dynamic governance optimization
 
 ### Cross-Platform Governance
+
 - **Multi-Chain Compatibility**
   - Stacks Blockchain Integration
   - Web5 Decentralized Identity Support
   - Interoperability Protocols
 
 ### Governance Security
+
 - **Advanced Protection Mechanisms**
   - Multi-signature proposal execution
   - Intelligent threat detection
@@ -392,6 +437,7 @@ The platform supports dynamic configuration updates:
   - Zero-knowledge proof governance
 
 ### Compliance and Ethics
+
 - **Governance Principles**
   - Transparent decision-making
   - Privacy-preserving technologies
@@ -399,20 +445,23 @@ The platform supports dynamic configuration updates:
   - Continuous improvement mechanisms
 
 ### Technical Specifications
+
 - **Supported Platforms**:
   - Rust (Core Implementation)
   - Dart (Mobile/Web Interfaces)
   - Web5 Decentralized Infrastructure
 
 ### Version Information
+
 - **Current Version**: 3.1.0
 - **Last Updated**: 2024-02-15
-- **Compatibility**: 
+- **Compatibility**:
   - Stacks v2.4
   - Web5 Protocol v1.0
   - Bitcoin Core Compatibility
 
 ### Governance Manifesto
+
 *"Intelligence is our governance, decentralization is our method, and human potential is our ultimate goal."*
 
 ## Storage Architecture
@@ -420,6 +469,7 @@ The platform supports dynamic configuration updates:
 Anya uses Web5's Decentralized Web Nodes (DWN) for all data storage, providing:
 
 ### Features
+
 - **Decentralized Storage**: Data is stored across the DWN network
 - **Identity-Based Access**: Data access is controlled by DIDs
 - **Protocol-Driven**: Data schemas and interactions defined by protocols
@@ -428,6 +478,7 @@ Anya uses Web5's Decentralized Web Nodes (DWN) for all data storage, providing:
 - **Flexible Querying**: Rich query capabilities for data retrieval
 
 ### Data Types
+
 - User profiles and preferences
 - Transaction records
 - Analytics data
@@ -436,6 +487,7 @@ Anya uses Web5's Decentralized Web Nodes (DWN) for all data storage, providing:
 - Audit logs
 
 ### Benefits
+
 - No central database dependency
 - Built-in encryption and security
 - Automatic data replication
@@ -456,6 +508,7 @@ We welcome contributions! See our [Contributing Guide](CONTRIBUTING.md) for deta
 ## License
 
 This project is licensed under either of:
+
 - Apache License, Version 2.0
 - MIT License
 
@@ -471,6 +524,7 @@ at your option.
 ## Acknowledgments
 
 Special thanks to our contributors and the following projects:
+
 - Bitcoin Core
 - Lightning Network
 - Web5
