@@ -2,6 +2,7 @@
 ;; Core DAO functionality with Bitcoin-inspired governance
 
 (use-trait ft-trait 'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait)
+(use-trait dao-trait .dao-trait.dao-trait)
 
 ;; Constants
 (define-constant contract-owner tx-sender)

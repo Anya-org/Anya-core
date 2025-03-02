@@ -9,6 +9,8 @@ license = "MIT"
 [contracts]
 governance-token = {path = "src/contracts/governance_token.clar"}
 dao = {path = "src/contracts/dao.clar"}
+dao-trait = {path = "dao/traits/dao-trait.clar"}
+dao-core = {path = "dao/core/dao-core.clar"}
 
 [dependencies]
 sip-010-trait = {contract_id = "SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard", version = "1.0.0"}
