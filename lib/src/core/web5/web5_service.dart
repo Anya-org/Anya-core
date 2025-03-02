@@ -2,6 +2,11 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:logging/logging.dart';
 import 'package:web5_dart/web5_dart.dart' as web5;
+import 'package:bitcoin_anchoring/bitcoin_anchoring.dart';
+
+import 'metrics.dart';
+import 'read_first_dwn.dart';
+import 'identity.dart';
 
 /// Service class for Web5 functionality
 class Web5Service {
@@ -109,6 +114,90 @@ class Web5Service {
       _logger.severe('Failed to delete record: $e');
       throw Web5Exception('Failed to delete record: $e');
     }
+  }
+}
+
+/// Web5Service provides a unified interface for Web5 operations
+/// with Read First Always principle enforcement and Bitcoin anchoring.
+///
+/// Part of AIP-001: Read First Always implementation.
+class Web5ServiceWithReadFirst {
+  final DidManager _didManager;
+  final DwnManager _dwnManager;
+  final ReadFirstDwnManager _readFirstManager;
+  final BitcoinAnchoringService _anchoringService;
+  
+  /// Creates a new Web5Service with Read First Always enforcement
+  Web5ServiceWithReadFirst(this._didManager, this._dwnManager, this._anchoringService) 
+    : _readFirstManager = ReadFirstDwnManager(_didManager, _dwnManager);
+
+  /// Get access to the ReadFirstMetrics for compliance tracking
+  ReadFirstMetrics get metrics => _readFirstManager.metrics;
+  
+  /// Get the DID manager
+  DidManager get didManager => _didManager;
+  
+  /// Create a new record in the DWN with Read First enforcement
+  Future<RecordCreateResponse> createRecord(RecordCreateRequest request, {bool anchor = false}) async {
+    final response = await _readFirstManager.createRecord(request);
+    
+    if (anchor && response.status.code == 200) {
+      await _anchoringService.anchorRecord(response.recordId);
+    }
+    
+    return response;
+  }
+  
+  /// Query for records in the DWN with Read First tracking
+  Future<RecordQueryResponse> queryRecords(RecordQueryRequest request) async {
+    return await _readFirstManager.queryRecords(request);
+  }
+  
+  /// Read a specific record by ID with Read First tracking
+  Future<RecordReadResponse> readRecord(RecordReadRequest request) async {
+    return await _readFirstManager.readRecord(request);
+  }
+  
+  /// Update a record in the DWN with Read First enforcement
+  Future<RecordUpdateResponse> updateRecord(RecordUpdateRequest request, {bool anchor = false}) async {
+    final response = await _readFirstManager.updateRecord(request);
+    
+    if (anchor && response.status.code == 200) {
+      await _anchoringService.anchorRecord(request.recordId);
+    }
+    
+    return response;
+  }
+  
+  /// Delete a record from the DWN with Read First enforcement
+  Future<RecordDeleteResponse> deleteRecord(RecordDeleteRequest request, {bool anchor = false}) async {
+    final response = await _readFirstManager.deleteRecord(request);
+    
+    if (anchor && response.status.code == 200) {
+      await _anchoringService.anchorDeletion(request.recordId);
+    }
+    
+    return response;
+  }
+  
+  /// Get compliance report for Read First principle
+  Map<String, dynamic> getComplianceReport() {
+    return metrics.getDetailedMetrics();
+  }
+  
+  /// Reset all Read First metrics
+  void resetMetrics() {
+    metrics.reset();
+  }
+  
+  /// Check if a record is anchored to Bitcoin
+  Future<AnchoringStatus> getAnchoringStatus(String recordId) async {
+    return await _anchoringService.getAnchoringStatus(recordId);
+  }
+  
+  /// Wait for a record to be confirmed on the Bitcoin blockchain
+  Future<bool> waitForConfirmation(String recordId, {int minConfirmations = 1, Duration timeout = const Duration(minutes: 10)}) async {
+    return await _anchoringService.waitForConfirmation(recordId, minConfirmations: minConfirmations, timeout: timeout);
   }
 }
 
