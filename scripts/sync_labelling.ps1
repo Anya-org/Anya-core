@@ -39,12 +39,22 @@ $LABEL_HISTORY_DIR = ".label_history"
 
 # Find the workspace root directory
 $SCRIPT_DIR = Split-Path -Parent $MyInvocation.MyCommand.Path
-$BASE_DIR = Split-Path -Parent $SCRIPT_DIR
+# Check if SCRIPT_DIR ends with 'scripts' (user running from scripts directory)
+if ($SCRIPT_DIR -match '\\scripts$') {
+    $BASE_DIR = Split-Path -Parent $SCRIPT_DIR
+} else {
+    # Assume the script is being run from a direct path
+    $BASE_DIR = $SCRIPT_DIR
+}
+
 if ([string]::IsNullOrEmpty($RootDir)) {
     $ROOT_DIR = Split-Path -Parent $BASE_DIR
 } else {
     $ROOT_DIR = $RootDir
 }
+
+Write-Host "Working with base directory: $BASE_DIR" -ForegroundColor Cyan
+Write-Host "Using root directory for repositories: $ROOT_DIR" -ForegroundColor Cyan
 
 # Display help information
 function Show-Help {
@@ -65,7 +75,7 @@ function Show-Help {
     Write-Host "Examples:" -ForegroundColor Green
     Write-Host "  ./scripts/sync_labelling.ps1"
     Write-Host "  ./scripts/sync_labelling.ps1 -CheckOnly"
-    Write-Host "  ./scripts/sync_labelling.ps1 -Target ""anya-web5,anya-mobile"" -DryRun"
+    Write-Host "  ./scripts/sync_labelling.ps1 -Target ""anya-web5,anya-bitcoin"" -DryRun"
     Write-Host ""
 }
 
@@ -371,9 +381,31 @@ if ($Target -eq "anya-core,anya-web5,anya-mobile,anya-bitcoin,dash33") {
         if ($detectedRepos.Count -gt 0) {
             $Target = $detectedRepos -join ","
             Write-Host "Auto-detected repositories: $Target" -ForegroundColor Green
+        } else {
+            # Search one level deeper in case of nested structure
+            Write-Host "No repositories found at top level, searching one level deeper..." -ForegroundColor Yellow
+            $detectedRepos = Get-ChildItem -Path $ROOT_DIR -Directory | 
+                             ForEach-Object { 
+                                 Get-ChildItem -Path $_.FullName -Directory -ErrorAction SilentlyContinue
+                             } |
+                             Where-Object { Test-Path -Path (Join-Path -Path $_.FullName -ChildPath ".git") -PathType Container } |
+                             Select-Object -ExpandProperty Name
+            
+            if ($detectedRepos.Count -gt 0) {
+                $Target = $detectedRepos -join ","
+                Write-Host "Auto-detected repositories in subdirectories: $Target" -ForegroundColor Green
+            } else {
+                # Default to current repository only if nothing else found
+                $currentFolder = Split-Path -Leaf $BASE_DIR
+                $Target = $currentFolder
+                Write-Host "No repositories detected. Using current repository: $Target" -ForegroundColor Yellow
+            }
         }
     } catch {
-        Write-Host "Repository auto-detection failed. Using provided list." -ForegroundColor Yellow
+        # In case of error, use current folder
+        $currentFolder = Split-Path -Leaf $BASE_DIR
+        $Target = $currentFolder
+        Write-Host "Repository auto-detection failed. Using current repository: $Target" -ForegroundColor Yellow
     }
 }
 
