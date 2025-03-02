@@ -4,7 +4,7 @@
 # Synchronizes AI_LABELLING.md across all repositories in the Anya ecosystem.
 # Ensures consistent labeling standards across the entire project.
 #
-# Usage: ./sync_labelling.ps1 [-Source repo] [-Target repos] [-CheckOnly] [-DryRun]
+# Usage: ./scripts/sync_labelling.ps1 [-Source repo] [-Target repos] [-CheckOnly] [-DryRun]
 
 param(
     [Parameter(HelpMessage="Source repository for label standards")]
@@ -25,6 +25,9 @@ param(
     [Parameter(HelpMessage="Use batch_commit.ps1 for committing changes")]
     [switch]$BatchCommit = $false,
     
+    [Parameter(HelpMessage="Root directory containing all repositories")]
+    [string]$RootDir = "",
+    
     [Parameter(HelpMessage="Show help message")]
     [switch]$Help = $false
 )
@@ -34,11 +37,20 @@ $LABELLING_FILE = "AI_LABELLING.md"
 $COMMIT_RULES_FILE = "COMMIT_RULES.md"
 $LABEL_HISTORY_DIR = ".label_history"
 
+# Find the workspace root directory
+$SCRIPT_DIR = Split-Path -Parent $MyInvocation.MyCommand.Path
+$BASE_DIR = Split-Path -Parent $SCRIPT_DIR
+if ([string]::IsNullOrEmpty($RootDir)) {
+    $ROOT_DIR = Split-Path -Parent $BASE_DIR
+} else {
+    $ROOT_DIR = $RootDir
+}
+
 # Display help information
 function Show-Help {
     Write-Host "Labeling Synchronization Tool" -ForegroundColor Cyan
     Write-Host "============================" -ForegroundColor Cyan
-    Write-Host "Usage: ./sync_labelling.ps1 [options]"
+    Write-Host "Usage: ./scripts/sync_labelling.ps1 [options]"
     Write-Host ""
     Write-Host "Parameters:" -ForegroundColor Yellow
     Write-Host "  -Source ""REPO""           Source repository for label standards (default: anya-core)"
@@ -47,12 +59,13 @@ function Show-Help {
     Write-Host "  -DryRun                  Show what would be done without making actual changes"
     Write-Host "  -NoCommit                Do not commit changes after synchronization"
     Write-Host "  -BatchCommit             Use batch_commit.ps1 for committing changes"
+    Write-Host "  -RootDir ""PATH""          Root directory containing all repositories (optional)"
     Write-Host "  -Help                    Show this help message"
     Write-Host ""
     Write-Host "Examples:" -ForegroundColor Green
-    Write-Host "  ./sync_labelling.ps1"
-    Write-Host "  ./sync_labelling.ps1 -CheckOnly"
-    Write-Host "  ./sync_labelling.ps1 -Target ""anya-web5,anya-mobile"" -DryRun"
+    Write-Host "  ./scripts/sync_labelling.ps1"
+    Write-Host "  ./scripts/sync_labelling.ps1 -CheckOnly"
+    Write-Host "  ./scripts/sync_labelling.ps1 -Target ""anya-web5,anya-mobile"" -DryRun"
     Write-Host ""
 }
 
@@ -60,6 +73,19 @@ function Show-Help {
 if ($Help) {
     Show-Help
     exit 0
+}
+
+# Function to check if git is available
+function Test-GitAvailable {
+    try {
+        $null = & git --version
+        return $true
+    }
+    catch {
+        Write-Host "Error: Git is not available on this system or not in the PATH." -ForegroundColor Red
+        Write-Host "Please install Git or add it to your PATH variable." -ForegroundColor Yellow
+        return $false
+    }
 }
 
 # Get file hash
@@ -125,13 +151,13 @@ function Sync-File {
         [bool]$CheckOnly
     )
     
-    $baseDir = Split-Path -Parent (Split-Path -Parent $PSCommandPath)
-    $sourcePath = Join-Path -Path (Join-Path -Path (Split-Path -Parent $baseDir) -ChildPath $SourceRepo) -ChildPath $Filename
-    $targetPath = Join-Path -Path (Join-Path -Path (Split-Path -Parent $baseDir) -ChildPath $TargetRepo) -ChildPath $Filename
+    $sourcePath = Join-Path -Path (Join-Path -Path $ROOT_DIR -ChildPath $SourceRepo) -ChildPath $Filename
+    $targetPath = Join-Path -Path (Join-Path -Path $ROOT_DIR -ChildPath $TargetRepo) -ChildPath $Filename
     
-    # Convert paths to absolute
-    $sourcePath = Resolve-Path -Path $sourcePath -ErrorAction SilentlyContinue
-    if (-not $sourcePath) {
+    # Convert paths to absolute if they exist
+    if (Test-Path -Path $sourcePath) {
+        $sourcePath = Resolve-Path -Path $sourcePath
+    } else {
         Write-Host "ERROR: Source file $sourcePath does not exist" -ForegroundColor Red
         return $false, $false
     }
@@ -192,8 +218,7 @@ function Commit-Changes {
         [bool]$BatchCommit
     )
     
-    $baseDir = Split-Path -Parent (Split-Path -Parent $PSCommandPath)
-    $repoPath = Join-Path -Path (Split-Path -Parent $baseDir) -ChildPath $Repo
+    $repoPath = Join-Path -Path $ROOT_DIR -ChildPath $Repo
     
     # No changes to commit
     if ($ChangedFiles.Count -eq 0) {
@@ -202,13 +227,13 @@ function Commit-Changes {
     
     # Don't commit if -NoCommit was specified
     if ($NoCommit) {
-        Write-Host "NOT COMMITTING: Changes in $Repo (--no-commit specified)" -ForegroundColor Yellow
+        Write-Host "NOT COMMITTING: Changes in $Repo (-NoCommit specified)" -ForegroundColor Yellow
         return $true
     }
     
     # Use batch_commit.ps1 if specified
     if ($BatchCommit) {
-        $batchScript = Join-Path -Path (Join-Path -Path $baseDir -ChildPath "scripts") -ChildPath "batch_commit.ps1"
+        $batchScript = Join-Path -Path $BASE_DIR -ChildPath "scripts\batch_commit.ps1"
         if (-not (Test-Path -Path $batchScript)) {
             Write-Host "ERROR: batch_commit.ps1 not found at $batchScript" -ForegroundColor Red
             return $false
@@ -226,6 +251,7 @@ function Commit-Changes {
             Scope = "labelling"
             Labels = "AIR-3,AIS-3,AIE-3"
             Repos = $Repo
+            RootDir = $ROOT_DIR
         }
         
         try {
@@ -233,7 +259,8 @@ function Commit-Changes {
             Write-Host "✓ Committed changes in $Repo using batch_commit.ps1" -ForegroundColor Green
             return $true
         } catch {
-            Write-Host "ERROR: Failed to commit changes in $Repo: $_" -ForegroundColor Red
+            $errorMsg = $_.Exception.Message
+            Write-Host "ERROR: Failed to commit changes in $Repo`: $errorMsg" -ForegroundColor Red
             return $false
         }
     }
@@ -246,10 +273,15 @@ function Commit-Changes {
     
     try {
         # Check if git is installed
-        $null = & git --version
+        if (-not (Test-GitAvailable)) {
+            return $false
+        }
+        
+        # Save current location
+        $currentLocation = Get-Location
         
         # Change to repository directory
-        Push-Location -Path $repoPath
+        Set-Location -Path $repoPath
         
         # Add changes
         $null = & git add $ChangedFiles
@@ -266,26 +298,84 @@ Ensure consistent labelling standards across all repositories.
         # Commit changes
         $tempFile = New-TemporaryFile
         Set-Content -Path $tempFile -Value $commitMsg
-        $null = & git commit -F $tempFile.FullName
+        $commitOutput = git commit -F $tempFile.FullName 2>&1
+        $commitSuccess = $LASTEXITCODE -eq 0
         Remove-Item -Path $tempFile -Force
         
-        Write-Host "✓ Committed changes in $Repo" -ForegroundColor Green
+        if ($commitSuccess) {
+            Write-Host "✓ Committed changes in $Repo" -ForegroundColor Green
+        } else {
+            Write-Host "ERROR: Failed to commit changes in $Repo" -ForegroundColor Red
+            Write-Host "Git output: $commitOutput" -ForegroundColor Red
+        }
         
-        Pop-Location
-        return $true
+        # Return to original location
+        Set-Location -Path $currentLocation
+        return $commitSuccess
     } catch {
-        Write-Host "ERROR: Failed to commit changes in $Repo: $_" -ForegroundColor Red
-        if (Get-Location -eq $repoPath) {
-            Pop-Location
+        $errorMsg = $_.Exception.Message
+        Write-Host "ERROR: Failed to commit changes in $Repo`: $errorMsg" -ForegroundColor Red
+        
+        # Make sure we return to the original location
+        if ((Get-Location).Path -eq $repoPath) {
+            Set-Location -Path $currentLocation
         }
         return $false
     }
 }
 
+# Check if repositories exist and are git repositories
+function Test-Repositories {
+    param(
+        [string[]]$Repositories
+    )
+    
+    $validRepos = @()
+    $invalidRepos = @()
+    
+    foreach ($repo in $Repositories) {
+        $repoPath = Join-Path -Path $ROOT_DIR -ChildPath $repo
+        $gitDir = Join-Path -Path $repoPath -ChildPath ".git"
+        
+        if (-not (Test-Path -Path $repoPath -PathType Container)) {
+            Write-Host "WARNING: Repository $repo not found at $repoPath" -ForegroundColor Yellow
+            $invalidRepos += $repo
+            continue
+        }
+        
+        if (-not (Test-Path -Path $gitDir -PathType Container)) {
+            Write-Host "WARNING: $repo is not a git repository" -ForegroundColor Yellow
+            $invalidRepos += $repo
+            continue
+        }
+        
+        $validRepos += $repo
+    }
+    
+    return $validRepos, $invalidRepos
+}
+
 # Main execution
 Write-Host "Synchronizing labelling files from $Source to repositories" -ForegroundColor Cyan
+Write-Host "Root Directory: $ROOT_DIR" -ForegroundColor Cyan
 Write-Host "Mode: $(if ($CheckOnly) { 'Check only' } else { 'Synchronize' }) $(if ($DryRun) { '(Dry run)' } else { '' })" -ForegroundColor Cyan
 Write-Host ""
+
+# Auto-detect repositories if not explicitly provided
+if ($Target -eq "anya-core,anya-web5,anya-mobile,anya-bitcoin,dash33") {
+    try {
+        $detectedRepos = Get-ChildItem -Path $ROOT_DIR -Directory | 
+                        Where-Object { Test-Path -Path (Join-Path -Path $_.FullName -ChildPath ".git") -PathType Container } |
+                        Select-Object -ExpandProperty Name
+        
+        if ($detectedRepos.Count -gt 0) {
+            $Target = $detectedRepos -join ","
+            Write-Host "Auto-detected repositories: $Target" -ForegroundColor Green
+        }
+    } catch {
+        Write-Host "Repository auto-detection failed. Using provided list." -ForegroundColor Yellow
+    }
+}
 
 # Get list of target repositories
 $targetRepos = $Target -split ','
@@ -295,6 +385,13 @@ if ($targetRepos -notcontains $Source) {
     Write-Host "WARNING: Source repository $Source not in target list. Adding it." -ForegroundColor Yellow
     $targetRepos += $Source
 }
+
+# Validate repositories
+$validRepos, $invalidRepos = Test-Repositories -Repositories $targetRepos
+if ($invalidRepos.Count -gt 0) {
+    Write-Host "WARNING: Skipping invalid repositories: $($invalidRepos -join ', ')" -ForegroundColor Yellow
+}
+$targetRepos = $validRepos
 
 # Files to synchronize
 $filesToSync = @($LABELLING_FILE, $COMMIT_RULES_FILE)
@@ -337,16 +434,25 @@ foreach ($repo in $targetRepos) {
 }
 
 # Commit changes if needed
+$commitSucceeded = @()
+$commitFailed = @()
+
 if (-not $CheckOnly) {
     foreach ($repo in $targetRepos) {
         if ($repo -ne $Source -and $changesByRepo[$repo].Count -gt 0) {
-            Commit-Changes -Repo $repo -ChangedFiles $changesByRepo[$repo] -DryRun $DryRun -NoCommit $NoCommit -BatchCommit $BatchCommit
+            $success = Commit-Changes -Repo $repo -ChangedFiles $changesByRepo[$repo] -DryRun $DryRun -NoCommit $NoCommit -BatchCommit $BatchCommit
+            if ($success) {
+                $commitSucceeded += $repo
+            } else {
+                $commitFailed += $repo
+            }
         }
     }
 }
 
 # Summary
-Write-Host "`nSummary:" -ForegroundColor Cyan
+Write-Host "`nSync Summary:" -ForegroundColor Cyan
+Write-Host "=============" -ForegroundColor Cyan
 Write-Host "- Repositories with differences: $($reposWithDiffs.Count)" -ForegroundColor Yellow
 if ($reposWithDiffs.Count -gt 0) {
     Write-Host "  - $($reposWithDiffs -join ', ')" -ForegroundColor Yellow
@@ -357,6 +463,18 @@ if (-not $CheckOnly) {
     Write-Host "- Repositories synchronized: $($uniqueSynced.Count)" -ForegroundColor Green
     if ($uniqueSynced.Count -gt 0) {
         Write-Host "  - $($uniqueSynced -join ', ')" -ForegroundColor Green
+    }
+    
+    if (-not $DryRun -and -not $NoCommit) {
+        Write-Host "- Commits succeeded: $($commitSucceeded.Count)" -ForegroundColor Green
+        if ($commitSucceeded.Count -gt 0) {
+            Write-Host "  - $($commitSucceeded -join ', ')" -ForegroundColor Green
+        }
+        
+        Write-Host "- Commits failed: $($commitFailed.Count)" -ForegroundColor $(if ($commitFailed.Count -gt 0) { "Red" } else { "Green" })
+        if ($commitFailed.Count -gt 0) {
+            Write-Host "  - $($commitFailed -join ', ')" -ForegroundColor Red
+        }
     }
 }
 

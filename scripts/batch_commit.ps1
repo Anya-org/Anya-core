@@ -3,7 +3,7 @@
 # PowerShell version of batch commit script for Anya Core ecosystem
 # Applies changes with proper labeling across multiple repositories
 #
-# Usage: ./batch_commit.ps1 -Message "Commit message" -Type "feat" -Scope "component" -Labels "AIR-3,AIS-2,AIT-3" [-Repos "repo1,repo2"] [-Validate]
+# Usage: ./scripts/batch_commit.ps1 -Message "Commit message" -Type "feat" -Scope "component" -Labels "AIR-3,AIS-2,AIT-3" [-Repos "repo1,repo2"] [-Validate]
 
 # Default values
 param(
@@ -29,18 +29,27 @@ param(
     [switch]$DryRun = $false,
     
     [Parameter(HelpMessage="Show help message")]
-    [switch]$Help = $false
+    [switch]$Help = $false,
+    
+    [Parameter(HelpMessage="Root directory containing all repositories")]
+    [string]$RootDir = ""
 )
 
-# Base directory
-$BASE_DIR = Get-Location
+# Find the workspace root directory
+$SCRIPT_DIR = Split-Path -Parent $MyInvocation.MyCommand.Path
+$BASE_DIR = Split-Path -Parent $SCRIPT_DIR
+if ([string]::IsNullOrEmpty($RootDir)) {
+    $ROOT_DIR = Split-Path -Parent $BASE_DIR
+} else {
+    $ROOT_DIR = $RootDir
+}
 $LABEL_CACHE_FILE = Join-Path -Path $BASE_DIR -ChildPath ".label_cache.json"
 
 # Display help information
 function Show-Help {
     Write-Host "Batch Commit Tool with Comprehensive Labeling" -ForegroundColor Cyan
     Write-Host "=============================================" -ForegroundColor Cyan
-    Write-Host "Usage: ./batch_commit.ps1 [options]"
+    Write-Host "Usage: ./scripts/batch_commit.ps1 [options]"
     Write-Host ""
     Write-Host "Parameters:" -ForegroundColor Yellow
     Write-Host "  -Message ""MESSAGE""        Commit message (required)"
@@ -51,10 +60,11 @@ function Show-Help {
     Write-Host "  -Validate                  Validate labels before committing"
     Write-Host "  -DryRun                    Show what would be committed without making changes"
     Write-Host "  -Help                      Show this help message"
+    Write-Host "  -RootDir ""PATH""           Root directory containing all repositories (optional)"
     Write-Host ""
     Write-Host "Examples:" -ForegroundColor Green
-    Write-Host '  ./batch_commit.ps1 -Message "Update AI models" -Type "feat" -Scope "ml" -Labels "AIR-3,AIS-2,AIT-3,AIM-2"'
-    Write-Host '  ./batch_commit.ps1 -Message "Fix security issues" -Type "fix" -Scope "security" -Labels "AIR-3,AIS-3" -Repos "anya-core,anya-web5" -Validate'
+    Write-Host '  ./scripts/batch_commit.ps1 -Message "Update AI models" -Type "feat" -Scope "ml" -Labels "AIR-3,AIS-2,AIT-3,AIM-2"'
+    Write-Host '  ./scripts/batch_commit.ps1 -Message "Fix security issues" -Type "fix" -Scope "security" -Labels "AIR-3,AIS-3" -Repos "anya-core,anya-bitcoin" -Validate'
     Write-Host ""
     Write-Host "Available commit types:" -ForegroundColor Yellow
     Write-Host "  feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert"
@@ -94,8 +104,25 @@ foreach ($label in $LABEL_ARRAY) {
 
 # Get list of repositories
 if ([string]::IsNullOrEmpty($Repos)) {
-    # Default list of repositories
-    $Repos = "anya-core,anya-web5,anya-mobile,anya-bitcoin,dash33"
+    # Auto-detect repositories in the root directory
+    try {
+        $detectedRepos = Get-ChildItem -Path $ROOT_DIR -Directory | 
+                          Where-Object { Test-Path -Path (Join-Path -Path $_.FullName -ChildPath ".git") -PathType Container } |
+                          Select-Object -ExpandProperty Name
+        
+        if ($detectedRepos.Count -gt 0) {
+            $Repos = $detectedRepos -join ","
+            Write-Host "Auto-detected repositories: $Repos" -ForegroundColor Green
+        } else {
+            # Default list of repositories if none detected
+            $Repos = "anya-core,anya-web5,anya-mobile,anya-bitcoin,dash33"
+            Write-Host "No repositories detected. Using default list: $Repos" -ForegroundColor Yellow
+        }
+    } catch {
+        # Default list of repositories if detection fails
+        $Repos = "anya-core,anya-web5,anya-mobile,anya-bitcoin,dash33"
+        Write-Host "Repository detection failed. Using default list: $Repos" -ForegroundColor Yellow
+    }
 }
 $REPO_ARRAY = $Repos -split ','
 
@@ -189,6 +216,24 @@ function Get-CommitMessage {
     return $commitMsg
 }
 
+# Function to check if git is available
+function Test-GitAvailable {
+    try {
+        $null = & git --version
+        return $true
+    }
+    catch {
+        Write-Host "Error: Git is not available on this system or not in the PATH." -ForegroundColor Red
+        Write-Host "Please install Git or add it to your PATH variable." -ForegroundColor Yellow
+        return $false
+    }
+}
+
+# Check if git is available
+if (-not (Test-GitAvailable)) {
+    exit 1
+}
+
 # Main execution
 Write-Host "Batch Commit with Comprehensive Labeling" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
@@ -199,6 +244,7 @@ if (-not [string]::IsNullOrEmpty($Scope)) {
 Write-Host "Message: $Message"
 Write-Host "Labels: $FORMATTED_LABELS"
 Write-Host "Repositories: $($Repos -replace ',', ', ')"
+Write-Host "Root Directory: $ROOT_DIR"
 Write-Host ""
 
 # Validate labels if requested
@@ -226,30 +272,65 @@ Write-Host $COMMIT_MESSAGE
 Write-Host "-----------------------------------"
 Write-Host ""
 
+# Track successful and failed operations
+$successful_commits = @()
+$failed_repos = @()
+
 # Process each repository
 foreach ($repo in $REPO_ARRAY) {
-    $repo_path = Join-Path -Path (Split-Path -Parent $BASE_DIR) -ChildPath $repo
+    $repo_path = Join-Path -Path $ROOT_DIR -ChildPath $repo
     
     # Skip if repository doesn't exist
     if (-not (Test-Path -Path $repo_path -PathType Container)) {
         Write-Host "Warning: Repository $repo not found at $repo_path" -ForegroundColor Yellow
+        $failed_repos += $repo
+        continue
+    }
+    
+    # Skip if not a git repository
+    $git_dir = Join-Path -Path $repo_path -ChildPath ".git"
+    if (-not (Test-Path -Path $git_dir -PathType Container)) {
+        Write-Host "Warning: $repo is not a git repository" -ForegroundColor Yellow
+        $failed_repos += $repo
         continue
     }
     
     Write-Host "Processing repository: $repo" -ForegroundColor Cyan
     
-    # Check if there are any changes to commit
-    Push-Location -Path $repo_path
-    git update-index -q --refresh
-    $hasChanges = $false
-    $gitStatus = git status -s
-    if (-not [string]::IsNullOrEmpty($gitStatus)) {
-        $hasChanges = $true
+    # Save current location to return to later
+    $currentLocation = Get-Location
+    
+    # Change to repository directory
+    try {
+        Set-Location -Path $repo_path -ErrorAction Stop
+    }
+    catch {
+        Write-Host "Error: Failed to change directory to $repo_path" -ForegroundColor Red
+        Write-Host "  Details: $($_.Exception.Message)" -ForegroundColor Red
+        $failed_repos += $repo
+        continue
     }
     
-    if (-not $hasChanges) {
-        Write-Host "No changes to commit in $repo" -ForegroundColor Yellow
-        Pop-Location
+    # Check if there are any changes to commit
+    try {
+        $hasChanges = $false
+        git update-index -q --refresh
+        $gitStatus = git status -s
+        if (-not [string]::IsNullOrEmpty($gitStatus)) {
+            $hasChanges = $true
+        }
+        
+        if (-not $hasChanges) {
+            Write-Host "No changes to commit in $repo" -ForegroundColor Yellow
+            Set-Location -Path $currentLocation
+            continue
+        }
+    }
+    catch {
+        Write-Host "Error: Failed to check git status in $repo" -ForegroundColor Red
+        Write-Host "  Details: $($_.Exception.Message)" -ForegroundColor Red
+        Set-Location -Path $currentLocation
+        $failed_repos += $repo
         continue
     }
     
@@ -257,19 +338,54 @@ foreach ($repo in $REPO_ARRAY) {
     if ($DryRun) {
         Write-Host "DRY RUN: Would commit changes in $repo with message:" -ForegroundColor Yellow
         Write-Host $COMMIT_MESSAGE
+        $successful_commits += $repo
     } else {
-        Write-Host "Committing changes in $repo..." -ForegroundColor Green
-        git add .
-        # Creating a temporary file for the commit message
-        $tempFile = New-TemporaryFile
-        Set-Content -Path $tempFile -Value $COMMIT_MESSAGE
-        git commit -F $tempFile
-        Remove-Item -Path $tempFile
-        Write-Host "Changes committed successfully in $repo" -ForegroundColor Green
+        try {
+            Write-Host "Committing changes in $repo..." -ForegroundColor Green
+            
+            # Add changes
+            git add .
+            
+            # Creating a temporary file for the commit message
+            $tempFile = New-TemporaryFile
+            Set-Content -Path $tempFile -Value $COMMIT_MESSAGE
+            
+            # Commit changes
+            $commitOutput = git commit -F $tempFile 2>&1
+            Remove-Item -Path $tempFile -Force
+            
+            # Check if commit was successful
+            if ($LASTEXITCODE -eq 0) {
+                Write-Host "Changes committed successfully in $repo" -ForegroundColor Green
+                $successful_commits += $repo
+            } else {
+                Write-Host "Failed to commit changes in $repo" -ForegroundColor Red
+                Write-Host "Git output: $commitOutput" -ForegroundColor Red
+                $failed_repos += $repo
+            }
+        }
+        catch {
+            Write-Host "Error: Exception during commit in $repo" -ForegroundColor Red
+            Write-Host "  Details: $($_.Exception.Message)" -ForegroundColor Red
+            $failed_repos += $repo
+        }
     }
     
-    Pop-Location
+    # Return to original location
+    Set-Location -Path $currentLocation
     Write-Host ""
 }
 
-Write-Host "Batch commit process completed." -ForegroundColor Green 
+# Summary
+Write-Host "Batch Commit Summary:" -ForegroundColor Cyan
+Write-Host "====================" -ForegroundColor Cyan
+Write-Host "Successful commits: $($successful_commits.Count)" -ForegroundColor Green
+if ($successful_commits.Count -gt 0) {
+    Write-Host "  - $($successful_commits -join ', ')" -ForegroundColor Green
+}
+Write-Host "Failed repositories: $($failed_repos.Count)" -ForegroundColor $(if ($failed_repos.Count -gt 0) { "Red" } else { "Green" })
+if ($failed_repos.Count -gt 0) {
+    Write-Host "  - $($failed_repos -join ', ')" -ForegroundColor Red
+}
+
+Write-Host "`nBatch commit process completed." -ForegroundColor Cyan 
