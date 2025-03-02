@@ -1,14 +1,20 @@
 # Anya Core Platform
 
-A powerful platform combining Bitcoin/crypto functionality, ML-based analytics, and Web5 decentralized data management.
+A powerful platform combining Bitcoin/crypto functionality, ML-based analytics, 
+and Web5 decentralized data management.
 
-> For Enterprise features and capabilities, please see our [Enterprise Platform Documentation](./enterprise/README.md)
+> For Enterprise features and capabilities, please see our 
+> [Enterprise Platform Documentation](./enterprise/README.md)
 
 ![Anya Architecture](docs/images/anya_architecture.png)
 
 ## Licensing
 
-This core platform is released under the [MIT License](LICENSE.md), allowing for free use, modification, and distribution. However, please note that the [Enterprise features](./enterprise/README.md) are subject to a separate proprietary license with different terms, including revenue sharing requirements. See the [Enterprise License](./enterprise/LICENSE) for details.
+This core platform is released under the [MIT License](LICENSE.md), allowing for 
+free use, modification, and distribution. However, please note that the 
+[Enterprise features](./enterprise/README.md) are subject to a separate 
+proprietary license with different terms, including revenue sharing requirements. 
+See the [Enterprise License](./enterprise/LICENSE) for details.
 
 ## Core Features
 
@@ -98,7 +104,7 @@ ml-core = { version = "0.1.0" }
 
 ## Quick Start
 
-1. **Clone and Setup**
+### 1. Clone and Setup
 
 ```bash
 # Clone the repository
@@ -112,7 +118,7 @@ cd anya-core
 cargo build --release
 ```
 
-2. **Configuration**
+### 2. Configuration
 
 ```env
 # Web5 Settings
@@ -135,7 +141,7 @@ TRACING_ENDPOINT=http://localhost:4317
 
 ## Documentation
 
-### System Architecture
+### System Architecture Documentation
 
 - [Architecture Overview](docs/ARCHITECTURE.md)
 - [Hexagonal Design](docs/HEXAGONAL.md)
@@ -143,7 +149,7 @@ TRACING_ENDPOINT=http://localhost:4317
 - [ML System](docs/ML_SYSTEM_ARCHITECTURE.md)
 - [Web5 Integration](docs/WEB5_INTEGRATION.md)
 
-### Development
+### Development Documentation
 
 - [API Reference](docs/API.md)
 - [Contributing Guide](CONTRIBUTING.md)
@@ -152,7 +158,7 @@ TRACING_ENDPOINT=http://localhost:4317
 - [Checkpoint System](docs/CHECKPOINT_SYSTEM.md)
 - [Checkpoint Guide](docs/CHECKPOINT_GUIDE.md)
 
-### Deployment
+### Deployment Documentation
 
 - [Deployment Guide](docs/DEPLOYMENT.md)
 - [Configuration Guide](docs/CONFIGURATION.md)
@@ -160,7 +166,7 @@ TRACING_ENDPOINT=http://localhost:4317
 
 ## Core Components
 
-### ML Component
+### ML Component Features
 
 - Advanced model management and execution
 - Real-time inference with metrics tracking
@@ -170,7 +176,7 @@ TRACING_ENDPOINT=http://localhost:4317
 - Support for distributed training
 - Model A/B testing capabilities
 
-### Security Component
+### Security Component Features
 
 - Comprehensive security operations
   - Authentication and authorization
@@ -182,7 +188,7 @@ TRACING_ENDPOINT=http://localhost:4317
 - Policy management and enforcement
 - Compliance tracking and reporting
 
-### Protocol Component
+### Protocol Component Features
 
 - Advanced transaction handling
   - Multiple operation types (Create, Sign, Broadcast)
@@ -195,7 +201,7 @@ TRACING_ENDPOINT=http://localhost:4317
 - PSBT support
 - Multi-signature operations
 
-### Enterprise Component
+### Enterprise Component Features
 
 - Comprehensive business operations
   - Atomic swaps
@@ -219,19 +225,19 @@ TRACING_ENDPOINT=http://localhost:4317
    - Thread-safe primitives
    - Resource management
 
-2. **Error Handling**
+2. **Error Handling System**
    - Comprehensive error types
    - Validation at multiple layers
    - Error aggregation and analysis
    - Retry strategies
 
-3. **Metrics & Monitoring**
+3. **Metrics & Monitoring System**
    - Unified metrics collection
    - Health checks
    - Performance tracking
    - Alerting system
 
-4. **Security**
+4. **Security Architecture**
    - Context validation
    - Audit logging
    - Threat detection
@@ -239,7 +245,7 @@ TRACING_ENDPOINT=http://localhost:4317
 
 ### Implementation Details
 
-#### Repository Layer
+#### Repository Layer Details
 
 - CRUD operations
 - Data validation
@@ -247,7 +253,7 @@ TRACING_ENDPOINT=http://localhost:4317
 - Transaction management
 - Audit logging
 
-#### Service Layer
+#### Service Layer Components
 
 - Business logic
 - Operation processing
@@ -255,7 +261,7 @@ TRACING_ENDPOINT=http://localhost:4317
 - Metrics collection
 - Health monitoring
 
-#### Handler Layer
+#### Handler Layer Organization
 
 - Request/response mapping
 - Input validation
@@ -265,21 +271,21 @@ TRACING_ENDPOINT=http://localhost:4317
 
 ## Testing Strategy
 
-### Unit Testing
+### Unit Testing Approach
 
 - Component-level tests
 - Mock implementations
 - Error case coverage
 - Performance benchmarks
 
-### Integration Testing
+### Integration Testing Methods
 
 - Cross-component testing
 - End-to-end scenarios
 - Performance testing
 - Security testing
 
-### Property Testing
+### Property Testing Framework
 
 - Invariant verification
 - Fuzz testing
@@ -288,30 +294,30 @@ TRACING_ENDPOINT=http://localhost:4317
 
 ## Performance Optimization
 
-### Caching
+### Caching Strategy
 
 - In-memory caching
 - Distributed caching
 - Cache invalidation
 - Cache metrics
 
-### Concurrency
+### Concurrency Model
 
 - Async operations
 - Thread pooling
 - Resource management
 - Deadlock prevention
 
-### Monitoring
+### Monitoring Capabilities
 
 - Performance metrics
 - Resource utilization
 - Bottleneck detection
 - Trend analysis
 
-## Deployment
+## Deployment Requirements
 
-### Requirements
+### System Requirements
 
 - Rust 1.70+
 - Bitcoin Core 24.0+
@@ -319,9 +325,9 @@ TRACING_ENDPOINT=http://localhost:4317
 - PostgreSQL 14+
 - Redis 7+
 
-### Configuration
+### Configuration Options
 
-```env
+```bash
 # Core Settings
 RUST_LOG=info
 RUST_BACKTRACE=1
@@ -343,25 +349,26 @@ ENCRYPTION_KEY=<secure-key>
 JWT_SECRET=<jwt-secret>
 ```
 
-## Configuration
+## Configuration System
 
-The Anya platform uses a flexible configuration system that supports multiple configuration sources:
+The Anya platform uses a flexible configuration system that supports multiple 
+configuration sources:
 
 1. **Configuration Files** (`config/`)
    - `default.yaml`: Default configuration values
    - Environment-specific configs (e.g., `development.yaml`, `production.yaml`)
-
+   
 2. **Environment Variables**
    - All configuration can be overridden using environment variables
    - Variables are prefixed with `ANYA_`
    - Example: `ANYA_NETWORK_CAPACITY=2000`
-
+   
 3. **Secure Credentials**
    - Sensitive data is stored securely using encryption
    - Credentials are managed through the `CredentialManager`
    - Never commit `.env` files containing secrets
 
-### Configuration Structure
+### Configuration Structure Example
 
 ```yaml
 network:
@@ -380,7 +387,7 @@ features:
   quantum_resistant: false
 ```
 
-### Dynamic Configuration
+### Dynamic Configuration Capabilities
 
 The platform supports dynamic configuration updates:
 
@@ -388,7 +395,7 @@ The platform supports dynamic configuration updates:
 - Timelock periods scale with network activity
 - Performance thresholds adapt to usage patterns
 
-### Security
+### Security Configuration
 
 - Sensitive configuration is encrypted at rest
 - Credentials are stored securely using the `SecureStorage` module
@@ -401,74 +408,75 @@ The platform supports dynamic configuration updates:
 - **Total Supply**: 21,000,000 AGT
 - **Emission Model**: Bitcoin-inspired halving mechanism
 - **Voting Mechanism**:
-  - Quadratic voting
-  - Time-weighted participation
-  - Expertise-based multipliers
+   - Quadratic voting
+   - Time-weighted participation
+   - Expertise-based multipliers
 
-### Governance Features
+### Governance System Features
 
-- **Proposal Framework**
-  - Low barrier to entry (100 AGT proposal threshold)
-  - Multi-dimensional proposal evaluation
-  - ML-driven proposal scoring
-  - Adaptive governance parameters
+- **Proposal Framework**:
+   - Low barrier to entry (100 AGT proposal threshold)
+   - Multi-dimensional proposal evaluation
+   - ML-driven proposal scoring
+   - Adaptive governance parameters
 
 ### Governance Intelligence
 
-- **Machine Learning Enhanced**
-  - Predictive proposal outcome analysis
-  - Risk assessment modeling
-  - Sentiment analysis integration
-  - Dynamic governance optimization
+- **Machine Learning Enhanced**:
+   - Predictive proposal outcome analysis
+   - Risk assessment modeling
+   - Sentiment analysis integration
+   - Dynamic governance optimization
 
 ### Cross-Platform Governance
 
-- **Multi-Chain Compatibility**
-  - Stacks Blockchain Integration
-  - Web5 Decentralized Identity Support
-  - Interoperability Protocols
+- **Multi-Chain Compatibility**:
+   - Stacks Blockchain Integration
+   - Web5 Decentralized Identity Support
+   - Interoperability Protocols
 
-### Governance Security
+### Governance Security Measures
 
-- **Advanced Protection Mechanisms**
-  - Multi-signature proposal execution
-  - Intelligent threat detection
-  - Automated security audits
-  - Zero-knowledge proof governance
+- **Advanced Protection Mechanisms**:
+   - Multi-signature proposal execution
+   - Intelligent threat detection
+   - Automated security audits
+   - Zero-knowledge proof governance
 
-### Compliance and Ethics
+### Compliance and Ethics Framework
 
-- **Governance Principles**
-  - Transparent decision-making
-  - Privacy-preserving technologies
-  - Ethical AI governance
-  - Continuous improvement mechanisms
+- **Governance Principles**:
+   - Transparent decision-making
+   - Privacy-preserving technologies
+   - Ethical AI governance
+   - Continuous improvement mechanisms
 
 ### Technical Specifications
 
 - **Supported Platforms**:
-  - Rust (Core Implementation)
-  - Dart (Mobile/Web Interfaces)
-  - Web5 Decentralized Infrastructure
+   - Rust (Core Implementation)
+   - Dart (Mobile/Web Interfaces)
+   - Web5 Decentralized Infrastructure
 
 ### Version Information
 
 - **Current Version**: 3.1.0
 - **Last Updated**: 2024-02-15
 - **Compatibility**:
-  - Stacks v2.4
-  - Web5 Protocol v1.0
-  - Bitcoin Core Compatibility
+   - Stacks v2.4
+   - Web5 Protocol v1.0
+   - Bitcoin Core Compatibility
 
 ### Governance Manifesto
 
-*"Intelligence is our governance, decentralization is our method, and human potential is our ultimate goal."*
+> "Intelligence is our governance, decentralization is our method, and 
+> human potential is our ultimate goal."
 
 ## Storage Architecture
 
 Anya uses Web5's Decentralized Web Nodes (DWN) for all data storage, providing:
 
-### Features
+### Storage Features
 
 - **Decentralized Storage**: Data is stored across the DWN network
 - **Identity-Based Access**: Data access is controlled by DIDs
@@ -477,7 +485,7 @@ Anya uses Web5's Decentralized Web Nodes (DWN) for all data storage, providing:
 - **Automatic Replication**: Data is replicated across nodes
 - **Flexible Querying**: Rich query capabilities for data retrieval
 
-### Data Types
+### Data Types Supported
 
 - User profiles and preferences
 - Transaction records
@@ -486,7 +494,7 @@ Anya uses Web5's Decentralized Web Nodes (DWN) for all data storage, providing:
 - System configurations
 - Audit logs
 
-### Benefits
+### Storage Benefits
 
 - No central database dependency
 - Built-in encryption and security
@@ -495,17 +503,17 @@ Anya uses Web5's Decentralized Web Nodes (DWN) for all data storage, providing:
 - Protocol-based data validation
 - Offline-first capability
 
-## Contributing
+## Contributing Guidelines
 
-We welcome contributions! See our [Contributing Guide](CONTRIBUTING.md) for details.
+We welcome contributions! See our Contributing Guide for details.
 
-## Project Status
+## Project Status Information
 
 - **Current Version**: 1.0.0
 - **Status**: Production/Stable
 - **Last Update**: 2024-01-05
 
-## License
+## License Information
 
 This project is licensed under either of:
 
@@ -514,14 +522,16 @@ This project is licensed under either of:
 
 at your option.
 
-## Links
+## Additional Resources
 
-- [Documentation](https://docs.anya.ai)
-- [API Reference](https://api.anya.ai)
-- [Community Forum](https://community.anya.ai)
-- [Development Blog](https://blog.anya.ai)
+### External Links
 
-## Acknowledgments
+- [Documentation](https://docs.anya-core.org)
+- [API Reference](https://api.anya-core.org)
+- [Community Forum](https://community.anya-core.org)
+- [Development Blog](https://blog.anya-core.org)
+
+### Acknowledgments
 
 Special thanks to our contributors and the following projects:
 
@@ -531,4 +541,6 @@ Special thanks to our contributors and the following projects:
 - TBD
 - Block
 
-*Last updated: 2024-12-07*
+### Last Updated
+
+*2024-12-07*
