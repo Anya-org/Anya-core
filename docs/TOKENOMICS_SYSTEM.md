@@ -12,6 +12,8 @@ The Anya tokenomics system implements a pure Bitcoin-style token issuance model 
 
 This model ensures proper market liquidity through DEX allocation, rewards contributors fairly, and maintains the long-term supply control mechanism inspired by Bitcoin's monetary policy.
 
+> **Implementation Status**: For detailed information about the implementation progress and milestones, see [IMPLEMENTATION_MILESTONES.md](IMPLEMENTATION_MILESTONES.md).
+
 ## Component Architecture
 
 ```
