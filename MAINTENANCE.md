@@ -35,6 +35,7 @@
 ### Dependency Audit Findings
 
 #### Unmaintained Crates
+
 1. **`instant` (0.1.13)**
    - **Warning:** Unmaintained
    - **Advisory ID:** RUSTSEC-2024-0384
@@ -46,6 +47,7 @@
    - **Details:** [View Advisory](https://rustsec.org/advisories/RUSTSEC-2024-0370)
 
 ### Recommended Actions
+
 - Consider updating or replacing the unmaintained crates to ensure project security and stability.
 - Document any changes made to dependencies in future updates.
 
