@@ -37,13 +37,23 @@ param(
 
 # Find the workspace root directory
 $SCRIPT_DIR = Split-Path -Parent $MyInvocation.MyCommand.Path
-$BASE_DIR = Split-Path -Parent $SCRIPT_DIR
+# Check if SCRIPT_DIR ends with 'scripts' (user running from scripts directory)
+if ($SCRIPT_DIR -match '\\scripts$') {
+    $BASE_DIR = Split-Path -Parent $SCRIPT_DIR
+} else {
+    # Assume the script is being run from a direct path
+    $BASE_DIR = $SCRIPT_DIR
+}
+
 if ([string]::IsNullOrEmpty($RootDir)) {
     $ROOT_DIR = Split-Path -Parent $BASE_DIR
 } else {
     $ROOT_DIR = $RootDir
 }
 $LABEL_CACHE_FILE = Join-Path -Path $BASE_DIR -ChildPath ".label_cache.json"
+
+Write-Host "Working with base directory: $BASE_DIR" -ForegroundColor Cyan
+Write-Host "Using root directory for repositories: $ROOT_DIR" -ForegroundColor Cyan
 
 # Display help information
 function Show-Help {
@@ -102,27 +112,40 @@ foreach ($label in $LABEL_ARRAY) {
     $FORMATTED_LABELS += "[$label]"
 }
 
-# Get list of repositories
-if ([string]::IsNullOrEmpty($Repos)) {
-    # Auto-detect repositories in the root directory
-    try {
+# Auto-detect repositories in the root directory
+try {
+    $detectedRepos = Get-ChildItem -Path $ROOT_DIR -Directory | 
+                     Where-Object { Test-Path -Path (Join-Path -Path $_.FullName -ChildPath ".git") -PathType Container } |
+                     Select-Object -ExpandProperty Name
+    
+    if ($detectedRepos.Count -gt 0) {
+        $Repos = $detectedRepos -join ","
+        Write-Host "Auto-detected repositories: $Repos" -ForegroundColor Green
+    } else {
+        # Search one level deeper in case of nested structure
+        Write-Host "No repositories found at top level, searching one level deeper..." -ForegroundColor Yellow
         $detectedRepos = Get-ChildItem -Path $ROOT_DIR -Directory | 
-                          Where-Object { Test-Path -Path (Join-Path -Path $_.FullName -ChildPath ".git") -PathType Container } |
-                          Select-Object -ExpandProperty Name
+                         ForEach-Object { 
+                             Get-ChildItem -Path $_.FullName -Directory -ErrorAction SilentlyContinue
+                         } |
+                         Where-Object { Test-Path -Path (Join-Path -Path $_.FullName -ChildPath ".git") -PathType Container } |
+                         Select-Object -ExpandProperty Name
         
         if ($detectedRepos.Count -gt 0) {
             $Repos = $detectedRepos -join ","
-            Write-Host "Auto-detected repositories: $Repos" -ForegroundColor Green
+            Write-Host "Auto-detected repositories in subdirectories: $Repos" -ForegroundColor Green
         } else {
-            # Default list of repositories if none detected
-            $Repos = "anya-core,anya-web5,anya-mobile,anya-bitcoin,dash33"
-            Write-Host "No repositories detected. Using default list: $Repos" -ForegroundColor Yellow
+            # Default to current repository only if nothing else found
+            $currentFolder = Split-Path -Leaf $BASE_DIR
+            $Repos = $currentFolder
+            Write-Host "No repositories detected. Using current repository: $Repos" -ForegroundColor Yellow
         }
-    } catch {
-        # Default list of repositories if detection fails
-        $Repos = "anya-core,anya-web5,anya-mobile,anya-bitcoin,dash33"
-        Write-Host "Repository detection failed. Using default list: $Repos" -ForegroundColor Yellow
     }
+} catch {
+    # Default to current repository if detection fails
+    $currentFolder = Split-Path -Leaf $BASE_DIR
+    $Repos = $currentFolder
+    Write-Host "Repository detection failed. Using current repository: $Repos" -ForegroundColor Yellow
 }
 $REPO_ARRAY = $Repos -split ','
 

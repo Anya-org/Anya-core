@@ -108,6 +108,43 @@ The labeling system is designed to work seamlessly across different operating sy
 
 Both versions provide identical functionality with platform-appropriate syntax and error handling.
 
+## Quick Start for Windows Users
+
+If you're having issues running the scripts on Windows, follow these simplified steps:
+
+1. **Open PowerShell and navigate to the anya-core directory**:
+   ```powershell
+   cd C:\path\to\OPSource\anya-core
+   ```
+
+2. **Run the batch commit script directly from PowerShell**:
+   ```powershell
+   # Run script with full path specification
+   .\scripts\batch_commit.ps1 -Message "Your commit message" -Type "feat" -Labels "AIR-3,AIS-2"
+   
+   # If running outside the repository:
+   & "C:\path\to\OPSource\anya-core\scripts\batch_commit.ps1" -Message "Your commit message" -Type "feat" -Labels "AIR-3,AIS-2"
+   ```
+
+3. **Specify repositories explicitly if auto-detection fails**:
+   ```powershell
+   .\scripts\batch_commit.ps1 -Message "Update docs" -Type "docs" -Labels "AIR-3,AIS-2" -Repos "anya-core"
+   ```
+
+4. **For unusual repository structures, use the RootDir parameter**:
+   ```powershell
+   .\scripts\batch_commit.ps1 -Message "Fix bug" -Type "fix" -Labels "AIR-3,AIS-2" -RootDir "C:\Users\username\Projects"
+   ```
+
+5. **If you receive `-l` parameter errors**, you're likely using the wrong script format:
+   ```powershell
+   # Wrong (Bash format)
+   .\scripts\batch_commit.sh -m "Message" -l "AIR-3,AIS-2"  # This won't work in PowerShell!
+   
+   # Correct (PowerShell format)
+   .\scripts\batch_commit.ps1 -Message "Message" -Labels "AIR-3,AIS-2"  # Use this instead
+   ```
+
 ### Windows-Specific Setup
 
 When running the PowerShell scripts on Windows:
