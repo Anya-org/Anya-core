@@ -9,6 +9,8 @@ graph TB
         AI[AI Engine]
         Security[Security Layer]
         Bitcoin[Bitcoin & Lightning]
+        DAO[DAO System]
+        DEX[DEX Integration]
     end
 
     subgraph Submodules[Primary Submodules]
@@ -16,6 +18,7 @@ graph TB
         enterprise[Enterprise Integration]
         mobile[Mobile Interface]
         web5[Web5 Implementation]
+        tokenomics[Bitcoin-Style Tokenomics]
     end
 
     subgraph Integration[Integration Points]
@@ -28,7 +31,10 @@ graph TB
     Core --> AI
     Core --> Security
     Core --> Bitcoin
+    Core --> DAO
     AI --> Security
+    DAO --> tokenomics
+    DAO --> DEX
 
     %% Submodule Connections
     dash33 --> AI
@@ -36,6 +42,7 @@ graph TB
     mobile --> API
     web5 --> Security
     Bitcoin --> Security
+    tokenomics --> Bitcoin
 
     %% Integration Layer
     API --> Security
@@ -69,6 +76,20 @@ graph TB
    - Lightning Network integration
    - Payment channels
    - Wallet management
+
+5. **DAO System**
+   - Decentralized governance
+   - Proposal management
+   - Voting mechanisms
+   - Administrative controls
+   - Bitcoin-style tokenomics
+   - DEX integration
+
+6. **DEX Integration**
+   - Liquidity provision (30% allocation)
+   - Trading operations
+   - Buyback mechanism
+   - Price oracle
 
 ### Bitcoin & Lightning Architecture
 ```mermaid
@@ -112,6 +133,49 @@ graph TB
     Events --> LNode
     Security --> Core
     Security --> LNode
+```
+
+### DAO System Architecture
+```mermaid
+graph TB
+    subgraph DAO[DAO Layer]
+        DAOCore[DAO Core]
+        Traits[DAO Traits]
+        Token[Governance Token]
+        Proposals[Proposal System]
+    end
+
+    subgraph Tokenomics[Tokenomics Layer]
+        Issuance[Bitcoin-Style Issuance]
+        Distribution[Token Distribution]
+        Economics[Token Economics]
+    end
+
+    subgraph DEX[DEX Layer]
+        Liquidity[Liquidity Management]
+        Trading[Trading Operations]
+        Oracle[Price Oracle]
+        Buyback[Buyback Mechanism]
+    end
+
+    %% Connections
+    DAOCore --> Traits
+    DAOCore --> Token
+    DAOCore --> Proposals
+    
+    Token --> Issuance
+    Issuance --> Distribution
+    Distribution --> Economics
+    
+    Distribution --> Liquidity
+    DAOCore --> Buyback
+    Buyback --> Trading
+    Trading --> Oracle
+    
+    Liquidity --> DEX
+    Trading --> DEX
+    Oracle --> DEX
+    Buyback --> DEX
 ```
 
 ### Submodules
@@ -168,6 +232,19 @@ graph TB
        Core --> Protocol
    ```
 
+5. **Bitcoin-Style Tokenomics**
+   ```mermaid
+   graph LR
+       Core[Tokenomics Core]
+       Issuance[Bitcoin-Style Issuance]
+       Distribution[Distribution System]
+       Halving[Halving Mechanism]
+
+       Core --> Issuance
+       Core --> Distribution
+       Core --> Halving
+   ```
+
 ## Integration Architecture
 
 ```mermaid
@@ -178,6 +255,7 @@ sequenceDiagram
     participant dash33
     participant Web5
     participant Lightning
+    participant DAO
 
     User->>Mobile: Payment Request
     Mobile->>Core: Process
@@ -193,8 +271,44 @@ sequenceDiagram
     Lightning-->>Core: Payment Confirmation
     Core->>Web5: Store Receipt
     Web5-->>Core: Confirm
+    Core->>DAO: Update Statistics
+    DAO-->>Core: Acknowledge
     Core-->>Mobile: Success
     Mobile-->>User: Result
+```
+
+## DAO System Flow
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant DAOCore
+    participant Token
+    participant Issuance
+    participant DEX
+
+    User->>DAOCore: Submit Proposal
+    DAOCore->>Token: Check Balance
+    Token-->>DAOCore: Confirm Balance
+    DAOCore-->>User: Proposal Created
+    
+    User->>DAOCore: Vote
+    DAOCore->>Token: Verify Token Weight
+    Token-->>DAOCore: Token Weight
+    DAOCore-->>User: Vote Recorded
+    
+    DAOCore->>Issuance: Mint Tokens
+    Issuance->>Token: Issue Tokens
+    Token-->>Issuance: Confirm
+    
+    Issuance->>DEX: Allocate 30%
+    Issuance->>DAOCore: Allocate 55%
+    Issuance->>User: Allocate 15% (Team)
+    
+    User->>DAOCore: Execute Proposal
+    DAOCore->>DEX: Perform Action
+    DEX-->>DAOCore: Action Result
+    DAOCore-->>User: Execution Complete
 ```
 
 ## Lightning Network Component Flow
@@ -241,6 +355,45 @@ graph TB
     BitcoinIntegration --> TxBroadcast
 ```
 
+## Tokenomics System Flow
+
+```mermaid
+graph TB
+    subgraph Issuance[Bitcoin-Style Issuance]
+        Genesis[Genesis Block]
+        BlockReward[Block Reward: 5,000 AGT]
+        Halving[Halving: 210,000 blocks]
+        TotalSupply[Total Supply: 21B AGT]
+    end
+
+    subgraph Distribution[Token Distribution]
+        DEXAlloc[DEX: 30%]
+        TeamAlloc[Team: 15%]
+        DAOAlloc[DAO: 55%]
+    end
+
+    subgraph TeamDist[Team Distribution]
+        TopPerformer[Top: 40%]
+        MidPerformers[Middle: 5-40%]
+        LowPerformer[Low: 5%]
+    end
+
+    %% Connections
+    Genesis --> BlockReward
+    BlockReward --> Halving
+    Halving --> TotalSupply
+    
+    BlockReward --> Distribution
+    Distribution --> DEXAlloc
+    Distribution --> TeamAlloc
+    Distribution --> DAOAlloc
+    
+    TeamAlloc --> TeamDist
+    TeamDist --> TopPerformer
+    TeamDist --> MidPerformers
+    TeamDist --> LowPerformer
+```
+
 ## Security Model
 
 ```mermaid
@@ -248,94 +401,63 @@ graph TB
     subgraph Security[Security Layer]
         Auth[Authentication]
         Crypto[Cryptography]
-        Access[Access Control]
-        Audit[Audit System]
+        Audit[Audit Logging]
+        Policy[Policy Enforcement]
     end
 
-    subgraph Components[System Components]
-        Core[Core System]
-        AI[AI Engine]
-        Data[Data Layer]
-        API[API Layer]
-        Bitcoin[Bitcoin & Lightning]
+    subgraph DAO_Security[DAO Security]
+        MultiAdmin[Multi-Admin Controls]
+        ProposalValidation[Proposal Validation]
+        TokenVerification[Token Verification]
+        AdminActions[Admin Action Logging]
     end
 
-    Security --> Components
+    subgraph Tokenomics_Security[Tokenomics Security]
+        ImmutableParams[Immutable Parameters]
+        DistributionControls[Distribution Controls]
+        TeamAllocationSecurity[Team Allocation Security]
+    end
+
+    %% Connections
+    Security --> Auth
+    Security --> Crypto
+    Security --> Audit
+    Security --> Policy
+    
+    DAO_Security --> MultiAdmin
+    DAO_Security --> ProposalValidation
+    DAO_Security --> TokenVerification
+    DAO_Security --> AdminActions
+    
+    Tokenomics_Security --> ImmutableParams
+    Tokenomics_Security --> DistributionControls
+    Tokenomics_Security --> TeamAllocationSecurity
+    
+    Security --> DAO_Security
+    Security --> Tokenomics_Security
 ```
 
-## Data Flow
+## Cross-References
 
-```mermaid
-graph LR
-    subgraph Input[Input Layer]
-        Mobile[Mobile]
-        Web[Web]
-        API[API]
-        Payment[Payment Channels]
-    end
+For detailed information about specific components, please see the following documentation:
 
-    subgraph Processing[Processing Layer]
-        Core[Core Engine]
-        dash33[dash33 AI]
-        Analytics[Analytics]
-        LightningNode[Lightning Node]
-    end
+- [DAO System Documentation](DAO_INDEX.md)
+- [Tokenomics System](TOKENOMICS_SYSTEM.md)
+- [DAO System Map](DAO_SYSTEM_MAP.md)
+- [Implementation Milestones](IMPLEMENTATION_MILESTONES.md)
+- [DAO System Guide](DAO_SYSTEM_GUIDE.md)
+- [Bitcoin Documentation](/bitcoin/index.html)
+- [Web5 Documentation](/web5/index.html)
 
-    subgraph Storage[Storage Layer]
-        Web5[Web5 Storage]
-        Local[Local Storage]
-        Cache[Cache]
-        ChannelDB[Channel State DB]
-    end
+## Implementation Status
 
-    Input --> Processing
-    Processing --> Storage
-    Payment --> LightningNode
-    LightningNode --> ChannelDB
-```
+Current implementation status:
+- ✅ Core architecture and interfaces
+- ✅ Bitcoin-style issuance model with 21 billion token supply
+- 🔄 Distribution allocation mechanisms (In Progress)
+- ⏳ DEX integration (Pending)
+- ⏳ Advanced governance features (Pending)
 
-## Development Workflow
+For detailed progress, see the [Implementation Milestones](IMPLEMENTATION_MILESTONES.md) document.
 
-```mermaid
-graph LR
-    Dev[Development]
-    Test[Testing]
-    Review[Review]
-    Deploy[Deployment]
-
-    Dev --> Test
-    Test --> Review
-    Review --> Deploy
-    Deploy -.-> Dev
-```
-
-## Monitoring and Metrics
-
-```mermaid
-graph TB
-    subgraph Collection[Data Collection]
-        Perf[Performance]
-        Usage[Usage]
-        Errors[Errors]
-        LightningMetrics[Lightning Metrics]
-    end
-
-    subgraph Analysis[Analysis]
-        AI[AI Processing]
-        Stats[Statistics]
-        Alerts[Alerts]
-        ChannelHealth[Channel Health]
-    end
-
-    subgraph Actions[Actions]
-        Scale[Auto-scaling]
-        Notify[Notifications]
-        Log[Logging]
-        ChannelBalancing[Channel Balancing]
-    end
-
-    Collection --> Analysis
-    Analysis --> Actions
-    LightningMetrics --> ChannelHealth
-    ChannelHealth --> ChannelBalancing
-```
+*Last updated: 2025-03-04*

@@ -1,89 +1,135 @@
-# Documentation Search Index
+# Anya Core Documentation Search Index
 
-## Core Components
+This document serves as a searchable index for all Anya Core documentation, including key terms, component references, and internal links. Use this page to quickly find relevant documentation.
 
-### ML Component
-- Model Management (`/anya-core/ml/models`)
-- Inference Engine (`/anya-core/ml/inference`)
-- Performance Monitoring (`/anya-core/ml/monitoring`)
-- Model Training (`/anya-core/ml/training`)
-- Model Validation (`/anya-core/ml/validation`)
-- A/B Testing (`/anya-core/ml/testing`)
+## Main Documentation Entries
 
-### Security Component
-- Authentication (`/anya-core/security/auth`)
-- Authorization (`/anya-core/security/auth`)
-- Cryptography (`/anya-core/security/crypto`)
-- Audit System (`/anya-core/security/audit`)
-- Threat Detection (`/anya-core/security/threats`)
-- Security Policies (`/anya-core/security/policies`)
+- [ROOT_INDEX](../ROOT_INDEX.md) - Root documentation index
+- [INDEX](INDEX.md) - Main documentation index
+- [README](../README.md) - Main project README
+- [SYSTEM_MAP](SYSTEM_MAP.md) - System architecture map
+- [ARCHITECTURE](ARCHITECTURE.md) - Detailed architecture documentation
+- [API](API.md) - API documentation
 
-### Protocol Component
-- Transaction Management (`/anya-core/protocol/transactions`)
-- Script Types (`/anya-core/protocol/scripts`)
-- Network Operations (`/anya-core/protocol/network`)
-- Fee Management (`/anya-core/protocol/fees`)
-- PSBT Support (`/anya-core/protocol/psbt`)
-- Mempool Monitoring (`/anya-core/protocol/mempool`)
+## DAO & Tokenomics Documentation
 
-### Enterprise Component
-- Business Operations (`/anya-core/enterprise/operations`)
-- Risk Management (`/anya-core/enterprise/risk`)
-- Compliance (`/anya-core/enterprise/compliance`)
-- Workflow Automation (`/anya-core/enterprise/workflow`)
-- Portfolio Management (`/anya-core/enterprise/portfolio`)
-- Reporting (`/anya-core/enterprise/reporting`)
+- [DAO_INDEX](DAO_INDEX.md) - DAO documentation index
+- [DAO_SYSTEM_MAP](DAO_SYSTEM_MAP.md) - DAO system architecture
+- [DAO_SYSTEM_GUIDE](DAO_SYSTEM_GUIDE.md) - Comprehensive DAO guide
+- [TOKENOMICS_SYSTEM](TOKENOMICS_SYSTEM.md) - Bitcoin-style tokenomics
+- [IMPLEMENTATION_MILESTONES](IMPLEMENTATION_MILESTONES.md) - Implementation progress
+
+## Bitcoin & Crypto Documentation
+
+- [bitcoin/README](bitcoin/README.md) - Bitcoin integration
+- [lightning/README](lightning/README.md) - Lightning Network integration
+
+## Web5 & Identity Documentation
+
+- [web5/README](web5/README.md) - Web5 integration
+- [identity/README](identity/README.md) - Decentralized identity
+
+## Machine Learning Documentation
+
+- [ML_SYSTEM_ARCHITECTURE](ML_SYSTEM_ARCHITECTURE.md) - ML system architecture
+- [ml/README](ml/README.md) - Machine learning components
 
 ## Development Resources
 
-### Architecture
-- Component Design (`/anya-core/architecture/components`)
-- Data Flow (`/anya-core/architecture/data-flow`)
-- Security Model (`/anya-core/architecture/security`)
-- Scalability (`/anya-core/architecture/scalability`)
-- High Availability (`/anya-core/architecture/ha`)
-- Disaster Recovery (`/anya-core/architecture/dr`)
+- [CONTRIBUTING](../CONTRIBUTING.md) - Contributing guidelines
+- [CHECKPOINT_SYSTEM](CHECKPOINT_SYSTEM.md) - Development checkpoints
+- [CHECKPOINT_GUIDE](CHECKPOINT_GUIDE.md) - Checkpoint usage guide
+- [AI_LABELLING](../AI_LABELLING.md) - AI labeling system
 
-### API Documentation
-- ML APIs (`/anya-core/api/ml`)
-- Security APIs (`/anya-core/api/security`)
-- Protocol APIs (`/anya-core/api/protocol`)
-- Enterprise APIs (`/anya-core/api/enterprise`)
-- Web5 APIs (`/anya-core/api/web5`)
-- Bitcoin APIs (`/anya-core/api/bitcoin`)
+## Searchable Terms
 
-### Integration
-- Bitcoin Integration (`/anya-core/integration/bitcoin`)
-- Web5 Integration (`/anya-core/integration/web5`)
-- Lightning Integration (`/anya-core/integration/lightning`)
-- DLC Integration (`/anya-core/integration/dlc`)
-- Third-party Integration (`/anya-core/integration/third-party`)
-- API Integration (`/anya-core/integration/api`)
+### DAO & Tokenomics Terms
 
-### Operations
-- Deployment (`/anya-core/operations/deployment`)
-- Monitoring (`/anya-core/operations/monitoring`)
-- Maintenance (`/anya-core/operations/maintenance`)
-- Backup (`/anya-core/operations/backup`)
-- Recovery (`/anya-core/operations/recovery`)
-- Updates (`/anya-core/operations/updates`)
+- **Bitcoin-Style Tokenomics**: [TOKENOMICS_SYSTEM](TOKENOMICS_SYSTEM.md)
+- **21 Billion Token Supply**: [TOKENOMICS_SYSTEM](TOKENOMICS_SYSTEM.md), [DAO_SYSTEM_GUIDE](DAO_SYSTEM_GUIDE.md)
+- **Halving Interval**: [TOKENOMICS_SYSTEM](TOKENOMICS_SYSTEM.md) - 210,000 blocks
+- **Initial Block Reward**: [TOKENOMICS_SYSTEM](TOKENOMICS_SYSTEM.md) - 5,000 AGT
+- **Distribution Model**: [TOKENOMICS_SYSTEM](TOKENOMICS_SYSTEM.md) - 30% DEX, 15% team, 55% DAO
+- **DEX Integration**: [DAO_SYSTEM_MAP](DAO_SYSTEM_MAP.md), [TOKENOMICS_SYSTEM](TOKENOMICS_SYSTEM.md)
+- **DAO Governance**: [DAO_SYSTEM_GUIDE](DAO_SYSTEM_GUIDE.md)
+- **Proposal System**: [DAO_SYSTEM_MAP](DAO_SYSTEM_MAP.md)
+- **Voting Mechanism**: [DAO_SYSTEM_GUIDE](DAO_SYSTEM_GUIDE.md)
+- **Administrative Controls**: [DAO_SYSTEM_MAP](DAO_SYSTEM_MAP.md)
+- **Token Integration**: [DAO_SYSTEM_MAP](DAO_SYSTEM_MAP.md)
+- **Buyback Mechanism**: [TOKENOMICS_SYSTEM](TOKENOMICS_SYSTEM.md)
 
-## Quick Links
+### Bitcoin & Crypto Terms
 
-### Getting Started
-- Installation (`/anya-core/getting-started/installation`)
-- Configuration (`/anya-core/getting-started/configuration`)
-- First Steps (`/anya-core/getting-started/first-steps`)
-- Examples (`/anya-core/getting-started/examples`)
-- Tutorials (`/anya-core/getting-started/tutorials`)
-- FAQs (`/anya-core/getting-started/faq`)
+- **Bitcoin Integration**: [bitcoin/README](bitcoin/README.md)
+- **Lightning Network**: [lightning/README](lightning/README.md)
+- **DLC (Discreet Log Contracts)**: [bitcoin/dlc](bitcoin/dlc.md)
+- **Taproot Assets**: [bitcoin/taproot](bitcoin/taproot.md)
+- **Cross-Chain**: [bitcoin/cross-chain](bitcoin/cross-chain.md)
 
-### Support
-- Community Support (`/anya-core/support/community`)
-- Enterprise Support (`/anya-core/support/enterprise`)
-- Security Issues (`/anya-core/support/security`)
-- Bug Reports (`/anya-core/support/bugs`)
-- Feature Requests (`/anya-core/support/features`)
-- Contributing (`/anya-core/support/contributing`)
+### Web5 & Identity Terms
 
-*Last updated: 2024-12-27*
+- **Web5 Integration**: [web5/README](web5/README.md)
+- **Decentralized Identity**: [identity/README](identity/README.md)
+- **DWN (Decentralized Web Nodes)**: [web5/dwn](web5/dwn.md)
+- **DID (Decentralized Identifiers)**: [identity/did](identity/did.md)
+
+### Machine Learning Terms
+
+- **ML Architecture**: [ML_SYSTEM_ARCHITECTURE](ML_SYSTEM_ARCHITECTURE.md)
+- **Model Management**: [ml/models](ml/models.md)
+- **Inference Engine**: [ml/inference](ml/inference.md)
+- **Performance Monitoring**: [ml/monitoring](ml/monitoring.md)
+
+### Development Terms
+
+- **Checkpoint System**: [CHECKPOINT_SYSTEM](CHECKPOINT_SYSTEM.md)
+- **AI Labeling**: [AI_LABELLING](../AI_LABELLING.md)
+- **Contributing**: [CONTRIBUTING](../CONTRIBUTING.md)
+- **Testing**: [TESTING](TESTING.md)
+
+## Components by Function
+
+### DAO Components
+
+- [dao-trait.clar](../dao/traits/dao-trait.clar) - Interface for DAO functionality
+- [dao-core.clar](../dao/core/dao-core.clar) - Enhanced DAO implementation
+- [dao.clar](../src/contracts/dao.clar) - Main DAO contract
+- [governance_token.clar](../src/contracts/governance_token.clar) - Token contract
+- [bitcoin-issuance.clar](../src/contracts/bitcoin-issuance.clar) - Bitcoin-style issuance
+- [dex-adapter.clar](../src/contracts/dex-adapter.clar) - DEX integration
+- [dex-integration-trait.clar](../dao/traits/dex-integration-trait.clar) - DEX interface
+- [token-economics.clar](../dao/extensions/token-economics.clar) - Economics implementation
+
+### Bitcoin Components
+
+- [bitcoin_interface.rs](../src/bitcoin/interface.rs) - Bitcoin interface
+- [lightning_manager.rs](../src/lightning/manager.rs) - Lightning management
+- [taproot_assets.rs](../src/bitcoin/taproot/assets.rs) - Taproot assets
+
+### Web5 Components
+
+- [web5_manager.rs](../src/web5/manager.rs) - Web5 management
+- [did_system.rs](../src/web5/identity/did.rs) - DID system
+- [dwn_client.rs](../src/web5/dwn/client.rs) - DWN client
+
+### ML Components
+
+- [ml_system.rs](../src/ml/system.rs) - ML system
+- [model_manager.rs](../src/ml/models/manager.rs) - Model management
+- [inference.rs](../src/ml/inference/engine.rs) - Inference engine
+
+## Implementation Status
+
+- [IMPLEMENTATION_MILESTONES](IMPLEMENTATION_MILESTONES.md) - Current implementation status
+  - ✅ Core architecture and interfaces
+  - ✅ Bitcoin-style issuance model with 21 billion token supply
+  - 🔄 Distribution allocation mechanisms (In Progress)
+  - ⏳ DEX integration (Pending)
+  - ⏳ Advanced governance features (Pending)
+
+## Version Information
+
+- **Current Version**: 3.1.0
+- **Last Updated**: 2025-03-05
+
+*This search index is automatically updated with each release.*

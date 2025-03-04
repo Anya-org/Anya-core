@@ -1,18 +1,26 @@
-# Anya Core Platform 
+# Anya Core Platform
 
 [AIR-3][AIS-3][AIT-3][AIM-3][AIP-3][AIE-3][BPC-3][W5C-3][DID-3][PFM-2][SCL-2][RES-3][UXA-2][DAO-3]
 
 A powerful platform combining Bitcoin/crypto functionality, ML-based analytics,
-and Web5 decentralized data management.
+Web5 decentralized data management, and a Bitcoin-style DAO governance system.
 
 > For Enterprise features and capabilities, please see our
 > [Enterprise Platform Documentation](./enterprise/README.md)
 
 ![Anya Architecture](docs/images/anya_architecture.png)
 
-> **AI Labeling**: This project follows the [comprehensive AI Labeling System](AI_LABELLING.md) 
+> **AI Labeling**: This project follows the [comprehensive AI Labeling System](AI_LABELLING.md)
 > based on the Bitcoin Development Framework v2.5 standards. All components are labeled with
 > appropriate Core and Extended category labels.
+
+## Documentation Quick Links
+
+- [Documentation Index](docs/INDEX.md) - Main documentation index
+- [System Architecture](docs/SYSTEM_MAP.md) - Complete system architecture
+- [DAO System](docs/DAO_SYSTEM_GUIDE.md) - Comprehensive DAO documentation
+- [Tokenomics System](docs/TOKENOMICS_SYSTEM.md) - Bitcoin-style tokenomics
+- [Implementation Milestones](docs/IMPLEMENTATION_MILESTONES.md) - Project progress
 
 ## Licensing
 
@@ -24,7 +32,7 @@ See the [Enterprise License](./enterprise/LICENSE) for details.
 
 ## Core Features
 
-### Hexagonal Architecture 
+### Hexagonal Architecture
 
 [AIR-3][AIS-3][AIT-3][PFM-2][SCL-3][RES-3]
 
@@ -35,7 +43,18 @@ See the [Enterprise License](./enterprise/LICENSE) for details.
 - Comprehensive health monitoring
 - Thread-safe caching layer
 
-### Blockchain Integration 
+### DAO & Tokenomics System
+
+[AIR-3][AIS-3][AIT-3][AIP-3][BPC-3][DAO-3][RES-3][SCL-2]
+
+- Bitcoin-style token issuance (21 billion total supply)
+- Halving mechanism (every 210,000 blocks)
+- Strategic distribution (30% DEX, 15% team, 55% DAO)
+- Decentralized governance with proposals and voting
+- Integrated DEX for liquidity and trading
+- Comprehensive logging and transparency
+
+### Blockchain Integration
 
 [AIR-3][AIS-3][AIT-3][AIP-3][BPC-3][PFM-2][RES-3][SCL-2]
 
@@ -46,7 +65,7 @@ See the [Enterprise License](./enterprise/LICENSE) for details.
 - Cross-chain capabilities
 - Custom chain support
 
-### Machine Learning & AI 
+### Machine Learning & AI
 
 [AIR-3][AIS-3][AIT-3][AIM-3][AIP-3][AIE-3][PFM-2][SCL-2][RES-2]
 
@@ -56,7 +75,7 @@ See the [Enterprise License](./enterprise/LICENSE) for details.
 - Basic analytics
 - Prediction models
 
-### Web5 Integration & Storage 
+### Web5 Integration & Storage
 
 [AIR-3][AIS-3][AIT-3][AIP-3][W5C-3][DID-3][PFM-2][SCL-3][RES-2]
 
@@ -71,11 +90,11 @@ See the [Enterprise License](./enterprise/LICENSE) for details.
 - Identity management
 - Custom protocols
 
-### Decentralized Communication 
+### Decentralized Communication
 
 [AIR-3][AIS-3][AIT-2][AIP-3][PFM-2][SCL-2][RES-3]
 
-- Nostr protocol integration 
+- Nostr protocol integration
 (NIPs 01, 02, 04, 05, 13, 15, 20)
 - End-to-end encrypted messaging
 - Multi-relay support with health monitoring
@@ -83,19 +102,19 @@ See the [Enterprise License](./enterprise/LICENSE) for details.
 - Simple key subscription system
 - Secure key management and backup
 
-### Development Infrastructure 
+### Development Infrastructure
 
 [AIR-3][AIS-2][AIT-3][PFM-2]
 
 - Comprehensive checkpoint system
-- AI labeling integration 
+- AI labeling integration
 (Core and Extended categories)
-- Automated checkpoint creation 
+- Automated checkpoint creation
 (merges, thresholds)
 - Development milestone tracking
 - GitHub Actions workflow integration
 
-### Monitoring & Metrics 
+### Monitoring & Metrics
 
 [AIR-3][AIM-3][PFM-3][RES-3][SCL-2]
 
@@ -112,6 +131,7 @@ See the [Enterprise License](./enterprise/LICENSE) for details.
 - Rust 1.70+
 - Bitcoin Core 24.0+
 - Web5 DWN Node
+- Clarinet 2.3.0+ (for DAO contracts)
 
 ### Core Dependencies
 
@@ -123,6 +143,7 @@ tracing = { version = "0.1", features = ["attributes"] }
 metrics = "0.21"
 web5 = { version = "0.1.0", features = ["storage"] }
 ml-core = { version = "0.1.0" }
+clarity-repl = { git = "https://github.com/hirosystems/clarinet", tag = "v1.7.0" }
 ```
 
 ## Quick Start
@@ -157,21 +178,57 @@ BITCOIN_RPC_PASS=password
 ML_MODEL_PATH=/path/to/models
 NPU_ENABLED=true
 
+# DAO Settings
+DAO_CONTRACT_PATH=/path/to/contracts
+TOKEN_NAME=Anya Governance Token
+TOKEN_SYMBOL=AGT
+TOTAL_SUPPLY=21000000000
+INITIAL_BLOCK_REWARD=5000
+HALVING_INTERVAL=210000
+
 # Monitoring
 METRICS_ENDPOINT=http://localhost:9090
 TRACING_ENDPOINT=http://localhost:4317
+```
+
+### 3. DAO Setup
+
+If you don't have Clarinet installed, you can use the provided installation script:
+
+```powershell
+# On Windows
+.\scripts\install-clarinet.ps1
+```
+
+To verify the DAO configuration:
+
+```powershell
+# On Windows
+.\scripts\verify-clarinet-config.ps1
+```
+
+To run DAO tests:
+
+```bash
+# With Clarinet installed
+clarinet test
+
+# Without Clarinet (simulation only)
+.\scripts\run-dao-tests.ps1
 ```
 
 ## Documentation
 
 ### System Architecture Documentation
 
-- [Architecture Overview]
-(docs/ARCHITECTURE.md)
+- [Architecture Overview](docs/ARCHITECTURE.md)
 - [Hexagonal Design](docs/HEXAGONAL.md)
+- [System Map](docs/SYSTEM_MAP.md)
+- [DAO System Map](docs/DAO_SYSTEM_MAP.md)
 - [Error Handling](docs/ERROR_HANDLING.md)
 - [ML System](docs/ML_SYSTEM_ARCHITECTURE.md)
 - [Web5 Integration](docs/WEB5_INTEGRATION.md)
+- [Tokenomics System](docs/TOKENOMICS_SYSTEM.md)
 
 ### Development Documentation
 
@@ -182,6 +239,7 @@ TRACING_ENDPOINT=http://localhost:4317
 - [Checkpoint System](docs/CHECKPOINT_SYSTEM.md)
 - [Checkpoint Guide](docs/CHECKPOINT_GUIDE.md)
 - [AI and Component Labeling Guide](AI_LABELLING.md)
+- [Implementation Milestones](docs/IMPLEMENTATION_MILESTONES.md)
 
 ### Deployment Documentation
 
@@ -191,7 +249,30 @@ TRACING_ENDPOINT=http://localhost:4317
 
 ## Core Components
 
-### ML Component Features 
+### DAO Component Features
+
+[AIR-3][AIS-3][AIT-3][BPC-3][DAO-3][SCL-2]
+
+- **Governance System**
+  - Proposal creation and management
+  - Token-weighted voting
+  - Administrative controls
+  - Configurable parameters
+- **Bitcoin-Style Tokenomics**
+  - 21 billion token supply
+  - Halving every 210,000 blocks
+  - Initial block reward of 5,000 AGT
+- **Strategic Distribution**
+  - 30% to DEX for liquidity
+  - 15% to development team (based on contribution)
+  - 55% to DAO/community
+- **DEX Integration**
+  - Liquidity provision
+  - Trading operations
+  - Price oracle
+  - Buyback mechanism
+
+### ML Component Features
 
 [AIR-3][AIS-3][AIT-3][AIM-3][AIP-3][AIE-3][PFM-2][SCL-2][RES-2]
 
@@ -203,7 +284,7 @@ TRACING_ENDPOINT=http://localhost:4317
 - Support for distributed training
 - Model A/B testing capabilities
 
-### Security Component Features 
+### Security Component Features
 
 [AIR-3][AIS-3][AIT-3][AIP-3][PFM-2][RES-3]
 
@@ -217,12 +298,12 @@ TRACING_ENDPOINT=http://localhost:4317
 - Policy management and enforcement
 - Compliance tracking and reporting
 
-### Protocol Component Features 
+### Protocol Component Features
 
 [AIR-3][AIS-3][AIT-3][BPC-3][PFM-3][RES-3][SCL-2]
 
 - Advanced transaction handling
-  - Multiple operation types 
+  - Multiple operation types
 (Create, Sign, Broadcast)
   - Input/output validation
   - Fee estimation and management
@@ -233,7 +314,7 @@ TRACING_ENDPOINT=http://localhost:4317
 - PSBT support
 - Multi-signature operations
 
-### Enterprise Component Features 
+### Enterprise Component Features
 
 [AIR-3][AIS-3][AIT-3][BPC-3][PFM-3][RES-3][SCL-3][DAO-3]
 
@@ -250,33 +331,33 @@ TRACING_ENDPOINT=http://localhost:4317
 - Batch operation support
 - Workflow management
 
-## System Architecture 
+## System Architecture
 
 [AIR-3][AIS-3][AIT-3][PFM-3][SCL-3][RES-3]
 
 ### Core Design Principles
 
-1. **Memory Safety** 
+1. **Memory Safety**
 [AIR-3][AIS-3][RES-3]
    - Rust's ownership system
    - Thread-safe primitives
    - Resource management
 
-2. **Error Handling System** 
+2. **Error Handling System**
 [AIR-3][AIS-3][AIT-3][RES-3]
    - Comprehensive error types
    - Validation at multiple layers
    - Error aggregation and analysis
    - Retry strategies
 
-3. **Metrics & Monitoring System** 
+3. **Metrics & Monitoring System**
 [AIR-3][AIM-3][PFM-3][RES-3]
    - Unified metrics collection
    - Health checks
    - Performance tracking
    - Alerting system
 
-4. **Security Architecture** 
+4. **Security Architecture**
 [AIR-3][AIS-3][AIP-3][RES-3]
    - Context validation
    - Audit logging
@@ -285,7 +366,7 @@ TRACING_ENDPOINT=http://localhost:4317
 
 ### Implementation Details
 
-#### Repository Layer Details 
+#### Repository Layer Details
 
 [AIR-3][AIS-3][PFM-2][SCL-2]
 
@@ -295,7 +376,7 @@ TRACING_ENDPOINT=http://localhost:4317
 - Transaction management
 - Audit logging
 
-#### Service Layer Components 
+#### Service Layer Components
 
 [AIR-3][AIS-3][AIT-3][PFM-3][RES-3]
 
@@ -305,7 +386,7 @@ TRACING_ENDPOINT=http://localhost:4317
 - Metrics collection
 - Health monitoring
 
-#### Handler Layer Organization 
+#### Handler Layer Organization
 
 [AIR-3][AIS-3][AIT-2][PFM-2]
 
@@ -315,7 +396,7 @@ TRACING_ENDPOINT=http://localhost:4317
 - Metrics tracking
 - Security enforcement
 
-## Testing Strategy 
+## Testing Strategy
 
 [AIR-3][AIT-3][RES-2]
 
@@ -326,7 +407,7 @@ TRACING_ENDPOINT=http://localhost:4317
 - Error case coverage
 - Performance benchmarks
 
-### Integration Testing Methods 
+### Integration Testing Methods
 
 [AIT-3][PFM-2]
 
@@ -335,7 +416,7 @@ TRACING_ENDPOINT=http://localhost:4317
 - Performance testing
 - Security testing
 
-### Property Testing Framework 
+### Property Testing Framework
 
 [AIT-3][AIS-3]
 
@@ -344,11 +425,11 @@ TRACING_ENDPOINT=http://localhost:4317
 - Boundary testing
 - Concurrency testing
 
-## Performance Optimization 
+## Performance Optimization
 
 [AIR-3][PFM-3][SCL-3]
 
-### Caching Strategy 
+### Caching Strategy
 
 [PFM-3][SCL-3]
 
@@ -357,7 +438,7 @@ TRACING_ENDPOINT=http://localhost:4317
 - Cache invalidation
 - Cache metrics
 
-### Concurrency Model 
+### Concurrency Model
 
 [PFM-3][SCL-3][RES-3]
 
@@ -366,7 +447,7 @@ TRACING_ENDPOINT=http://localhost:4317
 - Resource management
 - Deadlock prevention
 
-### Monitoring Capabilities 
+### Monitoring Capabilities
 
 [AIM-3][PFM-3]
 
@@ -382,6 +463,7 @@ TRACING_ENDPOINT=http://localhost:4317
 - Rust 1.70+
 - Bitcoin Core 24.0+
 - Web5 DWN Node
+- Clarinet 2.3.0+
 - PostgreSQL 14+
 - Redis 7+
 
@@ -403,6 +485,11 @@ BTC_RPC_PASS=pass
 
 # Web5
 WEB5_DWN_URL=http://localhost:3000
+
+# DAO Settings
+DAO_PROPOSAL_THRESHOLD=100
+DAO_VOTING_PERIOD=10080
+DAO_EXECUTION_DELAY=2880
 
 # Security
 ENCRYPTION_KEY=<secure-key>
@@ -440,6 +527,9 @@ dao:
   contract_name: "anya-dao"
   proposal_threshold: 100000000
   voting_period_blocks: 1008
+  token_supply: 21000000000
+  block_reward: 5000
+  halving_interval: 210000
 
 features:
   experimental_ml: false
@@ -447,7 +537,7 @@ features:
   quantum_resistant: false
 ```
 
-### Dynamic Configuration Capabilities 
+### Dynamic Configuration Capabilities
 
 [AIR-3][PFM-3][SCL-3]
 
@@ -457,7 +547,7 @@ The platform supports dynamic configuration updates:
 - Timelock periods scale with network activity
 - Performance thresholds adapt to usage patterns
 
-### Security Configuration 
+### Security Configuration
 
 [AIR-3][AIS-3][AIP-3]
 
@@ -465,20 +555,22 @@ The platform supports dynamic configuration updates:
 - Credentials are stored securely using the `SecureStorage` module
 - Environment-specific secrets are managed via `.env` files (not committed to VCS)
 
-## Decentralized Governance (DAO) 
+## Decentralized Governance (DAO)
 
 [AIR-3][AIS-3][AIT-3][AIP-3][AIE-3][DAO-3]
 
 ### Governance Token (AGT)
 
-- **Total Supply**: 21,000,000 AGT
+- **Total Supply**: 21,000,000,000 AGT
+- **Initial Block Reward**: 5,000 AGT
+- **Halving Interval**: 210,000 blocks
+- **Distribution Model**:
+  - 30% to DEX for liquidity
+  - 15% to development team (based on contribution)
+  - 55% to DAO/community
 - **Emission Model**: Bitcoin-inspired halving mechanism
-- **Voting Mechanism**:
-  - Quadratic voting
-  - Time-weighted participation
-  - Expertise-based multipliers
 
-### Governance System Features 
+### Governance System Features
 
 [AIR-3][DAO-3][AIP-3]
 
@@ -488,7 +580,7 @@ The platform supports dynamic configuration updates:
   - ML-driven proposal scoring
   - Adaptive governance parameters
 
-### Governance Intelligence 
+### Governance Intelligence
 
 [AIR-3][AIM-3][AIE-3][DAO-3]
 
@@ -498,7 +590,7 @@ The platform supports dynamic configuration updates:
   - Sentiment analysis integration
   - Dynamic governance optimization
 
-### Cross-Platform Governance 
+### Cross-Platform Governance
 
 [AIR-3][DAO-3][BPC-2][W5C-3]
 
@@ -507,7 +599,7 @@ The platform supports dynamic configuration updates:
   - Web5 Decentralized Identity Support
   - Interoperability Protocols
 
-### Governance Security Measures 
+### Governance Security Measures
 
 [AIR-3][AIS-3][DAO-3][RES-3]
 
@@ -517,7 +609,7 @@ The platform supports dynamic configuration updates:
   - Automated security audits
   - Zero-knowledge proof governance
 
-### Compliance and Ethics Framework 
+### Compliance and Ethics Framework
 
 [AIR-3][AIE-3][DAO-3]
 
@@ -530,14 +622,14 @@ The platform supports dynamic configuration updates:
 ### Technical Specifications
 
 - **Supported Platforms**:
-  - Rust (Core Implementation)
-  - Dart (Mobile/Web Interfaces)
+  - Clarity (Core Implementation)
+  - Rust (API Integration)
   - Web5 Decentralized Infrastructure
 
 ### Version Information
 
 - **Current Version**: 3.1.0
-- **Last Updated**: 2024-02-15
+- **Last Updated**: 2025-03-04
 - **Compatibility**:
   - Stacks v2.4
   - Web5 Protocol v1.0
@@ -548,7 +640,7 @@ The platform supports dynamic configuration updates:
 > "Intelligence is our governance, decentralization is our method, and
 > human potential is our ultimate goal."
 
-## Storage Architecture 
+## Storage Architecture
 
 [AIR-3][AIS-3][AIP-3][W5C-3][DID-3][SCL-3]
 
@@ -571,6 +663,7 @@ Anya uses Web5's Decentralized Web Nodes (DWN) for all data storage, providing:
 - Machine learning models
 - System configurations
 - Audit logs
+- DAO proposals and votes
 
 ### Storage Benefits
 
@@ -583,13 +676,13 @@ Anya uses Web5's Decentralized Web Nodes (DWN) for all data storage, providing:
 
 ## Contributing Guidelines
 
-We welcome contributions! See our Contributing Guide for details.
+We welcome contributions! See our [Contributing Guide](CONTRIBUTING.md) for details.
 
 ## Project Status Information
 
-- **Current Version**: 1.0.0
+- **Current Version**: 3.1.0
 - **Status**: Production/Stable
-- **Last Update**: 2025-03-03
+- **Last Update**: 2025-03-04
 
 ## License Information
 
@@ -621,4 +714,4 @@ Special thanks to our contributors and the following projects:
 
 ### Last Updated
 
-*2025-03-03*
+*2025-03-04*
