@@ -1,11 +1,16 @@
 ;; Anya DAO Token Economics Module
-;; Implements the token distribution logic, including the 6-month initial release phase
+;; Implements the token distribution logic with Bitcoin-style tokenomics
 
 ;; Constants - Token Distribution
 (define-constant TOKEN-GENESIS-BLOCK u0)
-(define-constant INITIAL-RELEASE-BLOCKS u240000) ;; ~6 months in blocks
-(define-constant INITIAL-RELEASE-PERCENTAGE u45) ;; 45% released in first 6 months
-(define-constant TOTAL-SUPPLY u100000000000) ;; 100 billion tokens (with decimals)
+(define-constant HALVING-INTERVAL u210000) ;; Bitcoin-style halving
+(define-constant INITIAL-BLOCK-REWARD u5000) ;; 5,000 tokens per block
+(define-constant TOTAL-SUPPLY u21000000000) ;; 21 billion tokens
+
+;; Distribution percentages (must add up to 100%)
+(define-constant DEX-ALLOCATION-PERCENTAGE u30) ;; 30% allocated to DEX
+(define-constant TEAM-ALLOCATION-PERCENTAGE u15) ;; 15% allocated to dev team
+(define-constant DAO-ALLOCATION-PERCENTAGE u55) ;; 55% to DAO/community
 
 ;; Error codes
 (define-constant ERR_UNAUTHORIZED u1001)

@@ -11,6 +11,14 @@
 (define-constant PROPOSAL-THRESHOLD u100) ;; 100 AGT
 (define-constant QUORUM-VOTES u500) ;; 500 AGT
 
+;; Bitcoin-style tokenomics constants
+(define-constant TOTAL_SUPPLY u21000000000) ;; 21 billion tokens
+(define-constant INITIAL_BLOCK_REWARD u5000) ;; 5,000 tokens per block
+(define-constant HALVING_INTERVAL u210000) ;; Halving every 210,000 blocks
+(define-constant DEX_ALLOCATION_PERCENTAGE u30) ;; 30% to DEX
+(define-constant TEAM_ALLOCATION_PERCENTAGE u15) ;; 15% to team
+(define-constant DAO_ALLOCATION_PERCENTAGE u55) ;; 55% to DAO/community
+
 ;; Error Codes
 (define-constant ERR-OWNER-ONLY (err u100))
 (define-constant ERR-INSUFFICIENT-BALANCE (err u101))
@@ -21,7 +29,8 @@
 (define-constant ERR-NOT-EXECUTABLE (err u106))
 
 ;; Governance Token Reference
-(define-data-var governance-token principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.anya-token)
+(define-data-var governance-token principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.governance_token)
+(define-data-var next-proposal-id uint u0)
 
 ;; Proposal Data Structures
 (define-map proposals
