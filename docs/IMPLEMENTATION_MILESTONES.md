@@ -5,12 +5,14 @@ This document tracks the implementation progress of the Anya DAO tokenomics syst
 ## Tokenomics Implementation Milestones
 
 ### Milestone 1: Core Issuance Model (Completed)
+
 - ✅ Bitcoin-style issuance mechanics implemented
 - ✅ Initial block reward set to 5,000 AGT
 - ✅ Halving interval configured at 210,000 blocks
 - ✅ Total supply increased to 21 billion tokens
 
 ### Milestone 2: Distribution Allocation (In Progress)
+
 - ✅ 30% DEX allocation mechanism
 - ✅ 15% team allocation with variable distribution
 - ✅ 55% DAO/community allocation
@@ -18,24 +20,28 @@ This document tracks the implementation progress of the Anya DAO tokenomics syst
 - ⏳ Distribution tracking and reporting system
 
 ### Milestone 3: DEX Integration (Pending)
+
 - ⏳ Liquidity pool initialization with token allocation
 - ⏳ Trading operations for AGT/STX pair
 - ⏳ Price oracle implementation
 - ⏳ Buyback mechanism for DAO
 
 ### Milestone 4: Governance Integration (Pending)
+
 - ⏳ DAO controls for tokenomics parameters
 - ⏳ Proposal system for parameter adjustments
 - ⏳ Voting mechanisms for allocation changes
 - ⏳ Treasury management integration
 
 ### Milestone 5: Security Auditing (Pending)
+
 - ⏳ Comprehensive security review
 - ⏳ Economic model simulation and testing
 - ⏳ Formal verification of critical functions
 - ⏳ Third-party audit of tokenomics implementation
 
 ### Milestone 6: Community Launch (Pending)
+
 - ⏳ Public documentation of tokenomics
 - ⏳ Community education program
 - ⏳ Initial token distribution event
@@ -72,4 +78,4 @@ The current implementation focus is on completing **Milestone 2: Distribution Al
 3. Testing the distribution between DEX, team, and DAO allocations
 4. Documenting the allocation API for integration with other system components
 
-Work on **Milestone 3: DEX Integration** will begin once Milestone 2 is completed, with an estimated start date in mid-Q2 2025. 
+Work on **Milestone 3: DEX Integration** will begin once Milestone 2 is completed, with an estimated start date in mid-Q2 2025.

@@ -4,13 +4,13 @@
 (impl-trait 'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait)
 
 ;; Token Configuration
-(define-fungible-token anya-token u21000000) ;; Exact Bitcoin supply
+(define-fungible-token anya-token u21000000000) ;; 21 billion supply
 
 ;; Constants
 (define-constant contract-owner tx-sender)
-(define-constant MAX_SUPPLY u21000000)
-(define-constant INITIAL_BLOCK_REWARD u50)
-(define-constant HALVING_INTERVAL u210000)
+(define-constant MAX_SUPPLY u21000000000) ;; 21 billion tokens
+(define-constant INITIAL_BLOCK_REWARD u5000) ;; 5,000 tokens per block
+(define-constant HALVING_INTERVAL u210000) ;; Every 210,000 blocks
 
 ;; Error Codes
 (define-constant ERR-OWNER-ONLY (err u100))

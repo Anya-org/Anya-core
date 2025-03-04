@@ -5,6 +5,17 @@
 (use-trait dao-trait 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.dao-trait.dao-trait)
 (use-trait ft-trait 'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait)
 
+;; Implement DEX integration trait
+(impl-trait 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.dex-integration-trait.dex-integration-trait)
+
+;; Bitcoin-style tokenomics constants
+(define-constant TOTAL_SUPPLY u21000000000) ;; 21 billion tokens
+(define-constant INITIAL_BLOCK_REWARD u5000) ;; 5,000 tokens per block
+(define-constant HALVING_INTERVAL u210000) ;; Halving every 210,000 blocks
+(define-constant DEX_ALLOCATION_PERCENTAGE u30) ;; 30% to DEX
+(define-constant TEAM_ALLOCATION_PERCENTAGE u15) ;; 15% to team
+(define-constant DAO_ALLOCATION_PERCENTAGE u55) ;; 55% to DAO/community
+
 ;; Error codes
 (define-constant ERR_UNAUTHORIZED u1001)
 (define-constant ERR_INSUFFICIENT_LIQUIDITY u1002)
