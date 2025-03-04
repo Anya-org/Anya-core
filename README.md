@@ -1,4 +1,6 @@
-# Anya Core Platform [AIR-3][AIS-3][AIT-3][AIM-3][AIP-3][AIE-3][BPC-3][W5C-3][DID-3][PFM-2][SCL-2][RES-3][UXA-2][DAO-3]
+# Anya Core Platform 
+
+[AIR-3][AIS-3][AIT-3][AIM-3][AIP-3][AIE-3][BPC-3][W5C-3][DID-3][PFM-2][SCL-2][RES-3][UXA-2][DAO-3]
 
 A powerful platform combining Bitcoin/crypto functionality, ML-based analytics,
 and Web5 decentralized data management.
@@ -22,7 +24,9 @@ See the [Enterprise License](./enterprise/LICENSE) for details.
 
 ## Core Features
 
-### Hexagonal Architecture [AIR-3][AIS-3][AIT-3][PFM-2][SCL-3][RES-3]
+### Hexagonal Architecture 
+
+[AIR-3][AIS-3][AIT-3][PFM-2][SCL-3][RES-3]
 
 - Clean separation of concerns with ports and adapters
 - Domain-driven design principles
@@ -31,7 +35,9 @@ See the [Enterprise License](./enterprise/LICENSE) for details.
 - Comprehensive health monitoring
 - Thread-safe caching layer
 
-### Blockchain Integration [AIR-3][AIS-3][AIT-3][AIP-3][BPC-3][PFM-2][RES-3][SCL-2]
+### Blockchain Integration 
+
+[AIR-3][AIS-3][AIT-3][AIP-3][BPC-3][PFM-2][RES-3][SCL-2]
 
 - Bitcoin Core & Lightning Network support
 - DLC (Discreet Log Contracts)
@@ -40,7 +46,9 @@ See the [Enterprise License](./enterprise/LICENSE) for details.
 - Cross-chain capabilities
 - Custom chain support
 
-### Machine Learning & AI [AIR-3][AIS-3][AIT-3][AIM-3][AIP-3][AIE-3][PFM-2][SCL-2][RES-2]
+### Machine Learning & AI 
+
+[AIR-3][AIS-3][AIT-3][AIM-3][AIP-3][AIE-3][PFM-2][SCL-2][RES-2]
 
 - Model optimization
 - Federated learning
@@ -48,7 +56,9 @@ See the [Enterprise License](./enterprise/LICENSE) for details.
 - Basic analytics
 - Prediction models
 
-### Web5 Integration & Storage [AIR-3][AIS-3][AIT-3][AIP-3][W5C-3][DID-3][PFM-2][SCL-3][RES-2]
+### Web5 Integration & Storage 
+
+[AIR-3][AIS-3][AIT-3][AIP-3][W5C-3][DID-3][PFM-2][SCL-3][RES-2]
 
 - Decentralized Web Nodes (DWN)
 - Decentralized data storage
@@ -61,24 +71,33 @@ See the [Enterprise License](./enterprise/LICENSE) for details.
 - Identity management
 - Custom protocols
 
-### Decentralized Communication [AIR-3][AIS-3][AIT-2][AIP-3][PFM-2][SCL-2][RES-3]
+### Decentralized Communication 
 
-- Nostr protocol integration (NIPs 01, 02, 04, 05, 13, 15, 20)
+[AIR-3][AIS-3][AIT-2][AIP-3][PFM-2][SCL-2][RES-3]
+
+- Nostr protocol integration 
+(NIPs 01, 02, 04, 05, 13, 15, 20)
 - End-to-end encrypted messaging
 - Multi-relay support with health monitoring
 - Automatic relay selection and load balancing
 - Simple key subscription system
 - Secure key management and backup
 
-### Development Infrastructure [AIR-3][AIS-2][AIT-3][PFM-2]
+### Development Infrastructure 
+
+[AIR-3][AIS-2][AIT-3][PFM-2]
 
 - Comprehensive checkpoint system
-- AI labeling integration (Core and Extended categories)
-- Automated checkpoint creation (merges, thresholds)
+- AI labeling integration 
+(Core and Extended categories)
+- Automated checkpoint creation 
+(merges, thresholds)
 - Development milestone tracking
 - GitHub Actions workflow integration
 
-### Monitoring & Metrics [AIR-3][AIM-3][PFM-3][RES-3][SCL-2]
+### Monitoring & Metrics 
+
+[AIR-3][AIM-3][PFM-3][RES-3][SCL-2]
 
 - Distributed tracing
 - Performance metrics
@@ -147,7 +166,8 @@ TRACING_ENDPOINT=http://localhost:4317
 
 ### System Architecture Documentation
 
-- [Architecture Overview](docs/ARCHITECTURE.md)
+- [Architecture Overview]
+(docs/ARCHITECTURE.md)
 - [Hexagonal Design](docs/HEXAGONAL.md)
 - [Error Handling](docs/ERROR_HANDLING.md)
 - [ML System](docs/ML_SYSTEM_ARCHITECTURE.md)
@@ -171,7 +191,9 @@ TRACING_ENDPOINT=http://localhost:4317
 
 ## Core Components
 
-### ML Component Features [AIR-3][AIS-3][AIT-3][AIM-3][AIP-3][AIE-3][PFM-2][SCL-2][RES-2]
+### ML Component Features 
+
+[AIR-3][AIS-3][AIT-3][AIM-3][AIP-3][AIE-3][PFM-2][SCL-2][RES-2]
 
 - Advanced model management and execution
 - Real-time inference with metrics tracking
@@ -181,7 +203,9 @@ TRACING_ENDPOINT=http://localhost:4317
 - Support for distributed training
 - Model A/B testing capabilities
 
-### Security Component Features [AIR-3][AIS-3][AIT-3][AIP-3][PFM-2][RES-3]
+### Security Component Features 
+
+[AIR-3][AIS-3][AIT-3][AIP-3][PFM-2][RES-3]
 
 - Comprehensive security operations
   - Authentication and authorization
@@ -193,10 +217,13 @@ TRACING_ENDPOINT=http://localhost:4317
 - Policy management and enforcement
 - Compliance tracking and reporting
 
-### Protocol Component Features [AIR-3][AIS-3][AIT-3][BPC-3][PFM-3][RES-3][SCL-2]
+### Protocol Component Features 
+
+[AIR-3][AIS-3][AIT-3][BPC-3][PFM-3][RES-3][SCL-2]
 
 - Advanced transaction handling
-  - Multiple operation types (Create, Sign, Broadcast)
+  - Multiple operation types 
+(Create, Sign, Broadcast)
   - Input/output validation
   - Fee estimation and management
 - Support for various script types
@@ -206,7 +233,9 @@ TRACING_ENDPOINT=http://localhost:4317
 - PSBT support
 - Multi-signature operations
 
-### Enterprise Component Features [AIR-3][AIS-3][AIT-3][BPC-3][PFM-3][RES-3][SCL-3][DAO-3]
+### Enterprise Component Features 
+
+[AIR-3][AIS-3][AIT-3][BPC-3][PFM-3][RES-3][SCL-3][DAO-3]
 
 - Comprehensive business operations
   - Atomic swaps
@@ -221,28 +250,34 @@ TRACING_ENDPOINT=http://localhost:4317
 - Batch operation support
 - Workflow management
 
-## System Architecture [AIR-3][AIS-3][AIT-3][PFM-3][SCL-3][RES-3]
+## System Architecture 
+
+[AIR-3][AIS-3][AIT-3][PFM-3][SCL-3][RES-3]
 
 ### Core Design Principles
 
-1. **Memory Safety** [AIR-3][AIS-3][RES-3]
+1. **Memory Safety** 
+[AIR-3][AIS-3][RES-3]
    - Rust's ownership system
    - Thread-safe primitives
    - Resource management
 
-2. **Error Handling System** [AIR-3][AIS-3][AIT-3][RES-3]
+2. **Error Handling System** 
+[AIR-3][AIS-3][AIT-3][RES-3]
    - Comprehensive error types
    - Validation at multiple layers
    - Error aggregation and analysis
    - Retry strategies
 
-3. **Metrics & Monitoring System** [AIR-3][AIM-3][PFM-3][RES-3]
+3. **Metrics & Monitoring System** 
+[AIR-3][AIM-3][PFM-3][RES-3]
    - Unified metrics collection
    - Health checks
    - Performance tracking
    - Alerting system
 
-4. **Security Architecture** [AIR-3][AIS-3][AIP-3][RES-3]
+4. **Security Architecture** 
+[AIR-3][AIS-3][AIP-3][RES-3]
    - Context validation
    - Audit logging
    - Threat detection
@@ -250,7 +285,9 @@ TRACING_ENDPOINT=http://localhost:4317
 
 ### Implementation Details
 
-#### Repository Layer Details [AIR-3][AIS-3][PFM-2][SCL-2]
+#### Repository Layer Details 
+
+[AIR-3][AIS-3][PFM-2][SCL-2]
 
 - CRUD operations
 - Data validation
@@ -258,7 +295,9 @@ TRACING_ENDPOINT=http://localhost:4317
 - Transaction management
 - Audit logging
 
-#### Service Layer Components [AIR-3][AIS-3][AIT-3][PFM-3][RES-3]
+#### Service Layer Components 
+
+[AIR-3][AIS-3][AIT-3][PFM-3][RES-3]
 
 - Business logic
 - Operation processing
@@ -266,7 +305,9 @@ TRACING_ENDPOINT=http://localhost:4317
 - Metrics collection
 - Health monitoring
 
-#### Handler Layer Organization [AIR-3][AIS-3][AIT-2][PFM-2]
+#### Handler Layer Organization 
+
+[AIR-3][AIS-3][AIT-2][PFM-2]
 
 - Request/response mapping
 - Input validation
@@ -274,7 +315,9 @@ TRACING_ENDPOINT=http://localhost:4317
 - Metrics tracking
 - Security enforcement
 
-## Testing Strategy [AIR-3][AIT-3][RES-2]
+## Testing Strategy 
+
+[AIR-3][AIT-3][RES-2]
 
 ### Unit Testing Approach [AIT-3]
 
@@ -283,37 +326,49 @@ TRACING_ENDPOINT=http://localhost:4317
 - Error case coverage
 - Performance benchmarks
 
-### Integration Testing Methods [AIT-3][PFM-2]
+### Integration Testing Methods 
+
+[AIT-3][PFM-2]
 
 - Cross-component testing
 - End-to-end scenarios
 - Performance testing
 - Security testing
 
-### Property Testing Framework [AIT-3][AIS-3]
+### Property Testing Framework 
+
+[AIT-3][AIS-3]
 
 - Invariant verification
 - Fuzz testing
 - Boundary testing
 - Concurrency testing
 
-## Performance Optimization [AIR-3][PFM-3][SCL-3]
+## Performance Optimization 
 
-### Caching Strategy [PFM-3][SCL-3]
+[AIR-3][PFM-3][SCL-3]
+
+### Caching Strategy 
+
+[PFM-3][SCL-3]
 
 - In-memory caching
 - Distributed caching
 - Cache invalidation
 - Cache metrics
 
-### Concurrency Model [PFM-3][SCL-3][RES-3]
+### Concurrency Model 
+
+[PFM-3][SCL-3][RES-3]
 
 - Async operations
 - Thread pooling
 - Resource management
 - Deadlock prevention
 
-### Monitoring Capabilities [AIM-3][PFM-3]
+### Monitoring Capabilities 
+
+[AIM-3][PFM-3]
 
 - Performance metrics
 - Resource utilization
@@ -392,7 +447,9 @@ features:
   quantum_resistant: false
 ```
 
-### Dynamic Configuration Capabilities [AIR-3][PFM-3][SCL-3]
+### Dynamic Configuration Capabilities 
+
+[AIR-3][PFM-3][SCL-3]
 
 The platform supports dynamic configuration updates:
 
@@ -400,13 +457,17 @@ The platform supports dynamic configuration updates:
 - Timelock periods scale with network activity
 - Performance thresholds adapt to usage patterns
 
-### Security Configuration [AIR-3][AIS-3][AIP-3]
+### Security Configuration 
+
+[AIR-3][AIS-3][AIP-3]
 
 - Sensitive configuration is encrypted at rest
 - Credentials are stored securely using the `SecureStorage` module
 - Environment-specific secrets are managed via `.env` files (not committed to VCS)
 
-## Decentralized Governance (DAO) [AIR-3][AIS-3][AIT-3][AIP-3][AIE-3][DAO-3]
+## Decentralized Governance (DAO) 
+
+[AIR-3][AIS-3][AIT-3][AIP-3][AIE-3][DAO-3]
 
 ### Governance Token (AGT)
 
@@ -417,7 +478,9 @@ The platform supports dynamic configuration updates:
   - Time-weighted participation
   - Expertise-based multipliers
 
-### Governance System Features [AIR-3][DAO-3][AIP-3]
+### Governance System Features 
+
+[AIR-3][DAO-3][AIP-3]
 
 - **Proposal Framework**:
   - Low barrier to entry (100 AGT proposal threshold)
@@ -425,7 +488,9 @@ The platform supports dynamic configuration updates:
   - ML-driven proposal scoring
   - Adaptive governance parameters
 
-### Governance Intelligence [AIR-3][AIM-3][AIE-3][DAO-3]
+### Governance Intelligence 
+
+[AIR-3][AIM-3][AIE-3][DAO-3]
 
 - **Machine Learning Enhanced**:
   - Predictive proposal outcome analysis
@@ -433,14 +498,18 @@ The platform supports dynamic configuration updates:
   - Sentiment analysis integration
   - Dynamic governance optimization
 
-### Cross-Platform Governance [AIR-3][DAO-3][BPC-2][W5C-3]
+### Cross-Platform Governance 
+
+[AIR-3][DAO-3][BPC-2][W5C-3]
 
 - **Multi-Chain Compatibility**:
   - Stacks Blockchain Integration
   - Web5 Decentralized Identity Support
   - Interoperability Protocols
 
-### Governance Security Measures [AIR-3][AIS-3][DAO-3][RES-3]
+### Governance Security Measures 
+
+[AIR-3][AIS-3][DAO-3][RES-3]
 
 - **Advanced Protection Mechanisms**:
   - Multi-signature proposal execution
@@ -448,7 +517,9 @@ The platform supports dynamic configuration updates:
   - Automated security audits
   - Zero-knowledge proof governance
 
-### Compliance and Ethics Framework [AIR-3][AIE-3][DAO-3]
+### Compliance and Ethics Framework 
+
+[AIR-3][AIE-3][DAO-3]
 
 - **Governance Principles**:
   - Transparent decision-making
@@ -477,7 +548,9 @@ The platform supports dynamic configuration updates:
 > "Intelligence is our governance, decentralization is our method, and
 > human potential is our ultimate goal."
 
-## Storage Architecture [AIR-3][AIS-3][AIP-3][W5C-3][DID-3][SCL-3]
+## Storage Architecture 
+
+[AIR-3][AIS-3][AIP-3][W5C-3][DID-3][SCL-3]
 
 Anya uses Web5's Decentralized Web Nodes (DWN) for all data storage, providing:
 
@@ -516,7 +589,7 @@ We welcome contributions! See our Contributing Guide for details.
 
 - **Current Version**: 1.0.0
 - **Status**: Production/Stable
-- **Last Update**: 2024-01-05
+- **Last Update**: 2025-03-03
 
 ## License Information
 
@@ -548,4 +621,4 @@ Special thanks to our contributors and the following projects:
 
 ### Last Updated
 
-*2024-12-07*
+*2025-03-03*
