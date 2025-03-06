@@ -25,10 +25,13 @@ futures = "0.3.30"
 serde = { version = "1.0.215", features = ["derive"] }
 serde_json = "1.0.133"
 serde_yaml = "0.9.25"
+toml = "0.8.8"
 anyhow = "1.0.75"
 thiserror = "1.0.69"
 async-trait = "0.1.77"
 pyo3 = { version = "0.19.2", features = ["extension-module"] }
+once_cell = "1.18.0"
+regex = "1.9.5"
 
 # Web5 Integration
 web5 = { git = "https://github.com/TBD54566975/web5-rs", package = "web5", tag = "v4.0.0" }
@@ -73,9 +76,12 @@ futures = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 serde_yaml = { workspace = true }
+toml = { workspace = true }
 anyhow = { workspace = true }
 thiserror = { workspace = true }
 async-trait = { workspace = true }
+once_cell = { workspace = true }
+regex = { workspace = true }
 
 # Web5 Integration
 web5 = { workspace = true }
