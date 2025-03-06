@@ -355,6 +355,335 @@ graph TB
     BitcoinIntegration --> TxBroadcast
 ```
 
+## Layer 2 Solutions Architecture
+
+Anya Core provides comprehensive support for a variety of Bitcoin Layer 2 solutions, each integrated with our hexagonal architecture pattern.
+
+```mermaid
+graph TB
+    subgraph L2Manager[Layer 2 Manager]
+        TypeRegistry[Layer 2 Type Registry]
+        ClientFactory[Layer 2 Client Factory]
+        Config[Layer 2 Configuration]
+    end
+
+    subgraph Solutions[Layer 2 Solutions]
+        BOB[BOB - Bitcoin Optimistic Blockchain]
+        Lightning[Lightning Network]
+        RGB[RGB Protocol]
+        RSK[RSK Sidechain]
+        Stacks[Stacks Blockchain]
+        DLC[Discreet Log Contracts]
+        StateChannels[State Channels]
+        Taproot[Taproot Assets]
+    end
+
+    subgraph Integration[Bitcoin Integration]
+        Wallet[Bitcoin Wallet]
+        Scripts[Script Engine]
+        UTXO[UTXO Management]
+        TxBroadcast[Transaction Broadcasting]
+    end
+
+    %% Connections
+    L2Manager --> TypeRegistry
+    L2Manager --> ClientFactory
+    L2Manager --> Config
+    
+    ClientFactory --> Solutions
+    
+    Solutions --> BOB
+    Solutions --> Lightning
+    Solutions --> RGB
+    Solutions --> RSK
+    Solutions --> Stacks
+    Solutions --> DLC
+    Solutions --> StateChannels
+    Solutions --> Taproot
+    
+    BOB --> Integration
+    Lightning --> Integration
+    RGB --> Integration
+    RSK --> Integration
+    Stacks --> Integration
+    DLC --> Integration
+    StateChannels --> Integration
+    Taproot --> Integration
+    
+    Integration --> Wallet
+    Integration --> Scripts
+    Integration --> UTXO
+    Integration --> TxBroadcast
+```
+
+### BOB Integration Architecture
+
+```mermaid
+graph TB
+    subgraph BOBClient[BOB Client]
+        RelayMonitor[Bitcoin Relay Monitor]
+        EvmAdapter[EVM Adapter]
+        BitVMValidator[BitVM Validator]
+        CrossLayerManager[Cross-Layer Manager]
+        AnalyticsEngine[Analytics Engine]
+    end
+
+    subgraph BitcoinRelay[Bitcoin Relay]
+        RelayStatus[Relay Status]
+        RelayValidation[Relay Validation]
+        BlockSync[Block Synchronization]
+    end
+
+    subgraph EVMLayer[EVM Layer]
+        SmartContracts[Smart Contracts]
+        Transactions[EVM Transactions]
+        GasManagement[Gas Management]
+    end
+
+    subgraph BitVMLayer[BitVM Layer]
+        Proofs[BitVM Proofs]
+        Verification[Proof Verification]
+        FraudProofs[Fraud Proofs]
+    end
+
+    %% Connections
+    BOBClient --> RelayMonitor
+    BOBClient --> EvmAdapter
+    BOBClient --> BitVMValidator
+    BOBClient --> CrossLayerManager
+    BOBClient --> AnalyticsEngine
+    
+    RelayMonitor --> BitcoinRelay
+    EvmAdapter --> EVMLayer
+    BitVMValidator --> BitVMLayer
+    
+    BitcoinRelay --> RelayStatus
+    BitcoinRelay --> RelayValidation
+    BitcoinRelay --> BlockSync
+    
+    EVMLayer --> SmartContracts
+    EVMLayer --> Transactions
+    EVMLayer --> GasManagement
+    
+    BitVMLayer --> Proofs
+    BitVMLayer --> Verification
+    BitVMLayer --> FraudProofs
+```
+
+### RGB Protocol Architecture
+
+```mermaid
+graph TB
+    subgraph RGBClient[RGB Client]
+        ContractManager[Contract Manager]
+        AssetManager[Asset Manager]
+        SchemaValidator[Schema Validator]
+        TransactionManager[Transaction Manager]
+    end
+
+    subgraph ContractTypes[Contract Types]
+        FungibleAssets[Fungible Assets]
+        CollectibleAssets[Collectible Assets]
+        IdentityContracts[Identity Contracts]
+        CustomContracts[Custom Contracts]
+    end
+
+    subgraph ClientIntegration[Client Integration]
+        BitcoinTransactions[Bitcoin Transactions]
+        ClientSideValidation[Client-Side Validation]
+        Storage[Data Storage]
+    end
+
+    %% Connections
+    RGBClient --> ContractManager
+    RGBClient --> AssetManager
+    RGBClient --> SchemaValidator
+    RGBClient --> TransactionManager
+    
+    ContractManager --> ContractTypes
+    AssetManager --> ContractTypes
+    
+    ContractTypes --> FungibleAssets
+    ContractTypes --> CollectibleAssets
+    ContractTypes --> IdentityContracts
+    ContractTypes --> CustomContracts
+    
+    RGBClient --> ClientIntegration
+    
+    ClientIntegration --> BitcoinTransactions
+    ClientIntegration --> ClientSideValidation
+    ClientIntegration --> Storage
+```
+
+### RSK Integration Architecture
+
+```mermaid
+graph TB
+    subgraph RSKClient[RSK Client]
+        NodeConnector[Node Connector]
+        BridgeInterface[Bridge Interface]
+        SmartContractCaller[Smart Contract Caller]
+        TxManager[Transaction Manager]
+    end
+
+    subgraph Bridge[Two-Way Peg]
+        FederationManagement[Federation Management]
+        PegInProcess[Peg-In Process]
+        PegOutProcess[Peg-Out Process]
+    end
+
+    subgraph SmartBitcoin[Smart Bitcoin]
+        RBTC[RBTC Token]
+        TokenOperations[Token Operations]
+    end
+
+    %% Connections
+    RSKClient --> NodeConnector
+    RSKClient --> BridgeInterface
+    RSKClient --> SmartContractCaller
+    RSKClient --> TxManager
+    
+    BridgeInterface --> Bridge
+    
+    Bridge --> FederationManagement
+    Bridge --> PegInProcess
+    Bridge --> PegOutProcess
+    
+    SmartContractCaller --> SmartBitcoin
+    
+    SmartBitcoin --> RBTC
+    SmartBitcoin --> TokenOperations
+```
+
+### Stacks Integration Architecture
+
+```mermaid
+graph TB
+    subgraph StacksClient[Stacks Client]
+        ApiClient[API Client]
+        BlockchainOperations[Blockchain Operations]
+        SmartContractInterface[Smart Contract Interface]
+        STXOperations[STX Operations]
+    end
+
+    subgraph ClarityContracts[Clarity Contracts]
+        ContractCalls[Contract Calls]
+        ContractDeployment[Contract Deployment]
+        FungibleTokens[Fungible Tokens]
+        NonFungibleTokens[Non-Fungible Tokens]
+    end
+
+    subgraph BitcoinIntegration[Bitcoin Integration]
+        StacksBlocks[Stacks Blocks]
+        PoXMining[Proof of Transfer Mining]
+    end
+
+    %% Connections
+    StacksClient --> ApiClient
+    StacksClient --> BlockchainOperations
+    StacksClient --> SmartContractInterface
+    StacksClient --> STXOperations
+    
+    SmartContractInterface --> ClarityContracts
+    
+    ClarityContracts --> ContractCalls
+    ClarityContracts --> ContractDeployment
+    ClarityContracts --> FungibleTokens
+    ClarityContracts --> NonFungibleTokens
+    
+    BlockchainOperations --> BitcoinIntegration
+    
+    BitcoinIntegration --> StacksBlocks
+    BitcoinIntegration --> PoXMining
+```
+
+### DLC Integration Architecture
+
+```mermaid
+graph TB
+    subgraph DLCClient[DLC Client]
+        ContractManager[Contract Manager]
+        OracleManager[Oracle Manager]
+        EventManager[Event Manager]
+        OutcomeManager[Outcome Manager]
+    end
+
+    subgraph ContractLifecycle[Contract Lifecycle]
+        ContractOffer[Contract Offer]
+        ContractAccept[Contract Accept]
+        ContractSign[Contract Sign]
+        ContractExecute[Contract Execute]
+    end
+
+    subgraph OracleSystem[Oracle System]
+        OracleRegistration[Oracle Registration]
+        OracleAnnouncement[Oracle Announcement]
+        OracleAttestation[Oracle Attestation]
+    end
+
+    %% Connections
+    DLCClient --> ContractManager
+    DLCClient --> OracleManager
+    DLCClient --> EventManager
+    DLCClient --> OutcomeManager
+    
+    ContractManager --> ContractLifecycle
+    
+    ContractLifecycle --> ContractOffer
+    ContractLifecycle --> ContractAccept
+    ContractLifecycle --> ContractSign
+    ContractLifecycle --> ContractExecute
+    
+    OracleManager --> OracleSystem
+    
+    OracleSystem --> OracleRegistration
+    OracleSystem --> OracleAnnouncement
+    OracleSystem --> OracleAttestation
+```
+
+### Taproot Assets Protocol Architecture
+
+```mermaid
+graph TB
+    subgraph TaprootClient[Taproot Assets Client]
+        AssetMinter[Asset Minter]
+        AssetTransfer[Asset Transfer]
+        ScriptTree[Script Tree Manager]
+        KeyManager[Key Manager]
+    end
+
+    subgraph AssetTypes[Asset Types]
+        FungibleAssets[Fungible Assets]
+        CollectibleAssets[Collectible Assets]
+        IssuanceStructure[Issuance Structure]
+    end
+
+    subgraph TaprootIntegration[Taproot Integration]
+        KeyPathSpending[Key Path Spending]
+        ScriptPathSpending[Script Path Spending]
+        MerkleProofs[Merkle Proofs]
+    end
+
+    %% Connections
+    TaprootClient --> AssetMinter
+    TaprootClient --> AssetTransfer
+    TaprootClient --> ScriptTree
+    TaprootClient --> KeyManager
+    
+    AssetMinter --> AssetTypes
+    AssetTransfer --> AssetTypes
+    
+    AssetTypes --> FungibleAssets
+    AssetTypes --> CollectibleAssets
+    AssetTypes --> IssuanceStructure
+    
+    TaprootClient --> TaprootIntegration
+    
+    TaprootIntegration --> KeyPathSpending
+    TaprootIntegration --> ScriptPathSpending
+    TaprootIntegration --> MerkleProofs
+```
+
 ## Tokenomics System Flow
 
 ```mermaid
