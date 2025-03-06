@@ -24,7 +24,7 @@ bitcoin = { workspace = true, features = ["rand"] }
 web5 = { workspace = true }
 
 # Internal Dependencies
-anya-core = { path = "../dependencies/anya-core", version = "0.2.0" }
+anya-core = { path = "..", version = "0.2.0" }
 
 [features]
 default = ["standard"]
