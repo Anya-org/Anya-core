@@ -201,6 +201,79 @@ Performance metrics for the security system:
 | Crypto Operations | 1-100 | 100-1000 | 10-30 |
 | Security Monitoring | 5-20 | 1000+ | 5-10 |
 
+## Bitcoin-Specific Security Features
+
+The Security Architecture includes specialized features for Bitcoin operations:
+
+### 1. Secure Key Management
+
+- **Hardware Security Module (HSM) integration** for critical key operations
+- **Key rotation policies** with configurable schedules
+- **Multi-signature support** for transaction approval
+- **Threshold signature schemes** for distributed security
+
+### 2. Transaction Security
+
+- **Transaction validation** with cryptographic verification
+- **Fee analysis** to prevent fee-based attacks
+- **Output validation** against security policies
+- **Script analysis** for potential vulnerabilities
+
+### 3. Layer 2 Security
+
+The security architecture now includes specialized protections for Layer 2 solutions:
+
+#### BOB Hybrid L2 Security
+- **Bitcoin Relay Security**: Validating relay integrity and preventing relay manipulation
+- **Cross-Layer Transaction Validation**: Ensuring security of transactions between Bitcoin L1 and BOB L2
+- **EVM Smart Contract Security**: Static analysis and runtime verification for EVM contracts
+- **BitVM Security Measures**: Special security monitoring for BitVM verification operations
+- **Fraud Proof Validation**: Security controls for optimistic rollup fraud proofs
+- **MEV Protection**: Protection against maximal extractable value exploitation in the hybrid environment
+
+**Implementation:**
+```rust
+pub struct L2SecurityMonitor {
+    // Relay security components
+    relay_validation: RelayValidation,
+    
+    // Smart contract security
+    evm_security_analyzer: EvmSecurityAnalyzer,
+    
+    // Cross-layer security
+    cross_layer_validator: CrossLayerValidator,
+    
+    // BitVM security
+    bitvm_security: BitVMSecurityMonitor,
+}
+```
+
+**Cross-Layer Security Architecture:**
+```
+┌─────────────────┐           ┌─────────────────┐
+│                 │           │                 │
+│  Bitcoin L1     │◄────────►│  Security        │
+│  Security       │           │  Core           │
+│                 │           │                 │
+└─────────────────┘           └────────┬────────┘
+                                       │
+                                       ▼
+                              ┌─────────────────┐
+                              │                 │
+                              │  L2 Security    │
+                              │  Monitor        │
+                              │                 │
+                              └─────────────────┘
+                                       │
+                                       ▼
+                              ┌─────────────────┐
+                              │                 │
+                              │  Smart Contract │
+                              │  Security       │
+                              │                 │
+                              └─────────────────┘
+```
+
 ## Future Enhancements
 
 1. HSM Integration for secure key management

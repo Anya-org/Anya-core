@@ -17,6 +17,13 @@ Welcome to the Anya Core documentation. This index will help you navigate the va
 - [Implementation Milestones](docs/IMPLEMENTATION_MILESTONES.md) - Current progress tracking
 - [Testing Strategy](docs/TESTING_STRATEGY.md) - Sectional testing methodology
 
+## Architecture Documentation
+
+- [ML System Architecture](docs/ML_SYSTEM_ARCHITECTURE.md) - Machine Learning system with Agent Checker (AIP-002)
+- [Security Architecture](docs/SECURITY_ARCHITECTURE.md) - Security system with System Hardening (AIE-001)
+- [Performance Architecture](docs/PERFORMANCE_ARCHITECTURE.md) - Performance system with Optimization (AIR-008)
+- [Core System Integration](docs/CORE_SYSTEM_INTEGRATION.md) - Integration of all P1 components
+
 ## System Components
 
 ### Bitcoin & Lightning
@@ -38,7 +45,7 @@ Welcome to the Anya Core documentation. This index will help you navigate the va
 
 ### AI & Machine Learning
 
-- [ML System Architecture](docs/ML_SYSTEM_ARCHITECTURE.md) - ML system design
+- [ML System Architecture](docs/ML_SYSTEM_ARCHITECTURE.md) - ML system design with Agent Checker
 - [AI Component Reference](docs/ml/README.md) - AI component details
 
 ## Development Resources
@@ -90,7 +97,7 @@ Welcome to the Anya Core documentation. This index will help you navigate the va
 ## Release Information
 
 - **Current Version**: 3.1.0
-- **Last Updated**: 2025-03-04
+- **Last Updated**: 2025-03-06
 - **Compatibility**:
   - Stacks v2.4
   - Web5 Protocol v1.0
