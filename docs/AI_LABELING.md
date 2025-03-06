@@ -1,28 +1,35 @@
 # AI-Driven Labeling System
 
 ## Overview
+
 This document outlines our AI-driven labeling system for tracking requests, issues, improvements, and other project items.
 
 ## Label Categories
 
 ### AIR - Anya Improvement Requests
+
 Format: `AIR-[number]`
+
 ```
 AIR-001: Add new relay selection algorithm
 AIR-002: Enhance key backup mechanism
-AIR-003: Implement advanced message threading
+AIR-003: Implement advanced repository connectivity
 ```
 
 ### AIS - Anya Implementation Specifications
+
 Format: `AIS-[number]`
+
 ```
 AIS-001: Nostr protocol integration specification
-AIS-002: Relay management system design
+AIS-002: Repository management system design
 AIS-003: Key subscription workflow
 ```
 
 ### AIT - Anya Issue Tracking
+
 Format: `AIT-[number]`
+
 ```
 AIT-001: Connection timeout with specific relays
 AIT-002: Message encryption performance bottleneck
@@ -30,7 +37,9 @@ AIT-003: Key recovery process failure
 ```
 
 ### AIM - Anya Integration Modules
+
 Format: `AIM-[number]`
+
 ```
 AIM-001: Nostr module integration
 AIM-002: Web5 DWN connector
@@ -38,7 +47,9 @@ AIM-003: Bitcoin Core bridge
 ```
 
 ### AIP - Anya Intelligence Patterns
+
 Format: `AIP-[number]`
+
 ```
 AIP-001: Smart relay selection
 AIP-002: Adaptive message routing
@@ -46,7 +57,9 @@ AIP-003: Predictive caching
 ```
 
 ### AIE - Anya Intelligence Enhancements
+
 Format: `AIE-[number]`
+
 ```
 AIE-001: Enhanced pattern recognition
 AIE-002: Improved decision making
@@ -56,6 +69,7 @@ AIE-003: Advanced learning capabilities
 ## Usage Guidelines
 
 ### 1. Creating New Items
+
 ```markdown
 # AIR-004: Implement Advanced Message Threading
 
@@ -75,6 +89,7 @@ Add support for hierarchical message threading with AI-driven organization.
 ```
 
 ### 2. Referencing Items
+
 ```rust
 // In code comments
 /// Implements AIR-004: Advanced message threading
@@ -85,6 +100,7 @@ pub struct MessageThread {
 ```
 
 ### 3. Commit Messages
+
 ```bash
 git commit -m "AIR-004: Implement message threading core
 - Add thread structure
@@ -96,6 +112,7 @@ Relates to: AIS-002, AIP-001"
 ## Integration with Issue Tracking
 
 ### GitHub Issues Template
+
 ```yaml
 name: Feature Request
 about: Suggest an idea for Anya
@@ -117,6 +134,7 @@ body:
 ```
 
 ### Pull Request Template
+
 ```markdown
 ## Description
 Implements [AIR-XXX]
@@ -136,6 +154,7 @@ Implements [AIR-XXX]
 ## AI Integration
 
 ### 1. Automatic Labeling
+
 ```python
 def suggest_ai_label(content):
     """Suggest appropriate AI label based on content analysis."""
@@ -149,6 +168,7 @@ def suggest_ai_label(content):
 ```
 
 ### 2. Relationship Detection
+
 ```python
 def detect_relationships(item):
     """Detect relationships between AI-labeled items."""
@@ -160,6 +180,7 @@ def detect_relationships(item):
 ```
 
 ### 3. Progress Tracking
+
 ```python
 def track_ai_items():
     """Track progress of AI-labeled items."""
@@ -204,6 +225,7 @@ def track_ai_items():
 ## Tools Integration
 
 ### 1. GitHub Actions
+
 ```yaml
 name: AI Label Validation
 on:
@@ -221,6 +243,7 @@ jobs:
 ```
 
 ### 2. VS Code Extension
+
 ```json
 {
   "ai-labeling.patterns": {
@@ -237,6 +260,7 @@ jobs:
 ## Examples
 
 ### Feature Implementation
+
 ```rust
 /// AIR-004: Advanced Message Threading
 /// Implements thread management with AI-driven organization
@@ -249,6 +273,7 @@ pub mod message_threading {
 ```
 
 ### Issue Resolution
+
 ```rust
 /// AIT-002: Fix message encryption performance
 /// Implements optimized encryption using parallel processing
@@ -259,6 +284,7 @@ pub fn optimize_encryption() {
 ```
 
 ### Integration Module
+
 ```rust
 /// AIM-001: Nostr Integration
 /// Implements core Nostr functionality
@@ -270,4 +296,24 @@ pub mod nostr {
 }
 ```
 
-*Last updated: 2024-12-07*
+### Documentation Infrastructure
+
+```powershell
+# AIR-003: Repository Connectivity Standardization
+# Updates GitHub URLs across the codebase for consistent references
+# Related:
+# - AIS-002: Repository Management
+# - AIM-003: Bitcoin Core Bridge
+
+# PowerShell script for URL consistency
+function Update-RepositoryUrls {
+    param(
+        [string]$OldUrl = "github.com/botshelomokoka/anya-core",
+        [string]$NewUrl = "github.com/anya-org/anya-core"
+    )
+    
+    # Implementation details...
+}
+```
+
+*Last updated: 2025-03-06*
