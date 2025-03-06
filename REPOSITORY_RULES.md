@@ -339,6 +339,148 @@ Lightning Network components must:
 - Maintain security and privacy
 - Achieve minimum AIS-3, PFM-2, RES-3, BPC-2 ratings
 
+## Operational Reliability and AI Quality Assurance
+
+### 1. Progress Monitoring Requirements
+
+All long-running operations must:
+
+- Provide clear progress indicators with percentage completion
+- Include timeout mechanisms to prevent indefinite hanging
+- Log intermediate progress at appropriate intervals
+- Include cancellation capabilities for user-initiated operations
+- Implement heartbeat mechanisms for distributed operations
+
+Example implementation:
+
+```rust
+/// [AIR-2][AIS-2][RES-3] Execute blockchain synchronization with progress monitoring
+/// 
+/// Synchronizes the local blockchain with network nodes while providing
+/// detailed progress feedback and preventing indefinite hanging.
+pub fn sync_blockchain(timeout_seconds: u64) -> Result<SyncStatus, Error> {
+    let start_time = Instant::now();
+    let mut progress = 0.0;
+    
+    // Set up progress callback
+    let progress_callback = |current: f64| {
+        progress = current;
+        log::info!("Sync progress: {:.2}%", progress * 100.0);
+        
+        // Check for timeout
+        if start_time.elapsed().as_secs() > timeout_seconds {
+            return Err(Error::Timeout("Blockchain sync timed out"));
+        }
+        
+        Ok(())
+    };
+    
+    // Execute with progress monitoring
+    let result = blockchain_client.sync(progress_callback)?;
+    
+    // Final progress log
+    log::info!("Sync completed: 100%");
+    
+    Ok(result)
+}
+```
+
+### 2. AI Hallucination Prevention
+
+All AI components must:
+
+- Implement fact verification mechanisms against trusted data sources
+- Include confidence scoring for all generated outputs
+- Apply appropriate thresholds for confidence-based filtering
+- Maintain comprehensive logging of verification steps
+- Incorporate human-in-the-loop validation for critical operations
+
+Implementation requirements:
+
+```rust
+/// [AIR-3][AIS-3][AIE-3] Generate blockchain transaction with hallucination prevention
+/// 
+/// Creates a transaction with AI assistance while ensuring all generated data
+/// is verified against trusted sources to prevent hallucination.
+pub fn generate_transaction(parameters: TransactionParameters) -> Result<Transaction, Error> {
+    // Generate candidate transaction
+    let (candidate_tx, confidence_score) = ai_engine.generate_transaction(parameters)?;
+    
+    // Apply confidence threshold
+    if confidence_score < CONFIG.min_confidence_threshold {
+        return Err(Error::LowConfidence("Generated transaction has insufficient confidence score"));
+    }
+    
+    // Verify against blockchain state
+    let verification_result = verify_against_blockchain(&candidate_tx)?;
+    if !verification_result.is_valid {
+        log::warn!("AI hallucination detected: {}", verification_result.reason);
+        return Err(Error::VerificationFailed(verification_result.reason));
+    }
+    
+    // Log verification for audit
+    log::info!("Transaction verified: confidence={}, verification_steps={}", 
+              confidence_score, verification_result.steps.len());
+    
+    Ok(candidate_tx)
+}
+```
+
+### 3. Process Hang Prevention
+
+All system processes must:
+
+- Implement watchdog timers for detecting stuck operations
+- Use structured concurrency patterns to manage child tasks
+- Include cascading timeout mechanisms for dependent operations
+- Provide automatic recovery mechanisms for detected hangs
+- Log detailed diagnostics when operations exceed expected durations
+
+Example:
+
+```rust
+/// [AIR-2][RES-3] Execute network operation with hang prevention
+/// 
+/// Performs a network operation with proper timeout handling and
+/// recovery mechanisms to prevent indefinite hanging.
+pub async fn execute_network_operation(params: NetworkParams) -> Result<NetworkResponse, Error> {
+    // Create watchdog timer
+    let watchdog = Watchdog::new("network_operation", Duration::from_secs(30));
+    
+    // Execute operation with timeout
+    let operation_future = network_client.execute(params);
+    match tokio::time::timeout(Duration::from_secs(15), operation_future).await {
+        Ok(result) => {
+            // Operation completed successfully
+            watchdog.stop();
+            Ok(result?)
+        }
+        Err(_) => {
+            // Operation timed out
+            log::warn!("Network operation timed out, attempting recovery");
+            
+            // Recovery attempt with shorter timeout
+            match tokio::time::timeout(
+                Duration::from_secs(5), 
+                network_client.execute_recovery(params)
+            ).await {
+                Ok(recovery_result) => {
+                    watchdog.stop();
+                    log::info!("Recovery successful after timeout");
+                    Ok(recovery_result?)
+                }
+                Err(_) => {
+                    // Recovery also timed out
+                    watchdog.trigger_alert();
+                    log::error!("Recovery failed, operation hang detected");
+                    Err(Error::OperationHang("Network operation and recovery both timed out"))
+                }
+            }
+        }
+    }
+}
+```
+
 ## Last Updated
 
 2025-02-24 

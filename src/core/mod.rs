@@ -5,6 +5,8 @@
 pub mod performance_optimization;
 // Configuration management module
 pub mod config_management;
+// Reliability module
+pub mod reliability;
 
 // Re-exports
 pub use performance_optimization::PerformanceOptimizer;
@@ -17,6 +19,14 @@ pub use config_management::ConfigValue;
 pub use config_management::ConfigSource;
 pub use config_management::ValidationRule;
 pub use config_management::CONFIG_MANAGER;
+
+// Re-export reliability types
+pub use reliability::Watchdog;
+pub use reliability::ProgressTracker;
+pub use reliability::ConfidenceAssessment;
+pub use reliability::AiVerification;
+pub use reliability::execute_with_monitoring;
+pub use reliability::execute_with_recovery;
 
 // ML agent checker module is in src/ml/agent_checker.rs
 // Re-export from ml module
