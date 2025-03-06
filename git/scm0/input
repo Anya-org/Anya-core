@@ -1,0 +1,25 @@
+AIM-004: Implement hexagonal architecture for Bitcoin Layer 2 solutions
+
+Integrate core Layer 2 protocol adapters with Bitcoin ecosystem:
+- BOB (Bitcoin Optimistic Blockchain) adapter with PSBT support
+- RGB Protocol integration with Taproot asset capabilities (BIP-341)
+- RSK Sidechain with Bitcoin-backed verification
+- Modular framework for future Layer 2 solutions
+
+Technical Implementation:
+- Hexagonal architecture pattern for protocol isolation
+- Port/adapter separation for clean interfaces
+- Comprehensive test suite with 100% coverage for consensus code
+- Security validation against BIP standards
+- Prometheus metric endpoints for performance monitoring
+
+Compliance:
+- [x] BIP 341/342 (Taproot)
+- [x] BIP 174 (PSBT)
+- [x] Miniscript Support
+- [ ] Testnet Validation (pending)
+
+References Bitcoin Development Framework v2.5
+Related to: AIR-342, AIT-367
+
+Signed-off-by: bo_thebig <botshelomokoka@gmail.com> 

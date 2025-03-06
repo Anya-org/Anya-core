@@ -204,6 +204,80 @@ The core system includes comprehensive testing:
 4. Distributed system support
 5. Cloud-native deployment options
 
+## Integration with Other Components
+
+### 1. Security Integration
+The Core System integrates with the Security Architecture to ensure:
+- Secure component interaction
+- Access control for cross-component operations
+- Audit logging for system operations
+- Threat detection in component inputs/outputs
+
+### 2. Performance Integration
+The Core System integrates with the Performance Architecture to:
+- Monitor resource usage across components
+- Optimize core system execution
+- Control scaling of system operations
+- Ensure efficient resource utilization
+
+### 3. ML Agent Integration
+The Core System integrates with the ML System to:
+- Process input through the AgentChecker
+- Receive system health status from ML components
+- Coordinate ML operations with other components
+- Apply ML-driven optimizations to system configuration
+
+### 4. Layer 2 Integration
+
+The Core System now includes integration with Bitcoin Layer 2 solutions, particularly BOB (Bitcoin Optimistic Blockchain):
+
+#### BOB Hybrid L2 Integration
+- **Bitcoin Relay Interface**: Core system provides interfaces to monitor and interact with BOB's Bitcoin relay
+- **EVM Compatibility Layer**: Enables interaction with BOB's EVM-compatible smart contracts
+- **Hybrid Execution Environment**: Manages the execution context for operations spanning Bitcoin L1 and BOB L2
+- **BitVM Support**: Interfaces with BOB's BitVM implementation for optimistic rollups
+- **Cross-Layer State Management**: Coordinates state synchronization between L1 and L2 operations
+
+**Implementation:**
+```rust
+pub struct L2Integration {
+    // BOB-specific components
+    bitcoin_relay_connector: BitcoinRelayConnector,
+    evm_adapter: EvmAdapter,
+    bitvm_validator: BitVMValidator,
+    
+    // Configuration
+    layer2_config: Layer2Config,
+    
+    // State management
+    cross_layer_state: CrossLayerState,
+}
+```
+
+**Integration Architecture:**
+```
+┌─────────────────┐           ┌─────────────────┐
+│                 │           │                 │
+│  Bitcoin L1     │◄────────►│  Core System    │
+│                 │           │                 │
+└─────────────────┘           └────────┬────────┘
+                                       │
+                                       ▼
+                              ┌─────────────────┐
+                              │                 │
+                              │  BOB Layer 2    │
+                              │                 │
+                              └─────────────────┘
+                                       │
+                                       ▼
+                              ┌─────────────────┐
+                              │                 │
+                              │  EVM Smart      │
+                              │  Contracts      │
+                              │                 │
+                              └─────────────────┘
+```
+
 ---
 
 *This document follows the [AI Labeling System](../AI_LABELLING.md) standards based on the Bitcoin Development Framework v2.5.* 

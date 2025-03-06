@@ -38,6 +38,10 @@ pub mod script {
     pub mod standard;    // Standard scripts
 }
 
+/// AIM-004: Layer 2 Integration Modules
+/// Layer 2 protocols for Bitcoin implemented with hexagonal architecture
+pub mod layer2;
+
 #[derive(Debug, Clone)]
 pub struct Config {
     network: Network,
@@ -62,6 +66,8 @@ pub struct BitcoinNode {
     consensus: consensus::validation::Validator,
     mempool: mempool::pool::Mempool,
     network: net::p2p::P2P,
+    /// Layer 2 protocol registry
+    layer2_registry: Option<Arc<layer2::framework::Layer2Registry>>,
 }
 
 impl BitcoinNode {
@@ -71,6 +77,7 @@ impl BitcoinNode {
             mempool: mempool::pool::Mempool::new(&config)?,
             network: net::p2p::P2P::new(&config)?,
             config,
+            layer2_registry: None,
         })
     }
 
@@ -79,6 +86,17 @@ impl BitcoinNode {
         self.consensus.start()?;
         self.mempool.start()?;
         self.network.start()?;
+        
+        // Initialize Layer 2 factory and registry
+        let factory = Arc::new(layer2::framework::Layer2Factory::new());
+        let registry = Arc::new(layer2::framework::Layer2Registry::new(factory));
+        self.layer2_registry = Some(registry);
+        
         Ok(())
+    }
+    
+    /// Get Layer 2 protocol registry
+    pub fn layer2_registry(&self) -> Option<Arc<layer2::framework::Layer2Registry>> {
+        self.layer2_registry.clone()
     }
 }
