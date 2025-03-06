@@ -9,9 +9,9 @@ src = "docs"
 [output.html]
 default-theme = "light"
 preferred-dark-theme = "navy"
-git-repository-url = "https://github.com/botshelomokoka/anya-core"
+git-repository-url = "https://github.com/anya-org/anya-core"
 git-repository-icon = "fa-github"
-edit-url-template = "https://github.com/botshelomokoka/anya-core/edit/main/{path}"
+edit-url-template = "https://github.com/anya-org/anya-core/edit/main/{path}"
 site-url = "/anya-core/"
 additional-css = ["docs/assets/custom.css"]
 additional-js = ["docs/assets/custom.js"]
@@ -44,3 +44,4 @@ follow-web-links = true
 [preprocessor.toc]
 command = "mdbook-toc"
 renderer = ["html"]
+

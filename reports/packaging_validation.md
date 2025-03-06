@@ -1,4 +1,4 @@
-﻿# Anya Core - Packaging Validation Report
+# Anya Core - Packaging Validation Report
 **Generated:** 2025-03-01 15:25:29
 
 ## Feature Status

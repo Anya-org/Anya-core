@@ -14,7 +14,7 @@ permissions:
 jobs:
   sync-enterprise:
     runs-on: ubuntu-latest
-    if: github.repository == 'botshelomokoka/anya-core'
+    if: github.repository == 'anya-org/anya-core'
     
     steps:
       - name: Checkout repository
@@ -36,3 +36,4 @@ jobs:
           git fetch origin main
           git merge origin/main --ff-only
           git push origin main
+

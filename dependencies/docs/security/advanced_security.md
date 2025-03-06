@@ -6,4 +6,3 @@ This guide details the comprehensive security architecture integrating Bitcoin, 
 ## Core Security Components
 
 ### 1. Multi-Layer Authentication
-

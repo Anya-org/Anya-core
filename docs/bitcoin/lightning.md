@@ -175,4 +175,4 @@ The Lightning implementation integrates with the Bitcoin functionality through:
 
 ---
 
-_Last updated: 2025-03-01_ 
+_Last updated: 2025-03-01_

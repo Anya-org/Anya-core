@@ -47,5 +47,3 @@ The Anya Project uses a Git commit message format to ensure that the commit mess
 The Anya Project uses Git worktrees to manage different features and versions of the project. Worktrees are used to create a new branch for a feature or bug fix.
 
 - Create a new worktree for a feature:
-
-  

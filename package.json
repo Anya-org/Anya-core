@@ -17,7 +17,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/botshelomokoka/anya-core.git"
+    "url": "git+https://github.com/anya-org/anya-core.git"
   },
   "keywords": [
     "bitcoin",
@@ -30,7 +30,8 @@
   "author": "bo_thebig",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/botshelomokoka/anya-core/issues"
+    "url": "https://github.com/anya-org/anya-core/issues"
   },
-  "homepage": "https://github.com/botshelomokoka/anya-core#readme"
+  "homepage": "https://github.com/anya-org/anya-core#readme"
 }
+
