@@ -47,6 +47,10 @@ pub mod bitcoin;
 pub mod dao;
 pub mod extensions;
 pub mod config;
+pub mod core;
+pub mod security;
+pub mod enterprise;
+pub mod layer2;
 
 /// Core error type for the Anya system
 #[derive(Debug)]

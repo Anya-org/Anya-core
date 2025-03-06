@@ -27,6 +27,14 @@ Anya Core is an AI-powered Bitcoin protocol that enables advanced blockchain cap
 - [Testing](/anya-core/testing) - Testing procedures
 - [Implementation Milestones](IMPLEMENTATION_MILESTONES.md) - Current progress
 
+## Architecture Documentation
+
+- [ML System Architecture](ML_SYSTEM_ARCHITECTURE.md) - ML system with Agent Checker (AIP-002)
+- [Security Architecture](SECURITY_ARCHITECTURE.md) - Security with System Hardening (AIE-001)
+- [Performance Architecture](PERFORMANCE_ARCHITECTURE.md) - Performance with Optimization (AIR-008)
+- [Core System Integration](CORE_SYSTEM_INTEGRATION.md) - Integration of all P1 components
+- [System Map](SYSTEM_MAP.md) - Complete system architecture overview
+
 ## Component Documentation
 
 ### Core Components
@@ -90,9 +98,76 @@ Anya Core is an AI-powered Bitcoin protocol that enables advanced blockchain cap
 - [Web5 Integration](/anya-core/integration/web5)
 - [Lightning Integration](/anya-core/integration/lightning)
 - [DLC Integration](/anya-core/integration/dlc)
-- [DEX Integration](/anya-core/integration/dex)
+- [BOB Layer 2 Integration](/anya-core/integration/bob)
+- [Layer 2 Solutions Overview](bitcoin/LAYER2_SUPPORT.md)
 
-## Latest Features (2025-03-04)
+## Layer 2 Solutions
+
+Anya Core supports multiple Layer 2 solutions for Bitcoin:
+
+### BOB Hybrid L2
+
+The BOB (Bitcoin Optimistic Blockchain) integration provides:
+
+- **Hybrid Security Model**: Combining Bitcoin PoW security with EVM versatility
+- **Smart Contract Support**: EVM-compatible smart contracts for Bitcoin
+- **Cross-Layer Transactions**: Seamless operations between Bitcoin L1 and BOB L2
+- **BitVM Integration**: Optimistic rollups via BitVM verification
+- **Performance Optimization**: Enhanced transaction throughput and reduced fees
+
+### Lightning Network
+
+The Lightning Network integration provides:
+
+- **Payment Channels**: Fast and low-fee off-chain transactions
+- **Routing**: Multi-hop payment routing across the network
+- **HTLC Support**: Hash Time Locked Contracts for secure payments
+- **Watchtowers**: Protection against channel breaches
+
+### RGB Protocol (Coming Q3 2025)
+
+The RGB Protocol integration will provide:
+
+- **Client-Side Validation**: Validate contracts client-side
+- **Asset Issuance**: Issue fungible and non-fungible assets
+- **Schema Validation**: Use standardized schemas for contracts
+- **Bitcoin Integration**: Built on top of Bitcoin transactions
+
+### RSK - Rootstock (Coming Q3 2025)
+
+The RSK integration will provide:
+
+- **Two-Way Peg**: Secure bridge between Bitcoin and RSK
+- **Smart Bitcoin (RBTC)**: Bitcoin-backed token on RSK
+- **Smart Contracts**: Solidity support for Bitcoin
+- **Federation**: Trusted federation for bridge security
+
+### Taproot Assets (Coming Q2 2025)
+
+The Taproot Assets integration will provide:
+
+- **Asset Issuance**: Create and manage assets on Bitcoin
+- **Transfers**: Transfer assets between parties
+- **Taproot Script Trees**: Leverage Taproot script paths
+- **Merkle Proof Verification**: Validate asset ownership
+
+### State Channels
+
+The state channel integration provides:
+
+- **Generic State**: Support for arbitrary state transitions
+- **Multi-Party Channels**: Channels with multiple participants
+- **Conditional Logic**: Complex conditional state transitions
+- **Dispute Resolution**: On-chain dispute resolution mechanisms
+
+## Latest Features (2025-03-06)
+
+### Priority 1 Components
+
+- **ML*/Agent Checker (AIP-002)**: System health monitoring and verification with auto-save
+- **System Hardening (AIE-001)**: Security configuration with different security levels
+- **Performance Optimization (AIR-008)**: Resource tracking and optimization with configurable targets
+- **Core System Integration**: Unified interface for all P1 components with consistent auto-save
 
 ### DAO & Tokenomics System
 
@@ -132,8 +207,9 @@ Anya Core is an AI-powered Bitcoin protocol that enables advanced blockchain cap
 
 ## Latest Updates
 
-### Version {{ site.version }} (2025-03-04)
+### Version {{ site.version }} (2025-03-06)
 
+- P1 component implementation complete (AIP-002, AIE-001, AIR-008)
 - Bitcoin-style DAO implementation
 - 21 billion token supply with halving every 210,000 blocks
 - Strategic token distribution (30% DEX, 15% team, 55% DAO)
@@ -202,4 +278,4 @@ async fn main() -> Result<()> {
 
 [Get Started →](/anya-core/getting-started)
 
-*Last updated: 2025-03-04*
+*Last updated: 2025-03-06*
