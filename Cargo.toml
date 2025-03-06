@@ -2,12 +2,8 @@
 members = [
     ".",
     "anya-enterprise",
-    "anya-extensions", 
-    "dependencies/anya-core",
-    "dependencies/anya-web5",
-    "anya-bitcoin",
-    "dash33",
-    "mobile"
+    "anya-extensions",
+    "anya-bitcoin"
 ]
 resolver = "2"
 
@@ -16,7 +12,7 @@ version = "0.2.0"
 edition = "2021"
 authors = ["Botshelo Mokoka <botshelomokoka@gmail.com>"]
 license = "MIT"
-repository = "https://github.com/botshelomokoka/anya"
+repository = "https://github.com/anya-org/anya"
 
 [workspace.dependencies]
 # Core dependencies
@@ -62,7 +58,7 @@ proptest = "1.2.0"
 test-log = { version = "0.2.14", features = ["trace"] }
 
 [package]
-name = "anya"
+name = "anya-core"
 version.workspace = true
 edition.workspace = true
 description = "Decentralized AI Governance System"
@@ -140,6 +136,7 @@ tonic-build = "0.10.2"
 default = ["std"]
 std = []
 nightly = []
+enterprise = ["std"]
 
 [profile.release]
 lto = true
