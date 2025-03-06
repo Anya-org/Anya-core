@@ -80,6 +80,14 @@ pub enum AnyaError {
     Config(String),
     /// General system errors
     System(String),
+    /// Operation timed out
+    Timeout(String),
+    /// Operation hung or became unresponsive
+    OperationHang(String),
+    /// AI output had low confidence
+    LowConfidence(String),
+    /// AI output verification failed
+    VerificationFailed(String),
 }
 
 impl fmt::Display for AnyaError {
@@ -91,6 +99,10 @@ impl fmt::Display for AnyaError {
             AnyaError::DAO(msg) => write!(f, "DAO error: {}", msg),
             AnyaError::Config(msg) => write!(f, "Configuration error: {}", msg),
             AnyaError::System(msg) => write!(f, "System error: {}", msg),
+            AnyaError::Timeout(msg) => write!(f, "Timeout error: {}", msg),
+            AnyaError::OperationHang(msg) => write!(f, "Operation hang: {}", msg),
+            AnyaError::LowConfidence(msg) => write!(f, "Low confidence: {}", msg),
+            AnyaError::VerificationFailed(msg) => write!(f, "Verification failed: {}", msg),
         }
     }
 }
