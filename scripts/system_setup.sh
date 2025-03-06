@@ -200,7 +200,7 @@ main() {
     
     # Clone repository
     log_info "Cloning the Anya Core repository..."
-    git clone https://github.com/botshelomokoka/anya-core.git
+    git clone https://github.com/anya-org/anya-core.git
     cd anya-core || exit
     
     # Build project
@@ -227,3 +227,4 @@ main() {
 if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
     main
 fi
+

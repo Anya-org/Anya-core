@@ -22,7 +22,7 @@ Please read our [Code of Conduct](CODE_OF_CONDUCT.md) to foster an open and welc
 
 ## Getting Started
 
-1. Fork the repository on GitHub: <https://github.com/botshelomokoka/anya-core>
+1. Fork the repository on GitHub: <https://github.com/anya-org/anya-core>
 2. Clone your fork locally: `git clone https://github.com/your-username/anya-core.git`
 3. Create a new branch for your feature or bug fix: `git checkout -b your-branch-name`
 

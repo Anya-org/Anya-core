@@ -5,7 +5,7 @@ edition = "2021"
 authors = ["Anya Contributors"]
 description = "Bitcoin-specific functionality for Anya project"
 license = "MIT OR Apache-2.0"
-repository = "https://github.com/botshelomokoka/anya-core"
+repository = "https://github.com/anya-org/anya-core"
 
 [dependencies]
 bitcoin = { version = "0.32.1", features = ["rand", "serde", "taproot"] }
@@ -37,3 +37,4 @@ tracing-subscriber = "0.3.17"
 [lib]
 name = "anya_bitcoin"
 path = "src/lib.rs"
+

@@ -177,7 +177,9 @@ parent-directory/
 │   │   ├── batch_commit.ps1
 │   │   ├── batch_commit.sh
 │   │   ├── sync_labelling.ps1
-│   │   └── sync_labelling.py
+│   │   ├── sync_labelling.py
+│   │   ├── update_github_url.ps1
+│   │   └── update_github_url.sh
 │   └── AI_LABELLING.md
 ├── anya-bitcoin/
 │   ├── .git/
@@ -222,6 +224,33 @@ To ensure consistent labeling across all repositories:
 2. **Synchronize**: Run the synchronization script manually or let the GitHub Actions workflow handle it
 3. **Verify**: Check that all repositories have the updated labeling standards
 4. **Document**: Inform the team about any significant changes
+
+### Maintaining Repository References
+
+To update GitHub repository URLs across the codebase:
+
+1. **Run Update Script**: Execute `update_github_url.ps1` (Windows) or `update_github_url.sh` (Linux/macOS)
+2. **Verify Changes**: Review the log file and check critical files
+3. **Test**: Ensure all references work correctly after the update
+4. **Commit**: Commit changes in logical groups (documentation, configuration, scripts, etc.)
+
+Example usage:
+
+```powershell
+# Windows (PowerShell)
+./scripts/update_github_url.ps1 -DryRun
+
+# Actually perform the updates
+./scripts/update_github_url.ps1
+```
+
+```bash
+# Linux/macOS
+./scripts/update_github_url.sh --dry-run
+
+# Actually perform the updates
+./scripts/update_github_url.sh
+```
 
 ## Development Workflow with Labels
 
@@ -351,4 +380,4 @@ python scripts/sync_labelling.py --target "anya-web5,anya-bitcoin" --dry-run
 
 - [AI Labeling Guide](../AI_LABELLING.md): Comprehensive AI labeling standards
 - [Commit Rules](../COMMIT_RULES.md): Rules for creating commits with labels
-- [Component Requirements](../docs/COMPONENT_REQUIREMENTS.md): Detailed requirements for each label level 
+- [Component Requirements](../docs/COMPONENT_REQUIREMENTS.md): Detailed requirements for each label level

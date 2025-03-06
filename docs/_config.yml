@@ -21,7 +21,7 @@ sass:
 # GitHub metadata
 github:
   is_project_page: true
-  repository_url: https://github.com/botshelomokoka/anya-core
+  repository_url: https://github.com/anya-org/anya-core
   repository_name: anya-core
   owner_url: https://github.com/botshelomokoka
   owner_name: Botshelo Mokoka
@@ -77,3 +77,4 @@ exclude:
   - CONTRIBUTING.md
   - LICENSE
   - CNAME
+

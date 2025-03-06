@@ -4,7 +4,7 @@ version = "0.2.7"
 authors = ["Botshelo Mokoka"]
 edition = "2021"
 license = "MIT OR Apache-2.0"
-repository = "https://github.com/botshelomokoka/anya-core"
+repository = "https://github.com/anya-org/anya-core"
 description = "Core dependencies and shared components for the Anya Bitcoin Platform"
 
 [dependencies]
@@ -65,3 +65,4 @@ rustdoc-args = ["--cfg", "docsrs"]
 
 [package.metadata.cargo-udeps]
 ignore = ["criterion"] # Used only in bench
+

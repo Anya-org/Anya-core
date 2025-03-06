@@ -15,6 +15,7 @@ Welcome to the Anya Core documentation. This index will help you navigate the va
 - [DAO System](docs/DAO_SYSTEM_GUIDE.md) - Comprehensive DAO documentation
 - [Tokenomics System](docs/TOKENOMICS_SYSTEM.md) - Bitcoin-style tokenomics
 - [Implementation Milestones](docs/IMPLEMENTATION_MILESTONES.md) - Current progress tracking
+- [Testing Strategy](docs/TESTING_STRATEGY.md) - Sectional testing methodology
 
 ## System Components
 
@@ -102,5 +103,3 @@ Welcome to the Anya Core documentation. This index will help you navigate the va
 - [GitHub Discussions](https://github.com/anya/anya-core/discussions)
 
 *This documentation follows the [AI Labeling System](AI_LABELLING.md) standards based on the Bitcoin Development Framework v2.5. All components are labeled with appropriate Core and Extended category labels.*
-
-

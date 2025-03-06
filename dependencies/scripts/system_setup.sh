@@ -103,7 +103,7 @@ source $HOME/.cargo/env
 
 # Clone the repository
 print_status "Cloning the Anya Core repository..."
-git clone https://github.com/botshelomokoka/anya-core.git
+git clone https://github.com/anya-org/anya-core.git
 cd anya-core
 
 # Build the project
@@ -171,3 +171,4 @@ print_status "Username: $USERNAME"
 print_status "Instance ID: $INSTANCE_ID"
 print_status "Project ID: $PROJECT_ID"
 print_status "You can now run the project using 'cargo run'"
+

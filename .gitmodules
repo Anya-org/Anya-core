@@ -28,7 +28,8 @@
 
 [submodule "core"]
 	path = core
-	url = https://github.com/botshelomokoka/anya-core.git
+	url = https://github.com/anya-org/anya-core.git
 	branch = main
 	update = merge
 	fetchRecurseSubmodules = true
+

@@ -1,7 +1,7 @@
 # Anya Dependencies
 
-[![Build Status](https://github.com/botshelomokoka/anya-core/workflows/CI/badge.svg)](https://github.com/botshelomokoka/anya-core/actions)
-[![Security Audit](https://github.com/botshelomokoka/anya-core/workflows/Security/badge.svg)](https://github.com/botshelomokoka/anya-core/security)
+[![Build Status](https://github.com/anya-org/anya-core/workflows/CI/badge.svg)](https://github.com/anya-org/anya-core/actions)
+[![Security Audit](https://github.com/anya-org/anya-core/workflows/Security/badge.svg)](https://github.com/anya-org/anya-core/security)
 
 Core dependencies and shared components for the Anya Bitcoin Platform ecosystem.
 

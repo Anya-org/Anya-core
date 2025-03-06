@@ -344,4 +344,4 @@ clarinet test dao/tests/dao-core-test.clar
 clarinet deploy --testnet
 
 # Generate documentation
-clarinet docs 
+clarinet docs

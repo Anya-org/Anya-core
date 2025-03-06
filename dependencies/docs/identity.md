@@ -11,4 +11,3 @@ The identity management system in Anya provides decentralized identity capabilit
 - DID Resolution Caching
 
 ### Usage Examples
-

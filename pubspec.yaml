@@ -1,7 +1,7 @@
 name: anya
 description: Enterprise-grade Bitcoin Infrastructure Platform
 version: 0.2.0
-homepage: https://github.com/botshelomokoka/anya-core
+homepage: https://github.com/anya-org/anya-core
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
@@ -35,3 +35,4 @@ topics:
   - web5
   - cryptocurrency
   - blockchain
+

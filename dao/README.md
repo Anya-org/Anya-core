@@ -199,4 +199,4 @@ When extending or modifying the DAO system:
 3. Add appropriate tests in the `tests/` directory
 4. Ensure all operations are properly logged for transparency
 5. Update the documentation to reflect your changes
-6. Ensure compatibility with the Bitcoin-style tokenomics model 
+6. Ensure compatibility with the Bitcoin-style tokenomics model

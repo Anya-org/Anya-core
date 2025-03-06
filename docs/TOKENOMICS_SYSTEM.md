@@ -222,4 +222,4 @@ Potential future enhancements to the tokenomics system include:
 
 3. **Cross-Chain Integration**
    - Wrapped AGT on other chains
-   - Cross-chain governance capabilities 
+   - Cross-chain governance capabilities

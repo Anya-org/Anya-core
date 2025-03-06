@@ -6,4 +6,3 @@ This guide details the security architecture and best practices for the Anya sys
 ## Core Security Components
 
 ### 1. Authentication System
-

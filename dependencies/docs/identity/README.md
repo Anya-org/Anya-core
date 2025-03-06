@@ -26,4 +26,3 @@ The identity protocol provides a comprehensive system for managing decentralized
 ## Usage Examples
 
 ### Issuing a Credential
-

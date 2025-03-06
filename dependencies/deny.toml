@@ -33,7 +33,7 @@ unknown-registry = "deny"
 unknown-git = "deny"
 allow-registry = ["https://github.com/rust-lang/crates.io-index"]
 allow-git = [
-    "https://github.com/botshelomokoka/anya-core",
+    "https://github.com/anya-org/anya-core",
 ]
 
 [advisories]
@@ -64,3 +64,4 @@ expression = "Apache-2.0"
 license-files = [
     { path = "LICENSE-APACHE", hash = 0 }
 ]
+
