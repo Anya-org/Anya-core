@@ -191,3 +191,48 @@ impl FederatedLearningManager {
         &self.nodes
     }
 }
+
+// AIP-002: ML Module Integration
+// Exports ML-based agent checker functionality
+
+// Agent checker module
+pub mod agent_checker;
+
+// Re-exports for convenience
+pub use agent_checker::AgentChecker;
+pub use agent_checker::SystemStage;
+pub use agent_checker::ComponentStatus;
+pub use agent_checker::SystemHealth;
+
+// Development, Production, and Release thresholds
+pub const DEV_THRESHOLD: f64 = 0.60;
+pub const PROD_THRESHOLD: f64 = 0.90;
+pub const RELEASE_THRESHOLD: f64 = 0.99;
+
+/// Helper function to create an agent checker with default auto-save frequency (20)
+pub fn create_agent_checker() -> AgentChecker {
+    AgentChecker::new(20)
+}
+
+/// Helper function to determine if a system is ready for a given stage
+pub fn is_ready_for_stage(health: f64, stage: SystemStage) -> bool {
+    match stage {
+        SystemStage::Development => health >= DEV_THRESHOLD,
+        SystemStage::Production => health >= PROD_THRESHOLD,
+        SystemStage::Release => health >= RELEASE_THRESHOLD,
+        SystemStage::Unavailable => false,
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    
+    #[test]
+    fn test_stage_readiness() {
+        assert_eq!(is_ready_for_stage(0.55, SystemStage::Development), false);
+        assert_eq!(is_ready_for_stage(0.65, SystemStage::Development), true);
+        assert_eq!(is_ready_for_stage(0.85, SystemStage::Production), false);
+        assert_eq!(is_ready_for_stage(0.95, SystemStage::Production), true);
+    }
+}
