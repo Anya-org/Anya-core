@@ -1,11 +1,166 @@
-// Web5 DWN Module
-// Provides Decentralized Web Node functionality for Web5
+// Decentralized Web Node (DWN) Implementation
+// Provides storage and messaging capabilities for Web5
+// [AIR-012] Operational Reliability and [AIP-002] Modular Architecture
 
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use std::time::{SystemTime, UNIX_EPOCH};
 use serde::{Serialize, Deserialize};
 use crate::web5::{Web5Error, Web5Result};
+use crate::web5::identity::{Web5Result as IdentityWeb5Result, Web5Error as IdentityWeb5Error, DID};
+
+/// DWN configuration
+#[derive(Clone, Debug)]
+pub struct DWNConfig {
+    /// DWN endpoint URL
+    pub endpoint: Option<String>,
+    /// Whether to use local storage
+    pub use_local_storage: bool,
+    /// Maximum message size in bytes
+    pub max_message_size: usize,
+}
+
+impl Default for DWNConfig {
+    fn default() -> Self {
+        Self {
+            endpoint: None,
+            use_local_storage: true,
+            max_message_size: 1024 * 1024, // 1 MB
+        }
+    }
+}
+
+/// DWN Message
+/// 
+/// Represents a message in the Decentralized Web Node.
+#[derive(Clone, Debug)]
+pub struct DWNMessage {
+    /// Message ID
+    pub id: String,
+    /// DID of the sender
+    pub from: String,
+    /// DID of the recipient
+    pub to: String,
+    /// Message protocol
+    pub protocol: String,
+    /// Message type
+    pub message_type: String,
+    /// Message data
+    pub data: Vec<u8>,
+    /// Timestamp
+    pub timestamp: u64,
+}
+
+/// DWN Client
+/// 
+/// Client for interacting with a Decentralized Web Node.
+pub struct DWNClient {
+    /// Configuration
+    config: DWNConfig,
+    /// Local storage for messages
+    local_storage: Arc<Mutex<HashMap<String, DWNMessage>>>,
+    /// Identity DID
+    identity: Option<String>,
+}
+
+impl DWNClient {
+    /// Create a new DWN client with the specified configuration
+    pub fn new(config: DWNConfig) -> Self {
+        Self {
+            config,
+            local_storage: Arc::new(Mutex::new(HashMap::new())),
+            identity: None,
+        }
+    }
+    
+    /// Set the identity DID for the client
+    pub fn set_identity(&mut self, did: &str) {
+        self.identity = Some(did.to_string());
+    }
+    
+    /// Send a message to a DID through the DWN
+    pub fn send_message(&self, to: &str, protocol: &str, message_type: &str, data: &[u8]) -> Web5Result<String> {
+        // Check if identity is set
+        let from = self.identity.as_ref().ok_or_else(|| {
+            Web5Error::Identity("Identity not set for DWN client".to_string())
+        })?;
+        
+        // Check message size
+        if data.len() > self.config.max_message_size {
+            return Err(Web5Error::Communication(format!(
+                "Message size exceeds maximum allowed: {} > {}",
+                data.len(),
+                self.config.max_message_size
+            )));
+        }
+        
+        // Create message ID
+        let id = format!("msg_{}", generate_id());
+        
+        // Create message
+        let message = DWNMessage {
+            id: id.clone(),
+            from: from.clone(),
+            to: to.to_string(),
+            protocol: protocol.to_string(),
+            message_type: message_type.to_string(),
+            data: data.to_vec(),
+            timestamp: current_time(),
+        };
+        
+        // Store locally if configured
+        if self.config.use_local_storage {
+            let mut storage = self.local_storage.lock().unwrap();
+            storage.insert(id.clone(), message);
+        }
+        
+        // Here we would send to remote DWN if endpoint is configured
+        if let Some(endpoint) = &self.config.endpoint {
+            // In a real implementation, this would send the message to the DWN
+            // For this example, we're just logging
+            println!("Would send message to DWN at {}: {:?}", endpoint, message);
+        }
+        
+        Ok(id)
+    }
+    
+    /// Get messages for the identity DID
+    pub fn get_messages(&self, protocol: Option<&str>) -> Web5Result<Vec<DWNMessage>> {
+        // Check if identity is set
+        let identity = self.identity.as_ref().ok_or_else(|| {
+            Web5Error::Identity("Identity not set for DWN client".to_string())
+        })?;
+        
+        let storage = self.local_storage.lock().unwrap();
+        
+        // Filter messages by recipient and optionally by protocol
+        let messages: Vec<DWNMessage> = storage.values()
+            .filter(|msg| msg.to == *identity && 
+                   protocol.map_or(true, |p| msg.protocol == p))
+            .cloned()
+            .collect();
+        
+        Ok(messages)
+    }
+}
+
+/// Generate a random ID
+fn generate_id() -> String {
+    let now = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap()
+        .as_secs();
+    
+    format!("{:x}", now)
+}
+
+/// Get current time in seconds
+fn current_time() -> u64 {
+    SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap()
+        .as_secs()
+}
 
 /// DWN Manager
 /// 
@@ -48,21 +203,6 @@ pub struct Attestation {
     pub timestamp: u64,
     /// Attestation signature
     pub signature: String,
-}
-
-/// DWN Message
-/// 
-/// Represents a message sent to a Decentralized Web Node.
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct DWNMessage {
-    /// Message type
-    pub message_type: DWNMessageType,
-    /// Message descriptor
-    pub descriptor: DWNMessageDescriptor,
-    /// Message data
-    pub data: Option<serde_json::Value>,
-    /// Message attestations
-    pub attestations: Vec<Attestation>,
 }
 
 /// DWN Message Type
