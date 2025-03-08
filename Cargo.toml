@@ -57,6 +57,12 @@ criterion = "0.5.1"
 proptest = "1.2.0"
 test-log = { version = "0.2.14", features = ["trace"] }
 
+# Machine Learning
+ndarray = "0.15.6"
+smartcore = "0.3.2"
+tch = "0.14.0"
+log = "0.4.20"
+
 [package]
 name = "anya-core"
 version.workspace = true
@@ -119,7 +125,6 @@ rustls = "0.22.1"
 data-encoding = "2.5.0"
 jsonwebtoken = "9.2.0"
 totp-rs = "5.4.0"
-async-io-mini = "*"
 darling = "*"
 
 [dev-dependencies]
