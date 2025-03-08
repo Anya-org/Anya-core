@@ -90,8 +90,11 @@ web5 = { workspace = true }
 jsonschema = { workspace = true }
 
 # Blockchain Integration
-bitcoin = { workspace = true }
+bitcoin = { workspace = true, features = ["rand", "secp-recovery"] }
 bitcoincore-rpc = { workspace = true }
+secp256k1 = { version = "0.27.0", features = ["rand", "recovery"] }
+bip39 = "2.0.0"
+md5 = "0.7.0"
 
 # Networking
 libp2p = { workspace = true }
@@ -101,6 +104,7 @@ tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
 tracing-futures = "0.2.5"
 metrics = { version = "0.21.1" }
+log = "0.4.20"
 
 # Time and Date
 chrono = { version = "0.4.31", features = ["serde"], default-features = false }
@@ -142,6 +146,8 @@ default = ["std"]
 std = []
 nightly = []
 enterprise = ["std"]
+bitcoin = ["std"]
+liquid = ["std"]
 
 [profile.release]
 lto = true
@@ -153,3 +159,27 @@ panic = "abort"
 [profile.dev]
 opt-level = 0
 debug = true
+
+[[bin]]
+name = "anya-core"
+path = "src/main.rs"
+
+[[bin]]
+name = "api_server"
+path = "src/bin/api_server.rs"
+
+[[bin]]
+name = "installer"
+path = "src/bin/installer.rs"
+
+[[bin]]
+name = "lightning_demo"
+path = "src/bin/lightning_demo.rs"
+
+[[bin]]
+name = "main"
+path = "src/bin/main.rs"
+
+[[bin]]
+name = "run_protocol_tests"
+path = "tests/run_protocol_tests.rs"
