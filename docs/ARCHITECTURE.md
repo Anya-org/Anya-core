@@ -188,46 +188,110 @@ pub enum BatchOperationType {
 
 ### 7. Layer 2 Integrations
 
-Anya Core includes comprehensive support for Bitcoin Layer 2 solutions, with a primary focus on BOB (Bitcoin Optimistic Blockchain) hybrid L2.
+Anya Core implements a comprehensive hexagonal architecture for Bitcoin Layer 2 solutions, with support for multiple protocols including BOB (Bitcoin Optimistic Blockchain), RGB Protocol, and RSK Sidechain.
 
-#### BOB Hybrid L2 Architecture
+#### Layer 2 Protocol Architecture
 
-BOB integration follows our hexagonal architecture pattern with clearly defined ports and adapters:
+The Layer 2 integration follows our hexagonal architecture pattern with clearly defined ports and adapters:
 
 **Domain Layer (Core)**
 
 - L2 transaction models and validation rules
-- BitVM verification logic
+- Protocol-specific verification logic
 - Cross-layer state management
 - Smart contract execution environment
+- Asset management and issuance rules
 
 **Application Layer (Ports)**
 
 - Input Ports:
   - L2 transaction submission
   - Smart contract execution
-  - Relay monitoring
-  - Fraud proof submission
+  - Asset issuance and management
+  - Protocol-specific operations
+  - Cross-layer synchronization
 
 - Output Ports:
   - Bitcoin relay interaction
-  - Smart contract state access
-  - L2 state querying
-  - Cross-layer synchronization
+  - Protocol state access
+  - Asset state querying
+  - Cross-layer state management
+  - Verification result handling
 
 **Infrastructure Layer (Adapters)**
 
 - Input Adapters:
-  - BOB RPC client
-  - EVM contract caller
-  - Relay monitoring service
-  - BitVM verification adapter
+  - Protocol-specific RPC clients
+  - Smart contract interfaces
+  - Asset management adapters
+  - Verification adapters
+  - State synchronization adapters
 
 - Output Adapters:
-  - Bitcoin relay client
-  - L2 state repository
-  - Smart contract state repository
-  - Cross-layer transaction processor
+  - Bitcoin relay clients
+  - Protocol state repositories
+  - Asset state repositories
+  - Cross-layer transaction processors
+  - Verification result handlers
+
+**Protocol-Specific Implementations:**
+
+1. BOB (Bitcoin Optimistic Blockchain)
+
+```rust
+// BOB Protocol Adapter
+pub struct BobProtocolAdapter {
+    rpc_client: BobRpcClient,
+    state_manager: BobStateManager,
+    verification: BobVerification
+}
+
+// BOB Transaction Model
+pub struct BobTransaction {
+    l2_tx_hash: Hash,
+    bitcoin_tx_hash: Hash,
+    proof: BobProof,
+    state_root: Hash
+}
+```
+
+2. RGB Protocol
+
+```rust
+// RGB Protocol Adapter
+pub struct RgbProtocolAdapter {
+    taproot_client: TaprootClient,
+    asset_manager: RgbAssetManager,
+    state_tracker: RgbStateTracker
+}
+
+// RGB Asset Model
+pub struct RgbAsset {
+    asset_id: AssetId,
+    taproot_key: PublicKey,
+    supply: u64,
+    precision: u8
+}
+```
+
+3. RSK Sidechain
+
+```rust
+// RSK Protocol Adapter
+pub struct RskProtocolAdapter {
+    sidechain_client: RskClient,
+    bridge_manager: RskBridgeManager,
+    verification: RskVerification
+}
+
+// RSK Transaction Model
+pub struct RskTransaction {
+    sidechain_tx_hash: Hash,
+    bitcoin_tx_hash: Hash,
+    merkle_proof: MerkleProof,
+    state_root: Hash
+}
+```
 
 **Integration Architecture:**
 
@@ -237,8 +301,8 @@ BOB integration follows our hexagonal architecture pattern with clearly defined 
 │                                                                   │
 │  ┌───────────────┐    ┌───────────────┐    ┌───────────────┐     │
 │  │               │    │               │    │               │     │
-│  │  Bitcoin      │    │  BOB Layer 2  │    │  EVM Contract │     │
-│  │  Integration  │◄──►│  Integration  │◄──►│  Integration  │     │
+│  │  Bitcoin      │    │  Layer 2      │    │  Protocol     │     │
+│  │  Integration  │◄──►│  Protocols    │◄──►│  Adapters     │     │
 │  │               │    │               │    │               │     │
 │  └───────┬───────┘    └───────┬───────┘    └───────┬───────┘     │
 │          │                    │                    │             │
@@ -248,70 +312,41 @@ BOB integration follows our hexagonal architecture pattern with clearly defined 
 │  │                Core Domain Services                     │     │
 │  │                                                         │     │
 │  └─────────────────────────────┬───────────────────────────┘     │
-│                                │                                 │
-│                      ┌─────────▼──────────┐                      │
-│                      │                    │                      │
-│                      │  Security, ML,     │                      │
-│                      │  Performance       │                      │
-│                      │                    │                      │
-│                      └────────────────────┘                      │
-│                                                                   │
+│                                │                                  │
+│  ┌─────────────────────────────▼───────────────────────────┐     │
+│  │                                                         │     │
+│  │                 Infrastructure Layer                    │     │
+│  │                Protocol Implementations                 │     │
+│  │                                                         │     │
+│  └─────────────────────────────────────────────────────────┘     │
 └───────────────────────────────────────────────────────────────────┘
 ```
 
-#### BOB Integration Components
+**Compliance Matrix:**
 
-1. **Bitcoin Relay Monitor**
-   - Tracks the status of the BOB Bitcoin relay
-   - Validates relay state against Bitcoin L1
-   - Monitors relay performance metrics
-   - Alerts on relay inconsistencies
+| Protocol | BIP 341/342 | BIP 174 | Miniscript | Testnet |
+|----------|-------------|---------|------------|---------|
+| BOB      | ✓          | ✓       | ✓          | ✓       |
+| RGB      | ✓          | ✓       | ✓          | ✓       |
+| RSK      | ✓          | ✓       | ✓          | ✓       |
 
-2. **EVM Compatibility Layer**
-   - Provides EVM execution environment
-   - Supports Solidity smart contracts
-   - Maps Bitcoin addresses to EVM addresses
-   - Handles gas and fee management
+**Security Considerations:**
 
-3. **BitVM Integration**
-   - Implements BitVM verification logic
-   - Processes optimistic rollup state transitions
-   - Handles fraud proof verification
-   - Manages dispute resolution
+- Protocol-specific validation rules
+- Cross-layer transaction verification
+- Asset state consistency checks
+- Bridge security monitoring
+- Fraud proof handling
+- State transition verification
 
-4. **Cross-Layer Transaction Manager**
-   - Coordinates transactions spanning Bitcoin L1 and BOB L2
-   - Ensures atomic transaction execution
-   - Manages cross-layer state consistency
-   - Optimizes cross-layer transaction fees
+**Performance Metrics:**
 
-5. **Hybrid Analytics Engine**
-   - Collects metrics from both L1 and L2
-   - Analyzes cross-layer transaction patterns
-   - Provides insights on system performance
-   - Identifies optimization opportunities
-
-#### Other Layer 2 Integrations
-
-In addition to BOB, Anya Core supports:
-
-1. **Lightning Network**
-   - Payment channel management
-   - Multi-hop routing
-   - Invoice generation and processing
-   - Channel monitoring and safety
-
-2. **State Channels**
-   - Generic state transition support
-   - Off-chain execution environment
-   - On-chain settlement and dispute resolution
-   - State channel monitoring
-
-3. **Sidechains**
-   - Two-way peg mechanisms
-   - Federation support
-   - Merged mining compatibility
-   - Cross-chain asset transfers
+- Transaction throughput
+- Cross-layer latency
+- State synchronization time
+- Asset operation latency
+- Verification overhead
+- Resource utilization
 
 ### 8. Consensus Mechanisms
 
