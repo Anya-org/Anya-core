@@ -24,6 +24,7 @@
         },
         "gitlens.defaultDateFormat": "YYYY-MM-DD HH:mm",
         "gitlens.defaultDateShortFormat": "YYYY-MM-DD",
-        "gitlens.views.searchAndCompare.enabled": true
+        "gitlens.views.searchAndCompare.enabled": true,
+        "rust-analyzer.checkOnSave": false
     }
 }
