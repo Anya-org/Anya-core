@@ -1,5 +1,6 @@
 // Web5 Module for Anya Core
-// Provides Web5 functionality including DIDs, protocols, and web components
+// Implements Web5 specification with focus on decentralized identity and protocols
+// [AIR-012] Operational Reliability and [AIP-002] Modular Architecture
 
 // Re-export modules
 pub mod identity;
@@ -8,19 +9,20 @@ pub mod dwn;  // Decentralized Web Node
 pub mod vc;   // Verifiable Credentials
 
 // Re-export important types for easy access
-pub use identity::{Web5Error, Web5Result, DIDManager, DID, DIDDocument, VerificationMethod};
+pub use identity::{Web5Error, Web5Result, DIDManager, DID, DIDDocument};
 pub use protocols::{ProtocolHandler, ProtocolManager, ProtocolDefinition};
 
-/// Web5 configuration
+/// Web5 configuration with focused parameters
+#[derive(Clone, Debug)]
 pub struct Web5Config {
     /// Whether Web5 functionality is enabled
     pub enabled: bool,
-    /// Default DID method to use
+    /// Default DID method to use (e.g., "ion", "key", "web")
     pub did_method: String,
-    /// DWN endpoint URL
+    /// DWN endpoint URL (if applicable)
     pub dwn_url: Option<String>,
-    /// Whether to automatically sync DIDs
-    pub auto_sync: bool,
+    /// Whether to use local storage for DIDs
+    pub use_local_storage: bool,
 }
 
 impl Default for Web5Config {
@@ -29,23 +31,24 @@ impl Default for Web5Config {
             enabled: true,
             did_method: "ion".to_string(),
             dwn_url: None,
-            auto_sync: true,
+            use_local_storage: true,
         }
     }
 }
 
-/// Web5 manager that coordinates all Web5 functionality
+/// Web5Manager: Lightweight coordinator for Web5 functionality following hexagonal architecture
+/// Implements ports and adapters pattern for clean interfaces
 pub struct Web5Manager {
     /// Configuration
     config: Web5Config,
-    /// DID manager
+    /// DID manager - Core identity functionality
     did_manager: identity::DIDManager,
-    /// Protocol manager
+    /// Protocol manager - Core protocol functionality 
     protocol_manager: protocols::ProtocolManager,
 }
 
 impl Web5Manager {
-    /// Create a new Web5 manager
+    /// Create a new Web5 manager with the specified configuration
     pub fn new(config: &Web5Config) -> Web5Result<Self> {
         let did_manager = identity::DIDManager::new(&config.did_method);
         let protocol_manager = protocols::ProtocolManager::new();
@@ -57,21 +60,80 @@ impl Web5Manager {
         })
     }
     
-    /// Get the DID manager
+    /// Access the DID manager component
     pub fn did_manager(&self) -> &identity::DIDManager {
         &self.did_manager
     }
     
-    /// Get the protocol manager
+    /// Access the protocol manager component
     pub fn protocol_manager(&self) -> &protocols::ProtocolManager {
         &self.protocol_manager
     }
+    
+    /// Initialize the Web5 subsystem with default protocols
+    pub fn initialize(&mut self) -> Web5Result<()> {
+        // Register standard protocols
+        let profile_handler = protocols::ProfileProtocolHandler::new();
+        self.protocol_manager.register_protocol(Box::new(profile_handler))?;
+        
+        // Create default identity if none exists
+        if self.config.use_local_storage && self.did_manager.get_default_did()?.is_none() {
+            let did = self.did_manager.create_did()?;
+            self.did_manager.set_default_did(&did.id)?;
+        }
+        
+        Ok(())
+    }
+    
+    /// Get the system status
+    pub fn status(&self) -> Web5Result<Web5Status> {
+        let did_count = self.did_manager.dids().len();
+        let protocol_count = self.protocol_manager.get_all_protocols().len();
+        
+        Ok(Web5Status {
+            enabled: self.config.enabled,
+            did_count,
+            protocol_count,
+            dwn_connected: self.config.dwn_url.is_some(),
+        })
+    }
+}
+
+/// Web5 system status information
+#[derive(Clone, Debug)]
+pub struct Web5Status {
+    /// Whether Web5 is enabled
+    pub enabled: bool,
+    /// Number of DIDs managed
+    pub did_count: usize,
+    /// Number of protocols registered
+    pub protocol_count: usize,
+    /// Whether connected to a DWN
+    pub dwn_connected: bool,
 }
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+    
     #[test]
-    fn it_works() {
-        assert!(true);
+    fn test_web5_manager_creation() {
+        let config = Web5Config::default();
+        let manager = Web5Manager::new(&config).unwrap();
+        
+        assert!(manager.config.enabled);
+        assert_eq!(manager.config.did_method, "ion");
+    }
+    
+    #[test]
+    fn test_web5_status() {
+        let config = Web5Config::default();
+        let manager = Web5Manager::new(&config).unwrap();
+        
+        let status = manager.status().unwrap();
+        assert!(status.enabled);
+        assert_eq!(status.did_count, 0);
+        assert_eq!(status.protocol_count, 0);
+        assert!(!status.dwn_connected);
     }
 }

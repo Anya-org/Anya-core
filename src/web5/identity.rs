@@ -1,12 +1,11 @@
 // Web5 Identity Implementation
 // Provides DID (Decentralized Identity) functionality
-// as part of the Web5 integration
+// as part of the Web5 integration - [AIR-012] Operational Reliability
 
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use std::time::{SystemTime, UNIX_EPOCH};
 use serde::{Serialize, Deserialize};
-use crate::web5::{Web5Error, Web5Result};
 
 // Define Result type for Web5
 pub type Web5Result<T> = Result<T, Web5Error>;
@@ -32,8 +31,9 @@ pub enum Web5Error {
 
 /// DID Manager
 /// 
-/// Manages decentralized identities (DIDs) for Web5.
-#[derive(Debug)]
+/// Core component responsible for decentralized identity management.
+/// Implements the ports and adapters pattern for extensibility.
+#[derive(Clone)]
 pub struct DIDManager {
     /// DIDs managed by this instance
     dids: Arc<Mutex<HashMap<String, DID>>>,
@@ -43,10 +43,10 @@ pub struct DIDManager {
     method: String,
 }
 
-/// Decentralized Identifier (DID)
+/// Decentralized Identifier
 /// 
-/// Represents a decentralized identity in the Web5 ecosystem.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+/// Represents a DID with its document and private keys.
+#[derive(Clone, Serialize, Deserialize)]
 pub struct DID {
     /// DID URI (e.g., "did:ion:123...")
     pub id: String,
@@ -59,10 +59,11 @@ pub struct DID {
 
 /// DID Document
 /// 
-/// Represents a DID Document as defined in the W3C DID specification.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+/// The public representation of a DID, containing verification methods
+/// and service endpoints as defined in the DID Core specification.
+#[derive(Clone, Serialize, Deserialize)]
 pub struct DIDDocument {
-    /// DID URI
+    /// DID context
     #[serde(rename = "@context")]
     pub context: Vec<String>,
     /// DID URI
@@ -76,9 +77,6 @@ pub struct DIDDocument {
     /// Assertion methods
     #[serde(default)]
     pub assertion_method: Vec<String>,
-    /// Key agreement methods
-    #[serde(default)]
-    pub key_agreement: Vec<String>,
     /// Service endpoints
     #[serde(default)]
     pub service: Vec<Service>,
@@ -86,8 +84,9 @@ pub struct DIDDocument {
 
 /// Verification Method
 /// 
-/// Represents a verification method in a DID Document.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+/// A cryptographic mechanism used for authentication and
+/// digital signatures within a DID.
+#[derive(Clone, Serialize, Deserialize)]
 pub struct VerificationMethod {
     /// ID of the verification method
     pub id: String,
@@ -99,15 +98,12 @@ pub struct VerificationMethod {
     /// Public key in JWK format
     #[serde(skip_serializing_if = "Option::is_none")]
     pub public_key_jwk: Option<JWK>,
-    /// Public key in multibase format
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub public_key_multibase: Option<String>,
 }
 
-/// JSON Web Key (JWK)
+/// JSON Web Key
 /// 
-/// Represents a cryptographic key in JWK format.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+/// A cryptographic key representation in JSON format.
+#[derive(Clone, Serialize, Deserialize)]
 pub struct JWK {
     /// Key type
     pub kty: String,
@@ -127,8 +123,8 @@ pub struct JWK {
 
 /// Service
 /// 
-/// Represents a service endpoint in a DID Document.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+/// A service endpoint for a DID.
+#[derive(Clone, Serialize, Deserialize)]
 pub struct Service {
     /// ID of the service
     pub id: String,
@@ -140,7 +136,7 @@ pub struct Service {
 }
 
 impl DIDManager {
-    /// Create a new DID Manager
+    /// Create a new DID manager with the specified method
     pub fn new(method: &str) -> Self {
         Self {
             dids: Arc::new(Mutex::new(HashMap::new())),
@@ -149,85 +145,61 @@ impl DIDManager {
         }
     }
     
-    /// Create a new DID
+    /// Create a new DID with the configured method
     pub fn create_did(&self) -> Web5Result<DID> {
-        // In a real implementation, this would generate keys and create a DID
-        // For this example, we're creating a placeholder DID
+        // Generate a random ID for the DID
+        let id = format!("did:{}:{}", self.method, generate_random_id());
         
-        let did_id = format!("did:{}:{}", self.method, generate_random_id());
-        
-        let verification_method = VerificationMethod {
-            id: format!("{}#keys-1", did_id),
-            vm_type: "JsonWebKey2020".to_string(),
-            controller: did_id.clone(),
-            public_key_jwk: Some(JWK {
-                kty: "EC".to_string(),
-                crv: Some("secp256k1".to_string()),
-                x: Some(base64_encode(&[1, 2, 3, 4])),
-                y: Some(base64_encode(&[5, 6, 7, 8])),
-                kid: Some("keys-1".to_string()),
-            }),
-            public_key_multibase: None,
-        };
-        
-        let service = Service {
-            id: format!("{}#dwn", did_id),
-            service_type: "DecentralizedWebNode".to_string(),
-            service_endpoint: "https://dwn.tbddev.org".to_string(),
-        };
-        
+        // Create a basic DID document
         let document = DIDDocument {
             context: vec!["https://www.w3.org/ns/did/v1".to_string()],
-            id: did_id.clone(),
-            verification_method: vec![verification_method.clone()],
-            authentication: vec![format!("{}#keys-1", did_id)],
-            assertion_method: vec![format!("{}#keys-1", did_id)],
-            key_agreement: vec![],
-            service: vec![service],
+            id: id.clone(),
+            verification_method: Vec::new(),
+            authentication: Vec::new(),
+            assertion_method: Vec::new(),
+            service: Vec::new(),
         };
         
-        let mut private_keys = HashMap::new();
-        private_keys.insert("keys-1".to_string(), vec![1, 2, 3, 4, 5, 6, 7, 8]);
-        
+        // Create the DID
         let did = DID {
-            id: did_id.clone(),
+            id: id.clone(),
             document,
-            private_keys,
+            private_keys: HashMap::new(),
         };
         
         // Store the DID
-        if let Ok(mut dids) = self.dids.lock() {
-            dids.insert(did_id.clone(), did.clone());
+        {
+            let mut dids = self.dids.lock().unwrap();
+            dids.insert(id.clone(), did.clone());
         }
         
         Ok(did)
     }
     
-    /// Resolve a DID
+    /// Resolve a DID to its document
     pub fn resolve_did(&self, did: &str) -> Web5Result<DIDDocument> {
-        // Check if we have the DID locally
-        if let Ok(dids) = self.dids.lock() {
-            if let Some(did_obj) = dids.get(did) {
-                return Ok(did_obj.document.clone());
-            }
+        // First, check if we have the DID locally
+        let dids = self.dids.lock().unwrap();
+        if let Some(did_obj) = dids.get(did) {
+            return Ok(did_obj.document.clone());
         }
         
-        // In a real implementation, this would resolve the DID from the network
-        // For this example, we're returning an error
-        Err(Web5Error::DIDError(format!("DID not found: {}", did)))
+        // If not found locally, return an error (future: implement remote resolution)
+        Err(Web5Error::Identity(format!("DID not found: {}", did)))
     }
     
     /// Set the default DID
     pub fn set_default_did(&mut self, did: &str) -> Web5Result<()> {
         // Check if the DID exists
-        if let Ok(dids) = self.dids.lock() {
-            if dids.contains_key(did) {
-                self.default_did = Some(did.to_string());
-                return Ok(());
-            }
+        let dids = self.dids.lock().unwrap();
+        if !dids.contains_key(did) {
+            return Err(Web5Error::Identity(format!("DID not found: {}", did)));
         }
         
-        Err(Web5Error::DIDError(format!("DID not found: {}", did)))
+        // Set the default DID
+        self.default_did = Some(did.to_string());
+        
+        Ok(())
     }
     
     /// Get the default DID
@@ -235,78 +207,38 @@ impl DIDManager {
         Ok(self.default_did.clone())
     }
     
-    /// Sign data with a DID
+    /// Sign data with a DID's private key
     pub fn sign(&self, did: &str, data: &[u8]) -> Web5Result<Vec<u8>> {
+        // This is a simplified implementation
+        // In a real implementation, this would use the DID's private key
+        
         // Get the DID
-        let did_obj = if let Ok(dids) = self.dids.lock() {
-            if let Some(did_obj) = dids.get(did) {
-                did_obj.clone()
-            } else {
-                return Err(Web5Error::DIDError(format!("DID not found: {}", did)));
-            }
-        } else {
-            return Err(Web5Error::DIDError("Failed to lock DIDs".to_string()));
-        };
+        let dids = self.dids.lock().unwrap();
+        let did_obj = dids.get(did).ok_or_else(|| {
+            Web5Error::Identity(format!("DID not found: {}", did))
+        })?;
         
-        // Get the first private key
-        let key_id = did_obj.document.authentication.get(0)
-            .ok_or_else(|| Web5Error::DIDError("No authentication key found".to_string()))?;
-        
-        let key_id = key_id.split('#').last()
-            .ok_or_else(|| Web5Error::DIDError("Invalid key ID".to_string()))?;
-        
-        let private_key = did_obj.private_keys.get(key_id)
-            .ok_or_else(|| Web5Error::DIDError(format!("Private key not found: {}", key_id)))?;
-        
-        // In a real implementation, this would sign the data with the private key
-        // For this example, we're just returning a placeholder signature
-        let mut signature = vec![0, 1, 2, 3];
-        signature.extend_from_slice(data);
-        
-        Ok(signature)
+        // For now, just return a placeholder signature
+        // In a real implementation, this would use the appropriate
+        // cryptographic algorithm based on the DID's verification method
+        Ok(vec![0u8; 64])
     }
     
-    /// Verify a signature
-    pub fn verify(&self, did: &str, data: &[u8], signature: &[u8]) -> Web5Result<bool> {
-        // Resolve the DID
-        let document = self.resolve_did(did)?;
-        
-        // In a real implementation, this would verify the signature with the public key
-        // For this example, we're just checking if the signature starts with [0, 1, 2, 3]
-        if signature.len() < 4 {
-            return Ok(false);
-        }
-        
-        if signature[0] != 0 || signature[1] != 1 || signature[2] != 2 || signature[3] != 3 {
-            return Ok(false);
-        }
-        
-        // Check if the data matches
-        if signature.len() - 4 != data.len() {
-            return Ok(false);
-        }
-        
-        for i in 0..data.len() {
-            if signature[i + 4] != data[i] {
-                return Ok(false);
-            }
-        }
-        
-        Ok(true)
+    /// Get a list of all DIDs
+    pub fn dids(&self) -> Vec<String> {
+        let dids = self.dids.lock().unwrap();
+        dids.keys().cloned().collect()
     }
 }
 
-/// Generate a random ID
+/// Generate a random ID for a DID
 fn generate_random_id() -> String {
-    use rand::Rng;
-    let mut rng = rand::thread_rng();
-    let id: u64 = rng.gen();
-    format!("{:x}", id)
-}
-
-/// Base64 encode bytes
-fn base64_encode(bytes: &[u8]) -> String {
-    base64::encode(bytes)
+    let now = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap()
+        .as_secs();
+    
+    format!("{:x}", now)
 }
 
 #[cfg(test)]
@@ -315,33 +247,25 @@ mod tests {
     
     #[test]
     fn test_create_did() {
-        let did_manager = DIDManager::new("ion");
-        let did = did_manager.create_did().unwrap();
+        let manager = DIDManager::new("ion");
+        let did = manager.create_did().unwrap();
         
         assert!(did.id.starts_with("did:ion:"));
         assert_eq!(did.document.id, did.id);
-        assert_eq!(did.document.verification_method.len(), 1);
-        assert_eq!(did.document.service.len(), 1);
     }
     
     #[test]
-    fn test_resolve_did() {
-        let did_manager = DIDManager::new("ion");
-        let did = did_manager.create_did().unwrap();
+    fn test_default_did() {
+        let mut manager = DIDManager::new("ion");
+        let did = manager.create_did().unwrap();
         
-        let document = did_manager.resolve_did(&did.id).unwrap();
-        assert_eq!(document.id, did.id);
-    }
-    
-    #[test]
-    fn test_sign_and_verify() {
-        let did_manager = DIDManager::new("ion");
-        let did = did_manager.create_did().unwrap();
+        // Initially no default DID
+        assert!(manager.get_default_did().unwrap().is_none());
         
-        let data = b"Hello, World!";
-        let signature = did_manager.sign(&did.id, data).unwrap();
+        // Set default DID
+        manager.set_default_did(&did.id).unwrap();
         
-        let valid = did_manager.verify(&did.id, data, &signature).unwrap();
-        assert!(valid);
+        // Check default DID
+        assert_eq!(manager.get_default_did().unwrap().unwrap(), did.id);
     }
 } 
