@@ -7,7 +7,7 @@
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 use std::future::Future;
-use log::{info, warn, error};
+use tracing::{info, warn, error};
 use tokio::time::timeout;
 
 use crate::AnyaError;

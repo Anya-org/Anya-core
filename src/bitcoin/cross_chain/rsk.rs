@@ -5,10 +5,13 @@
 // Implements Bitcoin-RSK cross-chain functionality with SPV proofs
 // as per Bitcoin Development Framework v2.5 requirements
 
-use bitcoin::{Block, BlockHeader, Transaction, TxIn, TxOut, Script};
-use bitcoin::hashes::{Hash, sha256d};
-use bitcoin::util::merkleblock::PartialMerkleTree;
 use std::collections::HashMap;
+use crate::bitcoin::interface::BlockHeader;
+
+// For now, we'll reuse types from the liquid module
+use crate::bitcoin::cross_chain::liquid::{
+    Transaction, TxIn, TxOut, Script, PartialMerkleTree, OutPoint
+};
 
 /// RSK SPV Proof structure
 /// 

@@ -1,11 +1,34 @@
-// Web5 Identity Module
-// Provides DID (Decentralized Identity) functionality for Web5
+// Web5 Identity Implementation
+// Provides DID (Decentralized Identity) functionality
+// as part of the Web5 integration
 
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use std::time::{SystemTime, UNIX_EPOCH};
 use serde::{Serialize, Deserialize};
 use crate::web5::{Web5Error, Web5Result};
+
+// Define Result type for Web5
+pub type Web5Result<T> = Result<T, Web5Error>;
+
+// Define Error enum for Web5
+#[derive(Debug, thiserror::Error)]
+pub enum Web5Error {
+    #[error("Identity error: {0}")]
+    Identity(String),
+    
+    #[error("Protocol error: {0}")]
+    Protocol(String),
+    
+    #[error("Communication error: {0}")]
+    Communication(String),
+    
+    #[error("Storage error: {0}")]
+    Storage(String),
+    
+    #[error("Credential error: {0}")]
+    Credential(String),
+}
 
 /// DID Manager
 /// 

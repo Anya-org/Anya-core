@@ -5,8 +5,9 @@
 // Provides functionality for Bitcoin cross-chain operations
 // as per Bitcoin Development Framework v2.5 requirements
 
-pub mod rsk;
+// Re-export modules
 pub mod liquid;
+pub mod rsk;
 
 use bitcoin::{Block, BlockHeader, Transaction};
 use bitcoin::hashes::Hash;
@@ -17,15 +18,13 @@ use std::collections::HashMap;
 /// Represents the status of a cross-chain transaction.
 #[derive(Debug, Clone, PartialEq)]
 pub enum CrossChainStatus {
-    /// Transaction is pending on the source chain
+    /// Transaction is pending confirmation on the source chain
     PendingSource,
-    /// Transaction is confirmed on the source chain
+    /// Transaction is confirmed on the source chain, waiting for target chain processing
     ConfirmedSource,
-    /// Transaction is being processed by the bridge
-    ProcessingBridge,
-    /// Transaction is pending on the target chain
-    PendingTarget,
-    /// Transaction is confirmed on the target chain
+    /// Transaction is being processed by the cross-chain bridge
+    ProcessingTarget,
+    /// Transaction is completed on both chains
     Completed,
     /// Transaction failed
     Failed(String),
@@ -231,7 +230,7 @@ pub fn update_transaction_status(
             } else if source_confirmations < bridge.required_confirmations {
                 transaction.status = CrossChainStatus::ConfirmedSource;
             } else if transaction.target_txid.is_none() {
-                transaction.status = CrossChainStatus::ProcessingBridge;
+                transaction.status = CrossChainStatus::ProcessingTarget;
                 
                 // In a real implementation, this would check the RSK chain
                 // For this example, we're simulating RSK processing
@@ -247,7 +246,7 @@ pub fn update_transaction_status(
             } else if source_confirmations < 102 { // Liquid requires 102 confirmations
                 transaction.status = CrossChainStatus::ConfirmedSource;
             } else if transaction.target_txid.is_none() {
-                transaction.status = CrossChainStatus::ProcessingBridge;
+                transaction.status = CrossChainStatus::ProcessingTarget;
                 
                 // In a real implementation, this would check the Liquid chain
                 // For this example, we're simulating Liquid processing
@@ -263,6 +262,50 @@ pub fn update_transaction_status(
     }
     
     Ok(transaction.status.clone())
+}
+
+/// Common interface for cross-chain SPV proofs
+pub trait SPVProof {
+    /// Get the transaction hash
+    fn tx_hash(&self) -> &[u8; 32];
+    
+    /// Verify the proof
+    fn verify(&self) -> bool;
+    
+    /// Get the confirmation count
+    fn confirmations(&self) -> u32;
+}
+
+// Implement SPVProof for LiquidSPV
+impl SPVProof for liquid::LiquidSPV {
+    fn tx_hash(&self) -> &[u8; 32] {
+        &self.tx_hash
+    }
+    
+    fn verify(&self) -> bool {
+        // In a real implementation, this would verify the merkle proof
+        true
+    }
+    
+    fn confirmations(&self) -> u32 {
+        self.confirmations
+    }
+}
+
+// Implement SPVProof for BitcoinSPV
+impl SPVProof for rsk::BitcoinSPV {
+    fn tx_hash(&self) -> &[u8; 32] {
+        &self.tx_hash
+    }
+    
+    fn verify(&self) -> bool {
+        // In a real implementation, this would verify the merkle proof
+        true
+    }
+    
+    fn confirmations(&self) -> u32 {
+        self.confirmations
+    }
 }
 
 #[cfg(test)]

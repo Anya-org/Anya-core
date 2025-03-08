@@ -1,13 +1,14 @@
-// Web5 Protocols Module
-// Provides protocol handling functionality for Web5
+// Web5 Protocols Implementation
+// Provides protocol handlers for Web5 interactions
 
 use std::collections::HashMap;
 use serde::{Serialize, Deserialize};
-use crate::web5::{Web5Error, Web5Result};
+use crate::web5::identity::Web5Result;
+use crate::web5::identity::Web5Error;
 
 /// Protocol Handler trait
 /// 
-/// Defines the interface for Web5 protocol handlers.
+/// Defines the interface for protocol handlers in the Web5 system.
 pub trait ProtocolHandler: Send + Sync {
     /// Get the protocol ID
     fn protocol_id(&self) -> &str;
