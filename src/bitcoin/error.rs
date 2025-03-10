@@ -1,5 +1,14 @@
 use thiserror::Error;
 use bitcoin::secp256k1;
+use bitcoin::{
+    taproot::TaprootBuilderError,
+    sighash::TaprootError,
+    taproot::TaprootBuilder,
+    taproot::SigFromSliceError,
+};
+use hex::FromHexError;
+use bitcoin::key::FromSliceError;
+use futures_io;
 
 /// Bitcoin operation errors
 #[derive(Error, Debug)]
@@ -54,6 +63,69 @@ pub enum BitcoinError {
 
     #[error("Other error: {0}")]
     Other(String),
+
+    #[error("Asset already issued")]
+    AssetAlreadyIssued,
+
+    #[error("Taproot builder error: {0}")]
+    TaprootBuilderError(TaprootBuilderError),
+
+    #[error("Invalid secret key")]
+    InvalidSecretKey,
+
+    #[error("Invalid witness")]
+    InvalidWitness,
+
+    #[error("Hex decoding error")]
+    HexDecodingError,
+
+    #[error("Key conversion error")]
+    KeyConversionError,
+
+    #[error("IO error: {0}")]
+    IOError(String),
+}
+
+impl From<TaprootBuilderError> for BitcoinError {
+    fn from(err: TaprootBuilderError) -> Self {
+        BitcoinError::TaprootBuilderError(err)
+    }
+}
+
+impl From<TaprootError> for BitcoinError {
+    fn from(err: TaprootError) -> Self {
+        BitcoinError::TaprootError(err.to_string())
+    }
+}
+
+impl From<TaprootBuilder> for BitcoinError {
+    fn from(_: TaprootBuilder) -> Self {
+        BitcoinError::TaprootBuilderError
+    }
+}
+
+impl From<SigFromSliceError> for BitcoinError {
+    fn from(_: SigFromSliceError) -> Self {
+        BitcoinError::SignatureConversionError
+    }
+}
+
+impl From<FromHexError> for BitcoinError {
+    fn from(_: FromHexError) -> Self {
+        BitcoinError::HexDecodingError
+    }
+}
+
+impl From<FromSliceError> for BitcoinError {
+    fn from(_: FromSliceError) -> Self {
+        BitcoinError::KeyConversionError
+    }
+}
+
+impl From<futures_io::Error> for BitcoinError {
+    fn from(err: futures_io::Error) -> Self {
+        BitcoinError::IOError(err.to_string())
+    }
 }
 
 /// Result type for Bitcoin operations
