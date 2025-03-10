@@ -49,6 +49,8 @@ pub struct DWNMessage {
     pub data: Vec<u8>,
     /// Timestamp
     pub timestamp: u64,
+    /// Attestations (signatures, proofs)
+    pub attestations: Vec<Attestation>,
 }
 
 /// DWN Client
@@ -106,12 +108,14 @@ impl DWNClient {
             message_type: message_type.to_string(),
             data: data.to_vec(),
             timestamp: current_time(),
+            attestations: Vec::new(),
         };
         
         // Store locally if configured
         if self.config.use_local_storage {
             let mut storage = self.local_storage.lock().unwrap();
-            storage.insert(id.clone(), message);
+            let message_for_storage = message.clone();
+            storage.insert(id.clone(), message_for_storage);
         }
         
         // Here we would send to remote DWN if endpoint is configured
@@ -343,67 +347,71 @@ impl DWNManager {
         // In a real implementation, this would send the message to a DWN
         // For this example, we're handling it locally
         
-        match message.message_type {
-            DWNMessageType::Create => {
-                // Create a record
-                let data = message.data.ok_or_else(|| Web5Error::DWNError("No data provided".to_string()))?;
-                
+        match message.message_type.as_str() {
+            "Create" => {
+                // Implementation for Create message type
+                let data = message.data.clone();
+                // Process create message logic
                 let record = DWNRecord {
-                    id: message.descriptor.id.clone(),
-                    owner: message.descriptor.author.clone(),
-                    schema: message.descriptor.schema.clone(),
-                    data,
+                    id: message.id.clone(),
+                    owner: message.from.clone(),
+                    schema: message.protocol.clone(),
+                    data: serde_json::from_slice(&data)
+                        .unwrap_or_else(|_| serde_json::Value::Null),
                     metadata: HashMap::new(),
-                    attestations: message.attestations.clone(),
+                    attestations: Vec::new(),
                 };
-                
                 self.store_record(record)?;
-                
                 Ok(message)
             },
-            DWNMessageType::Read => {
-                // Read a record
-                let id = message.descriptor.id.clone();
-                
+            "Read" => {
+                // Implementation for Read message type
+                let id = message.id.clone();
                 if let Ok(records) = self.records.lock() {
                     if let Some(record) = records.get(&id) {
                         let mut response = message.clone();
-                        response.data = Some(record.data.clone());
+                        response.data = match serde_json::to_vec(&record.data) {
+                            Ok(bytes) => bytes,
+                            Err(_) => Vec::new(),
+                        };
                         return Ok(response);
                     }
                 }
-                
                 Err(Web5Error::DWNError(format!("Record not found: {}", id)))
             },
-            DWNMessageType::Update => {
-                // Update a record
-                let id = message.descriptor.id.clone();
-                let data = message.data.ok_or_else(|| Web5Error::DWNError("No data provided".to_string()))?;
-                
+            "Update" => {
+                // Implementation for Update message type
+                let id = message.id.clone();
+                let data = message.data.clone();
                 if let Ok(mut records) = self.records.lock() {
                     if let Some(record) = records.get_mut(&id) {
-                        record.data = data;
+                        record.data = match serde_json::from_slice(&data) {
+                            Ok(value) => value,
+                            Err(_) => serde_json::Value::Null,
+                        };
                         record.attestations = message.attestations.clone();
                         return Ok(message);
                     }
                 }
-                
                 Err(Web5Error::DWNError(format!("Record not found: {}", id)))
             },
-            DWNMessageType::Delete => {
-                // Delete a record
-                let id = message.descriptor.id.clone();
-                
+            "Delete" => {
+                // Implementation for Delete message type
+                let id = message.id.clone();
                 self.delete_record(&id)?;
-                
                 Ok(message)
             },
-            DWNMessageType::Query => {
-                // Query records
-                let data = message.data.ok_or_else(|| Web5Error::DWNError("No query provided".to_string()))?;
-                
-                let query: DWNQuery = serde_json::from_value(data)
-                    .map_err(|e| Web5Error::SerializationError(e.to_string()))?;
+            "Query" => {
+                // Implementation for Query message type
+                let data = message.data.clone();
+                // Process query logic - simplified for illustration
+                let query: DWNQuery = match serde_json::from_slice(&data) {
+                    Ok(value) => match serde_json::from_value(value) {
+                        Ok(query) => query,
+                        Err(e) => return Err(Web5Error::SerializationError(e.to_string())),
+                    },
+                    Err(e) => return Err(Web5Error::SerializationError(e.to_string())),
+                };
                 
                 let owner = query.filter.owner.unwrap_or_default();
                 let schema = query.filter.schema.unwrap_or_default();
@@ -411,11 +419,17 @@ impl DWNManager {
                 let records = self.query_records(&owner, &schema)?;
                 
                 let mut response = message.clone();
-                response.data = Some(serde_json::to_value(records)
-                    .map_err(|e| Web5Error::SerializationError(e.to_string()))?);
+                response.data = match serde_json::to_vec(&records) {
+                    Ok(bytes) => bytes,
+                    Err(e) => return Err(Web5Error::SerializationError(e.to_string())),
+                };
                 
                 Ok(response)
             },
+            _ => {
+                // Handle unsupported message type
+                Err(Web5Error::DWNError(format!("Unsupported message type: {}", message.message_type)))
+            }
         }
     }
     

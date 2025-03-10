@@ -1,4 +1,12 @@
-// src/bitcoin/wallet/mod.rs
+// Migrated from OPSource to anya-core
+// This file was automatically migrated as part of the Rust-only implementation
+// Original file: C:\Users\bmokoka\Downloads\OPSource\src\bitcoin\wallet\mod.rs
+// Bitcoin Wallet Module
+// Implements unified wallet capabilities for Bitcoin and related chains
+//
+// [AIR-3][AIS-3][AIT-3][AIM-2][AIP-3][BPC-3][RES-2][SCL-2]
+// This module provides comprehensive wallet functionality with high security,
+// privacy, and protocol compliance ratings.
 
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
@@ -9,6 +17,9 @@ use bitcoin::LockTime;
 use crate::bitcoin::error::{BitcoinError, BitcoinResult};
 use crate::AnyaResult;
 use crate::bitcoin::interface::BitcoinInterface;
+use bitcoin::hashes::Hash as BitcoinHashTrait;
+use crate::AnyaError;
+use bitcoin::{Script, ScriptBuf, Sequence, TxIn, TxOut, Amount};
 
 pub mod bip32;
 pub mod transactions;
@@ -96,6 +107,7 @@ pub trait UnifiedWallet: KeyManager + AddressManager + TransactionManager + Bala
     fn restore(&self, path: &str, password: &str) -> AnyaResult<()>;
 }
 
+#[derive(Clone)]
 pub struct Asset {
     pub id: String,
     pub name: String,
@@ -168,10 +180,15 @@ impl Wallet {
                 let secret_key = self.derive_key(&path)?;
                 let public_key = bitcoin::secp256k1::PublicKey::from_secret_key(&self.secp, &secret_key);
                 
+                // Convert to bitcoin::PublicKey
+                let bitcoin_pubkey = bitcoin::PublicKey::new(public_key);
+                // Get compressed public key for p2wpkh and p2shwpkh
+                let compressed_pubkey = bitcoin::key::CompressedPublicKey::from_slice(&bitcoin_pubkey.inner.serialize()).unwrap();
+                
                 let address = match address_type {
-                    AddressType::Legacy => Address::p2pkh(&public_key, self.config.network),
-                    AddressType::SegWit => Address::p2wpkh(&public_key, self.config.network)?,
-                    AddressType::NestedSegWit => Address::p2shwpkh(&public_key, self.config.network)?,
+                    AddressType::Legacy => Address::p2pkh(&bitcoin_pubkey, self.config.network),
+                    AddressType::SegWit => Address::p2wpkh(&compressed_pubkey, self.config.network),
+                    AddressType::NestedSegWit => Address::p2shwpkh(&compressed_pubkey, self.config.network),
                     AddressType::Taproot => {
                         let xonly = bitcoin::secp256k1::XOnlyPublicKey::from(public_key);
                         Address::p2tr(&self.secp, xonly, None, self.config.network)
@@ -194,7 +211,8 @@ impl KeyManager for Wallet {
         let seed = seed_guard.as_ref()
             .ok_or_else(|| BitcoinError::Wallet("Wallet not initialized".to_string()))?;
         
-        bip32::derive_key_from_seed(seed, path)
+        Ok(bip32::derive_key_from_seed(seed, path)
+            .map_err(|e| AnyaError::Bitcoin(e.to_string()))?)
     }
     
     fn get_public_key(&self, path: &str) -> AnyaResult<bitcoin::secp256k1::PublicKey> {
@@ -205,14 +223,21 @@ impl KeyManager for Wallet {
     
     fn sign_message(&self, message: &[u8], path: &str) -> AnyaResult<Vec<u8>> {
         let private_key = self.derive_key(path)?;
-        let message_hash = bitcoin::secp256k1::Message::from_hashed_data::<bitcoin::hashes::sha256::Hash>(message);
+        
+        // Hash the message with SHA256
+        let hash = bitcoin::hashes::sha256::Hash::hash(message);
+        let message_hash = bitcoin::secp256k1::Message::from_digest(hash.to_byte_array());
+        
         let signature = self.secp.sign_ecdsa(&message_hash, &private_key);
         Ok(signature.serialize_der().to_vec())
     }
     
     fn verify_message(&self, message: &[u8], signature: &[u8], path: &str) -> AnyaResult<bool> {
         let public_key = self.get_public_key(path)?;
-        let message_hash = bitcoin::secp256k1::Message::from_hashed_data::<bitcoin::hashes::sha256::Hash>(message);
+        
+        // Hash the message with SHA256
+        let hash = bitcoin::hashes::sha256::Hash::hash(message);
+        let message_hash = bitcoin::secp256k1::Message::from_digest(hash.to_byte_array());
         
         let signature = bitcoin::secp256k1::ecdsa::Signature::from_der(signature)
             .map_err(|e| BitcoinError::Wallet(format!("Invalid signature: {}", e)))?;
@@ -240,10 +265,15 @@ impl AddressManager for Wallet {
         let secret_key = self.derive_key(&path)?;
         let public_key = bitcoin::secp256k1::PublicKey::from_secret_key(&self.secp, &secret_key);
         
+        // Convert to bitcoin::PublicKey
+        let bitcoin_pubkey = bitcoin::PublicKey::new(public_key);
+        // Get compressed public key for p2wpkh and p2shwpkh
+        let compressed_pubkey = bitcoin::key::CompressedPublicKey::from_slice(&bitcoin_pubkey.inner.serialize()).unwrap();
+        
         let address = match address_type {
-            AddressType::Legacy => Address::p2pkh(&public_key, self.config.network),
-            AddressType::SegWit => Address::p2wpkh(&public_key, self.config.network)?,
-            AddressType::NestedSegWit => Address::p2shwpkh(&public_key, self.config.network)?,
+            AddressType::Legacy => Address::p2pkh(&bitcoin_pubkey, self.config.network),
+            AddressType::SegWit => Address::p2wpkh(&compressed_pubkey, self.config.network),
+            AddressType::NestedSegWit => Address::p2shwpkh(&compressed_pubkey, self.config.network),
             AddressType::Taproot => {
                 let xonly = bitcoin::secp256k1::XOnlyPublicKey::from(public_key);
                 Address::p2tr(&self.secp, xonly, None, self.config.network)
@@ -275,10 +305,15 @@ impl AddressManager for Wallet {
         let secret_key = self.derive_key(&path)?;
         let public_key = bitcoin::secp256k1::PublicKey::from_secret_key(&self.secp, &secret_key);
         
+        // Convert to bitcoin::PublicKey
+        let bitcoin_pubkey = bitcoin::PublicKey::new(public_key);
+        // Get compressed public key for p2wpkh and p2shwpkh
+        let compressed_pubkey = bitcoin::key::CompressedPublicKey::from_slice(&bitcoin_pubkey.inner.serialize()).unwrap();
+        
         let address = match address_type {
-            AddressType::Legacy => Address::p2pkh(&public_key, self.config.network),
-            AddressType::SegWit => Address::p2wpkh(&public_key, self.config.network)?,
-            AddressType::NestedSegWit => Address::p2shwpkh(&public_key, self.config.network)?,
+            AddressType::Legacy => Address::p2pkh(&bitcoin_pubkey, self.config.network),
+            AddressType::SegWit => Address::p2wpkh(&compressed_pubkey, self.config.network),
+            AddressType::NestedSegWit => Address::p2shwpkh(&compressed_pubkey, self.config.network),
             AddressType::Taproot => {
                 let xonly = bitcoin::secp256k1::XOnlyPublicKey::from(public_key);
                 Address::p2tr(&self.secp, xonly, None, self.config.network)
@@ -327,10 +362,12 @@ impl TransactionManager for Wallet {
         for (addr, amount) in outputs {
             let script_pubkey = Address::from_str(&addr)
                 .map_err(|e| BitcoinError::Wallet(format!("Invalid address: {}", e)))?
+                .require_network(self.config.network)
+                .map_err(|e| BitcoinError::Wallet(format!("Network mismatch: {}", e)))?
                 .script_pubkey();
             
             tx_outs.push(TxOut {
-                value: amount,
+                value: Amount::from_sat(amount),
                 script_pubkey,
             });
         }
@@ -498,20 +535,18 @@ impl UnifiedWallet for Wallet {
 
 // Helper function to determine chain from asset ID
 fn determine_chain_from_asset_id(asset_id: &str) -> String {
-    if asset_id.starts_with("rgb:") {
-        "rgb".to_string()
-    } else if asset_id.starts_with("liquid:") {
-        "liquid".to_string()
-    } else if asset_id.starts_with("rsk:") {
-        "rsk".to_string()
-    } else if asset_id.starts_with("stacks:") {
-        "stacks".to_string()
+    // Simple heuristic based on asset ID prefix
+    if asset_id.starts_with("btc-") {
+        "Bitcoin".to_string()
+    } else if asset_id.starts_with("lq-") {
+        "Liquid".to_string()
+    } else if asset_id.starts_with("rsk-") {
+        "RSK".to_string()
     } else {
-        "bitcoin".to_string()
+        "Unknown".to_string()
     }
 }
 
-#[derive(Debug, Clone)]
 pub struct BitcoinWallet {
     network: Network,
     interface: Box<dyn BitcoinInterface>,

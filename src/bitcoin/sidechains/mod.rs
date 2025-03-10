@@ -1,4 +1,12 @@
-// src/bitcoin/sidechains/mod.rs
+// Migrated from OPSource to anya-core
+// This file was automatically migrated as part of the Rust-only implementation
+// Original file: C:\Users\bmokoka\Downloads\OPSource\src\bitcoin\sidechains\mod.rs
+// Bitcoin Sidechains Module
+// Implements unified sidechain management for Bitcoin ecosystem
+//
+// [AIR-2][AIS-3][AIT-2][AIM-2][AIP-2][BPC-3][PFM-2][RES-3][SCL-2]
+// This module provides comprehensive sidechain management with high resilience
+// and strong security for cross-chain operations.
 
 //! Bitcoin Sidechains
 //!
@@ -11,7 +19,7 @@ pub mod stacks;
 use std::collections::HashMap;
 use bitcoin::Txid;
 
-use crate::common::error::AnyaResult;
+use crate::AnyaResult;
 
 /// Sidechain identifier
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]

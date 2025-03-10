@@ -54,6 +54,7 @@ Welcome to the Anya Core documentation. This index will help you navigate the va
 - [Contributing Guide](CONTRIBUTING.md) - How to contribute
 - [Checkpoint System](docs/CHECKPOINT_SYSTEM.md) - Development checkpoints
 - [AI Labeling System](AI_LABELLING.md) - Component labeling standards
+- [AI Labeling Implementation](docs/AI_LABELING_IMPLEMENTATION.md) - Implementation status
 
 ## Key Features at a Glance
 
