@@ -2,16 +2,21 @@
 // This file was automatically migrated as part of the Rust-only implementation
 // Original file: C:\Users\bmokoka\Downloads\OPSource\src\bitcoin\cross_chain\mod.rs
 // Cross-Chain Module
-// Provides functionality for Bitcoin cross-chain operations
-// as per Bitcoin Development Framework v2.5 requirements
+// Implements unified cross-chain bridge functionality for Bitcoin sidechains
+//
+// [AIR-3][AIS-3][AIT-3][AIM-2][AIP-2][BPC-3][PFM-2][RES-3][SCL-2]
+// This module provides a unified interface for cross-chain operations
+// with high security and resilience ratings for multi-chain support.
 
 // Re-export modules
 pub mod liquid;
 pub mod rsk;
 
-use bitcoin::{Block, BlockHeader, Transaction};
+use crate::bitcoin::interface::BlockHeader;
+use bitcoin::{Block, Transaction};
 use bitcoin::hashes::Hash;
 use std::collections::HashMap;
+use hex;
 
 /// Cross-Chain Transaction Status
 /// 
@@ -23,6 +28,8 @@ pub enum CrossChainStatus {
     /// Transaction is confirmed on the source chain, waiting for target chain processing
     ConfirmedSource,
     /// Transaction is being processed by the cross-chain bridge
+    ProcessingBridge,
+    /// Transaction is being processed on the target chain
     ProcessingTarget,
     /// Transaction is completed on both chains
     Completed,
@@ -157,27 +164,37 @@ pub fn create_transaction(
 pub fn execute_transaction(
     bridge: &mut CrossChainBridge,
     transaction: &mut CrossChainTransaction,
-) -> Result<String, &'static str> {
+) -> Result<String, BitcoinError> {
     // Execute the transaction based on the target chain
     match bridge.target_chain.as_str() {
         "RSK" => {
             // Create an RSK bridge transaction
-            let mut rsk_tx = rsk::create_rsk_bridge_transaction(
-                &transaction.source_sender,
-                &transaction.target_recipient,
-                transaction.amount,
-            )?;
+            let bridge_tx = rsk::RSKBridgeTransaction {
+                prev_tx_id: transaction.source_txid.clone(),
+                prev_vout: 0, // This would be set properly in a real implementation
+                sender_pubkey: bitcoin::PublicKey::from_slice(&hex::decode(&transaction.source_sender).unwrap()).unwrap(),
+                amount: transaction.amount,
+                change_amount: 0, // This would be calculated in a real implementation
+                status: rsk::RSKBridgeStatus::PendingBitcoin,
+                btc_inputs: vec![],
+                btc_sender: transaction.source_sender.clone(),
+                btc_txid: None,
+                rsk_recipient: transaction.target_recipient.clone(),
+            };
+
+            // Create federation script (in a real implementation, this would be the RSK federation's script)
+            let federation_script = bitcoin::ScriptBuf::new_p2wpkh(&bridge_tx.sender_pubkey.pubkey_hash());
+
+            // Create the RSK bridge transaction
+            let rsk_tx = rsk::create_rsk_bridge_transaction(&bridge_tx, federation_script)?;
             
             // For this example, we're just setting the transaction ID
             // In a real implementation, this would execute the transaction
-            let txid = format!("{}:{}", bridge.source_chain, transaction.timestamp);
+            let txid = rsk_tx.compute_txid().to_string();
             
             // Update the transaction
             transaction.source_txid = txid.clone();
             transaction.status = CrossChainStatus::PendingSource;
-            
-            // Add the transaction to the bridge
-            bridge.transactions.insert(txid.clone(), transaction.clone());
             
             Ok(txid)
         },

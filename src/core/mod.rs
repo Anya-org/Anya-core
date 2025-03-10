@@ -128,4 +128,13 @@ mod tests {
         assert_eq!(hardening_changes, 1);
         assert_eq!(performance_changes, 1);
     }
-} 
+}
+
+// Core module
+// Implements core functionality for Bitcoin operations
+// as per Bitcoin Development Framework v2.5 requirements
+
+pub mod performance;
+
+// Re-export key types
+pub use performance::Metrics; 

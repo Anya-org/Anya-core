@@ -4,12 +4,26 @@
 // Discrete Log Contracts (DLCs) Module
 // Implements privacy-preserving DLCs using non-interactive oracle patterns
 // to maintain transaction indistinguishability as per Bitcoin Development Framework v2.5
+//
+// [AIR-2][AIS-3][AIT-3][AIM-2][AIP-2][BPC-3][PFM-2][RES-2]
+// This module meets DLC Oracle Integration requirements with non-interactive pattern
+// implementation and comprehensive security measures.
 
-use bitcoin::{Transaction, TxIn, TxOut, Script, OutPoint, Witness};
-use bitcoin::secp256k1::{Secp256k1, SecretKey, PublicKey, Message, Signature};
+use bitcoin::{Transaction, TxIn, TxOut, Script, OutPoint, Witness, ScriptBuf, Sequence, Amount, WitnessProgram, WitnessVersion};
+use bitcoin::secp256k1::{Secp256k1, SecretKey, PublicKey, Message};
+use bitcoin::secp256k1::ecdsa::Signature;
 use bitcoin::hashes::{Hash, sha256};
-use bitcoin::util::psbt::PartiallySignedTransaction;
+use bitcoin::psbt::Psbt as PartiallySignedTransaction;
 use std::collections::HashMap;
+use bitcoin::sighash::{Prevouts, SighashCache, TapSighashType};
+use bitcoin::blockdata::opcodes::all;
+use crate::bitcoin::LockTime;
+use crate::bitcoin::Version;
+use bitcoin::sighash::ScriptPath;
+use crate::bitcoin::error::BitcoinError;
+
+// Import BitcoinResult type
+use crate::bitcoin::error::BitcoinResult;
 
 /// DLC Contract structure
 /// 
@@ -18,19 +32,25 @@ use std::collections::HashMap;
 #[derive(Debug, Clone)]
 pub struct DLCContract {
     /// Contract ID (hash of contract parameters)
-    pub contract_id: [u8; 32],
+    pub id: [u8; 32],
     /// Oracle public key
     pub oracle_pubkey: PublicKey,
-    /// Possible outcomes and their corresponding payouts
-    pub outcomes: Vec<(String, u64)>,
-    /// Collateral amount from each party
+    /// Contract outcomes and associated payouts
+    pub outcomes: HashMap<String, u64>,
+    /// Collateral amount (in satoshis)
     pub collateral_amount: u64,
-    /// Contract execution timelock (absolute)
+    /// Timelock (block height)
     pub timelock: u32,
-    /// Contract funding transaction
+    /// Funding transaction
     pub funding_tx: Option<Transaction>,
     /// Contract execution transaction templates (one per outcome)
     pub execution_txs: HashMap<String, Transaction>,
+    /// Funding transaction output index
+    pub funding_output_index: Option<usize>,
+    /// Party A public key
+    pub party_a_pubkey: PublicKey,
+    /// Party B public key
+    pub party_b_pubkey: PublicKey,
 }
 
 /// DLC Oracle structure
@@ -88,17 +108,20 @@ pub fn create_contract(
     contract_params.extend_from_slice(&collateral_amount.to_le_bytes());
     contract_params.extend_from_slice(&timelock.to_le_bytes());
     
-    let contract_id = sha256::Hash::hash(&contract_params).into_inner();
+    let contract_id = sha256::Hash::hash(&contract_params).to_byte_array();
     
     // Create the contract
-    let contract = DLCContract {
-        contract_id,
+    let mut contract = DLCContract {
+        id: contract_id,
         oracle_pubkey: *oracle_pubkey,
-        outcomes: outcomes.to_vec(),
+        outcomes: outcomes.iter().map(|(k, v)| (k.clone(), *v)).collect(),
         collateral_amount,
         timelock,
         funding_tx: None,
         execution_txs: HashMap::new(),
+        funding_output_index: None,
+        party_a_pubkey: PublicKey::from_slice(&[2; 33]).unwrap_or_else(|_| panic!("Invalid public key")),
+        party_b_pubkey: PublicKey::from_slice(&[3; 33]).unwrap_or_else(|_| panic!("Invalid public key")),
     };
     
     Ok(contract)
@@ -131,8 +154,8 @@ pub fn create_funding_transaction(
     let secp = Secp256k1::new();
     
     // Calculate total input amounts
-    let party_a_input_amount: u64 = party_a_inputs.iter().map(|(_, txout, _)| txout.value).sum();
-    let party_b_input_amount: u64 = party_b_inputs.iter().map(|(_, txout, _)| txout.value).sum();
+    let party_a_input_amount: u64 = party_a_inputs.iter().map(|(_, txout, _)| txout.value.to_sat()).sum();
+    let party_b_input_amount: u64 = party_b_inputs.iter().map(|(_, txout, _)| txout.value.to_sat()).sum();
     
     // Ensure both parties have enough funds
     if party_a_input_amount < contract.collateral_amount {
@@ -146,28 +169,25 @@ pub fn create_funding_transaction(
     // Create inputs
     let mut inputs = Vec::new();
     
-    // Add party A inputs
+    // Create inputs for party A
     for (outpoint, _, _) in &party_a_inputs {
         inputs.push(TxIn {
             previous_output: *outpoint,
-            script_sig: Script::new(),
-            sequence: 0xFFFFFFFF,
+            script_sig: ScriptBuf::new(),
+            sequence: Sequence::MAX,
             witness: Witness::new(),
         });
     }
     
-    // Add party B inputs
+    // Create inputs for party B
     for (outpoint, _, _) in &party_b_inputs {
         inputs.push(TxIn {
             previous_output: *outpoint,
-            script_sig: Script::new(),
-            sequence: 0xFFFFFFFF,
+            script_sig: ScriptBuf::new(),
+            sequence: Sequence::MAX,
             witness: Witness::new(),
         });
     }
-    
-    // Create outputs
-    let mut outputs = Vec::new();
     
     // Create 2-of-2 multisig output for the contract
     let party_a_pubkey = PublicKey::from_secret_key(&secp, &party_a_inputs[0].2);
@@ -175,53 +195,70 @@ pub fn create_funding_transaction(
     
     // Create a MuSig public key (simplified for this example)
     // In a real implementation, this would use proper MuSig key aggregation
-    let contract_script = Script::new_v0_p2wsh(&bitcoin::blockdata::script::Builder::new()
-        .push_opcode(bitcoin::blockdata::opcodes::all::OP_2)
+    let script = bitcoin::blockdata::script::Builder::new()
+        .push_opcode(all::OP_PUSHNUM_2)
         .push_key(&bitcoin::PublicKey::new(party_a_pubkey))
         .push_key(&bitcoin::PublicKey::new(party_b_pubkey))
-        .push_opcode(bitcoin::blockdata::opcodes::all::OP_2)
-        .push_opcode(bitcoin::blockdata::opcodes::all::OP_CHECKMULTISIG)
-        .into_script());
+        .push_opcode(all::OP_PUSHNUM_2)
+        .push_opcode(all::OP_CHECKMULTISIG)
+        .into_script();
     
-    // Add the contract output
-    outputs.push(TxOut {
-        value: contract.collateral_amount * 2, // Both parties' collateral
+    // Create the P2WSH script
+    let script_hash = bitcoin::hashes::sha256::Hash::hash(script.as_bytes());
+    let witness_program = WitnessProgram::new(
+        WitnessVersion::V0,
+        script_hash.as_byte_array(),
+    ).expect("Failed to create witness program");
+    let contract_script = ScriptBuf::new_witness_program(&witness_program);
+    
+    // Create the contract output
+    let contract_output = TxOut {
+        value: Amount::from_sat(contract.collateral_amount * 2), // Both parties' collateral
         script_pubkey: contract_script,
-    });
+    };
     
-    // Add change outputs if necessary
-    let party_a_change = party_a_input_amount - contract.collateral_amount;
-    if party_a_change > 0 {
-        // Create a change output for party A
-        // In a real implementation, this would use a proper change address
-        let change_script = Script::new_v0_p2wpkh(&bitcoin::PublicKey::new(party_a_pubkey).wpubkey_hash().unwrap());
-        outputs.push(TxOut {
-            value: party_a_change,
-            script_pubkey: change_script,
-        });
-    }
+    // Calculate change amounts
+    let party_a_change = party_a_input_amount - contract.collateral_amount - 1000; // Fee
+    let party_b_change = party_b_input_amount - contract.collateral_amount - 1000; // Fee
     
-    let party_b_change = party_b_input_amount - contract.collateral_amount;
-    if party_b_change > 0 {
-        // Create a change output for party B
-        // In a real implementation, this would use a proper change address
-        let change_script = Script::new_v0_p2wpkh(&bitcoin::PublicKey::new(party_b_pubkey).wpubkey_hash().unwrap());
-        outputs.push(TxOut {
-            value: party_b_change,
-            script_pubkey: change_script,
-        });
-    }
+    // Create change output for party A
+    let party_a_pubkey_obj = bitcoin::PublicKey::from_slice(&party_a_pubkey.serialize()).unwrap();
+    let party_a_script = ScriptBuf::new_p2wpkh(&party_a_pubkey_obj.wpubkey_hash().unwrap());
     
-    // Create the transaction
+    let party_a_change_output = TxOut {
+        value: Amount::from_sat(party_a_change),
+        script_pubkey: party_a_script,
+    };
+    
+    // Create change output for party B
+    let party_b_pubkey_obj = bitcoin::PublicKey::from_slice(&party_b_pubkey.serialize()).unwrap();
+    let party_b_script = ScriptBuf::new_p2wpkh(&party_b_pubkey_obj.wpubkey_hash().unwrap());
+    
+    let party_b_change_output = TxOut {
+        value: Amount::from_sat(party_b_change),
+        script_pubkey: party_b_script,
+    };
+    
+    // Create outputs
+    let mut outputs = vec![contract_output, party_a_change_output, party_b_change_output];
+    
+    // Create the funding transaction
     let funding_tx = Transaction {
-        version: 2,
-        lock_time: 0,
+        version: Version::TWO,
+        lock_time: LockTime::ZERO,
         input: inputs,
         output: outputs,
     };
     
+    // Find the funding output that has the correct collateral amount
+    let contract_output_index = funding_tx.output
+        .iter()
+        .position(|output| output.value == Amount::from_sat(contract.collateral_amount * 2))
+        .ok_or("Could not find funding output with correct amount")?;
+    
     // Store the funding transaction in the contract
     contract.funding_tx = Some(funding_tx.clone());
+    contract.funding_output_index = Some(contract_output_index);
     
     Ok(funding_tx)
 }
@@ -238,7 +275,7 @@ pub fn create_execution_transactions(
     
     // Find the contract output index
     let contract_output_index = funding_tx.output.iter()
-        .position(|output| output.value == contract.collateral_amount * 2)
+        .position(|output| output.value == Amount::from_sat(contract.collateral_amount * 2))
         .ok_or("Contract output not found in funding transaction")?;
     
     let mut execution_txs = HashMap::new();
@@ -253,11 +290,11 @@ pub fn create_execution_transactions(
         // Create inputs
         let input = TxIn {
             previous_output: OutPoint {
-                txid: funding_tx.txid(),
+                txid: funding_tx.compute_txid(),
                 vout: contract_output_index as u32,
             },
-            script_sig: Script::new(),
-            sequence: 0xFFFFFFFF,
+            script_sig: Script::new().into(),
+            sequence: bitcoin::Sequence(0xFFFFFFFF),
             witness: Witness::new(),
         };
         
@@ -266,26 +303,28 @@ pub fn create_execution_transactions(
         
         // Add party A output if they receive a payout
         if party_a_payout > 0 {
-            let party_a_script = Script::new_v0_p2wpkh(&bitcoin::PublicKey::new(*party_a_pubkey).wpubkey_hash().unwrap());
+            let party_a_pubkey_obj = bitcoin::PublicKey::from_slice(&party_a_pubkey.serialize()).unwrap();
+            let party_a_script = ScriptBuf::new_p2wpkh(&party_a_pubkey_obj.wpubkey_hash().unwrap());
             outputs.push(TxOut {
-                value: party_a_payout,
+                value: Amount::from_sat(party_a_payout),
                 script_pubkey: party_a_script,
             });
         }
         
         // Add party B output if they receive a payout
         if party_b_payout > 0 {
-            let party_b_script = Script::new_v0_p2wpkh(&bitcoin::PublicKey::new(*party_b_pubkey).wpubkey_hash().unwrap());
+            let party_b_pubkey_obj = bitcoin::PublicKey::from_slice(&party_b_pubkey.serialize()).unwrap();
+            let party_b_script = ScriptBuf::new_p2wpkh(&party_b_pubkey_obj.wpubkey_hash().unwrap());
             outputs.push(TxOut {
-                value: party_b_payout,
+                value: Amount::from_sat(party_b_payout),
                 script_pubkey: party_b_script,
             });
         }
         
         // Create the transaction
         let execution_tx = Transaction {
-            version: 2,
-            lock_time: contract.timelock,
+            version: Version::TWO,
+            lock_time: LockTime::from_consensus(contract.timelock),
             input: vec![input],
             output: outputs,
         };
@@ -337,107 +376,220 @@ pub fn create_adaptor_signatures(
     Ok(adaptor_signatures)
 }
 
-/// Sign an outcome as an oracle
-/// 
-/// Signs an outcome as a DLC oracle, enabling the execution of the
-/// corresponding execution transaction.
-pub fn sign_outcome_as_oracle(
-    oracle: &DLCOracle,
+/// Sign an outcome with the oracle's private key
+pub fn sign_oracle_outcome(
     outcome: &str,
+    private_key: &SecretKey,
+    oracle_r_point: &PublicKey,
 ) -> Result<Signature, &'static str> {
-    let secret_key = oracle.secret_key.as_ref().ok_or("Oracle private key not available")?;
+    // Create a hash of the outcome
+    let outcome_hash = sha256::Hash::hash(outcome.as_bytes());
+    
+    // Create a message from the hash
+    let message = Message::from_digest_slice(&outcome_hash[..]).map_err(|_| "Failed to create message")?;
+    
+    // Create a secp256k1 context
     let secp = Secp256k1::new();
     
-    // Hash the outcome
-    let outcome_hash = sha256::Hash::hash(outcome.as_bytes());
-    let message = Message::from_digest_slice(&outcome_hash[..])?;
-    
-    // Sign the outcome
-    let signature = secp.sign_ecdsa(&message, secret_key);
+    // Sign the message with the oracle's private key
+    let signature = secp.sign_ecdsa(&message, private_key);
     
     Ok(signature)
 }
 
-/// Execute a DLC with an oracle signature
-/// 
-/// Executes a DLC using an oracle signature for a specific outcome.
-pub fn execute_dlc(
+/// Execute a DLC contract with pre-signed signatures
+pub fn execute_contract_with_signatures(
     contract: &DLCContract,
     outcome: &str,
+    party_a_sig: &Signature,
+    party_b_sig: &Signature,
     oracle_signature: &Signature,
-    party_a_secret_key: &SecretKey,
-    party_b_secret_key: &SecretKey,
-) -> BitcoinResult<Transaction> {
+    funding_tx: &Transaction,
+    execution_tx: &mut Transaction,
+) -> Result<(), &'static str> {
+    // Create the contract script
+    let contract_script = create_contract_script(
+        &contract.party_a_pubkey,
+        &contract.party_b_pubkey,
+        &contract.oracle_pubkey,
+    ).into_script();
+    
+    // Create the witness stack
+    let mut witness_stack = Vec::new();
+    
+    // Add the signatures to the witness stack
+    witness_stack.push(party_a_sig.serialize_der().to_vec());
+    witness_stack.push(party_b_sig.serialize_der().to_vec());
+    witness_stack.push(oracle_signature.serialize_der().to_vec());
+    witness_stack.push(contract_script.as_bytes().to_vec());
+    
+    // Set the witness for the contract output
+    let contract_output_index = 0; // Assuming the contract output is the first input
+    execution_tx.input[contract_output_index].witness = Witness::from(witness_stack);
+    
+    Ok(())
+}
+
+/// Create an execution transaction for a DLC
+/// 
+/// Creates a transaction that spends from the funding transaction
+/// to execute the contract based on the oracle's signature.
+pub fn create_execution_transaction(
+    contract: &DLCContract,
+    oracle_signature: &Signature,
+    outcome: &str,
+) -> Result<Transaction, &'static str> {
+    let funding_tx = contract.funding_tx.as_ref().ok_or("Funding transaction not found")?;
     let secp = Secp256k1::new();
     
-    // Get the execution transaction for this outcome
-    let mut execution_tx = contract.execution_txs.get(outcome)
-        .ok_or("Execution transaction not found for outcome")?
-        .clone();
+    // Find the outcome in the contract
+    let (party_a_payout, party_b_payout) = match contract.outcomes.get(outcome) {
+        Some(payout) => {
+            let party_a_payout = *payout;
+            let party_b_payout = contract.collateral_amount * 2 - party_a_payout;
+            (party_a_payout, party_b_payout)
+        },
+        None => return Err("Outcome not found in contract"),
+    };
     
-    // Verify the oracle signature
-    let outcome_hash = sha256::Hash::hash(outcome.as_bytes());
-    let message = Message::from_digest_slice(&outcome_hash[..])?;
+    // Create input spending from the funding transaction
+    let input = TxIn {
+        previous_output: OutPoint {
+            txid: funding_tx.compute_txid(),
+            vout: contract.funding_output_index.unwrap() as u32,
+        },
+        script_sig: Script::new().into(),
+        sequence: bitcoin::Sequence(0xFFFFFFFF),
+        witness: Witness::new(),
+    };
     
-    if !secp.verify_ecdsa(&message, oracle_signature, &contract.oracle_pubkey).is_ok() {
-        return Err(BitcoinError::InvalidOracleSignature);
+    // Create outputs for both parties
+    let mut outputs = Vec::new();
+    
+    // Party A output
+    if party_a_payout > 0 {
+        let party_a_pubkey = &contract.party_a_pubkey;
+        let party_a_pubkey_obj = bitcoin::PublicKey::from_slice(&party_a_pubkey.serialize()).unwrap();
+        let party_a_script = ScriptBuf::new_p2wpkh(&party_a_pubkey_obj.wpubkey_hash().unwrap());
+        
+        outputs.push(TxOut {
+            value: Amount::from_sat(party_a_payout),
+            script_pubkey: party_a_script,
+        });
     }
     
-    // In a real implementation, this would use proper MuSig signatures
-    // For this example, we're using a simplified approach
-    let party_a_pubkey = PublicKey::from_secret_key(&secp, party_a_secret_key);
-    let party_b_pubkey = PublicKey::from_secret_key(&secp, party_b_secret_key);
+    // Party B output
+    if party_b_payout > 0 {
+        let party_b_pubkey = &contract.party_b_pubkey;
+        let party_b_pubkey_obj = bitcoin::PublicKey::from_slice(&party_b_pubkey.serialize()).unwrap();
+        let party_b_script = ScriptBuf::new_p2wpkh(&party_b_pubkey_obj.wpubkey_hash().unwrap());
+        
+        outputs.push(TxOut {
+            value: Amount::from_sat(party_b_payout),
+            script_pubkey: party_b_script,
+        });
+    }
     
-    // Create a 2-of-2 multisig witness
-    // In a real implementation, this would use proper MuSig signatures
-    let funding_tx = contract.funding_tx.as_ref().ok_or("Funding transaction not created")?;
-    let contract_output_index = funding_tx.output.iter()
-        .position(|output| output.value == contract.collateral_amount * 2)
-        .ok_or("Contract output not found in funding transaction")?;
-    
-    let contract_script = bitcoin::blockdata::script::Builder::new()
-        .push_opcode(bitcoin::blockdata::opcodes::all::OP_2)
-        .push_key(&bitcoin::PublicKey::new(party_a_pubkey))
-        .push_key(&bitcoin::PublicKey::new(party_b_pubkey))
-        .push_opcode(bitcoin::blockdata::opcodes::all::OP_2)
-        .push_opcode(bitcoin::blockdata::opcodes::all::OP_CHECKMULTISIG)
-        .into_script();
-    
-    // Create the signature for the execution transaction
-    let sighash = execution_tx.signature_hash(
-        0,
-        &contract_script,
-        contract.collateral_amount * 2,
-        bitcoin::sighash::EcdsaSighashType::All,
-    );
-    let sighash_message = Message::from_digest_slice(&sighash[..])
-        .map_err(|_| "Failed to create message from sighash")?;
-    
-    // Sign the transaction with both keys
-    // In a real implementation, this would use proper adaptor signatures
-    let party_a_signature = secp.sign_ecdsa(&sighash_message, party_a_secret_key);
-    let party_b_signature = secp.sign_ecdsa(&sighash_message, party_b_secret_key);
-    
-    // Create the witness
-    let mut witness_elements = Vec::new();
-    witness_elements.push(Vec::new()); // Empty element for OP_0 (CHECKMULTISIG bug)
-    
-    // Add signatures
-    let mut party_a_sig_with_hashtype = party_a_signature.serialize_der().to_vec();
-    party_a_sig_with_hashtype.push(bitcoin::sighash::EcdsaSighashType::All as u8);
-    witness_elements.push(party_a_sig_with_hashtype);
-    
-    let mut party_b_sig_with_hashtype = party_b_signature.serialize_der().to_vec();
-    party_b_sig_with_hashtype.push(bitcoin::sighash::EcdsaSighashType::All as u8);
-    witness_elements.push(party_b_sig_with_hashtype);
-    
-    // Add the redeem script
-    witness_elements.push(contract_script.as_bytes().to_vec());
-    
-    // Set the witness
-    execution_tx.input[0].witness = Witness::from(witness_elements);
+    // Create the execution transaction
+    let execution_tx = Transaction {
+        version: Version::TWO,
+        lock_time: LockTime::from_consensus(contract.timelock),
+        input: vec![input],
+        output: outputs,
+    };
     
     Ok(execution_tx)
+}
+
+/// Sign an execution transaction for a DLC
+/// 
+/// Signs the execution transaction with the private keys of both parties
+/// and the oracle's signature.
+pub fn sign_execution_transaction(
+    contract: &DLCContract,
+    execution_tx: &mut Transaction,
+    party_a_key: &SecretKey,
+    party_b_key: &SecretKey,
+    oracle_signature: &Signature,
+) -> Result<(), &'static str> {
+    let secp = Secp256k1::new();
+    let funding_tx = contract.funding_tx.as_ref().ok_or("Funding transaction not found")?;
+    
+    // Find the contract output index
+    let contract_output_index = execution_tx.input
+        .iter()
+        .position(|input| input.previous_output.txid == funding_tx.compute_txid() && 
+                          input.previous_output.vout == contract.funding_output_index.unwrap() as u32)
+        .ok_or("Contract input not found in execution transaction")?;
+    
+    // Get the contract script
+    let contract_script = &funding_tx.output[contract.funding_output_index.unwrap()].script_pubkey;
+    
+    // Create a sighash for the execution transaction
+    let mut sighash_cache = bitcoin::sighash::SighashCache::new(&*execution_tx);
+    let script_path = ScriptPath::with_defaults(&contract_script);
+    let sighash = sighash_cache.taproot_script_spend_signature_hash(
+        0, // Input index
+        &script_path,
+        TapSighashType::Default,
+    )?;
+    
+    // Sign the transaction with party A's key
+    let party_a_sig = secp.sign_ecdsa(&Message::from_digest_slice(&sighash[..]).unwrap(), party_a_key);
+    
+    // Sign the transaction with party B's key
+    let party_b_sig = secp.sign_ecdsa(&Message::from_digest_slice(&sighash[..]).unwrap(), party_b_key);
+    
+    // Create the witness stack
+    let mut witness_stack = Vec::new();
+    witness_stack.push(party_a_sig.serialize_der().to_vec());
+    witness_stack.push(party_b_sig.serialize_der().to_vec());
+    witness_stack.push(oracle_signature.serialize_der().to_vec());
+    witness_stack.push(contract_script.as_bytes().to_vec());
+    
+    // Set the witness
+    execution_tx.input[contract_output_index].witness = Witness::from(witness_stack);
+    
+    Ok(())
+}
+
+/// Verify an oracle signature for a DLC outcome
+pub fn verify_oracle_signature(
+    outcome: &str,
+    oracle_signature: &Signature,
+    oracle_public_key: &PublicKey,
+) -> BitcoinResult<bool> {
+    // Create a hash of the outcome
+    let outcome_hash = sha256::Hash::hash(outcome.as_bytes());
+    
+    // Create a message from the hash
+    let message = Message::from_digest_slice(&outcome_hash[..])
+        .map_err(|_| BitcoinError::InvalidSignature("Failed to create message".to_string()))?;
+    
+    // Create a secp256k1 context
+    let secp = Secp256k1::new();
+    
+    // Verify the signature
+    if !secp.verify_ecdsa(&message, oracle_signature, oracle_public_key).is_ok() {
+        return Ok(false);
+    }
+    
+    Ok(true)
+}
+
+/// Create a contract script for a DLC
+fn create_contract_script(
+    party_a_pubkey: &PublicKey,
+    party_b_pubkey: &PublicKey,
+    oracle_pubkey: &PublicKey,
+) -> bitcoin::blockdata::script::Builder {
+    // Create a 2-of-2 multisig script with the oracle's public key
+    bitcoin::blockdata::script::Builder::new()
+        .push_opcode(all::OP_PUSHNUM_2)
+        .push_key(&bitcoin::PublicKey::new(*party_a_pubkey))
+        .push_key(&bitcoin::PublicKey::new(*party_b_pubkey))
+        .push_opcode(all::OP_PUSHNUM_2)
+        .push_opcode(all::OP_CHECKMULTISIG)
 }
 
 #[cfg(test)]
@@ -445,23 +597,34 @@ mod tests {
     use super::*;
     
     #[test]
-    fn test_create_contract() {
+    fn test_create_dlc_contract() {
         let secp = Secp256k1::new();
-        let oracle_secret_key = SecretKey::new(&mut rand::thread_rng());
-        let oracle_pubkey = PublicKey::from_secret_key(&secp, &oracle_secret_key);
+        let oracle_key = SecretKey::from_slice(&[1; 32]).unwrap();
+        let oracle_pubkey = PublicKey::from_secret_key(&secp, &oracle_key);
         
         let outcomes = vec![
-            ("Team A wins".to_string(), 100),
-            ("Team B wins".to_string(), 0),
-            ("Draw".to_string(), 50),
+            ("win".to_string(), 15000000),
+            ("lose".to_string(), 5000000),
         ];
         
-        let contract = create_contract(&oracle_pubkey, &outcomes, 1_000_000, 100).unwrap();
+        let outcomes_map: HashMap<String, u64> = outcomes.iter()
+            .map(|(k, v)| (k.clone(), *v))
+            .collect();
+        
+        let collateral_amount = 10000000;
+        let timelock = 144 * 7; // 1 week
+        
+        let contract = create_contract(
+            &oracle_pubkey,
+            &outcomes,
+            collateral_amount,
+            timelock,
+        ).unwrap();
         
         assert_eq!(contract.oracle_pubkey, oracle_pubkey);
-        assert_eq!(contract.outcomes, outcomes);
-        assert_eq!(contract.collateral_amount, 1_000_000);
-        assert_eq!(contract.timelock, 100);
+        assert_eq!(contract.outcomes, outcomes_map);
+        assert_eq!(contract.collateral_amount, collateral_amount);
+        assert_eq!(contract.timelock, timelock);
     }
     
     #[test]

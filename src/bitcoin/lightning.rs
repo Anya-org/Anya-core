@@ -9,13 +9,21 @@ use secp256k1::{PublicKey as Secp256k1PublicKey, SecretKey as Secp256k1SecretKey
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
+use std::fmt;
 
 // Import BitcoinConfig from a module we know exists
 use crate::bitcoin::interface::BitcoinImplementationType;
 
 // Define custom Lightning-specific key types to avoid conflicts with secp256k1 types
+#[derive(Clone)]
 pub struct LightningPublicKey {
     pub bytes: [u8; 33],
+}
+
+impl fmt::Debug for LightningPublicKey {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "LightningPublicKey({})", hex::encode(&self.bytes))
+    }
 }
 
 impl LightningPublicKey {
@@ -50,6 +58,13 @@ impl LightningPublicKey {
     }
 }
 
+// Add Display implementation for LightningPublicKey
+impl std::fmt::Display for LightningPublicKey {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", hex::encode(&self.bytes))
+    }
+}
+
 pub struct LightningSecretKey {
     pub bytes: [u8; 32],
 }
@@ -66,12 +81,13 @@ impl LightningSecp256k1<All> {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Debug)]
 pub struct LightningTxid {
     pub bytes: [u8; 32],
 }
 
 // Define BitcoinConfig as a struct that matches the interface needs
+#[derive(Clone, Debug)]
 pub struct BitcoinConfig {
     pub enabled: bool,
     pub network: String,
@@ -493,12 +509,13 @@ impl LightningNode {
         // Generate payment hash
         let payment_hash = format!("hash_{:x}", rand::random::<u64>());
         
-        // Create BOLT11 invoice (simplified for this example)
-        let network_prefix = match self.config.network {
-            Network::Bitcoin => "lnbc",
-            Network::Testnet => "lntb",
-            Network::Regtest => "lnbcrt",
-            Network::Signet => "lnsb",
+        // Fix the network matching
+        let network_prefix = match self.config.network.as_str() {
+            "bitcoin" => "lnbc",
+            "testnet" => "lntb",
+            "regtest" => "lnbcrt",
+            "signet" => "lnsb",
+            _ => "lnbc", // Default to mainnet
         };
         
         let amount_part = match amount_msat {
@@ -669,9 +686,9 @@ impl BitcoinLightningBridge {
         channel: &Channel,
         confirmation_height: Option<u32>,
     ) -> AnyaResult<ChannelTransaction> {
-        let tx_info = ChannelTransaction {
+        Ok(ChannelTransaction {
             channel_id: channel.channel_id.clone(),
-            funding_txid: channel.funding_txid,
+            funding_txid: channel.funding_txid.clone(),
             funding_output_idx: channel.funding_output_idx,
             funding_amount: channel.capacity,
             status: if confirmation_height.is_some() {
@@ -683,12 +700,7 @@ impl BitcoinLightningBridge {
             closing_txid: None,
             created_at: current_time(),
             updated_at: current_time(),
-        };
-        
-        let mut channel_txs = self.channel_transactions.lock().unwrap();
-        channel_txs.insert(channel.channel_id.clone(), tx_info.clone());
-        
-        Ok(tx_info)
+        })
     }
     
     /// Register a channel closing
@@ -761,5 +773,14 @@ impl LightningTxid {
         bytes.copy_from_slice(data);
         
         Ok(LightningTxid { bytes })
+    }
+}
+
+// Add Clone implementation for LightningTxid
+impl Clone for LightningTxid {
+    fn clone(&self) -> Self {
+        Self {
+            bytes: self.bytes,
+        }
     }
 } 

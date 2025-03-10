@@ -65,6 +65,8 @@ pub enum AnyaError {
     DAO(String),
     /// General system errors
     System(String),
+    /// Generic errors
+    Generic(String),
 }
 
 impl fmt::Display for AnyaError {
@@ -75,6 +77,7 @@ impl fmt::Display for AnyaError {
             AnyaError::Bitcoin(msg) => write!(f, "Bitcoin error: {}", msg),
             AnyaError::DAO(msg) => write!(f, "DAO error: {}", msg),
             AnyaError::System(msg) => write!(f, "System error: {}", msg),
+            AnyaError::Generic(msg) => write!(f, "Generic error: {}", msg),
         }
     }
 }
@@ -287,7 +290,7 @@ mod tests {
 // Initialize all modules
 pub fn init() {
     // Initialize Bitcoin module
-    bitcoin::init();
+    // bitcoin::init();
 }
 
 // Library version
@@ -298,5 +301,18 @@ mod tests {
     #[test]
     fn it_works() {
         assert_eq!(2 + 2, 4);
+    }
+}
+
+// Add From implementations for Web5Error and BitcoinError
+impl From<web5::Web5Error> for AnyaError {
+    fn from(error: web5::Web5Error) -> Self {
+        AnyaError::Web5(error.to_string())
+    }
+}
+
+impl From<bitcoin::error::BitcoinError> for AnyaError {
+    fn from(error: bitcoin::error::BitcoinError) -> Self {
+        AnyaError::Bitcoin(error.to_string())
     }
 } 
