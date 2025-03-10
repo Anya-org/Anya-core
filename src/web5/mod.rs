@@ -51,12 +51,12 @@ pub struct Web5Manager {
 
 impl Web5Manager {
     /// Create a new Web5 manager with the specified configuration
-    pub fn new(config: &Web5Config) -> Web5Result<Self> {
+    pub fn new(config: Web5Config) -> Web5Result<Self> {
         let did_manager = identity::DIDManager::new(&config.did_method);
         let protocol_manager = protocols::ProtocolManager::new();
         
         Ok(Self {
-            config: config.clone(),
+            config,
             did_manager,
             protocol_manager,
         })
@@ -133,7 +133,7 @@ mod tests {
     #[test]
     fn test_web5_manager_creation() {
         let config = Web5Config::default();
-        let manager = Web5Manager::new(&config).unwrap();
+        let manager = Web5Manager::new(config).unwrap();
         
         assert!(manager.config.enabled);
         assert_eq!(manager.config.did_method, "ion");
@@ -142,7 +142,7 @@ mod tests {
     #[test]
     fn test_web5_status() {
         let config = Web5Config::default();
-        let manager = Web5Manager::new(&config).unwrap();
+        let manager = Web5Manager::new(config).unwrap();
         
         let status = manager.status().unwrap();
         assert!(status.enabled);

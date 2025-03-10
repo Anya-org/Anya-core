@@ -268,4 +268,223 @@ pub mod taproot {
 
 // Future modules to be implemented
 mod state_channels;
-mod sidechains; 
+mod sidechains;
+
+// Add the Layer2Protocol trait and related types at the beginning of the file
+use async_trait::async_trait;
+use crate::AnyaResult;
+
+/// Core domain interfaces for Layer 2 protocols
+#[async_trait]
+pub trait Layer2Protocol {
+    /// Initialize the Layer 2 protocol
+    async fn initialize(&self) -> AnyaResult<()>;
+    
+    /// Connect to the Layer 2 network
+    async fn connect(&self) -> AnyaResult<()>;
+    
+    /// Disconnect from the Layer 2 network
+    async fn disconnect(&self) -> AnyaResult<()>;
+    
+    /// Submit transaction to the Layer 2 network
+    async fn submit_transaction(&self, tx: &[u8]) -> AnyaResult<String>;
+    
+    /// Get transaction status from the Layer 2 network
+    async fn get_transaction_status(&self, tx_id: &str) -> AnyaResult<TransactionStatus>;
+    
+    /// Get the current state of the protocol
+    async fn get_state(&self) -> AnyaResult<ProtocolState>;
+    
+    /// Synchronize state with the network
+    async fn sync_state(&self) -> AnyaResult<()>;
+    
+    /// Issue a new asset on the Layer 2 network
+    async fn issue_asset(&self, params: AssetParams) -> AnyaResult<String>;
+    
+    /// Transfer an asset on the Layer 2 network
+    async fn transfer_asset(&self, transfer: AssetTransfer) -> AnyaResult<TransferResult>;
+    
+    /// Verify a proof on the Layer 2 network
+    async fn verify_proof(&self, proof: &Proof) -> AnyaResult<VerificationResult>;
+    
+    /// Validate the state of the protocol
+    async fn validate_state(&self, state: &ProtocolState) -> AnyaResult<ValidationResult>;
+}
+
+/// Transaction status for Layer 2 protocols
+#[derive(Debug, Clone, PartialEq)]
+pub enum TransactionStatus {
+    /// Transaction is pending
+    Pending,
+    /// Transaction is confirmed
+    Confirmed,
+    /// Transaction is finalized
+    Finalized,
+    /// Transaction failed
+    Failed(String),
+}
+
+/// Protocol state for Layer 2 protocols
+#[derive(Debug, Clone)]
+pub struct ProtocolState {
+    /// Whether the protocol is initialized
+    pub initialized: bool,
+    /// Whether the protocol is connected
+    pub connected: bool,
+    /// Last synchronized block height
+    pub last_block_height: Option<u64>,
+    /// Last synchronized timestamp
+    pub last_sync_time: Option<u64>,
+    /// Protocol-specific state data
+    pub data: std::collections::HashMap<String, String>,
+}
+
+/// Asset parameters for Layer 2 protocols
+#[derive(Debug, Clone)]
+pub struct AssetParams {
+    /// Asset name
+    pub name: String,
+    /// Asset symbol
+    pub symbol: String,
+    /// Asset supply
+    pub supply: u64,
+    /// Asset precision
+    pub precision: u8,
+    /// Asset metadata
+    pub metadata: std::collections::HashMap<String, String>,
+}
+
+/// Asset transfer for Layer 2 protocols
+#[derive(Debug, Clone)]
+pub struct AssetTransfer {
+    /// Asset ID
+    pub asset_id: String,
+    /// Sender address
+    pub from: String,
+    /// Recipient address
+    pub to: String,
+    /// Amount to transfer
+    pub amount: u64,
+    /// Transfer metadata
+    pub metadata: std::collections::HashMap<String, String>,
+}
+
+/// Transfer result for Layer 2 protocols
+#[derive(Debug, Clone)]
+pub struct TransferResult {
+    /// Transaction ID
+    pub tx_id: String,
+    /// Asset ID
+    pub asset_id: String,
+    /// Transfer status
+    pub status: TransactionStatus,
+    /// Transfer timestamp
+    pub timestamp: u64,
+}
+
+/// Proof for Layer 2 protocols
+#[derive(Debug, Clone)]
+pub struct Proof {
+    /// Proof ID
+    pub id: String,
+    /// Proof type
+    pub proof_type: String,
+    /// Proof data
+    pub data: Vec<u8>,
+    /// Proof metadata
+    pub metadata: std::collections::HashMap<String, String>,
+}
+
+/// Verification result for Layer 2 protocols
+#[derive(Debug, Clone)]
+pub enum VerificationResult {
+    /// Verification succeeded
+    Valid,
+    /// Verification failed
+    Invalid(String),
+    /// Verification is pending
+    Pending,
+}
+
+/// Validation result for Layer 2 protocols
+#[derive(Debug, Clone)]
+pub enum ValidationResult {
+    /// Validation succeeded
+    Valid,
+    /// Validation failed
+    Invalid(String),
+    /// Validation is pending
+    Pending,
+}
+
+// Add Default implementations for the Layer2 types
+
+impl Default for ProtocolState {
+    fn default() -> Self {
+        Self {
+            initialized: false,
+            connected: false,
+            last_block_height: None,
+            last_sync_time: None,
+            data: std::collections::HashMap::new(),
+        }
+    }
+}
+
+impl Default for AssetParams {
+    fn default() -> Self {
+        Self {
+            name: String::new(),
+            symbol: String::new(),
+            supply: 0,
+            precision: 8,
+            metadata: std::collections::HashMap::new(),
+        }
+    }
+}
+
+impl Default for AssetTransfer {
+    fn default() -> Self {
+        Self {
+            asset_id: String::new(),
+            from: String::new(),
+            to: String::new(),
+            amount: 0,
+            metadata: std::collections::HashMap::new(),
+        }
+    }
+}
+
+impl Default for TransferResult {
+    fn default() -> Self {
+        Self {
+            tx_id: String::new(),
+            asset_id: String::new(),
+            status: TransactionStatus::Pending,
+            timestamp: 0,
+        }
+    }
+}
+
+impl Default for Proof {
+    fn default() -> Self {
+        Self {
+            id: String::new(),
+            proof_type: String::new(),
+            data: Vec::new(),
+            metadata: std::collections::HashMap::new(),
+        }
+    }
+}
+
+impl Default for VerificationResult {
+    fn default() -> Self {
+        Self::Valid
+    }
+}
+
+impl Default for ValidationResult {
+    fn default() -> Self {
+        Self::Valid
+    }
+} 

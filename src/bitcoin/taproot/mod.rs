@@ -7,19 +7,19 @@
 
 use bitcoin::{
     secp256k1::{self, Secp256k1, SecretKey, Keypair, XOnlyPublicKey, Parity, Message},
-    taproot::{self, TapLeafHash, TaprootBuilder, LeafVersion, TaprootSpendInfo, ControlBlock, TapSighashType},
+    taproot::{self, TapLeafHash, TaprootBuilder, LeafVersion, TaprootSpendInfo, ControlBlock},
     Address, Network, Script, ScriptBuf, Transaction, TxIn, TxOut, Witness,
-    transaction::{Version, LockTime, Sequence},
+    transaction::{Version},
     Amount, OutPoint,
     hashes::{sha256, Hash},
     key::{PublicKey, PrivateKey},
     sighash::{SighashCache, Prevouts},
     address::NetworkChecked,
     script::{PushBytes, PushBytesBuf},
-    util::sighash::Prevouts,
     script::Builder,
     opcodes,
-    bitcoin_hashes::{sha256, HashEngine},
+    TapSighashType,
+    sighash::P2wpkhError,
 };
 use sha2::{Sha256, Digest};
 use crate::bitcoin::error::{BitcoinError, BitcoinResult};
@@ -30,6 +30,7 @@ use std::convert::TryInto;
 use serde_json;
 use hex;
 use std::io::Write;
+use crate::bitcoin::LockTime;
 
 /// Taproot Asset structure
 /// 
@@ -276,7 +277,7 @@ pub fn sign_taproot_transaction(
         let pubkey = PublicKey::from_slice(&keypair.public_key().serialize())?;
         
         // Create signature hash
-        let mut sighash_cache = SighashCache::new(tx);
+        let mut sighash_cache = SighashCache::new(&mut *tx);
         let sighash = sighash_cache.p2wpkh_signature_hash(
             input_index,
             &txout.script_pubkey,
@@ -306,7 +307,7 @@ pub fn sign_taproot_transaction(
         let keypair = Keypair::from_secret_key(&secp, secret_key);
         
         // Create signature hash
-        let mut sighash_cache = SighashCache::new(tx);
+        let mut sighash_cache = SighashCache::new(&mut *tx);
         let sighash = sighash_cache.taproot_key_spend_signature_hash(
             input_index,
             &Prevouts::All(&[txout]),
@@ -371,37 +372,40 @@ pub fn transfer_asset(transfer: &AssetTransfer) -> BitcoinResult<String> {
 /// Signs all inputs in a transaction.
 pub fn sign_transaction(tx: &mut Transaction, secret_key: &[u8], prevouts: &[TxOut]) -> BitcoinResult<()> {
     let secp = Secp256k1::new();
-    let mut sighash_cache = SighashCache::new(tx);
-    
     let secret_key = SecretKey::from_slice(secret_key)?;
     let keypair = Keypair::from_secret_key(&secp, &secret_key);
-
-    for (input_index, _) in tx.input.iter().enumerate() {
-        // Get the corresponding previous output for this input
-        let txout = match prevouts.get(input_index) {
-            Some(output) => output,
-            None => return Err(BitcoinError::InvalidTransaction("Missing prevout for input".to_string())),
-        };
+    
+    // Collect input indices first
+    let input_indices: Vec<usize> = (0..tx.input.len()).collect();
+    
+    for input_index in input_indices {
+        // Create a fresh sighash cache for each input
+        let mut sighash_cache = SighashCache::new(&mut *tx);
         
-        // Create sighash for Taproot key spend
-        let sighash = sighash_cache.taproot_key_spend_signature_hash(
+        // Create signature hash
+        let sighash = sighash_cache.p2wpkh_signature_hash(
             input_index,
-            &Prevouts::All(&[txout]),
-            TapSighashType::Default,
+            &prevouts[input_index].script_pubkey,
+            prevouts[input_index].value,
+            bitcoin::sighash::EcdsaSighashType::All,
         )?;
-
-        // Sign with Schnorr
-        let msg = Message::from_digest_slice(&sighash[..])?;
-        let sig = secp.sign_schnorr_with_rng(&msg, &keypair, &mut thread_rng());
         
-        // Convert to Taproot signature
-        let tap_sig = taproot::Signature::from_slice(sig.as_ref().as_slice())?;
-
-        // Create witness
-        let witness = Witness::p2tr_key_spend(&tap_sig);
+        // Sign the transaction
+        let signature = secp.sign_ecdsa(&Message::from_digest_slice(&sighash[..])?, &secret_key);
+        
+        // Create the witness
+        let mut signature_bytes = signature.serialize_der().to_vec();
+        signature_bytes.push(0x01); // SIGHASH_ALL
+        
+        let witness = Witness::from(vec![
+            signature_bytes,
+            keypair.public_key().serialize().to_vec(),
+        ]);
+        
+        // Update the witness
         tx.input[input_index].witness = witness;
     }
-
+    
     Ok(())
 }
 
@@ -424,12 +428,14 @@ pub fn create_asset_script(asset: &TaprootAsset) -> ScriptBuf {
         .push_opcode(opcodes::all::OP_RETURN);
 
     // Create PushBytesBuf values
-    let precision_bytes = PushBytesBuf::from_slice(&[asset.precision])
-        .expect("Failed to convert precision to PushBytesBuf");
-    let name_bytes = PushBytesBuf::from_slice(asset.name.as_bytes())
-        .expect("Failed to convert name to PushBytesBuf");
-    let supply_bytes = PushBytesBuf::from_slice(&asset.supply.to_le_bytes())
-        .expect("Failed to convert supply to PushBytesBuf");
+    let mut precision_bytes = PushBytesBuf::new();
+    precision_bytes.extend_from_slice(&[asset.precision]).expect("Failed to extend precision bytes");
+    
+    let mut name_bytes = PushBytesBuf::new();
+    name_bytes.extend_from_slice(asset.name.as_bytes()).expect("Failed to extend name bytes");
+    
+    let mut supply_bytes = PushBytesBuf::new();
+    supply_bytes.extend_from_slice(&asset.supply.to_le_bytes()).expect("Failed to extend supply bytes");
 
     builder = builder
         .push_slice(&precision_bytes)
@@ -444,11 +450,12 @@ pub fn create_transfer_script(transfer: &AssetTransfer) -> ScriptBuf {
         .push_opcode(opcodes::all::OP_RETURN);
 
     // Create PushBytesBuf values
-    let asset_id_push = PushBytesBuf::from_slice(&transfer.asset_id)
-        .expect("Failed to convert asset ID to PushBytesBuf");
+    let mut asset_id_push = PushBytesBuf::new();
+    asset_id_push.extend_from_slice(&transfer.asset_id).expect("Failed to extend asset ID bytes");
+    
     let amount_bytes = transfer.amount.to_le_bytes();
-    let amount_push = PushBytesBuf::from_slice(&amount_bytes)
-        .expect("Failed to convert amount to PushBytesBuf");
+    let mut amount_push = PushBytesBuf::new();
+    amount_push.extend_from_slice(&amount_bytes).expect("Failed to extend amount bytes");
 
     builder = builder
         .push_slice(&asset_id_push)
@@ -510,7 +517,7 @@ impl TaprootAsset {
 
     pub fn sign_transaction(&self, tx: &mut Transaction, input_index: usize, secret_key: &[u8]) -> BitcoinResult<()> {
         let secp = Secp256k1::new();
-        let mut sighash_cache = SighashCache::new(tx);
+        let mut sighash_cache = SighashCache::new(&mut *tx);
         let secret_key = SecretKey::from_slice(secret_key)?;
         let keypair = Keypair::from_secret_key(&secp, &secret_key);
         
