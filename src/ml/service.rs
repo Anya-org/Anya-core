@@ -210,14 +210,15 @@ impl MLService {
 
     /// Train the model with new data
     pub async fn train(&mut self, features: Array2<f64>, labels: Array1<f64>) -> AnyaResult<()> {
-        // In a real implementation, this would properly train the model
-        
         let mut model = self.model.lock().unwrap();
         
-        // Example of how it might work in production
-        match model.fit(&features, &labels) {
-            Ok(_) => Ok(()),
-            Err(e) => Err(AnyaError::ML(format!("Failed to train model: {}", e))),
+        // Call the fit method which returns a bool
+        let fit_success = model.fit(&features, &labels);
+        
+        if fit_success {
+            Ok(())
+        } else {
+            Err(AnyaError::ML("Failed to train model".to_string()))
         }
     }
     

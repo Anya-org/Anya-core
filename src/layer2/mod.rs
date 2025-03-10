@@ -9,29 +9,9 @@
 
 pub mod bob;
 pub mod lightning;
-pub mod taproot_assets;
-pub mod rgb;
-pub mod rsk;
-pub mod dlc;
-pub mod stacks;
-pub mod liquid;
-pub mod state_channels;
-pub mod mock;
 
 // Re-export key types for easier access
 pub use bob::{Layer2Client as BobClient, Layer2Config as BobConfig, Layer2Error as BobError};
-pub use lightning::LightningProtocol;
-pub use taproot_assets::TaprootAssetsProtocol;
-pub use rgb::RgbProtocol;
-pub use rsk::RskProtocol;
-pub use dlc::DlcProtocol;
-pub use stacks::StacksProtocol;
-pub use liquid::LiquidProtocol;
-pub use state_channels::StateChannelsProtocol;
-pub use mock::MockLayer2Protocol;
-
-use async_trait::async_trait;
-use serde::{Serialize, Deserialize};
 
 /// Layer 2 type enumeration
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -78,7 +58,7 @@ pub struct Layer2ManagerConfig {
     /// BOB L2 configuration
     pub bob_config: Option<bob::BobConfig>,
     /// Lightning configuration
-    pub lightning_config: Option<lightning::LightningProtocolConfig>,
+    pub lightning_config: Option<lightning::LightningConfig>,
     /// Enable/disable specific Layer 2 solutions
     pub enabled_solutions: Vec<Layer2Type>,
 }
@@ -142,7 +122,7 @@ pub struct Layer2Manager {
     /// BOB client if enabled
     bob_client: Option<bob::BobClient>,
     /// Lightning client if enabled
-    lightning_client: Option<lightning::LightningProtocol>,
+    lightning_client: Option<lightning::LightningClient>,
 }
 
 impl Layer2Manager {
@@ -157,7 +137,7 @@ impl Layer2Manager {
         let lightning_client = if config.enabled_solutions.contains(&Layer2Type::Lightning) {
             config.lightning_config.clone().map(|_| {
                 // TODO: Replace with actual Lightning client initialization
-                lightning::LightningProtocol::new()
+                lightning::LightningClient::default()
             })
         } else {
             None
@@ -255,85 +235,37 @@ impl Layer2Manager {
     }
 
     /// Get the Lightning client if enabled
-    pub fn lightning_client(&self) -> Option<&lightning::LightningProtocol> {
+    pub fn lightning_client(&self) -> Option<&lightning::LightningClient> {
         self.lightning_client.as_ref()
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub enum TransactionStatus {
-    Pending,
-    Confirmed,
-    Failed,
-    Rejected,
+// Placeholder modules for future implementations
+pub mod rgb {
+    //! RGB Protocol integration module
+    //! To be implemented in Q3 2025
 }
 
-impl Default for TransactionStatus {
-    fn default() -> Self {
-        Self::Pending
-    }
+pub mod rsk {
+    //! RSK Sidechain integration module
+    //! To be implemented in Q3 2025
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Default)]
-pub struct ProtocolState {
-    pub height: u64,
-    pub hash: String,
-    pub timestamp: u64,
+pub mod stacks {
+    //! Stacks Blockchain integration module
+    //! To be implemented in Q3 2025
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct AssetParams {
-    pub name: String,
-    pub symbol: String,
-    pub decimals: u8,
-    pub total_supply: u64,
+pub mod dlc {
+    //! Discreet Log Contracts integration module
+    //! To be implemented in Q3 2025
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct AssetTransfer {
-    pub asset_id: String,
-    pub amount: u64,
-    pub from: String,
-    pub to: String,
+pub mod taproot {
+    //! Taproot Assets integration module
+    //! To be implemented in Q2 2025
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Default)]
-pub struct TransferResult {
-    pub tx_id: String,
-    pub status: TransactionStatus,
-    pub timestamp: u64,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct Proof {
-    pub merkle_root: String,
-    pub merkle_proof: Vec<String>,
-    pub block_header: String,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize, Default)]
-pub struct VerificationResult {
-    pub valid: bool,
-    pub error: Option<String>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize, Default)]
-pub struct ValidationResult {
-    pub valid: bool,
-    pub error: Option<String>,
-}
-
-#[async_trait::async_trait]
-pub trait Layer2Protocol: Send + Sync {
-    async fn initialize(&self) -> crate::AnyaResult<()>;
-    async fn connect(&self) -> crate::AnyaResult<()>;
-    async fn disconnect(&self) -> crate::AnyaResult<()>;
-    async fn submit_transaction(&self, tx: &[u8]) -> crate::AnyaResult<String>;
-    async fn get_transaction_status(&self, tx_id: &str) -> crate::AnyaResult<TransactionStatus>;
-    async fn get_state(&self) -> crate::AnyaResult<ProtocolState>;
-    async fn sync_state(&self) -> crate::AnyaResult<()>;
-    async fn issue_asset(&self, params: AssetParams) -> crate::AnyaResult<String>;
-    async fn transfer_asset(&self, transfer: AssetTransfer) -> crate::AnyaResult<TransferResult>;
-    async fn verify_proof(&self, proof: &Proof) -> crate::AnyaResult<VerificationResult>;
-    async fn validate_state(&self, state: &ProtocolState) -> crate::AnyaResult<ValidationResult>;
-} 
+// Future modules to be implemented
+mod state_channels;
+mod sidechains; 

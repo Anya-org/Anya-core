@@ -5,6 +5,7 @@ use std::sync::{Arc, Mutex};
 use std::str::FromStr;
 use bitcoin::secp256k1::{Secp256k1, SecretKey};
 use bitcoin::{Network, Address, Transaction, TxOut};
+use bitcoin::LockTime;
 use crate::bitcoin::error::{BitcoinError, BitcoinResult};
 use crate::AnyaResult;
 use crate::bitcoin::interface::BitcoinInterface;
@@ -42,7 +43,7 @@ pub trait AddressManager {
     fn get_all_addresses(&self) -> AnyaResult<Vec<Address>>;
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum AddressType {
     Legacy,    // P2PKH
     SegWit,    // P2WPKH
@@ -338,7 +339,7 @@ impl TransactionManager for Wallet {
         // For simplicity, we're returning a dummy transaction
         Ok(Transaction {
             version: bitcoin::transaction::Version(2),
-            lock_time: bitcoin::transaction::LockTime::ZERO,
+            lock_time: LockTime::ZERO,
             input: vec![],
             output: tx_outs,
         })

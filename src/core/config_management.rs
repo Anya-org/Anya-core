@@ -29,7 +29,7 @@ pub enum ConfigSource {
 }
 
 /// Configuration value types
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum ConfigValue {
     /// String value
@@ -66,7 +66,7 @@ pub struct ConfigEntry {
 }
 
 /// Configuration validation rule
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub enum ValidationRule {
     /// Required field
     Required,
@@ -84,6 +84,21 @@ pub enum ValidationRule {
     Enum(Vec<ConfigValue>),
     /// Custom validation function
     Custom(Arc<dyn Fn(&ConfigValue) -> Result<(), ValidationError> + Send + Sync>),
+}
+
+impl std::fmt::Debug for ValidationRule {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            ValidationRule::Required => write!(f, "ValidationRule::Required"),
+            ValidationRule::MinValue(val) => write!(f, "ValidationRule::MinValue({})", val),
+            ValidationRule::MaxValue(val) => write!(f, "ValidationRule::MaxValue({})", val),
+            ValidationRule::MinLength(len) => write!(f, "ValidationRule::MinLength({})", len),
+            ValidationRule::MaxLength(len) => write!(f, "ValidationRule::MaxLength({})", len),
+            ValidationRule::Pattern(pattern) => write!(f, "ValidationRule::Pattern({})", pattern),
+            ValidationRule::Enum(values) => write!(f, "ValidationRule::Enum({:?})", values),
+            ValidationRule::Custom(_) => write!(f, "ValidationRule::Custom(<function>)"),
+        }
+    }
 }
 
 /// Configuration change event
@@ -306,7 +321,8 @@ impl ConfigManager {
         
         // Trim history if it exceeds the maximum size
         if history.len() > self.max_history_size {
-            history.drain(0..history.len() - self.max_history_size);
+            let drain_count = history.len() - self.max_history_size;
+            history.drain(0..drain_count);
         }
     }
     

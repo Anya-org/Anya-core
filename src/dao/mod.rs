@@ -7,6 +7,7 @@ use crate::AnyaResult;
 use crate::AnyaError;
 use std::collections::HashMap;
 use chrono::{DateTime, Utc};
+use serde_json;
 
 pub mod types;
 pub use types::{Proposal, ProposalMetrics, RiskMetrics};
@@ -148,5 +149,55 @@ impl DAOManager {
         proposal.updated_at = Utc::now();
         
         Ok(())
+    }
+
+    /// Get the system status
+    pub fn get_status(&self) -> (bool, u8) {
+        let operational = self.config.enabled;
+        let health = if operational {
+            // Basic health check based on configuration
+            if self.config.contract_address.is_some() {
+                100
+            } else {
+                70 // Configured but no contract address
+            }
+        } else {
+            0
+        };
+        
+        (operational, health)
+    }
+    
+    /// Get system metrics
+    pub fn get_metrics(&self) -> HashMap<String, serde_json::Value> {
+        let mut metrics = HashMap::new();
+        
+        // Add basic metrics
+        metrics.insert("enabled".to_string(), serde_json::json!(self.config.enabled));
+        metrics.insert("proposal_count".to_string(), serde_json::json!(self.proposals.len()));
+        metrics.insert("proposal_threshold".to_string(), serde_json::json!(self.config.proposal_threshold));
+        metrics.insert("voting_period_blocks".to_string(), serde_json::json!(self.config.voting_period_blocks));
+        
+        // Add contract address if available
+        if let Some(address) = &self.config.contract_address {
+            metrics.insert("contract_address".to_string(), serde_json::json!(address));
+        }
+        
+        // Add proposal status counts
+        let active_proposals = self.proposals.values()
+            .filter(|p| p.status == types::ProposalStatus::Active)
+            .count();
+        let passed_proposals = self.proposals.values()
+            .filter(|p| p.status == types::ProposalStatus::Passed)
+            .count();
+        let executed_proposals = self.proposals.values()
+            .filter(|p| p.status == types::ProposalStatus::Executed)
+            .count();
+        
+        metrics.insert("active_proposals".to_string(), serde_json::json!(active_proposals));
+        metrics.insert("passed_proposals".to_string(), serde_json::json!(passed_proposals));
+        metrics.insert("executed_proposals".to_string(), serde_json::json!(executed_proposals));
+        
+        metrics
     }
 } 
