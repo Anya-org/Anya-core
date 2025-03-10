@@ -12,6 +12,8 @@ pub mod vc;   // Verifiable Credentials
 pub use identity::{Web5Error, Web5Result, DIDManager, DID, DIDDocument};
 pub use protocols::{ProtocolHandler, ProtocolManager, ProtocolDefinition};
 
+use std::collections::HashMap;
+
 /// Web5 configuration with focused parameters
 #[derive(Clone, Debug)]
 pub struct Web5Config {
@@ -96,6 +98,18 @@ impl Web5Manager {
             protocol_count,
             dwn_connected: self.config.dwn_url.is_some(),
         })
+    }
+
+    /// Get metrics for the Web5 system
+    pub fn get_metrics(&self) -> HashMap<String, serde_json::Value> {
+        let mut metrics = HashMap::new();
+        
+        // Add basic metrics
+        metrics.insert("did_count".to_string(), serde_json::json!(self.did_manager.dids().len()));
+        metrics.insert("protocol_count".to_string(), serde_json::json!(self.protocol_manager.get_all_protocols().len()));
+        metrics.insert("dwn_connected".to_string(), serde_json::json!(self.config.dwn_url.is_some()));
+        
+        metrics
     }
 }
 

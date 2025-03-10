@@ -82,7 +82,7 @@ impl BitcoinInterface for RustBitcoinImplementation {
     }
 
     async fn broadcast_transaction(&self, transaction: &Transaction) -> BitcoinResult<String> {
-        Ok(transaction.txid().to_string())
+        Ok(transaction.compute_txid().to_string())
     }
 
     async fn get_block_header(&self, _hash: &str) -> BitcoinResult<BlockHeader> {
@@ -102,7 +102,7 @@ impl BitcoinInterface for RustBitcoinImplementation {
     }
 
     async fn send_transaction(&self, tx: &Transaction) -> BitcoinResult<String> {
-        Ok(tx.txid().to_string())
+        Ok(tx.compute_txid().to_string())
     }
 
     fn implementation_type(&self) -> BitcoinImplementationType {

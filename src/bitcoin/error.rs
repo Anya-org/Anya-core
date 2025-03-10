@@ -8,7 +8,6 @@ use bitcoin::{
 };
 use hex::FromHexError;
 use bitcoin::key::FromSliceError;
-use futures_io;
 
 /// Bitcoin operation errors
 #[derive(Error, Debug)]
@@ -34,8 +33,8 @@ pub enum BitcoinError {
     #[error("Invalid script")]
     InvalidScript,
 
-    #[error("Invalid address")]
-    InvalidAddress,
+    #[error("Invalid address: {0}")]
+    InvalidAddress(String),
 
     #[error("Insufficient funds")]
     InsufficientFunds,
@@ -59,7 +58,7 @@ pub enum BitcoinError {
     DLC(String),
 
     #[error("Secp256k1 error: {0}")]
-    Secp256k1Error(#[from] secp256k1::Error),
+    Secp256k1Error(String),
 
     #[error("Other error: {0}")]
     Other(String),
@@ -84,6 +83,18 @@ pub enum BitcoinError {
 
     #[error("IO error: {0}")]
     IOError(String),
+
+    #[error("Invalid transaction: {0}")]
+    InvalidTransaction(String),
+
+    #[error("Invalid signature: {0}")]
+    InvalidSignature(String),
+
+    #[error("Invalid oracle signature")]
+    InvalidOracleSignature,
+
+    #[error("Key error: {0}")]
+    KeyError(String),
 }
 
 impl From<TaprootBuilderError> for BitcoinError {
@@ -100,7 +111,7 @@ impl From<TaprootError> for BitcoinError {
 
 impl From<TaprootBuilder> for BitcoinError {
     fn from(_: TaprootBuilder) -> Self {
-        BitcoinError::TaprootBuilderError
+        BitcoinError::TaprootError("Taproot builder error".to_string())
     }
 }
 
@@ -122,9 +133,9 @@ impl From<FromSliceError> for BitcoinError {
     }
 }
 
-impl From<futures_io::Error> for BitcoinError {
-    fn from(err: futures_io::Error) -> Self {
-        BitcoinError::IOError(err.to_string())
+impl From<secp256k1::Error> for BitcoinError {
+    fn from(error: secp256k1::Error) -> Self {
+        BitcoinError::Secp256k1Error(error.to_string())
     }
 }
 

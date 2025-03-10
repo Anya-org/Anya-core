@@ -55,11 +55,7 @@ graph TB
 ### Core Repository
 1. **Core Components**
    - Base system functionality
-   - Configuration management (AIR-012)
-     - Multi-source configuration
-     - Type-safe validation
-     - Security features
-     - Change tracking
+   - Configuration management
    - Service orchestration
    - Resource management
 
