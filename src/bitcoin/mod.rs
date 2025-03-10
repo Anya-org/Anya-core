@@ -20,7 +20,7 @@ pub mod layer2;
 // Import necessary dependencies
 use bitcoin::{
     Address, Amount, Network, OutPoint, PublicKey, Script, ScriptBuf, Transaction, TxIn, TxOut,
-    Witness, secp256k1::{Secp256k1, SecretKey, Keypair},
+    Witness, secp256k1::{Secp256k1, SecretKey, Keypair, XOnlyPublicKey},
     taproot::{TaprootBuilder, TapTweakHash},
     hashes::{Hash, sha256},
     key::PrivateKey,
@@ -35,6 +35,9 @@ use crate::bitcoin::error::{BitcoinError, BitcoinResult};
 use tracing::{info, warn, error};
 use std::str::FromStr;
 use rand::RngCore;
+use bitcoin::sighash::SighashCache;
+use std::collections::HashMap;
+use serde_json;
 
 // Re-export the Layer2Protocol trait
 pub use layer2::Layer2Protocol;
@@ -124,17 +127,26 @@ impl BitcoinManager {
         // 2. Correct prevout values
         // 3. Appropriate signature verification
         
-        let sighash = tx.sighash_all(
+        // Use SighashCache for sighash calculation (replaces sighash_all)
+        let mut sighash_cache = SighashCache::new(tx);
+        let sighash = sighash_cache.legacy_signature_hash(
             input_index,
             &ScriptBuf::new(), // Placeholder script
-            Amount::from_sat(0) // Placeholder amount
-        );
+            bitcoin::sighash::EcdsaSighashType::All.to_u32(),
+        ).map_err(|_| BitcoinError::InvalidSighash)?;
         
-        let sig = secp.sign_ecdsa(&bitcoin::secp256k1::Message::from_slice(&sighash[..])
-            .map_err(|_| BitcoinError::InvalidSighash)?, 
-            secret_key);
+        // Use Message::from_digest_slice instead of deprecated from_slice
+        let msg = bitcoin::secp256k1::Message::from_digest_slice(&sighash[..])
+            .map_err(|_| BitcoinError::InvalidSighash)?;
+            
+        let sig = secp.sign_ecdsa(&msg, secret_key);
         
-        Ok(Signature::from_der(&sig.serialize_der()).map_err(|_| BitcoinError::SignatureConversionError)?)
+        // Convert the signature to DER format
+        let der_sig = sig.serialize_der();
+        
+        // Convert to Bitcoin's ECDSA signature format
+        Ok(ecdsa::Signature::from_slice(&der_sig)
+            .map_err(|_| BitcoinError::SignatureConversionError)?)
     }
 
     pub fn verify_merkle_proof(&self, _tx_hash: &[u8], _block_header: &[u8]) -> BitcoinResult<bool> {
@@ -176,18 +188,29 @@ impl BitcoinManager {
         Ok(())
     }
     
+    /// Get the system status
     pub fn get_status(&self) -> (bool, u8) {
-        // Return operational status and health percentage
-        (true, 100)
+        // Check if we have a network connection
+        let operational = self.network != Network::Regtest;
+        let health = if operational {
+            // Basic health check - could be expanded with more sophisticated checks
+            if self.master_key.is_some() { 100 } else { 70 }
+        } else {
+            0
+        };
+        
+        (operational, health)
     }
     
-    pub fn get_metrics(&self) -> Vec<(String, f64)> {
-        // Return key metrics
-        vec![
-            ("block_height".to_string(), 0.0),
-            ("transactions".to_string(), 0.0),
-            ("fee_rate".to_string(), 1.0)
-        ]
+    /// Get system metrics
+    pub fn get_metrics(&self) -> HashMap<String, serde_json::Value> {
+        let mut metrics = HashMap::new();
+        
+        // Add basic metrics
+        metrics.insert("network".to_string(), serde_json::json!(self.network.to_string()));
+        metrics.insert("has_master_key".to_string(), serde_json::json!(self.master_key.is_some()));
+        
+        metrics
     }
 }
 
@@ -228,42 +251,48 @@ pub fn create_taproot_transaction(
     inputs: Vec<TxIn>,
     outputs: Vec<TxOut>,
     taproot_script: &Script,
-) -> Result<Transaction, &'static str> {
-    // Create a new secp256k1 context
+    output_value: u64,
+) -> BitcoinResult<Transaction> {
     let secp = Secp256k1::new();
     
-    // Generate internal key
+    // Create a random internal key for Taproot
     let mut rng = rand::thread_rng();
-    let mut secret_key_bytes = [0u8; 32];
-    rng.fill_bytes(&mut secret_key_bytes);
+    let mut random_bytes = [0u8; 32];
+    rng.fill_bytes(&mut random_bytes);
     
-    let secret_key = match SecretKey::from_slice(&secret_key_bytes) {
-        Ok(sk) => sk,
-        Err(_) => return Err("Failed to create secret key"),
-    };
-    
+    let secret_key = SecretKey::from_slice(&random_bytes)
+        .map_err(|_| BitcoinError::InvalidSecretKey)?;
     let keypair = Keypair::from_secret_key(&secp, &secret_key);
     let internal_pubkey = keypair.public_key();
     
-    // Build taproot tree with the provided script
-    let mut builder = TaprootBuilder::new();
-    builder = match builder.add_leaf(0, taproot_script.clone()) {
-        Ok(b) => b,
-        Err(_) => return Err("Failed to add leaf to Taproot tree"),
-    };
+    // Create Taproot tree with the script
+    let taproot_builder = TaprootBuilder::new()
+        .add_leaf(0, taproot_script.clone())
+        .map_err(|e| BitcoinError::TaprootError(e.to_string()))?;
     
-    // Finalize the Taproot output
-    let spend_info = match builder.finalize(&secp, internal_pubkey.x_only_public_key()) {
-        Ok(info) => info,
-        Err(_) => return Err("Failed to finalize Taproot output"),
-    };
+    // Finalize the Taproot spend info
+    let taproot_spend_info = taproot_builder
+        .finalize(&secp, internal_pubkey)
+        .map_err(|e| BitcoinError::TaprootError(e.to_string()))?;
     
-    // Create the transaction
+    // Create transaction
     let tx = Transaction {
         version: Version(2),
         lock_time: LockTime::ZERO,
         input: inputs,
         output: outputs,
+    };
+    
+    // Create the Taproot output
+    let taproot_output = TxOut {
+        value: Amount::from_sat(output_value),
+        script_pubkey: ScriptBuf::new_p2tr(
+            &secp,
+            // Convert PublicKey to XOnlyPublicKey
+            XOnlyPublicKey::from_slice(&internal_pubkey.inner.serialize()[1..33])
+                .map_err(|e| BitcoinError::KeyError(e.to_string()))?,
+            None,
+        ),
     };
     
     Ok(tx)
@@ -460,9 +489,13 @@ pub mod adapters {
                 &PrivateKey::new(child_key.xpriv.private_key, self.network)
             );
             
+            // Convert PublicKey to XOnlyPublicKey
+            let x_only_pubkey = XOnlyPublicKey::from_slice(&public_key.inner.serialize()[1..33])
+                .map_err(|e| "Failed to create XOnlyPublicKey")?;
+            
             let address = Address::p2tr(
                 &secp,
-                public_key.x_only_public_key().0, 
+                x_only_pubkey, 
                 None,
                 self.network
             );
@@ -589,16 +622,15 @@ pub mod adapters {
             
             // Hash the outcome
             let outcome_hash = sha256::Hash::hash(outcome.as_bytes());
+            let message = bitcoin::secp256k1::Message::from_digest_slice(&outcome_hash[..])
+                .map_err(|_| "Invalid message hash")?;
             
             // Sign the outcome hash
-            let message = bitcoin::secp256k1::Message::from_slice(&outcome_hash[..])
-                .map_err(|_| "Failed to create message")?;
-                
             let sig = secp.sign_ecdsa(&message, oracle_key);
             
             // Convert to bitcoin::ecdsa::Signature
             let der_sig = sig.serialize_der();
-            ecdsa::Signature::from_der(&der_sig)
+            ecdsa::Signature::from_slice(&der_sig)
                 .map_err(|_| "Failed to convert signature")
         }
     }

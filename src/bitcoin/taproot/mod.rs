@@ -15,11 +15,13 @@ use bitcoin::{
     key::{PublicKey, PrivateKey},
     sighash::{SighashCache, Prevouts},
     address::NetworkChecked,
-    script::PushBytes,
+    script::{PushBytes, PushBytesBuf},
     util::sighash::Prevouts,
     script::Builder,
     opcodes,
+    bitcoin_hashes::{sha256, HashEngine},
 };
+use sha2::{Sha256, Digest};
 use crate::bitcoin::error::{BitcoinError, BitcoinResult};
 use std::collections::HashMap;
 use std::str::FromStr;
@@ -73,6 +75,20 @@ pub struct AssetTransfer {
     pub transfer_tx: Option<Transaction>,
 }
 
+/// Generate a unique asset ID based on asset properties
+pub fn generate_asset_id(name: &str, supply: u64, precision: u8, metadata: &str) -> [u8; 32] {
+    let mut hasher = Sha256::new();
+    hasher.update(name.as_bytes());
+    hasher.update(&supply.to_be_bytes());
+    hasher.update(&[precision]);
+    hasher.update(metadata.as_bytes());
+    
+    let result = hasher.finalize();
+    let mut output = [0u8; 32];
+    output.copy_from_slice(&result[..]);
+    output
+}
+
 /// Create a new Taproot asset
 /// 
 /// Creates a new Taproot asset with the specified parameters.
@@ -95,13 +111,8 @@ pub fn create_asset(
         return Err(BitcoinError::TaprootError("Precision cannot exceed 18 decimal places".to_string()));
     }
     
-    // Create asset ID by hashing parameters
-    let mut hasher = sha256::Hash::engine();
-    hasher.write_all(name.as_bytes())?;
-    hasher.write_all(&supply.to_be_bytes())?;
-    hasher.write_all(&[precision])?;
-    hasher.write_all(metadata.as_bytes())?;
-    let asset_id = sha256::Hash::from_engine(hasher).to_byte_array();
+    // Generate a unique ID for the asset (hash of parameters)
+    let asset_id = generate_asset_id(name, supply, precision, metadata);
     
     // Create the Taproot asset
     let asset = TaprootAsset {
@@ -288,7 +299,7 @@ pub fn sign_taproot_transaction(
             pubkey.to_bytes(),
         ];
         
-        let witness = Witness::from_vec(witness_elements);
+        let witness = Witness::from(witness_elements);
         tx.input[input_index].witness = witness;
     } else if txout.script_pubkey.is_p2tr() {
         // Handle P2TR signing
@@ -361,10 +372,17 @@ pub fn transfer_asset(transfer: &AssetTransfer) -> BitcoinResult<String> {
 pub fn sign_transaction(tx: &mut Transaction, secret_key: &[u8], prevouts: &[TxOut]) -> BitcoinResult<()> {
     let secp = Secp256k1::new();
     let mut sighash_cache = SighashCache::new(tx);
+    
     let secret_key = SecretKey::from_slice(secret_key)?;
     let keypair = Keypair::from_secret_key(&secp, &secret_key);
 
     for (input_index, _) in tx.input.iter().enumerate() {
+        // Get the corresponding previous output for this input
+        let txout = match prevouts.get(input_index) {
+            Some(output) => output,
+            None => return Err(BitcoinError::InvalidTransaction("Missing prevout for input".to_string())),
+        };
+        
         // Create sighash for Taproot key spend
         let sighash = sighash_cache.taproot_key_spend_signature_hash(
             input_index,
@@ -387,31 +405,31 @@ pub fn sign_transaction(tx: &mut Transaction, secret_key: &[u8], prevouts: &[TxO
     Ok(())
 }
 
-/// Helper function to convert string to Bitcoin address
+/// Convert a string to a Bitcoin address
 pub fn string_to_address(address_str: &str) -> BitcoinResult<Address<NetworkChecked>> {
-    Ok(Address::from_str(address_str)
-        .map_err(|_| BitcoinError::InvalidAddress)?
-        .assume_checked())
+    Address::from_str(address_str)
+        .map(|addr| addr.assume_checked())
+        .map_err(|_| BitcoinError::InvalidAddress(address_str.to_string()))
 }
 
-/// Helper function to convert from_str for Address
+/// Convert a string to a Bitcoin address (alias for string_to_address)
 pub fn from_str(address_str: &str) -> BitcoinResult<Address<NetworkChecked>> {
-    Ok(Address::from_str(address_str)
-        .map_err(|_| BitcoinError::InvalidAddress)?
-        .assume_checked())
+    Address::from_str(address_str)
+        .map(|addr| addr.assume_checked())
+        .map_err(|_| BitcoinError::InvalidAddress(address_str.to_string()))
 }
 
 pub fn create_asset_script(asset: &TaprootAsset) -> ScriptBuf {
     let mut builder = Builder::new()
         .push_opcode(opcodes::all::OP_RETURN);
 
-    // Convert values to PushBytes
+    // Create PushBytesBuf values
     let precision_bytes = PushBytesBuf::from_slice(&[asset.precision])
-        .expect("Failed to convert precision to PushBytes");
+        .expect("Failed to convert precision to PushBytesBuf");
     let name_bytes = PushBytesBuf::from_slice(asset.name.as_bytes())
-        .expect("Failed to convert name to PushBytes");
+        .expect("Failed to convert name to PushBytesBuf");
     let supply_bytes = PushBytesBuf::from_slice(&asset.supply.to_le_bytes())
-        .expect("Failed to convert supply to PushBytes");
+        .expect("Failed to convert supply to PushBytesBuf");
 
     builder = builder
         .push_slice(&precision_bytes)
@@ -425,12 +443,12 @@ pub fn create_transfer_script(transfer: &AssetTransfer) -> ScriptBuf {
     let mut builder = Builder::new()
         .push_opcode(opcodes::all::OP_RETURN);
 
-    // Convert values to PushBytes
+    // Create PushBytesBuf values
     let asset_id_push = PushBytesBuf::from_slice(&transfer.asset_id)
-        .expect("Failed to convert asset ID to PushBytes");
+        .expect("Failed to convert asset ID to PushBytesBuf");
     let amount_bytes = transfer.amount.to_le_bytes();
     let amount_push = PushBytesBuf::from_slice(&amount_bytes)
-        .expect("Failed to convert amount to PushBytes");
+        .expect("Failed to convert amount to PushBytesBuf");
 
     builder = builder
         .push_slice(&asset_id_push)

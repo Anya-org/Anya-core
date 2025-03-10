@@ -163,7 +163,7 @@ impl Config {
         }
         
         if let Ok(dwn_endpoint) = std::env::var("WEB5_DWN_ENDPOINT") {
-            config.web5_config.dwn_endpoints = vec![dwn_endpoint];
+            config.web5_config.dwn_url = Some(dwn_endpoint);
         }
         
         // Feature flags
