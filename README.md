@@ -21,6 +21,8 @@ Web5 decentralized data management, and a Bitcoin-style DAO governance system.
 - [DAO System](docs/DAO_SYSTEM_GUIDE.md) - Comprehensive DAO documentation
 - [Tokenomics System](docs/TOKENOMICS_SYSTEM.md) - Bitcoin-style tokenomics
 - [Implementation Milestones](docs/IMPLEMENTATION_MILESTONES.md) - Project progress
+- [AI Labeling System](AI_LABELLING.md) - Component labeling standards
+- [AI Labeling Implementation](docs/AI_LABELING_IMPLEMENTATION.md) - Implementation status
 
 ## Licensing
 

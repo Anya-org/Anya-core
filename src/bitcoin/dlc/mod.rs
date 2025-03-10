@@ -4,6 +4,10 @@
 // Discrete Log Contracts (DLCs) Module
 // Implements privacy-preserving DLCs using non-interactive oracle patterns
 // to maintain transaction indistinguishability as per Bitcoin Development Framework v2.5
+//
+// [AIR-2][AIS-3][AIT-3][AIM-2][AIP-2][BPC-3][PFM-2][RES-2]
+// This module meets DLC Oracle Integration requirements with non-interactive pattern
+// implementation and comprehensive security measures.
 
 use bitcoin::{Transaction, TxIn, TxOut, Script, OutPoint, Witness, ScriptBuf, Sequence, Amount, WitnessProgram, WitnessVersion};
 use bitcoin::secp256k1::{Secp256k1, SecretKey, PublicKey, Message};

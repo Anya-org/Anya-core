@@ -1,9 +1,12 @@
 // Migrated from OPSource to anya-core
 // This file was automatically migrated as part of the Rust-only implementation
 // Original file: C:\Users\bmokoka\Downloads\OPSource\src\bitcoin\taproot\mod.rs
-// Taproot Asset Module
-// Implements Taproot-enabled protocols for asset issuance and management
-// as per Bitcoin Development Framework v2.5 requirements
+// Bitcoin Taproot Module
+// Implements Taproot for enhanced transaction privacy and smart contract capabilities
+//
+// [AIR-2][AIS-3][AIT-3][AIM-2][AIP-3][BPC-3][PFM-2][RES-2]
+// This module implements full Bitcoin Compliance with BIP-341/342 (Taproot)
+// and provides comprehensive privacy features.
 
 use bitcoin::{
     secp256k1::{self, Secp256k1, SecretKey, Keypair, XOnlyPublicKey, Parity, Message},

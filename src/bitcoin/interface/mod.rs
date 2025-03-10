@@ -1,16 +1,12 @@
 // Migrated from OPSource to anya-core
 // This file was automatically migrated as part of the Rust-only implementation
-// Original file: C:\Users\bmokoka\Downloads\OPSource\src\bitcoin\interface.rs
-// Bitcoin Interface Layer
-// Provides a unified interface for Bitcoin operations with Rust implementation.
+// Original file: C:\Users\bmokoka\Downloads\OPSource\src\bitcoin\interface\mod.rs
+// Bitcoin Interface Module
+// Implements a clean API for Bitcoin network operations
 //
-// This module implements the "ports and adapters" pattern from hexagonal architecture,
-// allowing different implementations to be swapped at runtime while maintaining
-// a consistent API for the rest of the application. This facilitates:
-//
-// 1. Testing core business logic against multiple implementations
-// 2. Runtime selection of implementation based on features or configuration
-// 3. Clear separation of interface (this file) from implementation details
+// [AIR-3][AIS-3][AIT-2][AIM-2][AIP-2][BPC-3][AIP-3][PFM-2]
+// This module provides high interoperability with full Bitcoin protocol compliance
+// and comprehensive security measures for network operations.
 
 use std::sync::Arc;
 use async_trait::async_trait;

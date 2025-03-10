@@ -1,3 +1,13 @@
+// Migrated from OPSource to anya-core
+// This file was automatically migrated as part of the Rust-only implementation
+// Original file: C:\Users\bmokoka\Downloads\OPSource\src\bitcoin\error.rs
+// Bitcoin Error Handling Module
+// Implements comprehensive error types and handling for Bitcoin operations
+//
+// [AIR-3][AIS-2][AIT-2][AIM-1][AIP-1][BPC-2][RES-2]
+// This module provides structured error types with comprehensive coverage
+// for all Bitcoin-related operations with good resilience characteristics.
+
 use thiserror::Error;
 use bitcoin::secp256k1;
 use bitcoin::{

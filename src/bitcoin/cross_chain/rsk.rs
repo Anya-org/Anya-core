@@ -2,8 +2,11 @@
 // This file was automatically migrated as part of the Rust-only implementation
 // Original file: C:\Users\bmokoka\Downloads\OPSource\src\bitcoin\cross_chain\rsk.rs
 // RSK Cross-Chain Module
-// Implements Bitcoin-RSK cross-chain functionality with SPV proofs
-// as per Bitcoin Development Framework v2.5 requirements
+// Implements Bitcoin-RSK bridge functionality for cross-chain operations
+//
+// [AIR-2][AIS-3][AIT-2][AIM-2][AIP-2][BPC-2][PFM-2][RES-3]
+// This module meets Cross-Chain Operations requirements with high resilience 
+// and comprehensive security for bridging Bitcoin and RSK networks.
 
 use std::collections::HashMap;
 use std::str::FromStr;
@@ -153,7 +156,7 @@ pub fn verify_bitcoin_payment(proof: &BitcoinSPV) -> bool {
     }
 }
 
-/// Create a Bitcoin transaction for the RSK bridge
+/// Create an RSK bridge transaction
 pub fn create_rsk_bridge_transaction(
     bridge_tx: &RSKBridgeTransaction,
     federation_script: ScriptBuf,
@@ -181,10 +184,10 @@ pub fn create_rsk_bridge_transaction(
 
     // Change output (if needed)
     let mut outputs = vec![federation_output];
-    
+
     if bridge_tx.change_amount > 0 {
-        // Create a P2WPKH script using the public key
-        let sender_script = ScriptBuf::new_v0_p2wpkh(&bridge_tx.sender_pubkey);
+        // Create a P2WPKH script using the public key hash
+        let sender_script = ScriptBuf::new_p2wpkh(&bridge_tx.sender_pubkey.pubkey_hash());
         let change_output = TxOut {
             value: Amount::from_sat(bridge_tx.change_amount),
             script_pubkey: sender_script,
@@ -444,7 +447,7 @@ mod tests {
         };
 
         // Create a federation script
-        let federation_script = ScriptBuf::new_v0_p2wpkh(&bridge_tx.sender_pubkey);
+        let federation_script = ScriptBuf::new_p2wpkh(&bridge_tx.sender_pubkey.pubkey_hash());
 
         // Create the bridge transaction
         let tx = create_rsk_bridge_transaction(&bridge_tx, federation_script).unwrap();

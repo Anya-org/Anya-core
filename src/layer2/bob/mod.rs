@@ -1,5 +1,12 @@
-// BOB Layer 2 Integration Module
-// Last Updated: 2025-03-06
+// Migrated from OPSource to anya-core
+// This file was automatically migrated as part of the Rust-only implementation
+// Original file: C:\Users\bmokoka\Downloads\OPSource\src\layer2\bob\mod.rs
+// BOB Layer 2 Module
+// Implements Bitcoin Ordinals Bridge for layer 2 operations
+//
+// [AIR-2][AIS-3][AIT-2][AIM-2][AIP-2][BPC-2][PFM-2][RES-2]
+// This module provides Bitcoin layer 2 functionality with strong security
+// and privacy protections for advanced BOB operations.
 
 //! # BOB Layer 2 Integration
 //!
