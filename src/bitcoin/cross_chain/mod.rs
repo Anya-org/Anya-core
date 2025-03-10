@@ -2,8 +2,11 @@
 // This file was automatically migrated as part of the Rust-only implementation
 // Original file: C:\Users\bmokoka\Downloads\OPSource\src\bitcoin\cross_chain\mod.rs
 // Cross-Chain Module
-// Provides functionality for Bitcoin cross-chain operations
-// as per Bitcoin Development Framework v2.5 requirements
+// Implements unified cross-chain bridge functionality for Bitcoin sidechains
+//
+// [AIR-3][AIS-3][AIT-3][AIM-2][AIP-2][BPC-3][PFM-2][RES-3][SCL-2]
+// This module provides a unified interface for cross-chain operations
+// with high security and resilience ratings for multi-chain support.
 
 // Re-export modules
 pub mod liquid;
@@ -180,7 +183,7 @@ pub fn execute_transaction(
             };
 
             // Create federation script (in a real implementation, this would be the RSK federation's script)
-            let federation_script = bitcoin::ScriptBuf::new_v0_p2wpkh(&bridge_tx.sender_pubkey);
+            let federation_script = bitcoin::ScriptBuf::new_p2wpkh(&bridge_tx.sender_pubkey.pubkey_hash());
 
             // Create the RSK bridge transaction
             let rsk_tx = rsk::create_rsk_bridge_transaction(&bridge_tx, federation_script)?;

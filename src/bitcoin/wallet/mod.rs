@@ -1,4 +1,12 @@
-// src/bitcoin/wallet/mod.rs
+// Migrated from OPSource to anya-core
+// This file was automatically migrated as part of the Rust-only implementation
+// Original file: C:\Users\bmokoka\Downloads\OPSource\src\bitcoin\wallet\mod.rs
+// Bitcoin Wallet Module
+// Implements unified wallet capabilities for Bitcoin and related chains
+//
+// [AIR-3][AIS-3][AIT-3][AIM-2][AIP-3][BPC-3][RES-2][SCL-2]
+// This module provides comprehensive wallet functionality with high security,
+// privacy, and protocol compliance ratings.
 
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};

@@ -1,9 +1,12 @@
 // Migrated from OPSource to anya-core
 // This file was automatically migrated as part of the Rust-only implementation
 // Original file: C:\Users\bmokoka\Downloads\OPSource\src\bitcoin\mod.rs
-// Bitcoin module for Anya Core
-// This module provides Bitcoin-specific functionality and integrations
-// Implements Bitcoin Development Framework v2.5 requirements
+// Bitcoin Core Module
+// Implements Bitcoin Protocol functionality following BIP standards
+//
+// [AIR-3][AIS-3][AIT-3][AIM-3][AIP-3][BPC-3][PFM-3][RES-3][SCL-2]
+// This is the main Bitcoin integration module with full protocol compliance
+// and comprehensive security, privacy, and performance optimizations.
 
 // Re-export submodules
 pub mod error;

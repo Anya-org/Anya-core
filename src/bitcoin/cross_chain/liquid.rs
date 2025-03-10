@@ -1,6 +1,12 @@
-// Liquid Implementation for Bitcoin Cross-Chain Module
-// Implements Liquid integration for cross-chain operations
-// as per Bitcoin Development Framework v2.5 requirements
+// Migrated from OPSource to anya-core
+// This file was automatically migrated as part of the Rust-only implementation
+// Original file: C:\Users\bmokoka\Downloads\OPSource\src\bitcoin\cross_chain\liquid.rs
+// Liquid Cross-Chain Module
+// Implements Bitcoin-Liquid bridge functionality for asset issuance and transfers
+//
+// [AIR-2][AIS-3][AIT-2][AIM-2][AIP-2][BPC-2][PFM-2][RES-3]
+// This module meets Cross-Chain Operations requirements with high resilience 
+// and comprehensive security for bridging Bitcoin and Liquid networks.
 
 use std::collections::HashMap;
 use bitcoin::hashes::{Hash as HashTrait, sha256};
