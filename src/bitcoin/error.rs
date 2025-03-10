@@ -3,6 +3,7 @@ use bitcoin::secp256k1;
 use bitcoin::{
     taproot::TaprootBuilderError,
     sighash::TaprootError,
+    sighash::P2wpkhError,
     taproot::TaprootBuilder,
     taproot::SigFromSliceError,
 };
@@ -95,6 +96,12 @@ pub enum BitcoinError {
 
     #[error("Key error: {0}")]
     KeyError(String),
+
+    #[error("P2WPKH error: {0}")]
+    P2wpkhError(String),
+
+    #[error("Invalid contract: {0}")]
+    InvalidContract(String),
 }
 
 impl From<TaprootBuilderError> for BitcoinError {
@@ -136,6 +143,18 @@ impl From<FromSliceError> for BitcoinError {
 impl From<secp256k1::Error> for BitcoinError {
     fn from(error: secp256k1::Error) -> Self {
         BitcoinError::Secp256k1Error(error.to_string())
+    }
+}
+
+impl From<&str> for BitcoinError {
+    fn from(error: &str) -> Self {
+        BitcoinError::Other(error.to_string())
+    }
+}
+
+impl From<P2wpkhError> for BitcoinError {
+    fn from(err: P2wpkhError) -> Self {
+        BitcoinError::P2wpkhError(err.to_string())
     }
 }
 

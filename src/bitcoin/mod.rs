@@ -54,6 +54,7 @@ pub const LIQUID_TESTNET_MAGIC: u32 = 0x0709110B;
 pub const LIQUID_REGTEST_MAGIC: u32 = 0xDAB5BFFA;
 
 /// Bitcoin configuration
+#[derive(Debug, Clone)]
 pub struct BitcoinConfig {
     pub network: Network,
     pub rpc_url: Option<String>,
@@ -263,17 +264,17 @@ pub fn create_taproot_transaction(
     let secret_key = SecretKey::from_slice(&random_bytes)
         .map_err(|_| BitcoinError::InvalidSecretKey)?;
     let keypair = Keypair::from_secret_key(&secp, &secret_key);
-    let internal_pubkey = keypair.public_key();
+    let internal_pubkey = keypair.x_only_public_key().0;
     
     // Create Taproot tree with the script
     let taproot_builder = TaprootBuilder::new()
-        .add_leaf(0, taproot_script.clone())
-        .map_err(|e| BitcoinError::TaprootError(e.to_string()))?;
+        .add_leaf(0, ScriptBuf::from(taproot_script.clone()))
+        .map_err(|e| BitcoinError::TaprootError(format!("{:?}", e)))?;
     
     // Finalize the Taproot spend info
     let taproot_spend_info = taproot_builder
         .finalize(&secp, internal_pubkey)
-        .map_err(|e| BitcoinError::TaprootError(e.to_string()))?;
+        .map_err(|e| BitcoinError::TaprootError(format!("{:?}", e)))?;
     
     // Create transaction
     let tx = Transaction {
@@ -289,7 +290,7 @@ pub fn create_taproot_transaction(
         script_pubkey: ScriptBuf::new_p2tr(
             &secp,
             // Convert PublicKey to XOnlyPublicKey
-            XOnlyPublicKey::from_slice(&internal_pubkey.inner.serialize()[1..33])
+            XOnlyPublicKey::from_slice(&internal_pubkey.serialize()[1..33])
                 .map_err(|e| BitcoinError::KeyError(e.to_string()))?,
             None,
         ),

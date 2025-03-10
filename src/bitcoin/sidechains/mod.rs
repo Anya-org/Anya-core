@@ -11,7 +11,7 @@ pub mod stacks;
 use std::collections::HashMap;
 use bitcoin::Txid;
 
-use crate::common::error::AnyaResult;
+use crate::AnyaResult;
 
 /// Sidechain identifier
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]

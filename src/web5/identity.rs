@@ -27,6 +27,12 @@ pub enum Web5Error {
     
     #[error("Credential error: {0}")]
     Credential(String),
+    
+    #[error("DWN error: {0}")]
+    DWNError(String),
+    
+    #[error("Serialization error: {0}")]
+    SerializationError(String),
 }
 
 /// DID Manager

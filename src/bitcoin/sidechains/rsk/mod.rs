@@ -23,8 +23,8 @@ use std::path::PathBuf;
 use bitcoin::Txid;
 use serde::{Serialize, Deserialize};
 
-use crate::common::error::AnyaResult;
-use crate::bitcoin::wallet::TxOptions;
+use crate::AnyaResult;
+use crate::bitcoin::wallet::transactions::TxOptions;
 
 /// RSK transaction data
 #[derive(Debug, Clone, Serialize, Deserialize)]

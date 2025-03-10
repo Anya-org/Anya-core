@@ -7,6 +7,7 @@ use crate::dao::types::{Proposal, ProposalMetrics, RiskMetrics};
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use chrono::Utc;
+use std::marker::PhantomData;
 
 // Define our own types for now to avoid external dependencies
 pub struct Array1<T> {
@@ -36,22 +37,66 @@ impl<T: Clone> Array2<T> {
 pub struct Device {}
 
 impl Device {
+    pub fn Cuda(device_id: i64) -> Self {
+        // In a real implementation, this would initialize CUDA
+        Self {}
+    }
+    
     pub fn Cpu() -> Self {
         Self {}
     }
     
-    pub fn Cuda(_: usize) -> Self {
-        Self {}
+    pub fn is_cuda(&self) -> bool {
+        // This is a placeholder implementation
+        false
     }
 }
 
 pub struct RandomForestClassifier<T> {
-    phantom: std::marker::PhantomData<T>,
+    features: Vec<String>,
+    classes: Vec<String>,
+    trained: bool,
+    model_data: Vec<u8>,
+    _marker: PhantomData<T>,
+}
+
+impl<T> Default for RandomForestClassifier<T> {
+    fn default() -> Self {
+        Self {
+            features: Vec::new(),
+            classes: Vec::new(),
+            trained: false,
+            model_data: Vec::new(),
+            _marker: PhantomData,
+        }
+    }
 }
 
 impl<T> RandomForestClassifier<T> {
     pub fn new() -> Self {
-        Self { phantom: std::marker::PhantomData }
+        Self {
+            features: Vec::new(),
+            classes: Vec::new(),
+            trained: false,
+            model_data: Vec::new(),
+            _marker: PhantomData,
+        }
+    }
+    
+    pub fn with_n_trees(mut self, _n_trees: usize) -> Self {
+        // In a real implementation, this would configure the number of trees
+        // For now, it's just a placeholder
+        self
+    }
+    
+    pub fn with_max_depth(mut self, _max_depth: usize) -> Self {
+        // Placeholder for future implementation
+        self
+    }
+    
+    pub fn with_min_samples_leaf(mut self, _min_samples_leaf: usize) -> Self {
+        // Placeholder for future implementation
+        self
     }
     
     pub fn fit(&mut self, _: &Array2<T>, _: &Array1<T>) -> bool {
@@ -78,7 +123,7 @@ impl MLService {
         let device = if tch::Cuda::is_available() {
             Device::Cuda(0)
         } else {
-            Device::Cpu
+            Device::Cpu()
         };
         
         Self {

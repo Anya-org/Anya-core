@@ -66,4 +66,13 @@ mod tests {
         assert_eq!(network_config.get("ddos_protection"), Some(&"enabled".to_string()));
         assert_eq!(db_config.get("data_encryption"), Some(&"aes-256".to_string()));
     }
-} 
+}
+
+// Security module
+// Implements security features for Bitcoin operations
+// as per Bitcoin Development Framework v2.5 requirements
+
+pub mod validation;
+
+// Re-export key types
+pub use validation::ValidationResult; 
