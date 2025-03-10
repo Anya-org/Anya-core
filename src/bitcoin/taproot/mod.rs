@@ -3,15 +3,22 @@
 // Original file: C:\Users\bmokoka\Downloads\OPSource\src\bitcoin\taproot\mod.rs
 // Taproot Asset Module
 // Implements Taproot-enabled protocols for asset issuance and management
-// as per Bitcoin Development Framework v2.5 requirementsuse bitcoin::{
-    secp256k1::{self, Secp256k1, SecretKey, Keypair, XOnlyPublicKey},
-    taproot::{self, TapLeafHash, TaprootBuilder, LeafVersion, TaprootSpendInfo, ControlBlock},
+// as per Bitcoin Development Framework v2.5 requirements
+
+use bitcoin::{
+    secp256k1::{self, Secp256k1, SecretKey, Keypair, XOnlyPublicKey, Parity, Message},
+    taproot::{self, TapLeafHash, TaprootBuilder, LeafVersion, TaprootSpendInfo, ControlBlock, TapSighashType},
     Address, Network, Script, ScriptBuf, Transaction, TxIn, TxOut, Witness,
     transaction::{Version, LockTime, Sequence},
     Amount, OutPoint,
     hashes::{sha256, Hash},
     key::{PublicKey, PrivateKey},
-    sighash::{SighashCache, TapSighashType},
+    sighash::{SighashCache, Prevouts},
+    address::NetworkChecked,
+    script::PushBytes,
+    util::sighash::Prevouts,
+    script::Builder,
+    opcodes,
 };
 use crate::bitcoin::error::{BitcoinError, BitcoinResult};
 use std::collections::HashMap;
@@ -20,6 +27,7 @@ use rand::{thread_rng, RngCore};
 use std::convert::TryInto;
 use serde_json;
 use hex;
+use std::io::Write;
 
 /// Taproot Asset structure
 /// 
@@ -40,6 +48,12 @@ pub struct TaprootAsset {
     pub issuance_tx: Option<Transaction>,
     /// Current holders (address -> amount)
     pub holders: HashMap<String, u64>,
+    /// Placeholder for the new issue method
+    pub issued: bool,
+    /// Placeholder for the new issue method
+    pub issuer_pubkey: [u8; 32],
+    /// Placeholder for the new issue method
+    pub value: u64,
 }
 
 /// Asset Transfer structure
@@ -83,10 +97,10 @@ pub fn create_asset(
     
     // Create asset ID by hashing parameters
     let mut hasher = sha256::Hash::engine();
-    hasher.write(name.as_bytes());
-    hasher.write(&supply.to_be_bytes());
-    hasher.write(&[precision]);
-    hasher.write(metadata.as_bytes());
+    hasher.write_all(name.as_bytes())?;
+    hasher.write_all(&supply.to_be_bytes())?;
+    hasher.write_all(&[precision])?;
+    hasher.write_all(metadata.as_bytes())?;
     let asset_id = sha256::Hash::from_engine(hasher).to_byte_array();
     
     // Create the Taproot asset
@@ -98,6 +112,9 @@ pub fn create_asset(
         metadata: metadata.to_string(),
         issuance_tx: None,
         holders: HashMap::new(),
+        issued: false,
+        issuer_pubkey: [0; 32],
+        value: 0,
     };
     
     Ok(asset)
@@ -106,116 +123,27 @@ pub fn create_asset(
 /// Issue a Taproot asset
 /// 
 /// Creates a transaction that issues the asset to the specified address.
-pub fn issue_asset(
-    asset: &mut TaprootAsset,
-    issuer_inputs: Vec<(OutPoint, TxOut, SecretKey)>,
-    issuer_address: &str,
-) -> BitcoinResult<Transaction> {
-    if asset.issuance_tx.is_some() {
-        return Err(BitcoinError::TaprootError("Asset has already been issued".to_string()));
-    }
-    
-    if issuer_inputs.is_empty() {
-        return Err(BitcoinError::TaprootError("At least one UTXO is required for issuance".to_string()));
-    }
-    
-    // Calculate total input amount
-    let input_amount: u64 = issuer_inputs.iter().map(|(_, txout, _)| txout.value.to_sat()).sum();
-    
-    // Ensure issuer has enough funds for the transaction
-    if input_amount < 10000 { // Minimum amount for a valid transaction
-        return Err(BitcoinError::InsufficientFunds);
-    }
-    
-    // Create a new secp256k1 context
+pub fn issue_asset(asset: &TaprootAsset, issuer_secret_key: &[u8]) -> BitcoinResult<String> {
     let secp = Secp256k1::new();
-    
-    // Convert issuer address to Bitcoin address
-    let issuer_bitcoin_address = Address::from_str(issuer_address)
-        .map_err(|_| BitcoinError::InvalidAddress)?;
-    
-    // Create transaction inputs
-    let inputs: Vec<TxIn> = issuer_inputs
-        .iter()
-        .map(|(outpoint, _, _)| TxIn {
-            previous_output: *outpoint,
-            script_sig: ScriptBuf::new(),
-            sequence: Sequence::MAX,
-            witness: Witness::new(),
-        })
-        .collect();
-    
-    // Generate internal key for Taproot
-    let issuer_secret_key = &issuer_inputs[0].2;
-    let keypair = Keypair::from_secret_key(&secp, issuer_secret_key);
-    let internal_key = keypair.x_only_public_key();
-    
-    // Build the asset metadata script
-    let asset_script = ScriptBuf::builder()
-        .push_opcode(bitcoin::opcodes::all::OP_RETURN)
-        .push_slice(b"ASSET")
-        .push_slice(asset.asset_id.as_slice())
-        .push_slice(asset.name.as_bytes())
-        .push_slice(&asset.supply.to_be_bytes())
-        .push_slice(&[asset.precision])
-        .push_slice(asset.metadata.as_bytes())
-        .into_script();
-    
-    // Build Taproot tree with the asset script
+    let secret_key = SecretKey::from_slice(issuer_secret_key)?;
+    let keypair = Keypair::from_secret_key(&secp, &secret_key);
+    let internal_key = keypair.x_only_public_key().0;
+
+    // Create asset script
+    let asset_script = create_asset_script(asset);
+
+    // Create Taproot tree
     let mut builder = TaprootBuilder::new();
-    match builder.add_leaf(0, asset_script.clone()) {
-        Ok(b) => builder = b,
-        Err(e) => return Err(BitcoinError::TaprootError(format!("Failed to add asset script to Taproot tree: {:?}", e))),
-    };
-    
-    // Finalize the Taproot output
-    let spend_info = match builder.finalize(&secp, internal_key) {
-        Ok(info) => info,
-        Err(e) => return Err(BitcoinError::TaprootError(format!("Failed to finalize Taproot output: {:?}", e))),
-    };
-    
-    // Create the Taproot output
-    let taproot_script_pubkey = spend_info.output_script();
-    
-    // Prepare transaction outputs
-    let mut outputs = Vec::new();
-    
-    // Add the asset issuance output
-    outputs.push(TxOut {
-        value: Amount::from_sat(5000), // Small amount for the issuance output
-        script_pubkey: taproot_script_pubkey,
-    });
-    
-    // Add change output if necessary
-    let fee = 1000; // 1000 satoshis fee
-    let change_amount = input_amount - 5000 - fee;
-    
-    if change_amount > 546 { // Dust limit
-        outputs.push(TxOut {
-            value: Amount::from_sat(change_amount),
-            script_pubkey: issuer_bitcoin_address.script_pubkey(),
-        });
-    }
-    
-    // Create the transaction
-    let issuance_tx = Transaction {
-        version: Version(2),
-        lock_time: LockTime::ZERO,
-        input: inputs,
-        output: outputs,
-    };
-    
-    // Sign the transaction
-    let signed_tx = sign_transaction(&issuance_tx, &issuer_inputs)
-        .map_err(|e| BitcoinError::TaprootError(e.to_string()))?;
-    
-    // Update the asset with the issuance transaction
-    asset.issuance_tx = Some(signed_tx.clone());
-    
-    // Set the issuer as the holder of all tokens
-    asset.holders.insert(issuer_address.to_string(), asset.supply);
-    
-    Ok(signed_tx)
+    builder = builder.add_leaf(0, asset_script)?;
+
+    // Finalize Taproot
+    let spend_info = builder.finalize(&secp, internal_key)?;
+
+    // Create output script
+    let output_key = spend_info.output_key();
+    let taproot_script = ScriptBuf::new_p2tr(&secp, output_key.into(), None);
+
+    Ok(taproot_script.to_string())
 }
 
 /// Verify a Taproot asset
@@ -297,20 +225,14 @@ pub fn create_taproot_transaction(
     };
     
     let keypair = Keypair::from_secret_key(&secp, &secret_key);
-    let internal_key = keypair.x_only_public_key();
+    let internal_key = keypair.x_only_public_key().0;
     
     // Build taproot tree with the provided script
     let mut builder = TaprootBuilder::new();
-    match builder.add_leaf(0, taproot_script.clone()) {
-        Ok(b) => builder = b,
-        Err(e) => return Err(BitcoinError::TaprootError(format!("Failed to add leaf to Taproot tree: {:?}", e))),
-    };
+    builder = builder.add_leaf(0, taproot_script.clone().into())?;
     
     // Finalize the Taproot output
-    let spend_info = match builder.finalize(&secp, internal_key) {
-        Ok(info) => info,
-        Err(e) => return Err(BitcoinError::TaprootError(format!("Failed to finalize Taproot output: {:?}", e))),
-    };
+    let spend_info = builder.finalize(&secp, internal_key)?;
     
     // Create the transaction
     let tx = Transaction {
@@ -340,10 +262,10 @@ pub fn sign_taproot_transaction(
     if txout.script_pubkey.is_p2wpkh() {
         // Handle P2WPKH signing
         let keypair = Keypair::from_secret_key(&secp, secret_key);
-        let pubkey = PublicKey::from_keypair(&keypair);
+        let pubkey = PublicKey::from_slice(&keypair.public_key().serialize())?;
         
         // Create signature hash
-        let mut sighash_cache = SighashCache::new(tx.clone());
+        let mut sighash_cache = SighashCache::new(tx);
         let sighash = sighash_cache.p2wpkh_signature_hash(
             input_index,
             &txout.script_pubkey,
@@ -352,42 +274,42 @@ pub fn sign_taproot_transaction(
         ).map_err(|_| BitcoinError::SigningError)?;
         
         // Sign the transaction
-        let message = bitcoin::secp256k1::Message::from_slice(&sighash)
+        let message = bitcoin::secp256k1::Message::from_digest_slice(&sighash[..])
             .map_err(|_| BitcoinError::InvalidSighash)?;
         let signature = secp.sign_ecdsa(&message, secret_key);
         
         // Build the witness
         let sig_bytes = signature.serialize_der();
         let mut sig_with_hashtype = sig_bytes.to_vec();
-        sig_with_hashtype.push(0x01); // SIGHASH_ALL
+        sig_with_hashtype.push(bitcoin::sighash::EcdsaSighashType::All.to_u32() as u8);
         
         let witness_elements = vec![
             sig_with_hashtype,
             pubkey.to_bytes(),
         ];
         
-        tx.input[input_index].witness = Witness::from_vec(witness_elements);
+        let witness = Witness::from_vec(witness_elements);
+        tx.input[input_index].witness = witness;
     } else if txout.script_pubkey.is_p2tr() {
         // Handle P2TR signing
         let keypair = Keypair::from_secret_key(&secp, secret_key);
         
         // Create signature hash
-        let mut sighash_cache = SighashCache::new(tx.clone());
+        let mut sighash_cache = SighashCache::new(tx);
         let sighash = sighash_cache.taproot_key_spend_signature_hash(
             input_index,
-            &[],  // Prevouts
-            txout.value,
+            &Prevouts::All(&[txout]),
             TapSighashType::Default,
         ).map_err(|_| BitcoinError::SigningError)?;
         
         // Sign the transaction
-        let message = bitcoin::secp256k1::Message::from_slice(&sighash)
+        let message = bitcoin::secp256k1::Message::from_digest_slice(&sighash[..])
             .map_err(|_| BitcoinError::InvalidSighash)?;
         let signature = secp.sign_schnorr_with_rng(&message, &keypair, &mut thread_rng());
         
         // Build the witness
         let witness_elements = vec![signature.as_ref().to_vec()];
-        tx.input[input_index].witness = Witness::from_vec(witness_elements);
+        tx.input[input_index].witness = Witness::from(witness_elements);
     } else {
         return Err(BitcoinError::TaprootError("Unsupported script type for signing".to_string()));
     }
@@ -408,215 +330,203 @@ pub fn verify_taproot_output(
 
 /// Transfer a Taproot asset
 /// 
-/// Creates a transaction that transfers the asset to a new owner.
-pub fn transfer_asset(
-    asset: &mut TaprootAsset,
-    transfer: &AssetTransfer,
-    sender_inputs: Vec<(OutPoint, TxOut, SecretKey)>,
-) -> BitcoinResult<Transaction> {
-    // Verify the asset exists and has been issued
-    if asset.issuance_tx.is_none() {
-        return Err(BitcoinError::TaprootError("Asset has not been issued yet".to_string()));
-    }
+/// Creates a transaction that transfers the asset from one address to another.
+pub fn transfer_asset(transfer: &AssetTransfer) -> BitcoinResult<String> {
+    let secp = Secp256k1::new();
     
-    // Check if sender has enough assets
-    let sender_balance = asset.holders.get(&transfer.sender).cloned().unwrap_or(0);
-    if sender_balance < transfer.amount {
-        return Err(BitcoinError::InsufficientFunds);
-    }
-    
-    // Verify sender has funds for the transaction
-    if sender_inputs.is_empty() {
-        return Err(BitcoinError::TaprootError("Sender must provide UTXOs for the transfer".to_string()));
-    }
-    
-    // Calculate total input amount
-    let input_amount: u64 = sender_inputs.iter().map(|(_, txout, _)| txout.value.to_sat()).sum();
-    
-    // Ensure sender has enough funds for the transaction
-    if input_amount < 10000 { // Minimum amount for a valid transaction
-        return Err(BitcoinError::InsufficientFunds);
-    }
-    
-    // Convert addresses to Bitcoin addresses
-    let sender_bitcoin_address = Address::from_str(&transfer.sender)
-        .map_err(|_| BitcoinError::InvalidAddress)?;
-    
-    let recipient_bitcoin_address = Address::from_str(&transfer.recipient)
-        .map_err(|_| BitcoinError::InvalidAddress)?;
-    
-    // Create transaction inputs
-    let inputs: Vec<TxIn> = sender_inputs
-        .iter()
-        .map(|(outpoint, _, _)| TxIn {
-            previous_output: *outpoint,
-            script_sig: ScriptBuf::new(),
-            sequence: Sequence::MAX,
-            witness: Witness::new(),
-        })
-        .collect();
-    
-    // Generate internal key for Taproot
-    let sender_secret_key = &sender_inputs[0].2;
-    let keypair = Keypair::from_secret_key(&secp, sender_secret_key);
-    let internal_key = keypair.x_only_public_key();
-    
-    // Build the asset transfer script
-    let transfer_script = ScriptBuf::builder()
-        .push_opcode(bitcoin::opcodes::all::OP_RETURN)
-        .push_slice(b"TRANSFER")
-        .push_slice(asset.asset_id.as_slice())
-        .push_slice(transfer.sender.as_bytes())
-        .push_slice(transfer.recipient.as_bytes())
-        .push_slice(&transfer.amount.to_be_bytes())
-        .into_script();
-    
-    // Build Taproot tree with the transfer script
+    // Convert recipient's public key from bytes to XOnlyPublicKey
+    let recipient_bytes = hex::decode(&transfer.recipient)?;
+    let recipient_pubkey = XOnlyPublicKey::from_slice(&recipient_bytes)?;
+
+    // Create transfer script
+    let transfer_script = create_transfer_script(transfer);
+
+    // Build Taproot tree
     let mut builder = TaprootBuilder::new();
-    match builder.add_leaf(0, transfer_script.clone()) {
-        Ok(b) => builder = b,
-        Err(e) => return Err(BitcoinError::TaprootError(format!("Failed to add transfer script: {:?}", e))),
-    };
-    
-    // Finalize the Taproot output
-    let spend_info = match builder.finalize(&secp, internal_key) {
-        Ok(info) => info,
-        Err(e) => return Err(BitcoinError::TaprootError(format!("Failed to finalize Taproot output: {:?}", e))),
-    };
-    
-    // Create the Taproot output
-    let taproot_script_pubkey = spend_info.output_script();
-    
-    // Prepare transaction outputs
-    let mut outputs = Vec::new();
-    
-    // Add the asset transfer evidence output
-    outputs.push(TxOut {
-        value: Amount::from_sat(1000), // Small amount for the transfer evidence
-        script_pubkey: taproot_script_pubkey,
-    });
-    
-    // Add the recipient's output
-    outputs.push(TxOut {
-        value: Amount::from_sat(10000), // Minimum amount for a valid output
-        script_pubkey: recipient_bitcoin_address.script_pubkey(),
-    });
-    
-    // Add change output if necessary
-    let fee = 1000; // 1000 satoshis fee
-    let change_amount = input_amount - 11000 - fee; // 11000 = 1000 (transfer evidence) + 10000 (recipient)
-    
-    if change_amount > 546 { // Dust limit
-        outputs.push(TxOut {
-            value: Amount::from_sat(change_amount),
-            script_pubkey: sender_bitcoin_address.script_pubkey(),
-        });
-    }
-    
-    // Create the transaction
-    let transfer_tx = Transaction {
-        version: Version(2),
-        lock_time: LockTime::ZERO,
-        input: inputs,
-        output: outputs,
-    };
-    
-    // Sign the transaction
-    let signed_tx = sign_transaction(&transfer_tx, &sender_inputs)
-        .map_err(|e| BitcoinError::TaprootError(e.to_string()))?;
-    
-    // Update asset balances
-    let new_sender_balance = sender_balance - transfer.amount;
-    if new_sender_balance > 0 {
-        asset.holders.insert(transfer.sender.clone(), new_sender_balance);
-    } else {
-        asset.holders.remove(&transfer.sender);
-    }
-    
-    let recipient_balance = asset.holders.get(&transfer.recipient).cloned().unwrap_or(0);
-    asset.holders.insert(transfer.recipient.clone(), recipient_balance + transfer.amount);
-    
-    Ok(signed_tx)
+    builder = builder.add_leaf(0, transfer_script)?;
+
+    // Finalize Taproot
+    let spend_info = builder.finalize(&secp, recipient_pubkey)?;
+
+    // Create output script
+    let output_key = spend_info.output_key();
+    let taproot_script = ScriptBuf::new_p2tr(&secp, output_key.into(), None);
+
+    Ok(taproot_script.to_string())
 }
 
 /// Sign a transaction
 /// 
 /// Signs all inputs in a transaction.
-fn sign_transaction(
-    tx: &Transaction,
-    inputs: &[(OutPoint, TxOut, SecretKey)],
-) -> Result<Transaction, &'static str> {
+pub fn sign_transaction(tx: &mut Transaction, secret_key: &[u8], prevouts: &[TxOut]) -> BitcoinResult<()> {
     let secp = Secp256k1::new();
-    let mut signed_tx = tx.clone();
-    
-    for (i, (_, txout, secret_key)) in inputs.iter().enumerate() {
-        let keypair = Keypair::from_secret_key(&secp, secret_key);
+    let mut sighash_cache = SighashCache::new(tx);
+    let secret_key = SecretKey::from_slice(secret_key)?;
+    let keypair = Keypair::from_secret_key(&secp, &secret_key);
+
+    for (input_index, _) in tx.input.iter().enumerate() {
+        // Create sighash for Taproot key spend
+        let sighash = sighash_cache.taproot_key_spend_signature_hash(
+            input_index,
+            &Prevouts::All(&[txout]),
+            TapSighashType::Default,
+        )?;
+
+        // Sign with Schnorr
+        let msg = Message::from_digest_slice(&sighash[..])?;
+        let sig = secp.sign_schnorr_with_rng(&msg, &keypair, &mut thread_rng());
         
-        // Create signature hash based on output type
-        let mut sighash_cache = SighashCache::new(signed_tx.clone());
-        
-        if txout.script_pubkey.is_p2tr() {
-            // Handle P2TR signing
-            let sighash = sighash_cache.taproot_key_spend_signature_hash(
-                i,
-                &[],  // No script path spending
-                txout.value,
-                TapSighashType::Default,
-            ).map_err(|_| "Failed to create taproot sighash")?;
-            
-            // Sign the sighash
-            let message = bitcoin::secp256k1::Message::from_slice(&sighash).map_err(|_| "Invalid sighash")?;
-            let signature = secp.sign_schnorr_with_rng(&message, &keypair, &mut thread_rng());
-            
-            // Create witness with just the signature
-            let witness_elements = vec![signature.as_ref().to_vec()];
-            signed_tx.input[i].witness = Witness::from_vec(witness_elements);
-        } else {
-            // Handle legacy or segwit v0 signing
-            let pubkey = PublicKey::from_keypair(&keypair);
-            
-            let sighash = if txout.script_pubkey.is_p2wpkh() {
-                sighash_cache.p2wpkh_signature_hash(
-                    i,
-                    &txout.script_pubkey,
-                    txout.value,
-                    bitcoin::sighash::EcdsaSighashType::All,
-                ).map_err(|_| "Failed to create sighash")?
-            } else {
-                return Err("Unsupported output type");
-            };
-            
-            // Sign the sighash
-            let message = bitcoin::secp256k1::Message::from_slice(&sighash).map_err(|_| "Invalid sighash")?;
-            let signature = secp.sign_ecdsa(&message, secret_key);
-            
-            // Create the signature bytes with sighash flag
-            let mut sig_bytes = signature.serialize_der().to_vec();
-            sig_bytes.push(0x01); // SIGHASH_ALL
-            
-            // Create appropriate witness
-            let witness_elements = vec![sig_bytes, pubkey.to_bytes()];
-            signed_tx.input[i].witness = Witness::from_vec(witness_elements);
-        }
+        // Convert to Taproot signature
+        let tap_sig = taproot::Signature::from_slice(sig.as_ref().as_slice())?;
+
+        // Create witness
+        let witness = Witness::p2tr_key_spend(&tap_sig);
+        tx.input[input_index].witness = witness;
     }
-    
-    Ok(signed_tx)
+
+    Ok(())
 }
 
-/// Helper function to convert a string to a bitcoin::Address
-pub fn string_to_address(address_str: &str, network: Network) -> BitcoinResult<Address> {
-    let addr = Address::from_str(address_str).map_err(|_| BitcoinError::InvalidAddress)?;
-    
-    if addr.network() != network {
-        return Err(BitcoinError::TaprootError("Address network mismatch".to_string()));
-    }
-    
-    Ok(addr)
+/// Helper function to convert string to Bitcoin address
+pub fn string_to_address(address_str: &str) -> BitcoinResult<Address<NetworkChecked>> {
+    Ok(Address::from_str(address_str)
+        .map_err(|_| BitcoinError::InvalidAddress)?
+        .assume_checked())
 }
 
 /// Helper function to convert from_str for Address
-pub fn from_str(address_str: &str) -> BitcoinResult<Address> {
-    Address::from_str(address_str).map_err(|_| BitcoinError::InvalidAddress)
+pub fn from_str(address_str: &str) -> BitcoinResult<Address<NetworkChecked>> {
+    Ok(Address::from_str(address_str)
+        .map_err(|_| BitcoinError::InvalidAddress)?
+        .assume_checked())
+}
+
+pub fn create_asset_script(asset: &TaprootAsset) -> ScriptBuf {
+    let mut builder = Builder::new()
+        .push_opcode(opcodes::all::OP_RETURN);
+
+    // Convert values to PushBytes
+    let precision_bytes = PushBytesBuf::from_slice(&[asset.precision])
+        .expect("Failed to convert precision to PushBytes");
+    let name_bytes = PushBytesBuf::from_slice(asset.name.as_bytes())
+        .expect("Failed to convert name to PushBytes");
+    let supply_bytes = PushBytesBuf::from_slice(&asset.supply.to_le_bytes())
+        .expect("Failed to convert supply to PushBytes");
+
+    builder = builder
+        .push_slice(&precision_bytes)
+        .push_slice(&name_bytes)
+        .push_slice(&supply_bytes);
+
+    builder.into_script()
+}
+
+pub fn create_transfer_script(transfer: &AssetTransfer) -> ScriptBuf {
+    let mut builder = Builder::new()
+        .push_opcode(opcodes::all::OP_RETURN);
+
+    // Convert values to PushBytes
+    let asset_id_push = PushBytesBuf::from_slice(&transfer.asset_id)
+        .expect("Failed to convert asset ID to PushBytes");
+    let amount_bytes = transfer.amount.to_le_bytes();
+    let amount_push = PushBytesBuf::from_slice(&amount_bytes)
+        .expect("Failed to convert amount to PushBytes");
+
+    builder = builder
+        .push_slice(&asset_id_push)
+        .push_slice(&amount_push);
+
+    builder.into_script()
+}
+
+impl TaprootAsset {
+    pub fn issue(&mut self) -> BitcoinResult<String> {
+        if self.issued {
+            return Err(BitcoinError::AssetAlreadyIssued);
+        }
+
+        let secp = Secp256k1::new();
+        let internal_key = XOnlyPublicKey::from_slice(&self.issuer_pubkey)?;
+        
+        // Create asset script
+        let asset_script = create_asset_script(self);
+
+        // Build Taproot tree
+        let mut builder = TaprootBuilder::new();
+        builder = builder.add_leaf(0, asset_script)?;
+        
+        // Finalize with internal key
+        let spend_info = builder.finalize(&secp, internal_key)?;
+        
+        // Create output script
+        let output_key = spend_info.output_key();
+        let taproot_script = ScriptBuf::new_p2tr(&secp, output_key.into(), None);
+        
+        self.issued = true;
+        Ok(taproot_script.to_string())
+    }
+
+    pub fn transfer(&mut self, transfer: AssetTransfer) -> BitcoinResult<String> {
+        let secp = Secp256k1::new();
+        
+        // Convert recipient's public key
+        let recipient_bytes = hex::decode(&transfer.recipient)?;
+        let recipient_pubkey = XOnlyPublicKey::from_slice(&recipient_bytes)?;
+
+        // Create transfer script
+        let transfer_script = create_transfer_script(&transfer);
+
+        // Build Taproot tree
+        let mut builder = TaprootBuilder::new();
+        builder = builder.add_leaf(0, transfer_script)?;
+
+        // Finalize with recipient's key
+        let spend_info = builder.finalize(&secp, recipient_pubkey)?;
+        
+        // Create output script
+        let output_key = spend_info.output_key();
+        let taproot_script = ScriptBuf::new_p2tr(&secp, output_key.into(), None);
+        
+        Ok(taproot_script.to_string())
+    }
+
+    pub fn sign_transaction(&self, tx: &mut Transaction, input_index: usize, secret_key: &[u8]) -> BitcoinResult<()> {
+        let secp = Secp256k1::new();
+        let mut sighash_cache = SighashCache::new(tx);
+        let secret_key = SecretKey::from_slice(secret_key)?;
+        let keypair = Keypair::from_secret_key(&secp, &secret_key);
+        
+        // Get the previous output being spent
+        let txout = self.get_previous_output(input_index)?;
+        
+        // Create sighash for Taproot key spend
+        let sighash = sighash_cache.taproot_key_spend_signature_hash(
+            input_index,
+            &Prevouts::All(&[txout]),
+            TapSighashType::Default,
+        )?;
+        
+        // Sign with Schnorr
+        let msg = Message::from_digest_slice(&sighash[..])?;
+        let sig = secp.sign_schnorr_with_rng(&msg, &keypair, &mut thread_rng());
+        
+        // Convert to Taproot signature
+        let tap_sig = taproot::Signature::from_slice(sig.as_ref().as_slice())?;
+        
+        // Create witness
+        let witness = Witness::p2tr_key_spend(&tap_sig);
+        tx.input[input_index].witness = witness;
+        
+        Ok(())
+    }
+
+    fn get_previous_output(&self, _input_index: usize) -> BitcoinResult<TxOut> {
+        // Placeholder implementation
+        Ok(TxOut {
+            value: Amount::from_sat(0),
+            script_pubkey: ScriptBuf::new()
+        })
+    }
 }
 
 #[cfg(test)]

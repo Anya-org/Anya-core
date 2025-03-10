@@ -317,8 +317,7 @@ pub fn create_adaptor_signatures(
         
         // Hash the outcome to create a point for the adaptor
         let outcome_hash = sha256::Hash::hash(outcome.as_bytes());
-        let outcome_message = Message::from_slice(&outcome_hash[..])
-            .map_err(|_| "Failed to create message from outcome hash")?;
+        let outcome_message = Message::from_digest_slice(&outcome_hash[..])?;
         
         // In a real implementation, this would use proper adaptor signature cryptography
         // For this example, we're using a simplified approach
@@ -350,8 +349,7 @@ pub fn sign_outcome_as_oracle(
     
     // Hash the outcome
     let outcome_hash = sha256::Hash::hash(outcome.as_bytes());
-    let message = Message::from_slice(&outcome_hash[..])
-        .map_err(|_| "Failed to create message from outcome hash")?;
+    let message = Message::from_digest_slice(&outcome_hash[..])?;
     
     // Sign the outcome
     let signature = secp.sign_ecdsa(&message, secret_key);
@@ -378,8 +376,7 @@ pub fn execute_dlc(
     
     // Verify the oracle signature
     let outcome_hash = sha256::Hash::hash(outcome.as_bytes());
-    let message = Message::from_slice(&outcome_hash[..])
-        .map_err(|_| "Failed to create message from outcome hash")?;
+    let message = Message::from_digest_slice(&outcome_hash[..])?;
     
     if !secp.verify_ecdsa(&message, oracle_signature, &contract.oracle_pubkey).is_ok() {
         return Err("Invalid oracle signature");
@@ -414,8 +411,7 @@ pub fn execute_dlc(
         bitcoin::sighash::EcdsaSighashType::All,
     );
     
-    let sighash_message = Message::from_slice(&sighash[..])
-        .map_err(|_| "Failed to create message from sighash")?;
+    let sighash_message = Message::from_digest_slice(&sighash[..])?;
     
     let party_a_signature = secp.sign_ecdsa(&sighash_message, party_a_secret_key);
     let party_b_signature = secp.sign_ecdsa(&sighash_message, party_b_secret_key);
