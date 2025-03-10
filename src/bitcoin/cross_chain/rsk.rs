@@ -7,6 +7,7 @@
 
 use std::collections::HashMap;
 use crate::bitcoin::interface::BlockHeader;
+use bitcoin::hash::Hash;
 
 // For now, we'll reuse types from the liquid module
 use crate::bitcoin::cross_chain::liquid::{
@@ -95,7 +96,7 @@ pub fn verify_bitcoin_payment(proof: &BitcoinSPV) -> bool {
     let merkle_root = proof.block_header.merkle_root;
     
     // Verify the merkle proof
-    let mut matched_hashes: Vec<sha256d::Hash> = Vec::new();
+    let mut matched_hashes: Vec<Hash> = Vec::new();
     let mut indices: Vec<u32> = Vec::new();
     
     if !proof.merkle_proof.extract_matches(&mut matched_hashes, &mut indices) {
@@ -103,7 +104,7 @@ pub fn verify_bitcoin_payment(proof: &BitcoinSPV) -> bool {
     }
     
     // Check if the transaction hash is in the matched hashes
-    let tx_hash = match sha256d::Hash::from_slice(&proof.tx_hash) {
+    let tx_hash = match Hash::from_slice(&proof.tx_hash) {
         Ok(hash) => hash,
         Err(_) => return false,
     };

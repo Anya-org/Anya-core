@@ -1,330 +1,521 @@
-# Hexagonal Architecture Design
+# Hexagonal Architecture Implementation
 
 ## Overview
 
-Our hexagonal architecture implementation follows the ports and adapters pattern to achieve clean separation of concerns and maintainable code. This document details the specific implementation and design decisions.
+Anya Core implements a comprehensive hexagonal architecture pattern, emphasizing clean separation of concerns, domain-driven design, and modularity. This document details the implementation of the hexagonal architecture across the system, with a focus on Bitcoin Layer 2 integrations.
 
-## Core Principles
+## Core Architecture
 
-### 1. Domain-Centric Design
-- Business logic isolated in the domain layer
-- No dependencies on external frameworks
-- Pure business rules and logic
-- Domain-driven design patterns
+### Domain Layer
 
-### 2. Ports and Adapters
-- Clear separation between business logic and technical details
-- Dependency inversion through interfaces
-- Pluggable implementations
-- Easy testing and mocking
-
-### 3. Dependency Flow
-```mermaid
-graph TD
-    A[External World] --> B[Input Adapters]
-    B --> C[Input Ports]
-    C --> D[Domain Core]
-    D --> E[Output Ports]
-    E --> F[Output Adapters]
-    F --> G[External Services]
-```
-
-## Implementation Details
-
-### 1. Domain Layer
+The domain layer contains the core business logic and rules, independent of external concerns:
 
 ```rust
-// Core domain entities
+// Core domain models
 pub struct Transaction {
     id: TransactionId,
-    amount: Amount,
-    status: TransactionStatus,
-    metadata: TransactionMetadata,
+    inputs: Vec<Input>,
+    outputs: Vec<Output>,
+    witnesses: Vec<Witness>,
+    metadata: TransactionMetadata
 }
 
 // Domain services
 pub trait TransactionService {
-    async fn process(&self, tx: Transaction) -> DomainResult<ProcessedTransaction>;
-    async fn validate(&self, tx: &Transaction) -> DomainResult<ValidationResult>;
-}
-
-// Domain events
-pub trait DomainEvent {
-    fn event_type(&self) -> &str;
-    fn occurred_at(&self) -> DateTime<Utc>;
-    fn aggregate_id(&self) -> &str;
+    async fn validate(&self, tx: &Transaction) -> Result<ValidationResult>;
+    async fn process(&self, tx: &Transaction) -> Result<ProcessingResult>;
+    async fn verify(&self, tx: &Transaction) -> Result<VerificationResult>;
 }
 ```
 
-### 2. Application Layer (Ports)
+### Application Layer (Ports)
 
-#### Input Ports
+The application layer defines the interfaces (ports) that the domain layer uses to interact with external systems:
+
 ```rust
-// Command handlers
-#[async_trait]
-pub trait TransactionHandler {
-    async fn handle_create(&self, cmd: CreateTransactionCommand) -> ApplicationResult<TransactionId>;
-    async fn handle_process(&self, cmd: ProcessTransactionCommand) -> ApplicationResult<()>;
+// Input ports (primary/driving)
+pub trait TransactionPort {
+    async fn submit_transaction(&self, tx: Transaction) -> Result<TransactionId>;
+    async fn get_transaction(&self, id: TransactionId) -> Result<Transaction>;
+    async fn validate_transaction(&self, tx: &Transaction) -> Result<ValidationResult>;
 }
 
-// Query handlers
-#[async_trait]
-pub trait TransactionQuery {
-    async fn get_by_id(&self, id: &TransactionId) -> ApplicationResult<Option<Transaction>>;
-    async fn get_by_status(&self, status: TransactionStatus) -> ApplicationResult<Vec<Transaction>>;
+// Output ports (secondary/driven)
+pub trait BlockchainPort {
+    async fn broadcast_transaction(&self, tx: &Transaction) -> Result<BroadcastResult>;
+    async fn get_block(&self, hash: BlockHash) -> Result<Block>;
+    async fn verify_proof(&self, proof: &Proof) -> Result<VerificationResult>;
 }
 ```
 
-#### Output Ports
+### Infrastructure Layer (Adapters)
+
+The infrastructure layer implements the ports defined in the application layer:
+
 ```rust
-// Repository interfaces
-#[async_trait]
-pub trait TransactionRepository {
-    async fn save(&self, tx: &Transaction) -> RepositoryResult<()>;
-    async fn find_by_id(&self, id: &TransactionId) -> RepositoryResult<Option<Transaction>>;
-    async fn update_status(&self, id: &TransactionId, status: TransactionStatus) -> RepositoryResult<()>;
+// Bitcoin adapter implementation
+pub struct BitcoinAdapter {
+    rpc_client: BitcoinRpcClient,
+    network: Network,
+    config: BitcoinConfig
 }
 
-// External service interfaces
-#[async_trait]
-pub trait BlockchainService {
-    async fn submit_transaction(&self, tx: &Transaction) -> ServiceResult<BlockchainTxId>;
-    async fn get_confirmation_status(&self, tx_id: &BlockchainTxId) -> ServiceResult<ConfirmationStatus>;
+impl BlockchainPort for BitcoinAdapter {
+    async fn broadcast_transaction(&self, tx: &Transaction) -> Result<BroadcastResult> {
+        // Implementation
+    }
+    
+    async fn get_block(&self, hash: BlockHash) -> Result<Block> {
+        // Implementation
+    }
+    
+    async fn verify_proof(&self, proof: &Proof) -> Result<VerificationResult> {
+        // Implementation
+    }
 }
 ```
 
-### 3. Infrastructure Layer (Adapters)
+## Layer 2 Protocol Integration
 
-#### Input Adapters
+### Protocol Adapters
+
+Each Layer 2 protocol has its own adapter implementation:
+
 ```rust
-// REST API adapter
-pub struct TransactionController {
-    tx_handler: Arc<dyn TransactionHandler>,
-    tx_query: Arc<dyn TransactionQuery>,
+// Protocol adapter trait
+pub trait ProtocolAdapter {
+    async fn submit_transaction(&self, tx: ProtocolTransaction) -> Result<TransactionId>;
+    async fn verify_state(&self, state: &ProtocolState) -> Result<VerificationResult>;
+    async fn sync_state(&self) -> Result<SyncResult>;
 }
 
-impl TransactionController {
-    async fn create_transaction(&self, req: HttpRequest) -> HttpResponse {
-        let cmd = CreateTransactionCommand::from(req);
-        match self.tx_handler.handle_create(cmd).await {
-            Ok(id) => HttpResponse::Created().json(id),
-            Err(e) => e.into_response(),
+// BOB Protocol adapter
+pub struct BobAdapter {
+    rpc_client: BobRpcClient,
+    state_manager: BobStateManager,
+    verification: BobVerification
+}
+
+// RGB Protocol adapter
+pub struct RgbAdapter {
+    taproot_client: TaprootClient,
+    asset_manager: RgbAssetManager,
+    state_tracker: RgbStateTracker
+}
+
+// RSK Protocol adapter
+pub struct RskAdapter {
+    sidechain_client: RskClient,
+    bridge_manager: RskBridgeManager,
+    verification: RskVerification
+}
+```
+
+### Protocol Ports
+
+Protocol-specific ports define the interfaces for each Layer 2 protocol:
+
+```rust
+// Protocol ports
+pub trait ProtocolPort {
+    async fn submit_protocol_tx(&self, tx: ProtocolTransaction) -> Result<TransactionId>;
+    async fn verify_protocol_state(&self, state: &ProtocolState) -> Result<VerificationResult>;
+    async fn sync_protocol_state(&self) -> Result<SyncResult>;
+}
+
+// Asset management ports
+pub trait AssetPort {
+    async fn issue_asset(&self, params: AssetParams) -> Result<AssetId>;
+    async fn transfer_asset(&self, transfer: AssetTransfer) -> Result<TransferResult>;
+    async fn get_asset_state(&self, asset_id: AssetId) -> Result<AssetState>;
+}
+```
+
+## Dependency Injection
+
+The system uses dependency injection to wire up the hexagonal architecture:
+
+```rust
+// Dependency container
+pub struct Container {
+    bitcoin_adapter: Arc<BitcoinAdapter>,
+    bob_adapter: Arc<BobAdapter>,
+    rgb_adapter: Arc<RgbAdapter>,
+    rsk_adapter: Arc<RskAdapter>
+}
+
+impl Container {
+    pub fn new(config: Config) -> Self {
+        // Initialize adapters
+        let bitcoin_adapter = Arc::new(BitcoinAdapter::new(config.bitcoin.clone()));
+        let bob_adapter = Arc::new(BobAdapter::new(config.bob.clone()));
+        let rgb_adapter = Arc::new(RgbAdapter::new(config.rgb.clone()));
+        let rsk_adapter = Arc::new(RskAdapter::new(config.rsk.clone()));
+        
+        Self {
+            bitcoin_adapter,
+            bob_adapter,
+            rgb_adapter,
+            rsk_adapter
         }
     }
 }
+```
 
-// Message queue adapter
-pub struct TransactionMessageConsumer {
-    tx_handler: Arc<dyn TransactionHandler>,
-}
+## Testing Strategy
 
-impl TransactionMessageConsumer {
-    async fn handle_message(&self, msg: Message) -> Result<(), ConsumerError> {
-        let cmd = ProcessTransactionCommand::from(msg);
-        self.tx_handler.handle_process(cmd).await.map_err(Into::into)
+The hexagonal architecture enables comprehensive testing at each layer:
+
+```rust
+#[cfg(test)]
+mod tests {
+    use super::*;
+    
+    // Domain layer tests
+    #[tokio::test]
+    async fn test_transaction_validation() {
+        // Test implementation
+    }
+    
+    // Port tests
+    #[tokio::test]
+    async fn test_protocol_port() {
+        // Test implementation
+    }
+    
+    // Adapter tests
+    #[tokio::test]
+    async fn test_bitcoin_adapter() {
+        // Test implementation
     }
 }
 ```
 
-#### Output Adapters
+## Monitoring and Metrics
+
+The system includes comprehensive monitoring and metrics collection:
+
 ```rust
-// Database adapter
-pub struct PostgresTransactionRepository {
-    pool: PgPool,
-    metrics: MetricsCollector,
-    circuit_breaker: CircuitBreaker,
+// Metrics collection
+pub struct MetricsCollector {
+    prometheus_client: PrometheusClient,
+    metrics: Arc<RwLock<Metrics>>,
 }
 
-#[async_trait]
-impl TransactionRepository for PostgresTransactionRepository {
-    async fn save(&self, tx: &Transaction) -> RepositoryResult<()> {
-        let _guard = self.circuit_breaker.guard();
-        let result = self.pool.execute(/* SQL query */).await;
-        self.metrics.record_operation("save_transaction", &result);
-        result.map_err(Into::into)
+impl MetricsCollector {
+    pub fn record_transaction(&self, tx: &Transaction) {
+        // Record transaction metrics
     }
-}
-
-// Blockchain service adapter
-pub struct BitcoinServiceAdapter {
-    rpc_client: BitcoinRpcClient,
-    metrics: MetricsCollector,
-}
-
-#[async_trait]
-impl BlockchainService for BitcoinServiceAdapter {
-    async fn submit_transaction(&self, tx: &Transaction) -> ServiceResult<BlockchainTxId> {
-        let btc_tx = self.convert_to_bitcoin_tx(tx);
-        self.rpc_client.send_raw_transaction(btc_tx).await.map_err(Into::into)
+    
+    pub fn record_protocol_state(&self, protocol: &str, state: &ProtocolState) {
+        // Record protocol state metrics
     }
 }
 ```
 
 ## Error Handling
 
-### 1. Layer-Specific Errors
-```rust
-// Domain errors
-#[derive(Error, Debug)]
-pub enum DomainError {
-    #[error("Invalid transaction: {0}")]
-    InvalidTransaction(String),
-    #[error("Business rule violation: {0}")]
-    BusinessRuleViolation(String),
-}
+Error handling is implemented consistently across all layers:
 
-// Application errors
-#[derive(Error, Debug)]
-pub enum ApplicationError {
-    #[error("Command validation failed: {0}")]
-    ValidationError(String),
+```rust
+// Error types
+#[derive(Debug, Error)]
+pub enum HexagonalError {
     #[error("Domain error: {0}")]
-    DomainError(#[from] DomainError),
+    Domain(String),
+    
+    #[error("Protocol error: {0}")]
+    Protocol(String),
+    
+    #[error("Infrastructure error: {0}")]
+    Infrastructure(String),
 }
 
-// Infrastructure errors
-#[derive(Error, Debug)]
-pub enum InfrastructureError {
-    #[error("Database error: {0}")]
-    DatabaseError(#[from] sqlx::Error),
-    #[error("External service error: {0}")]
-    ServiceError(String),
-}
-```
-
-### 2. Error Context
-```rust
+// Error context
 pub struct ErrorContext {
-    error: Box<dyn Error>,
-    layer: ArchitectureLayer,
+    error: HexagonalError,
     severity: ErrorSeverity,
     trace_id: Option<String>,
-    retry_info: Option<RetryInfo>,
+    retry_count: u32,
+    metrics: ErrorMetrics
 }
 ```
 
-## Metrics and Monitoring
+## Security Considerations
 
-### 1. Layer-Specific Metrics
+The hexagonal architecture ensures security at each layer:
+
+1. Domain Layer
+   - Business rule validation
+   - State transition verification
+   - Access control enforcement
+
+2. Application Layer
+   - Input validation
+   - Output sanitization
+   - Rate limiting
+
+3. Infrastructure Layer
+   - Secure communication
+   - Authentication
+   - Authorization
+
+## Performance Optimization
+
+Performance optimizations are implemented at each layer:
+
+1. Domain Layer
+   - Efficient data structures
+   - Caching strategies
+   - Batch processing
+
+2. Application Layer
+   - Connection pooling
+   - Request batching
+   - Response caching
+
+3. Infrastructure Layer
+   - Load balancing
+   - Circuit breaking
+   - Retry strategies
+
+## Future Extensions
+
+The hexagonal architecture supports easy extension for new protocols and features:
+
+1. New Protocol Integration
+   - Implement ProtocolPort
+   - Create ProtocolAdapter
+   - Add to dependency container
+
+2. New Feature Addition
+   - Define domain models
+   - Create ports
+   - Implement adapters
+
+3. System Evolution
+   - Version ports
+   - Migrate adapters
+   - Update dependencies
+
+## Bitcoin Layer 2 Integration
+
+### Protocol Compliance
+
+The hexagonal architecture ensures compliance with Bitcoin standards and protocols:
+
 ```rust
-// Domain metrics
-pub struct DomainMetrics {
-    business_rule_violations: Counter,
-    validation_failures: Counter,
-    successful_operations: Counter,
+// BIP compliance validation
+pub trait BipCompliance {
+    async fn validate_bip341(&self, tx: &Transaction) -> Result<ValidationResult>;
+    async fn validate_bip342(&self, tx: &Transaction) -> Result<ValidationResult>;
+    async fn validate_bip174(&self, psbt: &PartiallySignedTransaction) -> Result<ValidationResult>;
 }
 
-// Infrastructure metrics
-pub struct InfrastructureMetrics {
-    database_operations: Histogram,
-    external_service_calls: Histogram,
-    cache_hit_rate: Gauge,
+// Miniscript support
+pub trait MiniscriptSupport {
+    async fn compile_script(&self, policy: &Policy) -> Result<Script>;
+    async fn analyze_script(&self, script: &Script) -> Result<ScriptAnalysis>;
 }
 ```
 
-### 2. Cross-Cutting Metrics
+### Layer 2 Protocol Integration
+
+Each Layer 2 protocol is integrated through dedicated adapters:
+
 ```rust
-pub struct CrossCuttingMetrics {
-    request_duration: Histogram,
-    error_count: Counter,
-    active_transactions: Gauge,
+// BOB Protocol
+impl ProtocolAdapter for BobAdapter {
+    async fn submit_transaction(&self, tx: ProtocolTransaction) -> Result<TransactionId> {
+        // Validate against BIP standards
+        self.validate_bip341(&tx).await?;
+        self.validate_bip342(&tx).await?;
+        
+        // Process transaction
+        let result = self.process_transaction(tx).await?;
+        
+        // Record metrics
+        self.metrics.record_transaction(&result);
+        
+        Ok(result.id)
+    }
 }
-```
 
-## Testing Strategy
+// RGB Protocol
+impl ProtocolAdapter for RgbAdapter {
+    async fn submit_transaction(&self, tx: ProtocolTransaction) -> Result<TransactionId> {
+        // Validate Taproot requirements
+        self.validate_taproot(&tx).await?;
+        
+        // Process asset transaction
+        let result = self.process_asset_tx(tx).await?;
+        
+        // Update asset state
+        self.update_asset_state(&result).await?;
+        
+        Ok(result.id)
+    }
+}
 
-### 1. Domain Layer Tests
-```rust
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn test_transaction_validation() {
-        let tx = Transaction::new(/* test data */);
-        let service = TransactionService::new();
-        let result = service.validate(&tx);
-        assert!(result.is_ok());
+// RSK Protocol
+impl ProtocolAdapter for RskAdapter {
+    async fn submit_transaction(&self, tx: ProtocolTransaction) -> Result<TransactionId> {
+        // Verify Bitcoin-backed state
+        self.verify_bitcoin_backing(&tx).await?;
+        
+        // Process sidechain transaction
+        let result = self.process_sidechain_tx(tx).await?;
+        
+        // Update bridge state
+        self.update_bridge_state(&result).await?;
+        
+        Ok(result.id)
     }
 }
 ```
 
-### 2. Port Tests
+### Cross-Layer State Management
+
+The system maintains consistent state across layers:
+
 ```rust
-#[cfg(test)]
-mod tests {
-    #[tokio::test]
-    async fn test_transaction_handler() {
-        let handler = MockTransactionHandler::new();
-        let cmd = CreateTransactionCommand::new(/* test data */);
-        let result = handler.handle_create(cmd).await;
-        assert!(result.is_ok());
+// Cross-layer state manager
+pub struct CrossLayerStateManager {
+    bitcoin_state: Arc<BitcoinState>,
+    l2_states: Arc<RwLock<HashMap<ProtocolId, ProtocolState>>>,
+    bridge_states: Arc<RwLock<HashMap<BridgeId, BridgeState>>>
+}
+
+impl CrossLayerStateManager {
+    pub async fn sync_states(&self) -> Result<SyncResult> {
+        // Sync Bitcoin state
+        let bitcoin_state = self.sync_bitcoin_state().await?;
+        
+        // Sync Layer 2 states
+        for (protocol_id, state) in self.l2_states.read().await.iter() {
+            self.sync_protocol_state(protocol_id, state).await?;
+        }
+        
+        // Sync bridge states
+        for (bridge_id, state) in self.bridge_states.read().await.iter() {
+            self.sync_bridge_state(bridge_id, state).await?;
+        }
+        
+        Ok(SyncResult::Success)
     }
 }
 ```
 
-### 3. Adapter Tests
-```rust
-#[cfg(test)]
-mod tests {
-    #[tokio::test]
-    async fn test_postgres_repository() {
-        let repo = PostgresTransactionRepository::new(/* test pool */);
-        let tx = Transaction::new(/* test data */);
-        let result = repo.save(&tx).await;
-        assert!(result.is_ok());
-    }
-}
-```
+## Compliance Requirements
 
-## Configuration
+### BIP Standards
 
-### 1. Dependency Injection
-```rust
-pub struct ApplicationContext {
-    tx_handler: Arc<dyn TransactionHandler>,
-    tx_repository: Arc<dyn TransactionRepository>,
-    blockchain_service: Arc<dyn BlockchainService>,
-}
+The system implements comprehensive BIP compliance:
 
-impl ApplicationContext {
-    pub fn new(config: Config) -> Self {
-        // Initialize and wire dependencies
-    }
-}
-```
+1. BIP 341/342 (Taproot)
+   - Taproot key path spending
+   - Taproot script path spending
+   - Taproot key aggregation
+   - Taproot script verification
 
-### 2. Feature Flags
-```toml
-[features]
-default = ["postgres", "bitcoin"]
-postgres = ["sqlx/postgres"]
-bitcoin = ["bitcoin-rpc"]
-mock = ["mockall"]
-```
+2. BIP 174 (PSBT)
+   - PSBT creation and modification
+   - PSBT validation
+   - PSBT signing
+   - PSBT finalization
 
-## Best Practices
+3. Miniscript
+   - Policy compilation
+   - Script analysis
+   - Witness generation
+   - Script verification
 
-1. **Domain Layer**
-   - Keep it pure and framework-independent
-   - Use value objects for validation
-   - Implement rich domain models
-   - Use domain events for side effects
+### Security Requirements
 
-2. **Ports Layer**
-   - Define clear interfaces
-   - Use async traits
-   - Keep ports focused and single-purpose
-   - Document expected behavior
+Security is enforced at each layer:
 
-3. **Adapters Layer**
-   - Implement proper error mapping
-   - Include metrics and monitoring
-   - Use circuit breakers for external services
-   - Implement proper resource cleanup
+1. Transaction Security
+   - Input validation
+   - Output verification
+   - Witness validation
+   - Script verification
 
-4. **Testing**
-   - Use mocks for ports in unit tests
-   - Test adapters against test containers
-   - Include performance tests
-   - Test error conditions
+2. State Security
+   - State transition validation
+   - State consistency checks
+   - State recovery mechanisms
+   - State backup procedures
+
+3. Protocol Security
+   - Protocol-specific validation
+   - Cross-layer verification
+   - Bridge security
+   - Fraud proof handling
+
+### Performance Requirements
+
+Performance is optimized across layers:
+
+1. Transaction Processing
+   - Batch processing
+   - Parallel validation
+   - Caching strategies
+   - Rate limiting
+
+2. State Management
+   - Efficient state storage
+   - State synchronization
+   - State recovery
+   - State pruning
+
+3. Protocol Operations
+   - Protocol-specific optimizations
+   - Cross-layer batching
+   - Resource management
+   - Load balancing
+
+## Monitoring and Alerts
+
+The system includes comprehensive monitoring:
+
+1. Protocol Metrics
+   - Transaction throughput
+   - State synchronization time
+   - Validation latency
+   - Error rates
+
+2. Security Metrics
+   - Validation failures
+   - Security incidents
+   - Fraud attempts
+   - State inconsistencies
+
+3. Performance Metrics
+   - Resource utilization
+   - Operation latency
+   - Queue depths
+   - Cache hit rates
+
+## Future Extensions
+
+The architecture supports future protocol additions:
+
+1. New Protocol Integration
+   - Implement ProtocolAdapter
+   - Add protocol-specific ports
+   - Update dependency container
+   - Add monitoring
+
+2. Protocol Evolution
+   - Version protocol adapters
+   - Update validation rules
+   - Enhance security measures
+   - Optimize performance
+
+3. System Enhancement
+   - Add new features
+   - Improve monitoring
+   - Enhance security
+   - Optimize performance
 
 *Last updated: 2024-12-07*

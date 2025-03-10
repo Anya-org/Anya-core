@@ -4,13 +4,12 @@ use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use std::str::FromStr;
 use bitcoin::secp256k1::{Secp256k1, SecretKey};
-use bitcoin::{Network, Address, Script, Transaction, TxOut};
-use crate::bitcoin::error::BitcoinError;
+use bitcoin::{Network, Address, Transaction, TxOut};
+use crate::bitcoin::error::{BitcoinError, BitcoinResult};
 use crate::AnyaResult;
-use crate::bitcoin::BitcoinCore;
+use crate::bitcoin::interface::BitcoinInterface;
 
 pub mod bip32;
-pub mod descriptors;
 pub mod transactions;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -112,11 +111,11 @@ pub struct Wallet {
     addresses: Mutex<HashMap<AddressType, Vec<Address>>>,
     assets: Mutex<HashMap<String, Asset>>,
     transactions: Mutex<Vec<Transaction>>,
-    bitcoin_client: Option<Arc<dyn BitcoinCore>>,
+    bitcoin_client: Option<Arc<dyn BitcoinInterface>>,
 }
 
 impl Wallet {
-    pub fn new(config: WalletConfig, bitcoin_client: Option<Arc<dyn BitcoinCore>>) -> Self {
+    pub fn new(config: WalletConfig, bitcoin_client: Option<Arc<dyn BitcoinInterface>>) -> Self {
         Self {
             config,
             seed: Mutex::new(None),
@@ -314,17 +313,12 @@ impl AddressManager for Wallet {
     }
 }
 
-// Implement the remaining traits for the Wallet
-
 impl TransactionManager for Wallet {
-    // Implementation of TransactionManager trait...
-    // (Simplified for brevity)
-    
     fn create_transaction(
         &self,
         outputs: Vec<(String, u64)>,
         fee_rate: f64,
-        options: transactions::TxOptions,
+        _options: transactions::TxOptions,
     ) -> AnyaResult<Transaction> {
         // Simplified implementation
         let mut tx_outs = Vec::new();
@@ -343,24 +337,24 @@ impl TransactionManager for Wallet {
         // In a real implementation, we would select UTXOs, create inputs, etc.
         // For simplicity, we're returning a dummy transaction
         Ok(Transaction {
-            version: 2,
-            lock_time: 0,
+            version: bitcoin::transaction::Version(2),
+            lock_time: bitcoin::transaction::LockTime::ZERO,
             input: vec![],
             output: tx_outs,
         })
     }
     
-    fn sign_transaction(&self, tx: &mut Transaction) -> AnyaResult<()> {
+    fn sign_transaction(&self, _tx: &mut Transaction) -> AnyaResult<()> {
         // Simplified implementation
         Ok(())
     }
     
     fn broadcast_transaction(&self, tx: &Transaction) -> AnyaResult<String> {
         // Simplified implementation
-        Ok(tx.txid().to_string())
+        Ok(tx.compute_txid().to_string())
     }
     
-    fn get_transaction(&self, txid: &str) -> AnyaResult<Option<Transaction>> {
+    fn get_transaction(&self, _txid: &str) -> AnyaResult<Option<Transaction>> {
         // Simplified implementation
         Ok(None)
     }
@@ -372,9 +366,6 @@ impl TransactionManager for Wallet {
 }
 
 impl BalanceManager for Wallet {
-    // Implementation of BalanceManager trait...
-    // (Simplified for brevity)
-    
     fn get_balance(&self) -> AnyaResult<u64> {
         // Simplified implementation
         Ok(0)
@@ -422,7 +413,7 @@ impl UnifiedWallet for Wallet {
     
     fn get_stacks_address(&self) -> AnyaResult<String> {
         // Derive a Stacks address from the same seed
-        let secret_key = self.derive_key("m/44'/5757'/0'/0/0")?;
+        let _secret_key = self.derive_key("m/44'/5757'/0'/0/0")?;
         
         // In a real implementation, this would convert the key to a Stacks address
         // For simplicity, we're returning a dummy address
@@ -431,7 +422,7 @@ impl UnifiedWallet for Wallet {
     
     fn get_rsk_address(&self) -> AnyaResult<String> {
         // Derive an RSK address from the same seed
-        let secret_key = self.derive_key("m/44'/137'/0'/0/0")?;
+        let _secret_key = self.derive_key("m/44'/137'/0'/0/0")?;
         
         // In a real implementation, this would convert the key to an RSK address
         // For simplicity, we're returning a dummy address
@@ -440,7 +431,7 @@ impl UnifiedWallet for Wallet {
     
     fn get_liquid_address(&self) -> AnyaResult<String> {
         // Derive a Liquid address from the same seed
-        let secret_key = self.derive_key("m/44'/2'/0'/0/0")?;
+        let _secret_key = self.derive_key("m/44'/2'/0'/0/0")?;
         
         // In a real implementation, this would convert the key to a Liquid address
         // For simplicity, we're returning a dummy address
@@ -516,5 +507,32 @@ fn determine_chain_from_asset_id(asset_id: &str) -> String {
         "stacks".to_string()
     } else {
         "bitcoin".to_string()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct BitcoinWallet {
+    network: Network,
+    interface: Box<dyn BitcoinInterface>,
+}
+
+impl BitcoinWallet {
+    pub fn new(network: Network, interface: Box<dyn BitcoinInterface>) -> Self {
+        Self {
+            network,
+            interface,
+        }
+    }
+
+    pub async fn get_balance(&self, address: &Address) -> BitcoinResult<u64> {
+        self.interface.get_balance(address).await
+    }
+
+    pub async fn send_transaction(&self, tx: &Transaction) -> BitcoinResult<String> {
+        self.interface.send_transaction(tx).await
+    }
+
+    pub async fn get_transaction(&self, txid: &str) -> BitcoinResult<Transaction> {
+        self.interface.get_transaction(txid).await
     }
 } 

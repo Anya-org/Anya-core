@@ -21,6 +21,20 @@ use std::time::Duration;
 use crate::bitcoin::types::{BitcoinAddress, Transaction as BtcTransaction};
 use crate::core::performance::Metrics;
 use crate::security::validation::ValidationResult;
+use crate::{
+    AnyaError,
+    layer2::{
+        Layer2Protocol,
+        ProtocolState,
+        TransactionStatus,
+        AssetParams,
+        AssetTransfer,
+        TransferResult,
+        Proof,
+        VerificationResult,
+        ValidationResult,
+    },
+};
 
 /// Configuration for the BOB Layer 2 integration
 #[derive(Clone, Debug)]
