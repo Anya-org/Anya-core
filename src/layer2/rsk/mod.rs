@@ -22,6 +22,22 @@ use std::time::{Duration, Instant};
 use crate::bitcoin::types::{BitcoinAddress, Transaction as BtcTransaction};
 use crate::core::performance::Metrics;
 use crate::security::validation::ValidationResult;
+use crate::{
+    AnyaResult,
+    layer2::{
+        Layer2Protocol,
+        ProtocolState,
+        TransactionStatus,
+        AssetParams,
+        AssetTransfer,
+        TransferResult,
+        Proof,
+        VerificationResult,
+        ValidationResult,
+    },
+};
+use async_trait::async_trait;
+use tracing::{info, warn, error};
 
 /// Configuration for the RSK integration
 #[derive(Clone, Debug)]
@@ -766,5 +782,77 @@ pub mod tests {
         
         assert_eq!(block.number, 1000000);
         assert!(!block.hash.is_empty());
+    }
+}
+
+pub struct RskProtocol {
+    initialized: bool,
+    connected: bool,
+}
+
+impl RskProtocol {
+    pub fn new() -> Self {
+        Self {
+            initialized: false,
+            connected: false,
+        }
+    }
+}
+
+#[async_trait]
+impl Layer2Protocol for RskProtocol {
+    async fn initialize(&self) -> AnyaResult<()> {
+        info!("Initializing RSK protocol...");
+        Ok(())
+    }
+
+    async fn connect(&self) -> AnyaResult<()> {
+        info!("Connecting to RSK network...");
+        Ok(())
+    }
+
+    async fn disconnect(&self) -> AnyaResult<()> {
+        info!("Disconnecting from RSK network...");
+        Ok(())
+    }
+
+    async fn submit_transaction(&self, tx: &[u8]) -> AnyaResult<String> {
+        info!("Submitting RSK transaction...");
+        Ok("rsk_tx_123".to_string())
+    }
+
+    async fn get_transaction_status(&self, tx_id: &str) -> AnyaResult<TransactionStatus> {
+        info!("Getting RSK transaction status...");
+        Ok(TransactionStatus::Confirmed)
+    }
+
+    async fn get_state(&self) -> AnyaResult<ProtocolState> {
+        info!("Getting RSK state...");
+        Ok(ProtocolState::default())
+    }
+
+    async fn sync_state(&self) -> AnyaResult<()> {
+        info!("Syncing RSK state...");
+        Ok(())
+    }
+
+    async fn issue_asset(&self, params: AssetParams) -> AnyaResult<String> {
+        info!("Issuing RSK asset...");
+        Ok("rsk_asset_123".to_string())
+    }
+
+    async fn transfer_asset(&self, transfer: AssetTransfer) -> AnyaResult<TransferResult> {
+        info!("Transferring RSK asset...");
+        Ok(TransferResult::default())
+    }
+
+    async fn verify_proof(&self, proof: &Proof) -> AnyaResult<VerificationResult> {
+        info!("Verifying RSK proof...");
+        Ok(VerificationResult::default())
+    }
+
+    async fn validate_state(&self, state: &ProtocolState) -> AnyaResult<ValidationResult> {
+        info!("Validating RSK state...");
+        Ok(ValidationResult::default())
     }
 } 

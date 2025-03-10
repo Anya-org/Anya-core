@@ -13,6 +13,10 @@
 // 3. Clear separation of interface (this file) from implementation details
 
 use std::sync::Arc;
+use async_trait::async_trait;
+use bitcoin::{Address, Transaction, Block, Network};
+use crate::bitcoin::error::{BitcoinError, BitcoinResult};
+use crate::config::Config;
 
 /// Bitcoin implementation type selection enum
 /// 
@@ -22,32 +26,12 @@ use std::sync::Arc;
 pub enum BitcoinImplementationType {
     /// Use the Rust bitcoin implementation (rust-bitcoin, BDK)
     Rust,
+    Core,
+    Electrum,
+    Custom,
+    Web3,
+    RPC,
 }
-
-/// Common error type for Bitcoin operations
-/// 
-/// Provides a unified error handling approach across implementations
-/// while maintaining meaningful context about the error source.
-#[derive(Debug, thiserror::Error)]
-pub enum BitcoinError {
-    #[error("Network error: {0}")]
-    NetworkError(String),
-    
-    #[error("Transaction error: {0}")]
-    TransactionError(String),
-    
-    #[error("Wallet error: {0}")]
-    WalletError(String),
-    
-    #[error("Block error: {0}")]
-    BlockError(String),
-    
-    #[error("Implementation error: {0}")]
-    ImplementationError(String),
-}
-
-/// Result type for Bitcoin operations
-pub type BitcoinResult<T> = Result<T, BitcoinError>;
 
 /// Generic Bitcoin address type that works across implementations
 /// 
@@ -65,7 +49,7 @@ pub struct BitcoinAddress {
 /// 
 /// These represent all the major Bitcoin address types supported
 /// across our implementations.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum AddressType {
     /// Legacy addresses (1...)
     P2PKH,
@@ -138,16 +122,14 @@ pub struct TransactionOutput {
 /// Contains the core data from a Bitcoin block header
 #[derive(Debug, Clone)]
 pub struct BlockHeader {
-    /// Block hash
-    pub hash: String,
     /// Block version
     pub version: i32,
     /// Hash of the previous block
-    pub prev_hash: String,
+    pub prev_blockhash: String,
     /// Merkle root of all transactions
     pub merkle_root: String,
     /// Block timestamp
-    pub timestamp: u32,
+    pub time: u32,
     /// Difficulty target in compact format
     pub bits: u32,
     /// Nonce value for proof of work
@@ -159,52 +141,68 @@ pub struct BlockHeader {
 /// This trait defines the contract that all Bitcoin implementations must fulfill.
 /// It follows the "port" concept from hexagonal architecture, allowing different
 /// adapters (implementations) to be plugged in while maintaining a consistent API.
+#[async_trait]
 pub trait BitcoinInterface: Send + Sync {
     /// Get transaction by txid
     /// 
     /// Retrieves detailed information about a transaction given its ID.
-    fn get_transaction(&self, txid: &str) -> BitcoinResult<BitcoinTransaction>;
+    async fn get_transaction(&self, txid: &str) -> BitcoinResult<Transaction>;
     
     /// Get block by hash
     /// 
     /// Retrieves all transactions in a block given the block hash.
-    fn get_block(&self, hash: &str) -> BitcoinResult<Vec<BitcoinTransaction>>;
+    async fn get_block(&self, hash: &str) -> BitcoinResult<Block>;
     
     /// Get current blockchain height
     /// 
     /// Returns the current height of the blockchain (number of blocks).
-    fn get_block_height(&self) -> BitcoinResult<u32>;
+    async fn get_block_height(&self) -> BitcoinResult<u32>;
     
     /// Generate a new address
     /// 
     /// Creates a new Bitcoin address of the specified type.
-    fn generate_address(&self, address_type: AddressType) -> BitcoinResult<BitcoinAddress>;
+    async fn generate_address(&self, address_type: AddressType) -> BitcoinResult<Address>;
     
     /// Create and sign a transaction
     /// 
     /// Creates a transaction sending to specified outputs with the given fee rate.
     /// The implementation handles input selection, change addresses, and signing.
-    fn create_transaction(
+    async fn create_transaction(
         &self,
         outputs: Vec<(String, u64)>,
         fee_rate: u64,
-    ) -> BitcoinResult<BitcoinTransaction>;
+    ) -> BitcoinResult<Transaction>;
     
     /// Broadcast a transaction to the network
     /// 
     /// Sends a signed transaction to the Bitcoin network.
-    fn broadcast_transaction(&self, transaction: &BitcoinTransaction) -> BitcoinResult<String>;
+    async fn broadcast_transaction(&self, transaction: &Transaction) -> BitcoinResult<String>;
     
     /// Get balance for wallet/address
     /// 
     /// Returns the current balance of the wallet in satoshis.
-    fn get_balance(&self) -> BitcoinResult<u64>;
+    async fn get_balance(&self, address: &Address) -> BitcoinResult<u64>;
     
     /// Estimate fee for a transaction
     /// 
     /// Estimates the fee rate (in sat/vB) needed for confirmation within target_blocks.
-    fn estimate_fee(&self, target_blocks: u8) -> BitcoinResult<u64>;
+    async fn estimate_fee(&self, target_blocks: u8) -> BitcoinResult<u64>;
     
+    /// Get block header by hash
+    /// 
+    /// Retrieves block header information for a given block hash.
+    async fn get_block_header(&self, hash: &str) -> BitcoinResult<BlockHeader>;
+
+    /// Verify a merkle proof
+    /// 
+    /// Verifies a merkle proof for a given transaction hash and block header.
+    async fn verify_merkle_proof(&self, tx_hash: &str, block_header: &BlockHeader) -> BitcoinResult<bool>;
+
+    /// Send a transaction
+    /// 
+    /// Sends a transaction to the network.
+    async fn send_transaction(&self, tx: &Transaction) -> BitcoinResult<String>;
+
     /// Implementation type
     /// 
     /// Returns which implementation type is being used.
@@ -217,12 +215,16 @@ pub trait BitcoinInterface: Send + Sync {
 /// based on the requested type and configuration.
 pub fn create_bitcoin_interface(
     implementation_type: BitcoinImplementationType,
-    config: &crate::config::Config,
+    config: &Config,
 ) -> Arc<dyn BitcoinInterface> {
     match implementation_type {
         BitcoinImplementationType::Rust => {
             let implementation = crate::bitcoin::rust::RustBitcoinImplementation::new(config);
             Arc::new(implementation)
+        }
+        _ => {
+            // Placeholder for other implementations
+            Arc::new(crate::bitcoin::rust::RustBitcoinImplementation::new(config))
         }
     }
 }
@@ -231,9 +233,29 @@ pub fn create_bitcoin_interface(
 /// 
 /// This function returns the appropriate Bitcoin interface implementation
 /// based on the current configuration settings.
-pub fn get_current_bitcoin_interface(config: &crate::config::Config) -> Arc<dyn BitcoinInterface> {
+pub fn get_current_bitcoin_interface(config: &Config) -> Arc<dyn BitcoinInterface> {
     // Always use Rust implementation
     create_bitcoin_interface(BitcoinImplementationType::Rust, config)
+}
+
+pub struct BitcoinInterfaceConfig {
+    pub implementation_type: BitcoinImplementationType,
+    pub network: Network,
+    pub rpc_url: Option<String>,
+    pub rpc_user: Option<String>,
+    pub rpc_password: Option<String>,
+}
+
+impl Default for BitcoinInterfaceConfig {
+    fn default() -> Self {
+        Self {
+            implementation_type: BitcoinImplementationType::Rust,
+            network: Network::Bitcoin,
+            rpc_url: None,
+            rpc_user: None,
+            rpc_password: None,
+        }
+    }
 }
 
 #[cfg(test)]
@@ -242,7 +264,7 @@ mod tests {
     
     #[test]
     fn test_interface_creation() {
-        let mut config = crate::config::Config::default();
+        let config = Config::default();
         
         // Test Rust implementation
         let rust_impl = get_current_bitcoin_interface(&config);
