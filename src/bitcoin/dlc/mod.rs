@@ -315,13 +315,14 @@ pub fn create_adaptor_signatures(
         let execution_tx = contract.execution_txs.get(outcome)
             .ok_or("Execution transaction not found for outcome")?;
         
-        // Hash the outcome to create a point for the adaptor
+        // Hash the outcome to get the point used for adaptor signatures
         let outcome_hash = sha256::Hash::hash(outcome.as_bytes());
-        let outcome_message = Message::from_digest_slice(&outcome_hash[..])?;
+        let message = Message::from_digest_slice(&outcome_hash[..])
+            .map_err(|_| "Failed to create message from outcome hash")?;
         
         // In a real implementation, this would use proper adaptor signature cryptography
         // For this example, we're using a simplified approach
-        let signature = secp.sign_ecdsa(&outcome_message, party_secret_key);
+        let signature = secp.sign_ecdsa(&message, party_secret_key);
         
         // Create the adaptor signature
         // In a real implementation, this would be an actual adaptor signature
@@ -366,7 +367,7 @@ pub fn execute_dlc(
     oracle_signature: &Signature,
     party_a_secret_key: &SecretKey,
     party_b_secret_key: &SecretKey,
-) -> Result<Transaction, &'static str> {
+) -> BitcoinResult<Transaction> {
     let secp = Secp256k1::new();
     
     // Get the execution transaction for this outcome
@@ -379,7 +380,7 @@ pub fn execute_dlc(
     let message = Message::from_digest_slice(&outcome_hash[..])?;
     
     if !secp.verify_ecdsa(&message, oracle_signature, &contract.oracle_pubkey).is_ok() {
-        return Err("Invalid oracle signature");
+        return Err(BitcoinError::InvalidOracleSignature);
     }
     
     // In a real implementation, this would use proper MuSig signatures
@@ -402,17 +403,18 @@ pub fn execute_dlc(
         .push_opcode(bitcoin::blockdata::opcodes::all::OP_CHECKMULTISIG)
         .into_script();
     
-    // Sign the transaction with both keys
-    // In a real implementation, this would use proper adaptor signatures
+    // Create the signature for the execution transaction
     let sighash = execution_tx.signature_hash(
         0,
         &contract_script,
         contract.collateral_amount * 2,
         bitcoin::sighash::EcdsaSighashType::All,
     );
+    let sighash_message = Message::from_digest_slice(&sighash[..])
+        .map_err(|_| "Failed to create message from sighash")?;
     
-    let sighash_message = Message::from_digest_slice(&sighash[..])?;
-    
+    // Sign the transaction with both keys
+    // In a real implementation, this would use proper adaptor signatures
     let party_a_signature = secp.sign_ecdsa(&sighash_message, party_a_secret_key);
     let party_b_signature = secp.sign_ecdsa(&sighash_message, party_b_secret_key);
     
@@ -433,7 +435,7 @@ pub fn execute_dlc(
     witness_elements.push(contract_script.as_bytes().to_vec());
     
     // Set the witness
-    execution_tx.input[0].witness = Witness::from_vec(witness_elements);
+    execution_tx.input[0].witness = Witness::from(witness_elements);
     
     Ok(execution_tx)
 }

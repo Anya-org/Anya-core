@@ -21,20 +21,6 @@ use std::time::Duration;
 use crate::bitcoin::types::{BitcoinAddress, Transaction as BtcTransaction};
 use crate::core::performance::Metrics;
 use crate::security::validation::ValidationResult;
-use crate::{
-    AnyaError,
-    layer2::{
-        Layer2Protocol,
-        ProtocolState,
-        TransactionStatus,
-        AssetParams,
-        AssetTransfer,
-        TransferResult,
-        Proof,
-        VerificationResult,
-        ValidationResult,
-    },
-};
 
 /// Configuration for the BOB Layer 2 integration
 #[derive(Clone, Debug)]
@@ -350,37 +336,21 @@ pub enum BobError {
     ConfigError(String),
 }
 
-// Re-export key types
 pub use self::{
     BobClient as Layer2Client,
     BobConfig as Layer2Config,
     BobError as Layer2Error,
 };
 
-// Module exports
+// Module exports - only declare these once
 pub mod relay;
 pub mod evm;
 pub mod bitvm;
 pub mod cross_layer;
 pub mod analytics;
 
-// Empty module implementations to be filled in later
-pub mod relay {
-    //! Bitcoin relay interaction module
-}
+// We'll remove the duplicate module declarations below
+// and add comments to the existing modules
 
-pub mod evm {
-    //! EVM compatibility module
-}
-
-pub mod bitvm {
-    //! BitVM integration module
-}
-
-pub mod cross_layer {
-    //! Cross-layer transaction handling module
-}
-
-pub mod analytics {
-    //! Hybrid analytics module
-} 
+// Implementation note: removed redundant module declarations
+// The content from these modules should be moved to the actual module files 

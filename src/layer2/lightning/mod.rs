@@ -16,6 +16,50 @@ use crate::{
 use async_trait::async_trait;
 use tracing::{info, error, warn};
 
+/// Configuration for Lightning Network integration
+#[derive(Clone, Debug)]
+pub struct LightningConfig {
+    // TODO: Add configuration options
+    pub rpc_url: Option<String>,
+    pub network: Option<String>,
+    pub max_fee_rate: Option<u64>,
+}
+
+impl Default for LightningConfig {
+    fn default() -> Self {
+        Self {
+            rpc_url: None,
+            network: None,
+            max_fee_rate: None,
+        }
+    }
+}
+
+/// Lightning Network client
+#[derive(Default)]
+pub struct LightningClient {
+    // TODO: Implement Lightning client
+    config: LightningConfig,
+    protocol: Option<LightningProtocol>,
+}
+
+impl LightningClient {
+    pub fn new(config: LightningConfig) -> Self {
+        Self {
+            config,
+            protocol: Some(LightningProtocol::new()),
+        }
+    }
+    
+    pub async fn initialize(&self) -> AnyaResult<()> {
+        if let Some(protocol) = &self.protocol {
+            protocol.initialize().await
+        } else {
+            Err(AnyaError::Generic("Lightning protocol not initialized".to_string()))
+        }
+    }
+}
+
 pub struct LightningProtocol {
     initialized: bool,
     connected: bool,

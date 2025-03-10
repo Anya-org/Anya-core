@@ -108,7 +108,7 @@ impl CredentialManager {
             ],
             issuer: issuer_did.to_string(),
             issuanceDate: current_iso_date(),
-            credentialSubject,
+            credentialSubject: credential_subject,
             proof: None,
         };
         

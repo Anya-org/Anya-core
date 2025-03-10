@@ -41,6 +41,14 @@ pub struct Script {
     pub bytes: Vec<u8>,
 }
 
+impl Script {
+    pub fn new() -> Self {
+        Script {
+            bytes: Vec::new(),
+        }
+    }
+}
+
 pub struct PartialMerkleTree {
     pub hashes: Vec<[u8; 32]>,
     pub flags: Vec<bool>,
@@ -86,6 +94,7 @@ pub struct LiquidBridgeTransaction {
 /// Liquid Asset Type
 /// 
 /// Represents the type of asset on the Liquid network.
+#[derive(Debug, PartialEq, Clone)]
 pub enum LiquidAssetType {
     /// L-BTC (Liquid Bitcoin)
     LBTC,

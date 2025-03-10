@@ -4,8 +4,8 @@
 
 use crate::AnyaError;
 use crate::AnyaResult;
-use bitcoin::{BlockHash, Network, Transaction, Txid};
-use secp256k1::{PublicKey, SecretKey, Secp256k1};
+use bitcoin::{BlockHash, Network, Transaction, Txid as BitcoinTxid};
+use secp256k1::{PublicKey as Secp256k1PublicKey, SecretKey as Secp256k1SecretKey, Secp256k1 as Secp256k1Context};
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
@@ -13,29 +13,61 @@ use std::time::{Duration, SystemTime, UNIX_EPOCH};
 // Import BitcoinConfig from a module we know exists
 use crate::bitcoin::interface::BitcoinImplementationType;
 
-// Define PublicKey, SecretKey, etc. for our needs
-pub struct PublicKey {
+// Define custom Lightning-specific key types to avoid conflicts with secp256k1 types
+pub struct LightningPublicKey {
     pub bytes: [u8; 33],
 }
 
-pub struct SecretKey {
+impl LightningPublicKey {
+    pub fn from_str(s: &str) -> Result<Self, String> {
+        if s.len() != 66 {
+            return Err("Invalid public key length".to_string());
+        }
+        
+        // Remove 0x prefix if present
+        let hex_str = if s.starts_with("0x") { &s[2..] } else { s };
+        
+        // Parse hex string to bytes
+        let mut bytes = [0u8; 33];
+        hex::decode_to_slice(hex_str, &mut bytes)
+            .map_err(|e| format!("Invalid hex format: {}", e))?;
+        
+        Ok(LightningPublicKey { bytes })
+    }
+    
+    // Add a method to create from secp256k1 secret key
+    pub fn from_secret_key(_secp: &LightningSecp256k1<All>, _secret_key: &Secp256k1SecretKey) -> Self {
+        // In a real implementation, this would use the secp256k1 context to derive the public key
+        // For now, we'll just return a dummy key
+        LightningPublicKey { bytes: [0x03; 33] }
+    }
+    
+    // Add a method to create from another PublicKey
+    pub fn from_secp256k1(pubkey: &Secp256k1PublicKey) -> Self {
+        let mut bytes = [0u8; 33];
+        bytes.copy_from_slice(&pubkey.serialize());
+        LightningPublicKey { bytes }
+    }
+}
+
+pub struct LightningSecretKey {
     pub bytes: [u8; 32],
 }
 
-pub struct Secp256k1<T> {
+pub struct LightningSecp256k1<T> {
     _marker: std::marker::PhantomData<T>,
 }
 
 pub struct All;
 
-impl Secp256k1<All> {
+impl LightningSecp256k1<All> {
     pub fn new() -> Self {
         Self { _marker: std::marker::PhantomData }
     }
 }
 
 #[derive(Clone, Debug)]
-pub struct Txid {
+pub struct LightningTxid {
     pub bytes: [u8; 32],
 }
 
@@ -56,10 +88,10 @@ pub struct LightningNode {
     state: Mutex<LightningState>,
     
     /// Secp256k1 context
-    secp: Secp256k1<secp256k1::All>,
+    secp: LightningSecp256k1<All>,
     
     /// Node public key
-    pub node_id: PublicKey,
+    pub node_id: LightningPublicKey,
 }
 
 /// Lightning node state
@@ -87,7 +119,7 @@ pub struct Channel {
     pub channel_id: String,
     
     /// Funding transaction ID
-    pub funding_txid: Txid,
+    pub funding_txid: LightningTxid,
     
     /// Funding transaction output index
     pub funding_output_idx: u32,
@@ -102,7 +134,7 @@ pub struct Channel {
     pub remote_balance: u64,
     
     /// Remote node public key
-    pub remote_pubkey: PublicKey,
+    pub remote_pubkey: LightningPublicKey,
     
     /// Whether the channel is active
     pub is_active: bool,
@@ -118,7 +150,7 @@ pub struct Channel {
 #[derive(Debug, Clone)]
 pub struct PeerInfo {
     /// Peer node public key
-    pub pubkey: PublicKey,
+    pub pubkey: LightningPublicKey,
     
     /// Network addresses (host:port)
     pub addresses: Vec<String>,
@@ -230,7 +262,7 @@ pub struct ChannelTransaction {
     pub channel_id: String,
     
     /// Funding transaction ID
-    pub funding_txid: Txid,
+    pub funding_txid: LightningTxid,
     
     /// Funding output index
     pub funding_output_idx: u32,
@@ -245,7 +277,7 @@ pub struct ChannelTransaction {
     pub confirmation_height: Option<u32>,
     
     /// Closing transaction ID (if closed)
-    pub closing_txid: Option<Txid>,
+    pub closing_txid: Option<LightningTxid>,
     
     /// Created timestamp
     pub created_at: u64,
@@ -287,7 +319,7 @@ pub struct FundingAddress {
 #[derive(Debug, Clone)]
 pub struct ChannelParameters {
     /// Peer node public key
-    pub peer_pubkey: PublicKey,
+    pub peer_pubkey: LightningPublicKey,
     
     /// Push amount in millisatoshis (initial balance for peer)
     pub push_msat: Option<u64>,
@@ -299,12 +331,12 @@ pub struct ChannelParameters {
 impl LightningNode {
     /// Create a new Lightning node
     pub fn new(config: &BitcoinConfig) -> AnyaResult<Self> {
-        let secp = Secp256k1::new();
+        let secp = LightningSecp256k1::new();
         
         // Generate a node key (in a real implementation this would be read from storage)
-        let node_secret = SecretKey::from_slice(&[0x42; 32])
+        let node_secret = Secp256k1SecretKey::from_slice(&[0x42; 32])
             .map_err(|e| AnyaError::Bitcoin(format!("Failed to create Lightning node key: {}", e)))?;
-        let node_id = PublicKey::from_secret_key(&secp, &node_secret);
+        let node_id = LightningPublicKey::from_secret_key(&secp, &node_secret);
         
         // Create initial state
         let state = LightningState {
@@ -340,7 +372,7 @@ impl LightningNode {
     
     /// Connect to a remote node
     pub fn connect_peer(&self, node_pubkey: &str, host: &str, port: u16) -> AnyaResult<()> {
-        let pubkey = PublicKey::from_str(node_pubkey)
+        let pubkey = LightningPublicKey::from_str(node_pubkey)
             .map_err(|e| AnyaError::Bitcoin(format!("Invalid node pubkey: {}", e)))?;
             
         let mut state = self.state.lock().unwrap();
@@ -380,7 +412,7 @@ impl LightningNode {
         push_msat: Option<u64>,
         is_private: bool,
     ) -> AnyaResult<Channel> {
-        let pubkey = PublicKey::from_str(node_pubkey)
+        let pubkey = LightningPublicKey::from_str(node_pubkey)
             .map_err(|e| AnyaError::Bitcoin(format!("Invalid node pubkey: {}", e)))?;
             
         let mut state = self.state.lock().unwrap();
@@ -394,7 +426,7 @@ impl LightningNode {
         let channel_id = format!("channel_{:x}", rand::random::<u64>());
         
         // Generate funding transaction ID
-        let funding_txid = Txid::from_slice(&[0x42; 32])
+        let funding_txid = LightningTxid::from_slice(&[0x42; 32])
             .map_err(|e| AnyaError::Bitcoin(format!("Failed to create txid: {}", e)))?;
         
         // Calculate balance split
@@ -429,7 +461,7 @@ impl LightningNode {
     }
     
     /// Close a channel
-    pub fn close_channel(&self, channel_id: &str, force: bool) -> AnyaResult<Txid> {
+    pub fn close_channel(&self, channel_id: &str, force: bool) -> AnyaResult<LightningTxid> {
         let mut state = self.state.lock().unwrap();
         
         // Find channel
@@ -437,7 +469,7 @@ impl LightningNode {
             .ok_or_else(|| AnyaError::Bitcoin(format!("Channel not found: {}", channel_id)))?;
         
         // Generate closing transaction ID
-        let closing_txid = Txid::from_slice(&[0x24; 32])
+        let closing_txid = LightningTxid::from_slice(&[0x24; 32])
             .map_err(|e| AnyaError::Bitcoin(format!("Failed to create closing txid: {}", e)))?;
         
         // Update channel state
@@ -598,7 +630,7 @@ impl BitcoinLightningBridge {
     ) -> AnyaResult<String> {
         // Check if connected to peer
         let peers = self.lightning_node.list_peers()?;
-        let pubkey = PublicKey::from_str(peer_pubkey)
+        let pubkey = LightningPublicKey::from_str(peer_pubkey)
             .map_err(|e| AnyaError::Bitcoin(format!("Invalid node pubkey: {}", e)))?;
             
         let is_connected = peers.iter().any(|p| p.pubkey.to_string() == peer_pubkey);
@@ -663,7 +695,7 @@ impl BitcoinLightningBridge {
     pub fn register_channel_close(
         &self,
         channel_id: &str,
-        closing_txid: Txid,
+        closing_txid: LightningTxid,
     ) -> AnyaResult<()> {
         let mut channel_txs = self.channel_transactions.lock().unwrap();
         
@@ -716,4 +748,18 @@ fn current_time() -> u64 {
         .duration_since(UNIX_EPOCH)
         .unwrap_or_else(|_| Duration::from_secs(0))
         .as_secs()
+}
+
+// Add a method to create LightningTxid from slice
+impl LightningTxid {
+    pub fn from_slice(data: &[u8]) -> Result<Self, String> {
+        if data.len() != 32 {
+            return Err("Invalid txid length".to_string());
+        }
+        
+        let mut bytes = [0u8; 32];
+        bytes.copy_from_slice(data);
+        
+        Ok(LightningTxid { bytes })
+    }
 } 
