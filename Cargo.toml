@@ -148,6 +148,7 @@ nightly = []
 enterprise = ["std"]
 bitcoin = ["std"]
 liquid = ["std"]
+bitcoin_integration = ["bitcoin"]  # Add this new feature
 
 [profile.release]
 lto = true
@@ -180,6 +181,9 @@ path = "src/bin/lightning_demo.rs"
 name = "main"
 path = "src/bin/main.rs"
 
-[[bin]]
-name = "run_protocol_tests"
-path = "tests/run_protocol_tests.rs"
+# [[bin]]
+# name = "run_protocol_tests"
+# path = "tests/run_protocol_tests.rs"
+
+[lib]
+name = "anya_core"
