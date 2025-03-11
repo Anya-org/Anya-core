@@ -19,7 +19,8 @@ use bitcoin::sighash::{Prevouts, SighashCache, TapSighashType};
 use bitcoin::blockdata::opcodes::all;
 use crate::bitcoin::LockTime;
 use crate::bitcoin::Version;
-use bitcoin::sighash::ScriptPath;
+use bitcoin::taproot::{TapLeafHash, ScriptPath};
+use anyhow::{Result, anyhow};
 use crate::bitcoin::error::BitcoinError;
 
 // Import BitcoinResult type
@@ -532,9 +533,9 @@ pub fn sign_execution_transaction(
     let sighash = sighash_cache.taproot_script_spend_signature_hash(
         0,
         &Prevouts::All(&[/* prevouts */]),
-        &script_path,
+        TapLeafHash::from(script_path.clone()), // Clone and convert
         TapSighashType::Default,
-    ).map_err(|e| format!("Failed to calculate sighash: {}", e))?;
+    ).map_err(|e| anyhow!("Failed to calculate sighash: {}", e))?;
     
     // Sign the transaction with party A's key
     let party_a_sig = secp.sign_ecdsa(&Message::from_digest_slice(&sighash[..]).unwrap(), party_a_key);
@@ -592,6 +593,21 @@ fn create_contract_script(
         .push_key(&bitcoin::PublicKey::new(*party_b_pubkey))
         .push_opcode(all::OP_PUSHNUM_2)
         .push_opcode(all::OP_CHECKMULTISIG)
+}
+
+impl DLC {
+    fn calculate_sighash(&self, script_path: &ScriptPath) -> Result<Vec<u8>> {
+        let sighash = sighash_cache
+            .taproot_script_spend_signature_hash(
+                0,
+                &Prevouts::All(&[/* prevouts */]),
+                TapLeafHash::from(script_path.clone()), // Clone and convert
+                TapSighashType::Default,
+            )
+            .map_err(|e| anyhow!("Failed to calculate sighash: {}", e))?;
+            
+        Ok(sighash.to_vec())
+    }
 }
 
 #[cfg(test)]

@@ -29,7 +29,7 @@ thiserror = { workspace = true }
 web5 = { workspace = true }
 
 # Blockchain Integration
-bitcoin = { workspace = true }
+bitcoin = { workspace = true, features = ["rand", "rand-std"] }
 bitcoincore-rpc = { workspace = true }
 
 # Additional Dependencies
@@ -43,7 +43,7 @@ utoipa-swagger-ui = { version = "5.0.0", features = ["actix-web"] }
 ndarray = "0.15.6"
 
 # Internal Dependencies
-anya-core = { path = "..", version = "0.2.0", features = ["enterprise"] }
+anya-core = { path = "..", version = "0.2.0" }
 
 [features]
 default = []

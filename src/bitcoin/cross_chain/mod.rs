@@ -17,6 +17,8 @@ use bitcoin::{Block, Transaction};
 use bitcoin::hashes::Hash;
 use std::collections::HashMap;
 use hex;
+use bitcoin::blockdata::transaction::{Transaction, TxIn, TxOut};
+use bitcoin::key::{PublicKey, WPubkeyHash};
 
 /// Cross-Chain Transaction Status
 /// 
@@ -58,6 +60,15 @@ pub struct CrossChainBridge {
     pub fee_bps: u16,
     /// Bridge transactions
     pub transactions: HashMap<String, CrossChainTransaction>,
+}
+
+impl CrossChainBridge {
+    fn create_bridge_output(&self, bridge_tx: &BridgeTx) -> Result<ScriptBuf> {
+        // Convert PubkeyHash to WPubkeyHash
+        let wpubkey_hash = WPubkeyHash::from_pubkey_hash(bridge_tx.sender_pubkey.pubkey_hash());
+        let script = bitcoin::ScriptBuf::new_p2wpkh(&wpubkey_hash);
+        Ok(script)
+    }
 }
 
 /// Cross-Chain Transaction
@@ -398,4 +409,4 @@ mod tests {
         assert_eq!(transaction.fee, 100); // 0.1% of 1000000
         assert_eq!(transaction.status, CrossChainStatus::PendingSource);
     }
-} 
+}
