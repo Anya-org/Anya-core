@@ -179,7 +179,7 @@ pub fn create_rsk_bridge_transaction(
     // Output to the federation
     let federation_output = TxOut {
         value: Amount::from_sat(bridge_tx.amount),
-        script_pubkey: federation_script,
+        script_pubkey: federation_script.into(),
     };
 
     // Change output (if needed)
@@ -187,10 +187,10 @@ pub fn create_rsk_bridge_transaction(
 
     if bridge_tx.change_amount > 0 {
         // Create a P2WPKH script using the public key hash
-        let sender_script = ScriptBuf::new_p2wpkh(&bridge_tx.sender_pubkey.pubkey_hash());
+        let sender_script = ScriptBuf::new_p2wpkh(&WPubkeyHash::from_slice(&bridge_tx.sender_pubkey.pubkey_hash()).unwrap());
         let change_output = TxOut {
             value: Amount::from_sat(bridge_tx.change_amount),
-            script_pubkey: sender_script,
+            script_pubkey: sender_script.clone().into(),
         };
         outputs.push(change_output);
     }
@@ -261,8 +261,8 @@ pub fn execute_rsk_bridge_transaction(
         let sender_script = Script::new();
         
         outputs.push(TxOut {
-            value: change_amount,
-            script_pubkey: sender_script,
+            value: Amount::from_sat(change_amount),
+            script_pubkey: sender_script.clone().into(),
         });
     }
     
@@ -447,7 +447,7 @@ mod tests {
         };
 
         // Create a federation script
-        let federation_script = ScriptBuf::new_p2wpkh(&bridge_tx.sender_pubkey.pubkey_hash());
+        let federation_script = ScriptBuf::new_p2wpkh(&WPubkeyHash::from_slice(&bridge_tx.sender_pubkey.pubkey_hash()).unwrap());
 
         // Create the bridge transaction
         let tx = create_rsk_bridge_transaction(&bridge_tx, federation_script).unwrap();
@@ -469,4 +469,4 @@ mod tests {
         assert!(contract.contains("BitcoinSPVVerifier"));
         assert!(contract.contains("verifyTransaction"));
     }
-} 
+}

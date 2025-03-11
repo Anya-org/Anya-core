@@ -528,11 +528,13 @@ pub fn sign_execution_transaction(
     // Create a sighash for the execution transaction
     let mut sighash_cache = bitcoin::sighash::SighashCache::new(&*execution_tx);
     let script_path = ScriptPath::with_defaults(&contract_script);
+    // Fix the taproot signature hash calculation
     let sighash = sighash_cache.taproot_script_spend_signature_hash(
-        0, // Input index
+        0,
+        &Prevouts::All(&[/* prevouts */]),
         &script_path,
         TapSighashType::Default,
-    )?;
+    ).map_err(|e| format!("Failed to calculate sighash: {}", e))?;
     
     // Sign the transaction with party A's key
     let party_a_sig = secp.sign_ecdsa(&Message::from_digest_slice(&sighash[..]).unwrap(), party_a_key);
@@ -634,4 +636,4 @@ mod tests {
         assert_eq!(oracle.name, "Sports Oracle");
         assert!(oracle.secret_key.is_some());
     }
-} 
+}
