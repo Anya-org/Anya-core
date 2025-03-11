@@ -470,3 +470,28 @@ mod tests {
         assert!(contract.contains("verifyTransaction"));
     }
 }
+
+use bitcoin::blockdata::transaction::{OutPoint, Transaction, TxIn, TxOut};
+use bitcoin::Amount;
+use bitcoin::ScriptBuf;
+use bitcoin::key::PublicKey;
+use bitcoin::address::WitnessProgram;
+
+// ...existing code...
+
+impl RskBridge {
+    fn create_peg_out_tx(&self, bridge_tx: &BridgeTx) -> Result<Transaction> {
+        // Convert to Amount type
+        let value = Amount::from_sat(bridge_tx.amount);
+        
+        // Convert federation script to ScriptBuf
+        let script_pubkey = federation_script.clone().into_script_buf();
+        
+        let output = TxOut {
+            value,
+            script_pubkey,
+        };
+        
+        // ...existing code...
+    }
+}

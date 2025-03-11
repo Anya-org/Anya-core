@@ -3,14 +3,15 @@ members = [
     ".",
     "anya-enterprise",
     "anya-extensions",
-    "anya-bitcoin"
+    "anya-bitcoin",
+    "installer"
 ]
 resolver = "2"
 
 [workspace.package]
-version = "0.2.0"
+version = "0.2.0"  # Updated version to match requirement
 edition = "2021"
-authors = ["Botshelo Mokoka <botshelomokoka@gmail.com>"]
+authors = ["Anya Core Team"]
 license = "MIT"
 repository = "https://github.com/anya-org/anya"
 
@@ -34,7 +35,7 @@ web5 = { git = "https://github.com/TBD54566975/web5-rs", package = "web5", tag =
 jsonschema = "0.17.1"
 
 # Blockchain Integration
-bitcoin = { version = "0.32.1", features = ["rand"] }
+bitcoin = { version = "0.32.1", features = ["rand", "rand-std"] }
 bitcoincore-rpc = "0.17.0"
 secp256k1 = { version = "0.27.0", features = ["rand"] }
 bitcoin-wallet = "1.1.0"
@@ -65,7 +66,7 @@ log = "0.4.20"
 
 [package]
 name = "anya-core"
-version.workspace = true
+version = "0.2.0"  # Match workspace version
 edition.workspace = true
 description = "Decentralized AI Governance System"
 authors.workspace = true
@@ -90,10 +91,10 @@ web5 = { workspace = true }
 jsonschema = { workspace = true }
 
 # Blockchain Integration
-bitcoin = { workspace = true, features = ["rand", "secp-recovery"] }
+bitcoin = { workspace = true, features = ["rand", "rand-std", "secp-recovery"] }
 bitcoincore-rpc = { workspace = true }
 secp256k1 = { version = "0.27.0", features = ["rand", "recovery"] }
-bip39 = "2.0.0"
+bip39 = { version = "2.0.0", optional = true }  # Make bip39 optional
 md5 = "0.7.0"
 
 # Networking
@@ -142,13 +143,14 @@ proptest = { workspace = true }
 tonic-build = "0.10.2"
 
 [features]
-default = ["std"]
+default = ["std"]  # Remove bip39 from default features
 std = []
 nightly = []
 enterprise = ["std"]
 bitcoin = ["std"]
 liquid = ["std"]
-bitcoin_integration = ["bitcoin"]  # Add this new feature
+bitcoin_integration = ["bitcoin", "bip39"]  # Add bip39 to bitcoin_integration feature
+bip39_support = ["bip39"]
 
 [profile.release]
 lto = true
