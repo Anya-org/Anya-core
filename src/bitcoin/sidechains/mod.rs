@@ -13,8 +13,32 @@
 //! This module provides integration with various Bitcoin sidechains,
 //! enabling cross-chain functionality with Bitcoin-backed security.
 
+// Comment out missing modules
+// pub mod stacks;
+
+// Add placeholder for stacks module functionality
 pub mod rsk;
-pub mod stacks;
+pub mod liquid;
+
+// Add placeholder for stacks functionality
+pub struct StacksIntegration {
+    pub network: String,
+    pub endpoint: String,
+}
+
+impl StacksIntegration {
+    pub fn new(network: &str, endpoint: &str) -> Self {
+        Self {
+            network: network.to_string(),
+            endpoint: endpoint.to_string(),
+        }
+    }
+    
+    // Placeholder for stacks functionality
+    pub fn is_enabled(&self) -> bool {
+        false
+    }
+}
 
 use std::collections::HashMap;
 use bitcoin::Txid;
@@ -157,7 +181,6 @@ impl SidechainManager for DefaultSidechainManager {
         // Implementation goes here
         Ok(vec![
             SidechainType::RSK,
-            SidechainType::Stacks,
             SidechainType::Liquid,
         ])
     }

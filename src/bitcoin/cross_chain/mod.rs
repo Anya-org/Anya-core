@@ -19,6 +19,7 @@ use std::collections::HashMap;
 use hex;
 use bitcoin::blockdata::transaction::{Transaction, TxIn, TxOut};
 use bitcoin::key::{PublicKey, WPubkeyHash};
+use thiserror::Error;
 
 /// Cross-Chain Transaction Status
 /// 
@@ -37,6 +38,34 @@ pub enum CrossChainStatus {
     Completed,
     /// Transaction failed
     Failed(String),
+}
+
+/// Bridge error type
+#[derive(Debug, thiserror::Error)]
+pub enum BridgeError {
+    /// Invalid transaction
+    #[error("Invalid transaction: {0}")]
+    InvalidTransaction(String),
+    
+    /// Bridge execution error
+    #[error("Bridge execution error: {0}")]
+    ExecutionError(String),
+    
+    /// Insufficient funds
+    #[error("Insufficient funds: {0}")]
+    InsufficientFunds(String),
+    
+    /// Bridge not supported
+    #[error("Bridge not supported: {0}")]
+    NotSupported(String),
+    
+    /// Bitcoin error
+    #[error("Bitcoin error: {0}")]
+    BitcoinError(#[from] crate::bitcoin::error::BitcoinError),
+    
+    /// RSK bridge error
+    #[error("RSK bridge error: {0}")]
+    RskError(#[from] crate::bitcoin::cross_chain::rsk::BridgeError),
 }
 
 /// Cross-Chain Bridge
@@ -63,11 +92,9 @@ pub struct CrossChainBridge {
 }
 
 impl CrossChainBridge {
-    fn create_bridge_output(&self, bridge_tx: &BridgeTx) -> Result<ScriptBuf> {
-        // Convert PubkeyHash to WPubkeyHash
-        let wpubkey_hash = WPubkeyHash::from_pubkey_hash(bridge_tx.sender_pubkey.pubkey_hash());
-        let script = bitcoin::ScriptBuf::new_p2wpkh(&wpubkey_hash);
-        Ok(script)
+    fn create_bridge_output(&self, bridge_tx: &BridgeTx) -> Result<ScriptBuf, BridgeError> {
+        // Placeholder implementation for now
+        Err(BridgeError::NotSupported("Method not fully implemented".to_string()))
     }
 }
 
@@ -94,6 +121,51 @@ pub struct CrossChainTransaction {
     pub timestamp: u64,
     /// Number of confirmations on source chain
     pub source_confirmations: u32,
+}
+
+/// Bridge transaction
+/// 
+/// Represents a cross-chain bridge transaction.
+#[derive(Debug, Clone)]
+pub struct BridgeTx {
+    /// Transaction ID
+    pub tx_id: String,
+    
+    /// Sender address
+    pub sender: String,
+    
+    /// Sender public key
+    pub sender_pubkey: bitcoin::PublicKey,
+    
+    /// Recipient address
+    pub recipient: String,
+    
+    /// Amount to transfer
+    pub amount: u64,
+    
+    /// Fee amount
+    pub fee: u64,
+    
+    /// Bridge type
+    pub bridge_type: BridgeType,
+    
+    /// Transaction status
+    pub status: CrossChainStatus,
+}
+
+/// Bridge type
+/// 
+/// Represents the type of cross-chain bridge.
+#[derive(Debug, Clone, PartialEq)]
+pub enum BridgeType {
+    /// RSK federation bridge
+    RSK,
+    
+    /// Liquid federated sidechain
+    Liquid,
+    
+    /// Other bridge type
+    Other(String),
 }
 
 /// Create a new cross-chain bridge

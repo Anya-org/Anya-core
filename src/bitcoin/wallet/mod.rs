@@ -20,6 +20,17 @@ use crate::bitcoin::interface::BitcoinInterface;
 use bitcoin::hashes::Hash as BitcoinHashTrait;
 use crate::AnyaError;
 use bitcoin::{Script, ScriptBuf, Sequence, TxIn, TxOut, Amount};
+use std::path::{Path, PathBuf};
+use bitcoin::consensus::encode;
+use bitcoin::util::bip32::{ExtendedPrivKey, ExtendedPubKey, DerivationPath, KeySource};
+use bitcoin::util::psbt::PartiallySignedTransaction as PSBT;
+use bip39::{Mnemonic, MnemonicType, Seed};
+use thiserror::Error;
+use log::{debug, info, error, warn};
+use serde::{Serialize, Deserialize};
+use async_trait::async_trait;
+use crate::bitcoin::rpc::BitcoinRpcClient;
+use crate::bitcoin::network::NetworkConfig;
 
 pub mod bip32;
 pub mod transactions;
@@ -38,6 +49,15 @@ pub struct WalletConfig {
     pub name: String,
     pub seed_phrase: Option<String>,
     pub password: Option<String>,
+    pub receive_descriptor: String,
+    pub change_descriptor: String,
+    pub xpub: Option<String>,
+    pub data_dir: PathBuf,
+    pub use_rpc: bool,
+    pub coin_selection: CoinSelectionStrategy,
+    pub gap_limit: u32,
+    pub min_confirmations: u32,
+    pub fee_strategy: FeeStrategy,
 }
 
 pub trait KeyManager {
@@ -571,4 +591,495 @@ impl BitcoinWallet {
     pub async fn get_transaction(&self, txid: &str) -> BitcoinResult<Transaction> {
         self.interface.get_transaction(txid).await
     }
+}
+
+/// Wallet error type
+#[derive(Error, Debug)]
+pub enum WalletError {
+    /// Error related to the Bitcoin library
+    #[error("Bitcoin error: {0}")]
+    BitcoinError(String),
+    
+    /// Error related to secp256k1
+    #[error("Secp256k1 error: {0}")]
+    Secp256k1Error(#[from] secp256k1::Error),
+    
+    /// Error related to the BIP39 library
+    #[error("BIP39 error: {0}")]
+    Bip39Error(String),
+    
+    /// Error related to descriptors
+    #[error("Descriptor error: {0}")]
+    DescriptorError(String),
+    
+    /// Error related to wallet storage
+    #[error("Wallet storage error: {0}")]
+    StorageError(String),
+    
+    /// Error related to wallet configuration
+    #[error("Wallet configuration error: {0}")]
+    ConfigError(String),
+    
+    /// Error related to transaction creation
+    #[error("Transaction creation error: {0}")]
+    TransactionError(String),
+    
+    /// Error related to PSBT operations
+    #[error("PSBT error: {0}")]
+    PsbtError(String),
+    
+    /// Error related to signing operations
+    #[error("Signing error: {0}")]
+    SigningError(String),
+    
+    /// Error related to blockchain synchronization
+    #[error("Synchronization error: {0}")]
+    SyncError(String),
+    
+    /// Error related to address generation
+    #[error("Address generation error: {0}")]
+    AddressError(String),
+    
+    /// Error related to fee estimation
+    #[error("Fee estimation error: {0}")]
+    FeeEstimationError(String),
+    
+    /// RPC error
+    #[error("RPC error: {0}")]
+    RpcError(String),
+    
+    /// Invalid parameters
+    #[error("Invalid parameters: {0}")]
+    InvalidParameters(String),
+    
+    /// Insufficient funds
+    #[error("Insufficient funds: {0}")]
+    InsufficientFunds(String),
+    
+    /// IO error
+    #[error("IO error: {0}")]
+    IoError(#[from] std::io::Error),
+    
+    /// Serialization error
+    #[error("Serialization error: {0}")]
+    SerializationError(String),
+    
+    /// UTXO management error
+    #[error("UTXO management error: {0}")]
+    UtxoError(String),
+}
+
+/// UTXO (Unspent Transaction Output) representation
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Utxo {
+    /// The outpoint of this UTXO
+    pub outpoint: OutPoint,
+    
+    /// The TxOut data
+    pub txout: TxOut,
+    
+    /// The redeem script (if available)
+    pub redeem_script: Option<Script>,
+    
+    /// The witness script (if available)
+    pub witness_script: Option<Script>,
+    
+    /// Confirmations (0 for unconfirmed)
+    pub confirmations: u32,
+    
+    /// Is this UTXO spendable (not locked or reserved)
+    pub spendable: bool,
+    
+    /// Is this UTXO coming from the wallet (vs a watch-only address)
+    pub from_wallet: bool,
+}
+
+/// Transaction information
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TransactionInfo {
+    /// Transaction ID
+    pub txid: Txid,
+    
+    /// Complete transaction
+    pub transaction: Transaction,
+    
+    /// Block height (None if unconfirmed)
+    pub block_height: Option<u32>,
+    
+    /// Confirmations (0 for unconfirmed)
+    pub confirmations: u32,
+    
+    /// Fee in satoshis
+    pub fee: Option<u64>,
+    
+    /// Transaction time (from block)
+    pub timestamp: Option<u64>,
+    
+    /// Our inputs value (sum of wallet inputs)
+    pub sent: u64,
+    
+    /// Our outputs value (sum of wallet outputs)
+    pub received: u64,
+    
+    /// Labels associated with this transaction
+    pub labels: Vec<String>,
+}
+
+/// Fee rate type
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub enum FeeRate {
+    /// Satoshis per kilobyte
+    SatPerKb(u64),
+    
+    /// Satoshis per virtual byte
+    SatPerVb(u64),
+}
+
+impl FeeRate {
+    /// Convert to satoshis per virtual byte
+    pub fn to_sat_per_vb(&self) -> u64 {
+        match self {
+            FeeRate::SatPerKb(fee) => (fee + 999) / 1000,
+            FeeRate::SatPerVb(fee) => *fee,
+        }
+    }
+    
+    /// Convert to satoshis per kilobyte
+    pub fn to_sat_per_kb(&self) -> u64 {
+        match self {
+            FeeRate::SatPerKb(fee) => *fee,
+            FeeRate::SatPerVb(fee) => fee * 1000,
+        }
+    }
+}
+
+/// Wallet synchronization state
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SyncState {
+    /// Latest known block height
+    pub block_height: u32,
+    
+    /// Latest known block hash
+    pub block_hash: String,
+    
+    /// Latest scan time
+    pub last_scan: u64,
+    
+    /// Sync progress (0.0 to 1.0)
+    pub progress: f64,
+    
+    /// Is initial block download still in progress
+    pub ibd: bool,
+}
+
+/// Wallet trait definition
+#[async_trait]
+pub trait Wallet: Send + Sync {
+    /// Initialize the wallet
+    async fn init(&self) -> Result<(), WalletError>;
+    
+    /// Generate a new receiving address
+    async fn get_new_address(&self) -> Result<Address, WalletError>;
+    
+    /// Get the current receiving address (without incrementing)
+    async fn get_current_address(&self) -> Result<Address, WalletError>;
+    
+    /// Get a change address
+    async fn get_change_address(&self) -> Result<Address, WalletError>;
+    
+    /// Check if an address belongs to this wallet
+    async fn is_mine(&self, address: &Address) -> Result<bool, WalletError>;
+    
+    /// Get all wallet addresses
+    async fn list_addresses(&self) -> Result<Vec<Address>, WalletError>;
+    
+    /// Get wallet balance
+    async fn get_balance(&self) -> Result<u64, WalletError>;
+    
+    /// Get wallet balance with details
+    async fn get_detailed_balance(&self) -> Result<(u64, u64, u64), WalletError>;
+    
+    /// List unspent UTXOs
+    async fn list_utxos(&self) -> Result<Vec<Utxo>, WalletError>;
+    
+    /// Get transaction history
+    async fn get_transactions(&self) -> Result<Vec<TransactionInfo>, WalletError>;
+    
+    /// Get transaction by ID
+    async fn get_transaction(&self, txid: &Txid) -> Result<Option<TransactionInfo>, WalletError>;
+    
+    /// Create a transaction
+    async fn create_transaction(&self, params: TransactionParams) -> Result<PSBT, WalletError>;
+    
+    /// Sign a transaction
+    async fn sign_transaction(&self, psbt: &mut PSBT) -> Result<bool, WalletError>;
+    
+    /// Broadcast a transaction
+    async fn broadcast_transaction(&self, transaction: &Transaction) -> Result<Txid, WalletError>;
+    
+    /// Get fee estimate for the given strategy
+    async fn get_fee_rate(&self, strategy: FeeStrategy) -> Result<FeeRate, WalletError>;
+    
+    /// Calculate fee for a transaction
+    async fn calculate_fee(&self, psbt: &PSBT) -> Result<u64, WalletError>;
+    
+    /// Synchronize the wallet with the blockchain
+    async fn sync(&self) -> Result<SyncState, WalletError>;
+    
+    /// Export wallet data
+    async fn export(&self, path: &Path) -> Result<(), WalletError>;
+    
+    /// Import wallet data
+    async fn import(&self, path: &Path) -> Result<(), WalletError>;
+    
+    /// Create backup
+    async fn backup(&self, path: &Path) -> Result<(), WalletError>;
+    
+    /// Get wallet information
+    async fn get_info(&self) -> Result<WalletInfo, WalletError>;
+}
+
+/// Wallet info
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct WalletInfo {
+    /// Wallet name
+    pub name: String,
+    
+    /// Wallet version
+    pub version: String,
+    
+    /// Wallet format
+    pub format: String,
+    
+    /// Network
+    pub network: Network,
+    
+    /// Current balance
+    pub balance: u64,
+    
+    /// Unconfirmed balance
+    pub unconfirmed_balance: u64,
+    
+    /// Immature balance
+    pub immature_balance: u64,
+    
+    /// Number of keys
+    pub keypools: u32,
+    
+    /// Number of transactions
+    pub tx_count: u32,
+    
+    /// Keypool oldest
+    pub keypool_oldest: u64,
+    
+    /// Keypool size
+    pub keypool_size: u32,
+    
+    /// Payee requires witness
+    pub private_keys_enabled: bool,
+    
+    /// Unlocked until
+    pub unlocked_until: Option<u64>,
+    
+    /// HD seed version
+    pub hdseedid: Option<String>,
+    
+    /// Is the wallet avoiding reuse
+    pub avoid_reuse: bool,
+    
+    /// Scanning status
+    pub scanning: bool,
+    
+    /// Descriptors enabled
+    pub descriptors: bool,
+}
+
+/// Bitcoin wallet implementation
+pub struct BitcoinWallet {
+    /// Wallet configuration
+    config: WalletConfig,
+    
+    /// Network configuration
+    network_config: NetworkConfig,
+    
+    /// RPC client (if used)
+    rpc_client: Option<Arc<BitcoinRpcClient>>,
+    
+    /// Wallet data storage
+    storage: Arc<Mutex<WalletStorage>>,
+    
+    /// Secp256k1 context
+    secp: Secp256k1<secp256k1::All>,
+}
+
+/// Wallet storage structure
+#[derive(Debug, Serialize, Deserialize)]
+struct WalletStorage {
+    /// Wallet metadata
+    metadata: WalletMetadata,
+    
+    /// UTXOs
+    utxos: HashMap<OutPoint, Utxo>,
+    
+    /// Transactions
+    transactions: HashMap<Txid, TransactionInfo>,
+    
+    /// Address index mapping
+    addresses: HashMap<String, AddressInfo>,
+    
+    /// Current indexes
+    indexes: WalletIndexes,
+}
+
+/// Wallet metadata
+#[derive(Debug, Clone, Serialize, Deserialize)]
+struct WalletMetadata {
+    /// Wallet creation time
+    created_at: u64,
+    
+    /// Wallet last updated
+    updated_at: u64,
+    
+    /// Wallet version
+    version: String,
+    
+    /// Wallet network
+    network: Network,
+    
+    /// Wallet master fingerprint
+    master_fingerprint: Option<[u8; 4]>,
+    
+    /// Labels
+    labels: HashMap<String, String>,
+}
+
+/// Wallet address information
+#[derive(Debug, Clone, Serialize, Deserialize)]
+struct AddressInfo {
+    /// The address string
+    address: String,
+    
+    /// The path from which this address was derived
+    path: Option<DerivationPath>,
+    
+    /// The script
+    script: Script,
+    
+    /// Is this a change address
+    is_change: bool,
+    
+    /// Index in the derivation sequence
+    index: u32,
+    
+    /// The address labels
+    labels: Vec<String>,
+    
+    /// Last time this address was used
+    last_used: Option<u64>,
+}
+
+/// Wallet index tracking
+#[derive(Debug, Clone, Serialize, Deserialize)]
+struct WalletIndexes {
+    /// Next receive address index
+    receive_index: u32,
+    
+    /// Next change address index
+    change_index: u32,
+    
+    /// Last synced block
+    last_block: Option<u32>,
+    
+    /// Last sync time
+    last_sync: Option<u64>,
+}
+
+/// Module implementation details
+mod implementation;
+
+/// Module for HD key management
+pub mod hd;
+
+/// PSBT operations
+pub mod psbt;
+
+/// Coin selection algorithms
+pub mod coin_selection;
+
+/// Address management
+pub mod address;
+
+/// Descriptors
+pub mod descriptor;
+
+/// Fee strategy
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub enum FeeStrategy {
+    /// Very low fee (might take long to confirm)
+    VeryLow,
+    
+    /// Low fee
+    Low,
+    
+    /// Medium fee (good balance)
+    Medium,
+    
+    /// High fee
+    High,
+    
+    /// Very high fee (for urgent transactions)
+    VeryHigh,
+    
+    /// Custom fee rate
+    Custom(FeeRate),
+}
+
+/// Transaction creation parameters
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TransactionParams {
+    /// List of recipients with amounts
+    pub recipients: Vec<(Address, u64)>,
+    
+    /// Optional coin selection (use specific UTXOs)
+    pub utxos: Option<Vec<OutPoint>>,
+    
+    /// Fee strategy
+    pub fee_strategy: Option<FeeStrategy>,
+    
+    /// Lock time
+    pub lock_time: Option<u32>,
+    
+    /// Enable RBF (Replace-By-Fee)
+    pub enable_rbf: bool,
+    
+    /// Optional change address (if not using the default)
+    pub change_address: Option<Address>,
+    
+    /// Include metadata in an OP_RETURN output
+    pub op_return_data: Option<Vec<u8>>,
+    
+    /// Allow spending unconfirmed UTXOs
+    pub allow_unconfirmed: bool,
+}
+
+/// Coin selection strategy
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub enum CoinSelectionStrategy {
+    /// Select largest UTXOs first
+    LargestFirst,
+    
+    /// Select smallest UTXOs first
+    SmallestFirst,
+    
+    /// Use oldest confirmed first
+    OldestFirst,
+    
+    /// Use random selection
+    Random,
+    
+    /// Optimize for privacy (avoid change)
+    PrivacyOptimized,
+    
+    /// Branch and bound algorithm
+    BranchAndBound,
 } 

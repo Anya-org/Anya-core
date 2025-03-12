@@ -491,8 +491,34 @@ use bitcoin::address::WitnessProgram;
 
 // ...existing code...
 
+// Add the BridgeError type used in Result<T, BridgeError>
+/// Bridge error type
+#[derive(Debug, thiserror::Error)]
+pub enum BridgeError {
+    /// Invalid transaction
+    #[error("Invalid transaction: {0}")]
+    InvalidTransaction(String),
+    
+    /// Bridge execution error
+    #[error("Bridge execution error: {0}")]
+    ExecutionError(String),
+    
+    /// Insufficient funds
+    #[error("Insufficient funds: {0}")]
+    InsufficientFunds(String),
+    
+    /// Bridge not supported
+    #[error("Bridge not supported: {0}")]
+    NotSupported(String),
+    
+    /// Bitcoin error
+    #[error("Bitcoin error: {0}")]
+    BitcoinError(#[from] crate::bitcoin::error::BitcoinError),
+}
+
+// Fix the create_peg_out_tx method to use the BridgeError type
 impl RskBridge {
-    fn create_peg_out_tx(&self, bridge_tx: &BridgeTx) -> Result<Transaction> {
+    fn create_peg_out_tx(&self, bridge_tx: &BridgeTx) -> Result<Transaction, BridgeError> {
         // Convert to Amount type
         let value = Amount::from_sat(bridge_tx.amount);
         
@@ -504,6 +530,9 @@ impl RskBridge {
             script_pubkey,
         };
         
-        // ...existing code...
+        // ... existing code ...
+        
+        // For now, return a placeholder result
+        Err(BridgeError::NotSupported("Method not fully implemented".to_string()))
     }
 }
