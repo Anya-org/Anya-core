@@ -1,3 +1,5 @@
+<!-- markdownlint-disable MD013 line-length -->
+
 # Advanced Features
 
 Documentation for Advanced Features

@@ -1,3 +1,5 @@
+<!-- markdownlint-disable MD013 line-length -->
+
 # Core System Integration
 
 *Last Updated: 2024-03-10*

@@ -1,6 +1,6 @@
-// docs/AGENT_ARCHITECTURE.md
+<!-- markdownlint-disable MD013 line-length -->
 
-# Agent System Architecture
+# Agent System Architecture \[AIR-3\]\[AIS-2\]
 
 ## Core Agents
 
@@ -67,4 +67,7 @@
 - Code Repository Monitoring
 - Protocol Updates
 - Innovation Tracking
-*Last updated: 2024-12-07*
+
+## Last Updated
+
+2025-03-12

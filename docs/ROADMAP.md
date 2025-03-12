@@ -1,3 +1,5 @@
+<!-- markdownlint-disable MD013 line-length -->
+
 # Anya Enterprise Platform Roadmap
 
 ## Current Status (Phase 2 In Progress)

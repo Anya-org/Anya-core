@@ -1,3 +1,5 @@
+<!-- markdownlint-disable MD013 line-length -->
+
 # Comprehensive Labeling System for Multi-Repository Projects
 
 This document describes the comprehensive labeling system used across all Anya Core repositories, including the tools and procedures for maintaining consistency.
@@ -237,18 +239,18 @@ To update GitHub repository URLs across the codebase:
 Example usage:
 
 ```powershell
-# Windows (PowerShell)
+## Windows (PowerShell)
 ./scripts/update_github_url.ps1 -DryRun
 
-# Actually perform the updates
+## Actually perform the updates
 ./scripts/update_github_url.ps1
 ```
 
 ```bash
-# Linux/macOS
+## Linux/macOS
 ./scripts/update_github_url.sh --dry-run
 
-# Actually perform the updates
+## Actually perform the updates
 ./scripts/update_github_url.sh
 ```
 
@@ -338,41 +340,41 @@ On Windows systems:
 ### PowerShell Examples
 
 ```powershell
-# Batch commit with labels - simple example
+## Batch commit with labels - simple example
 ./scripts/batch_commit.ps1 -Message "Update ML models" -Type "feat" -Scope "ml" -Labels "AIR-3,AIS-2,AIT-3,AIM-2"
 
-# Batch commit with validation and specific repositories
+## Batch commit with validation and specific repositories
 ./scripts/batch_commit.ps1 -Message "Fix security issues" -Type "fix" -Scope "security" -Labels "AIR-3,AIS-3" -Repos "anya-core,anya-bitcoin" -Validate
 
-# Batch commit with custom root directory
+## Batch commit with custom root directory
 ./scripts/batch_commit.ps1 -Message "Update configs" -Type "chore" -Labels "AIR-3,AIS-2" -RootDir "C:\Projects\Anya"
 
-# Synchronize labels across all repositories
+## Synchronize labels across all repositories
 ./scripts/sync_labelling.ps1
 
-# Check for label differences only
+## Check for label differences only
 ./scripts/sync_labelling.ps1 -CheckOnly
 
-# Synchronize labels to specific repositories
+## Synchronize labels to specific repositories
 ./scripts/sync_labelling.ps1 -Target "anya-web5,anya-bitcoin" -DryRun
 ```
 
 ### Bash Examples
 
 ```bash
-# Batch commit with labels - simple example
+## Batch commit with labels - simple example
 ./scripts/batch_commit.sh -m "Update ML models" -t "feat" -s "ml" -l "AIR-3,AIS-2,AIT-3,AIM-2"
 
-# Batch commit with validation and specific repositories
+## Batch commit with validation and specific repositories
 ./scripts/batch_commit.sh -m "Fix security issues" -t "fix" -s "security" -l "AIR-3,AIS-3" -r "anya-core,anya-bitcoin" -v
 
-# Synchronize labels across all repositories
+## Synchronize labels across all repositories
 python scripts/sync_labelling.py
 
-# Check for label differences only
+## Check for label differences only
 python scripts/sync_labelling.py --check-only
 
-# Synchronize labels to specific repositories
+## Synchronize labels to specific repositories
 python scripts/sync_labelling.py --target "anya-web5,anya-bitcoin" --dry-run
 ```
 

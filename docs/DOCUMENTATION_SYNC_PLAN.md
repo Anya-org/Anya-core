@@ -1,3 +1,5 @@
+<!-- markdownlint-disable MD013 line-length -->
+
 # Documentation Synchronization Plan
 
 ## Overview
@@ -197,7 +199,7 @@ Deprecated features are marked with a warning banner:
 ### 1. API Endpoint Template
 
 ```markdown
-# Endpoint Name
+## Endpoint Name
 
 **URL**: `/api/resource`
 
@@ -244,7 +246,7 @@ curl -X GET https://api.anyacore.com/api/resource?param1=value
 ### 2. Component Documentation Template
 
 ```markdown
-# Component Name
+## Component Name
 
 ## Overview
 

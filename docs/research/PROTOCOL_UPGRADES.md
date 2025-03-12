@@ -1,3 +1,5 @@
+<!-- markdownlint-disable MD013 line-length -->
+
 # Protocol Support Research and Upgrade Plan
 
 *Last Updated: 2025-03-06*

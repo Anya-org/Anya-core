@@ -1,3 +1,5 @@
+<!-- markdownlint-disable MD013 line-length -->
+
 # Bitcoin Layer 2 Solutions Support
 
 *Last Updated: 2025-03-06*

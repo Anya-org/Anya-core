@@ -1,3 +1,5 @@
+<!-- markdownlint-disable MD013 line-length -->
+
 # Anya Core Sensitive Data Management
 
 This guide explains how to set up and manage sensitive data for your Anya Core installation.

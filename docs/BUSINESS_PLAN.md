@@ -1,3 +1,5 @@
+<!-- markdownlint-disable MD013 line-length -->
+
 # Anya Enterprise Business Plan & Revenue Model
 
 ## Executive Summary

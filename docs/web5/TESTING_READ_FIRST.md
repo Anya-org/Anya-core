@@ -1,3 +1,5 @@
+<!-- markdownlint-disable MD013 line-length -->
+
 # Testing the Read First Always Implementation
 
 This guide explains how to test the Read First Always principle implementation in both Dart and Rust components of the Anya Core project.

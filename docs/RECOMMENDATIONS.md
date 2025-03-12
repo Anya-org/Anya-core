@@ -1,3 +1,5 @@
+<!-- markdownlint-disable MD013 line-length -->
+
 # Key Recommendations for Anya Core
 
 ## Integration Improvements

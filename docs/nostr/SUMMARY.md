@@ -1,3 +1,5 @@
+<!-- markdownlint-disable MD013 line-length -->
+
 # Nostr Integration
 
 - [Overview](README.md)

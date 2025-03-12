@@ -1,3 +1,5 @@
+<!-- markdownlint-disable MD013 line-length -->
+
 # NIP-04: Encrypted Direct Messages
 
 ## Overview
