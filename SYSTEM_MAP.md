@@ -4,12 +4,13 @@
 ```
 anya (anya-core)
 ├── anya-bitcoin/               # Bitcoin integration
-├── anya-enterprise/           # Enterprise core features
-├── anya-extensions/          # Extension system
-├── dash33/                  # Web dashboard
-├── dependencies/           # Shared dependencies
-├── enterprise/           # Business implementation
-└── mobile/             # Cross-platform mobile app
+├── anya-enterprise/            # Enterprise core features
+├── anya-extensions/            # Extension system
+├── dash33/                    # Web dashboard
+├── dependencies/              # Shared dependencies
+├── enterprise/                # Business implementation
+├── mobile/                    # Cross-platform mobile app
+└── install/                   # Unified installer system
 ```
 
 ## Core Components
