@@ -18,13 +18,25 @@ use bitcoin::merkle::PartialMerkleTree;
 
 // For now, we'll reuse types from the liquid module
 use crate::bitcoin::cross_chain::liquid::{
-    Transaction, TxIn, TxOut, Script, PartialMerkleTree, OutPoint
+    Transaction as LiquidTransaction, TxIn as LiquidTxIn, TxOut as LiquidTxOut,
+    Script as LiquidScript, PartialMerkleTree as LiquidPartialMT, OutPoint as LiquidOutPoint,
 };
 
 use bitcoin::{
-    Transaction, TxIn, TxOut, Script, OutPoint, Amount,
-    Sequence, ScriptBuf, LockTime, Witness, Txid,
+    Amount,
+    TxIn,
+    TxOut,
+    Script,
+    ScriptBuf,
+    OutPoint,
+    Transaction,
+    Txid,
+    Sequence,
+    Witness,
+    locktime::LockTime,
     transaction::Version,
+    secp256k1::Secp256k1,
+    // ...any other necessary items...
 };
 
 /// RSK SPV Proof structure
