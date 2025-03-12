@@ -23,6 +23,7 @@ Web5 decentralized data management, and a Bitcoin-style DAO governance system.
 - [Implementation Milestones](docs/IMPLEMENTATION_MILESTONES.md) - Project progress
 - [AI Labeling System](AI_LABELLING.md) - Component labeling standards
 - [AI Labeling Implementation](docs/AI_LABELING_IMPLEMENTATION.md) - Implementation status
+- [Installation Guide](docs/installation/README.md) - Installation instructions
 
 ## Licensing
 
@@ -44,6 +45,17 @@ See the [Enterprise License](./enterprise/LICENSE) for details.
 - Circuit breaker pattern implementation
 - Comprehensive health monitoring
 - Thread-safe caching layer
+
+### Installation System
+
+[AIR-3][AIS-3][AIT-3][PFM-2]
+
+- Hexagonal architecture with clean separation of concerns
+- Multi-language support (Python, Rust, Node.js, Go)
+- Checkpoint system with progress tracking
+- Component-based installation with dependency management
+- Multiple deployment configurations
+- Cross-platform compatibility
 
 ### DAO & Tokenomics System
 
@@ -684,7 +696,7 @@ We welcome contributions! See our [Contributing Guide](CONTRIBUTING.md) for deta
 
 - **Current Version**: 3.1.0
 - **Status**: Production/Stable
-- **Last Update**: 2025-03-04
+- **Last Update**: 2025-03-12
 
 ## License Information
 
@@ -716,4 +728,4 @@ Special thanks to our contributors and the following projects:
 
 ### Last Updated
 
-*2025-03-04*
+*2025-03-12*
