@@ -1,3 +1,5 @@
+<!-- markdownlint-disable MD013 line-length -->
+
 # System Design
 
 Documentation for System Design

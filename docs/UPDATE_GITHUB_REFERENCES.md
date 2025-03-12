@@ -1,3 +1,5 @@
+<!-- markdownlint-disable MD013 line-length -->
+
 # GitHub URL Update Plan
 
 ## Overview
@@ -21,8 +23,8 @@ We have created two scripts to automate the URL update process:
 #### PowerShell Script (`scripts/update_github_url.ps1`)
 
 ```powershell
-# GitHub URL Update Script for Windows
-# This script updates all references to the old GitHub URL with the new URL
+## GitHub URL Update Script for Windows
+## This script updates all references to the old GitHub URL with the new URL
 
 param(
     [string]$OldUrl = "github.com/anya-org/anya-core",
@@ -31,14 +33,14 @@ param(
     [switch]$DryRun
 )
 
-# File extensions to check
+## File extensions to check
 $Extensions = @(
     "*.md", "*.html", "*.yaml", "*.yml", "*.toml", "*.json", 
     "*.sh", "*.ps1", "*.rs", "*.py", "*.js", "*.ts", "*.lock",
     "*.d", "*.html", "*.txt", "*.css"
 )
 
-# Function to update URLs in files
+## Function to update URLs in files
 function Update-URLs {
     param (
         [string]$FilePath
@@ -69,11 +71,11 @@ function Update-URLs {
     return $false
 }
 
-# Main execution
+## Main execution
 Write-Host "Starting GitHub URL update process..."
 $updateCount = 0
 
-# Process each file extension
+## Process each file extension
 foreach ($ext in $Extensions) {
     $files = Get-ChildItem -Path $RootDir -Recurse -File -Filter $ext
     
@@ -84,7 +86,7 @@ foreach ($ext in $Extensions) {
     }
 }
 
-# Update .git submodules
+## Update .git submodules
 $gitmodulesPath = Join-Path $RootDir ".gitmodules"
 if (Test-Path $gitmodulesPath) {
     if (Update-URLs -FilePath $gitmodulesPath) {
@@ -92,7 +94,7 @@ if (Test-Path $gitmodulesPath) {
     }
 }
 
-# Summary
+## Summary
 Write-Host "`nUpdate complete."
 if ($DryRun) {
     Write-Host "DRY RUN: Would have updated $updateCount files." -ForegroundColor Yellow
@@ -100,7 +102,7 @@ if ($DryRun) {
     Write-Host "Updated $updateCount files." -ForegroundColor Green
 }
 
-# Next steps
+## Next steps
 Write-Host "`nNext steps:"
 Write-Host "1. Run 'grep -r \"anya-org/anya-core\" .' to find any remaining references" -ForegroundColor Yellow
 Write-Host "2. Commit changes: 'git commit -am \"Update GitHub URLs from botshelomokoka to anya-org\"'" -ForegroundColor Yellow
@@ -111,15 +113,15 @@ Write-Host "3. Run tests to ensure everything still works" -ForegroundColor Yell
 
 ```bash
 #!/bin/bash
-# GitHub URL Update Script for Linux/macOS
-# This script updates all references to the old GitHub URL with the new URL
+## GitHub URL Update Script for Linux/macOS
+## This script updates all references to the old GitHub URL with the new URL
 
 OLD_URL="github.com/anya-org/anya-core"
 NEW_URL="github.com/anya-org/anya-core"
 ROOT_DIR="."
 DRY_RUN=false
 
-# Parse command line arguments
+## Parse command line arguments
 while [[ "$#" -gt 0 ]]; do
     case $1 in
         --old-url) OLD_URL="$2"; shift ;;
@@ -131,14 +133,14 @@ while [[ "$#" -gt 0 ]]; do
     shift
 done
 
-# File extensions to check
+## File extensions to check
 EXTENSIONS=(
     "*.md" "*.html" "*.yaml" "*.yml" "*.toml" "*.json" 
     "*.sh" "*.ps1" "*.rs" "*.py" "*.js" "*.ts" "*.lock"
     "*.d" "*.html" "*.txt" "*.css"
 )
 
-# Function to update URLs in a file
+## Function to update URLs in a file
 update_urls() {
     local file="$1"
     local content
@@ -169,11 +171,11 @@ update_urls() {
     return 1
 }
 
-# Main execution
+## Main execution
 echo "Starting GitHub URL update process..."
 update_count=0
 
-# Process each file extension
+## Process each file extension
 for ext in "${EXTENSIONS[@]}"; do
     while IFS= read -r file; do
         if update_urls "$file"; then
@@ -182,14 +184,14 @@ for ext in "${EXTENSIONS[@]}"; do
     done < <(find "$ROOT_DIR" -type f -name "$ext" 2>/dev/null)
 done
 
-# Update .git submodules
+## Update .git submodules
 if [ -f "$ROOT_DIR/.gitmodules" ]; then
     if update_urls "$ROOT_DIR/.gitmodules"; then
         ((update_count++))
     fi
 fi
 
-# Summary
+## Summary
 echo -e "\nUpdate complete."
 if [ "$DRY_RUN" = true ]; then
     echo -e "\e[33mDRY RUN: Would have updated $update_count files.\e[0m"
@@ -197,7 +199,7 @@ else
     echo -e "\e[32mUpdated $update_count files.\e[0m"
 fi
 
-# Next steps
+## Next steps
 echo -e "\nNext steps:"
 echo -e "\e[33m1. Run 'grep -r \"anya-org/anya-core\" .' to find any remaining references\e[0m"
 echo -e "\e[33m2. Commit changes: 'git commit -am \"Update GitHub URLs from botshelomokoka to anya-org\"'\e[0m"

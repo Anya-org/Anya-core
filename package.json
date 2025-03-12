@@ -32,6 +32,8 @@
   "bugs": {
     "url": "https://github.com/anya-org/anya-core/issues"
   },
-  "homepage": "https://github.com/anya-org/anya-core#readme"
+  "homepage": "https://github.com/anya-org/anya-core#readme",
+  "devDependencies": {
+    "markdownlint-cli2": "^0.17.2"
+  }
 }
-

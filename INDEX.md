@@ -17,6 +17,13 @@ Welcome to the Anya Core documentation. This index will help you navigate the va
 - [Implementation Milestones](docs/IMPLEMENTATION_MILESTONES.md) - Current progress tracking
 - [Testing Strategy](docs/TESTING_STRATEGY.md) - Sectional testing methodology
 
+## Installation & Deployment
+
+- [Installation Guide](docs/installation/README.md) - Complete installation instructions
+- [Installer Architecture](docs/installation/ARCHITECTURE.md) - Installation system design
+- [Configuration Guide](docs/installation/CONFIGURATION.md) - Configuration options
+- [Advanced Deployment](docs/installation/ADVANCED_DEPLOYMENT.md) - Advanced deployment scenarios
+
 ## Architecture Documentation
 
 - [ML System Architecture](docs/ML_SYSTEM_ARCHITECTURE.md) - Machine Learning system with Agent Checker (AIP-002)
@@ -47,6 +54,13 @@ Welcome to the Anya Core documentation. This index will help you navigate the va
 
 - [ML System Architecture](docs/ML_SYSTEM_ARCHITECTURE.md) - ML system design with Agent Checker
 - [AI Component Reference](docs/ml/README.md) - AI component details
+
+### Installation System
+
+- [Installer Core](docs/installation/CORE.md) - Core installation system
+- [Virtual Environment](docs/installation/VENV.md) - Virtual environment management
+- [Component Installation](docs/installation/COMPONENTS.md) - Component installation procedures
+- [Deployment Types](docs/installation/DEPLOYMENT_TYPES.md) - Deployment configurations
 
 ## Development Resources
 
@@ -97,7 +111,7 @@ Welcome to the Anya Core documentation. This index will help you navigate the va
 ## Release Information
 
 - **Current Version**: 3.1.0
-- **Last Updated**: 2025-03-06
+- **Last Updated**: 2025-03-12
 - **Compatibility**:
   - Stacks v2.4
   - Web5 Protocol v1.0

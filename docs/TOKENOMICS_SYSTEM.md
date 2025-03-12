@@ -1,3 +1,5 @@
+<!-- markdownlint-disable MD013 line-length -->
+
 # Anya Tokenomics System Architecture
 
 This document outlines the tokenomics architecture of the Anya DAO system, including the Bitcoin-style issuance model, DEX integration, and related components.

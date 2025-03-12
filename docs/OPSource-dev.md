@@ -1,3 +1,5 @@
+<!-- markdownlint-disable MD013 line-length -->
+
 # OPSource-dev Environment Rules
 
 This document outlines the development environment guidelines as per OPSource-dev standards.

@@ -1,3 +1,5 @@
+<!-- markdownlint-disable MD013 line-length -->
+
 # Anya Development Guide
 
 ## Development Environment Setup
@@ -10,13 +12,13 @@
 
 ### Building the Project
 ```bash
-# Build the project
+## Build the project
 cargo build
 
-# Run tests
+## Run tests
 cargo test
 
-# Run with development features
+## Run with development features
 cargo run --features "development"
 ```
 

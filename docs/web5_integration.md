@@ -1,3 +1,5 @@
+<!-- markdownlint-disable MD013 line-length -->
+
 # Anya Web5 Integration Documentation
 
 ## Overview

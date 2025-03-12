@@ -1,3 +1,5 @@
+<!-- markdownlint-disable MD013 line-length -->
+
 # Documentation Tags
 
 This page provides a comprehensive index of documentation tags to help you find relevant content quickly.

@@ -1,3 +1,5 @@
+<!-- markdownlint-disable MD013 line-length -->
+
 # Sectional Testing Strategy
 
 *Last Updated: 2025-03-04*
@@ -50,7 +52,7 @@ Our CI/CD pipeline now uses a sectional approach:
 ## YAML Configuration Example
 
 ```yaml
-# Sectional test for Core Issuance
+## Sectional test for Core Issuance
 check-core-issuance:
   runs-on: ubuntu-latest
   steps:

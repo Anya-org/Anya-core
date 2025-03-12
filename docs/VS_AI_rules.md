@@ -1,3 +1,5 @@
+<!-- markdownlint-disable MD013 line-length -->
+
 # Visual Studio AI IDE Rules
 
 This document outlines the rules and best practices for using Visual Studio with AI-assisted development in our project.

@@ -1,3 +1,5 @@
+<!-- markdownlint-disable MD013 line-length -->
+
 # Anya DAO Documentation Index
 
 Welcome to the Anya DAO documentation. This index provides a comprehensive overview of all DAO-related documentation and components.
