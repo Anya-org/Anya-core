@@ -1,3 +1,5 @@
+<!-- markdownlint-disable MD013 line-length -->
+
 # Anya Core Architecture
 
 ## Overview
@@ -820,7 +822,7 @@ The system maintains health through multiple layers:
    - Resource tracking
    - Health monitoring
 
-# Anya - Web5 Decentralized ML Agent Architecture
+## Anya - Web5 Decentralized ML Agent Architecture
 
 ## System Overview
 

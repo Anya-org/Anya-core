@@ -1,3 +1,5 @@
+<!-- markdownlint-disable MD013 line-length -->
+
 # Documentation Version History
 
 ## Version 2024.12.27

@@ -5,7 +5,60 @@ description: AI-Powered Bitcoin Protocol
 show_support: true
 ---
 
-# Welcome to Anya Core
+<!-- markdownlint-disable MD013 line-length -->
+
+# Anya Core Documentation \[AIR-3\]\[AIS-3\]
+
+This is the central index for all Anya Core documentation. All documentation follows the AI labelling convention defined in [AI Labelling Reference Guide](./AI_labelling.md).
+
+## Core Documentation
+
+| Document | Description | Tags |
+|----------|-------------|------|
+| [AI Labelling Reference Guide](./AI_labelling.md) | Defines standardized AI labelling tags for use in the Anya Core codebase | \[AIR-3\]\[AIS-3\] |
+| [High Availability](./high_availability.md) | Documentation for the High Availability subsystem | \[AIR-3\]\[AIS-3\]\[RES-3\]\[SCL-3\] |
+
+## Security Documentation
+
+| Document | Description | Tags |
+|----------|-------------|------|
+| [HSM Bitcoin Integration](./hsm_bitcoin_integration.md) | Describes how the Hardware Security Module integrates with Bitcoin | \[AIR-3\]\[AIS-3\]\[AIT-3\]\[AIP-3\]\[RES-3\] |
+
+## Module-Specific Documentation
+
+The following README files provide documentation for specific modules:
+
+| Module | Description | Tags |
+|--------|-------------|------|
+| [HSM Module](../src/security/hsm/README.md) | Hardware Security Module implementation | \[AIR-3\]\[AIS-3\]\[AIT-3\]\[AIP-3\]\[RES-3\] |
+
+## Development
+
+| Document | Description | Tags |
+|----------|-------------|------|
+| [Contributing Guide](./contributing.md) | Guidelines for contributing to Anya Core | \[AIR-1\]\[AIT-2\] |
+| [Development Setup](./dev_setup.md) | Development environment setup instructions | \[AIR-1\]\[AIT-1\] |
+
+## Architecture
+
+| Document | Description | Tags |
+|----------|-------------|------|
+| [System Architecture](./architecture.md) | Overall system architecture | \[AIR-4\]\[AIS-3\] |
+| [Hexagonal Architecture](./hexagonal.md) | Details on the hexagonal architecture pattern | \[AIR-3\] |
+
+## Last Updated
+
+This index was last updated on 2025-03-12.
+
+## Future Documentation
+
+The following documentation is planned for future releases:
+
+- Performance Benchmarks \[AIP-3\]
+- Deployment Guide \[SCL-3\]
+- Security Audit Report \[AIS-4\]
+
+## About Anya Core
 
 Anya Core is an AI-powered Bitcoin protocol that enables advanced blockchain capabilities through machine learning and Web5 integration. This documentation will help you understand and implement Anya's powerful features.
 
@@ -19,78 +72,13 @@ Anya Core is an AI-powered Bitcoin protocol that enables advanced blockchain cap
 - [Web5 Integration](/anya-core/web5) - Web5 implementation details
 - [DAO System](DAO_SYSTEM_GUIDE.md) - Comprehensive DAO documentation
 
-### Development
+### Development Resources
 
 - [API Documentation](/anya-core/api) - Complete API reference
 - [Security](/anya-core/security) - Security features and best practices
 - [Contributing](/anya-core/contributing) - How to contribute
 - [Testing](/anya-core/testing) - Testing procedures
 - [Implementation Milestones](IMPLEMENTATION_MILESTONES.md) - Current progress
-
-## Architecture Documentation
-
-- [ML System Architecture](ML_SYSTEM_ARCHITECTURE.md) - ML system with Agent Checker (AIP-002)
-- [Security Architecture](SECURITY_ARCHITECTURE.md) - Security with System Hardening (AIE-001)
-- [Performance Architecture](PERFORMANCE_ARCHITECTURE.md) - Performance with Optimization (AIR-008)
-- [Core System Integration](CORE_SYSTEM_INTEGRATION.md) - Integration of all P1 components
-- [System Map](SYSTEM_MAP.md) - Complete system architecture overview
-
-## Component Documentation
-
-### Core Components
-
-- [ML Component](/anya-core/ml)
-  - [Model Management](/anya-core/ml/models)
-  - [Inference Engine](/anya-core/ml/inference)
-  - [Performance Monitoring](/anya-core/ml/monitoring)
-  
-- [Security Component](/anya-core/security)
-  - [Authentication](/anya-core/security/auth)
-  - [Cryptography](/anya-core/security/crypto)
-  - [Audit System](/anya-core/security/audit)
-  
-- [Protocol Component](/anya-core/protocol)
-  - [Transaction Management](/anya-core/protocol/transactions)
-  - [Script Types](/anya-core/protocol/scripts)
-  - [Network Operations](/anya-core/protocol/network)
-  
-- [Enterprise Component](/anya-core/enterprise)
-  - [Business Operations](/anya-core/enterprise/operations)
-  - [Risk Management](/anya-core/enterprise/risk)
-  - [Compliance](/anya-core/enterprise/compliance)
-
-- [DAO Component](DAO_INDEX.md)
-  - [Bitcoin-Style Tokenomics](TOKENOMICS_SYSTEM.md) - 21B token supply with halving mechanism
-  - [DAO Architecture](DAO_SYSTEM_MAP.md) - System architecture and components
-  - [Implementation Status](IMPLEMENTATION_MILESTONES.md) - Current progress
-  - [Usage Guide](DAO_SYSTEM_GUIDE.md) - Comprehensive guide
-
-### System Documentation
-
-- [Architecture](/anya-core/architecture)
-  - [Component Design](/anya-core/architecture/components)
-  - [Data Flow](/anya-core/architecture/data-flow)
-  - [Security Model](/anya-core/architecture/security)
-  - [System Map](SYSTEM_MAP.md) - Complete system architecture
-  
-- [Development](/anya-core/development)
-  - [Setup Guide](/anya-core/development/setup)
-  - [Coding Standards](/anya-core/development/standards)
-  - [Testing Guide](/anya-core/development/testing)
-  
-- [Operations](/anya-core/operations)
-  - [Deployment](/anya-core/operations/deployment)
-  - [Monitoring](/anya-core/operations/monitoring)
-  - [Maintenance](/anya-core/operations/maintenance)
-
-### API Documentation
-
-- [API Reference](/anya-core/api)
-  - [ML APIs](/anya-core/api/ml)
-  - [Security APIs](/anya-core/api/security)
-  - [Protocol APIs](/anya-core/api/protocol)
-  - [Enterprise APIs](/anya-core/api/enterprise)
-  - [DAO APIs](/anya-core/api/dao)
 
 ### Integration Guides
 
@@ -160,7 +148,7 @@ The state channel integration provides:
 - **Conditional Logic**: Complex conditional state transitions
 - **Dispute Resolution**: On-chain dispute resolution mechanisms
 
-## Latest Features (2025-03-06)
+## Latest Features (2025-03-12)
 
 ### Priority 1 Components
 
@@ -207,7 +195,7 @@ The state channel integration provides:
 
 ## Latest Updates
 
-### Version {{ site.version }} (2025-03-06)
+### Version {{ site.version }} (2025-03-12)
 
 - P1 component implementation complete (AIP-002, AIE-001, AIR-008)
 - Bitcoin-style DAO implementation
@@ -278,4 +266,6 @@ async fn main() -> Result<()> {
 
 [Get Started →](/anya-core/getting-started)
 
-*Last updated: 2025-03-06*
+## Last Update
+
+*Last updated: 2025-03-12*

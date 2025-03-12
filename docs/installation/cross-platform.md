@@ -12,31 +12,31 @@ Anya now supports cross-platform installation using Dart SDK, making it easier t
 
 ### Windows
 ```powershell
-# Install Chocolatey (if not installed)
+## Install Chocolatey (if not installed)
 Set-ExecutionPolicy Bypass -Scope Process -Force
 [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
 iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
 
-# Install Dart SDK
+## Install Dart SDK
 choco install dart-sdk -y
 ```
 
 ### macOS
 ```bash
-# Install using Homebrew
+## Install using Homebrew
 brew tap dart-lang/dart
 brew install dart
 ```
 
 ### Linux (Ubuntu/Debian)
 ```bash
-# Add Google's apt repository
+## Add Google's apt repository
 sudo apt-get update
 sudo apt-get install apt-transport-https
 wget -qO- https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo gpg --dearmor -o /usr/share/keyrings/dart.gpg
 echo 'deb [signed-by=/usr/share/keyrings/dart.gpg arch=amd64] https://storage.googleapis.com/download.dartlang.org/linux/debian stable main' | sudo tee /etc/apt/sources.list.d/dart_stable.list
 
-# Install Dart SDK
+## Install Dart SDK
 sudo apt-get update
 sudo apt-get install dart
 ```
@@ -93,13 +93,13 @@ anya serve
 For development, you'll need additional tools:
 
 ```bash
-# Install development dependencies
+## Install development dependencies
 dart pub get
 
-# Run tests
+## Run tests
 dart test
 
-# Build for production
+## Build for production
 dart compile exe bin/anya.dart
 ```
 

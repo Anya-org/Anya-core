@@ -1,3 +1,5 @@
+<!-- markdownlint-disable MD013 line-length -->
+
 // docs/DEPENDENCIES.md
 
 # System Dependencies

@@ -1,3 +1,5 @@
+<!-- markdownlint-disable MD013 line-length -->
+
 # Authentication
 
 Documentation for Authentication

@@ -1,3 +1,5 @@
+<!-- markdownlint-disable MD013 line-length -->
+
 # Implementation Milestones
 
 *Last Updated: 2025-03-06*

@@ -1,3 +1,5 @@
+<!-- markdownlint-disable MD013 line-length -->
+
 # Configuration Management System Implementation Review
 
 *Last Updated: 2025-03-06*

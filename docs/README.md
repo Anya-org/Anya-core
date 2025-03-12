@@ -1,3 +1,5 @@
+<!-- markdownlint-disable MD013 line-length -->
+
 # Anya System Documentation
 
 ## Overview
@@ -137,63 +139,63 @@ Anya is an advanced integrated system combining Bitcoin/crypto functionality, ML
 
 1. **System Setup**
 ```bash
-# Clone the repository
+## Clone the repository
 git clone https://github.com/anya/anya-enterprise.git
 cd anya-enterprise
 
-# Install dependencies
+## Install dependencies
 ./scripts/setup.sh
 
-# Configure environment
+## Configure environment
 cp .env.example .env
 ```
 
 2. **Configuration**
 ```env
-# Core Settings
+## Core Settings
 DATABASE_URL=postgres://user:password@localhost/anya
 REDIS_URL=redis://localhost:6379
 
-# Security
+## Security
 HSM_ENABLED=true
 MFA_REQUIRED=true
 AUDIT_LEVEL=comprehensive
 
-# ML Settings
+## ML Settings
 ML_MODEL_PATH=/path/to/models
 NPU_ENABLED=true
 ML_THREADS=8
 
-# Web5
+## Web5
 DWN_ENABLED=true
 PROTOCOL_VERSION=1.0
 
-# Monitoring
+## Monitoring
 METRICS_ENDPOINT=http://localhost:9090
 TRACING_ENDPOINT=http://localhost:4317
 ```
 
 3. **Build & Deploy**
 ```bash
-# Build the project
+## Build the project
 cargo build --release
 
-# Run tests
+## Run tests
 cargo test --all-features
 
-# Start services
+## Start services
 ./scripts/start-services.sh
 ```
 
 4. **Verify Installation**
 ```bash
-# Check system health
+## Check system health
 ./scripts/health-check.sh
 
-# Verify components
+## Verify components
 ./scripts/verify-components.sh
 
-# Test security
+## Test security
 ./scripts/security-check.sh
 ```
 

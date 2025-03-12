@@ -1,3 +1,5 @@
+<!-- markdownlint-disable MD013 line-length -->
+
 # Environment Variables Documentation
 
 All environment variables in the Anya platform are prefixed with `ANYA_` to avoid conflicts with other applications.

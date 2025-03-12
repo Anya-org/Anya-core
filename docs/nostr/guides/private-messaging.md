@@ -1,3 +1,5 @@
+<!-- markdownlint-disable MD013 line-length -->
+
 # Private Messaging Integration Guide
 
 This guide demonstrates how to implement secure private messaging using Anya Core's Nostr integration.

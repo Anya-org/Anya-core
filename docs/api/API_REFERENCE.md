@@ -1,3 +1,5 @@
+<!-- markdownlint-disable MD013 line-length -->
+
 # API Reference
 
 ## Core API

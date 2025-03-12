@@ -1,3 +1,5 @@
+<!-- markdownlint-disable MD013 line-length -->
+
 # Performance Architecture
 
 *Last Updated: 2024-03-10*

@@ -1,3 +1,5 @@
+<!-- markdownlint-disable MD013 line-length -->
+
 # Checkpoint Creation Guide
 
 **Date:** 2025-03-02
@@ -8,16 +10,16 @@
 ### Creating a Checkpoint Manually
 
 ```powershell
-# Navigate to the repository root
+## Navigate to the repository root
 cd <repository-path>
 
-# Create a checkpoint
+## Create a checkpoint
 .\scripts\create_checkpoint.ps1 -CheckpointName "descriptive_name" -Message "Detailed checkpoint message"
 
-# Create a checkpoint with AI label
+## Create a checkpoint with AI label
 .\scripts\create_checkpoint.ps1 -CheckpointName "descriptive_name" -Message "Detailed checkpoint message" -AiLabel "AIP-001"
 
-# Create and push a checkpoint
+## Create and push a checkpoint
 .\scripts\create_checkpoint.ps1 -CheckpointName "descriptive_name" -Message "Detailed checkpoint message" -AiLabel "AIP-001" -PushToRemote
 ```
 
@@ -78,30 +80,30 @@ Automated checkpoints are created for:
 ### Listing Available Checkpoints
 
 ```powershell
-# List all Git tags (checkpoints)
+## List all Git tags (checkpoints)
 git tag -l
 
-# View checkpoint documentation
+## View checkpoint documentation
 Get-ChildItem -Path "docs/checkpoints" | Sort-Object LastWriteTime
 ```
 
 ### Comparing With a Checkpoint
 
 ```powershell
-# Compare current state with a checkpoint
+## Compare current state with a checkpoint
 git diff <checkpoint-tag>
 
-# See what files changed since a checkpoint
+## See what files changed since a checkpoint
 git diff --name-status <checkpoint-tag>
 ```
 
 ### Restoring to a Checkpoint (Caution!)
 
 ```powershell
-# First create a backup branch of your current state
+## First create a backup branch of your current state
 git checkout -b backup_before_restore
 
-# Restore to a checkpoint
+## Restore to a checkpoint
 git checkout <checkpoint-tag>
 git checkout -b restored_from_checkpoint
 ```

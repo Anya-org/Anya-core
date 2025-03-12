@@ -1,3 +1,5 @@
+<!-- markdownlint-disable MD013 line-length -->
+
 # Read First Always Principle in Web5
 
 ## Introduction
