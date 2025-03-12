@@ -1,3 +1,5 @@
+<!-- markdownlint-disable MD013 line-length -->
+
 # Anya Core Documentation Search Index
 
 This document serves as a searchable index for all Anya Core documentation, including key terms, component references, and internal links. Use this page to quickly find relevant documentation.

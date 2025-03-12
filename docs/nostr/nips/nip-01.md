@@ -1,3 +1,5 @@
+<!-- markdownlint-disable MD013 line-length -->
+
 # NIP-01: Basic Protocol Flow
 
 ## Overview

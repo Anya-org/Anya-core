@@ -1,3 +1,5 @@
+<!-- markdownlint-disable MD013 line-length -->
+
 # AI-Driven Labeling System
 
 ## Overview
@@ -71,7 +73,7 @@ AIE-003: Advanced learning capabilities
 ### 1. Creating New Items
 
 ```markdown
-# AIR-004: Implement Advanced Message Threading
+## AIR-004: Implement Advanced Message Threading
 
 ## Description
 Add support for hierarchical message threading with AI-driven organization.
@@ -299,13 +301,13 @@ pub mod nostr {
 ### Documentation Infrastructure
 
 ```powershell
-# AIR-003: Repository Connectivity Standardization
-# Updates GitHub URLs across the codebase for consistent references
-# Related:
-# - AIS-002: Repository Management
-# - AIM-003: Bitcoin Core Bridge
+## AIR-003: Repository Connectivity Standardization
+## Updates GitHub URLs across the codebase for consistent references
+## Related:
+## - AIS-002: Repository Management
+## - AIM-003: Bitcoin Core Bridge
 
-# PowerShell script for URL consistency
+## PowerShell script for URL consistency
 function Update-RepositoryUrls {
     param(
         [string]$OldUrl = "github.com/botshelomokoka/anya-core",

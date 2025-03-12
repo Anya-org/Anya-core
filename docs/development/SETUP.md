@@ -1,3 +1,5 @@
+<!-- markdownlint-disable MD013 line-length -->
+
 # Development Setup Guide
 
 ## Prerequisites
@@ -58,13 +60,13 @@ anya/
 
 ### Submodule Management
 ```bash
-# Initialize and update all submodules
+## Initialize and update all submodules
 git submodule update --init --recursive
 
-# Update specific submodule
+## Update specific submodule
 git submodule update --remote [submodule-name]
 
-# Track submodule branches
+## Track submodule branches
 git submodule foreach git checkout main
 ```
 

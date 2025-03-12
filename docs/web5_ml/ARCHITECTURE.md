@@ -1,3 +1,5 @@
+<!-- markdownlint-disable MD013 line-length -->
+
 # Web5 ML System Architecture
 
 ## Core Components

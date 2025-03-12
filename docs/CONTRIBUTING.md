@@ -1,140 +1,150 @@
-# Contributing to Anya Core
+# Contributing Guide \[AIR-1\]\[AIT-2\]
 
-We welcome contributions to the Anya Core project! This document provides guidelines for contributing to the project.
+<!-- markdownlint-disable MD013 line-length -->
 
-## Table of Contents
-
-1. [Code of Conduct](#code-of-conduct)
-2. [Getting Started](#getting-started)
-3. [Coding Standards](#coding-standards)
-4. [Making Changes](#making-changes)
-5. [Project Structure](#project-structure)
-6. [Code Review](#code-review)
-7. [Pull Requests](#pull-requests)
-8. [Documentation](#documentation)
-9. [Reporting Issues](#reporting-issues)
-10. [Key Areas for Contribution](#key-areas-for-contribution)
-11. [Community](#community)
+This document provides guidelines for contributing to the Anya Core project. Please read these guidelines before submitting any contributions.
 
 ## Code of Conduct
 
-Please read our [Code of Conduct](CODE_OF_CONDUCT.md) to foster an open and welcoming environment.
+All contributors are expected to adhere to our Code of Conduct. Please read it before participating.
 
 ## Getting Started
 
-1. Fork the repository on GitHub: <https://github.com/anya-org/anya-core>
-2. Clone your fork locally: `git clone https://github.com/your-username/anya-core.git`
-3. Create a new branch for your feature or bug fix: `git checkout -b your-branch-name`
+1. Fork the repository
+2. Clone your fork: `git clone https://github.com/yourusername/anya-core.git`
+3. Create a new branch: `git checkout -b feature/your-feature-name`
+4. Set up your development environment following the [Development Setup](./dev_setup.md) guide
 
-## Making Changes
+## Development Workflow
 
-1. Choose an issue to work on or create a new one
-2. Create a new branch for your feature or bug fix
-3. Make your changes and commit them with a clear commit message
-4. Push your changes to your fork on GitHub
-5. Submit a pull request to the main repository
+### Branch Naming Convention
 
-## Coding Standards
+- `feature/` - for new features
+- `fix/` - for bug fixes
+- `docs/` - for documentation changes
+- `refactor/` - for code refactoring
+- `test/` - for adding or modifying tests
 
-- Follow the Rust style guide
-- Use meaningful variable and function names
-- Write clear comments and documentation
-- Keep functions small and focused on a single task
-- Use error handling appropriately
+### Commit Message Guidelines
 
-## Commit Messages
+Follow these guidelines for commit messages:
 
 - Use the present tense ("Add feature" not "Added feature")
 - Use the imperative mood ("Move cursor to..." not "Moves cursor to...")
 - Limit the first line to 72 characters or less
 - Reference issues and pull requests liberally after the first line
+- Consider starting the commit message with an applicable emoji:
+  - ✨ `:sparkles:` when adding a new feature
+  - 🐛 `:bug:` when fixing a bug
+  - 📚 `:books:` when adding or updating documentation
+  - ♻️ `:recycle:` when refactoring code
+  - 🧪 `:test_tube:` when adding tests
 
-## Pull Requests
+### Pull Request Process
 
-- Provide a clear description of the changes in your pull request
-- Include any relevant issue numbers
-- Update documentation if necessary
-- Ensure all tests pass before submitting
+1. Update the README.md or documentation with details of changes if applicable
+2. Update the CHANGELOG.md with details of changes
+3. The PR should work for all supported platforms
+4. Ensure all tests pass
+5. Get approval from at least one maintainer
 
-## Testing
+## Coding Standards \[AIT-2\]
 
-- Write unit tests for new code
-- Update existing tests if necessary
-- Ensure all tests pass locally before submitting a pull request
+### Rust Code Style
+
+- Follow the [Rust API Guidelines](https://rust-lang.github.io/api-guidelines/)
+- Use `rustfmt` to format your code
+- Use `clippy` to catch common mistakes
+- Document all public items with rustdoc comments
+- Keep functions small and focused
+- Write comprehensive tests for all new functionality
+
+### AI Labelling \[AIR-1\]
+
+All new code must include appropriate AI labelling tags as defined in the [AI Labelling Reference Guide](./AI_labelling.md). For example:
+
+```rust
+/// Redis-based cache implementation
+/// \[AIR-2\]\[AIP-3\]\[RES-2\]
+pub struct RedisCache {
+    // Implementation
+}
+```
+
+### Testing Requirements \[AIT-2\]
+
+- Write unit tests for all new functionality
+- Ensure test coverage remains high
+- Include integration tests for complex features
+- For Bitcoin-related functionality, include testnet validation
 
 ## Documentation
 
-- Update the README.md if necessary
-- Document new features or changes in behavior
-- Keep API documentation up-to-date
+### Code Documentation
 
-## Community
+- Document all public functions, structs, and traits
+- Include examples in documentation where appropriate
+- Keep documentation up-to-date with code changes
 
-Join our community channels to discuss the project, ask questions, and get help:
+### Project Documentation
 
-- [Discord](https://discord.gg/anyacore)
-- [Telegram](https://t.me/anyacore)
-- [Forum](https://forum.anyacore.org)
+- Update relevant Markdown files when making significant changes
+- Follow the AI labelling guidelines for all documentation
+- Keep diagrams and architecture documents current
 
-Thank you for contributing to Anya Core!
+## Bitcoin Development Framework Compliance \[AIR-1\]
 
-## Project Structure
+Contributions that touch Bitcoin-related functionality must comply with the Bitcoin Development Framework v2.5:
 
-Familiarize yourself with the project structure:
+1. Ensure protocol adherence to Bitcoin's core tenets
+2. Follow privacy-preserving architecture principles
+3. Adhere to asset management standards
+4. Implement proper security validation
+5. Follow hexagonal architecture patterns
 
-anya-core/
-├── Cargo.toml
-├── Cargo.lock
-├── .gitignore
-├── README.md
-├── src/
-│   ├── main_system.rs
-│   ├── network_discovery.rs
-│   ├── user_management.rs
-│   ├── stx_support.rs
-│   ├── bitcoin_support.rs
-│   ├── lightning_support.rs
-│   ├── dlc_support.rs
-│   ├── kademlia.rs
-│   ├── setup_project.rs
-│   ├── setup_check.rs
-│   └── ml_logic/
-│       ├── mod.rs
-│       ├── federated_learning.rs
-│       └── system_evaluation.rs
-├── tests/
-│   ├── integration_tests.rs
-│   └── unit_tests/
-│       ├── user_management_tests.rs
-│       ├── blockchain_integration_tests.rs
-│       └── ml_logic_tests.rs
-├── docs/
-│   ├── API.md
-│   └── CONTRIBUTING.md
-└── scripts/
-    ├── setup.sh
-    └── run_tests.sh
+## Submitting Issues
 
-## Code Review
+### Bug Reports
 
-Your pull request will be reviewed by the maintainers. They may suggest changes or improvements. Please be patient and responsive during this process.
+When submitting a bug report, please include:
 
-## Reporting Issues
+- A clear, descriptive title
+- Steps to reproduce the issue
+- Expected behavior
+- Actual behavior
+- Screenshots or code examples if applicable
+- Environment information (OS, Rust version, etc.)
 
-If you find a bug or have a suggestion for improvement:
+### Feature Requests
 
-1. Check if the issue already exists in the GitHub issue tracker.
-2. If not, create a new issue with a clear title and description.
-3. Include steps to reproduce the issue if it's a bug.
-4. If possible, provide a minimal code example that demonstrates the issue.
+When submitting a feature request, please include:
 
-## Key Areas for Contribution
+- A clear, descriptive title
+- A detailed description of the proposed feature
+- Rationale for why this feature is needed
+- Any relevant examples or mockups
 
-- Enhancing the ML-driven components in `src/ml_logic/`
-- Improving Bitcoin, Stacks, and Lightning Network integrations
-- Expanding the capabilities of the Discreet Log Contracts (DLCs) support
-- Optimizing the Kademlia DHT implementation for better network discovery
-- Enhancing privacy features and security measures
-- Improving documentation and test coverage
+## Review Process
 
-*Last updated: 2024-12-07*
+All contributions go through a review process:
+
+1. Automated checks (CI/CD pipeline)
+2. Code review by maintainers
+3. Security review for sensitive areas
+4. Final approval and merge
+
+## Getting Help
+
+If you need help, you can:
+
+- Open a discussion on GitHub
+- Reach out on our Discord channel
+- Contact the maintainers directly
+
+## License
+
+By contributing to Anya Core, you agree that your contributions will be licensed under the project's license.
+
+## Last Updated
+
+2025-03-12

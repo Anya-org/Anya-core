@@ -1,3 +1,5 @@
+<!-- markdownlint-disable MD013 line-length -->
+
 # API Reference
 
 ## Overview
@@ -331,16 +333,16 @@ while let Some(msg) = ws.next().await {
 
 ### Installation
 ```bash
-# Rust
+## Rust
 cargo add anya-sdk
 
-# Python
+## Python
 pip install anya-python
 
-# JavaScript
+## JavaScript
 npm install anya-js
 
-# Go
+## Go
 go get github.com/anya/anya-go
 ```
 

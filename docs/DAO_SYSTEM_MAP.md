@@ -1,3 +1,5 @@
+<!-- markdownlint-disable MD013 line-length -->
+
 # Anya DAO System Architecture
 
 This document outlines the architecture and organization of the Anya DAO system within the Anya Core project, following the Bitcoin Development Framework v2.5 standards.

@@ -1,3 +1,5 @@
+<!-- markdownlint-disable MD013 line-length -->
+
 # Anya DAO System Comprehensive Guide
 
 ## Introduction
@@ -167,7 +169,7 @@ The team allocation is further distributed:
 If you don't have Clarinet installed, you can use the provided installation script:
 
 ```powershell
-# On Windows
+## On Windows
 .\scripts\install-clarinet.ps1
 ```
 
@@ -176,7 +178,7 @@ If you don't have Clarinet installed, you can use the provided installation scri
 To ensure all contracts are properly configured in Clarinet.toml:
 
 ```powershell
-# On Windows
+## On Windows
 .\scripts\verify-clarinet-config.ps1
 ```
 
@@ -185,20 +187,20 @@ To ensure all contracts are properly configured in Clarinet.toml:
 With Clarinet installed:
 
 ```bash
-# Navigate to the anya-core directory
+## Navigate to the anya-core directory
 cd anya-core
 
-# Check contract syntax
+## Check contract syntax
 clarinet check
 
-# Run tests
+## Run tests
 clarinet test
 ```
 
 Without Clarinet (simulation only):
 
 ```powershell
-# On Windows
+## On Windows
 .\scripts\run-dao-tests.ps1
 ```
 
@@ -334,14 +336,14 @@ When extending or modifying the DAO system:
 ### Useful Commands
 
 ```bash
-# Check DAO core syntax
+## Check DAO core syntax
 clarinet check dao/core/dao-core.clar
 
-# Run a specific test
+## Run a specific test
 clarinet test dao/tests/dao-core-test.clar
 
-# Deploy to testnet
+## Deploy to testnet
 clarinet deploy --testnet
 
-# Generate documentation
+## Generate documentation
 clarinet docs

@@ -1,3 +1,5 @@
+<!-- markdownlint-disable MD013 line-length -->
+
 # Checkpoint System
 
 **Date:** 2025-03-02
@@ -29,13 +31,13 @@ The checkpoint system provides automated snapshots of repository states at signi
 ### Creating Checkpoints Manually
 
 ```powershell
-# Basic usage
+## Basic usage
 .\scripts\create_checkpoint.ps1 -CheckpointName "feature_completion" -Message "Feature X completed"
 
-# With AI Label
+## With AI Label
 .\scripts\create_checkpoint.ps1 -CheckpointName "feature_completion" -Message "Feature X completed" -AiLabel "AIP-001"
 
-# Push to remote repository
+## Push to remote repository
 .\scripts\create_checkpoint.ps1 -CheckpointName "feature_completion" -Message "Feature X completed" -AiLabel "AIP-001" -PushToRemote
 ```
 

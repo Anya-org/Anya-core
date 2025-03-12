@@ -1,13 +1,15 @@
-# Anya Core API Documentation
+# Anya Core API Documentation \[AIR-3\]\[AIS-3\]
+
+<!-- markdownlint-disable MD013 line-length -->
 
 ## Table of Contents
 
 1. [Introduction](#introduction)
 2. [Authentication](#authentication)
 3. [Endpoints](#endpoints)
-   - [User Management](#api-v1-user)
-   - [Bitcoin Operations](#api-v1-transaction)
-   - [Lightning Network](#api-v1-network)
+   - [User Management](#user-management)
+   - [Bitcoin Operations](#bitcoin-operations)
+   - [Lightning Network](#lightning-network)
    - [Stacks (STX) Support](#stacks-stx-support)
    - [Discrete Log Contracts (DLCs)](#discrete-log-contracts-dlcs)
    - [Machine Learning and AI](#machine-learning-and-ai)
@@ -27,34 +29,30 @@ This document provides a comprehensive guide to the Anya Core API, detailing the
 
 ## Authentication
 
-All API requests require authentication using JSON Web Tokens (JWT). Include the JWT in the Authorization header of your requests:
-
-## Overview
-
-This document provides an overview of the API endpoints available in Anya Core.
+All API requests require authentication using JSON Web Tokens (JWT). Include the JWT in the Authorization header of your requests.
 
 ## Endpoints
 
-### /api/v1/user
+### User Management
 
-- **GET**: Retrieve user information
-- **POST**: Create a new user
-- **PUT**: Update user information
-- **DELETE**: Delete a user
+- **GET /api/v1/user**: Retrieve user information
+- **POST /api/v1/user**: Create a new user
+- **PUT /api/v1/user**: Update user information
+- **DELETE /api/v1/user**: Delete a user
 
-### /api/v1/transaction
+### Bitcoin Operations
 
-- **GET**: Retrieve transaction information
-- **POST**: Create a new transaction
-- **PUT**: Update transaction information
-- **DELETE**: Delete a transaction
+- **GET /api/v1/transaction**: Retrieve transaction information
+- **POST /api/v1/transaction**: Create a new transaction
+- **PUT /api/v1/transaction**: Update transaction information
+- **DELETE /api/v1/transaction**: Delete a transaction
 
-### /api/v1/network
+### Lightning Network
 
-- **GET**: Retrieve network information
-- **POST**: Create a new network
-- **PUT**: Update network information
-- **DELETE**: Delete a network
+- **GET /api/v1/network**: Retrieve network information
+- **POST /api/v1/network**: Create a new network
+- **PUT /api/v1/network**: Update network information
+- **DELETE /api/v1/network**: Delete a network
 
 ## Examples
 
@@ -62,50 +60,73 @@ This document provides an overview of the API endpoints available in Anya Core.
 
 ```sh
 curl -X GET https://api.anyacore.com/api/v1/user/123
+```
 
-Create a New User
+### Create a New User
 
+```sh
 curl -X POST https://api.anyacore.com/api/v1/user -d '{"name": "John Doe", "email": "john.doe@example.com"}'
+```
 
-Update User Information
+### Update User Information
 
+```sh
 curl -X PUT https://api.anyacore.com/api/v1/user/123 -d '{"name": "John Doe", "email": "john.doe@example.com"}'
+```
 
-Delete a User
+### Delete a User
 
+```sh
 curl -X DELETE https://api.anyacore.com/api/v1/user/123
+```
 
-Retrieve Transaction Information
+### Retrieve Transaction Information
 
+```sh
 curl -X GET https://api.anyacore.com/api/v1/transaction/456
+```
 
-Create a New Transaction
+### Create a New Transaction
 
+```sh
 curl -X POST https://api.anyacore.com/api/v1/transaction -d '{"amount": 100, "sender": "Alice", "recipient": "Bob"}'
+```
 
-Update Transaction Information
+### Update Transaction Information
 
+```sh
 curl -X PUT https://api.anyacore.com/api/v1/transaction/456 -d '{"amount": 200, "sender": "Alice", "recipient": "Bob"}'
+```
 
-Delete a Transaction
+### Delete a Transaction
 
+```sh
 curl -X DELETE https://api.anyacore.com/api/v1/transaction/456
+```
 
-Retrieve Network Information
+### Retrieve Network Information
 
+```sh
 curl -X GET https://api.anyacore.com/api/v1/network/789
+```
 
-Create a New Network
+### Create a New Network
 
+```sh
 curl -X POST https://api.anyacore.com/api/v1/network -d '{"name": "Test Network", "nodes": ["node1", "node2", "node3"]}'
+```
 
-Update Network Information
+### Update Network Information
 
+```sh
 curl -X PUT https://api.anyacore.com/api/v1/network/789 -d '{"name": "Test Network", "nodes": ["node1", "node2", "node3"]}'
+```
 
-Delete a Network
+### Delete a Network
 
+```sh
 curl -X DELETE https://api.anyacore.com/api/v1/network/789
+```
 
 ## Error Handling
 
@@ -144,4 +165,7 @@ This document provides a detailed overview of the Anya Core API, including avail
 - [Anya Core API Blog](https://blog.anyacore.com)
 - [Anya Core API News](https://news.anyacore.com)
 - [Anya Core API Updates](api/updates.md)
-*Last updated: 2025-03-06*
+
+## Last Updated
+
+2025-03-12
