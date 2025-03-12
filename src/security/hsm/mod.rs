@@ -12,6 +12,7 @@ use std::time::Duration;
 use tokio::time::timeout;
 use uuid::Uuid;
 use chrono::Utc;
+use std::sync::Mutex;
 
 use self::config::HsmConfig;
 use self::provider::{HsmProvider, HsmProviderType};
@@ -22,16 +23,19 @@ use self::operations::{HsmOperation, OperationResult, OperationRequest};
 /// [AIR-3][AIS-3][AIT-3][AIP-3][RES-3]
 pub struct HsmManager {
     /// Configuration for the HSM
-    config: Arc<HsmConfig>,
+    pub config: HsmConfig,
     
     /// Active HSM provider
-    provider: Box<dyn HsmProvider>,
+    pub provider: Box<dyn HsmProvider>,
     
     /// Audit logger for HSM operations
-    audit_logger: Arc<AuditLogger>,
+    pub audit_logger: Arc<AuditLogger>,
     
     /// Current status
-    status: Arc<RwLock<HsmStatus>>,
+    pub status: Arc<RwLock<HsmStatus>>,
+    
+    /// Operation tracker
+    pub operation_tracker: Arc<Mutex<HashMap<String, (DateTime<Utc>, String)>>>,
 }
 
 impl HsmManager {
@@ -40,17 +44,27 @@ impl HsmManager {
         info!("Initializing HSM Manager with provider: {:?}", config.provider_type);
         
         // Create the provider based on configuration
-        let provider = provider::create_provider(&config)?;
+        let provider: Box<dyn HsmProvider> = match config.provider_type {
+            HsmProviderType::Simulator => Box::new(SimulatorHsmProvider::new(&config.simulator)?),
+            HsmProviderType::SoftwareKeyStore => Box::new(SoftwareHsmProvider::new(&config.software)?),
+            HsmProviderType::CloudHsm => Box::new(CloudHsmProvider::new(&config.cloud).await?),
+            HsmProviderType::HardwareHsm => Box::new(HardwareHsmProvider::new(&config.hardware).await?),
+            HsmProviderType::BitcoinHsm => Box::new(BitcoinHsmProvider::new(&config.bitcoin).await?),
+        };
         
         // Create audit logger
         let audit_logger = Arc::new(AuditLogger::new(&config.audit).await?);
         
-        Ok(Self {
-            config: Arc::new(config),
+        // Create the HSM manager
+        let manager = Self {
+            config,
             provider,
             audit_logger,
+            operation_tracker: Arc::new(Mutex::new(HashMap::new())),
             status: Arc::new(RwLock::new(HsmStatus::Initializing)),
-        })
+        };
+        
+        Ok(manager)
     }
     
     /// Initializes the HSM Manager
@@ -710,4 +724,13 @@ impl Drop for HsmManager {
             warn!("HsmManager dropped without calling close(). Resources may not be cleaned up properly.");
         }
     }
+}
+
+// Ensure the HsmProvider trait has an execute_operation method
+pub trait HsmProvider: Send + Sync {
+    // ... existing methods ...
+    
+    async fn execute_operation(&self, request: HsmRequest) -> Result<HsmResponse, HsmError>;
+    
+    // ... existing methods ...
 } 

@@ -5,11 +5,12 @@ use tokio::sync::Mutex;
 use tracing::{debug, info, error, warn};
 use chrono::{DateTime, Utc};
 use std::path::PathBuf;
-use std::fs::{OpenOptions, File};
+use std::fs::{self, OpenOptions, File};
 use std::io::{Write, Read, Seek, SeekFrom};
 use async_trait::async_trait;
 use std::collections::HashMap;
 use uuid::Uuid;
+use std::path::Path;
 
 use crate::security::hsm::error::{AuditEventType, AuditEventResult, AuditEventSeverity};
 
@@ -77,7 +78,10 @@ pub struct AuditLogger {
     config: AuditLoggerConfig,
     
     /// Storage for audit events
-    storage: Arc<Mutex<Box<dyn AuditStorage>>>,
+    storage: Arc<Mutex<Box<dyn AuditStorage + Send + Sync>>>,
+    
+    /// Operation tracker for tracking related operations
+    operation_tracker: Arc<Mutex<HashMap<String, (DateTime<Utc>, String)>>>,
 }
 
 impl AuditLogger {
@@ -88,10 +92,16 @@ impl AuditLogger {
         // Create storage based on configuration
         let storage = create_storage(config).await?;
         
-        Ok(Self {
+        let logger = Self {
             config: config.clone(),
             storage: Arc::new(Mutex::new(storage)),
-        })
+            operation_tracker: Arc::new(Mutex::new(HashMap::new())),
+        };
+        
+        // Initialize the storage
+        logger.initialize().await?;
+        
+        Ok(logger)
     }
     
     /// Initializes the audit logger
@@ -103,22 +113,16 @@ impl AuditLogger {
         storage.initialize().await?;
         
         // Log initialization event
-        let event = AuditEvent {
-            timestamp: Utc::now(),
-            event_type: "audit.initialize".to_string(),
-            user: "system".to_string(),
-            source_ip: "127.0.0.1".to_string(),
-            details: serde_json::to_value(AuditInitializeEvent {
-                storage_type: format!("{:?}", self.config.storage_type),
-                retention_days: self.config.retention_days,
-                enabled: self.config.enabled,
-            }).map_err(|e| HsmError::SerializationError(e.to_string()))?,
-        };
+        let event = AuditEvent::new(
+            AuditEventType::HsmInitialize,
+            AuditEventResult::Success,
+            AuditEventSeverity::Info
+        );
         
-        storage.store_event(&event).await?;
+        storage.store_event(event).await?;
         
         // Perform cleanup if needed
-        if let Err(e) = storage.cleanup(self.config.retention_days, self.config.max_events).await {
+        if let Err(e) = storage.cleanup(self.config.retention_days, Some(self.config.max_events)).await {
             warn!("Failed to cleanup audit logs: {}", e);
         }
         
@@ -129,37 +133,35 @@ impl AuditLogger {
     /// Logs an HSM event
     pub async fn log_event<T: Serialize>(
         &self,
-        event_type: &str,
-        details: &T,
+        event_type: AuditEventType,
+        result: AuditEventResult,
+        severity: AuditEventSeverity,
+        details: T,
     ) -> Result<(), HsmError> {
         if !self.config.enabled {
             return Ok(());
         }
         
-        // Serialize the details
-        let details_value = match serde_json::to_value(details) {
-            Ok(value) => value,
-            Err(e) => {
-                error!("Failed to serialize audit event details: {}", e);
-                return Err(HsmError::SerializationError(e.to_string()));
-            }
-        };
+        let details_value = serde_json::to_value(details)
+            .map_err(|e| HsmError::SerializationError(e.to_string()))?;
+            
+        let mut event = AuditEvent::new(event_type, result, severity);
         
-        // Create the audit event
-        let event = AuditEvent {
-            timestamp: Utc::now(),
-            event_type: event_type.to_string(),
-            user: get_current_user(),
-            source_ip: get_source_ip(),
-            details: details_value,
-        };
+        // Add details to the event
+        let details_map: HashMap<String, String> = serde_json::from_value(details_value)
+            .unwrap_or_else(|_| {
+                // If we can't convert to a HashMap, create a single detail entry
+                let mut map = HashMap::new();
+                map.insert("data".to_string(), serde_json::to_string(&details_value).unwrap_or_default());
+                map
+            });
+            
+        for (key, value) in details_map {
+            event = event.with_detail(key, value);
+        }
         
-        // Store the event
         let mut storage = self.storage.lock().await;
-        storage.store_event(&event).await?;
-        
-        debug!("Logged HSM audit event: {}", event_type);
-        Ok(())
+        storage.store_event(event).await
     }
     
     /// Gets events from the audit log
@@ -168,70 +170,84 @@ impl AuditLogger {
         start_time: Option<DateTime<Utc>>,
         end_time: Option<DateTime<Utc>>,
         limit: Option<usize>,
-    ) -> Result<Vec<HsmAuditEvent>, HsmError> {
+    ) -> Result<Vec<AuditEvent>, HsmError> {
+        if !self.config.enabled {
+            return Ok(Vec::new());
+        }
+        
         let storage = self.storage.lock().await;
+        storage.get_events(start_time, end_time, limit).await
+    }
+    
+    /// Count audit events
+    pub async fn count_events(
+        &self,
+        start_time: Option<DateTime<Utc>>,
+        end_time: Option<DateTime<Utc>>,
+    ) -> Result<usize, HsmError> {
+        if !self.config.enabled {
+            return Ok(0);
+        }
         
-        // Get the raw events
-        let events = storage.get_events(start_time, end_time, limit).await?;
+        let storage = self.storage.lock().await;
+        storage.count_events(start_time, end_time).await
+    }
+    
+    /// Clean up old events
+    pub async fn cleanup(&self) -> Result<usize, HsmError> {
+        if !self.config.enabled {
+            return Ok(0);
+        }
         
-        // Convert to HsmAuditEvent format
-        let hsm_events = events.into_iter()
-            .filter_map(|event| {
-                // Only include HSM-related events
-                if !event.event_type.starts_with("hsm.") {
-                    return None;
-                }
-                
-                // Extract provider and status
-                let provider = match event.details.get("provider") {
-                    Some(val) => val.as_str().unwrap_or("unknown").to_string(),
-                    None => "unknown".to_string(),
-                };
-                
-                let status = match event.details.get("status") {
-                    Some(val) => val.as_str().unwrap_or("unknown").to_string(),
-                    None => "unknown".to_string(),
-                };
-                
-                // Extract operation_id if present
-                let operation_id = event.details.get("operation_id")
-                    .and_then(|val| val.as_str())
-                    .map(|s| s.to_string());
-                
-                // Redact sensitive details if configured
-                let details = if self.config.log_sensitive {
-                    event.details.get("details")
-                        .and_then(|val| val.as_str())
-                        .map(|s| s.to_string())
-                } else {
-                    // Redact sensitive info
-                    event.details.get("details")
-                        .and_then(|val| val.as_str())
-                        .map(|s| {
-                            if s.contains("key") || s.contains("signature") || s.contains("secret") {
-                                "REDACTED".to_string()
-                            } else {
-                                s.to_string()
-                            }
-                        })
-                };
-                
-                Some(HsmAuditEvent {
-                    event_type: event.event_type,
-                    provider,
-                    status,
-                    details,
-                    operation_id,
-                })
-            })
-            .collect();
-            
-        Ok(hsm_events)
+        let mut storage = self.storage.lock().await;
+        storage.cleanup(self.config.retention_days, Some(self.config.max_events)).await
+    }
+    
+    /// Track an operation
+    pub async fn track_operation(&self, operation_id: &str, details: &str) -> Result<(), HsmError> {
+        if !self.config.enabled {
+            return Ok(());
+        }
+        
+        let mut tracker = self.operation_tracker.lock().await;
+        tracker.insert(operation_id.to_string(), (Utc::now(), details.to_string()));
+        Ok(())
+    }
+    
+    /// Check if an operation is being tracked
+    pub async fn is_operation_tracked(&self, operation_id: &str) -> bool {
+        if !self.config.enabled {
+            return false;
+        }
+        
+        let tracker = self.operation_tracker.lock().await;
+        tracker.contains_key(operation_id)
+    }
+    
+    /// Get operation details
+    pub async fn get_operation_details(&self, operation_id: &str) -> Option<(DateTime<Utc>, String)> {
+        if !self.config.enabled {
+            return None;
+        }
+        
+        let tracker = self.operation_tracker.lock().await;
+        tracker.get(operation_id).cloned()
+    }
+    
+    /// Remove tracked operation
+    pub async fn remove_operation(&self, operation_id: &str) -> Result<(), HsmError> {
+        if !self.config.enabled {
+            return Ok(());
+        }
+        
+        let mut tracker = self.operation_tracker.lock().await;
+        tracker.remove(operation_id);
+        Ok(())
     }
 }
 
 /// Creates an appropriate storage backend based on configuration
-async fn create_storage(config: &AuditLoggerConfig) -> Result<Box<dyn AuditStorage>, HsmError> {
+async fn create_storage(config: &AuditLoggerConfig) -> Result<Box<dyn AuditStorage + Send + Sync>, HsmError> {
     match config.storage_type {
         AuditStorageType::Memory => {
             Ok(Box::new(MemoryAuditStorage::new()))
@@ -240,41 +256,27 @@ async fn create_storage(config: &AuditLoggerConfig) -> Result<Box<dyn AuditStora
             let path = config.file_path.clone()
                 .ok_or_else(|| HsmError::ConfigError("File path is required for file storage".to_string()))?;
                 
-            Ok(Box::new(FileAuditStorage::new(path)?))
+            Ok(Box::new(FileAuditStorage::new(path)))
         },
         AuditStorageType::Database => {
             let conn_string = config.db_connection.clone()
                 .ok_or_else(|| HsmError::ConfigError("Database connection string is required for DB storage".to_string()))?;
                 
-            Ok(Box::new(DbAuditStorage::new(conn_string).await?))
+            Ok(Box::new(DbAuditStorage::new(conn_string)))
         },
     }
 }
 
-/// Gets the current user (or system if not available)
-fn get_current_user() -> String {
-    std::env::var("USER")
-        .or_else(|_| std::env::var("USERNAME"))
-        .unwrap_or_else(|_| "system".to_string())
-}
-
-/// Gets the source IP (or localhost if not available)
-fn get_source_ip() -> String {
-    // In a real implementation, this would get the client IP
-    // For now, just return localhost
-    "127.0.0.1".to_string()
-}
-
 /// Storage trait for audit events
-#[async_trait::async_trait]
-trait AuditStorage: Send + Sync {
-    /// Initializes the storage
-    async fn initialize(&mut self) -> Result<(), HsmError>;
+#[async_trait]
+pub trait AuditStorage {
+    /// Initialize the storage
+    async fn initialize(&self) -> Result<(), HsmError>;
     
-    /// Stores an audit event
-    async fn store_event(&mut self, event: &AuditEvent) -> Result<(), HsmError>;
+    /// Store an audit event
+    async fn store_event(&self, event: AuditEvent) -> Result<(), HsmError>;
     
-    /// Gets events from the storage
+    /// Get audit events matching criteria
     async fn get_events(
         &self,
         start_time: Option<DateTime<Utc>>,
@@ -282,365 +284,19 @@ trait AuditStorage: Send + Sync {
         limit: Option<usize>,
     ) -> Result<Vec<AuditEvent>, HsmError>;
     
-    /// Cleans up old events
-    async fn cleanup(
-        &mut self,
-        retention_days: u32,
-        max_events: Option<usize>,
-    ) -> Result<(), HsmError>;
-}
-
-/// In-memory storage for audit events (for testing)
-struct MemoryAuditStorage {
-    events: Vec<AuditEvent>,
-}
-
-impl MemoryAuditStorage {
-    fn new() -> Self {
-        Self {
-            events: Vec::new(),
-        }
-    }
-}
-
-#[async_trait::async_trait]
-impl AuditStorage for MemoryAuditStorage {
-    async fn initialize(&mut self) -> Result<(), HsmError> {
-        // No initialization needed for memory storage
-        Ok(())
-    }
-    
-    async fn store_event(&mut self, event: &AuditEvent) -> Result<(), HsmError> {
-        self.events.push(event.clone());
-        Ok(())
-    }
-    
-    async fn get_events(
+    /// Count audit events matching criteria
+    async fn count_events(
         &self,
         start_time: Option<DateTime<Utc>>,
         end_time: Option<DateTime<Utc>>,
-        limit: Option<usize>,
-    ) -> Result<Vec<AuditEvent>, HsmError> {
-        let mut events = self.events.clone();
-        
-        // Filter by time range
-        if let Some(start) = start_time {
-            events.retain(|e| e.timestamp >= start);
-        }
-        
-        if let Some(end) = end_time {
-            events.retain(|e| e.timestamp <= end);
-        }
-        
-        // Sort by timestamp (newest first)
-        events.sort_by(|a, b| b.timestamp.cmp(&a.timestamp));
-        
-        // Apply limit
-        if let Some(limit) = limit {
-            events.truncate(limit);
-        }
-        
-        Ok(events)
-    }
+    ) -> Result<usize, HsmError>;
     
+    /// Clean up old events
     async fn cleanup(
-        &mut self,
-        retention_days: u32,
-        max_events: Option<usize>,
-    ) -> Result<(), HsmError> {
-        // Remove events older than retention period
-        let cutoff = Utc::now() - chrono::Duration::days(retention_days as i64);
-        self.events.retain(|e| e.timestamp >= cutoff);
-        
-        // Apply max events limit
-        if let Some(max) = max_events {
-            if self.events.len() > max {
-                // Sort by timestamp (newest first)
-                self.events.sort_by(|a, b| b.timestamp.cmp(&a.timestamp));
-                self.events.truncate(max);
-            }
-        }
-        
-        Ok(())
-    }
-}
-
-/// File-based storage for audit events
-struct FileAuditStorage {
-    path: PathBuf,
-    file: Option<File>,
-}
-
-impl FileAuditStorage {
-    fn new(path: String) -> Result<Self, HsmError> {
-        let path = PathBuf::from(path);
-        
-        // Ensure directory exists
-        if let Some(parent) = path.parent() {
-            std::fs::create_dir_all(parent).map_err(|e| 
-                HsmError::IoError(std::io::Error::new(
-                    std::io::ErrorKind::Other,
-                    format!("Failed to create directory: {}", e)
-                ))
-            )?;
-        }
-        
-        Ok(Self {
-            path,
-            file: None,
-        })
-    }
-}
-
-#[async_trait::async_trait]
-impl AuditStorage for FileAuditStorage {
-    async fn initialize(&mut self) -> Result<(), HsmError> {
-        // Open the file for appending
-        let file = OpenOptions::new()
-            .create(true)
-            .append(true)
-            .open(&self.path)
-            .map_err(|e| HsmError::IoError(e))?;
-            
-        self.file = Some(file);
-        Ok(())
-    }
-    
-    async fn store_event(&mut self, event: &AuditEvent) -> Result<(), HsmError> {
-        let file = self.file.as_mut().ok_or_else(|| 
-            HsmError::AuditError("File not initialized".to_string())
-        )?;
-        
-        // Serialize the event to JSON
-        let json = serde_json::to_string(event)
-            .map_err(|e| HsmError::SerializationError(e.to_string()))?;
-            
-        // Write the event to the file with a newline
-        writeln!(file, "{}", json)
-            .map_err(|e| HsmError::IoError(e))?;
-            
-        // Ensure it's written to disk
-        file.flush().map_err(|e| HsmError::IoError(e))?;
-        
-        Ok(())
-    }
-    
-    async fn get_events(
         &self,
-        start_time: Option<DateTime<Utc>>,
-        end_time: Option<DateTime<Utc>>,
-        limit: Option<usize>,
-    ) -> Result<Vec<AuditEvent>, HsmError> {
-        // Open the file for reading
-        let mut file = OpenOptions::new()
-            .read(true)
-            .open(&self.path)
-            .map_err(|e| {
-                if e.kind() == std::io::ErrorKind::NotFound {
-                    // Return empty vec if file doesn't exist yet
-                    return HsmError::AuditError("Audit log file not found".to_string());
-                }
-                HsmError::IoError(e)
-            })?;
-            
-        // Read the entire file
-        let mut contents = String::new();
-        file.read_to_string(&mut contents)
-            .map_err(|e| HsmError::IoError(e))?;
-            
-        // Parse each line as an event
-        let mut events: Vec<AuditEvent> = Vec::new();
-        for line in contents.lines() {
-            if line.trim().is_empty() {
-                continue;
-            }
-            
-            match serde_json::from_str::<AuditEvent>(line) {
-                Ok(event) => {
-                    // Filter by time range
-                    if let Some(start) = start_time {
-                        if event.timestamp < start {
-                            continue;
-                        }
-                    }
-                    
-                    if let Some(end) = end_time {
-                        if event.timestamp > end {
-                            continue;
-                        }
-                    }
-                    
-                    events.push(event);
-                },
-                Err(e) => {
-                    warn!("Failed to parse audit event: {}", e);
-                }
-            }
-        }
-        
-        // Sort by timestamp (newest first)
-        events.sort_by(|a, b| b.timestamp.cmp(&a.timestamp));
-        
-        // Apply limit
-        if let Some(limit) = limit {
-            events.truncate(limit);
-        }
-        
-        Ok(events)
-    }
-    
-    async fn cleanup(
-        &mut self,
         retention_days: u32,
         max_events: Option<usize>,
-    ) -> Result<(), HsmError> {
-        // Get all events
-        let mut events = match self.get_events(None, None, None).await {
-            Ok(events) => events,
-            Err(HsmError::AuditError(_)) => {
-                // File doesn't exist yet, nothing to clean up
-                return Ok(());
-            },
-            Err(e) => return Err(e),
-        };
-        
-        // Remove events older than retention period
-        let cutoff = Utc::now() - chrono::Duration::days(retention_days as i64);
-        events.retain(|e| e.timestamp >= cutoff);
-        
-        // Apply max events limit
-        if let Some(max) = max_events {
-            if events.len() > max {
-                // Sort by timestamp (newest first)
-                events.sort_by(|a, b| b.timestamp.cmp(&a.timestamp));
-                events.truncate(max);
-            }
-        }
-        
-        // Rewrite the file with the filtered events
-        let mut temp_path = self.path.clone();
-        temp_path.set_extension("tmp");
-        
-        // Create a temporary file
-        let mut temp_file = OpenOptions::new()
-            .create(true)
-            .write(true)
-            .truncate(true)
-            .open(&temp_path)
-            .map_err(|e| HsmError::IoError(e))?;
-            
-        // Write events to the temporary file
-        for event in events {
-            let json = serde_json::to_string(&event)
-                .map_err(|e| HsmError::SerializationError(e.to_string()))?;
-                
-            writeln!(temp_file, "{}", json)
-                .map_err(|e| HsmError::IoError(e))?;
-        }
-        
-        // Ensure it's written to disk
-        temp_file.flush().map_err(|e| HsmError::IoError(e))?;
-        
-        // Replace the original file with the temporary file
-        std::fs::rename(&temp_path, &self.path)
-            .map_err(|e| HsmError::IoError(e))?;
-            
-        // Reopen the file for appending
-        let file = OpenOptions::new()
-            .create(true)
-            .append(true)
-            .open(&self.path)
-            .map_err(|e| HsmError::IoError(e))?;
-            
-        self.file = Some(file);
-        
-        Ok(())
-    }
-}
-
-/// Database storage for audit events
-struct DbAuditStorage {
-    connection_string: String,
-    // In a real implementation, this would hold a database connection
-    // For now, we'll just use memory storage as a placeholder
-    memory_storage: MemoryAuditStorage,
-}
-
-impl DbAuditStorage {
-    async fn new(connection_string: String) -> Result<Self, HsmError> {
-        Ok(Self {
-            connection_string,
-            memory_storage: MemoryAuditStorage::new(),
-        })
-    }
-}
-
-#[async_trait::async_trait]
-impl AuditStorage for DbAuditStorage {
-    async fn initialize(&mut self) -> Result<(), HsmError> {
-        // In a real implementation, this would connect to the database
-        // For now, just initialize the memory storage
-        self.memory_storage.initialize().await
-    }
-    
-    async fn store_event(&mut self, event: &AuditEvent) -> Result<(), HsmError> {
-        // In a real implementation, this would store in the database
-        // For now, just use the memory storage
-        self.memory_storage.store_event(event).await
-    }
-    
-    async fn get_events(
-        &self,
-        start_time: Option<DateTime<Utc>>,
-        end_time: Option<DateTime<Utc>>,
-        limit: Option<usize>,
-    ) -> Result<Vec<AuditEvent>, HsmError> {
-        // In a real implementation, this would query the database
-        // For now, just use the memory storage
-        self.memory_storage.get_events(start_time, end_time, limit).await
-    }
-    
-    async fn cleanup(
-        &mut self,
-        retention_days: u32,
-        max_events: Option<usize>,
-    ) -> Result<(), HsmError> {
-        // In a real implementation, this would delete old records from the database
-        // For now, just use the memory storage
-        self.memory_storage.cleanup(retention_days, max_events).await
-    }
-}
-
-/// Audit event
-#[derive(Debug, Clone, Serialize, Deserialize)]
-struct AuditEvent {
-    /// Timestamp of the event
-    pub timestamp: DateTime<Utc>,
-    
-    /// Type of event
-    pub event_type: String,
-    
-    /// User who triggered the event
-    pub user: String,
-    
-    /// Source IP of the request
-    pub source_ip: String,
-    
-    /// Event details
-    pub details: serde_json::Value,
-}
-
-/// Initialization event details
-#[derive(Debug, Serialize, Deserialize)]
-struct AuditInitializeEvent {
-    /// Storage type
-    pub storage_type: String,
-    
-    /// Retention period in days
-    pub retention_days: u32,
-    
-    /// Whether audit logging is enabled
-    pub enabled: bool,
+    ) -> Result<usize, HsmError>;
 }
 
 /// Audit event
@@ -750,83 +406,12 @@ impl AuditEvent {
     }
 }
 
-/// Audit storage trait
-#[async_trait]
-pub trait AuditStorage: Send + Sync {
-    /// Initialize the storage
-    async fn initialize(&self) -> Result<(), HsmError>;
-    
-    /// Store an audit event
-    async fn store_event(&self, event: AuditEvent) -> Result<(), HsmError>;
-    
-    /// Get audit events matching a filter
-    async fn get_events(&self, filter: AuditFilter) -> Result<Vec<AuditEvent>, HsmError>;
-    
-    /// Count audit events matching a filter
-    async fn count_events(&self, filter: AuditFilter) -> Result<usize, HsmError>;
-    
-    /// Clean up old events
-    async fn cleanup(&self, retention_days: u32, max_events: u32) -> Result<usize, HsmError>;
-}
-
-/// Audit filter
-#[derive(Debug, Clone)]
-pub struct AuditFilter {
-    /// Filter by event type
-    pub event_type: Option<AuditEventType>,
-    
-    /// Filter by result
-    pub result: Option<AuditEventResult>,
-    
-    /// Filter by severity
-    pub severity: Option<AuditEventSeverity>,
-    
-    /// Filter by actor
-    pub actor: Option<String>,
-    
-    /// Filter by operation ID
-    pub operation_id: Option<String>,
-    
-    /// Filter by key ID
-    pub key_id: Option<String>,
-    
-    /// Filter by time range (start)
-    pub start_time: Option<DateTime<Utc>>,
-    
-    /// Filter by time range (end)
-    pub end_time: Option<DateTime<Utc>>,
-    
-    /// Maximum number of events to return
-    pub limit: Option<usize>,
-    
-    /// Number of events to skip
-    pub offset: Option<usize>,
-}
-
-impl Default for AuditFilter {
-    fn default() -> Self {
-        Self {
-            event_type: None,
-            result: None,
-            severity: None,
-            actor: None,
-            operation_id: None,
-            key_id: None,
-            start_time: None,
-            end_time: None,
-            limit: None,
-            offset: None,
-        }
-    }
-}
-
-/// In-memory audit storage
+/// In-memory storage for audit events (for testing)
 pub struct MemoryAuditStorage {
     events: Mutex<Vec<AuditEvent>>,
 }
 
 impl MemoryAuditStorage {
-    /// Create a new in-memory audit storage
     pub fn new() -> Self {
         Self {
             events: Mutex::new(Vec::new()),
@@ -837,274 +422,310 @@ impl MemoryAuditStorage {
 #[async_trait]
 impl AuditStorage for MemoryAuditStorage {
     async fn initialize(&self) -> Result<(), HsmError> {
+        // No initialization needed for in-memory storage
         Ok(())
     }
-    
+
     async fn store_event(&self, event: AuditEvent) -> Result<(), HsmError> {
         let mut events = self.events.lock().await;
         events.push(event);
         Ok(())
     }
-    
-    async fn get_events(&self, filter: AuditFilter) -> Result<Vec<AuditEvent>, HsmError> {
+
+    async fn get_events(
+        &self,
+        start_time: Option<DateTime<Utc>>,
+        end_time: Option<DateTime<Utc>>,
+        limit: Option<usize>,
+    ) -> Result<Vec<AuditEvent>, HsmError> {
         let events = self.events.lock().await;
-        let mut result = Vec::new();
         
-        for event in events.iter() {
-            if matches_filter(event, &filter) {
-                result.push(event.clone());
-            }
-        }
-        
-        // Apply limit and offset
-        if let Some(offset) = filter.offset {
-            if offset < result.len() {
-                result = result.into_iter().skip(offset).collect();
-            } else {
-                result.clear();
-            }
-        }
-        
-        if let Some(limit) = filter.limit {
-            result.truncate(limit);
-        }
+        let filtered_events: Vec<AuditEvent> = events
+            .iter()
+            .filter(|event| {
+                if let Some(start) = start_time {
+                    if event.timestamp < start {
+                        return false;
+                    }
+                }
+                
+                if let Some(end) = end_time {
+                    if event.timestamp > end {
+                        return false;
+                    }
+                }
+                
+                true
+            })
+            .cloned()
+            .collect();
+            
+        let result = if let Some(limit_val) = limit {
+            filtered_events.into_iter().take(limit_val).collect()
+        } else {
+            filtered_events
+        };
         
         Ok(result)
     }
-    
-    async fn count_events(&self, filter: AuditFilter) -> Result<usize, HsmError> {
+
+    async fn count_events(
+        &self,
+        start_time: Option<DateTime<Utc>>,
+        end_time: Option<DateTime<Utc>>,
+    ) -> Result<usize, HsmError> {
         let events = self.events.lock().await;
-        let count = events.iter().filter(|event| matches_filter(event, &filter)).count();
+        
+        let count = events
+            .iter()
+            .filter(|event| {
+                if let Some(start) = start_time {
+                    if event.timestamp < start {
+                        return false;
+                    }
+                }
+                
+                if let Some(end) = end_time {
+                    if event.timestamp > end {
+                        return false;
+                    }
+                }
+                
+                true
+            })
+            .count();
+        
         Ok(count)
     }
-    
-    async fn cleanup(&self, retention_days: u32, max_events: u32) -> Result<usize, HsmError> {
+
+    async fn cleanup(
+        &self,
+        retention_days: u32,
+        max_events: Option<usize>,
+    ) -> Result<usize, HsmError> {
         let mut events = self.events.lock().await;
         let initial_count = events.len();
         
         // Remove old events
-        if retention_days > 0 {
-            let retention_threshold = Utc::now() - chrono::Duration::days(retention_days as i64);
-            events.retain(|event| event.timestamp >= retention_threshold);
+        let cutoff = Utc::now() - chrono::Duration::days(retention_days as i64);
+        events.retain(|e| e.timestamp >= cutoff);
+        
+        // Apply max events limit
+        if let Some(max) = max_events {
+            if events.len() > max {
+                // Sort by timestamp (newest first)
+                events.sort_by(|a, b| b.timestamp.cmp(&a.timestamp));
+                events.truncate(max);
+            }
         }
         
-        // Limit total number of events
-        if max_events > 0 && events.len() > max_events as usize {
-            let excess = events.len() - max_events as usize;
-            events.drain(0..excess);
-        }
-        
-        Ok(initial_count - events.len())
+        let removed = initial_count - events.len();
+        Ok(removed)
     }
 }
 
-/// File-based audit storage
+/// File-based storage for audit events
 pub struct FileAuditStorage {
     file_path: String,
 }
 
 impl FileAuditStorage {
-    /// Create a new file-based audit storage
-    pub fn new(file_path: impl Into<String>) -> Self {
+    pub fn new(file_path: String) -> Self {
         Self {
-            file_path: file_path.into(),
+            file_path,
         }
     }
     
-    /// Ensure the log file exists
-    fn ensure_file(&self) -> Result<File, HsmError> {
+    /// Load events from file
+    async fn load_events(&self) -> Result<Vec<AuditEvent>, HsmError> {
         let path = Path::new(&self.file_path);
         
-        // Create parent directories if they don't exist
-        if let Some(parent) = path.parent() {
-            std::fs::create_dir_all(parent).map_err(|e| {
-                HsmError::AuditError(format!("Failed to create directory: {}", e))
-            })?;
+        // If file doesn't exist, return empty vector
+        if !path.exists() {
+            return Ok(Vec::new());
         }
         
-        // Open or create the file
-        OpenOptions::new()
-            .create(true)
-            .append(true)
-            .open(path)
-            .map_err(|e| HsmError::AuditError(format!("Failed to open log file: {}", e)))
+        // Read file contents
+        let contents = fs::read_to_string(path)
+            .map_err(|e| HsmError::AuditStorageError(format!("Failed to read audit log file: {}", e)))?;
+            
+        // Parse events (each line is a JSON object)
+        let mut events = Vec::new();
+        for line in contents.lines() {
+            if line.trim().is_empty() {
+                continue;
+            }
+            
+            match serde_json::from_str::<AuditEvent>(line) {
+                Ok(event) => events.push(event),
+                Err(e) => {
+                    warn!("Failed to parse audit event: {}", e);
+                }
+            }
+        }
+        
+        Ok(events)
     }
 }
 
 #[async_trait]
 impl AuditStorage for FileAuditStorage {
     async fn initialize(&self) -> Result<(), HsmError> {
-        // Ensure the file exists
-        self.ensure_file()?;
+        let file_path = &self.file_path;
+        let dir_path = Path::new(file_path).parent();
+        
+        if let Some(dir) = dir_path {
+            if !dir.exists() {
+                fs::create_dir_all(dir).map_err(|e| {
+                    HsmError::AuditStorageError(format!("Failed to create directory: {}", e))
+                })?;
+            }
+        }
+        
+        // Create the file if it doesn't exist
+        if !Path::new(file_path).exists() {
+            File::create(file_path).map_err(|e| {
+                HsmError::AuditStorageError(format!("Failed to create audit log file: {}", e))
+            })?;
+        }
+        
         Ok(())
     }
     
     async fn store_event(&self, event: AuditEvent) -> Result<(), HsmError> {
-        let mut file = self.ensure_file()?;
-        
-        // Serialize to JSON
+        // Serialize the event
         let json = serde_json::to_string(&event)
             .map_err(|e| HsmError::SerializationError(e.to_string()))?;
-        
-        // Write to file
+            
+        // Open the file in append mode
+        let mut file = OpenOptions::new()
+            .create(true)
+            .append(true)
+            .open(&self.file_path)
+            .map_err(|e| HsmError::AuditStorageError(format!("Failed to open audit log file: {}", e)))?;
+            
+        // Write the event with a newline
         writeln!(file, "{}", json)
-            .map_err(|e| HsmError::AuditError(format!("Failed to write to log file: {}", e)))?;
-        
+            .map_err(|e| HsmError::AuditStorageError(format!("Failed to write to audit log file: {}", e)))?;
+            
         Ok(())
     }
     
-    async fn get_events(&self, filter: AuditFilter) -> Result<Vec<AuditEvent>, HsmError> {
-        let path = Path::new(&self.file_path);
-        if !path.exists() {
-            return Ok(Vec::new());
+    async fn get_events(
+        &self,
+        start_time: Option<DateTime<Utc>>,
+        end_time: Option<DateTime<Utc>>,
+        limit: Option<usize>,
+    ) -> Result<Vec<AuditEvent>, HsmError> {
+        // Load all events
+        let mut events = self.load_events().await?;
+        
+        // Filter by time range
+        if let Some(start) = start_time {
+            events.retain(|e| e.timestamp >= start);
         }
         
-        let file = File::open(path)
-            .map_err(|e| HsmError::AuditError(format!("Failed to open log file: {}", e)))?;
-        
-        let reader = BufReader::new(file);
-        let mut events = Vec::new();
-        
-        for line in reader.lines() {
-            let line = line.map_err(|e| {
-                HsmError::AuditError(format!("Failed to read from log file: {}", e))
-            })?;
-            
-            if line.trim().is_empty() {
-                continue;
-            }
-            
-            let event: AuditEvent = serde_json::from_str(&line)
-                .map_err(|e| HsmError::SerializationError(e.to_string()))?;
-            
-            if matches_filter(&event, &filter) {
-                events.push(event);
-            }
+        if let Some(end) = end_time {
+            events.retain(|e| e.timestamp <= end);
         }
         
-        // Apply limit and offset
-        if let Some(offset) = filter.offset {
-            if offset < events.len() {
-                events = events.into_iter().skip(offset).collect();
-            } else {
-                events.clear();
-            }
-        }
+        // Sort by timestamp (newest first)
+        events.sort_by(|a, b| b.timestamp.cmp(&a.timestamp));
         
-        if let Some(limit) = filter.limit {
-            events.truncate(limit);
+        // Apply limit
+        if let Some(lim) = limit {
+            events.truncate(lim);
         }
         
         Ok(events)
     }
     
-    async fn count_events(&self, filter: AuditFilter) -> Result<usize, HsmError> {
-        let path = Path::new(&self.file_path);
-        if !path.exists() {
-            return Ok(0);
-        }
+    async fn count_events(
+        &self,
+        start_time: Option<DateTime<Utc>>,
+        end_time: Option<DateTime<Utc>>,
+    ) -> Result<usize, HsmError> {
+        // Load and filter events
+        let events = self.load_events().await?;
         
-        let file = File::open(path)
-            .map_err(|e| HsmError::AuditError(format!("Failed to open log file: {}", e)))?;
-        
-        let reader = BufReader::new(file);
-        let mut count = 0;
-        
-        for line in reader.lines() {
-            let line = line.map_err(|e| {
-                HsmError::AuditError(format!("Failed to read from log file: {}", e))
-            })?;
+        let count = events.iter()
+            .filter(|e| {
+                if let Some(start) = start_time {
+                    if e.timestamp < start {
+                        return false;
+                    }
+                }
+                
+                if let Some(end) = end_time {
+                    if e.timestamp > end {
+                        return false;
+                    }
+                }
+                
+                true
+            })
+            .count();
             
-            if line.trim().is_empty() {
-                continue;
-            }
-            
-            let event: AuditEvent = serde_json::from_str(&line)
-                .map_err(|e| HsmError::SerializationError(e.to_string()))?;
-            
-            if matches_filter(&event, &filter) {
-                count += 1;
-            }
-        }
-        
         Ok(count)
     }
     
-    async fn cleanup(&self, retention_days: u32, max_events: u32) -> Result<usize, HsmError> {
-        let path = Path::new(&self.file_path);
-        if !path.exists() {
-            return Ok(0);
-        }
-        
-        // This is a naive implementation: read all events, filter them, and write back.
-        // A more efficient approach would be to use a proper database.
-        
-        let file = File::open(path)
-            .map_err(|e| HsmError::AuditError(format!("Failed to open log file: {}", e)))?;
-        
-        let reader = BufReader::new(file);
-        let mut events = Vec::new();
-        
-        for line in reader.lines() {
-            let line = line.map_err(|e| {
-                HsmError::AuditError(format!("Failed to read from log file: {}", e))
-            })?;
-            
-            if line.trim().is_empty() {
-                continue;
-            }
-            
-            let event: AuditEvent = serde_json::from_str(&line)
-                .map_err(|e| HsmError::SerializationError(e.to_string()))?;
-            
-            events.push(event);
-        }
-        
+    async fn cleanup(
+        &self,
+        retention_days: u32,
+        max_events: Option<usize>,
+    ) -> Result<usize, HsmError> {
+        // Load all events
+        let mut events = self.load_events().await?;
         let initial_count = events.len();
         
-        // Remove old events
-        if retention_days > 0 {
-            let retention_threshold = Utc::now() - chrono::Duration::days(retention_days as i64);
-            events.retain(|event| event.timestamp >= retention_threshold);
+        // Filter out old events
+        let cutoff = Utc::now() - chrono::Duration::days(retention_days as i64);
+        events.retain(|e| e.timestamp >= cutoff);
+        
+        // Apply max events limit
+        if let Some(max) = max_events {
+            if events.len() > max {
+                // Sort by timestamp (newest first)
+                events.sort_by(|a, b| b.timestamp.cmp(&a.timestamp));
+                events.truncate(max);
+            }
         }
         
-        // Limit total number of events
-        if max_events > 0 && events.len() > max_events as usize {
-            let excess = events.len() - max_events as usize;
-            events.drain(0..excess);
-        }
-        
-        // Write back to file
-        let mut file = OpenOptions::new()
-            .create(true)
-            .write(true)
-            .truncate(true)
-            .open(path)
-            .map_err(|e| HsmError::AuditError(format!("Failed to open log file for writing: {}", e)))?;
-        
-        for event in &events {
-            let json = serde_json::to_string(event)
-                .map_err(|e| HsmError::SerializationError(e.to_string()))?;
-            
-            writeln!(file, "{}", json)
-                .map_err(|e| HsmError::AuditError(format!("Failed to write to log file: {}", e)))?;
+        // If we removed any events, rewrite the file
+        if events.len() < initial_count {
+            // Open file for writing (truncate)
+            let mut file = OpenOptions::new()
+                .create(true)
+                .write(true)
+                .truncate(true)
+                .open(&self.file_path)
+                .map_err(|e| HsmError::AuditStorageError(format!("Failed to open audit log file: {}", e)))?;
+                
+            // Write each event
+            for event in &events {
+                let json = serde_json::to_string(event)
+                    .map_err(|e| HsmError::SerializationError(e.to_string()))?;
+                    
+                writeln!(file, "{}", json)
+                    .map_err(|e| HsmError::AuditStorageError(format!("Failed to write to audit log file: {}", e)))?;
+            }
         }
         
         Ok(initial_count - events.len())
     }
 }
 
-/// Database audit storage
+/// Database storage for audit events
 pub struct DbAuditStorage {
-    db_connection: String,
-    // In a real implementation, this would have a database connection pool
+    connection_string: String,
+    memory_storage: MemoryAuditStorage, // Fallback storage
 }
 
 impl DbAuditStorage {
-    /// Create a new database audit storage
-    pub fn new(db_connection: impl Into<String>) -> Self {
+    pub fn new(connection_string: String) -> Self {
         Self {
-            db_connection: db_connection.into(),
+            connection_string,
+            memory_storage: MemoryAuditStorage::new(),
         }
     }
 }
@@ -1112,305 +733,50 @@ impl DbAuditStorage {
 #[async_trait]
 impl AuditStorage for DbAuditStorage {
     async fn initialize(&self) -> Result<(), HsmError> {
-        // In a real implementation, this would initialize the database connection
-        // and create the necessary tables if they don't exist
-        Err(HsmError::NotImplemented)
+        // In a real implementation, this would initialize the database
+        // For now, just use the memory storage as a fallback
+        debug!("Initializing database audit storage (using memory fallback)");
+        self.memory_storage.initialize().await
     }
     
     async fn store_event(&self, event: AuditEvent) -> Result<(), HsmError> {
-        // In a real implementation, this would store the event in the database
-        Err(HsmError::NotImplemented)
+        // In a real implementation, this would store in the database
+        // For now, just use the memory storage as a fallback
+        debug!("Storing event in database (using memory fallback): {}", event.id);
+        self.memory_storage.store_event(event).await
     }
     
-    async fn get_events(&self, filter: AuditFilter) -> Result<Vec<AuditEvent>, HsmError> {
+    async fn get_events(
+        &self,
+        start_time: Option<DateTime<Utc>>,
+        end_time: Option<DateTime<Utc>>,
+        limit: Option<usize>,
+    ) -> Result<Vec<AuditEvent>, HsmError> {
         // In a real implementation, this would query the database
-        Err(HsmError::NotImplemented)
+        // For now, just use the memory storage as a fallback
+        debug!("Getting events from database (using memory fallback)");
+        self.memory_storage.get_events(start_time, end_time, limit).await
     }
     
-    async fn count_events(&self, filter: AuditFilter) -> Result<usize, HsmError> {
-        // In a real implementation, this would count the matching events in the database
-        Err(HsmError::NotImplemented)
+    async fn count_events(
+        &self,
+        start_time: Option<DateTime<Utc>>,
+        end_time: Option<DateTime<Utc>>,
+    ) -> Result<usize, HsmError> {
+        // In a real implementation, this would count in the database
+        // For now, just use the memory storage as a fallback
+        debug!("Counting events in database (using memory fallback)");
+        self.memory_storage.count_events(start_time, end_time).await
     }
     
-    async fn cleanup(&self, retention_days: u32, max_events: u32) -> Result<usize, HsmError> {
-        // In a real implementation, this would delete old events from the database
-        Err(HsmError::NotImplemented)
-    }
-}
-
-/// Check if an event matches a filter
-fn matches_filter(event: &AuditEvent, filter: &AuditFilter) -> bool {
-    // Filter by event type
-    if let Some(event_type) = &filter.event_type {
-        if event.event_type != event_type.to_string() {
-            return false;
-        }
-    }
-    
-    // Filter by result
-    if let Some(result) = &filter.result {
-        if event.result != result.to_string() {
-            return false;
-        }
-    }
-    
-    // Filter by severity
-    if let Some(severity) = &filter.severity {
-        if event.severity != severity.to_string() {
-            return false;
-        }
-    }
-    
-    // Filter by actor
-    if let Some(actor) = &filter.actor {
-        match &event.actor {
-            Some(event_actor) => {
-                if event_actor != actor {
-                    return false;
-                }
-            },
-            None => return false,
-        }
-    }
-    
-    // Filter by operation ID
-    if let Some(operation_id) = &filter.operation_id {
-        match &event.operation_id {
-            Some(event_operation_id) => {
-                if event_operation_id != operation_id {
-                    return false;
-                }
-            },
-            None => return false,
-        }
-    }
-    
-    // Filter by key ID
-    if let Some(key_id) = &filter.key_id {
-        match &event.key_id {
-            Some(event_key_id) => {
-                if event_key_id != key_id {
-                    return false;
-                }
-            },
-            None => return false,
-        }
-    }
-    
-    // Filter by time range (start)
-    if let Some(start_time) = &filter.start_time {
-        if event.timestamp < *start_time {
-            return false;
-        }
-    }
-    
-    // Filter by time range (end)
-    if let Some(end_time) = &filter.end_time {
-        if event.timestamp > *end_time {
-            return false;
-        }
-    }
-    
-    true
-}
-
-/// Audit logger
-pub struct AuditLogger {
-    config: AuditLoggerConfig,
-    storage: Arc<dyn AuditStorage>,
-    operation_tracker: Mutex<HashMap<String, String>>, // Maps operation ID to actor
-}
-
-impl AuditLogger {
-    /// Create a new audit logger
-    pub fn new(config: AuditLoggerConfig) -> Result<Self, HsmError> {
-        // Create storage based on configuration
-        let storage: Arc<dyn AuditStorage> = match config.storage_type {
-            AuditStorageType::Memory => {
-                Arc::new(MemoryAuditStorage::new())
-            },
-            AuditStorageType::File => {
-                if let Some(file_path) = &config.file_path {
-                    Arc::new(FileAuditStorage::new(file_path.clone()))
-                } else {
-                    return Err(HsmError::InvalidParameters(
-                        "File path is required for file storage".to_string()
-                    ));
-                }
-            },
-            AuditStorageType::Database => {
-                if let Some(db_connection) = &config.db_connection {
-                    Arc::new(DbAuditStorage::new(db_connection.clone()))
-                } else {
-                    return Err(HsmError::InvalidParameters(
-                        "Database connection is required for database storage".to_string()
-                    ));
-                }
-            },
-        };
-        
-        Ok(Self {
-            config,
-            storage,
-            operation_tracker: Mutex::new(HashMap::new()),
-        })
-    }
-    
-    /// Initialize the audit logger
-    pub async fn initialize(&self) -> Result<(), HsmError> {
-        if !self.config.enabled {
-            return Ok(());
-        }
-        
-        self.storage.initialize().await?;
-        
-        // Log initialization event
-        let event = AuditEvent::success(AuditEventType::Initialize)
-            .with_detail("storage_type", format!("{:?}", self.config.storage_type));
-        
-        self.storage.store_event(event).await?;
-        
-        Ok(())
-    }
-    
-    /// Start a new operation and return the operation ID
-    pub async fn start_operation(&self, event_type: AuditEventType, actor: Option<String>, key_id: Option<String>) -> Result<String, HsmError> {
-        if !self.config.enabled {
-            return Ok(Uuid::new_v4().to_string());
-        }
-        
-        let operation_id = Uuid::new_v4().to_string();
-        
-        // Track the operation
-        if let Some(actor) = actor.as_ref() {
-            let mut tracker = self.operation_tracker.lock().await;
-            tracker.insert(operation_id.clone(), actor.clone());
-        }
-        
-        // Log start event
-        let mut event = AuditEvent::in_progress(event_type)
-            .with_operation_id(&operation_id);
-        
-        if let Some(actor) = actor {
-            event = event.with_actor(actor);
-        }
-        
-        if let Some(key_id) = key_id {
-            event = event.with_key_id(key_id);
-        }
-        
-        self.storage.store_event(event).await?;
-        
-        Ok(operation_id)
-    }
-    
-    /// Log a success event for an operation
-    pub async fn log_success(&self, event_type: AuditEventType, operation_id: &str, details: Option<HashMap<String, String>>) -> Result<(), HsmError> {
-        if !self.config.enabled {
-            return Ok(());
-        }
-        
-        // Create event
-        let mut event = AuditEvent::success(event_type)
-            .with_operation_id(operation_id);
-        
-        // Add actor from tracker
-        {
-            let tracker = self.operation_tracker.lock().await;
-            if let Some(actor) = tracker.get(operation_id) {
-                event = event.with_actor(actor);
-            }
-        }
-        
-        // Add details
-        if let Some(details) = details {
-            for (key, value) in details {
-                event = event.with_detail(key, value);
-            }
-        }
-        
-        // Store event
-        self.storage.store_event(event).await?;
-        
-        // Clean up tracker
-        {
-            let mut tracker = self.operation_tracker.lock().await;
-            tracker.remove(operation_id);
-        }
-        
-        Ok(())
-    }
-    
-    /// Log a failure event for an operation
-    pub async fn log_failure(&self, event_type: AuditEventType, operation_id: &str, error: impl Into<String>, details: Option<HashMap<String, String>>) -> Result<(), HsmError> {
-        if !self.config.enabled {
-            return Ok(());
-        }
-        
-        // Create event
-        let mut event = AuditEvent::failure(event_type, error)
-            .with_operation_id(operation_id);
-        
-        // Add actor from tracker
-        {
-            let tracker = self.operation_tracker.lock().await;
-            if let Some(actor) = tracker.get(operation_id) {
-                event = event.with_actor(actor);
-            }
-        }
-        
-        // Add details
-        if let Some(details) = details {
-            for (key, value) in details {
-                event = event.with_detail(key, value);
-            }
-        }
-        
-        // Store event
-        self.storage.store_event(event).await?;
-        
-        // Clean up tracker
-        {
-            let mut tracker = self.operation_tracker.lock().await;
-            tracker.remove(operation_id);
-        }
-        
-        Ok(())
-    }
-    
-    /// Log a simple event (not part of an operation)
-    pub async fn log_event(&self, event: AuditEvent) -> Result<(), HsmError> {
-        if !self.config.enabled {
-            return Ok(());
-        }
-        
-        self.storage.store_event(event).await
-    }
-    
-    /// Get audit events
-    pub async fn get_events(&self, filter: AuditFilter) -> Result<Vec<AuditEvent>, HsmError> {
-        if !self.config.enabled {
-            return Ok(Vec::new());
-        }
-        
-        self.storage.get_events(filter).await
-    }
-    
-    /// Count audit events
-    pub async fn count_events(&self, filter: AuditFilter) -> Result<usize, HsmError> {
-        if !self.config.enabled {
-            return Ok(0);
-        }
-        
-        self.storage.count_events(filter).await
-    }
-    
-    /// Clean up old events
-    pub async fn cleanup(&self) -> Result<usize, HsmError> {
-        if !self.config.enabled {
-            return Ok(0);
-        }
-        
-        self.storage.cleanup(self.config.retention_days, self.config.max_events).await
+    async fn cleanup(
+        &self,
+        retention_days: u32,
+        max_events: Option<usize>,
+    ) -> Result<usize, HsmError> {
+        // In a real implementation, this would delete from the database
+        // For now, just use the memory storage as a fallback
+        debug!("Cleaning up database (using memory fallback)");
+        self.memory_storage.cleanup(retention_days, max_events).await
     }
 } 
