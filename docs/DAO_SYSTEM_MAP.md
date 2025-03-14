@@ -43,12 +43,14 @@ This document provides a comprehensive map of the Anya DAO system architecture, 
 The central coordination layer for all DAO activities.
 
 **Subcomponents:**
+
 - Governance Controller
 - Permission Manager
 - Event System
 - Governance Analytics
 
 **Interfaces:**
+
 - User Interface
 - API Gateway
 - Notification System
@@ -58,6 +60,7 @@ The central coordination layer for all DAO activities.
 Manages the creation, tracking, and execution of governance proposals.
 
 **Subcomponents:**
+
 - Proposal Factory
 - Proposal Registry
 - Discussion Forum
@@ -65,6 +68,7 @@ Manages the creation, tracking, and execution of governance proposals.
 - Proposal Templates
 
 **Proposal Types:**
+
 - Protocol Upgrades
 - Treasury Operations
 - Emission Adjustments
@@ -76,6 +80,7 @@ Manages the creation, tracking, and execution of governance proposals.
 Handles all aspects of voting on governance proposals.
 
 **Subcomponents:**
+
 - Vote Tracker
 - Delegation Manager
 - Vote Calculator
@@ -83,6 +88,7 @@ Handles all aspects of voting on governance proposals.
 - Voting Power Oracle
 
 **Voting Mechanisms:**
+
 - Token-weighted Voting
 - Quadratic Voting
 - Conviction Voting
@@ -93,6 +99,7 @@ Handles all aspects of voting on governance proposals.
 Manages all treasury operations and protocol-owned assets.
 
 **Subcomponents:**
+
 - Treasury Manager
 - Asset Controller
 - Liquidity Operations
@@ -101,6 +108,7 @@ Manages all treasury operations and protocol-owned assets.
 - Buyback & Burn Module
 
 **Treasury Operations:**
+
 - Liquidity Management
   - DEX Position Management
   - Rebalancing Operations
@@ -126,6 +134,7 @@ Manages all treasury operations and protocol-owned assets.
 The on-chain implementation of the DAO system.
 
 **Core Contracts:**
+
 - DAO Core
 - Treasury Vault
 - Proposal Registry
@@ -134,6 +143,7 @@ The on-chain implementation of the DAO system.
 - Timelock Controller
 
 **Auxiliary Contracts:**
+
 - Multisig Controller
 - Access Control
 - Emergency System
@@ -145,6 +155,7 @@ The on-chain implementation of the DAO system.
 Manages token supply, distribution, and economics.
 
 **Subcomponents:**
+
 - Token Controller
 - Emission Manager
 - Distribution Controller
@@ -152,6 +163,7 @@ Manages token supply, distribution, and economics.
 - Supply Analytics
 
 **Tokenomics Implementation:**
+
 - **Supply Management**
   - Fixed supply of 21,000,000,000 AGT
   - Adaptive emission schedule
@@ -355,11 +367,13 @@ class TreasuryManager {
 The DAO system is deployed using a combination of on-chain and off-chain components:
 
 ### On-Chain Components
+
 - Stacks Blockchain (Primary)
 - Bitcoin (Settlement Layer)
 - Lightning Network (Payments)
 
 ### Off-Chain Components
+
 - Web5 DWN (Data Storage)
 - Backend Services (Business Logic)
 - Frontend Applications (User Interface)
