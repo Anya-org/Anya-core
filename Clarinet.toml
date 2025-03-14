@@ -1,7 +1,7 @@
 [project]
 name = "anya-dao"
-description = "Anya Decentralized Autonomous Organization Governance System"
-version = "3.1.0"
+description = "Anya Decentralized Autonomous Organization Governance System with Enhanced Tokenomics"
+version = "3.2.0"
 authors = ["Anya Core Team <core@anya.ai>"]
 homepage = "https://anya.ai"
 license = "MIT"
@@ -15,6 +15,15 @@ dex-adapter = {path = "src/contracts/dex-adapter.clar"}
 bitcoin-issuance = {path = "src/contracts/bitcoin-issuance.clar"}
 dex-integration-trait = {path = "dao/traits/dex-integration-trait.clar"}
 token-economics = {path = "dao/extensions/token-economics.clar"}
+treasury-management = {path = "contracts/dao/treasury-management.clar"}
+dao-governance = {path = "contracts/dao/dao-governance.clar"}
+tokenomics = {path = "contracts/dao/tokenomics.clar"}
+vesting = {path = "contracts/dao/vesting.clar"}
+voting = {path = "contracts/dao/voting.clar"}
+metrics-oracle = {path = "contracts/dao/metrics-oracle.clar"}
+financial-agent = {path = "contracts/dao/financial-agent.clar"}
+operations-manager = {path = "contracts/dao/operations-manager.clar"}
+reporting-system = {path = "contracts/dao/reporting-system.clar"}
 
 [dependencies]
 sip-010-trait = {contract_id = "SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard", version = "1.0.0"}
@@ -31,13 +40,45 @@ bitcoin_node = "https://blockstream.info/api"
 token_name = "Anya Governance Token"
 token_symbol = "AGT"
 total_supply = 21000000000
-initial_block_reward = 5000
-halving_interval = 210000
+initial_block_reward = 10000
+halving_interval = 105000
+min_halving_interval = 105000
+reserve_ratio = 0.15
+pol_target_ratio = 0.15
+
+[distribution]
+treasury_percentage = 35
+liquidity_percentage = 25
+team_percentage = 20
+community_percentage = 15
+partners_percentage = 5
 
 [governance]
 voting_threshold = 0.6
 proposal_threshold = 100
 quorum_percentage = 0.3
+execution_timelock = 2880
+supermajority_threshold = 0.67
+emergency_threshold = 0.8
+
+[treasury]
+reserve_ratio = 0.15
+pol_target_ratio = 0.15
+emergency_threshold = 0.3
+circuit_breaker_enabled = true
+emergency_council_size = 3
+
+[vesting]
+treasury_initial_release = 0.2
+treasury_vesting_months = 48
+liquidity_initial_release = 0.5
+liquidity_vesting_months = 18
+team_cliff_months = 12
+team_vesting_months = 36
+community_initial_release = 0.1
+community_vesting_months = 48
+partners_initial_release = 0.1
+partners_vesting_months = 36
 
 [security]
 audit_frequency = "quarterly"
@@ -74,3 +115,171 @@ panic = "abort"
 
 [experimental]
 enable_clarity_wasm = true
+
+[metrics]
+enabled = true
+collection_interval = 100
+storage_interval = 500
+metrics_endpoint = "https://metrics.anya.ai/ingest"
+tracker_types = ["token", "treasury", "governance", "market"]
+
+# Real-time tokenomics metrics tracking
+token_metrics = [
+    "circulating_supply",
+    "total_minted",
+    "total_burned",
+    "velocity",
+    "active_wallets",
+    "holder_distribution",
+    "median_balance"
+]
+
+# Treasury metrics tracking
+treasury_metrics = [
+    "reserves_ratio",
+    "pol_percentage",
+    "protocol_revenue",
+    "buyback_volume",
+    "runway_months",
+    "investment_performance",
+    "collateralization_ratio"
+]
+
+# Governance metrics tracking
+governance_metrics = [
+    "proposal_volume",
+    "voting_participation",
+    "vote_concentration",
+    "execution_success_rate",
+    "voter_retention",
+    "proposal_category_distribution"
+]
+
+# Market metrics tracking
+market_metrics = [
+    "price_movements",
+    "liquidity_depth",
+    "volume_analysis",
+    "volatility_index",
+    "correlation_patterns",
+    "sentiment_analysis"
+]
+
+[financial_agents]
+enabled = true
+agent_policy = "conservative"
+execution_approval = "multi-sig"
+simulation_depth = 1000
+max_per_operation = "0.5%"
+operation_cooldown = 100
+risk_tolerance = "medium"
+
+# Dynamic treasury management
+treasury_agents = [
+    {
+        name = "reserve_manager",
+        description = "Maintains treasury reserve ratio",
+        trigger_condition = "reserve_ratio < 0.13 or reserve_ratio > 0.20",
+        action = "adjust_reserves",
+        parameters = {target_ratio = 0.15, max_adjustment = "0.2%"}
+    },
+    {
+        name = "liquidity_manager",
+        description = "Optimizes protocol-owned liquidity",
+        trigger_condition = "pol_percentage < 0.12 or pol_percentage > 0.18",
+        action = "adjust_liquidity",
+        parameters = {target_ratio = 0.15, max_slippage = "0.5%"}
+    },
+    {
+        name = "buyback_agent",
+        description = "Executes token buybacks based on market conditions",
+        trigger_condition = "price_7d_change < -0.15 and reserve_ratio > 0.16",
+        action = "execute_buyback",
+        parameters = {max_size = "0.1%", target_impact = "0.5%"}
+    }
+]
+
+# Dynamic emission adjustments
+emission_agents = [
+    {
+        name = "velocity_controller",
+        description = "Adjusts emission rate based on token velocity",
+        trigger_condition = "token_velocity > 4.0 or token_velocity < 0.5",
+        action = "propose_emission_adjustment",
+        parameters = {max_adjustment = "10%", cooling_period = 10000}
+    },
+    {
+        name = "participation_optimizer",
+        description = "Optimizes incentives based on governance participation",
+        trigger_condition = "voting_participation < 0.20",
+        action = "adjust_incentives",
+        parameters = {target_boost = "25%", duration = 5000}
+    }
+]
+
+[operations]
+emergency_pause_enabled = true
+automation_level = "high"
+gas_optimization = true
+batching_enabled = true
+transaction_mempool = 1000
+execution_order = "priority_based"
+
+# Operational workflows
+workflows = [
+    {
+        name = "vesting_release",
+        trigger = "time_based",
+        frequency = "monthly",
+        actions = ["calculate_vesting", "execute_transfers", "update_records"]
+    },
+    {
+        name = "treasury_rebalance",
+        trigger = "threshold_based",
+        threshold = "5% deviation",
+        actions = ["analyze_allocation", "simulate_adjustments", "execute_transactions"]
+    },
+    {
+        name = "governance_cycle",
+        trigger = "block_height",
+        frequency = 10000,
+        actions = ["collect_metrics", "prepare_report", "publish_dashboard"]
+    }
+]
+
+[reporting]
+enabled = true
+public_dashboard = true
+api_enabled = true
+reporting_interval = 1000
+data_retention_blocks = 1000000
+export_formats = ["json", "csv", "pdf"]
+privacy_level = "aggregated"
+
+# Report types
+reports = [
+    {
+        name = "treasury_status",
+        components = ["asset_allocation", "reserve_ratio", "pol_percentage", "runway_analysis"],
+        frequency = "weekly",
+        public = true
+    },
+    {
+        name = "tokenomics_health",
+        components = ["distribution_analysis", "velocity_metrics", "emission_efficiency", "holder_analysis"],
+        frequency = "monthly",
+        public = true
+    },
+    {
+        name = "governance_activity",
+        components = ["proposal_analytics", "voting_patterns", "execution_results", "participation_trends"],
+        frequency = "bi-weekly",
+        public = true
+    },
+    {
+        name = "financial_operations",
+        components = ["transaction_history", "agent_activities", "financial_impact", "risk_assessment"],
+        frequency = "monthly",
+        public = true
+    }
+]
