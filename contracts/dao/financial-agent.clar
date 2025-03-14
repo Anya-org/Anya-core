@@ -954,4 +954,23 @@
     
     ;; Update max operation size if provided
     (match new-max-operation-size
-      size (var-set max
+      size (var-set max-operation-size size)
+      true)
+    
+    ;; Update operation cooldown if provided
+    (match new-operation-cooldown
+      cooldown (var-set operation-cooldown cooldown)
+      true)
+    
+    ;; Update multi-signature threshold if provided
+    (match new-multi-sig-threshold
+      threshold (var-set multi-sig-threshold threshold)
+      true)
+    
+    ;; Update simulation depth if provided
+    (match new-simulation-depth
+      depth (var-set simulation-depth depth)
+      true)
+    
+    (ok true)
+  ))
