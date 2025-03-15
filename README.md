@@ -62,8 +62,8 @@ See the [Enterprise License](./enterprise/LICENSE) for details.
 [AIR-3][AIS-3][AIT-3][AIP-3][BPC-3][DAO-3][RES-3][SCL-2]
 
 - Bitcoin-style token issuance (21 billion total supply)
-- Halving mechanism (every 210,000 blocks)
-- Strategic distribution (30% DEX, 15% team, 55% DAO)
+- Adaptive emission schedule with governance-controlled halving
+- Strategic token distribution with protocol treasury
 - Decentralized governance with proposals and voting
 - Integrated DEX for liquidity and trading
 - Comprehensive logging and transparency
@@ -272,19 +272,22 @@ clarinet test
   - Token-weighted voting
   - Administrative controls
   - Configurable parameters
-- **Bitcoin-Style Tokenomics**
+- **Modified Bitcoin-Style Tokenomics**
   - 21 billion token supply
-  - Halving every 210,000 blocks
-  - Initial block reward of 5,000 AGT
+  - Adaptive halving mechanism
+  - Initial block reward of 10,000 AGT
+  - DAO-controlled emission parameters
 - **Strategic Distribution**
-  - 30% to DEX for liquidity
-  - 15% to development team (based on contribution)
-  - 55% to DAO/community
+  - 35% Protocol Treasury (DAO-managed)
+  - 25% Liquidity Provision
+  - 20% Team & Development (with vesting)
+  - 15% Community Incentives
+  - 5% Strategic Partners & Advisors
 - **DEX Integration**
-  - Liquidity provision
+  - Protocol-owned liquidity
   - Trading operations
   - Price oracle
-  - Buyback mechanism
+  - Buyback and burn mechanism
 
 ### ML Component Features
 
@@ -542,8 +545,9 @@ dao:
   proposal_threshold: 100000000
   voting_period_blocks: 1008
   token_supply: 21000000000
-  block_reward: 5000
-  halving_interval: 210000
+  block_reward: 10000
+  min_halving_interval: 105000
+  treasury_reserve_ratio: 0.15
 
 features:
   experimental_ml: false
@@ -576,13 +580,24 @@ The platform supports dynamic configuration updates:
 ### Governance Token (AGT)
 
 - **Total Supply**: 21,000,000,000 AGT
-- **Initial Block Reward**: 5,000 AGT
-- **Halving Interval**: 210,000 blocks
+- **Initial Block Reward**: 10,000 AGT
+- **Halving Interval**: Adaptive, minimum 105,000 blocks
 - **Distribution Model**:
-  - 30% to DEX for liquidity
-  - 15% to development team (based on contribution)
-  - 55% to DAO/community
-- **Emission Model**: Bitcoin-inspired halving mechanism
+  - 35% Protocol Treasury (DAO-managed)
+    • 15% Strategic Reserves
+    • 20% Ecosystem Development
+  - 25% Liquidity Provision
+    • 15% Initial DEX Liquidity
+    • 10% Ongoing Liquidity Mining
+  - 20% Team & Development
+    • 4-year vesting with 1-year cliff
+    • Milestone-based release triggers
+  - 15% Community Incentives
+    • Governance participation
+    • Protocol usage rewards
+  - 5% Strategic Partners & Advisors
+    • 3-year vesting schedule
+- **Emission Model**: Adaptive Bitcoin-inspired mechanism with governance controls
 
 ### Governance System Features
 
@@ -593,6 +608,17 @@ The platform supports dynamic configuration updates:
   - Multi-dimensional proposal evaluation
   - ML-driven proposal scoring
   - Adaptive governance parameters
+  - Treasury management proposals
+
+### Treasury Management Framework
+
+[AIR-3][DAO-3][AIP-3][BPC-3]
+
+- **Protocol-Owned Liquidity**:
+  - DAO-controlled liquidity positions
+  - Minimum reserve requirements (15% of circulation)
+  - Strategic buyback and burn mechanisms
+  - Market stability operations
 
 ### Governance Intelligence
 

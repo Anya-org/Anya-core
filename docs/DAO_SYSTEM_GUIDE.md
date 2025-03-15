@@ -1,10 +1,247 @@
 <!-- markdownlint-disable MD013 line-length -->
 
-# Anya DAO System Comprehensive Guide
+# Anya DAO System Guide [AIR-3][AIS-3][AIT-3][AIP-3][BPC-3][DAO-3]
 
-## Introduction
+## Overview
 
-The Anya DAO (Decentralized Autonomous Organization) is a governance system built on the Bitcoin Development Framework v2.5, featuring Bitcoin-style tokenomics, integrated DEX capabilities, and advanced proposal management. This comprehensive guide consolidates information from all DAO-related documentation.
+The Anya DAO (Decentralized Autonomous Organization) is the governance layer for the Anya Core Platform, enabling token holders to collectively manage the protocol, treasury, and ecosystem development.
+
+## Governance Token
+
+The Anya Governance Token (AGT) is the core utility and governance token of the platform.
+
+### Token Economics
+
+- **Total Supply**: 21,000,000,000 AGT (Fixed)
+- **Initial Block Reward**: 10,000 AGT
+- **Emission Schedule**: Adaptive Bitcoin-inspired halving mechanism
+  - Minimum halving interval: 105,000 blocks
+  - Halving controlled by governance parameters
+
+### Token Distribution
+
+The AGT token is distributed according to the following model:
+
+- **35% Protocol Treasury** (7,350,000,000 AGT)
+  - 15% Strategic Reserves
+  - 20% Ecosystem Development
+
+- **25% Liquidity Provision** (5,250,000,000 AGT)
+  - 15% Initial DEX Liquidity
+  - 10% Ongoing Liquidity Mining
+
+- **20% Team & Development** (4,200,000,000 AGT)
+  - 4-year vesting with 1-year cliff
+  - Milestone-based release triggers
+
+- **15% Community Incentives** (3,150,000,000 AGT)
+  - Governance participation rewards
+  - Protocol usage incentives
+
+- **5% Strategic Partners & Advisors** (1,050,000,000 AGT)
+  - 3-year vesting schedule
+
+*For detailed tokenomics information, see [TOKENOMICS_SYSTEM.md](TOKENOMICS_SYSTEM.md)*
+
+## Governance Framework
+
+### Proposal Types
+
+The DAO supports multiple proposal types, each with specific requirements and voting parameters:
+
+1. **Protocol Upgrades**
+   - Contract upgrades
+   - Parameter changes
+   - Feature additions/removals
+
+2. **Treasury Management**
+   - Fund allocations
+   - Investment decisions
+   - Protocol-owned liquidity operations
+   
+3. **Emission Schedule Adjustments**
+   - Halving interval modifications
+   - Block reward changes
+   - Special emission events
+
+4. **Community Grants**
+   - Developer grants
+   - Marketing initiatives
+   - Community projects
+
+5. **Governance System Changes**
+   - Voting mechanism updates
+   - Proposal threshold adjustments
+   - Quorum requirement changes
+
+### Proposal Process
+
+1. **Submission Phase**
+   - Minimum 100 AGT to submit a proposal
+   - 3-day discussion period
+   - Technical feasibility review
+
+2. **Voting Phase**
+   - 7-day voting period
+   - Token-weighted voting
+   - Quadratic voting for select proposal types
+
+3. **Execution Phase**
+   - 2-day timelock before execution
+   - Automatic execution for approved proposals
+   - Multi-signature security for treasury operations
+
+### Voting Power
+
+Voting power in the DAO is determined by:
+
+- AGT token holdings
+- Governance participation history
+- Reputation score (based on contribution)
+
+## Treasury Management
+
+The DAO treasury is managed according to the following principles:
+
+### Treasury Composition
+
+- **Strategic Reserves**: 15% minimum of circulating supply
+- **Protocol-Owned Liquidity**: Minimum 15% of DEX allocation
+- **Ecosystem Fund**: Grants and investments
+- **Operations Fund**: Protocol development and maintenance
+
+### Treasury Operations
+
+The DAO can authorize various treasury operations:
+
+1. **Liquidity Management**
+   - Adding/removing DEX liquidity
+   - Fee tier adjustments
+   - Rebalancing across venues
+
+2. **Buyback and Burn**
+   - Token buybacks from market
+   - Burning mechanisms
+   - Supply adjustment operations
+
+3. **Strategic Investments**
+   - Protocol investments
+   - Ecosystem funding
+   - Partnership development
+
+4. **Reserve Management**
+   - Asset diversification
+   - Yield generation
+   - Risk management
+
+### Treasury Guards
+
+To ensure responsible treasury management:
+
+- **Spending Limits**: Tiered approval requirements based on amount
+- **Circuit Breakers**: Emergency pause during extreme conditions
+- **Time Locks**: Graduated waiting periods based on impact
+- **Audits**: Quarterly independent audits
+
+## Implementation Architecture
+
+The DAO is implemented using:
+
+### On-Chain Components
+
+- **Governance Contract**: Main DAO contract
+- **Treasury Contract**: Treasury management
+- **Token Contract**: AGT token implementation
+- **Proposal Registry**: Tracks all proposals
+
+### Off-Chain Components
+
+- **DAO Dashboard**: Web interface for governance
+- **Analytics Suite**: Governance metrics and insights
+- **Notification System**: Alerts for proposals and votes
+- **Discussion Forum**: Proposal discussion platform
+
+## Security Measures
+
+The DAO implements multiple security layers:
+
+- **Multi-Signature Requirements**: For critical operations
+- **Time Locks**: Delayed execution of significant changes
+- **Security Council**: Emergency response capability
+- **Formal Verification**: Of all governance contracts
+- **Bug Bounty Program**: For vulnerability reporting
+
+## Getting Started
+
+### Participation Guide
+
+1. **Acquire AGT tokens**
+   - DEX trading
+   - Liquidity provision
+   - Community contributions
+
+2. **Delegate Voting Power**
+   - Self-delegation
+   - Delegate to representatives
+   - Split delegation
+
+3. **Create Proposals**
+   - Proposal templates
+   - Documentation requirements
+   - Technical specifications
+
+4. **Vote on Proposals**
+   - Voting interface
+   - Voting strategies
+   - Vote timing considerations
+
+## Technical Reference
+
+### Contract Addresses
+
+- **DAO Contract**: `[CONTRACT_ADDRESS]`
+- **Treasury Contract**: `[CONTRACT_ADDRESS]`
+- **Token Contract**: `[CONTRACT_ADDRESS]`
+
+### API Integration
+
+```typescript
+// Example: Creating a proposal
+const proposal = await anyaDAO.createProposal({
+  title: "Adjust Emission Schedule",
+  description: "Modify halving interval to 115,000 blocks",
+  actions: [
+    {
+      contract: "emission",
+      method: "setHalvingInterval",
+      params: ["115000"]
+    }
+  ]
+});
+```
+
+## Governance Dashboard
+
+The DAO dashboard is available at [https://dao.anya-core.org](https://dao.anya-core.org) and provides:
+
+- Active proposal overview
+- Voting interface
+- Treasury statistics
+- Governance analytics
+- Personal voting history
+- Delegation management
+
+## Version History
+
+- **v2.0.0**: Updated tokenomics model with adaptive emission and strategic distribution
+- **v1.0.0**: Initial DAO implementation with fixed Bitcoin-style emission
+
+## Additional Resources
+
+- [DAO Technical Documentation](./DAO_TECHNICAL.md)
+- [DAO System Map](./DAO_SYSTEM_MAP.md)
+- [Tokenomics System](./TOKENOMICS_SYSTEM.md)
+- [Governance API Reference](./api/GOVERNANCE_API.md)
 
 ## Key Features
 

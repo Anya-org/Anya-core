@@ -1,227 +1,161 @@
 <!-- markdownlint-disable MD013 line-length -->
 
-# Anya Tokenomics System Architecture
+# Anya Tokenomics System [AIR-3][AIP-3][BPC-3][DAO-3]
 
-This document outlines the tokenomics architecture of the Anya DAO system, including the Bitcoin-style issuance model, DEX integration, and related components.
+This document outlines the complete tokenomics system for the Anya Governance Token (AGT), including distribution model, emission schedule, and treasury management framework.
 
-## System Overview
+## Token Specifications
 
-The Anya tokenomics system implements a pure Bitcoin-style token issuance model with specialized distribution rules:
+- **Name**: Anya Governance Token
+- **Symbol**: AGT
+- **Total Supply**: 21,000,000,000 AGT
+- **Decimals**: 8
+- **Token Standard**: Clarity SIP-010 Compatible
 
-1. Bitcoin-style issuance from genesis with higher initial rewards
-2. Strategic token distribution to DEX (30%), dev team (15%), and DAO/community (55%)
-3. Varying developer team allocation based on work contribution
+## Distribution Model
 
-This model ensures proper market liquidity through DEX allocation, rewards contributors fairly, and maintains the long-term supply control mechanism inspired by Bitcoin's monetary policy.
+The AGT token distribution is designed to create a balance between protocol sustainability, community incentives, and operational requirements:
 
-> **Implementation Status**: For detailed information about the implementation progress and milestones, see [IMPLEMENTATION_MILESTONES.md](IMPLEMENTATION_MILESTONES.md).
-
-## Component Architecture
-
-```
-anya-core/
-├── src/contracts/
-│   ├── governance_token.clar   # SIP-010 compliant governance token
-│   ├── dao.clar                # Main DAO contract
-│   ├── bitcoin-issuance.clar   # Bitcoin-style token issuance logic
-│   ├── dex-adapter.clar        # DEX integration for liquidity and trading
-│   └── token-economics.clar    # Token economic model implementation
-├── dao/
-│   ├── traits/
-│   │   ├── dao-trait.clar           # Interface for DAO functionality
-│   │   └── dex-integration-trait.clar # Interface for DEX integration
-│   ├── core/
-│   │   └── dao-core.clar            # Enhanced DAO core implementation
-│   └── extensions/
-│       └── token-economics.clar     # Advanced token economics logic
-```
-
-## Issuance Model
-
-### Bitcoin-Style Issuance with Specialized Distribution
-
-- **Total Supply**: 21 billion AGT (with 8 decimal places)
-- **Initial Block Reward**: 5,000 AGT per block (higher than Bitcoin)
-- **Halving Interval**: Every 210,000 blocks (~4 years with 10-minute blocks)
-- **Halving Schedule**:
-  - First 210,000 blocks: 5,000 AGT per block
-  - Next 210,000 blocks: 2,500 AGT per block
-  - Next 210,000 blocks: 1,250 AGT per block
-  - And so on...
-
-### Distribution Allocation
-
-For each block reward:
-
-- **DEX Allocation**: 30% of issuance for liquidity provision
-- **Developer Team**: 15% of issuance distributed to 10 team members
-- **DAO/Community**: 55% of issuance for governance and community
-
-### Developer Team Allocation
-
-The 15% allocation to the development team is distributed among 10 team members based on work contribution:
-
-- **Top Performer**: 40% of the team allocation
-- **Lowest Performer**: 5% of the team allocation
-- **Other Members**: Distributed on a sliding scale between 40% and 5%
-
-Team member allocations are configurable by administrators but must always sum to 100% of the team allocation.
-
-## DEX Integration
-
-The DEX adapter provides liquidity management and trading capabilities for the AGT token, including:
-
-### Key Features
-
-1. **Liquidity Provision**
-   - DEX receives 30% of all token issuance
-   - Users can provide STX/AGT liquidity to earn trading fees
-   - Liquidity providers receive LP tokens representing their share
-
-2. **Trading Operations**
-   - Swap AGT for STX and vice versa
-   - Constant product market maker formula (x * y = k)
-   - Fee percentage: 0.3% by default (configurable)
-
-3. **Buyback Mechanism**
-   - DAO can execute buybacks through the DEX
-   - Supports DAO-controlled market stabilization
-
-4. **Price Oracle**
-   - Provides reliable on-chain price information
-   - Useful for other contracts needing AGT price data
-
-## Contract Integration Flow
+### Strategic Distribution Breakdown
 
 ```
-                       ┌───────────────┐
-                       │  DAO Contract │
-                       └───────┬───────┘
-                               │
-                      Control & │
-                      Governance│
-                               ▼
-┌────────────────┐    ┌───────────────┐    ┌───────────────┐
-│  Governance    │◄─►│   DAO Core    │◄─►│  DEX Adapter   │
-│    Token       │    └───────┬───────┘    └───────────────┘
-└────────────────┘            │                    ▲
-         ▲                    │                    │
-         │                    │                    │
-         │                    │                    │
-         │                    ▼                    │
-         │            ┌───────────────┐            │
-         └────────────┤Bitcoin Issuance├────────────┘
-                      └───────────────┘
+Total Supply: 21,000,000,000 AGT
+
+35% Protocol Treasury (7,350,000,000 AGT)
+  • 15% Strategic Reserves (3,150,000,000 AGT)
+  • 20% Ecosystem Development (4,200,000,000 AGT)
+
+25% Liquidity Provision (5,250,000,000 AGT)
+  • 15% Initial DEX Liquidity (3,150,000,000 AGT)
+  • 10% Ongoing Liquidity Mining (2,100,000,000 AGT)
+
+20% Team & Development (4,200,000,000 AGT)
+  • 4-year vesting with 1-year cliff
+  • Milestone-based release triggers
+
+15% Community Incentives (3,150,000,000 AGT)
+  • Governance participation rewards
+  • Protocol usage incentives
+
+5% Strategic Partners & Advisors (1,050,000,000 AGT)
+  • 3-year vesting schedule
 ```
 
-## Key Contract Relationships
+## Emission Schedule
 
-1. **DAO & DAO Core**
-   - The DAO contract uses the DAO core for implementation
-   - Both implement the `dao-trait` interface for consistency
+AGT follows an adaptive Bitcoin-inspired emission model with governance-controlled parameters:
 
-2. **Issuance & Token**
-   - The Bitcoin issuance contract mints tokens according to the schedule
-   - It directs new tokens to the DEX, team members, and DAO as per allocation rules
+- **Initial Block Reward**: 10,000 AGT
+- **Minimum Halving Interval**: 105,000 blocks
+- **Halving Reduction**: 50% (consistent with Bitcoin model)
+- **Adaptive Controls**:
+  - Network usage metrics
+  - Treasury utilization rate
+  - Governance-approved adjustment triggers
 
-3. **DEX & Token**
-   - The DEX receives 30% of all newly minted tokens for liquidity
-   - It implements the `dex-integration-trait` interface
+### Emission Schedule Table
 
-4. **DAO & DEX Integration**
-   - The DAO can issue instructions to the DEX for buybacks
-   - The DAO can adjust liquidity parameters and fee settings
+| Phase | Block Range | Block Reward | Tokens Released |
+|-------|-------------|--------------|-----------------|
+| 1     | 0-105,000   | 10,000 AGT   | 1,050,000,000  |
+| 2     | 105,001-210,000 | 5,000 AGT | 525,000,000   |
+| 3     | 210,001-315,000 | 2,500 AGT | 262,500,000   |
+| 4     | 315,001-420,000 | 1,250 AGT | 131,250,000   |
+| ...   | ...         | ...          | ...            |
+
+*Note: The actual halving interval may be adjusted through governance proposals based on protocol performance metrics.*
+
+## Treasury Management Framework [AIR-3][DAO-3][BPC-3]
+
+The Protocol Treasury is managed through the DAO governance system with the following guidelines:
+
+### Treasury Management Principles
+
+1. **Protocol-Owned Liquidity Strategy**
+   - Minimum of 15% of DEX allocation maintained as protocol-owned liquidity
+   - Revenue from protocol operations directed to increase POL over time
+   - DAO-controlled trading strategy during extreme market conditions
+
+2. **Reserve Requirements**
+   - Minimum 15% of circulating supply maintained in strategic reserves
+   - Reserve ratio adjustable through governance with 75% supermajority
+
+3. **Circuit Breakers**
+   - Treasury operations automatically limited during extreme market volatility
+   - Emergency freeze mechanism requiring multi-signature approval
+
+4. **Buyback and Burn Mechanism**
+   - Protocol revenue can be allocated to token buybacks
+   - Buyback frequency and amount determined by governance
+   - Transparent burn mechanism with on-chain verification
+
+## Distribution Release Schedule
+
+### Initial Release
+
+- **Protocol Treasury**: 20% available at launch, 80% time-locked
+- **Liquidity Provision**: 50% available at launch, 50% released over 18 months
+- **Team & Development**: 0% at launch, 1-year cliff, then linear vesting over 3 years
+- **Community Incentives**: 10% available at launch, 90% released through reward programs
+- **Strategic Partners**: 10% at launch, 3-year linear vesting for remainder
+
+### Vesting Schedule
+
+| Allocation | Launch | 6 Months | 12 Months | 24 Months | 36 Months | 48 Months |
+|------------|--------|----------|-----------|-----------|-----------|-----------|
+| Protocol Treasury | 20% | 30% | 40% | 60% | 80% | 100% |
+| Liquidity | 50% | 67% | 83% | 100% | 100% | 100% |
+| Team & Dev | 0% | 0% | 25% | 50% | 75% | 100% |
+| Community | 10% | 25% | 40% | 70% | 90% | 100% |
+| Partners | 10% | 20% | 33% | 67% | 100% | 100% |
 
 ## Governance Controls
 
-The DAO governance system has control over several tokenomics parameters:
+The emission and distribution parameters can be modified through governance proposals with the following requirements:
 
-1. **Issuance Controls**
-   - Initialization of the issuance schedule
-   - Setting team member allocations
-   - Configuration of contract addresses
+- **Emission Rate Changes**: 67% approval, 10% quorum
+- **Treasury Allocation Changes**: 75% approval, 15% quorum
+- **Vesting Schedule Changes**: 80% approval, 25% quorum
 
-2. **DEX Controls**
-   - Fee percentage adjustment
-   - Liquidity provision/removal
-   - Buyback execution
+## Market Operations
 
-3. **Treasury Management**
-   - Token allocation for proposals
-   - Strategic reserve management
+The DAO can authorize the following market operations through governance:
 
-## Security Considerations
+1. **Liquidity Management**
+   - Add/remove liquidity from trading pairs
+   - Adjust fee tiers and reward distributions
+   - Rebalance liquidity across trading venues
 
-1. **Administrator Controls**
-   - All contracts have administrator checks for sensitive operations
-   - The DAO itself can be an administrator of the issuance and DEX contracts
+2. **Buyback Operations**
+   - Set periodic buyback schedules
+   - Establish price targets for buyback execution
+   - Determine burn vs. treasury allocation ratio
 
-2. **Immutable Schedule**
-   - The core issuance schedule (halving intervals) is hardcoded and cannot be changed
-   - This provides certainty about the token's monetary policy
+3. **Strategic Investments**
+   - Allocate treasury funds to ecosystem projects
+   - Establish investment criteria and return metrics
+   - Manage investment portfolio diversification
 
-3. **Contract Boundaries**
-   - Clear separation of concerns between contracts
-   - Well-defined interfaces (traits) for component interaction
+## Implementation Details
 
-## Deployment and Initialization
+The tokenomics system is implemented through:
 
-To deploy and initialize the system:
+- Clarity smart contracts for on-chain governance
+- Rust backend for execution and monitoring
+- Web5 DWN for transparent record-keeping
+- ML analytics for market operation optimization
 
-1. Deploy all contracts in Clarinet.toml
-2. Initialize the governance token
-3. Initialize the DAO with the token address
-4. Initialize the Bitcoin issuance contract with start block, token, DAO, and DEX addresses
-5. Set the team member allocations using the `set-team-allocations` function
-6. Configure the DAO as an administrator of the issuance and DEX contracts
+## Auditing and Transparency
 
-## Tokenomics Parameters
+All token movements and treasury operations are:
 
-Current tokenomics parameters are set as follows:
+- Recorded on-chain with transaction hashes
+- Published to a public dashboard
+- Subjected to quarterly independent audits
+- Verified through cryptographic proof of reserves
 
-| Parameter | Value | Description |
-|-----------|-------|-------------|
-| Total Supply | 21,000,000,000 AGT | Maximum supply cap |
-| Initial Block Reward | 5,000 AGT | Block reward with 8 decimal places |
-| Halving Interval | 210,000 blocks | ~4 years with 10-minute blocks |
-| DEX Allocation | 30% | Percentage of block rewards allocated to DEX |
-| Team Allocation | 15% | Percentage of block rewards allocated to dev team |
-| DAO Allocation | 55% | Percentage of block rewards allocated to DAO/community |
-| DEX Fee | 0.3% | Trading fee percentage |
-| Proposal Threshold | 100 AGT | Minimum tokens to submit a proposal |
-| Voting Threshold | 60% | Percentage needed to pass a proposal |
-| Quorum | 30% | Minimum participation required |
+## Version Control
 
-## Compliance with Bitcoin Development Framework
-
-This implementation follows the Bitcoin Development Framework v2.5 requirements:
-
-1. **Protocol Adherence**
-   - Bitcoin-like monetary policy with halving schedule
-   - Use of traits for interface consistency
-   - Comprehensive error handling
-
-2. **Privacy-Preserving Architecture**
-   - Constant product market maker formula for DEX
-   - Predictable issuance schedule
-
-3. **Asset Management Standards**
-   - SIP-010 compliant token
-   - Well-defined treasury management
-
-## Future Enhancements
-
-Potential future enhancements to the tokenomics system include:
-
-1. **Staking Mechanism**
-   - Time-locked staking for additional rewards
-   - Staking-based voting weight
-
-2. **Enhanced DEX Features**
-   - Multi-pair trading
-   - Dynamic fee adjustment based on volatility
-   - Flash loan prevention mechanisms
-
-3. **Cross-Chain Integration**
-   - Wrapped AGT on other chains
-   - Cross-chain governance capabilities
+- **Current Version**: 2.0.0
+- **Last Updated**: [CURRENT_DATE]
+- **Previous Version**: 1.0.0 (Bitcoin-fixed halving model)
