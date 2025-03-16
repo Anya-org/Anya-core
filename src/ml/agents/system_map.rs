@@ -9,6 +9,12 @@ use std::collections::{HashMap, HashSet};
 use once_cell::sync::Lazy;
 use serde::{Serialize, Deserialize};
 use async_trait::async_trait;
+use dashmap::{DashSet, DashMap};
+use std::sync::atomic::{AtomicU64, AtomicU32};
+use std::time::{SystemTime, UNIX_EPOCH};
+use std::sync::atomic::Ordering;
+use blake3;
+use rayon::iter::{IntoParallelIterator, ParallelIterator};
 
 use crate::error::Error;
 use super::AgentError;
@@ -17,19 +23,25 @@ use super::AgentError;
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct SystemIndex {
     /// Available agent IDs
-    pub agent_ids: HashSet<String>,
+    pub agent_ids: DashSet<String>,
     
-    /// Available component paths
-    pub component_paths: HashMap<String, String>,
+    /// Available component paths with content hash
+    pub component_paths: DashMap<String, (String, [u8; 32])>,
     
-    /// Available model paths
-    pub model_paths: HashMap<String, String>,
+    /// Available model paths with versioning
+    pub model_paths: DashMap<String, semver::Version>,
     
-    /// Last update timestamp
-    pub last_updated: u64,
+    /// Documentation links with hash verification
+    pub documentation_links: DashMap<String, (LinkStatus, [u8; 32])>,
     
-    /// Version of the index
-    pub version: u32,
+    /// Last update timestamp (nanoseconds since epoch)
+    pub last_updated: AtomicU64,
+    
+    /// Version of the index (atomic for lock-free updates)
+    pub version: AtomicU32,
+    
+    /// Rust-specific metrics
+    pub rust_metrics: DashMap<String, RustCodeMetrics>,
 }
 
 /// System-wide mapping of relationships and states
@@ -145,6 +157,27 @@ pub enum ModelStatus {
     Deprecated,
 }
 
+/// Link status for documentation
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum LinkStatus {
+    Valid,
+    Broken,
+    Deprecated(String),  // Deprecation timestamp
+    External,
+}
+
+/// Rust-specific metrics
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct RustCodeMetrics {
+    pub cyclomatic_complexity: f32,
+    pub unsafe_usage_count: u32,
+    pub test_coverage: f32,
+    pub dependency_graph: HashMap<String, Vec<String>>,
+    pub clippy_lints: HashMap<String, u32>,
+    pub security_audit_flags: Vec<String>,
+    pub bitcoin_protocol_adherence: f32,
+}
+
 // Global instance of the system index
 static GLOBAL_INDEX: Lazy<Arc<SystemIndexManager>> = Lazy::new(|| {
     Arc::new(SystemIndexManager::new())
@@ -176,21 +209,17 @@ impl SystemIndexManager {
     }
     
     /// Update the index
-    pub async fn update_index(&self) -> Result<(), AgentError> {
-        let mut index = self.index.write().map_err(|_| {
+    pub async fn update_index(&self, index: SystemIndex) -> Result<(), AgentError> {
+        let mut idx = self.index.write().map_err(|_| {
             AgentError::InternalError("Failed to acquire write lock on system index".to_string())
         })?;
         
-        // Update the timestamp
-        index.last_updated = std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .unwrap_or_default()
-            .as_secs();
-        
-        // Increment the version
-        index.version += 1;
-        
-        // TODO: Actual index update logic
+        idx.agent_ids = index.agent_ids;
+        idx.component_paths = index.component_paths;
+        idx.model_paths = index.model_paths;
+        idx.documentation_links = index.documentation_links;
+        idx.last_updated.store(index.last_updated.load(Ordering::SeqCst), Ordering::SeqCst);
+        idx.version.store(index.version.load(Ordering::SeqCst), Ordering::SeqCst);
         
         Ok(())
     }
@@ -204,11 +233,13 @@ impl SystemIndexManager {
         index.agent_ids.insert(agent_id);
         
         // Update metadata
-        index.last_updated = std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .unwrap_or_default()
-            .as_secs();
-        index.version += 1;
+        index.last_updated.store(
+            SystemTime::now()
+                .duration_since(UNIX_EPOCH)?
+                .as_nanos() as u64,
+            Ordering::SeqCst
+        );
+        index.version.store(index.version.load(Ordering::SeqCst) + 1, Ordering::SeqCst);
         
         Ok(())
     }
@@ -223,14 +254,16 @@ impl SystemIndexManager {
             AgentError::InternalError("Failed to acquire write lock on system index".to_string())
         })?;
         
-        index.component_paths.insert(component_id, path);
+        index.component_paths.insert(component_id, (path, blake3::hash(path.as_bytes()).into()));
         
         // Update metadata
-        index.last_updated = std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .unwrap_or_default()
-            .as_secs();
-        index.version += 1;
+        index.last_updated.store(
+            SystemTime::now()
+                .duration_since(UNIX_EPOCH)?
+                .as_nanos() as u64,
+            Ordering::SeqCst
+        );
+        index.version.store(index.version.load(Ordering::SeqCst) + 1, Ordering::SeqCst);
         
         Ok(())
     }
@@ -245,16 +278,121 @@ impl SystemIndexManager {
             AgentError::InternalError("Failed to acquire write lock on system index".to_string())
         })?;
         
-        index.model_paths.insert(model_id, path);
+        index.model_paths.insert(model_id, semver::Version::parse(path.split('.').last().unwrap_or("0.0.0")).unwrap());
         
         // Update metadata
-        index.last_updated = std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .unwrap_or_default()
-            .as_secs();
-        index.version += 1;
+        index.last_updated.store(
+            SystemTime::now()
+                .duration_since(UNIX_EPOCH)?
+                .as_nanos() as u64,
+            Ordering::SeqCst
+        );
+        index.version.store(index.version.load(Ordering::SeqCst) + 1, Ordering::SeqCst);
         
         Ok(())
+    }
+    
+    /// Parallel directory crawler using rayon
+    pub async fn crawl_and_update(&self) -> Result<(), AgentError> {
+        let new_index = self.read_index().await?;
+        
+        let walker = WalkDir::new(".")
+            .into_iter()
+            .filter_map(|e| e.ok())
+            .par_bridge()
+            .map(|entry| {
+                let path = entry.path().to_string_lossy().into_owned();
+                let hash = if entry.file_type().is_file() {
+                    blake3::hash(std::fs::read(path).unwrap_or_default()).to_hex().to_string()
+                } else {
+                    String::new()
+                };
+                (path, hash)
+            });
+
+        walker.for_each(|(path, hash)| {
+            let file_type = if path.ends_with(".md") {
+                "Documentation"
+            } else if path.ends_with(".rs") {
+                "Rust Source"
+            } else {
+                "Asset"
+            };
+            
+            new_index.component_paths.insert(
+                path,
+                (file_type.to_string(), blake3::hash(hash.as_bytes()).into())
+            );
+        });
+
+        new_index.last_updated.store(
+            SystemTime::now()
+                .duration_since(UNIX_EPOCH)?
+                .as_nanos() as u64,
+            Ordering::SeqCst
+        );
+        
+        self.update_index(new_index).await
+    }
+
+    async fn analyze_rust_file(&self, path: &str) -> RustCodeMetrics {
+        let content = std::fs::read_to_string(path).unwrap_or_default();
+        let syntax = syn::parse_file(&content).unwrap();
+        
+        let mut metrics = RustCodeMetrics {
+            cyclomatic_complexity: calculate_cyclomatic_complexity(&syntax),
+            unsafe_usage_count: count_unsafe_blocks(&syntax),
+            test_coverage: get_test_coverage(path),
+            dependency_graph: analyze_dependencies(&content),
+            clippy_lints: run_clippy_checks(path),
+            security_audit_flags: check_bitcoin_security(&content),
+            bitcoin_protocol_adherence: calculate_protocol_adherence(&content),
+        };
+
+        // Apply Bitcoin protocol rules
+        if metrics.bitcoin_protocol_adherence < 0.9 {
+            metrics.security_audit_flags.push(
+                "Low Bitcoin protocol adherence - review BIP-341/342 compliance".into()
+            );
+        }
+
+        metrics
+    }
+
+    pub async fn enhanced_crawl(&self) -> Result<(), AgentError> {
+        let walker = WalkDir::new(".")
+            .into_iter()
+            .filter_map(|e| e.ok())
+            .par_bridge()
+            .filter(|e| e.path().extension().map(|ext| ext == "rs").unwrap_or(false))
+            .map(|entry| {
+                let path = entry.path().to_string_lossy().into_owned();
+                let metrics = self.analyze_rust_file(&path);
+                (path, metrics)
+            });
+
+        walker.for_each(|(path, metrics)| {
+            self.index.write().unwrap().rust_metrics.insert(path, metrics);
+        });
+
+        Ok(())
+    }
+
+    pub async fn bitcoin_health_check(&self) -> f32 {
+        let index = self.read_index().await?;
+        let total = index.component_paths.len() as f32;
+        let compliant = index.component_paths.iter()
+            .filter(|(path, _)| is_bitcoin_related(path))
+            .filter(|(_, metrics)| metrics.bitcoin_protocol_adherence >= 0.9)
+            .count() as f32;
+            
+        compliant / total
+    }
+    
+    fn is_bitcoin_related(path: &str) -> bool {
+        path.contains("bitcoin") || 
+        path.ends_with(".psbt") ||
+        path.contains("bip341")
     }
 }
 
@@ -409,7 +547,7 @@ pub trait IndexProvider {
     async fn read_index(&self) -> Result<SystemIndex, AgentError>;
     
     /// Update the index
-    async fn update_index(&self) -> Result<(), AgentError>;
+    async fn update_index(&self, index: SystemIndex) -> Result<(), AgentError>;
 }
 
 /// Implementation of the MapProvider trait for the system map
@@ -435,8 +573,8 @@ impl IndexProvider for SystemIndexManager {
         self.read_index().await
     }
     
-    async fn update_index(&self) -> Result<(), AgentError> {
-        self.update_index().await
+    async fn update_index(&self, index: SystemIndex) -> Result<(), AgentError> {
+        self.update_index(index).await
     }
 }
 

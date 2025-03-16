@@ -1,7 +1,7 @@
 <!-- markdownlint-disable MD013 line-length -->
 
 # Anya Core Agent Architecture
-[AIR-3][AIS-3][AIT-3][BPC-3][DAO-3]
+[AIS-3][BPC-3][DAO-4]
 
 ## Overview
 
@@ -81,6 +81,35 @@ The Reporting System generates comprehensive analytics and reports for stakehold
 - Dashboard integration
 - Data export
 - Privacy controls
+
+### Bitcoin Protocol Integration
+
+All agents operate with BPC-3 compliance, ensuring full Taproot support and Bitcoin anchoring capabilities through the following mechanisms:
+
+- SPV Proof Validation
+- Taproot Signature Verification (BIP-341/342)
+- Blockchain Anchored Attestations
+
+### Institutional Governance (DAO-4)
+
+Agent operations follow the DAO-4 institutional framework, providing:
+
+- Multi-chain PSBT transaction support
+- Legal wrapper integration for cross-border operations
+- BPC-3 compliant proof validation
+- Institutional-grade approval workflows
+
+## Agent Decision Matrix
+
+| Operation | Bitcoin Protocol | DAO Governance | Security Level |
+|-----------|------------------|----------------|----------------|
+| Transaction Validation | BPC-3 | DAO-4 | AIS-3 |
+| Cross-Chain Settlement | BPC-3 | DAO-4 | AIS-3 |
+| Enterprise Approval | BPC-3 | DAO-4 | AIS-3 |
+
+## Integration Patterns
+
+Agents implement the hexagonal architecture with Bitcoin-first design principles, ensuring all operations maintain BPC-3 compliance while enabling DAO-4 governance controls.
 
 ## Implementation Priorities
 

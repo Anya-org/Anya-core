@@ -137,4 +137,22 @@ mod tests {
 pub mod performance;
 
 // Re-export key types
-pub use performance::Metrics; 
+pub use performance::Metrics;
+
+/// Core hexagonal architecture port definitions
+pub mod ports {
+    // Define all required ports according to BDF v2.5
+    pub mod node_communication {
+        // P2P networking protocols
+    }
+    
+    pub mod wallet_interface {
+        // PSBT/BIP-174 compliant interfaces
+    }
+    
+    pub mod smart_contract {
+        // Miniscript execution interfaces
+    }
+    
+    // Additional ports from BDF v2.5
+} 

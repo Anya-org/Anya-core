@@ -45,6 +45,14 @@ function Verify-IndexLinks {
         $pattern = '\[([^\]]+)\]\(([^)]+)\)'
         $matches = [regex]::Matches($content, $pattern)
         $brokenLinks = @()
+        $newLinks = @()
+        
+        # Cross-reference with system index
+        $indexData = Get-Content "$anyaDir/system_index.json" -Raw | ConvertFrom-Json
+        $componentHashes = @{}
+        $indexData.component_paths.PSObject.Properties | ForEach-Object {
+            $componentHashes[$_.Name] = $_.Value.hash
+        }
         
         foreach ($match in $matches) {
             $linkText = $match.Groups[1].Value
@@ -52,17 +60,75 @@ function Verify-IndexLinks {
             
             if (-not $linkPath.StartsWith("http")) {
                 $fullPath = Join-Path (Split-Path $indexFile) $linkPath.TrimStart("./")
-                if (-not (Test-Path $fullPath)) {
+                
+                # Check physical path
+                $pathExists = Test-Path $fullPath
+                
+                # Verify against system index
+                $inIndex = $indexData.component_paths.ContainsValue($fullPath) -or 
+                          $indexData.model_paths.ContainsValue($fullPath)
+                
+                if (-not $pathExists -or -not $inIndex) {
                     $brokenLinks += "$linkText -> $linkPath"
                 }
+                
+                # Record new links for index update
+                if ($pathExists -and -not $inIndex) {
+                    $newLinks += @{
+                        Path = $fullPath
+                        Type = if ($fullPath -match "\.md$") { "Documentation" } else { "Component" }
+                    }
+                }
+            }
+        }
+        
+        # Verify content hashes
+        foreach ($link in $newLinks) {
+            $currentHash = (Get-FileHash $link.Path -Algorithm SHA256).Hash
+            if ($componentHashes[$link.Path] -ne $currentHash) {
+                Write-Warning "Content drift detected in $($link.Path)"
+                $brokenLinks += "$($link.Path) [hash mismatch]"
+            }
+        }
+        
+        # Update system index with new links
+        if ($newLinks.Count -gt 0) {
+            $indexManager = [SystemIndexManager]::global()
+            $newIndex = $indexManager.read_index().Result
+            
+            foreach ($link in $newLinks) {
+                if (-not $newIndex.component_paths.ContainsKey($link.Path)) {
+                    $newIndex.component_paths[$link.Path] = $link.Type
+                }
+            }
+            
+            $indexManager.update_index($newIndex).Wait()
+        }
+        
+        # Enhanced Rust validation
+        if ($link.Path -match "\.rs$") {
+            $rustMetrics = $indexData.rust_metrics[$link.Path]
+            
+            if ($rustMetrics.cyclomatic_complexity -gt 25) {
+                Write-Warning "High complexity in $($link.Path) ($($rustMetrics.cyclomatic_complexity))"
+            }
+            
+            if ($rustMetrics.unsafe_usage_count -gt 0) {
+                Write-Warning "Unsafe code detected in $($link.Path) ($($rustMetrics.unsafe_usage_count) instances)"
+            }
+            
+            if ($rustMetrics.bitcoin_protocol_adherence -lt 0.9) {
+                Write-Warning "Low Bitcoin protocol adherence in $($link.Path) ($($rustMetrics.bitcoin_protocol_adherence))"
             }
         }
         
         if ($brokenLinks.Count -gt 0) {
             Write-Warning "Broken links found in $(Split-Path $indexFile -Leaf)"
             $brokenLinks | ForEach-Object { Write-Warning "  $_" }
+            return $false
         }
     }
+    return $true
 }
 
 # Main execution

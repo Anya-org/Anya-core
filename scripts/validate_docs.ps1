@@ -229,6 +229,15 @@ if ($brokenLinks.Count -gt 0) {
     Write-Host "`nBroken links found:" -ForegroundColor Red
     foreach ($link in $brokenLinks) {
         Write-Host "  - $($link.Source):$($link.Line) -> $($link.Target)" -ForegroundColor Red
+        
+        # Add protocol check to existing validation
+        if ($link.Path -match "\.rs$") {
+            $rust_metrics = $indexData.rust_metrics[$link.Path]
+            if ($rust_metrics.bitcoin_protocol_adherence -lt 0.9) {
+                Write-Warning "Protocol violation in $($link.Path)"
+                $global:protocol_violations++
+            }
+        }
     }
 } else {
     Write-Host "No broken links found." -ForegroundColor Green

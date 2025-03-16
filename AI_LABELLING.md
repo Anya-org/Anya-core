@@ -162,16 +162,11 @@ UXA labels indicate the level of user experience and accessibility consideration
 | UXA-2 | Enhanced UX/Accessibility | Comprehensive usability, WCAG A compliance |
 | UXA-3 | Full UX/Accessibility | Advanced UX, WCAG AAA compliance |
 
-### DAO - DAO Governance Integration
+### DAO - DAO Governance Integration (v2.2)
 
-DAO labels indicate the level of integration with decentralized governance systems.
-
-| Label | Description | Requirements |
-|-------|-------------|--------------|
-| DAO-0 | No DAO Integration | No governance features |
-| DAO-1 | Basic DAO Integration | Simple voting mechanisms |
-| DAO-2 | Enhanced DAO Integration | Comprehensive governance, proposal systems |
-| DAO-3 | Full DAO Integration | Advanced governance with quadratic voting, delegated authority |
+| Label | Requirements | Bitcoin Compliance |
+|-------|--------------|---------------------|
+| DAO-4 | Multi-chain PSBT, Legal Wrappers | BPC-3 Required |
 
 ## Implementation Rules
 
@@ -304,3 +299,13 @@ All ML components must have:
 ## Last Updated
 
 2025-02-24
+
+## Bitcoin Protocol Compliance (BPC)
+| Level | Requirements | Verification |
+|-------|--------------|--------------|
+| BPC-3 | BIP-341/342, Bitcoin Anchoring | SPV Proof Validation |
+
+## DAO Governance (DAO)
+| Level | Requirements | Bitcoin Alignment |
+|-------|--------------|-------------------|
+| DAO-4 | Institutional, Multi-chain | BPC-3 Compliant Proofs |
