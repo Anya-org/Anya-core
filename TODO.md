@@ -522,3 +522,144 @@ Priority areas for development:
   - [-] Persistent storage (45% complete)
 
 *Last updated: 2025-03-12*
+
+# Anya Core Development TODO
+
+[AIR-3][AIS-3][BPC-3][AIT-3][RES-3]
+
+This document lists pending tasks for the Anya Core implementation, organized by priority.
+
+## High Priority (March-April 2025)
+
+### Security Framework Implementation
+
+- [x] Implement CodeQL integration for automated security scanning
+- [x] Create Bitcoin protocol-specific security validation scripts
+- [x] Establish cryptographic validation framework
+- [x] Document security analysis framework in SECURITY_CODEQL.md
+- [ ] Integrate security analysis with CI/CD pipeline
+- [ ] Setup automated vulnerability reporting system
+- [ ] Fix cryptographic implementation issues (insecure RNG, DES usage)
+- [ ] Add cross-platform support for security scripts
+- [ ] Improve error handling in security analysis scripts
+- [ ] Bundle CodeQL CLI with project or add auto-installation script
+
+### Bitcoin Protocol Enhancement
+
+- [ ] Complete BIP-342 (Tapscript) implementation integration
+- [ ] Enhance BIP-370 (PSBT) support for cross-platform operations
+- [ ] Optimize DLC oracle implementation for reduced latency
+- [ ] Test MPC Bitcoin implementation against regression tests
+- [ ] Fix BIP-340 (Schnorr) implementation issues identified in validation
+- [ ] Fix BIP-341 (Taproot) implementation issues identified in validation
+- [ ] Implement missing patterns for silent leaf and merkle implementation
+- [ ] Ensure constant-time operations in all cryptographic functions
+
+### Core System Stability
+
+- [ ] Finalize hexagonal architecture implementation for Bitcoin modules
+- [ ] Complete API stability audit for v1.0 release freeze
+- [ ] Implement comprehensive error recovery mechanisms
+- [ ] Enhance logging system with proper AI labeling ([AIS-3])
+- [ ] Replace all insecure RNG usage with crypto.randomBytes()
+- [ ] Implement secure storage for sensitive information
+- [ ] Remove hardcoded secrets identified in security analysis
+
+## Medium Priority (May-June 2025)
+
+### Developer Experience
+
+- [ ] Finalize developer documentation for Bitcoin integration
+- [ ] Create additional examples for common Bitcoin operations
+- [ ] Build tutorial series for Bitcoin Core integration
+- [ ] Improve SDK development workflow documentation
+- [ ] Add detailed usage instructions for all security scripts
+- [ ] Document system requirements for security tools
+
+### Performance Optimization
+
+- [ ] Complete benchmark suite for core Bitcoin operations
+- [ ] Optimize signature validation for Schnorr (BIP340)
+- [ ] Implement batching for transaction verification
+- [ ] Enhance UTXO cache for faster access
+- [ ] Optimize cryptographic operations for performance
+
+### Testing Enhancement
+
+- [ ] Extend fuzz testing coverage to 15M+ iterations
+- [ ] Implement property-based testing for Bitcoin components
+- [ ] Create cross-implementation testing strategy
+- [ ] Expand test coverage for edge cases in Bitcoin protocol
+- [ ] Add automated security testing to CI/CD pipeline
+- [ ] Create comprehensive test plan for cryptographic operations
+
+## Low Priority (Q3 2025)
+
+### Documentation 
+
+- [ ] Create comprehensive API documentation website
+- [ ] Add video tutorials for common workflows
+- [ ] Document all error codes and recovery procedures
+- [ ] Create architecture diagrams for system documentation
+- [ ] Add security best practices documentation
+
+### Integration Support
+
+- [ ] Finalize plugins for common development environments
+- [ ] Enhance CI/CD templates for enterprise deployments
+- [ ] Document integration patterns for common systems
+- [ ] Create example projects for different use cases
+- [ ] Develop integration guides for security tools
+
+### Experimental Features
+
+- [ ] Explore stateless client implementation
+- [ ] Research zero-knowledge proofs for enhanced privacy
+- [ ] Prototype channel factory implementation
+- [ ] Evaluate quantum-resistant signature schemes integration
+- [ ] Investigate post-quantum cryptographic alternatives
+
+## Completed Tasks (February-March 2025)
+
+### Security
+
+- [x] Implement basic security validation script (validate-security.js)
+- [x] Create BIP compliance validation script (validate-bip-compliance.js)
+- [x] Develop crypto validation framework (crypto-validation.js)
+- [x] Setup PowerShell script for CodeQL analysis (run-codeql-analysis.ps1)
+- [x] Develop MCP server analysis script (analyze-mcp-server.js)
+- [x] Create security analysis documentation (SECURITY_CODEQL.md)
+- [x] Clean up redundant security scripts for streamlined workflow
+- [x] Generate comprehensive security workflow test report
+
+### Core Implementation
+
+- [x] Implement MCP server with Bitcoin protocol support
+- [x] Create module structure for Bitcoin Core integration
+- [x] Establish API patterns for Bitcoin operations
+- [x] Develop test framework for Bitcoin components
+
+### Documentation
+
+- [x] Update scripts README with focus on security analysis
+- [x] Document security analysis framework
+- [x] Create AI labeling implementation guidelines
+- [x] Define system architecture in SYSTEM_MAP.md
+
+## Implementation Notes
+
+All implementations must follow the Bitcoin Development Framework v2.5 standards and include proper AI labeling. Currently focused on security hardening and scalability improvements for the Bitcoin protocol integration.
+
+Based on workflow testing conducted on March 16, 2025, several critical security issues need addressing:
+1. Replace insecure RNG usage with crypto-secure alternatives
+2. Remove DES algorithm usage and replace with modern standards
+3. Implement constant-time operations for all cryptographic functions
+4. Complete BIP-340 and BIP-341 implementations to achieve BPC-3 compliance
+5. Fix cross-platform issues in security scripts
+6. Improve error handling and documentation for all security tools
+
+Security priority aligns with BIP standards for protocol implementation, with specific focus on Taproot (BIP 341) and PSBT (BIP 174) implementations.
+
+## Last Updated
+
+March 16, 2025

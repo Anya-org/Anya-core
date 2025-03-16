@@ -55,6 +55,12 @@ impl SecurityManager {
         for (x, y) in a.iter().zip(b.iter()) {
             result |= x ^ y;
         }
-        result == 0
+        
+        let mut is_equal = 1u8;
+        for i in 0..8 {
+            is_equal &= ((result >> i) & 1) ^ 1;
+        }
+        
+        is_equal == 1
     }
 }

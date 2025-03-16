@@ -29,18 +29,24 @@ pub enum HsmProviderType {
 /// Key types supported by HSM providers
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub enum KeyType {
-    /// RSA key with specified bit size
-    Rsa { bits: usize },
+    /// RSA key
+    Rsa { bits: u32 },
+    
     /// EC key with specified curve
     Ec { curve: EcCurve },
-    /// AES key with specified bit size
-    Aes { bits: usize },
+    
+    /// AES key with specified variant
+    Aes { variant: AesVariant },
+    
+    /// ChaCha20 key
+    ChaCha20,
+    
     /// HMAC key with specified algorithm
     Hmac { algorithm: HmacAlgorithm },
-    /// DES key with specified variant
-    Des { variant: DesVariant },
+    
     /// Ed25519 key
     Ed25519,
+    
     /// X25519 key
     X25519,
 }
@@ -48,22 +54,23 @@ pub enum KeyType {
 impl std::fmt::Display for KeyType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            KeyType::Rsa { bits } => write!(f, "rsa/{}", bits),
-            KeyType::Ec { curve } => write!(f, "ec/{}", curve),
-            KeyType::Aes { bits } => write!(f, "aes/{}", bits),
-            KeyType::Hmac { algorithm } => write!(f, "hmac/{}", algorithm),
-            KeyType::Des { variant } => write!(f, "des/{}", variant),
+            KeyType::Rsa { bits } => write!(f, "rsa::{}", bits),
+            KeyType::Ec { curve } => write!(f, "ec::{}", curve),
+            KeyType::Aes { variant } => write!(f, "aes::{}", variant),
+            KeyType::ChaCha20 => write!(f, "chacha20"),
+            KeyType::Hmac { algorithm } => write!(f, "hmac::{}", algorithm),
             KeyType::Ed25519 => write!(f, "ed25519"),
             KeyType::X25519 => write!(f, "x25519"),
         }
     }
 }
 
-impl KeyType {
-    /// Parse a key type string into a KeyType enum
-    pub fn from_str(s: &str) -> Result<Self, HsmError> {
-        let parts: Vec<&str> = s.split('/').collect();
-        if parts.len() != 2 && parts.len() != 1 {
+impl std::str::FromStr for KeyType {
+    type Err = HsmError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let parts: Vec<&str> = s.split("::").collect();
+        if parts.is_empty() {
             return Err(HsmError::InvalidKeyType(s.to_string()));
         }
 
@@ -72,11 +79,8 @@ impl KeyType {
                 if parts.len() != 2 {
                     return Err(HsmError::InvalidKeyType(s.to_string()));
                 }
-                let bits = parts[1].parse::<usize>()
+                let bits = parts[1].parse::<u32>()
                     .map_err(|_| HsmError::InvalidKeyType(s.to_string()))?;
-                if ![1024, 2048, 3072, 4096].contains(&bits) {
-                    return Err(HsmError::InvalidKeyType(s.to_string()));
-                }
                 Ok(KeyType::Rsa { bits })
             },
             "ec" => {
@@ -92,17 +96,6 @@ impl KeyType {
                 };
                 Ok(KeyType::Ec { curve })
             },
-            "aes" => {
-                if parts.len() != 2 {
-                    return Err(HsmError::InvalidKeyType(s.to_string()));
-                }
-                let bits = parts[1].parse::<usize>()
-                    .map_err(|_| HsmError::InvalidKeyType(s.to_string()))?;
-                if ![128, 192, 256].contains(&bits) {
-                    return Err(HsmError::InvalidKeyType(s.to_string()));
-                }
-                Ok(KeyType::Aes { bits })
-            },
             "hmac" => {
                 if parts.len() != 2 {
                     return Err(HsmError::InvalidKeyType(s.to_string()));
@@ -116,17 +109,23 @@ impl KeyType {
                 };
                 Ok(KeyType::Hmac { algorithm })
             },
-            "des" => {
+            "aes" => {
                 if parts.len() != 2 {
                     return Err(HsmError::InvalidKeyType(s.to_string()));
                 }
                 let variant = match parts[1].to_lowercase().as_str() {
-                    "single" => DesVariant::Single,
-                    "double" => DesVariant::Double,
-                    "triple" => DesVariant::Triple,
+                    "128" => AesVariant::Aes128,
+                    "192" => AesVariant::Aes192,
+                    "256" => AesVariant::Aes256,
                     _ => return Err(HsmError::InvalidKeyType(s.to_string())),
                 };
-                Ok(KeyType::Des { variant })
+                Ok(KeyType::Aes { variant })
+            },
+            "chacha20" => {
+                if parts.len() != 1 {
+                    return Err(HsmError::InvalidKeyType(s.to_string()));
+                }
+                Ok(KeyType::ChaCha20)
             },
             "ed25519" => Ok(KeyType::Ed25519),
             "x25519" => Ok(KeyType::X25519),
@@ -183,23 +182,23 @@ impl std::fmt::Display for HmacAlgorithm {
     }
 }
 
-/// DES variants supported by HSM providers
+/// AES variants supported by HSM providers
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
-pub enum DesVariant {
-    /// Single DES (64 bits, not recommended)
-    Single,
-    /// Double DES (128 bits, not recommended)
-    Double,
-    /// Triple DES (3-key, 192 bits)
-    Triple,
+pub enum AesVariant {
+    /// AES-128 (128 bits)
+    Aes128,
+    /// AES-192 (192 bits)
+    Aes192,
+    /// AES-256 (256 bits, recommended)
+    Aes256,
 }
 
-impl std::fmt::Display for DesVariant {
+impl std::fmt::Display for AesVariant {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            DesVariant::Single => write!(f, "single"),
-            DesVariant::Double => write!(f, "double"),
-            DesVariant::Triple => write!(f, "triple"),
+            AesVariant::Aes128 => write!(f, "128"),
+            AesVariant::Aes192 => write!(f, "192"),
+            AesVariant::Aes256 => write!(f, "256"),
         }
     }
 }
