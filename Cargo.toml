@@ -9,7 +9,7 @@ members = [
 resolver = "2"
 
 [workspace.package]
-version = "0.2.0"  # Updated version to match requirement
+version = "0.2.0"
 edition = "2021"
 authors = ["Anya Core Team"]
 license = "MIT"
@@ -64,36 +64,34 @@ smartcore = "0.3.2"
 tch = "0.14.0"
 log = "0.4.20"
 
-# Add these under existing dependencies
+# Analysis tools and additions
 dashmap = "5.5.3"
 rayon = "1.10.0"
 blake3 = "1.5.0"
 semver = "1.0.22"
 atomic-polyfill = "0.1.3"
 parking_lot = "0.12.1"
-
-# Analysis tools
 syn = { version = "2.0.60", features = ["full"] }
 cargo-geiger = "0.4.5"
 tarpaulin = "0.27.0"
 cargo-metadata = "0.18.1"
 cargo-clippy = "0.1.80"
 
-# Add protocol validation crate
+# Protocol validation
 bitcoin-protocol = { git = "https://github.com/bitcoin-core/rust-protocol", rev = "bip341" }
 
 [package]
-name = "anya-core"
+name = "anya"
 version = "0.1.0"
 edition = "2021"
 authors = ["Anya Development Team"]
 description = "Bitcoin-centric platform with BPC-3 and DAO-4 compliance"
 license = "MIT"
-repository = "https://github.com/anya-core/anya-core"
+repository = "https://github.com/anya-org/anya"
 readme = "README.md"
 
 [dependencies]
-# Core Dependencies
+# Core dependencies
 tokio = { workspace = true }
 futures = { workspace = true }
 serde = { workspace = true }
@@ -111,10 +109,10 @@ web5 = { workspace = true }
 jsonschema = { workspace = true }
 
 # Blockchain Integration
-bitcoin = { version = "0.30.0", features = ["use-serde"], optional = true }
+bitcoin = { version = "0.32.1", features = ["rand", "rand-std", "use-serde"], optional = true }
 bitcoincore-rpc = { workspace = true }
-secp256k1 = { version = "0.27.0", features = ["rand", "recovery"] }
-bip39 = { version = "2.0.0", optional = true }  # Make bip39 optional
+secp256k1 = { version = "0.27.0", features = ["rand", "recovery"], optional = true }
+bip39 = { version = "2.0.0", optional = true }
 md5 = "0.7.0"
 
 # Networking
@@ -152,10 +150,14 @@ jsonwebtoken = "9.2.0"
 totp-rs = "5.4.0"
 darling = "*"
 
-# New dependencies
+# CLI and File System
 clap = { version = "4.4.2", features = ["derive"] }
 walkdir = "2.4.0"
 env_logger = "0.10.0"
+
+# Bitcoin Protocol Dependencies
+bip174 = { version = "0.3.0", optional = true }
+bip341 = { version = "0.2.0", optional = true }
 
 [dev-dependencies]
 tokio-test = { workspace = true }
@@ -170,8 +172,8 @@ tonic-build = "0.10.2"
 
 [features]
 default = ["bip174", "bip341"]
-bip174 = ["bitcoin/psbt"]
-bip341 = ["bitcoin/taproot"]
+bip174 = ["dep:bip174", "bitcoin/psbt"]
+bip341 = ["dep:bip341", "bitcoin/taproot"]
 bitcoin-compliance = []
 dao-governance = []
 enterprise = ["bitcoin-compliance", "dao-governance"]
@@ -188,7 +190,7 @@ opt-level = 0
 debug = true
 
 [[bin]]
-name = "anya-core"
+name = "anya"
 path = "src/main.rs"
 
 [[bin]]
@@ -211,29 +213,6 @@ path = "src/bin/main.rs"
 name = "anya_validator"
 path = "src/bin/anya_validator.rs"
 
-# [[bin]]
-# name = "run_protocol_tests"
-# path = "tests/run_protocol_tests.rs"
-
 [lib]
-name = "anya_core"
+name = "anya"
 path = "src/lib.rs"
-
-# Add these to your existing Cargo.toml
-[dependencies]
-# ... existing dependencies ...
-colored = "2.0"
-dialoguer = "0.10"
-indicatif = "0.17"
-dirs = "5.0"
-toml = "0.7"
-serde = { version = "1.0", features = ["derive"] }
-chrono = "0.4"
-
-[[bin]]
-name = "anya_installer"
-path = "src/bin/anya_installer.rs"
-
-bitcoin = { version = "0.30.0", features = ["use-serde"] }
-bip174 = "0.3.0"
-bip341 = "0.2.0"

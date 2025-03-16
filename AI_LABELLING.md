@@ -1,4 +1,32 @@
-# AI Labeling System
+# AI Labelling System for Anya Project
+
+## Labelling Format
+Changes are tagged with the following format:
+[Category-Version][Component][Status]
+
+## Categories
+- AIS: AI Security (AIS-1 through AIS-3)
+- BPC: Bitcoin Protocol Compliance (BPC-1 through BPC-3)
+- DAO: Governance Implementation (DAO-1 through DAO-4)
+- CLN: Codebase Cleanup
+- DEP: Dependency Update
+- FIX: Bug Fix
+
+## Components
+- BTC: Bitcoin Integration
+- TRT: Taproot Implementation
+- PSB: PSBT Handling
+- DOC: Documentation
+- CFG: Configuration
+
+## Status Indicators
+- WIP: Work in Progress
+- RDY: Ready for Review
+- MRG: Merged
+- REV: Under Revision
+
+## Commit Message Format
+git commit -m "[BPC-3][TRT][RDY] Implement Taproot validation with BIP-341 compliance"
 
 ## Overview
 
@@ -309,3 +337,32 @@ All ML components must have:
 | Level | Requirements | Bitcoin Alignment |
 |-------|--------------|-------------------|
 | DAO-4 | Institutional, Multi-chain | BPC-3 Compliant Proofs |
+
+## Test Coverage Labels
+
+### Bitcoin Protocol Tests [BPC-3] 
+
+| Test Type | Implementation | No-Build Required |
+|-----------|----------------|-------------------|
+| BIP-341 (Taproot) | Mock + Testnet | ✅ |
+| BIP-174 (PSBT) | Mock + Testnet | ✅ |
+| BIP-370 (PSBT v2) | Mock Only | ✅ |
+
+### Testnet Integration [BTC-TST]
+
+| Component | Test Implementation | CI Integration |
+|-----------|---------------------|---------------|
+| Transaction Validation | ✅ | ✅ |
+| Block Validation | ✅ | ✅ |
+| Address Generation | ✅ | ✅ |
+
+## Test Tracking Format
+
+Tests are tracked with the following format:
+[Category-Version][Component][TestType]
+
+### Test Types
+- UNT: Unit Test
+- INT: Integration Test
+- TST: Testnet Test
+- MOK: Mock Test

@@ -192,3 +192,26 @@
         (ok true)
     )
 )
+
+(impl-trait .bip-compliance.bip-341-342-trait)
+(impl-trait .bip-compliance.bip-174-trait)
+
+;; Add Taproot authorization to DAO actions
+(define-public (execute-dao-action (action (buff 256)) (sig (buff 64)) (pubkey (buff 32)))
+  (let (
+    (message-hash (sha256 action))
+    (verified (unwrap! (contract-call? .bip-compliance verify-taproot-signature message-hash sig pubkey) (err u301)))
+  )
+  ;; Action execution logic
+  (ok true)
+  )
+)
+
+;; Implement PSBT handling for DAO treasury
+(define-public (process-dao-psbt (psbt (buff 1024)))
+  (let (
+    (processed (unwrap! (contract-call? .bip-compliance process-psbt psbt) (err u302)))
+  )
+  (ok processed)
+  )
+)
