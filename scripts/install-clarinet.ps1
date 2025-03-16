@@ -47,4 +47,7 @@ Remove-Item $installerPath -Force
 Write-Host "Temporary files cleaned up." -ForegroundColor Green
 
 Write-Host "Installation process completed." -ForegroundColor Cyan
-Write-Host "You can now use Clarinet to develop and test Clarity smart contracts." -ForegroundColor Cyan 
+Write-Host "You can now use Clarinet to develop and test Clarity smart contracts." -ForegroundColor Cyan
+
+# Then run with elevated permissions
+Start-Process powershell -Verb RunAs -ArgumentList "-File `"$PSScriptRoot\install-clarinet.ps1`"" 

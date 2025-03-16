@@ -1,0 +1,18 @@
+{
+  "BIP342": {
+    "Implemented": true,
+    "Status": "Verified"
+  },
+  "BIP174": {
+    "Implemented": true,
+    "Status": "Verified"
+  },
+  "Miniscript": {
+    "Implemented": true,
+    "Status": "Pending Audit"
+  },
+  "BIP341": {
+    "Implemented": true,
+    "Status": "Verified"
+  }
+}

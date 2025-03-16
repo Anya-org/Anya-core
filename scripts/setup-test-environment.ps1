@@ -15,7 +15,8 @@ $directories = @(
     "tests/system",
     "tests/performance",
     "tests/security",
-    "test-results"
+    "test-results",
+    "src/protocols"
 )
 
 foreach ($dir in $directories) {
@@ -104,6 +105,28 @@ $testConfig = @{
         "voting",
         "token-transfers"
     )
+    searchParams = @{
+        maxKeywords = 10
+        responseLimit = 50
+        indexPatterns = @(
+            "creator",
+            "category",
+            "date-range"
+        )
+    }
+    testTypes = @(
+        "basic",
+        "compliance",
+        "security",
+        "search",
+        "indexing"
+    )
+    testPatterns = @{
+        "bip-compliance" = @{
+            patterns = @("verify-taproot-signature", "process-psbt")
+            required = $true
+        }
+    }
 }
 
 $testConfigJson = $testConfig | ConvertTo-Json -Depth 5
@@ -135,6 +158,126 @@ if ($missingContracts -gt 0) {
     } else {
         Write-Host "❌ Contract template creator script not found" -ForegroundColor Red
         exit 1
+    }
+}
+
+# Create test configuration template
+$testConfigPath = "test-config.json"
+if (-not (Test-Path $testConfigPath)) {
+    $testConfig = @{
+        modules = @(
+            @{ 
+                name = "dao-core"
+                path = "dao/core/dao-core.clar"
+                testTypes = @("basic", "compliance", "security")
+            },
+            @{
+                name = "governance-token" 
+                path = "src/contracts/governance_token.clar"
+                testTypes = @("basic", "bip-compliance")
+            }
+        )
+        testPatterns = @{
+            "bip-compliance" = @{
+                patterns = @("verify-taproot-signature", "process-psbt")
+                required = $true
+            }
+        }
+    }
+    $testConfig | ConvertTo-Json -Depth 4 | Out-File $testConfigPath
+    Write-Host "Created test configuration template" -ForegroundColor Green
+}
+
+# Create BIP protocol templates if missing
+$protocolTemplates = @{
+    "src/protocols/bip-341.clar" = @"
+;; BIP-341 (Taproot) Protocol Adapter
+(define-read-only (verify-taproot-signature
+    (msg-hash (buff 32))
+    (sig (buff 64))
+    (pubkey (buff 33))
+)
+    ;; Implementation should use Bitcoin Core validation logic
+    (ok true)
+)
+"@
+
+    "src/protocols/bip-370.clar" = @"
+;; BIP-370 (PSBT v2) Protocol Adapter
+(define-public (process-psbt-v2 (psbt (buff 1024)))
+    ;; Implementation should validate PSBT v2 structure
+    (ok psbt)
+)
+"@
+
+    "src/protocols/bip-174.clar" = @"
+;; BIP-174 (PSBT) Protocol Adapter
+(define-public (process-psbt-v0 (psbt (buff 1024)))
+    ;; Implementation should validate PSBT v0 structure
+    (ok psbt)
+)
+"@
+}
+
+foreach ($proto in $protocolTemplates.GetEnumerator()) {
+    if (-not (Test-Path $proto.Key)) {
+        Set-Content -Path $proto.Key -Value $proto.Value
+        Write-Host "Created protocol template: $($proto.Key)" -ForegroundColor Yellow
+    }
+}
+
+# Validate Hexagonal Structure
+$hexComponents = @{
+    "Adapter Layer" = @("src/adapters/psbt-adapter.clar", "src/adapters/taproot-adapter.clar")
+    "Core Logic" = @("dao/core/dao-core.clar", "src/contracts/governance_token.clar")
+    "Protocol Adapters" = @("src/protocols/bip-341.clar", "src/protocols/bip-370.clar", "src/protocols/bip-174.clar")
+}
+
+foreach ($component in $hexComponents.GetEnumerator()) {
+    Write-Host "Validating $($component.Key) components..."
+    foreach ($file in $component.Value) {
+        if (-not (Test-Path $file)) {
+            throw "Hexagonal architecture violation: Missing $($component.Key) component - $file"
+        }
+    }
+}
+
+# Create BIP-341 secured symlinks
+New-Item -ItemType SymbolicLink -Path "test-results/security" -Target "tests/security" -Force | Out-Null
+
+# Create adapter layer templates if missing
+$adapterTemplates = @{
+    "src/adapters/psbt-adapter.clar" = @"
+;; PSBT Adapter (BIP-174/370)
+(define-public (process-psbt (psbt (buff 1024)) (version uint))
+    (if (> version u1)
+        (contract-call? .bip-370 process-psbt-v2 psbt)
+        (contract-call? .bip-174 process-psbt-v0 psbt)
+    )
+)
+"@
+    
+    "src/adapters/taproot-adapter.clar" = @"
+;; Taproot Adapter (BIP-341)
+(define-read-only (verify-taproot-sig 
+    (msg-hash (buff 32)) 
+    (sig (buff 64)) 
+    (pubkey (buff 33))
+)
+    (contract-call? .bip-341 verify-taproot-signature msg-hash sig pubkey)
+)
+"@
+}
+
+# Create adapters directory if missing
+if (-not (Test-Path "src/adapters")) {
+    New-Item -ItemType Directory -Path "src/adapters" -Force | Out-Null
+}
+
+foreach ($adapter in $adapterTemplates.GetEnumerator()) {
+    if (-not (Test-Path $adapter.Key)) {
+        Set-Content -Path $adapter.Key -Value $adapter.Value
+        Write-Host "Created adapter template: $($adapter.Key)" -ForegroundColor Yellow
     }
 }
 

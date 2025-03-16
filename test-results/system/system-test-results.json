@@ -1,0 +1,148 @@
+{
+  "systemTestResults": {
+    "DAO Proposal Lifecycle": {
+      "scenarios": [
+        {
+          "status": "COMPONENT_CHECK_PASS",
+          "name": "Create proposal with minimum token balance"
+        },
+        {
+          "status": "COMPONENT_CHECK_PASS",
+          "name": "Vote on active proposal"
+        },
+        {
+          "status": "COMPONENT_CHECK_PASS",
+          "name": "Execute approved proposal"
+        },
+        {
+          "status": "COMPONENT_CHECK_PASS",
+          "name": "Attempt to execute rejected proposal (should fail)"
+        }
+      ],
+      "components": [
+        "dao-core",
+        "dao",
+        "governance_token"
+      ],
+      "duration": 0.0500631,
+      "description": "Tests the full lifecycle of a proposal from creation to execution",
+      "name": "DAO Proposal Lifecycle",
+      "status": "COMPONENT_CHECK_PASS",
+      "coverage": 30.0
+    },
+    "Bitcoin Protocol Compliance": {
+      "scenarios": [
+        {
+          "status": "COMPONENT_CHECK_PASS",
+          "name": "Verify BIP-341 Taproot implementation"
+        },
+        {
+          "status": "COMPONENT_CHECK_PASS",
+          "name": "Test BIP-174 PSBT transaction creation"
+        },
+        {
+          "status": "COMPONENT_CHECK_PASS",
+          "name": "Validate BIP-342 Tapscript execution"
+        }
+      ],
+      "components": [
+        "dao-core",
+        "dao",
+        "bitcoin-issuance"
+      ],
+      "duration": 0.0639368,
+      "description": "Tests compliance with Bitcoin protocols, including PSBT and Taproot",
+      "name": "Bitcoin Protocol Compliance",
+      "status": "COMPONENT_CHECK_PASS",
+      "coverage": 30.0
+    },
+    "Liquidity Management": {
+      "scenarios": [
+        {
+          "status": "COMPONENT_CHECK_PASS",
+          "name": "Add liquidity to trading pool"
+        },
+        {
+          "status": "COMPONENT_CHECK_PASS",
+          "name": "Swap tokens through DEX"
+        },
+        {
+          "status": "COMPONENT_CHECK_PASS",
+          "name": "Remove liquidity and verify balances"
+        }
+      ],
+      "components": [
+        "dex-adapter",
+        "governance_token"
+      ],
+      "duration": 0.0271804,
+      "description": "Tests DEX interactions and liquidity operations",
+      "name": "Liquidity Management",
+      "status": "COMPONENT_CHECK_PASS",
+      "coverage": 30.0
+    },
+    "Cross-Contract Interactions": {
+      "scenarios": [
+        {
+          "status": "COMPONENT_CHECK_PASS",
+          "name": "Create governance proposal to modify economic parameters"
+        },
+        {
+          "status": "COMPONENT_CHECK_PASS",
+          "name": "Execute proposal that affects token issuance"
+        },
+        {
+          "status": "COMPONENT_CHECK_PASS",
+          "name": "Verify DEX liquidity adjusts to new economic parameters"
+        }
+      ],
+      "components": [
+        "dao-core",
+        "dao",
+        "governance_token",
+        "bitcoin-issuance",
+        "dex-adapter",
+        "token-economics"
+      ],
+      "duration": 0.1086137,
+      "description": "Tests interactions across all major contracts in the system",
+      "name": "Cross-Contract Interactions",
+      "status": "COMPONENT_CHECK_PASS",
+      "coverage": 30.0
+    },
+    "Token Distribution": {
+      "scenarios": [
+        {
+          "status": "COMPONENT_CHECK_PASS",
+          "name": "Mint initial token supply"
+        },
+        {
+          "status": "COMPONENT_CHECK_PASS",
+          "name": "Distribute tokens according to allocation model"
+        },
+        {
+          "status": "COMPONENT_CHECK_PASS",
+          "name": "Verify halving mechanism reduces rewards correctly"
+        }
+      ],
+      "components": [
+        "governance_token",
+        "bitcoin-issuance",
+        "token-economics"
+      ],
+      "duration": 0.0327096,
+      "description": "Tests token minting and distribution according to economic model",
+      "name": "Token Distribution",
+      "status": "COMPONENT_CHECK_PASS",
+      "coverage": 30.0
+    }
+  },
+  "startTime": "2025-03-16T13:41:38.0212272+02:00",
+  "systemCoverage": 30.0,
+  "totalTests": 5,
+  "endTime": "2025-03-16T13:41:38.4264635+02:00",
+  "passedTests": 5,
+  "skippedTests": 0,
+  "failedTests": 0,
+  "duration": 0.4052363
+}

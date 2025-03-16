@@ -4,16 +4,19 @@
     "recommendation": "Use guarded arithmetic operations from security-guards"
   },
   "reentrancy-protection": {
-    "pattern": "(non-reentrant|release-reentrancy|reentrancy-context)",
-    "recommendation": "Use context-aware reentrancy guards"
+    "patterns": [
+      "(define-data-var reentrancy-lock",
+      "(non-reentrant)",
+      "(release-reentrancy)"
+    ],
+    "recommendation": "Use context-aware reentrancy guards from security-guards.clar"
   },
   "bip-compliance": {
     "patterns": [
       "(verify-taproot-signature",
-      "process-psbt",
-      "execute-tapscript",
-      "tr\\(",
-      "psbt-version"
+      "(process-psbt",
+      "(validate-psbt-v2",
+      "(execute-tapscript"
     ],
     "recommendation": "Use BIP-341/342/174 compliant functions"
   },

@@ -321,21 +321,22 @@
     )
 )
 
-;; Enhanced batch minting with PSBT integration
-(define-public (batch-mint-tokens (recipients (list 100 principal)) (amounts (list 100 uint)) (psbt (buff 1024)))
+;; Batch minting with Taproot commitments
+(define-public (batch-mint (recipients (list 100 principal)) (amounts (list 100 uint)) (commitment (buff 32)))
   (let (
-    (processed (unwrap! (contract-call? .dao-core process-treasury-psbt psbt) (err u501)))
-    (total (fold amounts u0 (lambda (acc amount) (unwrap! (safe-add acc amount) (err u502)))))
+    (merkle-root (calculate-merkle-root recipients amounts))
+    (verified (contract-call? .bip-compliance verify-taproot-commitment merkle-root commitment))
   )
-  ;; Batch mint logic
+  (asserts! verified (err u801))
+  (map mint-token recipients amounts)
   (ok true)
   )
 )
 
 ;; Optimized merkle root calculation
-(define-private (calculate-merkle-root (recipients (list 100 principal)) (amounts (list 100 uint)))
-  (fold (map hash160 (concat recipients amounts)) 
-        (hash160 (concat 0x)) 
+(define-private (calculate-merkle-root (items (list 100 (tuple (recipient principal) (amount uint)))))
+  (fold (map (lambda (item) (hash160 (concat (unwrap! (get recipient item) (err u802)) (unwrap! (get amount item) (err u803))))) items)
+        (hash160 0x)
         (lambda (acc item) (hash160 (concat acc item)))
   )
 )
