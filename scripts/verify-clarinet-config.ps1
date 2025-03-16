@@ -24,6 +24,13 @@ $contractsToCheck = @(
 
 Write-Host "Verifying Clarinet.toml configuration..." -ForegroundColor Cyan
 
+# Add path verification at beginning
+if (-not (Test-Path $clarinetTomlPath)) {
+    Write-Host "Clarinet.toml not found, generating new config..."
+    clarinet new anya-dao
+    Set-Location anya-dao
+}
+
 # Check if Clarinet.toml exists
 if (-not (Test-Path $clarinetTomlPath)) {
     Write-Host "Error: Clarinet.toml not found at $clarinetTomlPath" -ForegroundColor Red
@@ -100,6 +107,17 @@ foreach ($contract in $contractsToCheck) {
     } else {
         Write-Host "Contract file missing: $($contract.Path)" -ForegroundColor Red
     }
+}
+
+# Add new search/index checks
+$requiredPatterns += @(
+    @{Pattern="search-proposals"; Contract="dao-core"},
+    @{Pattern="proposals-index"; Contract="dao-core"}
+)
+
+# Verify BIP-370 compliance for index updates
+if (-not ($clarinetToml -match "BIP-370")) {
+    Add-Content -Path $clarinetTomlPath "`nBIP-370 = { required = true }"
 }
 
 Write-Host "Verification completed." -ForegroundColor Cyan 

@@ -24,5 +24,37 @@
       "psbt-version",
       "globaltx"
     ]
+  },
+  "security_patterns": "C:\\Users\\bmokoka\\Downloads\\OPSource\\anya-core\\scripts\\..\\configs\\security-patterns",
+  "testMatrix": {
+    "modules": {
+      "dao-core": {
+        "paths": [
+          "dao/core/dao-core.clar",
+          "tests/modules/dao-core.test.clar"
+        ],
+        "requiredBIPs": ["bip-341", "bip-342", "bip-174"],
+        "securityPatterns": ["verify-taproot", "psbt-v2"]
+      }
+    },
+    "system": {
+      "complianceChecks": {
+        "bip-341": {
+          "threshold": 100,
+          "patterns": ["verify-taproot-signature"]
+        },
+        "psbt-handling": {
+          "threshold": 100,
+          "patterns": ["process-psbt", "validate-psbt-v2"]
+        }
+      }
+    }
+  },
+  "performanceBenchmarks": {
+    "txThroughput": {
+      "target": 150,
+      "unit": "tx/s",
+      "bipRequirements": ["bip-341", "bip-370"]
+    }
   }
 }

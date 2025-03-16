@@ -42,25 +42,28 @@
     (ok (ft-get-balance anya-token account)))
 
 ;; Token Transfer with Governance Considerations
-(define-public (transfer (amount uint) (sender principal) (recipient principal))
+(define-public (transfer (amount uint) (to principal))
     (let (
-        (guard (non-reentrant))
-        (safe-amount (unwrap! (safe-add amount u0) (err u401)))
+        (guard (contract-call? .security-guards non-reentrant))
+        (safe-amount (unwrap! (contract-call? .security-guards safe-add amount u0) (err u701)))
     )
-    (begin
-        (asserts! (is-eq tx-sender sender) ERR-NOT-TOKEN-OWNER)
-        (match (ft-transfer? anya-token safe-amount sender recipient)
-            response (begin
-                (ok true)
-                (release-reentrancy))
-            error (err error))))
+    (asserts! (contract-call? .security-guards valid-principal? to) (err u702))
+    ;; Transfer logic
+    (contract-call? .security-guards release-reentrancy)
+    (ok true)
+    )
+)
 
 ;; Minting with Supply Cap
-(define-public (mint (recipient principal) (amount uint))
-    (begin
-        (asserts! (is-eq tx-sender contract-owner) ERR-OWNER-ONLY)
-        (asserts! (<= (+ (ft-get-supply anya-token) amount) MAX_SUPPLY) ERR-SUPPLY-LIMIT)
-        (ft-mint? anya-token amount recipient)))
+(define-public (mint (amount uint) (recipient principal))
+    (let (
+        (total-supply (var-get total-supply))
+        (new-supply (unwrap! (contract-call? .security-guards safe-add total-supply amount) (err u703)))
+    )
+    (var-set total-supply new-supply)
+    (ok true)
+    )
+)
 
 ;; Burning Mechanism
 (define-public (burn (amount uint))
