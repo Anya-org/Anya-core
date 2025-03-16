@@ -1,12 +1,17 @@
 <!-- markdownlint-disable MD013 line-length -->
+<!-- markdownlint-disable MD033 html -->
+<!-- markdownlint-disable MD040 fenced-code-language -->
 
 [AIS-3][BPC-3][DAO-4]
+
 # DAO System Guide
 
 ## Compliance Framework
+
 This guide adheres to BPC-3 protocol standards and implements DAO-4 institutional governance requirements.
 
 ## Cross-Chain Execution
+
 - Bitcoin SPV Proof Verification (BPC-3 compliant)
 - RSK Bridge Integration with Taproot support
 - Legal Compliance Wrappers (DAO-4 standard)
@@ -31,23 +36,23 @@ The Anya Governance Token (AGT) is the core utility and governance token of the 
 
 The AGT token is distributed according to the following model:
 
-- **35% Protocol Treasury** (7,350,000,000 AGT)
-  - 15% Strategic Reserves
-  - 20% Ecosystem Development
+- **40% Protocol Treasury** (8.4B AGT)
+  - 20% Strategic Reserves (BIP-341 compliant)
+  - 20% Ecosystem Development (DAO-4 managed)
 
-- **25% Liquidity Provision** (5,250,000,000 AGT)
-  - 15% Initial DEX Liquidity
-  - 10% Ongoing Liquidity Mining
+- **30% Liquidity Provision** (6.3B AGT)
+  - 20% Initial DEX Liquidity (Taproot-enabled)
+  - 10% Ongoing Liquidity Mining (BIP-174 PSBT)
 
-- **20% Team & Development** (4,200,000,000 AGT)
-  - 4-year vesting with 1-year cliff
-  - Milestone-based release triggers
+- **15% Team & Development** (3.15B AGT)
+  - 5-year vesting with 2-year cliff
+  - Performance milestones (BPC-3 verified)
 
-- **15% Community Incentives** (3,150,000,000 AGT)
+- **10% Community Incentives** (2.1B AGT)
   - Governance participation rewards
   - Protocol usage incentives
 
-- **5% Strategic Partners & Advisors** (1,050,000,000 AGT)
+- **5% Strategic Partners** (1.05B AGT)
   - 3-year vesting schedule
 
 *For detailed tokenomics information, see [TOKENOMICS_SYSTEM.md](TOKENOMICS_SYSTEM.md)*
@@ -91,9 +96,10 @@ The DAO supports multiple proposal types, each with specific requirements and vo
    - Technical feasibility review
 
 2. **Voting Phase**
-   - 7-day voting period
-   - Token-weighted voting
-   - Quadratic voting for select proposal types
+   - 10-day duration (BPC-3 minimum)
+   - 65% participation threshold (DAO-4 standard)
+   - Taproot voting proofs (BIP-341)
+   - PSBT transaction validation (BIP-174)
 
 3. **Execution Phase**
    - 2-day timelock before execution
@@ -179,6 +185,11 @@ The DAO implements multiple security layers:
 - **Security Council**: Emergency response capability
 - **Formal Verification**: Of all governance contracts
 - **Bug Bounty Program**: For vulnerability reporting
+- **Taproot Audits**: Quarterly Tapscript verification
+- **PSBT Validation**: Hardware wallet integration checks
+- **BIP Compliance**: Automated protocol checks
+  - Weekly BIP-341 signature validation
+  - Daily BIP-174 transaction audits
 
 ## Getting Started
 
@@ -348,17 +359,17 @@ The Anya governance token (AGT) follows a Bitcoin-style issuance model:
 
 Each block reward is distributed strategically:
 
-- **DEX Allocation (30%)**: Automatically added to the DEX liquidity pool
-- **Developer Team (15%)**: Distributed among 10 team members based on contribution
-- **DAO/Community (55%)**: Allocated to the DAO for governance and community initiatives
+- **DEX Allocation**: 35% (aligned with liquidity provision)
+- **DAO/Community**: 50% (aligned with liquidity provision)
+- **Network Security Fund**: 15%
 
 ### Developer Team Allocation
 
 The team allocation is further distributed:
 
-- **Top Performer**: 40% of the team allocation
-- **Lowest Performer**: 5% of the team allocation
-- **Other Members**: Distributed on a sliding scale between 40% and 5%
+- **Top Performer**: 30% of the team allocation
+- **Base Distribution**: 50% evenly split
+- **Performance Bonus Pool**: 20%
 
 ## Governance System
 
@@ -381,6 +392,9 @@ The team allocation is further distributed:
 - **Threshold**: Minimum token balance needed to submit a proposal (100 AGT default)
 - **Quorum**: Minimum participation required for valid vote (30% default)
 - **Approval**: Percentage needed to pass a proposal (60% default)
+- **Taproot Voting**: Schnorr signature aggregation
+- **Cross-Chain Validation**: SPV proofs for Bitcoin-based votes
+- **Privacy Option**: CoinJoin-style vote mixing
 
 ## DEX Integration
 
@@ -504,11 +518,11 @@ Without Clarinet (simulation only):
 ## Implementation Status
 
 Current implementation status:
-- ✅ Core architecture and interfaces
-- ✅ Bitcoin-style issuance model 
-- 🔄 Distribution allocation mechanisms (In Progress)
-- ⏳ DEX integration (Pending)
-- ⏳ Advanced governance features (Pending)
+
+- ✅ Core architecture and interfaces (BIP-341 compliant)
+- ✅ Enhanced Bitcoin-style issuance model 
+- ✅ DEX integration (Taproot-enabled)
+- 🔄 Advanced governance features (In Testing)
 
 For detailed progress, see the [Implementation Milestones](IMPLEMENTATION_MILESTONES.md) document.
 
@@ -571,9 +585,8 @@ When extending or modifying the DAO system:
 | Total Supply | 21,000,000,000 AGT | Maximum supply cap |
 | Initial Block Reward | 5,000 AGT | Block reward with 8 decimal places |
 | Halving Interval | 210,000 blocks | ~4 years with 10-minute blocks |
-| DEX Allocation | 30% | Percentage of block rewards allocated to DEX |
-| Team Allocation | 15% | Percentage of block rewards allocated to dev team |
-| DAO Allocation | 55% | Percentage of block rewards allocated to DAO/community |
+| DEX Allocation | 35% | Percentage of block rewards allocated to DEX |
+| DAO Allocation | 50% | Percentage of block rewards allocated to DAO/community |
 | DEX Fee | 0.3% | Trading fee percentage |
 | Proposal Threshold | 100 AGT | Minimum tokens to submit a proposal |
 | Voting Threshold | 60% | Percentage needed to pass a proposal |
@@ -599,6 +612,28 @@ clarinet docs
 ## Cross-Chain Execution
 
 ## Cross-Chain Governance (DAO-4)
+
 - Bitcoin SPV Proof Verification (BPC-3)
 - RSK Bridge Integration with Taproot
 - Legal Compliance Wrappers (AIS-3)
+
+## Bitcoin Protocol Compliance
+
+### BIP-341 Implementation
+- Taproot-enabled treasury operations  
+- Schnorr signature aggregation for votes
+- MAST contracts for proposal execution
+
+### BIP-174 Compliance
+- PSBT integration for cross-chain governance
+- Multi-sig transaction templates
+- Hardware wallet signing support
+
+### Validation Workflows
+1. BIP-341 Validation Cycle:
+   Proposal → Schnorr Sig → MAST Commitment → Execution
+2. BIP-174 PSBT Flow:
+   Construction → Validation → Signing → Broadcast
+
+2. BIP-174 PSBT Flow:
+   Construction → Validation → Signing → Broadcast

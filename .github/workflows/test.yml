@@ -1,0 +1,41 @@
+name: Rust Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      BITCOIN_TESTNET_URL: ${{ secrets.BITCOIN_TESTNET_URL }}
+      BITCOIN_TESTNET_AUTH: ${{ secrets.BITCOIN_TESTNET_AUTH }}
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Install Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+      
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          
+      - name: Run tests
+        run: cargo test --features bip174,bip341
+        
+      - name: Update AI labelling
+        run: cargo run --bin anya_validator -- update-labels
+        
+      - name: Verify BIP compliance
+        run: cargo test bitcoin::protocol 

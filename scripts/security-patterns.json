@@ -1,0 +1,24 @@
+{
+  "overflow-protection": {
+    "pattern": "(safe-add|safe-sub|safe-mul|safe-div|time-locked-add)",
+    "recommendation": "Use guarded arithmetic operations from security-guards"
+  },
+  "reentrancy-protection": {
+    "pattern": "(non-reentrant|release-reentrancy|reentrancy-context)",
+    "recommendation": "Use context-aware reentrancy guards"
+  },
+  "bip-compliance": {
+    "patterns": [
+      "(verify-taproot-signature",
+      "process-psbt",
+      "execute-tapscript",
+      "tr\\(",
+      "psbt-version"
+    ],
+    "recommendation": "Use BIP-341/342/174 compliant functions"
+  },
+  "arithmetic-protection": {
+    "pattern": "(safe-add|safe-mul|with-arithmetic-guard|checked-math)",
+    "recommendation": "Use guarded arithmetic operations"
+  }
+} 

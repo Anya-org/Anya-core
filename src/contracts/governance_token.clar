@@ -42,13 +42,17 @@
     (ok (ft-get-balance anya-token account)))
 
 ;; Token Transfer with Governance Considerations
-(define-public (transfer (amount uint) (sender principal) (recipient principal) (memo (optional (buff 34))))
+(define-public (transfer (amount uint) (sender principal) (recipient principal))
+    (let (
+        (guard (non-reentrant))
+        (safe-amount (unwrap! (safe-add amount u0) (err u401)))
+    )
     (begin
         (asserts! (is-eq tx-sender sender) ERR-NOT-TOKEN-OWNER)
-        (match (ft-transfer? anya-token amount sender recipient)
+        (match (ft-transfer? anya-token safe-amount sender recipient)
             response (begin
-                (print memo)
-                (ok true))
+                (ok true)
+                (release-reentrancy))
             error (err error))))
 
 ;; Minting with Supply Cap
@@ -74,3 +78,11 @@
 
 (define-read-only (get-delegatee (account principal))
     (ok (map-get? delegated-power account)))
+
+;; Add input validation
+(define-private (validate-address (addr principal))
+    (match (contract-of addr)
+        some-contract true
+        none (err u402)
+    )
+)

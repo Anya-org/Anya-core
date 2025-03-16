@@ -1,0 +1,28 @@
+{
+  "exclude_patterns": [
+    "-trait.clar$",
+    "backup/"
+  ],
+  "contract_paths": [
+    "src/contracts/core/",
+    "src/contracts/protocols/"
+  ],
+  "bip_implementation_markers": {
+    "BIP-341": [
+      "verify-taproot-signature",
+      "tr(",
+      "taproot",
+      "schnorr"
+    ],
+    "BIP-342": [
+      "execute-tapscript",
+      "tapscript",
+      "op_checksigadd"
+    ],
+    "BIP-174": [
+      "process-psbt",
+      "psbt-version",
+      "globaltx"
+    ]
+  }
+}

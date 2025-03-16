@@ -2,16 +2,61 @@
 
 # Anya DAO Documentation Index
 
-Welcome to the Anya DAO documentation. This index provides a comprehensive overview of all DAO-related documentation and components.
+[AIS-3][BPC-3][DAO-4]
+
+## Core Documentation
+
+This index serves as the central entry point to all Anya DAO documentation.
+
+| Document | Description |
+|----------|-------------|
+| [DAO Overview](DAO_OVERVIEW.md) | Introduction and high-level overview of the Anya DAO |
+| [Governance Token](GOVERNANCE_TOKEN.md) | Details on the AGT token, economics, and distribution |
+| [Governance Framework](GOVERNANCE_FRAMEWORK.md) | Proposal types, voting process, and mechanism |
+| [Treasury Management](TREASURY_MANAGEMENT.md) | Treasury composition, operations, and guards |
+| [Bitcoin Compliance](BITCOIN_COMPLIANCE.md) | BIP compliance and Bitcoin protocol integration |
+| [Implementation Architecture](IMPLEMENTATION_ARCHITECTURE.md) | On-chain and off-chain components |
+| [Security Measures](SECURITY_MEASURES.md) | Security layers and protection mechanisms |
+| [DEX Integration](DEX_INTEGRATION.md) | Liquidity provision, trading operations, and pricing |
+
+## Technical Documents
+
+| Document | Description |
+|----------|-------------|
+| [Setup & Usage](SETUP_USAGE.md) | Installation, configuration, and example usage |
+| [System Architecture](SYSTEM_ARCHITECTURE.md) | Component structure and relationships |
+| [Implementation Status](IMPLEMENTATION_MILESTONES.md) | Current progress and development roadmap |
+| [API Reference](api/GOVERNANCE_API.md) | Technical API documentation for developers |
+
+## Visual Guides
+
+| Document | Description |
+|----------|-------------|
+| [DAO System Map](DAO_SYSTEM_MAP.md) | Visual representation of system components and relationships |
+| [Tokenomics Flowchart](TOKENOMICS_FLOWCHART.md) | Visual guide to token economics and distribution |
+
+## Resources
+
+| Document | Description |
+|----------|-------------|
+| [Contract Reference](CONTRACT_REFERENCE.md) | Detailed contract addresses and interactions |
+| [Contribution Guide](CONTRIBUTION_GUIDE.md) | Guidelines for contributing to the DAO ecosystem |
+| [Version History](VERSION_HISTORY.md) | Changelog and historical documentation |
+
+## Compliance Frameworks
+
+- [AIS-3] Asset Issuance Standard v3
+- [BPC-3] Bitcoin Protocol Compliance v3
+- [DAO-4] Decentralized Autonomous Organization Standard v4
+
+*Last updated: 2025-02-24*
 
 ## Core Documentation
 
 | Document | Description | Last Updated |
 |----------|-------------|--------------|
 | [DAO README](../dao/README.md) | Overview of the DAO module, setup, and usage | 2025-03-02 |
-| [DAO System Map](DAO_SYSTEM_MAP.md) | Architectural overview of the DAO system | 2025-03-02 |
 | [Tokenomics System](TOKENOMICS_SYSTEM.md) | Token economics architecture and Bitcoin-style issuance model | 2025-03-02 |
-| [Implementation Milestones](IMPLEMENTATION_MILESTONES.md) | Implementation progress and roadmap | 2025-03-02 |
 
 ## Technical Components
 
