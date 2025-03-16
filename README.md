@@ -1,4 +1,4 @@
-# Anya Core Platform
+# Anya-Core
 
 [AIR-3][AIS-3][AIT-3][AIM-3][AIP-3][AIE-3][BPC-3][W5C-3][DID-3][PFM-2][SCL-2][RES-3][UXA-2][DAO-3]
 
@@ -755,3 +755,16 @@ Special thanks to our contributors and the following projects:
 ### Last Updated
 
 *2025-03-12*
+
+## Validation
+Run the following to verify system compliance:
+
+```shell
+./scripts/validate_upgrade.ps1 -CheckAll -ProtocolLevel 3
+```
+
+## Standards Compliance
+This project adheres to:
+- Bitcoin Protocol Compliance Level 3 (BPC-3)
+- DAO Governance Standard Level 4 (DAO-4)
+- AI Security Standard Level 3 (AIS-3)

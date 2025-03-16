@@ -1,6 +1,15 @@
 <!-- markdownlint-disable MD013 line-length -->
 
-# Anya DAO System Guide [AIR-3][AIS-3][AIT-3][AIP-3][BPC-3][DAO-3]
+[AIS-3][BPC-3][DAO-4]
+# DAO System Guide
+
+## Compliance Framework
+This guide adheres to BPC-3 protocol standards and implements DAO-4 institutional governance requirements.
+
+## Cross-Chain Execution
+- Bitcoin SPV Proof Verification (BPC-3 compliant)
+- RSK Bridge Integration with Taproot support
+- Legal Compliance Wrappers (DAO-4 standard)
 
 ## Overview
 
@@ -584,3 +593,12 @@ clarinet deploy --testnet
 
 ## Generate documentation
 clarinet docs
+
+```
+
+## Cross-Chain Execution
+
+## Cross-Chain Governance (DAO-4)
+- Bitcoin SPV Proof Verification (BPC-3)
+- RSK Bridge Integration with Taproot
+- Legal Compliance Wrappers (AIS-3)

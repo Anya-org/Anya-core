@@ -51,6 +51,7 @@ pub mod core;
 pub mod security;
 pub mod enterprise;
 pub mod layer2;
+pub mod tools;
 
 /// Core error type for the Anya system
 #[derive(Debug)]
@@ -315,4 +316,24 @@ impl From<bitcoin::error::BitcoinError> for AnyaError {
     fn from(error: bitcoin::error::BitcoinError) -> Self {
         AnyaError::Bitcoin(error.to_string())
     }
+}
+
+pub use bitcoin::protocol::{BitcoinProtocol, BPCLevel, BitcoinError};
+pub use dao::governance::{DaoGovernance, DaoLevel, GovernanceError};
+
+/// Protocol version
+pub const PROTOCOL_VERSION: &str = "2.0.0";
+
+/// Year of implementation
+pub const IMPLEMENTATION_YEAR: u16 = 2025;
+
+/// Build identifier
+pub const BUILD_ID: &str = env!("CARGO_PKG_VERSION");
+
+/// Module re-exports for convenience
+pub mod prelude {
+    pub use crate::bitcoin::protocol::{BitcoinProtocol, BPCLevel};
+    pub use crate::bitcoin::taproot::TaprootValidator;
+    pub use crate::dao::governance::{DaoGovernance, DaoLevel};
+    pub use crate::tools::markdown::DocumentationValidator;
 } 
