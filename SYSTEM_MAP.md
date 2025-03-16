@@ -1,247 +1,189 @@
-# Anya-Core System Architecture [AIS-3][BPC-3][DAO-4]
+# Anya Core System Architecture Map
 
-## Core Components
+[AIR-3][AIS-3][BPC-3][AIT-3][RES-3]
 
-### Bitcoin Protocol Layer (Rust)
+This document provides a high-level overview of the Anya Core system architecture, emphasizing the Bitcoin protocol integration and security analysis framework, in compliance with the Bitcoin Development Framework v2.5.
 
-- `src/bitcoin/protocol.rs`: BPC-3 compliant protocol validation
-- `src/bitcoin/validation.rs`: Transaction and block validation
-- `src/bitcoin/taproot.rs`: Taproot (BIP-341/342) implementation
+## System Overview
 
-### DAO Governance Layer (Rust)
-
-- `src/dao/governance.rs`: DAO-4 institutional governance
-- `src/dao/voting.rs`: Quadratic voting implementation
-- `src/dao/legal.rs`: Legal wrapper integration
-
-### Tools (Rust)
-
-- `src/tools/markdown.rs`: Documentation validation and fixing
-- `src/bin/anya_validator.rs`: CLI validation tool
-
-## Migration Status
-
-All Python and PowerShell components have been successfully migrated to Rust:
-
-| Component | Original Language | Status |
-|-----------|-------------------|--------|
-| Bitcoin Validation | Python | ✅ Migrated to Rust |
-| Documentation Tools | PowerShell | ✅ Migrated to Rust |
-| System Validation | PowerShell | ✅ Migrated to Rust |
-
-## Compliance Status
-
-| Standard | Level | Status |
-|----------|-------|--------|
-| Bitcoin Protocol | BPC-3 | ✅ Compliant |
-| DAO Governance | DAO-4 | ✅ Compliant |
-| AI Security | AIS-3 | ✅ Compliant |
-
-## Build Commands
-
-```bash
-# Build Anya-Core and tools
-cargo build --release
-
-# Run documentation validation
-cargo run --bin anya_validator -- docs
-
-# Run system validation
-cargo run --bin anya_validator -- system --level 3
-```
-
-## Directory Structure
+The Anya Core system follows a hexagonal architecture pattern, separating core business logic from external dependencies through adapters and ports.
 
 ```
-anya (anya-core)
-├── anya-bitcoin/               # Bitcoin integration
-├── anya-enterprise/            # Enterprise core features
-├── anya-extensions/            # Extension system
-├── dash33/                    # Web dashboard
-├── dependencies/              # Shared dependencies
-├── enterprise/                # Business implementation
-├── mobile/                    # Cross-platform mobile app
-└── install/                   # Unified installer system
+                      +----------------+
+                      |  Bitcoin Core  |
+                      +-------+--------+
+                              |
+                      +-------v--------+
+                      |  Adapter Layer |
+                      +-------+--------+
+                              |
++----------------+    +-------v--------+    +----------------+
+|   External     |    |   Application  |    |   Monitoring   |
+|   Interfaces   <----+   Core Logic    +---->   & Metrics   |
+| (APIs, Wallets)|    +-------+--------+    | (Prometheus)   |
++----------------+            |             +----------------+
+                      +-------v--------+
+                      |   Protocol     |
+                      |   Adapters     |
+                      +-------+--------+
+                              |
+                      +-------v--------+
+                      |  Blockchain    |
+                      |  Network       |
+                      +----------------+
 ```
 
-## Documentation Index
+## Key Components
 
-### Architecture Documents
+### Core Bitcoin Implementation (scripts/bitcoin/)
 
-- [Agent Architecture](./AGENT_ARCHITECTURE.md)
-- [DAO Structure](./DAO.md)
-- [Governance](./GOVERNANCE.md)
+- **MCP Server** (mcp-server.js)
+  - Main Bitcoin protocol implementation
+  - Handles transaction validation and processing
+  - Manages UTXO state
+  - Implements BIP standards
 
-### Development Guides
+- **BIP Compliance Validation** (validate-bip-compliance.js)
+  - Validates implementation against Bitcoin Improvement Proposals
+  - Checks for BIP-340, BIP-341, BIP-342, BIP-174, BIP-370 compliance
+  - Reports compliance status
 
-- [Contributing Guide](./CONTRIBUTING.md)
-- [Security Policy](./SECURITY.md)
-- [Testing Guide](./TESTING.md)
+- **Security Validation** (validate-security.js)
+  - Basic security validation for Bitcoin components
+  - Initial security checks for core functionality
 
-### Planning & Roadmap
+### Security Analysis Framework (scripts/security/)
 
-- [New Features](./NEW_FEATURES.md)
-- [Roadmap](./ROADMAP.md)
-- [Changelog](./CHANGELOG.md)
+- **CodeQL Analysis** (run-codeql-analysis.ps1)
+  - Automated static code analysis
+  - Security vulnerability detection
+  - Custom Bitcoin-specific security rules
+  - Integration with CI/CD pipeline
 
-## Configuration Files
+- **Cryptographic Validation** (crypto-validation.js)
+  - Validates cryptographic implementations
+  - Checks for secure random number generation
+  - Validates constant-time operations
+  - Ensures appropriate key sizes
+  - Checks for modern cryptographic algorithms
 
-### Core Configuration
+- **MCP Server Analysis** (analyze-mcp-server.js)
+  - Deep analysis of MCP server implementation
+  - Checks for Bitcoin protocol compliance
+  - Validates security measures
+  - Reports vulnerabilities and compliance issues
 
-- [Cargo.toml](./Cargo.toml) - Rust dependencies
-- [.env.template](./.env.template) - Environment template
-- [docker-compose.yml](./docker-compose.yml) - Container orchestration
+- **Permissions Setup** (setup-permissions.sh)
+  - Sets up secure permissions for scripts
+  - Ensures least privilege principle
+  - Manages access control
 
-### Build & CI
+## Core Subsystems
 
-- [build.rs](./build.rs) - Rust build script
-- [rust_combined.yml](./rust_combined.yml) - CI pipeline
-- **[Enhanced]** Added protocol checks:
+### Transaction Processing
 
-  ```markdown
-  - Protocol Adherence Gate (BIP-341/342)
-  - Unsafe Code Scanner
-  - Bitcoin Tx Validation Suite
-  ```
+1. **Validation Layer** - Validates incoming transactions
+2. **UTXO Management** - Maintains the UTXO set
+3. **Mempool Management** - Handles pending transactions
+4. **Block Processing** - Processes new blocks
 
-## Scripts
+### Cryptographic Operations
 
-- [commit_push.ps1](./commit_push.ps1) - Git automation
-- [install_dependencies.sh](./install_dependencies.sh) - Setup script
-- [reorganize-code.ps1](./reorganize-code.ps1) - Code organization
+1. **Key Management** - Handles cryptographic keys
+2. **Signature Operations** - Implements signature algorithms (ECDSA, Schnorr)
+3. **Hash Functions** - Implements cryptographic hash functions
+4. **Random Number Generation** - Secure random number generation
 
-## Symbolic Links
+### Network Integration
 
-The following components are symlinked:
+1. **P2P Protocol** - Implements the Bitcoin P2P protocol
+2. **Block Synchronization** - Handles block synchronization
+3. **Transaction Relay** - Manages transaction broadcasting
 
-- `/anya/dash33` → `[Repository Root]/dash33`
-- `/anya/enterprise` → `[Repository Root]/enterprise`
-- `/anya/mobile` → `[Repository Root]/mobile`
+### Security Framework
 
-## System Requirements
+1. **Static Analysis** - CodeQL-based static code analysis
+2. **Compliance Validation** - BIP and protocol compliance checking
+3. **Cryptographic Validation** - Validation of cryptographic implementations
+4. **Vulnerability Reporting** - Reporting of security issues
 
-- Rust toolchain
-- Python 3.8+
-- Flutter SDK
-- Docker & Docker Compose
+## Implementation-Specific Components
 
-## Quick Links
+### Bitcoin Protocol Adapters
 
-- [Code of Conduct](./CODE_OF_CONDUCT.md)
-- [License](./LICENSE.md)
-- [Security Policy](./SECURITY.md)
+- **Taproot Integration** (BIP-341)
+- **Schnorr Signatures** (BIP-340)
+- **PSBT Support** (BIP-174)
+- **DLC Oracle Implementation**
+- **Lightning Network Integration**
 
-## Validation Status
+### Security Validation
 
-```index-validation
-Last Crawled: 2025-03-15T09:35:12.2847235Z
-Components Indexed: 23
-Bitcoin Protocol Adherence: 92.17%
-```
+- **Bitcoin-specific Security Checks**
+- **Cryptographic Algorithm Validation**
+- **Protocol Compliance Verification**
+- **AI System Security (AIS-3)**
 
-## Indexed Components
+## Data Flow
 
-```component-index
-{{AUTOGENERATED_INDEX}}
-```
+1. **Incoming Transactions**
+   - P2P Network → Validation Layer → Mempool → Block Template
 
-**Execution Command** (uses existing paths from system map):
+2. **Block Processing**
+   - P2P Network → Block Validation → UTXO Updates → Chain State
 
-```powershell
-.\scripts\map_based_index.ps1 -SystemMapPath .\SYSTEM_MAP.md -Verbose
-```
+3. **Security Analysis**
+   - Code Repository → CodeQL Analysis → Vulnerability Reports
 
-**Key Features:**
+4. **Compliance Validation**
+   - Implementation → BIP Validators → Compliance Reports
 
-1. **Map-Driven** - Only indexes files/directories explicitly listed in SYSTEM_MAP.md
-2. **Structure Preservation** - Maintains existing documentation hierarchy
-3. **Bitcoin Compliance** - Reuses protocol_checker from anya-bitcoin
-4. **Validation Integration** - Updates system map with index status
+## Integration Points
 
-**Output Structure** (REPO_INDEX.json):
+1. **Bitcoin Core Compatibility**
+   - Compatible with Bitcoin Core RPC interface
+   - Follows Bitcoin P2P protocol standards
+   - Implements standard Bitcoin script validation
 
-```json
-{
-  "core": {
-    "Cargo.toml": {
-      "path": "/path/to/Cargo.toml",
-      "type": "file",
-      "hash": "sha256...",
-      "bitcoin_adherence": null
-    }
-  },
-  "bitcoin": {
-    "anya-bitcoin": {
-      "path": "/path/to/anya-bitcoin",
-      "type": "directory",
-      "components": {
-        "protocol.rs": {
-          "hash": "sha256...", 
-          "bitcoin_adherence": 98.7
-        }
-      }
-    }
-  }
-}
-```
+2. **Security Tool Integration**
+   - CI/CD pipeline integration for CodeQL
+   - Automated reporting of security issues
+   - Integration with development workflow
 
-This implementation:
+3. **Monitoring and Metrics**
+   - Prometheus integration for metrics
+   - Alert system for security events
+   - Performance monitoring
 
-1. Respects existing system map structure
-2. Avoids recursive directory traversal
-3. Maintains Bitcoin protocol validation
-4. Integrates with current CI/CD pipelines
-5. Preserves documentation relationships
+## AI System Labeling
 
-**Verification:**
+All components adhere to the Bitcoin Development Framework v2.5 AI labeling system:
 
-```powershell
-# Validate index against system map
-Get-Content .\REPO_INDEX.json | ConvertFrom-Json | 
-Select-Object -ExpandProperty bitcoin | 
-Format-List
-```
+1. **[AIR-3]** - AI Readiness Level 3
+   - Production-ready implementation
+   - Stable API interfaces
+   - Comprehensive documentation
 
-## Rust Component Health
+2. **[AIS-3]** - AI Security Level 3
+   - Comprehensive security measures
+   - Regular security audits
+   - Vulnerability reporting system
 
-```rust-metrics
-- Average Cyclomatic Complexity: $(Get-Content "$anyaDir/system_index.json" | jq '[.rust_metrics[] | .cyclomatic_complexity] | add / length')
-- Total Unsafe Blocks: $(Get-Content "$anyaDir/system_index.json" | jq '[.rust_metrics[] | .unsafe_usage_count] | add')
-- Bitcoin Protocol Adherence: $(Get-Content "$anyaDir/system_index.json" | jq '[.rust_metrics[] | .bitcoin_protocol_adherence] | add / length | round(2)')
-- Security Audit Flags: $(Get-Content "$anyaDir/system_index.json" | jq '[.rust_metrics[].security_audit_flags[]] | length')
-```
+3. **[BPC-3]** - Bitcoin Protocol Compliance Level 3
+   - Full compliance with Bitcoin protocol
+   - Implementation of required BIPs
+   - Rigorous testing against Bitcoin Core
 
-Enterprise Core: High-volume trading/analytics
+4. **[AIT-3]** - AI Testing Level 3
+   - Exhaustive testing methodology
+   - High test coverage
+   - Regression testing suite
 
-**Post-Execution Verification**  
+5. **[RES-3]** - Resilience Level 3
+   - Robust fault tolerance
+   - Error recovery mechanisms
+   - Graceful degradation
 
-```powershell
-Test-Path .\REPO_INDEX.json                  # True
-(Get-Item .\REPO_INDEX.json).Length          # 25280 bytes
-Get-Content .\SYSTEM_MAP.md | Select-String "92.17%"  # Match found
-```
+## Last Updated
 
-**Error Resolution Log**  
-
-```text
-- Fixed missing Add-MappedEntry function
-- Implemented validation status updater
-- Handled relative path conversion
-- Added error handling for cargo protocol_checker
-```
-
-**Security Audit Results**  
-
-```text
-- 0 unsafe code blocks detected
-- 2 medium-severity protocol deviations found
-- Average Bitcoin adherence: 92.17% (meets 90% threshold)
-```
-
-**Recommended Next Steps**  
-
-```powershell
-# Schedule daily indexing
-Register-ScheduledTask -TaskName "DailyIndex" -Trigger (New-ScheduledTaskTrigger -Daily -At 2am) 
--Action (New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-File scripts\map_based_index.ps1")
-```
+March 16, 2025 

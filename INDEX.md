@@ -16,6 +16,13 @@ Welcome to the Anya Core documentation. This index will help you navigate the va
 - [Tokenomics System](docs/TOKENOMICS_SYSTEM.md) - Bitcoin-style tokenomics
 - [Implementation Milestones](docs/IMPLEMENTATION_MILESTONES.md) - Current progress tracking
 - [Testing Strategy](docs/TESTING_STRATEGY.md) - Sectional testing methodology
+- [README.md](./README.md) - Main project documentation
+- [SECURITY_CODEQL.md](./SECURITY_CODEQL.md) - Security analysis framework documentation
+- [ROADMAP.md](./ROADMAP.md) - Project development roadmap
+- [CHANGELOG.md](./CHANGELOG.md) - Version history and changes
+- [TODO.md](./TODO.md) - Current development tasks
+- [SYSTEM_MAP.md](./SYSTEM_MAP.md) - System architecture overview
+- [AI_LABELLING.md](./AI_LABELLING.md) - AI labeling system documentation
 
 ## Installation & Deployment
 
@@ -124,3 +131,53 @@ Welcome to the Anya Core documentation. This index will help you navigate the va
 - [GitHub Discussions](https://github.com/anya/anya-core/discussions)
 
 *This documentation follows the [AI Labeling System](AI_LABELLING.md) standards based on the Bitcoin Development Framework v2.5. All components are labeled with appropriate Core and Extended category labels.*
+
+## Bitcoin Protocol Implementation
+
+- [scripts/bitcoin/mcp-server.js](./scripts/bitcoin/mcp-server.js) - MCP server implementation
+- [scripts/bitcoin/validate-bip-compliance.js](./scripts/bitcoin/validate-bip-compliance.js) - BIP compliance validation
+- [scripts/bitcoin/validate-security.js](./scripts/bitcoin/validate-security.js) - Bitcoin security validation
+
+## Security Analysis Components
+
+- [scripts/security/run-codeql-analysis.ps1](./scripts/security/run-codeql-analysis.ps1) - CodeQL analysis script
+- [scripts/security/crypto-validation.js](./scripts/security/crypto-validation.js) - Cryptographic validation
+- [scripts/security/analyze-mcp-server.js](./scripts/security/analyze-mcp-server.js) - MCP server analysis
+- [scripts/security/setup-permissions.sh](./scripts/security/setup-permissions.sh) - Security permissions setup
+
+## Development Scripts
+
+- [scripts/README.md](./scripts/README.md) - Overview of available scripts
+- [scripts/build.ps1](./scripts/build.ps1) - Build script for the project
+- [scripts/dev-setup.ps1](./scripts/dev-setup.ps1) - Development environment setup
+
+## Testing Framework
+
+- [scripts/run-all-tests.sh](./scripts/run-all-tests.sh) - Run all test suites
+- [scripts/run-integration-tests.ps1](./scripts/run-integration-tests.ps1) - Integration tests
+- [scripts/run-module-tests.ps1](./scripts/run-module-tests.ps1) - Module-specific tests
+
+## Compliance and Governance
+
+- [GOVERNANCE.md](./GOVERNANCE.md) - Project governance structure
+- [CONTRIBUTING.md](./CONTRIBUTING.md) - Contribution guidelines
+- [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md) - Community code of conduct
+- [LICENSE.md](./LICENSE.md) - License information
+
+## Bitcoin Development Framework Compliance
+
+All components conform to the Bitcoin Development Framework v2.5 guidelines and include proper AI labeling according to the following system:
+
+- [AIR-3] - AI Readiness Level 3
+- [AIS-3] - AI Security Level 3
+- [BPC-3] - Bitcoin Protocol Compliance Level 3
+- [AIT-3] - AI Testing Level 3
+- [RES-3] - Resilience Level 3
+
+For full details on the AI labeling system, see [AI_LABELLING.md](./AI_LABELLING.md).
+
+## Version Information
+
+- Current Version: 0.9.5
+- Last Updated: March 16, 2025
+- Bitcoin Development Framework: v2.5

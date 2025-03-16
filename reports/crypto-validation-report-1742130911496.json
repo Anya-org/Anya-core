@@ -1,0 +1,519 @@
+{
+  "timestamp": "2025-03-16T13:15:11.357Z",
+  "overallResult": false,
+  "filesChecked": 9,
+  "fileResults": [
+    {
+      "file": "scripts/bitcoin/mcp-server.js",
+      "checkResults": [
+        {
+          "name": "Secure RNG Usage",
+          "description": "Check for proper use of cryptographically secure random number generation",
+          "passed": false,
+          "details": "Using insecure Math.random() instead of crypto.randomBytes()"
+        },
+        {
+          "name": "Constant-Time Operations",
+          "description": "Check for constant-time operations for cryptographic comparisons",
+          "passed": true,
+          "details": "Constant-time operations used or not needed"
+        },
+        {
+          "name": "Key Size Security",
+          "description": "Check for appropriate key sizes in cryptographic operations",
+          "passed": true,
+          "details": "No insecure key sizes detected"
+        },
+        {
+          "name": "Modern Cryptographic Algorithms",
+          "description": "Check for usage of modern, secure cryptographic algorithms",
+          "passed": false,
+          "details": "Using insecure algorithms: DES"
+        },
+        {
+          "name": "Proper Error Handling",
+          "description": "Check for proper error handling in cryptographic operations",
+          "passed": true,
+          "details": "Proper error handling in place or not needed"
+        },
+        {
+          "name": "Hardcoded Secrets",
+          "description": "Check for hardcoded cryptographic secrets or keys",
+          "passed": true,
+          "details": "No hardcoded secrets detected"
+        }
+      ],
+      "passed": false
+    },
+    {
+      "file": "src/bitcoin/taproot.rs",
+      "checkResults": [
+        {
+          "name": "Secure RNG Usage",
+          "description": "Check for proper use of cryptographically secure random number generation",
+          "passed": false,
+          "details": "No RNG usage detected"
+        },
+        {
+          "name": "Constant-Time Operations",
+          "description": "Check for constant-time operations for cryptographic comparisons",
+          "passed": false,
+          "details": "Crypto operations with non-constant-time comparisons"
+        },
+        {
+          "name": "Key Size Security",
+          "description": "Check for appropriate key sizes in cryptographic operations",
+          "passed": true,
+          "details": "No insecure key sizes detected"
+        },
+        {
+          "name": "Modern Cryptographic Algorithms",
+          "description": "Check for usage of modern, secure cryptographic algorithms",
+          "passed": false,
+          "details": "Using insecure algorithms: DES"
+        },
+        {
+          "name": "Proper Error Handling",
+          "description": "Check for proper error handling in cryptographic operations",
+          "passed": true,
+          "details": "Proper error handling in place or not needed"
+        },
+        {
+          "name": "Hardcoded Secrets",
+          "description": "Check for hardcoded cryptographic secrets or keys",
+          "passed": true,
+          "details": "No hardcoded secrets detected"
+        }
+      ],
+      "passed": false
+    },
+    {
+      "file": "src/bitcoin/protocol.rs",
+      "checkResults": [
+        {
+          "name": "Secure RNG Usage",
+          "description": "Check for proper use of cryptographically secure random number generation",
+          "passed": false,
+          "details": "No RNG usage detected"
+        },
+        {
+          "name": "Constant-Time Operations",
+          "description": "Check for constant-time operations for cryptographic comparisons",
+          "passed": false,
+          "details": "Crypto operations with non-constant-time comparisons"
+        },
+        {
+          "name": "Key Size Security",
+          "description": "Check for appropriate key sizes in cryptographic operations",
+          "passed": true,
+          "details": "No insecure key sizes detected"
+        },
+        {
+          "name": "Modern Cryptographic Algorithms",
+          "description": "Check for usage of modern, secure cryptographic algorithms",
+          "passed": true,
+          "details": "No explicit cryptographic algorithms detected"
+        },
+        {
+          "name": "Proper Error Handling",
+          "description": "Check for proper error handling in cryptographic operations",
+          "passed": true,
+          "details": "Proper error handling in place or not needed"
+        },
+        {
+          "name": "Hardcoded Secrets",
+          "description": "Check for hardcoded cryptographic secrets or keys",
+          "passed": true,
+          "details": "No hardcoded secrets detected"
+        }
+      ],
+      "passed": false
+    },
+    {
+      "file": "src/bitcoin/validation.rs",
+      "checkResults": [
+        {
+          "name": "Secure RNG Usage",
+          "description": "Check for proper use of cryptographically secure random number generation",
+          "passed": false,
+          "details": "No RNG usage detected"
+        },
+        {
+          "name": "Constant-Time Operations",
+          "description": "Check for constant-time operations for cryptographic comparisons",
+          "passed": false,
+          "details": "Crypto operations with non-constant-time comparisons"
+        },
+        {
+          "name": "Key Size Security",
+          "description": "Check for appropriate key sizes in cryptographic operations",
+          "passed": true,
+          "details": "No insecure key sizes detected"
+        },
+        {
+          "name": "Modern Cryptographic Algorithms",
+          "description": "Check for usage of modern, secure cryptographic algorithms",
+          "passed": false,
+          "details": "Using insecure algorithms: DES"
+        },
+        {
+          "name": "Proper Error Handling",
+          "description": "Check for proper error handling in cryptographic operations",
+          "passed": true,
+          "details": "Proper error handling in place or not needed"
+        },
+        {
+          "name": "Hardcoded Secrets",
+          "description": "Check for hardcoded cryptographic secrets or keys",
+          "passed": true,
+          "details": "No hardcoded secrets detected"
+        }
+      ],
+      "passed": false
+    },
+    {
+      "file": "src/bitcoin/dlc/adaptor.rs",
+      "checkResults": [
+        {
+          "name": "Secure RNG Usage",
+          "description": "Check for proper use of cryptographically secure random number generation",
+          "passed": false,
+          "details": "No RNG usage detected"
+        },
+        {
+          "name": "Constant-Time Operations",
+          "description": "Check for constant-time operations for cryptographic comparisons",
+          "passed": true,
+          "details": "Constant-time operations used or not needed"
+        },
+        {
+          "name": "Key Size Security",
+          "description": "Check for appropriate key sizes in cryptographic operations",
+          "passed": true,
+          "details": "No insecure key sizes detected"
+        },
+        {
+          "name": "Modern Cryptographic Algorithms",
+          "description": "Check for usage of modern, secure cryptographic algorithms",
+          "passed": true,
+          "details": "No explicit cryptographic algorithms detected"
+        },
+        {
+          "name": "Proper Error Handling",
+          "description": "Check for proper error handling in cryptographic operations",
+          "passed": true,
+          "details": "Proper error handling in place or not needed"
+        },
+        {
+          "name": "Hardcoded Secrets",
+          "description": "Check for hardcoded cryptographic secrets or keys",
+          "passed": true,
+          "details": "No hardcoded secrets detected"
+        }
+      ],
+      "passed": false
+    },
+    {
+      "file": "src/bitcoin/dlc/contract.rs",
+      "checkResults": [
+        {
+          "name": "Secure RNG Usage",
+          "description": "Check for proper use of cryptographically secure random number generation",
+          "passed": false,
+          "details": "No RNG usage detected"
+        },
+        {
+          "name": "Constant-Time Operations",
+          "description": "Check for constant-time operations for cryptographic comparisons",
+          "passed": false,
+          "details": "Crypto operations with non-constant-time comparisons"
+        },
+        {
+          "name": "Key Size Security",
+          "description": "Check for appropriate key sizes in cryptographic operations",
+          "passed": true,
+          "details": "No insecure key sizes detected"
+        },
+        {
+          "name": "Modern Cryptographic Algorithms",
+          "description": "Check for usage of modern, secure cryptographic algorithms",
+          "passed": false,
+          "details": "Using insecure algorithms: DES"
+        },
+        {
+          "name": "Proper Error Handling",
+          "description": "Check for proper error handling in cryptographic operations",
+          "passed": false,
+          "details": "Cryptographic operations without proper Result handling"
+        },
+        {
+          "name": "Hardcoded Secrets",
+          "description": "Check for hardcoded cryptographic secrets or keys",
+          "passed": true,
+          "details": "No hardcoded secrets detected"
+        }
+      ],
+      "passed": false
+    },
+    {
+      "file": "src/bitcoin/dlc/execution.rs",
+      "checkResults": [
+        {
+          "name": "Secure RNG Usage",
+          "description": "Check for proper use of cryptographically secure random number generation",
+          "passed": false,
+          "details": "No RNG usage detected"
+        },
+        {
+          "name": "Constant-Time Operations",
+          "description": "Check for constant-time operations for cryptographic comparisons",
+          "passed": true,
+          "details": "Constant-time operations used or not needed"
+        },
+        {
+          "name": "Key Size Security",
+          "description": "Check for appropriate key sizes in cryptographic operations",
+          "passed": true,
+          "details": "No insecure key sizes detected"
+        },
+        {
+          "name": "Modern Cryptographic Algorithms",
+          "description": "Check for usage of modern, secure cryptographic algorithms",
+          "passed": true,
+          "details": "No explicit cryptographic algorithms detected"
+        },
+        {
+          "name": "Proper Error Handling",
+          "description": "Check for proper error handling in cryptographic operations",
+          "passed": true,
+          "details": "Proper error handling in place or not needed"
+        },
+        {
+          "name": "Hardcoded Secrets",
+          "description": "Check for hardcoded cryptographic secrets or keys",
+          "passed": true,
+          "details": "No hardcoded secrets detected"
+        }
+      ],
+      "passed": false
+    },
+    {
+      "file": "src/bitcoin/dlc/mod.rs",
+      "checkResults": [
+        {
+          "name": "Secure RNG Usage",
+          "description": "Check for proper use of cryptographically secure random number generation",
+          "passed": true,
+          "details": "Using secure RNG"
+        },
+        {
+          "name": "Constant-Time Operations",
+          "description": "Check for constant-time operations for cryptographic comparisons",
+          "passed": false,
+          "details": "Crypto operations with non-constant-time comparisons"
+        },
+        {
+          "name": "Key Size Security",
+          "description": "Check for appropriate key sizes in cryptographic operations",
+          "passed": true,
+          "details": "No insecure key sizes detected"
+        },
+        {
+          "name": "Modern Cryptographic Algorithms",
+          "description": "Check for usage of modern, secure cryptographic algorithms",
+          "passed": false,
+          "details": "Using insecure algorithms: DES"
+        },
+        {
+          "name": "Proper Error Handling",
+          "description": "Check for proper error handling in cryptographic operations",
+          "passed": true,
+          "details": "Proper error handling in place or not needed"
+        },
+        {
+          "name": "Hardcoded Secrets",
+          "description": "Check for hardcoded cryptographic secrets or keys",
+          "passed": true,
+          "details": "No hardcoded secrets detected"
+        }
+      ],
+      "passed": false
+    },
+    {
+      "file": "src/bitcoin/dlc/oracle.rs",
+      "checkResults": [
+        {
+          "name": "Secure RNG Usage",
+          "description": "Check for proper use of cryptographically secure random number generation",
+          "passed": false,
+          "details": "No RNG usage detected"
+        },
+        {
+          "name": "Constant-Time Operations",
+          "description": "Check for constant-time operations for cryptographic comparisons",
+          "passed": false,
+          "details": "Crypto operations with non-constant-time comparisons"
+        },
+        {
+          "name": "Key Size Security",
+          "description": "Check for appropriate key sizes in cryptographic operations",
+          "passed": true,
+          "details": "No insecure key sizes detected"
+        },
+        {
+          "name": "Modern Cryptographic Algorithms",
+          "description": "Check for usage of modern, secure cryptographic algorithms",
+          "passed": false,
+          "details": "Using insecure algorithms: DES"
+        },
+        {
+          "name": "Proper Error Handling",
+          "description": "Check for proper error handling in cryptographic operations",
+          "passed": true,
+          "details": "Proper error handling in place or not needed"
+        },
+        {
+          "name": "Hardcoded Secrets",
+          "description": "Check for hardcoded cryptographic secrets or keys",
+          "passed": false,
+          "details": "Potential hardcoded secret or key detected"
+        }
+      ],
+      "passed": false
+    }
+  ],
+  "issues": [
+    {
+      "file": "scripts/bitcoin/mcp-server.js",
+      "check": "Secure RNG Usage",
+      "description": "Using insecure Math.random() instead of crypto.randomBytes()",
+      "severity": "critical"
+    },
+    {
+      "file": "scripts/bitcoin/mcp-server.js",
+      "check": "Modern Cryptographic Algorithms",
+      "description": "Using insecure algorithms: DES",
+      "severity": "high"
+    },
+    {
+      "file": "src/bitcoin/taproot.rs",
+      "check": "Secure RNG Usage",
+      "description": "No RNG usage detected",
+      "severity": "critical"
+    },
+    {
+      "file": "src/bitcoin/taproot.rs",
+      "check": "Constant-Time Operations",
+      "description": "Crypto operations with non-constant-time comparisons",
+      "severity": "high"
+    },
+    {
+      "file": "src/bitcoin/taproot.rs",
+      "check": "Modern Cryptographic Algorithms",
+      "description": "Using insecure algorithms: DES",
+      "severity": "high"
+    },
+    {
+      "file": "src/bitcoin/protocol.rs",
+      "check": "Secure RNG Usage",
+      "description": "No RNG usage detected",
+      "severity": "critical"
+    },
+    {
+      "file": "src/bitcoin/protocol.rs",
+      "check": "Constant-Time Operations",
+      "description": "Crypto operations with non-constant-time comparisons",
+      "severity": "high"
+    },
+    {
+      "file": "src/bitcoin/validation.rs",
+      "check": "Secure RNG Usage",
+      "description": "No RNG usage detected",
+      "severity": "critical"
+    },
+    {
+      "file": "src/bitcoin/validation.rs",
+      "check": "Constant-Time Operations",
+      "description": "Crypto operations with non-constant-time comparisons",
+      "severity": "high"
+    },
+    {
+      "file": "src/bitcoin/validation.rs",
+      "check": "Modern Cryptographic Algorithms",
+      "description": "Using insecure algorithms: DES",
+      "severity": "high"
+    },
+    {
+      "file": "src/bitcoin/dlc/adaptor.rs",
+      "check": "Secure RNG Usage",
+      "description": "No RNG usage detected",
+      "severity": "critical"
+    },
+    {
+      "file": "src/bitcoin/dlc/contract.rs",
+      "check": "Secure RNG Usage",
+      "description": "No RNG usage detected",
+      "severity": "critical"
+    },
+    {
+      "file": "src/bitcoin/dlc/contract.rs",
+      "check": "Constant-Time Operations",
+      "description": "Crypto operations with non-constant-time comparisons",
+      "severity": "high"
+    },
+    {
+      "file": "src/bitcoin/dlc/contract.rs",
+      "check": "Modern Cryptographic Algorithms",
+      "description": "Using insecure algorithms: DES",
+      "severity": "high"
+    },
+    {
+      "file": "src/bitcoin/dlc/contract.rs",
+      "check": "Proper Error Handling",
+      "description": "Cryptographic operations without proper Result handling",
+      "severity": "high"
+    },
+    {
+      "file": "src/bitcoin/dlc/execution.rs",
+      "check": "Secure RNG Usage",
+      "description": "No RNG usage detected",
+      "severity": "critical"
+    },
+    {
+      "file": "src/bitcoin/dlc/mod.rs",
+      "check": "Constant-Time Operations",
+      "description": "Crypto operations with non-constant-time comparisons",
+      "severity": "high"
+    },
+    {
+      "file": "src/bitcoin/dlc/mod.rs",
+      "check": "Modern Cryptographic Algorithms",
+      "description": "Using insecure algorithms: DES",
+      "severity": "high"
+    },
+    {
+      "file": "src/bitcoin/dlc/oracle.rs",
+      "check": "Secure RNG Usage",
+      "description": "No RNG usage detected",
+      "severity": "critical"
+    },
+    {
+      "file": "src/bitcoin/dlc/oracle.rs",
+      "check": "Constant-Time Operations",
+      "description": "Crypto operations with non-constant-time comparisons",
+      "severity": "high"
+    },
+    {
+      "file": "src/bitcoin/dlc/oracle.rs",
+      "check": "Modern Cryptographic Algorithms",
+      "description": "Using insecure algorithms: DES",
+      "severity": "high"
+    },
+    {
+      "file": "src/bitcoin/dlc/oracle.rs",
+      "check": "Hardcoded Secrets",
+      "description": "Potential hardcoded secret or key detected",
+      "severity": "critical"
+    }
+  ]
+}

@@ -1,0 +1,129 @@
+# Bitcoin Protocol Security Query Suite
+# [AIR-3][AIS-3][AIT-2][BPC-3]
+
+# Import standard query packs
+- import: codeql-suites/javascript-security-extended.qls
+  from: codeql-javascript
+- import: codeql-suites/rust-security-extended.qls
+  from: codeql-rust
+
+# Bitcoin-specific queries
+- description: "Bitcoin Cryptography Implementation Checks"
+  queries:
+    - include:
+        id: js/insufficient-key-size
+        tags:
+          - security
+          - cryptography
+    - include:
+        id: js/insufficient-entropy
+        tags:
+          - security
+          - cryptography
+    - include:
+        id: js/insecure-randomness
+        tags:
+          - security
+          - cryptography
+    - include: 
+        id: js/hardcoded-credentials
+        tags:
+          - security
+    - include:
+        id: js/reflected-xss
+        tags:
+          - security
+    - include:
+        id: js/command-line-injection
+        tags:
+          - security
+
+# Custom queries for Bitcoin protocol security
+- description: "Bitcoin Protocol Validation Checks"
+  queries:
+    # Custom queries for the Bitcoin Development Framework v2.5
+    - include:
+        id: js/taproot-signing-validation
+        tags:
+          - security
+          - crypto
+          - bitcoin
+    - include:
+        id: js/psbt-sanitization
+        tags:
+          - security
+          - bitcoin
+    - include:
+        id: js/dlc-oracle-validation
+        tags:
+          - security
+          - bitcoin
+          - oracle
+    - include:
+        id: js/lightning-payment-security
+        tags:
+          - security
+          - bitcoin
+          - lightning
+    - include:
+        id: js/constant-time-operations
+        tags:
+          - security
+          - timing-attack
+    - include: 
+        id: rs/timing-attack
+        tags:
+          - security
+          - cryptography
+
+# Time complexity checks
+- description: "Performance and Resource Management"
+  queries:
+    - include:
+        id: js/resource-exhaustion
+        tags:
+          - security
+          - performance
+    - include:
+        id: js/polynomial-redos
+        tags:
+          - security
+          - performance
+    - include:
+        id: rs/memory-exhaustion
+        tags:
+          - security
+          - performance
+
+# Input validation for cryptocurrency amounts
+- description: "Transaction and Amount Validation"
+  queries:
+    - include:
+        id: js/incomplete-input-sanitization
+        tags:
+          - security
+    - include:
+        id: js/unsafe-numeric-cast
+        tags:
+          - security
+    - include:
+        id: js/implicit-number-conversion
+        tags:
+          - security
+          - accuracy
+
+# Security queries for the MCP server
+- description: "MCP Server Security Checks"
+  queries:
+    - include:
+        id: js/prototype-pollution
+        tags:
+          - security
+    - include:
+        id: js/unsafe-deserialization
+        tags:
+          - security
+    - include:
+        id: js/request-forgery
+        tags:
+          - security 

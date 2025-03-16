@@ -1,0 +1,93 @@
+# CodeQL Configuration for Bitcoin Development Framework v2.5
+# [AIR-3][AIS-3][BPC-3]
+
+name: "Anya Bitcoin CodeQL Configuration"
+
+disable-default-queries: false
+
+queries:
+  # Include all default queries with custom security-focused queries
+  - uses: security-and-quality
+  # Bitcoin-specific security queries
+  - name: Bitcoin Protocol Security
+    uses: ./anya-core/codeql/bitcoin-protocol-security.qls
+  - name: Cryptographic Algorithm Validation
+    uses: ./anya-core/codeql/crypto-validation.qls
+  # Extended security queries
+  - uses: security-extended
+
+paths:
+  # Primary focus on Bitcoin implementation
+  - src/bitcoin
+  - scripts/bitcoin
+  # Infrastructure components that interact with Bitcoin
+  - src/infrastructure/bitcoin
+  - src/services/bitcoin
+  # Interface implementations
+  - src/interface/bitcoin
+  # Core implementations
+  - core/bitcoin
+  - core/cryptography
+  # Exclude test files and mock data
+  - '!**/test/**'
+  - '!**/tests/**'
+  - '!**/mock/**'
+  - '!**/mocks/**'
+  - '!**/fixtures/**'
+
+path-classifiers:
+  # Classify important cryptographic code for enhanced scrutiny
+  crypto:
+    - src/bitcoin/taproot.rs
+    - src/bitcoin/protocol.rs
+    - src/bitcoin/dlc/**/*.rs
+    - scripts/bitcoin/mcp-server.js
+    - '**/crypto/**/*.rs'
+    - '**/key/**/*.rs'
+    - '**/signature/**/*.rs'
+  
+  # Classify high security areas
+  security:
+    - src/bitcoin/validation.rs
+    - src/security/**/*.rs
+    - src/bitcoin/wallet/**/*.rs
+    - '**/auth/**/*.rs'
+
+query-filters:
+  # Exclude some queries that aren't relevant to our codebase
+  - exclude:
+      id: js/angular/disabling-sce
+  - exclude:
+      id: js/react/security/audit/react-no-refs
+  - exclude:
+      id: js/insecure-jquery-plugin
+
+# Specialized security analysis for cryptographic implementations
+security-severity-levels:
+  - name: critical
+    severity: 10.0
+    paths:
+      - crypto
+      - security
+  - name: high
+    severity: 8.0
+    paths:
+      - src/bitcoin
+      - scripts/bitcoin
+  - name: medium
+    severity: 5.0
+    paths:
+      - core/bitcoin
+  - name: low
+    severity: 2.0
+
+# Bitcoin Development Framework v2.5 specific settings
+bitcoin-framework:
+  compliance-level: BPC-3
+  validation:
+    - taproot-implementations
+    - psbt-handling
+    - schnorr-signatures
+    - lightning-protocols
+    - dlc-implementations
+    

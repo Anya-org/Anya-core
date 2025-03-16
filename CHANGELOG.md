@@ -1,6 +1,97 @@
-# Changelog
+# Changelog for Anya Core
+
+[AIR-3][AIS-3][BPC-3][AIT-3][RES-3]
 
 All notable changes to the Anya Core project will be documented in this file.
+
+## [Unreleased]
+
+### Added
+
+- Enhanced Bitcoin protocol security validation framework
+- CodeQL integration for automated security analysis
+- Comprehensive cryptographic validation system
+- Detailed security workflow test report with issue tracking
+- TODO updates based on security testing findings
+- BIP-341 (Taproot) implementation for Bitcoin core integration
+- Constant-time cryptographic operations utility module
+- Secure random number generator implementation (replacing Math.random())
+- Modern symmetric encryption module (AES-256 and ChaCha20-Poly1305)
+- Secure key generator for JavaScript Bitcoin implementations
+- SPV (Simplified Payment Verification) implementation with secure cryptographic operations
+- Secure Merkle proof verification with constant-time comparison operations
+
+### Changed
+
+- Improved script directory organization for security focus
+- Updated documentation to reflect Bitcoin Development Framework v2.5 compliance
+- Enhanced TODO list with critical security fixes based on test results
+- Prioritized cryptographic implementation fixes
+- Replaced insecure DES algorithm with modern alternatives (AES-256, ChaCha20)
+- Updated encryption algorithms in HSM modules to remove legacy TripleDesCbc
+- Implemented constant-time comparison operations for cryptographic functions
+- Enhanced security of Bitcoin Taproot implementation
+- Improved Bitcoin MCP server with secure SPV verification implementation
+- Updated verifyBitcoinSPV function with proper Merkle path verification and constant-time comparisons
+
+### Removed
+
+- Redundant and deprecated security scripts
+- Legacy test implementation files
+- DES key type and algorithm from HSM provider
+- TripleDesCbc encryption algorithm
+- Insecure Merkle proof verification implementation
+
+### Security
+
+- Identified critical RNG vulnerabilities in cryptographic implementations
+- Found insecure algorithm usage (DES) that needs replacement
+- Detected non-constant-time operations in cryptographic functions
+- Discovered potential hardcoded secrets in DLC oracle implementation
+- Fixed timing attack vulnerabilities in cryptographic comparisons
+- Replaced insecure random number generation with cryptographically secure alternatives
+- Modernized encryption algorithms across all security modules
+- Implemented BIP-340 (Schnorr) and BIP-341 (Taproot) with security best practices
+- Enhanced JavaScript components with secure RNG alternatives to Math.random()
+- Improved SPV verification with proper double-SHA256 implementation and constant-time comparisons
+- Enhanced Bitcoin payment verification with secure cryptographic operations
+
+## [0.9.5] - 2025-03-16
+
+### Added
+
+- Bitcoin MCP server security analysis script
+- Bitcoin BIP compliance validation script
+- PowerShell script for comprehensive CodeQL analysis
+- Cryptographic validation framework for Bitcoin operations
+- SECURITY_CODEQL.md documentation for security analysis
+- AI labeling compliance for all security components [AIR-3][AIS-3][BPC-3][AIT-3][RES-3]
+- Comprehensive workflow testing and issue tracking
+
+### Changed
+
+- Restructured scripts directory for better organization
+- Updated scripts README.md with security focus
+- Enhanced documentation with proper AI labeling
+- Updated TODO.md with security implementation priorities
+
+### Removed
+
+- Redundant security scripts and empty files
+- Deprecated test implementation files
+- Legacy documentation scripts
+
+### Fixed
+
+- Security validation for Taproot (BIP-341) implementation
+- Performance issues in cryptographic validation
+
+### Security
+
+- Implemented basic security validation mechanisms
+- Created framework for BIP compliance validation
+- Established cryptographic validation methodology
+- Identified security gaps through comprehensive workflow testing
 
 ## [1.4.0] - 2024-12-27
 

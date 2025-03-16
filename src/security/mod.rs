@@ -84,6 +84,9 @@ use log::{debug, error, info, warn};
 
 // Re-export HSM module
 pub mod hsm;
+pub mod constant_time;
+pub mod crypto;
+pub mod auth;
 
 // Export HSM manager and related types
 pub use hsm::{
