@@ -1,0 +1,18 @@
+name: Update AI Labelling
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  update-labels:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Process commit and update ai_labelling.md
+        run: cargo run --bin anya_validator -- update-labels
+      - name: Commit changes
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: "[DOC][AIS-3][MRG] Update AI labelling"
+          file_pattern: ai_labelling.md 
