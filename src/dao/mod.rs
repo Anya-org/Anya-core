@@ -200,4 +200,10 @@ impl DAOManager {
         
         metrics
     }
-} 
+}
+
+pub mod governance;
+pub mod legal;
+pub mod voting;
+
+pub use governance::{DaoGovernance, DaoLevel, GovernanceError}; 

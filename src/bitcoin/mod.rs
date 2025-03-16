@@ -638,5 +638,12 @@ pub mod adapters {
                 .map_err(|_| "Failed to convert signature")
         }
     }
-} 
+}
+
+pub mod protocol;
+pub mod taproot;
+pub mod validation;
+
+pub use protocol::{BitcoinProtocol, BPCLevel, BitcoinError};
+pub use taproot::TaprootValidator; 
 

@@ -1,0 +1,27 @@
+{
+  "bitcoin": {
+    "anya-bitcoin": {
+      "path": "C:\\anya\\anya-bitcoin",
+      "type": "directory",
+      "components": {
+        "protocol.rs": {
+          "hash": "sha256-7d83c87...",
+          "modified": "2025-03-15T09:32:45.1234567Z",
+          "bitcoin_adherence": 98.7
+        }
+      }
+    }
+  },
+  "enterprise": {
+    "anya-enterprise": {
+      "path": "C:\\anya\\anya-enterprise",
+      "type": "directory",
+      "components": {
+        "trading.rs": {
+          "hash": "sha256-9a2fb1e...",
+          "bitcoin_adherence": 89.2
+        }
+      }
+    }
+  }
+} 

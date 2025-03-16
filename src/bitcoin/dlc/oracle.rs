@@ -4,6 +4,7 @@ use std::collections::HashMap;
 use chrono::{DateTime, Utc};
 use serde::{Serialize, Deserialize};
 use bitcoin::secp256k1::{PublicKey, Signature};
+use thiserror::Error;
 
 use crate::common::error::AnyaResult;
 
@@ -235,4 +236,116 @@ impl OracleClient {
         // Implementation goes here
         unimplemented!("Attestation retrieval not yet implemented")
     }
+}
+
+/// Parameters for oracle attestation
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct OracleAttestationParams {
+    /// Commitment for the oracle
+    pub commitment: String,
+    
+    /// Oracle public key
+    pub oracle_pubkey: PublicKey,
+    
+    /// MuSig aggregated public key
+    pub musig_pubkey: PublicKey,
+    
+    /// Schnorr signature parameters
+    pub schnorr_params: SchnorrParams,
+}
+
+/// Schnorr signature parameters for privacy-preserving DLCs
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SchnorrParams {
+    /// R value for Schnorr
+    pub r_value: PublicKey,
+    
+    /// s value for Schnorr
+    pub s_value: Vec<u8>,
+}
+
+/// Error type for Oracle operations
+#[derive(Debug, Error)]
+pub enum Error {
+    #[error("Oracle error: {0}")]
+    OracleError(String),
+    
+    #[error("Serialization error: {0}")]
+    SerializationError(String),
+    
+    #[error("Signature error: {0}")]
+    SignatureError(String),
+}
+
+/// Non-interactive oracle pattern implementation
+/// According to BDF v2.5 Privacy-Preserving Architecture requirement 2
+pub fn implement_non_interactive_oracle(
+    commitment: &str, // 0x8f3a... (Taproot address) 
+    oracle_pubkey: &PublicKey
+) -> Result<OracleAttestationParams, Error> {
+    // Implement non-interactive oracle pattern
+    // Ensures transaction indistinguishability
+    
+    // Transaction Flow implementation:
+    // 1. Commitment: Using Taproot address
+    let taproot_commitment = commitment.to_string();
+    
+    // 2. Oracle Signature: Schnorr-based
+    let schnorr_params = SchnorrParams {
+        r_value: create_r_point()?,
+        s_value: vec![0; 32], // Placeholder, would be actual s value
+    };
+    
+    // 3. Execution: 2-of-2 MuSig
+    let musig_pubkey = create_musig_key(oracle_pubkey)?;
+    
+    Ok(OracleAttestationParams {
+        commitment: taproot_commitment,
+        oracle_pubkey: *oracle_pubkey,
+        musig_pubkey,
+        schnorr_params,
+    })
+}
+
+/// Create an R point for Schnorr signatures
+fn create_r_point() -> Result<PublicKey, Error> {
+    // Implementation would generate a proper R point
+    // This is a placeholder
+    Err(Error::OracleError("Not yet implemented".to_string()))
+}
+
+/// Create a MuSig aggregated key
+fn create_musig_key(oracle_pubkey: &PublicKey) -> Result<PublicKey, Error> {
+    // Implementation would create actual MuSig key
+    // This is a placeholder
+    Err(Error::OracleError("Not yet implemented".to_string()))
+}
+
+/// Create an oracle with non-interactive pattern support
+pub fn create_privacy_preserving_oracle(name: &str, endpoint: &str) -> Result<Oracle, Error> {
+    // Create properties with privacy features enabled
+    let mut properties = HashMap::new();
+    properties.insert("non_interactive".to_string(), "true".to_string());
+    properties.insert("schnorr_signatures".to_string(), "true".to_string());
+    properties.insert("musig_support".to_string(), "true".to_string());
+    
+    // Implementation would create an actual keypair
+    // This is a placeholder
+    let public_key = oracle_pubkey_from_string("02aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")?;
+    
+    let info = OracleInfo {
+        name: name.to_string(),
+        public_key,
+        endpoint: endpoint.to_string(),
+        properties,
+    };
+    
+    Ok(Oracle::new(info))
+}
+
+/// Parse an oracle public key from string
+fn oracle_pubkey_from_string(pubkey_hex: &str) -> Result<PublicKey, Error> {
+    // Implementation would parse an actual public key
+    // This is a placeholder
+    Err(Error::OracleError("Not yet implemented".to_string()))
 } 
