@@ -4,9 +4,11 @@ mod web5_tests;
 mod ml_tests;
 mod system_tests;
 mod compliance;
+mod unified_test;
 
 use clap::{App, Arg, SubCommand};
 use log::{info, error};
+use unified_test::{UnifiedTestRunner, UnifiedTestConfig};
 
 fn main() {
     // Initialize testing environment
@@ -14,6 +16,24 @@ fn main() {
         .version("3.1.0")
         .author("Anya-Core Team")
         .about("BPC-3 compliant testing framework")
+        .arg(Arg::with_name("rpc-endpoint")
+            .long("rpc-endpoint")
+            .value_name("URL")
+            .help("Bitcoin RPC endpoint URL")
+            .takes_value(true))
+        .arg(Arg::with_name("report-dir")
+            .long("report-dir")
+            .value_name("DIR")
+            .help("Directory for test reports")
+            .default_value("reports")
+            .takes_value(true))
+        .arg(Arg::with_name("no-reports")
+            .long("no-reports")
+            .help("Disable report generation"))
+        .arg(Arg::with_name("verbose")
+            .short('v')
+            .long("verbose")
+            .help("Enable verbose output"))
         .subcommand(SubCommand::with_name("component")
             .about("Test specific components")
             .arg(Arg::with_name("component")
@@ -25,75 +45,93 @@ fn main() {
             .about("Verify compliance with standards")
             .arg(Arg::with_name("standard")
                 .help("Standard to verify: BPC-3, DAO-4, AIS-3, etc.")))
+        .subcommand(SubCommand::with_name("unified")
+            .about("Run unified test suite")
+            .arg(Arg::with_name("components")
+                .long("components")
+                .value_name("COMPONENTS")
+                .help("Comma-separated list of components to test")
+                .takes_value(true)))
         .get_matches();
 
+    // Configure the test runner
+    let mut config = UnifiedTestConfig {
+        bitcoin_rpc_url: matches.value_of("rpc-endpoint").unwrap_or("").to_string(),
+        generate_reports: !matches.is_present("no-reports"),
+        report_dir: matches.value_of("report-dir").unwrap_or("reports").to_string(),
+        verbose: matches.is_present("verbose"),
+        ..Default::default()
+    };
+
+    // Process subcommands
     if let Some(matches) = matches.subcommand_matches("component") {
         let component = matches.value_of("component").unwrap();
-        match component {
-            "bitcoin" => run_bitcoin_tests(),
-            "dao" => run_dao_tests(),
-            "web5" => run_web5_tests(),
-            "ml" => run_ml_tests(),
-            _ => {
-                error!("Unknown component: {}", component);
-                std::process::exit(1);
+        config.components = vec![component.to_string()];
+        run_unified_tests(config);
+    } else if let Some(_) = matches.subcommand_matches("system") {
+        config.components = vec!["system".to_string()];
+        run_unified_tests(config);
+    } else if let Some(matches) = matches.subcommand_matches("compliance") {
+        config.components = vec!["compliance".to_string()];
+        if let Some(standard) = matches.value_of("standard") {
+            // Filter to just the requested standard
+            match standard {
+                "BPC-3" | "bpc3" => config.components = vec!["bpc3_compliance".to_string()],
+                "DAO-4" | "dao4" => config.components = vec!["dao4_compliance".to_string()],
+                "AIS-3" | "ais3" => config.components = vec!["ais3_compliance".to_string()],
+                _ => {
+                    error!("Unknown standard: {}", standard);
+                    std::process::exit(1);
+                }
             }
         }
-    } else if let Some(_) = matches.subcommand_matches("system") {
-        run_system_tests();
-    } else if let Some(matches) = matches.subcommand_matches("compliance") {
-        let standard = matches.value_of("standard").unwrap_or("all");
-        verify_compliance(standard);
+        run_unified_tests(config);
+    } else if let Some(matches) = matches.subcommand_matches("unified") {
+        if let Some(components) = matches.value_of("components") {
+            config.components = components.split(',').map(String::from).collect();
+        }
+        run_unified_tests(config);
     } else {
-        // Default behavior: run all tests
-        run_all_tests();
+        // Default behavior: run all tests using unified test runner
+        run_unified_tests(config);
     }
 }
 
-fn run_bitcoin_tests() {
-    info!("Running Bitcoin component tests (BPC-3 compliance)...");
-    bitcoin_tests::run_all();
-}
-
-fn run_dao_tests() {
-    info!("Running DAO component tests (DAO-4 compliance)...");
-    dao_tests::run_all();
-}
-
-fn run_web5_tests() {
-    info!("Running Web5 component tests...");
-    web5_tests::run_all();
-}
-
-fn run_ml_tests() {
-    info!("Running ML component tests...");
-    ml_tests::run_all();
-}
-
-fn run_system_tests() {
-    info!("Running full system integration tests...");
-    system_tests::run_all();
-}
-
-fn verify_compliance(standard: &str) {
-    info!("Verifying compliance with {}...", standard);
-    match standard {
-        "BPC-3" => compliance::verify_bpc3(),
-        "DAO-4" => compliance::verify_dao4(),
-        "AIS-3" => compliance::verify_ais3(),
-        "all" => compliance::verify_all(),
-        _ => {
-            error!("Unknown standard: {}", standard);
+fn run_unified_tests(config: UnifiedTestConfig) {
+    info!("Running unified tests with components: {}", config.components.join(", "));
+    
+    match UnifiedTestRunner::new(config) {
+        Ok(mut runner) => {
+            match runner.run_all_tests() {
+                Ok(results) => {
+                    // Prompt for configuration update if tests passed
+                    if results.failed.is_empty() {
+                        println!("Would you like to update your Anya-Core configuration based on test results? [y/N]");
+                        let mut input = String::new();
+                        std::io::stdin().read_line(&mut input).ok();
+                        if input.trim().to_lowercase() == "y" {
+                            match runner.update_config() {
+                                Ok(_) => println!("✅ Configuration updated successfully."),
+                                Err(e) => {
+                                    error!("Failed to update configuration: {}", e);
+                                }
+                            }
+                        }
+                    }
+                    
+                    if !results.failed.is_empty() {
+                        std::process::exit(1);
+                    }
+                },
+                Err(e) => {
+                    error!("Failed to run tests: {}", e);
+                    std::process::exit(1);
+                }
+            }
+        },
+        Err(e) => {
+            error!("Failed to initialize test runner: {}", e);
             std::process::exit(1);
         }
     }
-}
-
-fn run_all_tests() {
-    run_bitcoin_tests();
-    run_dao_tests();
-    run_web5_tests();
-    run_ml_tests();
-    run_system_tests();
-    verify_compliance("all");
 } 
