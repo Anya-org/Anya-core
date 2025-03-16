@@ -22,3 +22,14 @@ mod tests {
         assert!(init().is_ok());
     }
 }
+
+#[cfg(feature = "enterprise")]
+pub fn process_enterprise_tx(tx: BitcoinTransaction) -> Result<()> {
+    // New protocol check
+    if !tx.is_protocol_compliant() {
+        return Err(EnterpriseError::ProtocolViolation);
+    }
+    
+    // Existing processing logic
+    internal_tx_processor(tx)
+}

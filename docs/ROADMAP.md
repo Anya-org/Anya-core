@@ -1,96 +1,87 @@
 <!-- markdownlint-disable MD013 line-length -->
 
-# Anya Enterprise Platform Roadmap
+# Anya-Core Project Roadmap
 
-## Current Status (Phase 2 In Progress)
+## Current Version: 2.5.0 (BDF v2.5 Compliant)
 
-### Core Architecture
+Last Updated: 2024-05-01
 
-- ✅ Hexagonal Architecture Implementation
-- ✅ Advanced Error Handling
-- ✅ Circuit Breaker Pattern
-- ✅ Caching Layer
-- ✅ Telemetry System
-- ✅ Health Checking
+## Completed Milestones
 
-### Machine Learning
+### ✅ Core Bitcoin Protocol Integration (BPC-3)
 
-- ✅ Advanced Models
-- 🔄 NPU/RISC-V Integration
-- ✅ Pipeline Optimization
-- 🔄 Revenue Analysis
-- 🔄 Federated Learning
+- Full BIP-341/342 (Taproot) implementation
+- PSBT (BIP-174) support for transaction creation
+- BIP-370 partial support for advanced operations
+- Miniscript integration for smart contract execution
 
-### Blockchain Integration
+### ✅ DAO Governance Framework (DAO-4)
 
-- ✅ Bitcoin Core
-- 🔄 Lightning Network
-- 🔄 DeFi Capabilities
-- ⏳ Privacy Features
-- ✅ Taproot Support
+- Quadratic voting mechanism
+- Cross-chain governance capabilities
+- Legal framework integration
+- Delegation system with power factors
 
-## Phase 2: Advanced Features (In Progress)
+### ✅ Hexagonal Architecture Implementation
 
-### 1. Enhanced Machine Learning (Q1 2024)
+- Port definitions for all core interfaces
+- Adapter implementations for Bitcoin Core
+- Clean separation of core logic and protocols
+- Prometheus metrics exposure
 
-Advanced anomaly detection
-Automated model optimization
+### ✅ Layer 2 Integration
 
-- ✅ Real-time prediction pipelines (100%)
-- 🔄 Enhanced federated learning (60%)
-- 🔄 Custom NPU optimizations (40%)
+- Lightning Network support
+- RSK sidechain bridge
+- Liquid sidechain integration
+- RGB protocol for token issuance
+- Taproot Assets implementation
 
-### 2. Security Enhancements (Q1-Q2 2024)
+## Current Work (Q2-Q3 2024)
 
-Advanced HSM integration
-Enhanced privacy features
+### 🔄 Advanced Security Features
 
-- 🔄 Post-quantum cryptography (70%)
-- 🔄 Zero-knowledge systems (50%)
-- ✅ Advanced audit logging (90%)
+- HSM integration improvements
+- Multi-signature governance operations
+- Advanced audit trail implementation
+- Cold storage integration
 
-### 3. Blockchain Expansion (Q2 2024)
+### 🔄 System Awareness Components
 
-Comprehensive Bitcoin integration
-Advanced smart contract capability
+- Real-time network monitoring
+- Fee spike detection
+- 51% attack detection
+- Mempool analysis
 
-- ✅ Bitcoin tokenomics implementation (100%)
-- 🔄 Rust migration for core components (70%)
-- 🔄 DEX integration with token mechanism (25%)
-- ⏳ Cross-chain interoperability (0%)
+### 🔄 Cross-Chain Interoperability
 
-### 4. Mobile Integration (Q2-Q3 2024)
+- Enhanced bridge security
+- Multi-chain transaction validation
+- DLC oracle improvements
+- Non-interactive oracle patterns
 
-React Native implementation
-Mobile wallet capability
+## Future Roadmap (Q4 2024 - Q2 2025)
 
-- ⏳ React Native migration (10%)
-- ⏳ Mobile-specific Bitcoin features (5%)
-- ⏳ Offline transaction signing (0%)
-- ⏳ Mobile DAO controls (0%)
+### 📅 Performance Optimization
 
-## Phase 3: System Optimization (Q3 2024)
+- UTXO management improvements
+- Transaction batching
+- Signature aggregation
+- Fee optimization
 
-### 1. Performance Optimization
+### 📅 Mobile Integration
 
-- ⏳ Memory usage reduction
-- ⏳ End-to-end benchmarking suite
-- ⏳ Cross-platform performance parity
-- ⏳ Optimized WebAssembly compilation
+- React Native SDK
+- Mobile wallet integration
+- Offline signing capabilities
+- QR code-based PSBT exchange
 
-### 2. Advanced Testing Framework
+### 📅 Enterprise Features
 
-- 🔄 Sectional testing implementation (60%)
-- 🔄 Automated milestone tracking (40%)
-- ⏳ Visual regression testing
-- ⏳ Continuous performance monitoring
-
-### 3. Reporting and Analytics
-
-- ⏳ Real-time system health dashboard
-- ⏳ Combined metrics from all integrations
-- ⏳ Predictive capacity planning
-- ⏳ Anomaly detection for system metrics
+- Multi-tenant architecture
+- Advanced access control
+- Regulatory compliance tooling
+- Automated reporting
 
 ## Development Process
 
