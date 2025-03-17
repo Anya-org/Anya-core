@@ -1,0 +1,341 @@
+{
+  "timestamp": "2025-03-16T13:14:25.878Z",
+  "complianceLevel": "BPC-2",
+  "overallCompliance": false,
+  "standards": [
+    {
+      "id": "BIP-340",
+      "name": "Schnorr Signatures",
+      "description": "Schnorr signature scheme for Bitcoin",
+      "requiredPatterns": {
+        "passed": [
+          "verify",
+          "schnorr",
+          "signature"
+        ],
+        "failed": [
+          "schnorr",
+          "signature"
+        ]
+      },
+      "bestPractices": {
+        "passed": [
+          "auxiliary_data",
+          "nonce_generation",
+          "constant-time"
+        ],
+        "failed": [
+          "auxiliary_data",
+          "nonce_generation",
+          "constant-time"
+        ]
+      },
+      "fileResults": [
+        {
+          "file": "src/bitcoin/taproot.rs",
+          "found": true,
+          "patterns": {
+            "required": {
+              "passed": [
+                "verify"
+              ],
+              "failed": [
+                "schnorr",
+                "signature"
+              ]
+            },
+            "bestPractices": {
+              "passed": [],
+              "failed": [
+                "auxiliary_data",
+                "nonce_generation",
+                "constant-time"
+              ]
+            }
+          }
+        },
+        {
+          "file": "scripts/bitcoin/mcp-server.js",
+          "found": true,
+          "patterns": {
+            "required": {
+              "passed": [
+                "schnorr",
+                "signature",
+                "verify"
+              ],
+              "failed": []
+            },
+            "bestPractices": {
+              "passed": [
+                "auxiliary_data",
+                "nonce_generation",
+                "constant-time"
+              ],
+              "failed": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "BIP-341",
+      "name": "Taproot",
+      "description": "Taproot: SegWit version 1 spending rules",
+      "requiredPatterns": {
+        "passed": [
+          "taproot",
+          "SILENT_LEAF",
+          "merkle"
+        ],
+        "failed": [
+          "SILENT_LEAF",
+          "merkle"
+        ]
+      },
+      "bestPractices": {
+        "passed": [],
+        "failed": [
+          "key_path",
+          "script_path",
+          "p2tr"
+        ]
+      },
+      "fileResults": [
+        {
+          "file": "src/bitcoin/taproot.rs",
+          "found": true,
+          "patterns": {
+            "required": {
+              "passed": [
+                "taproot"
+              ],
+              "failed": [
+                "SILENT_LEAF",
+                "merkle"
+              ]
+            },
+            "bestPractices": {
+              "passed": [],
+              "failed": [
+                "key_path",
+                "script_path",
+                "p2tr"
+              ]
+            }
+          }
+        },
+        {
+          "file": "scripts/bitcoin/mcp-server.js",
+          "found": true,
+          "patterns": {
+            "required": {
+              "passed": [
+                "taproot",
+                "SILENT_LEAF",
+                "merkle"
+              ],
+              "failed": []
+            },
+            "bestPractices": {
+              "passed": [],
+              "failed": [
+                "key_path",
+                "script_path",
+                "p2tr"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "BIP-342",
+      "name": "Tapscript",
+      "description": "Validation of Taproot Scripts",
+      "requiredPatterns": {
+        "passed": [
+          "OP_CHECKSIG",
+          "OP_CHECKSIGVERIFY"
+        ],
+        "failed": [
+          "OP_CHECKSIG",
+          "OP_CHECKSIGVERIFY"
+        ]
+      },
+      "bestPractices": {
+        "passed": [
+          "OP_CHECKSIGADD",
+          "validation"
+        ],
+        "failed": [
+          "OP_CHECKSIGADD",
+          "validation"
+        ]
+      },
+      "fileResults": [
+        {
+          "file": "src/bitcoin/taproot.rs",
+          "found": true,
+          "patterns": {
+            "required": {
+              "passed": [],
+              "failed": [
+                "OP_CHECKSIG",
+                "OP_CHECKSIGVERIFY"
+              ]
+            },
+            "bestPractices": {
+              "passed": [],
+              "failed": [
+                "OP_CHECKSIGADD",
+                "validation"
+              ]
+            }
+          }
+        },
+        {
+          "file": "scripts/bitcoin/mcp-server.js",
+          "found": true,
+          "patterns": {
+            "required": {
+              "passed": [
+                "OP_CHECKSIG",
+                "OP_CHECKSIGVERIFY"
+              ],
+              "failed": []
+            },
+            "bestPractices": {
+              "passed": [
+                "OP_CHECKSIGADD",
+                "validation"
+              ],
+              "failed": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "BIP-174",
+      "name": "PSBT",
+      "description": "Partially Signed Bitcoin Transactions",
+      "requiredPatterns": {
+        "passed": [
+          "psbt",
+          "unsigned_tx",
+          "witness_utxo"
+        ],
+        "failed": []
+      },
+      "bestPractices": {
+        "passed": [
+          "bip32_derivation",
+          "partial_sig"
+        ],
+        "failed": []
+      },
+      "fileResults": [
+        {
+          "file": "scripts/bitcoin/mcp-server.js",
+          "found": true,
+          "patterns": {
+            "required": {
+              "passed": [
+                "psbt",
+                "unsigned_tx",
+                "witness_utxo"
+              ],
+              "failed": []
+            },
+            "bestPractices": {
+              "passed": [
+                "bip32_derivation",
+                "partial_sig"
+              ],
+              "failed": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "BIP-370",
+      "name": "PSBT Version 2",
+      "description": "PSBT Version 2 updates",
+      "requiredPatterns": {
+        "passed": [
+          "psbt",
+          "version: 2"
+        ],
+        "failed": []
+      },
+      "bestPractices": {
+        "passed": [
+          "tx_modifiable"
+        ],
+        "failed": []
+      },
+      "fileResults": [
+        {
+          "file": "scripts/bitcoin/mcp-server.js",
+          "found": true,
+          "patterns": {
+            "required": {
+              "passed": [
+                "psbt",
+                "version: 2"
+              ],
+              "failed": []
+            },
+            "bestPractices": {
+              "passed": [
+                "tx_modifiable"
+              ],
+              "failed": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "BIP-327",
+      "name": "MuSig2",
+      "description": "MuSig2: Simple Two-Round Schnorr Multi-Signatures",
+      "requiredPatterns": {
+        "passed": [
+          "musig",
+          "key_agg"
+        ],
+        "failed": []
+      },
+      "bestPractices": {
+        "passed": [
+          "stateless"
+        ],
+        "failed": []
+      },
+      "fileResults": [
+        {
+          "file": "scripts/bitcoin/mcp-server.js",
+          "found": true,
+          "patterns": {
+            "required": {
+              "passed": [
+                "musig",
+                "key_agg"
+              ],
+              "failed": []
+            },
+            "bestPractices": {
+              "passed": [
+                "stateless"
+              ],
+              "failed": []
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

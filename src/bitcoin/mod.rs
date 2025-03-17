@@ -645,5 +645,17 @@ pub mod taproot;
 pub mod validation;
 
 pub use protocol::{BitcoinProtocol, BPCLevel, BitcoinError};
-pub use taproot::TaprootValidator; 
+pub use taproot::TaprootValidator;
+
+// Export BIP-341 (Taproot) module
+pub mod bip341;
+
+// Re-export Taproot types
+pub use bip341::{TaprootMerkleTree, TaprootLeaf, TaprootSpend, TaprootOutput, Bip341Taproot};
+
+// Export SPV (Simplified Payment Verification) module
+pub mod spv;
+
+// Re-export SPV types
+pub use spv::{SpvProof, SpvError, verify_bitcoin_payment, verify_tx_inclusion, verify_merkle_proof};
 

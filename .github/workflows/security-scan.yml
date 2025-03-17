@@ -41,16 +41,80 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       security-events: write
+      contents: read
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v2
         with:
-          languages: 'rust'
+          languages: 'javascript, rust'
+          config-file: ./.github/codeql/codeql-config.yml
           
       - name: Build for Analysis
         uses: github/codeql-action/autobuild@v2
         
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
+
+  bitcoin-security-scan:
+    name: Bitcoin-Specific Security Scan
+    runs-on: ubuntu-latest
+    needs: code-scanning
+    permissions:
+      security-events: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          
+      - name: Install dependencies
+        run: |
+          npm install --production=false
+          
+      - name: Bitcoin Protocol Validation
+        run: |
+          echo "Running Bitcoin protocol security validation..."
+          node scripts/bitcoin/validate-security.js
+          
+      - name: Cryptographic Implementation Check
+        run: |
+          echo "Validating cryptographic implementations..."
+          node scripts/security/crypto-validation.js
+          
+      - name: BIP Standards Compliance Check
+        run: |
+          echo "Checking BIP standards compliance..."
+          node scripts/bitcoin/validate-bip-compliance.js
+          
+      - name: Check MCP Server Security
+        run: |
+          echo "Analyzing MCP server security..."
+          node scripts/security/analyze-mcp-server.js --file=scripts/bitcoin/mcp-server.js
+          
+      - name: Report Security Issues
+        if: failure()
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            if (fs.existsSync('security-report.json')) {
+              const report = JSON.parse(fs.readFileSync('security-report.json', 'utf8'));
+              const issues = report.issues || [];
+              if (issues.length > 0) {
+                github.rest.issues.create({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  title: 'Bitcoin Security Scan Issues',
+                  body: `Bitcoin security scan found ${issues.length} issues:\n\n` + 
+                    issues.map(issue => `- **${issue.severity}**: ${issue.description} in \`${issue.file}\``).join('\n')
+                });
+              }
+            }

@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 line-length -->
 
-[AIS-3][BPC-3][DAO-4]
+[AIS-3][BPC-3][DAO-3]
 # Security Architecture
 
 *Last Updated: 2024-03-10*

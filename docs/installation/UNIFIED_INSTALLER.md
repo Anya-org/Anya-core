@@ -1,6 +1,6 @@
 # Anya-Core Unified Installer
 
-[AIR-3][AIS-3][AIP-3][BPC-3][DAO-4]
+[AIR-3][AIS-3][AIP-3][BPC-3][DAO-3]
 
 This document describes the Anya-Core unified installer, which provides a seamless installation experience for all components of the Anya-Core platform.
 

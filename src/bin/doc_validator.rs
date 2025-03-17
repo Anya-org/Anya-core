@@ -1,4 +1,4 @@
-//! Documentation validator for Bitcoin compliance [AIS-3][BPC-3][DAO-4]
+//! Documentation validator for Bitcoin compliance [AIS-3][BPC-3][DAO-3]
 
 use anya_core::tools::markdown::{DocumentationValidator, DocError};
 use clap::{Parser, Subcommand};
@@ -7,7 +7,7 @@ use std::path::PathBuf;
 #[derive(Parser)]
 #[clap(
     name = "anya-doc-validator",
-    about = "Documentation validation tool [AIS-3][BPC-3][DAO-4]",
+    about = "Documentation validation tool [AIS-3][BPC-3][DAO-3]",
     version
 )]
 struct Cli {

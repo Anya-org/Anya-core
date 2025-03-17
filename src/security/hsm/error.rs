@@ -2,7 +2,7 @@
 //!
 //! This module provides comprehensive error types for HSM operations,
 //! audit logging, and security events.
-//! [AIR-4][AIS-4][AIM-4][AIP-4][RES-4]
+//! [AIR-3][AIS-3][AIM-3][AIP-3][RES-3]
 
 use std::fmt;
 use std::io;
