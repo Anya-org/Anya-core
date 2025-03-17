@@ -1,0 +1,53 @@
+name: Deploy to Server
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Set up known hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H 192.168.0.212 >> ~/.ssh/known_hosts
+
+      - name: Deploy to server
+        run: |
+          # Try to connect to the server
+          if ssh -o ConnectTimeout=10 anya@192.168.0.212 "echo 'Connection successful'"; then
+            echo "SSH connection established successfully"
+            
+            # Create directory if it doesn't exist
+            ssh anya@192.168.0.212 "mkdir -p /home/anya/git/anya-core"
+            
+            # Initialize a bare Git repository if it doesn't exist
+            ssh anya@192.168.0.212 "if [ ! -d /home/anya/git/anya-core.git ]; then mkdir -p /home/anya/git/anya-core.git && cd /home/anya/git/anya-core.git && git init --bare; fi"
+            
+            # Push the code
+            git remote add target ssh://anya@192.168.0.212/home/anya/git/anya-core.git || git remote set-url target ssh://anya@192.168.0.212/home/anya/git/anya-core.git
+            git push -f target ${{ github.ref_name }}
+            
+            # Set up the working copy
+            ssh anya@192.168.0.212 "cd /home/anya/git/anya-core.git && git --work-tree=/home/anya/git/anya-core --git-dir=/home/anya/git/anya-core.git checkout -f ${{ github.ref_name }}"
+            
+            # Run setup if needed
+            ssh anya@192.168.0.212 "cd /home/anya/git/anya-core && chmod +x scripts/*.sh && if [ -f scripts/setup.sh ]; then scripts/setup.sh; fi"
+            
+            echo "Deployment completed successfully!"
+          else
+            echo "Failed to connect to the server via SSH"
+            exit 1
+          fi 
