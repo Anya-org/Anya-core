@@ -98,7 +98,7 @@ Verify this DLC contract with oracle public key 03abc...
 
 ## AI Labelling Compliance
 
-All tools implemented in the MCP server follow the AI labelling guidelines specified in `AI_LABELLING.md`. The server has the following ratings:
+All tools implemented in the MCP server follow the AI labelling guidelines specified in `docs/standards/AI_LABELING.md`. The server has the following ratings:
 
 * **AIR-3**: Full AI-Readiness with structured data and well-documented interfaces
 * **AIS-3**: Full AI Security with comprehensive validation and threat modeling
@@ -149,6 +149,6 @@ When adding new tools to the MCP server:
 ## Related Documentation
 
 * [Bitcoin Development Framework v2.5](../docs/bitcoin-framework.md)
-* [AI Labelling Guidelines](../AI_LABELLING.md)
+* [AI Labelling Guidelines](../docs/standards/AI_LABELING.md)
 * [Hexagonal Architecture Requirements](../docs/hexagonal-architecture.md)
 * [Cursor MCP Documentation](https://docs.cursor.com/context/model-context-protocol) 

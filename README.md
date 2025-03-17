@@ -10,19 +10,18 @@ Web5 decentralized data management, and a Bitcoin-style DAO governance system.
 
 ![Anya Architecture](docs/images/anya_architecture.png)
 
-> **AI Labeling**: This project follows the [comprehensive AI Labeling System](AI_LABELLING.md)
+> **AI Labeling**: This project follows the [canonical AI Labeling System](docs/standards/AI_LABELING.md)
 > based on the Bitcoin Development Framework v2.5 standards. All components are labeled with
 > appropriate Core and Extended category labels.
 
 ## Documentation Quick Links
 
 - [Documentation Index](docs/INDEX.md) - Main documentation index
-- [System Architecture](docs/SYSTEM_MAP.md) - Complete system architecture
+- [System Architecture](SYSTEM_MAP.md) - Complete system architecture
 - [DAO System](docs/DAO_SYSTEM_GUIDE.md) - Comprehensive DAO documentation
 - [Tokenomics System](docs/TOKENOMICS_SYSTEM.md) - Bitcoin-style tokenomics
 - [Implementation Milestones](docs/IMPLEMENTATION_MILESTONES.md) - Project progress
-- [AI Labeling System](AI_LABELLING.md) - Component labeling standards
-- [AI Labeling Implementation](docs/AI_LABELING_IMPLEMENTATION.md) - Implementation status
+- [AI Labeling System](docs/standards/AI_LABELING.md) - Component labeling standards
 - [Installation Guide](docs/installation/README.md) - Installation instructions
 
 ## Licensing
@@ -252,7 +251,7 @@ clarinet test
 - [Testing Strategy](docs/TESTING.md)
 - [Checkpoint System](docs/CHECKPOINT_SYSTEM.md)
 - [Checkpoint Guide](docs/CHECKPOINT_GUIDE.md)
-- [AI and Component Labeling Guide](AI_LABELLING.md)
+- [AI and Component Labeling Guide](docs/standards/AI_LABELING.md)
 - [Implementation Milestones](docs/IMPLEMENTATION_MILESTONES.md)
 
 ### Deployment Documentation

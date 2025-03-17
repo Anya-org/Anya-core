@@ -79,7 +79,7 @@ function Show-Help {
     Write-Host "Available commit types:" -ForegroundColor Yellow
     Write-Host "  feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert"
     Write-Host ""
-    Write-Host "See AI_LABELLING.md for label requirements by component type"
+    Write-Host "See docs/standards/AI_LABELING.md for label requirements by component type"
 }
 
 # Process help request

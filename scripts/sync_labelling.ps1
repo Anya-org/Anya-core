@@ -1,7 +1,7 @@
 # sync_labelling.ps1
 #
 # PowerShell version of sync_labelling.py
-# Synchronizes AI_LABELLING.md across all repositories in the Anya ecosystem.
+# Synchronizes docs/standards/AI_LABELING.md across all repositories in the Anya ecosystem.
 # Ensures consistent labeling standards across the entire project.
 #
 # Usage: ./scripts/sync_labelling.ps1 [-Source repo] [-Target repos] [-CheckOnly] [-DryRun]
@@ -33,7 +33,7 @@ param(
 )
 
 # Constants
-$LABELLING_FILE = "AI_LABELLING.md"
+$LABELLING_FILE = "docs/standards/AI_LABELING.md"
 $COMMIT_RULES_FILE = "COMMIT_RULES.md"
 $LABEL_HISTORY_DIR = ".label_history"
 

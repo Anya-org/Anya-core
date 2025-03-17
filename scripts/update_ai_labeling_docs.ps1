@@ -11,12 +11,12 @@ Write-Host ""
 
 # Files to update with deprecation notices
 $filesToUpdate = @(
-    "docs/AI_labelling.md",
-    "docs/AI_LABELING.md",
-    "docs/AI_LABELING_IMPLEMENTATION.md",
+    "docs/docs/standards/AI_LABELING.md",
+    "docs/standards/AI_LABELING.md",
+    "docs/docs/standards/AI_LABELING.md",
     "docs/LABELLING_SYSTEM.md",
-    "AI_LABELLING.md",
-    "AI_LABELING_IMPLEMENTATION.md"
+    "docs/standards/AI_LABELING.md",
+    "docs/standards/AI_LABELING.md"
 )
 
 # Deprecation notice to add
