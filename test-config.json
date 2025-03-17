@@ -1,13 +1,4 @@
 {
-  "searchParams": {
-    "maxKeywords": 10,
-    "responseLimit": 50,
-    "indexPatterns": [
-      "creator",
-      "category",
-      "date-range"
-    ]
-  },
   "testTypes": [
     "basic",
     "compliance",
@@ -15,14 +6,35 @@
     "search",
     "indexing"
   ],
-  "testModules": [
-    "dao-core",
-    "dao-trait",
-    "governance-token",
-    "bitcoin-issuance",
-    "dex-adapter",
-    "token-economics"
+  "testPatterns": {
+    "bip-compliance": {
+      "patterns": [
+        "verify-taproot-signature",
+        "process-psbt"
+      ],
+      "required": true
+    }
+  },
+  "performanceBenchmarks": [
+    "proposal-creation",
+    "voting",
+    "token-transfers"
   ],
+  "complianceChecks": [
+    "BIP-341",
+    "BIP-174",
+    "BIP-342",
+    "BIP-370"
+  ],
+  "searchParams": {
+    "responseLimit": 50,
+    "indexPatterns": [
+      "creator",
+      "category",
+      "date-range"
+    ],
+    "maxKeywords": 10
+  },
   "integrationGroups": [
     {
       "modules": [
@@ -48,24 +60,12 @@
       "name": "liquidity"
     }
   ],
-  "complianceChecks": [
-    "BIP-341",
-    "BIP-174",
-    "BIP-342",
-    "BIP-370"
-  ],
-  "performanceBenchmarks": [
-    "proposal-creation",
-    "voting",
-    "token-transfers"
-  ],
-  "testPatterns": {
-    "bip-compliance": {
-      "required": true,
-      "patterns": [
-        "verify-taproot-signature",
-        "process-psbt"
-      ]
-    }
-  }
+  "testModules": [
+    "dao-core",
+    "dao-trait",
+    "governance-token",
+    "bitcoin-issuance",
+    "dex-adapter",
+    "token-economics"
+  ]
 }
