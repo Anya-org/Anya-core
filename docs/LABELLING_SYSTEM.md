@@ -68,7 +68,7 @@ Windows-compatible PowerShell version of the batch commit script.
 
 #### Python Version (`sync_labelling.py`)
 
-This script synchronizes the AI_LABELLING.md and COMMIT_RULES.md files across all repositories to ensure consistent labeling standards.
+This script synchronizes the docs/standards/AI_LABELING.md and COMMIT_RULES.md files across all repositories to ensure consistent labeling standards.
 
 ##### Usage:
 
@@ -108,7 +108,7 @@ Windows-compatible PowerShell version of the synchronization script.
 
 ### 3. GitHub Actions Workflow
 
-The `sync-labelling.yml` workflow automatically synchronizes labeling files whenever changes are made to `AI_LABELLING.md` or `COMMIT_RULES.md` in the main repository. It can also be manually triggered from the GitHub Actions tab.
+The `sync-labelling.yml` workflow automatically synchronizes labeling files whenever changes are made to `docs/standards/AI_LABELING.md` or `COMMIT_RULES.md` in the main repository. It can also be manually triggered from the GitHub Actions tab.
 
 ## Cross-Platform Compatibility
 
@@ -191,13 +191,13 @@ parent-directory/
 │   │   ├── sync_labelling.py
 │   │   ├── update_github_url.ps1
 │   │   └── update_github_url.sh
-│   └── AI_LABELLING.md
+│   └── docs/standards/AI_LABELING.md
 ├── anya-bitcoin/
 │   ├── .git/
-│   └── AI_LABELLING.md
+│   └── docs/standards/AI_LABELING.md
 ├── anya-web5/
 │   ├── .git/
-│   └── AI_LABELLING.md
+│   └── docs/standards/AI_LABELING.md
 └── ... other repositories
 ```
 
@@ -205,7 +205,7 @@ If your repositories are organized differently, use the `-RootDir` parameter to 
 
 ## Labeling System Details
 
-For detailed information about the labeling system itself, see [AI_LABELLING.md](../AI_LABELLING.md).
+For detailed information about the labeling system itself, see [docs/standards/AI_LABELING.md](../docs/standards/AI_LABELING.md).
 
 ## Label Integration Process
 
@@ -231,7 +231,7 @@ When updating components:
 
 To ensure consistent labeling across all repositories:
 
-1. **Update Master File**: Make changes to `AI_LABELLING.md` in the anya-core repository
+1. **Update Master File**: Make changes to `docs/standards/AI_LABELING.md` in the anya-core repository
 2. **Synchronize**: Run the synchronization script manually or let the GitHub Actions workflow handle it
 3. **Verify**: Check that all repositories have the updated labeling standards
 4. **Document**: Inform the team about any significant changes
@@ -299,7 +299,7 @@ CI/CD pipelines automatically:
 
 If label validation fails:
 
-1. Check the component type and required labels in `AI_LABELLING.md`
+1. Check the component type and required labels in `docs/standards/AI_LABELING.md`
 2. Ensure all required labels are included in the commit
 3. Verify the component meets the requirements for its labels
 4. Fix any issues and try again
@@ -389,7 +389,7 @@ python scripts/sync_labelling.py --target "anya-web5,anya-bitcoin" --dry-run
 
 ## Additional Resources
 
-- [AI Labeling Guide](../AI_LABELLING.md): Comprehensive AI labeling standards
+- [AI Labeling Guide](../docs/standards/AI_LABELING.md): Comprehensive AI labeling standards
 - [Commit Rules](../COMMIT_RULES.md): Rules for creating commits with labels
 - [Component Requirements](../docs/COMPONENT_REQUIREMENTS.md): Detailed requirements for each label level
 

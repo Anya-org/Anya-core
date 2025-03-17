@@ -136,7 +136,7 @@ When adding or modifying components, you must:
 When updating documentation:
 
 1. Add or update labels as needed
-2. Follow the [AI Labeling System](AI_LABELLING.md) guidelines
+2. Follow the [](docs/standards/AI_LABELING.md) guidelines
 3. Include `docs` type in commit messages
 4. Indicate label changes in commit message footers
 

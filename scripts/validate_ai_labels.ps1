@@ -342,4 +342,85 @@ if ($errorFiles -gt 0) {
 }
 else {
     exit 0
+}
+
+<#
+.SYNOPSIS
+    Validates AI labeling references across the codebase
+.DESCRIPTION
+    This script scans the codebase for references to outdated AI labeling files
+    and provides warnings about any files that need to be updated to reference
+    the canonical AI_LABELING.md file in docs/standards directory.
+.NOTES
+    Version:        1.0
+    Author:         Anya Core Team
+    Creation Date:  2025-03-20
+#>
+
+# Configuration
+$canonicalPathRelative = "docs/standards/AI_LABELING.md"
+$canonicalPathAbsolute = "$PSScriptRoot/../$canonicalPathRelative"
+$oldReferences = @(
+    "docs/standards/AI_LABELING.md",
+    "docs/docs/standards/AI_LABELING.md",
+    "docs/standards/AI_LABELING.md",
+    "docs/standards/AI_LABELING.md",
+    "docs/docs/standards/AI_LABELING.md"
+)
+
+# Check if canonical file exists
+if (-not (Test-Path $canonicalPathAbsolute)) {
+    Write-Error "Canonical AI labeling file not found at: $canonicalPathRelative"
+    exit 1
+}
+
+# Counters for reporting
+$totalFiles = 0
+$filesWithOldReferences = 0
+$totalOldReferences = 0
+
+Write-Host "`n📋 AI Labeling Reference Validator [AIR-3][AIS-3][BPC-3]`n" -ForegroundColor Cyan
+Write-Host "Scanning repository for outdated AI labeling references...`n"
+
+# Get all markdown, HTML, and code files
+$filesToScan = Get-ChildItem -Path "$PSScriptRoot/.." -Recurse -File -Include "*.md","*.html","*.js","*.ts","*.jsx","*.tsx","*.py","*.java","*.cs","*.go","*.rs","*.sh","*.ps1","*.sql" | 
+                Where-Object { -not $_.FullName.Contains("node_modules") -and -not $_.FullName.Contains(".git") }
+
+# Scan each file for old references
+foreach ($file in $filesToScan) {
+    $totalFiles++
+    $fileContent = Get-Content -Path $file.FullName -Raw
+    $foundOldReferences = @()
+    
+    foreach ($oldRef in $oldReferences) {
+        if ($fileContent -match [regex]::Escape($oldRef)) {
+            $foundOldReferences += $oldRef
+            $totalOldReferences++
+        }
+    }
+    
+    if ($foundOldReferences.Count -gt 0) {
+        $filesWithOldReferences++
+        $relativePath = $file.FullName.Replace("$PSScriptRoot\..\", "").Replace("\", "/")
+        
+        Write-Host "⚠️ File contains outdated AI labeling references: $relativePath" -ForegroundColor Yellow
+        Write-Host "   Found references to: $($foundOldReferences -join ', ')" -ForegroundColor Yellow
+        Write-Host "   Update to use canonical path: $canonicalPathRelative" -ForegroundColor Yellow
+        Write-Host ""
+    }
+}
+
+# Print summary
+Write-Host "📊 Summary:" -ForegroundColor Cyan
+Write-Host "   Total files scanned: $totalFiles" -ForegroundColor White
+Write-Host "   Files with outdated references: $filesWithOldReferences" -ForegroundColor $(if ($filesWithOldReferences -gt 0) { "Yellow" } else { "Green" })
+Write-Host "   Total outdated references found: $totalOldReferences" -ForegroundColor $(if ($totalOldReferences -gt 0) { "Yellow" } else { "Green" })
+Write-Host ""
+
+if ($totalOldReferences -eq 0) {
+    Write-Host "✅ No outdated AI labeling references found!" -ForegroundColor Green
+    exit 0
+} else {
+    Write-Host "⚠️ Please update all references to use the canonical AI labeling path: $canonicalPathRelative" -ForegroundColor Yellow
+    exit 0  # Non-zero exit code would be appropriate for CI/CD pipelines
 } 

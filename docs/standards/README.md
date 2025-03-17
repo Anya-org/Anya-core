@@ -1,6 +1,32 @@
-# Standards Documentation [AIR-3][AIS-3][BPC-3]
+# Anya Core Standards
 
-This directory contains canonical documentation of standards, architecture, and conventions used in the Anya Core project.
+[AIR-3][AIS-3][BPC-3]
+
+This directory contains the canonical standards documentation for the Anya Core project, in compliance with the Bitcoin Development Framework v2.5.
+
+## Available Standards
+
+- [AI Labeling System](AI_LABELING.md) - The authoritative AI labeling documentation (Version 3.0)
+
+## Implementation Requirements
+
+All components in the Anya Core codebase must adhere to these standards. When introducing new components or modifying existing ones, refer to these documents for guidance on labeling, security requirements, and architectural constraints.
+
+## Integration with Bitcoin Development Framework
+
+These standards are aligned with the Bitcoin Development Framework v2.5, ensuring proper implementation of:
+
+1. Protocol Adherence
+2. Privacy-Preserving Architecture
+3. Asset Management Standards
+
+## Versioning
+
+Standards are versioned with a date-based system (YYYY-MM-DD). When standards are updated, old versions are archived and the canonical documents are updated with clear migration guidelines.
+
+## Last Updated
+
+March 20, 2025
 
 ## Purpose
 
@@ -15,7 +41,6 @@ The standards documentation serves as the authoritative reference for:
 
 ### Core Standards
 
-- [AI Labeling System](AI_LABELING.md) - Official AI labeling conventions and guidelines
 - [Branch Structure](BRANCH_STRUCTURE.md) - Repository branch organization and conventions
 - [Hexagonal Architecture](HEXAGONAL_ARCHITECTURE.md) - Architecture principles
 

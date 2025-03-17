@@ -1,5 +1,5 @@
 pub fn update_ai_labelling_file(commit_info: &CommitInfo) -> Result<()> {
-    let mut content = std::fs::read_to_string("ai_labelling.md")?;
+    let mut content = std::fs::read_to_string("docs/standards/AI_LABELING.md")?;
     
     // Add new commit entry in chronological order
     let entry = format!(
@@ -15,6 +15,6 @@ pub fn update_ai_labelling_file(commit_info: &CommitInfo) -> Result<()> {
     // Insert at appropriate location
     // ...
     
-    std::fs::write("ai_labelling.md", content)?;
+    std::fs::write("docs/standards/AI_LABELING.md", content)?;
     Ok(())
 } 

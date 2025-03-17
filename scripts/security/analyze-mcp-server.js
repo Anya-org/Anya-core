@@ -176,7 +176,7 @@ const securityChecks = [
         return {
           passed: false,
           description: 'Missing or incomplete AI labeling according to project standards',
-          recommendation: 'Add proper AI labels according to the AI_LABELLING.md guidelines'
+          recommendation: 'Add proper AI labels according to the docs/standards/AI_LABELING.md guidelines'
         };
       }
       

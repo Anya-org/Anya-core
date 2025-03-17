@@ -2,7 +2,7 @@
 """
 sync_labelling.py
 
-Synchronizes AI_LABELLING.md across all repositories in the Anya ecosystem.
+Synchronizes docs/standards/AI_LABELING.md across all repositories in the Anya ecosystem.
 Ensures consistent labeling standards across the entire project.
 
 Usage: python sync_labelling.py [--source REPO] [--target REPOS] [--check-only] [--dry-run]
@@ -31,7 +31,7 @@ DEFAULT_REPOS = [
 ]
 
 # Labels file name
-LABELLING_FILE = "AI_LABELLING.md"
+LABELLING_FILE = "docs/standards/AI_LABELING.md"
 COMMIT_RULES_FILE = "COMMIT_RULES.md"
 
 # Directory for label history tracking
@@ -40,7 +40,7 @@ LABEL_HISTORY_DIR = ".label_history"
 def parse_args():
     """Parse command line arguments."""
     parser = argparse.ArgumentParser(
-        description="Synchronize AI_LABELLING.md and related files across repositories"
+        description="Synchronize docs/standards/AI_LABELING.md and related files across repositories"
     )
     parser.add_argument(
         "--source", 

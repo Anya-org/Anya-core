@@ -1,5 +1,11 @@
 <!-- markdownlint-disable MD013 line-length -->
 
+> **⚠️ DEPRECATION NOTICE ⚠️**
+>
+> This document is deprecated and will be removed in future versions.
+> Please use the canonical System Map documentation at [/SYSTEM_MAP.md](/SYSTEM_MAP.md).
+> The canonical document standardizes all system architecture documentation in compliance with the Bitcoin Development Framework v2.5.
+
 # Anya Core System Architecture
 
 ## Repository Structure

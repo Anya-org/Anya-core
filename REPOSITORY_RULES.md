@@ -24,7 +24,7 @@ All components must follow hexagonal architecture principles:
 
 ### 3. AI Labeling Requirements
 
-All code must include appropriate AI labels as defined in [AI_LABELLING.md](AI_LABELLING.md):
+All code must include appropriate AI labels as defined in [](docs/standards/AI_LABELING.md):
 
 ```rust
 /// [AIR-3][AIS-3][AIT-2][BPC-3] Taproot implementation
