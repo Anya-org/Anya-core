@@ -2,7 +2,7 @@
 
 # Anya-Core Testing Strategy
 
-[AIR-3][AIS-3][AIT-3][AIP-3][BPC-3][DAO-4]
+[AIR-3][AIS-3][AIT-3][AIP-3][BPC-3][DAO-3]
 
 This document outlines the comprehensive testing strategy for the Anya-Core platform, following the Bitcoin Development Framework v2.5 standards.
 

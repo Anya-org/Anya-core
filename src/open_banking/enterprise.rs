@@ -1,5 +1,5 @@
 // Enterprise Banking Module
-// [AIS-3][BPC-3][DAO-4]
+// [AIS-3][BPC-3][DAO-3]
 
 use crate::bitcoin::taproot::{TaprootSignature, verify_taproot_signatures};
 use crate::dao::governance::DaoGovernance;

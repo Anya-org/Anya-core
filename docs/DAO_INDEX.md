@@ -2,7 +2,7 @@
 
 # Anya DAO Documentation Index
 
-[AIS-3][BPC-3][DAO-4]
+[AIS-3][BPC-3][DAO-3]
 
 ## Core Documentation
 
@@ -47,7 +47,7 @@ This index serves as the central entry point to all Anya DAO documentation.
 
 - [AIS-3] Asset Issuance Standard v3
 - [BPC-3] Bitcoin Protocol Compliance v3
-- [DAO-4] Decentralized Autonomous Organization Standard v4
+- [DAO-3] Decentralized Autonomous Organization Standard v4
 
 *Last updated: 2025-02-24*
 

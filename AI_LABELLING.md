@@ -1,3 +1,12 @@
+<!-- markdownlint-disable MD013 line-length -->
+
+> **⚠️ DEPRECATION NOTICE ⚠️**
+> 
+> This document is deprecated and will be removed in future versions.
+> Please use the canonical AI labeling documentation at [docs/standards/AI_LABELING.md](docs/standards/AI_LABELING.md).
+> The canonical document standardizes all AI labeling formats and requirements.
+
+<!-- Original content below this line -->
 # AI Labelling System for Anya Project
 
 ## Labelling Format
@@ -366,3 +375,4 @@ Tests are tracked with the following format:
 - INT: Integration Test
 - TST: Testnet Test
 - MOK: Mock Test
+

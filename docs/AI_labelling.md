@@ -1,3 +1,12 @@
+<!-- markdownlint-disable MD013 line-length -->
+
+> **⚠️ DEPRECATION NOTICE ⚠️**
+> 
+> This document is deprecated and will be removed in future versions.
+> Please use the canonical AI labeling documentation at [docs/standards/AI_LABELING.md](docs/standards/AI_LABELING.md).
+> The canonical document standardizes all AI labeling formats and requirements.
+
+<!-- Original content below this line -->
 # AI Labelling Reference Guide \[AIR-3\]\[AIS-3\]
 
 <!-- markdownlint-disable MD013 line-length -->
@@ -163,3 +172,4 @@ Components may require multiple tags to fully describe their requirements:
 - v2.5 (2025-02-24): Updated tags for hexagonal architecture alignment
 - v2.6 (2025-03-01): Enhanced compliance requirements and added application examples
 - v2.7 (2025-03-12): Updated documentation and standardized tag usage across codebase
+

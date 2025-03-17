@@ -1,4 +1,4 @@
-//! Taproot (BIP-341/342) implementation [AIS-3][BPC-3][DAO-4]
+//! Taproot (BIP-341/342) implementation [AIS-3][BPC-3][DAO-3]
 
 use bitcoin::{Transaction, Script, ScriptBuf, TxOut};
 use thiserror::Error;
