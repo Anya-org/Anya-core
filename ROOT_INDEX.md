@@ -45,7 +45,7 @@ Welcome to the Anya Core documentation. This index will help you navigate the va
 - [API Documentation](docs/API.md) - API reference
 - [Contributing Guide](CONTRIBUTING.md) - How to contribute
 - [Checkpoint System](docs/CHECKPOINT_SYSTEM.md) - Development checkpoints
-- [AI Labeling System](AI_LABELLING.md) - Component labeling standards
+- [](docs/standards/AI_LABELING.md) - Component labeling standards
 
 ## Key Features at a Glance
 
@@ -106,4 +106,4 @@ Welcome to the Anya Core documentation. This index will help you navigate the va
 - [Issue Tracker](https://github.com/anya/anya-core/issues)
 - [GitHub Discussions](https://github.com/anya/anya-core/discussions)
 
-*This documentation follows the [AI Labeling System](AI_LABELLING.md) standards based on the Bitcoin Development Framework v2.5. All components are labeled with appropriate Core and Extended category labels.*
+*This documentation follows the [](docs/standards/AI_LABELING.md) standards based on the Bitcoin Development Framework v2.5. All components are labeled with appropriate Core and Extended category labels.*

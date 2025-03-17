@@ -54,7 +54,7 @@ function Test-CodeCompliance {
 
 function Test-LabelConsistency {
     # Validate AI labeling system integrity
-    $labelFile = "AI_LABELLING.md"
+    $labelFile = "docs/standards/AI_LABELING.md"
     $content = Get-Content $labelFile -Raw
     
     if (-not ($content -match "DAO-4 \| Institutional")) {

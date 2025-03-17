@@ -41,7 +41,7 @@ The following documentation files must be maintained across all repositories:
 | SECURITY.md | Security policies | Quarterly |
 | CHANGELOG.md | Change history | With each release |
 | docs/INDEX.md | Documentation index | With doc changes |
-| AI_LABELLING.md | AI labeling system | As needed |
+| docs/standards/AI_LABELING.md | AI labeling system | As needed |
 
 ## Synchronization Strategy
 
@@ -119,7 +119,7 @@ The following documentation files must be maintained across all repositories:
        branches: [ main ]
        paths:
          - 'docs/**'
-         - 'AI_LABELLING.md'
+         - 'docs/standards/AI_LABELING.md'
          - 'README.md'
          - 'CONTRIBUTING.md'
          - 'SECURITY.md'

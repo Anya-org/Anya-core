@@ -61,7 +61,7 @@ Follow these guidelines for commit messages:
 
 ### AI Labelling \[AIR-1\]
 
-All new code must include appropriate AI labelling tags as defined in the [AI Labelling Reference Guide](./AI_labelling.md). For example:
+All new code must include appropriate AI labelling tags as defined in the [AI Labelling Reference Guide](./docs/standards/AI_LABELING.md). For example:
 
 ```rust
 /// Redis-based cache implementation

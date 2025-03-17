@@ -194,4 +194,4 @@ Phase 6 (Layer 2):    [===============     ]  75%
 
 ---
 
-*This document follows the [AI Labeling System](../AI_LABELLING.md) standards based on the Bitcoin Development Framework v2.5.*
+*This document follows the [AI Labeling System](../docs/standards/AI_LABELING.md) standards based on the Bitcoin Development Framework v2.5.*

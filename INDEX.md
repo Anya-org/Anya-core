@@ -22,7 +22,7 @@ Welcome to the Anya Core documentation. This index will help you navigate the va
 - [CHANGELOG.md](./CHANGELOG.md) - Version history and changes
 - [TODO.md](./TODO.md) - Current development tasks
 - [SYSTEM_MAP.md](./SYSTEM_MAP.md) - System architecture overview
-- [AI_LABELLING.md](./AI_LABELLING.md) - AI labeling system documentation
+- [docs/standards/AI_LABELING.md](./docs/standards/AI_LABELING.md) - AI labeling system documentation
 
 ## Installation & Deployment
 
@@ -74,7 +74,7 @@ Welcome to the Anya Core documentation. This index will help you navigate the va
 - [API Documentation](docs/API.md) - API reference
 - [Contributing Guide](CONTRIBUTING.md) - How to contribute
 - [Checkpoint System](docs/CHECKPOINT_SYSTEM.md) - Development checkpoints
-- [AI Labeling System](AI_LABELLING.md) - Component labeling standards
+- [](docs/standards/AI_LABELING.md) - Component labeling standards
 
 ## Key Features at a Glance
 
@@ -130,7 +130,7 @@ Welcome to the Anya Core documentation. This index will help you navigate the va
 - [Issue Tracker](https://github.com/anya/anya-core/issues)
 - [GitHub Discussions](https://github.com/anya/anya-core/discussions)
 
-*This documentation follows the [AI Labeling System](AI_LABELLING.md) standards based on the Bitcoin Development Framework v2.5. All components are labeled with appropriate Core and Extended category labels.*
+*This documentation follows the [](docs/standards/AI_LABELING.md) standards based on the Bitcoin Development Framework v2.5. All components are labeled with appropriate Core and Extended category labels.*
 
 ## Bitcoin Protocol Implementation
 
@@ -174,7 +174,7 @@ All components conform to the Bitcoin Development Framework v2.5 guidelines and 
 - [AIT-3] - AI Testing Level 3
 - [RES-3] - Resilience Level 3
 
-For full details on the AI labeling system, see [AI_LABELLING.md](./AI_LABELLING.md).
+For full details on the AI labeling system, see [docs/standards/AI_LABELING.md](./docs/standards/AI_LABELING.md).
 
 ## Version Information
 
