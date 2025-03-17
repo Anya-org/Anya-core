@@ -11,6 +11,7 @@ All branches must follow a consistent naming convention:
 ```
 
 Where:
+
 - `<type>` is one of:
   - `feature`: New functionality
   - `fix`: Bug fixes
@@ -87,9 +88,11 @@ Example: `v1.3.0-rc1`
 ## Current Repository Structure
 
 ### Main Branches
+
 - `main` - Production-ready code, latest version v1.3.0-rc1
 
 ### Feature Branches
+
 - `feature/ai-validation-system` - AI validation for code quality
 - `feature/enhanced-bitcoin-compliance` - Enhanced Bitcoin protocol compliance
 - `feature/enterprise-wallet` - Enterprise wallet features
@@ -97,9 +100,11 @@ Example: `v1.3.0-rc1`
 - `feature/consolidated-updates` - Consolidated feature updates
 
 ### Documentation Branches
+
 - `docs/hexagonal-architecture-update` - Updates to architecture docs
 
 ### Specialty Branches
+
 - `AIP-001-read-first-implementation` - Implementation of AIP-001
 - `spv-security-enhancements` - SPV security improvements
 - `new-feature-branch` - Repository cleanup and restructuring
