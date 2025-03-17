@@ -42,6 +42,7 @@ All notable changes to the Anya Core project will be documented in this file.
 - Consolidated multiple inconsistent AI labeling documentation files into a single canonical source
 - Added deprecation notices to legacy AI labeling documentation
 - Created standards directory for canonical documentation
+- Improved script organization for better maintainability
 
 ### Removed
 
