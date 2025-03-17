@@ -24,6 +24,7 @@ All notable changes to the Anya Core project will be documented in this file.
 - AI labeling validation script to ensure standard compliance
 - Git hooks for enforcing AI labeling standards in commits
 - Documentation deprecation script for legacy AI labeling files
+- Repository branch structure documentation and organization
 
 ### Changed
 
@@ -41,6 +42,7 @@ All notable changes to the Anya Core project will be documented in this file.
 - Consolidated multiple inconsistent AI labeling documentation files into a single canonical source
 - Added deprecation notices to legacy AI labeling documentation
 - Created standards directory for canonical documentation
+- Improved script organization for better maintainability
 
 ### Removed
 
