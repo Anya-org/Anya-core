@@ -1,5 +1,14 @@
+<!-- markdownlint-disable MD013 line-length -->
+
+> **⚠️ DEPRECATION NOTICE ⚠️**
+> 
+> This document is deprecated and will be removed in future versions.
+> Please use the canonical AI labeling documentation at [docs/standards/AI_LABELING.md](docs/standards/AI_LABELING.md).
+> The canonical document standardizes all AI labeling formats and requirements.
+
+<!-- Original content below this line -->
 # AI Labeling Implementation Guide
-[AIS-3][BPC-3][DAO-4]
+[AIS-3][BPC-3][DAO-3]
 
 ## Overview
 
@@ -63,7 +72,7 @@ All components implementing DAO-4 must include:
 Components should be labeled using the following format:
 
 ```rust
-// [AIS-3][BPC-3][DAO-4]
+// [AIS-3][BPC-3][DAO-3]
 pub struct EnterpriseProcessor {
     // Implementation
 }
@@ -75,9 +84,10 @@ Documentation should include relevant labels in the header:
 
 ```markdown
 # Component Documentation
-[AIS-3][BPC-3][DAO-4]
+[AIS-3][BPC-3][DAO-3]
 ```
 
 ## Validation
 
 All components can be validated using the system validation script:
+

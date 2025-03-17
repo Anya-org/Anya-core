@@ -1,4 +1,4 @@
-[AIS-3][BPC-3][DAO-4]
+[AIS-3][BPC-3][DAO-3]
 # Enterprise Integration Guide
 
 Anya-Core enterprise features implement full DAO-4 institutional governance standards with BPC-3 Bitcoin protocol compliance.

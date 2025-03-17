@@ -1,6 +1,6 @@
 # Anya-Core Testing Implementation Guide
 
-[AIR-3][AIS-3][AIT-3][AIP-3][BPC-3][DAO-4]
+[AIR-3][AIS-3][AIT-3][AIP-3][BPC-3][DAO-3]
 
 This document provides detailed implementation guidelines for the Anya-Core testing framework, complementing the [Testing Strategy](./TESTING_STRATEGY.md).
 

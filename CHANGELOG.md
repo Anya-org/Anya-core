@@ -20,6 +20,10 @@ All notable changes to the Anya Core project will be documented in this file.
 - Secure key generator for JavaScript Bitcoin implementations
 - SPV (Simplified Payment Verification) implementation with secure cryptographic operations
 - Secure Merkle proof verification with constant-time comparison operations
+- Canonical AI labeling system documentation at docs/standards/AI_LABELING.md
+- AI labeling validation script to ensure standard compliance
+- Git hooks for enforcing AI labeling standards in commits
+- Documentation deprecation script for legacy AI labeling files
 
 ### Changed
 
@@ -33,6 +37,10 @@ All notable changes to the Anya Core project will be documented in this file.
 - Enhanced security of Bitcoin Taproot implementation
 - Improved Bitcoin MCP server with secure SPV verification implementation
 - Updated verifyBitcoinSPV function with proper Merkle path verification and constant-time comparisons
+- Standardized AI labeling system to use consistent 0-3 scale and bracket format [XXX-N]
+- Consolidated multiple inconsistent AI labeling documentation files into a single canonical source
+- Added deprecation notices to legacy AI labeling documentation
+- Created standards directory for canonical documentation
 
 ### Removed
 
@@ -41,6 +49,7 @@ All notable changes to the Anya Core project will be documented in this file.
 - DES key type and algorithm from HSM provider
 - TripleDesCbc encryption algorithm
 - Insecure Merkle proof verification implementation
+- Overlapping acronyms in AI labeling system
 
 ### Security
 
@@ -55,6 +64,7 @@ All notable changes to the Anya Core project will be documented in this file.
 - Enhanced JavaScript components with secure RNG alternatives to Math.random()
 - Improved SPV verification with proper double-SHA256 implementation and constant-time comparisons
 - Enhanced Bitcoin payment verification with secure cryptographic operations
+- Standardized security documentation using consistent AI labeling system
 
 ## [0.9.5] - 2025-03-16
 

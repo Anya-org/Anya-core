@@ -1,5 +1,14 @@
 <!-- markdownlint-disable MD013 line-length -->
 
+> **⚠️ DEPRECATION NOTICE ⚠️**
+> 
+> This document is deprecated and will be removed in future versions.
+> Please use the canonical AI labeling documentation at [docs/standards/AI_LABELING.md](docs/standards/AI_LABELING.md).
+> The canonical document standardizes all AI labeling formats and requirements.
+
+<!-- Original content below this line -->
+<!-- markdownlint-disable MD013 line-length -->
+
 # Comprehensive Labeling System for Multi-Repository Projects
 
 This document describes the comprehensive labeling system used across all Anya Core repositories, including the tools and procedures for maintaining consistency.
@@ -383,3 +392,4 @@ python scripts/sync_labelling.py --target "anya-web5,anya-bitcoin" --dry-run
 - [AI Labeling Guide](../AI_LABELLING.md): Comprehensive AI labeling standards
 - [Commit Rules](../COMMIT_RULES.md): Rules for creating commits with labels
 - [Component Requirements](../docs/COMPONENT_REQUIREMENTS.md): Detailed requirements for each label level
+
