@@ -9,7 +9,7 @@ use std::fs;
 #[derive(Parser)]
 #[clap(
     name = "anya-validator",
-    about = "Anya Core validation tools [AIS-3][BPC-3][DAO-4]",
+    about = "Anya Core validation tools [AIS-3][BPC-3][DAO-3]",
     version
 )]
 struct Cli {

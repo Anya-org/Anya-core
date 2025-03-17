@@ -1,76 +1,74 @@
-# Documentation Scripts \[AIR-1\]\[AIT-1\]
+# Script Directory
+[AIR-3][AIS-3][BPC-3][AIT-3][RES-3]
 
-<!-- markdownlint-disable MD013 line-length -->
+This directory contains scripts for building, testing, and maintaining the Bitcoin MCP Server implementation according to the Bitcoin Development Framework v2.5.
 
-This directory contains scripts for managing project documentation.
+## Directory Structure
 
-## Markdown Linting and Fixing
+- `bitcoin/`: Scripts specific to Bitcoin protocol implementation
+  - `validate-security.js`: Basic security validation for Bitcoin components
+  - `validate-bip-compliance.js`: Validates compliance with Bitcoin Improvement Proposals (BIPs)
+  - `mcp-server.js`: Main MCP server implementation
 
-We use markdownlint to ensure consistent formatting and style in our markdown documentation. The configuration is in `.markdownlint.json` at the project root.
+- `security/`: Security analysis and validation scripts
+  - `run-codeql-analysis.ps1`: PowerShell script to run CodeQL analysis
+  - `crypto-validation.js`: Validates cryptographic implementations
+  - `analyze-mcp-server.js`: Analyzes MCP server security
+  - `setup-permissions.sh`: Sets up permissions for security scripts
 
-### Automated Fixing Script
+## Key Scripts
 
-The `fix_markdown.js` script automates fixing common markdownlint issues across the project:
+### Security Analysis
 
-1. **Installation**:
+The security analysis framework consists of multiple components:
+
+1. **CodeQL Analysis**:
+   ```powershell
+   .\scripts\security\run-codeql-analysis.ps1
+   ```
+   
+2. **Component-specific Analysis**:
    ```bash
-   npm install --save-dev markdownlint-cli2
+   node scripts/security/analyze-mcp-server.js --file=scripts/bitcoin/mcp-server.js
+   node scripts/security/crypto-validation.js
+   node scripts/bitcoin/validate-bip-compliance.js
    ```
 
-2. **Usage**:
-   ```bash
-   # Fix markdown files in the docs directory (default)
-   node scripts/fix_markdown.js
+### Test Scripts
 
-   # Fix markdown files in a specific directory
-   node scripts/fix_markdown.js path/to/directory
-   ```
+Several scripts are available for testing various components:
 
-3. **What It Does**:
-   - Escapes AI labelling tags like `[AIR-3]` to `\[AIR-3\]` to prevent markdownlint errors
-   - Adds markdownlint disable comments for line length where needed
-   - Fixes line endings and other common issues
-   - Runs markdownlint-cli2 with the --fix flag for additional fixes
+```powershell
+# Run all tests
+.\scripts\run-all-tests.sh
 
-### Manual Fixes
+# Run integration tests
+.\scripts\run-integration-tests.ps1
 
-Some markdownlint issues require manual fixing:
+# Run module tests
+.\scripts\run-module-tests.ps1
+```
 
-1. **Multiple top-level headings (MD025)**:
-   - Each markdown file should have only one H1 (`#`) heading
-   - Change subsequent H1 headings to H2 (`##`)
+### Build Scripts
 
-2. **Duplicate headings (MD024)**:
-   - Avoid duplicate heading text at the same level
-   - Add additional text or use different wording
+Scripts for building and setting up the development environment:
 
-3. **Reference-style links missing definitions (MD052)**:
-   - Escape AI labelling tags with backslashes: `\[AIR-3\]`
-   - Or add the missing reference definitions
+```bash
+# Setup development environment
+.\scripts\dev-setup.ps1
 
-## Documentation Style Guide
+# Build the project
+.\scripts\build.ps1
+```
 
-Please refer to [MARKDOWN_STYLE_GUIDE.md](../docs/MARKDOWN_STYLE_GUIDE.md) for comprehensive documentation standards.
+## Compliance
 
-## Common Issues and Solutions
+The scripts in this directory have been updated to comply with the Bitcoin Development Framework v2.5 requirements and include proper AI labeling ([AIR-3][AIS-3][BPC-3][AIT-3][RES-3]).
 
-| Issue | Rule | Solution |
-|-------|------|----------|
-| Line too long | MD013 | Disabled in config, no action needed |
-| Multiple top-level headings | MD025 | Keep only one H1 heading per file |
-| AI tags interpreted as references | MD052 | Escape tags with backslashes: `\[AIR-3\]` |
-| HTML-like tags | MD033 | Disabled in config, but minimize usage |
-| No code block language specified | MD040 | Add language after backticks: ```rust |
-| Emphasis used as heading | MD036 | Use proper heading syntax instead |
+For more information on security analysis and compliance, see `SECURITY_CODEQL.md` in the project root.
 
-## Integration with CI/CD
+## Recent Updates
 
-The markdown linting process is integrated with our CI/CD pipeline:
-
-1. **Pull Requests**: Automatically checks markdown files for linting issues
-2. **Pre-commit Hook**: Validates markdown files before commits (optional setup)
-3. **Documentation Generation**: Ensures consistently formatted documentation for generated sites
-
-## Last Updated
-
-2025-03-12 
+- **March 2025**: Cleaned up redundant scripts and standardized the security analysis framework
+- **March 2025**: Enhanced BIP compliance validation (BIP-340, BIP-341, BIP-342, BIP-174, BIP-370, BIP-327)
+- **March 2025**: Added CodeQL integration for comprehensive security analysis 

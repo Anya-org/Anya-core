@@ -1,6 +1,6 @@
 # Setup & Usage
 
-[AIS-3][BPC-3][DAO-4]
+[AIS-3][BPC-3][DAO-3]
 
 ## Overview
 

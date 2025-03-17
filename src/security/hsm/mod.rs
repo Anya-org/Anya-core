@@ -625,19 +625,20 @@ pub enum SignatureAlgorithm {
 }
 
 /// Encryption algorithm
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
 pub enum EncryptionAlgorithm {
-    /// RSA with PKCS#1 v1.5 padding
-    RsaPkcs1v15,
-    
-    /// RSA with OAEP padding and SHA-256
+    /// RSA PKCS#1 v1.5
+    RsaPkcs1,
+    /// RSA OAEP with SHA-256
     RsaOaepSha256,
-    
-    /// AES in GCM mode
-    AesGcm,
-    
-    /// AES in CBC mode
-    AesCbc,
+    /// AES-CBC with 256-bit key
+    AesCbc256,
+    /// AES-GCM with 256-bit key
+    AesGcm256,
+    /// AES-CTR with 256-bit key
+    AesCtr256,
+    /// ChaCha20-Poly1305
+    ChaCha20Poly1305,
 }
 
 /// HSM status
