@@ -42,7 +42,7 @@ show_help() {
     echo "Available commit types:"
     echo "  feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert"
     echo ""
-    echo "See AI_LABELLING.md for label requirements by component type"
+    echo "See docs/standards/AI_LABELING.md for label requirements by component type"
 }
 
 # Parse command-line arguments

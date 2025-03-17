@@ -41,7 +41,7 @@ This document serves as a searchable index for all Anya Core documentation, incl
 - [CONTRIBUTING](../CONTRIBUTING.md) - Contributing guidelines
 - [CHECKPOINT_SYSTEM](CHECKPOINT_SYSTEM.md) - Development checkpoints
 - [CHECKPOINT_GUIDE](CHECKPOINT_GUIDE.md) - Checkpoint usage guide
-- [AI_LABELLING](../AI_LABELLING.md) - AI labeling system
+- [AI_LABELLING](../docs/standards/AI_LABELING.md) - AI labeling system
 
 ## Searchable Terms
 
@@ -85,7 +85,7 @@ This document serves as a searchable index for all Anya Core documentation, incl
 ### Development Terms
 
 - **Checkpoint System**: [CHECKPOINT_SYSTEM](CHECKPOINT_SYSTEM.md)
-- **AI Labeling**: [AI_LABELLING](../AI_LABELLING.md)
+- **AI Labeling**: [AI_LABELLING](../docs/standards/AI_LABELING.md)
 - **Contributing**: [CONTRIBUTING](../CONTRIBUTING.md)
 - **Testing**: [TESTING](TESTING.md)
 

@@ -16,7 +16,7 @@ $Config = @{
         "SECURITY.md",
         "CHANGELOG.md",
         "docs/INDEX.md",
-        "AI_LABELLING.md"
+        "docs/standards/AI_LABELING.md"
     )
     
     RequiredDirs = @(

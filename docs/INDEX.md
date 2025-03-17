@@ -9,13 +9,13 @@ show_support: true
 
 # Anya Core Documentation \[AIR-3\]\[AIS-3\]
 
-This is the central index for all Anya Core documentation. All documentation follows the AI labelling convention defined in [AI Labelling Reference Guide](./AI_labelling.md).
+This is the central index for all Anya Core documentation. All documentation follows the AI labelling convention defined in [AI Labelling Reference Guide](./docs/standards/AI_LABELING.md).
 
 ## Core Documentation
 
 | Document | Description | Tags |
 |----------|-------------|------|
-| [AI Labelling Reference Guide](./AI_labelling.md) | Defines standardized AI labelling tags for use in the Anya Core codebase | \[AIR-3\]\[AIS-3\] |
+| [AI Labelling Reference Guide](./docs/standards/AI_LABELING.md) | Defines standardized AI labelling tags for use in the Anya Core codebase | \[AIR-3\]\[AIS-3\] |
 | [High Availability](./high_availability.md) | Documentation for the High Availability subsystem | \[AIR-3\]\[AIS-3\]\[RES-3\]\[SCL-3\] |
 
 ## Security Documentation

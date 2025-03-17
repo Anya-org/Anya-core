@@ -361,11 +361,11 @@ else {
 $canonicalPathRelative = "docs/standards/AI_LABELING.md"
 $canonicalPathAbsolute = "$PSScriptRoot/../$canonicalPathRelative"
 $oldReferences = @(
-    "AI_LABELLING.md",
-    "docs/AI_labelling.md",
-    "docs/AI_LABELING.md",
-    "AI_LABELING_IMPLEMENTATION.md",
-    "docs/AI_LABELING_IMPLEMENTATION.md"
+    "docs/standards/AI_LABELING.md",
+    "docs/docs/standards/AI_LABELING.md",
+    "docs/standards/AI_LABELING.md",
+    "docs/standards/AI_LABELING.md",
+    "docs/docs/standards/AI_LABELING.md"
 )
 
 # Check if canonical file exists
