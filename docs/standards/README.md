@@ -1,44 +1,52 @@
-# Anya Core Standards [AIR-3][AIS-3][BPC-3]
+# Standards Documentation [AIR-3][AIS-3][BPC-3]
 
-<!-- markdownlint-disable MD013 line-length -->
+This directory contains canonical documentation of standards, architecture, and conventions used in the Anya Core project.
 
-This directory contains the canonical documentation for all standards used in the Anya Core project.
+## Purpose
 
-## Standards Document Index
+The standards documentation serves as the authoritative reference for:
 
-| Document | Description | Status |
-|----------|-------------|--------|
-| [AI_LABELING.md](AI_LABELING.md) | Canonical AI labeling system definition | Active |
+1. Code conventions and style guides
+2. Architecture patterns and principles
+3. System organization and design
+4. Versioning and labeling systems
+
+## Index of Documents
+
+### Core Standards
+
+- [AI Labeling System](AI_LABELING.md) - Official AI labeling conventions and guidelines
+- [Branch Structure](BRANCH_STRUCTURE.md) - Repository branch organization and conventions
+- [Hexagonal Architecture](HEXAGONAL_ARCHITECTURE.md) - Architecture principles
+
+### Bitcoin Compliance
+
+- [BIP Standards](BIP_STANDARDS.md) - Compliance with Bitcoin Improvement Proposals
+- [Security Model](SECURITY_MODEL.md) - Security principles and validation
 
 ## Version History
 
-| Version | Date | Description |
-|---------|------|-------------|
-| 1.0 | 2025-03-20 | Initial standards directory created |
+- v1.0 (2025-02-15): Initial standards documentation
+- v1.1 (2025-03-01): Added Hexagonal Architecture documentation
+- v1.2 (2025-03-20): Added AI Labeling System
+- v1.3 (2025-03-25): Added Branch Structure documentation
 
 ## Usage Guidelines
 
-### Standards Compliance
+All team members must adhere to these standards. When developing new features or modifying existing code:
 
-All code and documentation in the Anya Core project must comply with these standards. Enforcement is done through:
+1. Review relevant standards documents
+2. Apply conventions consistently
+3. Update standards documentation if necessary
 
-1. **Automated Validation**: Scripts in the `scripts/` directory validate compliance
-2. **Git Hooks**: Pre-commit and commit-msg hooks enforce standards
-3. **CI/CD**: GitHub Actions workflows validate compliance in PRs
-4. **Code Reviews**: Reviewers ensure standards compliance
+## Proposing Changes
 
-### Proposing Standards Changes
+To propose changes to standards:
 
-To propose changes to these standards:
-
-1. Create a new branch with the format `standards/[standard-name]`
-2. Make your changes
-3. Submit a PR with the appropriate AI labels
-4. Get approval from at least two senior contributors
-
-## Relationship to Other Documentation
-
-These standards take precedence over other documentation files. When conflicts exist, the documents in this directory are the source of truth.
+1. Create a `docs/` branch from `main`
+2. Make your changes to the relevant document(s)
+3. Submit a PR with thorough explanation
+4. Obtain approval from at least two senior team members
 
 ## Standards Implementation Scripts
 
