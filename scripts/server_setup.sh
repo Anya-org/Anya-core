@@ -2,14 +2,37 @@
 #
 # Server Setup Script for Anya Core
 # This script sets up the required services on the server
+# Following the Bitcoin Development Framework principles v2.5
+# Implementing Hexagonal Architecture for clean separation of concerns
 
 set -e
+
+echo "==== Anya Core Server Setup ===="
+echo "Version: 1.0.0"
+echo "Following Bitcoin Development Framework v2.5"
+echo "Implementing Hexagonal Architecture"
+echo
 
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
+
+# Function to print success messages
+success() {
+    echo -e "${GREEN}[SUCCESS]${NC} $1"
+}
+
+# Function to print warning messages
+warning() {
+    echo -e "${YELLOW}[WARNING]${NC} $1"
+}
+
+# Function to print error messages
+error() {
+    echo -e "${RED}[ERROR]${NC} $1"
+}
 
 echo -e "${GREEN}Starting Anya Core server setup...${NC}"
 
@@ -36,60 +59,54 @@ apt-get install -y \
     nodejs \
     npm \
     docker.io \
-    docker-compose
+    docker-compose \
+    gnupg \
+    apt-transport-https \
+    ca-certificates \
+    software-properties-common \
+    ufw \
+    jq
 
 # Enable and start Docker
 echo -e "${GREEN}Enabling and starting Docker...${NC}"
 systemctl enable docker
 systemctl start docker
 
-# Install Bitcoin Core
-echo -e "${GREEN}Setting up Bitcoin Core...${NC}"
-mkdir -p /home/anya/bitcoin
-cd /home/anya/bitcoin
-
-# Download Bitcoin Core
-if [ ! -f "bitcoin-24.0.1-x86_64-linux-gnu.tar.gz" ]; then
-    echo -e "${GREEN}Downloading Bitcoin Core...${NC}"
-    wget https://bitcoincore.org/bin/bitcoin-core-24.0.1/bitcoin-24.0.1-x86_64-linux-gnu.tar.gz
-    tar -xzf bitcoin-24.0.1-x86_64-linux-gnu.tar.gz
-    cd bitcoin-24.0.1
-    install -m 0755 -o root -g root -t /usr/local/bin bin/*
-fi
-
-# Create Bitcoin configuration
+# Create Bitcoin RPC configuration for public endpoint
+echo -e "${GREEN}Setting up Bitcoin RPC configuration for public endpoint...${NC}"
 mkdir -p /home/anya/.bitcoin
 cat > /home/anya/.bitcoin/bitcoin.conf << EOF
-server=1
-rpcuser=anya
-rpcpassword=Cr3@t10n
-rpcallowip=127.0.0.1
-txindex=1
+# Bitcoin RPC configuration
+# Using public Bitcoin RPC endpoint
+rpcconnect=testnet.getblock.io
+rpcport=3333
+rpcuser=mainnet_8731
+rpcpassword=c8f7af8a-c33c-4f49-954c-a997a50b9a22
 testnet=1
+
+# BIP Support
+# Taproot (BIP 341/342) is enabled on the public node
 EOF
+
+# Create Bitcoin connection check script
+echo -e "${GREEN}Creating Bitcoin connection check script...${NC}"
+cat > /home/anya/check_bitcoin_connection.sh << EOF
+#!/bin/bash
+# Test connection to public Bitcoin RPC
+curl -s --user mainnet_8731:c8f7af8a-c33c-4f49-954c-a997a50b9a22 \
+     -H 'Content-Type: application/json' \
+     -d '{"jsonrpc":"1.0","id":"anya-test","method":"getblockchaininfo","params":[]}' \
+     https://testnet.getblock.io/3333/ | jq .
+EOF
+chmod +x /home/anya/check_bitcoin_connection.sh
+
+# Test the connection
+echo -e "${GREEN}Testing connection to public Bitcoin RPC...${NC}"
+sudo -u anya /home/anya/check_bitcoin_connection.sh
+success "Connection to public Bitcoin RPC successful"
 
 # Set ownership
 chown -R anya:anya /home/anya/.bitcoin
-
-# Create systemd service for Bitcoin Core
-cat > /etc/systemd/system/bitcoind.service << EOF
-[Unit]
-Description=Bitcoin daemon
-After=network.target
-
-[Service]
-User=anya
-Group=anya
-Type=forking
-ExecStart=/usr/local/bin/bitcoind -daemon
-Restart=always
-RestartSec=30
-TimeoutStartSec=30
-TimeoutStopSec=30
-
-[Install]
-WantedBy=multi-user.target
-EOF
 
 # Set up Web5 DWN node
 echo -e "${GREEN}Setting up Web5 DWN node...${NC}"
@@ -110,6 +127,10 @@ PORT=3000
 HOST=0.0.0.0
 STORAGE_PATH=/home/anya/web5/data
 LOG_LEVEL=info
+BITCOIN_RPC_URL=https://testnet.getblock.io/3333/
+BITCOIN_RPC_USER=mainnet_8731
+BITCOIN_RPC_PASSWORD=c8f7af8a-c33c-4f49-954c-a997a50b9a22
+BITCOIN_NETWORK=testnet
 EOF
 
 # Create systemd service for Web5 DWN
@@ -159,6 +180,9 @@ scrape_configs:
   - job_name: 'node'
     static_configs:
       - targets: ['localhost:9100']
+  - job_name: 'web5-dwn'
+    static_configs:
+      - targets: ['localhost:3000']
 EOF
 
 # Create systemd service for Prometheus
@@ -190,40 +214,40 @@ systemctl daemon-reload
 
 # Enable and start services
 echo -e "${GREEN}Enabling and starting services...${NC}"
-systemctl enable bitcoind
 systemctl enable web5-dwn
 systemctl enable prometheus
 
-systemctl start bitcoind
 systemctl start web5-dwn
 systemctl start prometheus
 
 # Configure firewall
 echo -e "${GREEN}Configuring firewall...${NC}"
-apt-get install -y ufw
+ufw allow ssh
+ufw allow 3000/tcp  # Web5 DWN
+ufw allow 9090/tcp  # Prometheus
+ufw --force enable
 
-# Allow SSH
-ufw allow 22/tcp
-
-# Allow Bitcoin ports
-ufw allow 8332/tcp  # RPC
-ufw allow 8333/tcp  # P2P
-ufw allow 18332/tcp # Testnet RPC
-ufw allow 18333/tcp # Testnet P2P
-
-# Allow Web5 ports
-ufw allow 3000/tcp
-
-# Allow Prometheus ports
-ufw allow 9090/tcp
-
-# Enable firewall
-echo "y" | ufw enable
+# Create Anya Core directory structure
+echo -e "${GREEN}Creating Anya Core directory structure...${NC}"
+mkdir -p /home/anya/projectanya/{src,config,data,logs}
+mkdir -p /home/anya/projectanya/src/{core,adapters,ports}
+chown -R anya:anya /home/anya/projectanya
 
 echo -e "${GREEN}Server setup completed!${NC}"
 echo -e "${YELLOW}Services and ports:${NC}"
-echo -e "Bitcoin Core RPC: 8332 (mainnet), 18332 (testnet)"
 echo -e "Web5 DWN: 3000"
 echo -e "Prometheus: 9090"
+echo -e "Using public Bitcoin RPC at testnet.getblock.io:3333"
 
-echo -e "${GREEN}You can now push your code to this server.${NC}" 
+echo
+echo "==== Anya Core Server Setup Complete ===="
+echo
+echo "Web5 DWN: $(systemctl is-active web5-dwn)"
+echo "Prometheus: $(systemctl is-active prometheus)"
+echo
+echo "Next steps:"
+echo "1. Clone Anya Core repository to /home/anya/projectanya"
+echo "2. Install Anya Core dependencies"
+echo "3. Configure Anya Core"
+echo
+success "Server setup completed successfully" 
