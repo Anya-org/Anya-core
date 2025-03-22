@@ -1,0 +1,42 @@
+name: Server Tunnel
+
+on:
+  workflow_dispatch:
+    inputs:
+      duration:
+        description: 'Tunnel duration in minutes'
+        required: true
+        default: '60'
+
+jobs:
+  tunnel:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y openssh-client autossh netcat-openbsd
+
+      - name: Create SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H 192.168.0.212 >> ~/.ssh/known_hosts
+
+      - name: Set up reverse tunnel
+        run: |
+          echo "Starting tunnel to 192.168.0.212"
+          echo "The tunnel will remain active for ${{ github.event.inputs.duration }} minutes"
+          autossh -M 0 -o "ServerAliveInterval 30" -o "ServerAliveCountMax 3" -N -R 9922:localhost:22 anya@192.168.0.212 -p 22 &
+          TUNNEL_PID=$!
+          
+          echo "Reverse tunnel established with PID: $TUNNEL_PID"
+          echo "You can now connect to your GitHub runner by SSH to 192.168.0.212 port 9922"
+          echo "Example: ssh -p 9922 runner@localhost (from the server)"
+          
+          # Keep alive for the specified duration
+          sleep $((${{ github.event.inputs.duration }} * 60))
+          
+          echo "Tunnel duration expired, shutting down"
+          kill $TUNNEL_PID 

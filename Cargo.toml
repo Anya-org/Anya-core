@@ -1,22 +1,12 @@
-[workspace]
-members = [
-    ".",
-    "anya-enterprise",
-    "anya-extensions",
-    "anya-bitcoin",
-    "installer"
-]
-resolver = "2"
-
-[workspace.package]
-version = "0.2.0"
+[package]
+name = "anya-core"
+version = "0.1.0"
 edition = "2021"
 authors = ["Anya Core Team"]
 license = "MIT"
 repository = "https://github.com/anya-org/anya"
 
-[workspace.dependencies]
-# Core dependencies
+[dependencies]
 tokio = { version = "1.41.1", features = ["full"] }
 futures = "0.3.30"
 serde = { version = "1.0.215", features = ["derive"] }
@@ -29,6 +19,11 @@ async-trait = "0.1.77"
 pyo3 = { version = "0.19.2", features = ["extension-module"] }
 once_cell = "1.18.0"
 regex = "1.9.5"
+log = "0.4"
+clap = { version = "4.4", features = ["derive"] }
+systemstat = "4.0"
+chrono = { version = "0.4", features = ["serde"] }
+reqwest = { version = "0.11", features = ["blocking", "json"] }
 
 # Web5 Integration
 web5 = { git = "https://github.com/TBD54566975/web5-rs", package = "web5", tag = "v4.0.0" }
@@ -49,135 +44,29 @@ tracing-subscriber = { version = "0.3.18", features = ["env-filter", "json"] }
 metrics = "0.21.1"
 
 # Cryptography
-curve25519-dalek = { version = "4.1.3", features = ["digest", "rand_core", "serde"] }
-
-# Testing
-tokio-test = "0.4.3"
-mockall = "0.11.4"
-criterion = "0.5.1"
-proptest = "1.2.0"
-test-log = { version = "0.2.14", features = ["trace"] }
-
-# Machine Learning
-ndarray = "0.15.6"
-smartcore = "0.3.2"
-tch = "0.14.0"
-log = "0.4.20"
-
-# Analysis tools and additions
-dashmap = "5.5.3"
-rayon = "1.10.0"
-blake3 = "1.5.0"
-semver = "1.0.22"
-atomic-polyfill = "0.1.3"
-parking_lot = "0.12.1"
-syn = { version = "2.0.60", features = ["full"] }
-cargo-geiger = "0.4.5"
-tarpaulin = "0.27.0"
-cargo-metadata = "0.18.1"
-cargo-clippy = "0.1.80"
-
-# Protocol validation
-bitcoin-protocol = { git = "https://github.com/bitcoin-core/rust-protocol", rev = "bip341" }
-
-[package]
-name = "anya"
-version = "0.1.0"
-edition = "2021"
-authors = ["Anya Development Team"]
-description = "Bitcoin-centric platform with BPC-3 and DAO-4 compliance"
-license = "MIT"
-repository = "https://github.com/anya-org/anya"
-readme = "README.md"
-
-[dependencies]
-# Core dependencies
-tokio = { workspace = true }
-futures = { workspace = true }
-serde = { workspace = true }
-serde_json = { workspace = true }
-serde_yaml = { workspace = true }
-toml = { workspace = true }
-anyhow = { workspace = true }
-thiserror = { workspace = true }
-async-trait = { workspace = true }
-once_cell = { workspace = true }
-regex = { workspace = true }
-
-# Web5 Integration
-web5 = { workspace = true }
-jsonschema = { workspace = true }
-
-# Blockchain Integration
-bitcoin = { version = "0.32.1", features = ["rand", "rand-std", "use-serde"], optional = true }
-bitcoincore-rpc = { workspace = true }
-secp256k1 = { version = "0.27.0", features = ["rand", "recovery"], optional = true }
-bip39 = { version = "2.0.0", optional = true }
-md5 = "0.7.0"
-
-# Networking
-libp2p = { workspace = true }
-
-# Logging and Metrics
-tracing = { workspace = true }
-tracing-subscriber = { workspace = true }
-tracing-futures = "0.2.5"
-metrics = { version = "0.21.1" }
-log = "0.4.20"
-
-# Time and Date
-chrono = { version = "0.4.31", features = ["serde"], default-features = false }
-
-# Terminal Detection
-is-terminal = "0.4.9"
-
-# Cryptography
-curve25519-dalek = { workspace = true }
-
-# Utilities
-uuid = { version = "1.8.0", features = ["v4"] }
-rand = "0.8"
-base64 = "0.21.7"
-hex = "0.4"
+ring = "0.17"
 sha2 = "0.10.8"
+ed25519-dalek = "2.1.1"
+x25519-dalek = "2.0.0"
+chacha20poly1305 = "0.10.1"
+aes-gcm = "0.10.3"
 hmac = "0.12.1"
 pbkdf2 = "0.12.2"
-argon2 = "0.5.3"
-x509-parser = "0.15.1"
-rustls = "0.22.1"
-data-encoding = "2.5.0"
-jsonwebtoken = "9.2.0"
-totp-rs = "5.4.0"
-darling = "*"
 
-# CLI and File System
-clap = { version = "4.4.2", features = ["derive"] }
-walkdir = "2.4.0"
-env_logger = "0.10.0"
+# Testing
+test = "0.15.4"
+mockall = "0.11"
+tokio-test = "0.4"
 
-# Bitcoin Protocol Dependencies
-bip174 = { version = "0.3.0", optional = true }
-bip341 = { version = "0.2.0", optional = true }
+[target.'cfg(unix)'.dependencies]
+std = { version = "1.0", features = ["os", "unix", "fs"] }
+
+[target.'cfg(windows)'.dependencies]
+std = { version = "1.0", features = ["os", "windows", "fs"] }
 
 [dev-dependencies]
-tokio-test = { workspace = true }
-mockall = { workspace = true }
-tempfile = "3.9.0"
-criterion = { workspace = true }
-proptest = { workspace = true }
-pretty_assertions = "1.3"
-
-[build-dependencies]
-tonic-build = "0.10.2"
-
-[features]
-default = ["bip174", "bip341"]
-bip174 = ["dep:bip174", "bitcoin/psbt"]
-bip341 = ["dep:bip341", "bitcoin/taproot"]
-bitcoin-compliance = []
-dao-governance = []
-enterprise = ["bitcoin-compliance", "dao-governance"]
-testing = []
+tokio-test = "0.4"
+mockall = "0.11"
 
 [profile.release]
 lto = true
