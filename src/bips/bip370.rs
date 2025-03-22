@@ -1,0 +1,27 @@
+use bitcoin::psbt::Psbt;
+use bitcoin::secp256k1::Secp256k1;
+use bitcoin::util::bip32::ExtendedPrivKey;
+use bitcoin::util::psbt::PartiallySignedTransaction;
+use std::collections::HashMap;
+
+pub struct BIP370 {
+    secp: Secp256k1<bitcoin::secp256k1::All>,
+}
+
+impl BIP370 {
+    pub fn new() -> Self {
+        Self {
+            secp: Secp256k1::new(),
+        }
+    }
+
+    pub fn sign_psbt(&self, psbt: &mut PartiallySignedTransaction, xpriv: &ExtendedPrivKey) {
+        // Implementation of BIP-370 signing
+        unimplemented!()
+    }
+
+    pub fn verify_psbt(&self, psbt: &PartiallySignedTransaction) -> bool {
+        // Implementation of BIP-370 verification
+        unimplemented!()
+    }
+}

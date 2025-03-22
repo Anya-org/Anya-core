@@ -1,0 +1,98 @@
+{
+  "bips": [
+    {
+      "number": 174,
+      "title": "Partially Signed Bitcoin Transaction Format",
+      "status": "Final",
+      "implementation": "src/protocols/bip-174.clar",
+      "adapter": "src/adapters/psbt-adapter.clar",
+      "tests": ["tests/bip174-psbt.test.clar"]
+    },
+    {
+      "number": 341,
+      "title": "Taproot: SegWit version 1 spending rules",
+      "status": "Final",
+      "implementation": "src/protocols/bip-341.clar",
+      "adapter": "src/adapters/taproot-adapter.clar",
+      "tests": ["tests/bip341-taproot.test.clar"]
+    },
+    {
+      "number": 370,
+      "title": "PSBT Version 2",
+      "status": "Draft",
+      "implementation": "src/protocols/bip-370.clar",
+      "adapter": "src/adapters/psbt-adapter.clar",
+      "tests": ["tests/bip-compliance.test.clar"]
+    }
+  ],
+  "hexagonal": {
+    "ports": [
+      {
+        "name": "Node Communication",
+        "type": "primary",
+        "description": "P2P networking protocols"
+      },
+      {
+        "name": "Wallet Interface",
+        "type": "primary",
+        "description": "PSBT/BIP-174 compliant interfaces"
+      },
+      {
+        "name": "Smart Contract Execution",
+        "type": "primary",
+        "description": "Miniscript execution interfaces"
+      },
+      {
+        "name": "Blockchain",
+        "type": "secondary",
+        "description": "Bitcoin blockchain interaction"
+      },
+      {
+        "name": "Storage",
+        "type": "secondary",
+        "description": "Data persistence"
+      },
+      {
+        "name": "Metrics",
+        "type": "secondary",
+        "description": "Performance monitoring"
+      }
+    ],
+    "adapters": {
+      "primary": [
+        {
+          "name": "REST API",
+          "port": "Node Communication",
+          "implementation": "src/api/rest_controller.rs"
+        },
+        {
+          "name": "PSBT Adapter",
+          "port": "Wallet Interface",
+          "implementation": "src/adapters/psbt-adapter.clar"
+        },
+        {
+          "name": "Taproot Adapter",
+          "port": "Smart Contract Execution",
+          "implementation": "src/adapters/taproot-adapter.clar"
+        }
+      ],
+      "secondary": [
+        {
+          "name": "Bitcoin RPC",
+          "port": "Blockchain",
+          "implementation": "src/blockchain/bitcoin/adapter.rs"
+        },
+        {
+          "name": "File Storage",
+          "port": "Storage",
+          "implementation": "src/storage/file_adapter.rs"
+        },
+        {
+          "name": "Prometheus",
+          "port": "Metrics",
+          "implementation": "src/metrics/prometheus_adapter.rs"
+        }
+      ]
+    }
+  }
+} 
