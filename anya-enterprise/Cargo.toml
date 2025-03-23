@@ -2,68 +2,17 @@
 name = "anya-enterprise"
 version.workspace = true
 edition.workspace = true
-authors = ["Anya Enterprise Contributors"]
-description = "Advanced features for Anya Core (Enterprise Edition)"
-license = "Commercial"
-publish = false
-
-[lib]
-name = "anya_enterprise"
-path = "src/lib.rs"
-crate-type = ["cdylib", "rlib"]
-
-[[bin]]
-name = "anya-enterprise"
-path = "src/main.rs"
+authors.workspace = true
+license.workspace = true
+description = "Enterprise features for Anya Core"
 
 [dependencies]
-# Core Dependencies
-tokio = { workspace = true }
-futures = { workspace = true }
-serde = { workspace = true }
-serde_json = { workspace = true }
-anyhow = { workspace = true }
-thiserror = { workspace = true }
+anya-core = { path = "../anya-core", version.workspace = true }
+secp256k1.workspace = true
 
-# Web5 Integration
-web5 = { workspace = true }
-
-# Blockchain Integration
-bitcoin = { workspace = true, features = ["rand", "rand-std"] }
-bitcoincore-rpc = { workspace = true }
-
-# Additional Dependencies
-pyo3 = { version = "0.19.2", features = ["extension-module"] }
-log = "0.4.20"
-env_logger = "0.10.1"
-actix-web = "4.4.0"
-actix-rt = "2.9.0"
-utoipa = { version = "4.1.0", features = ["actix_extras"] }
-utoipa-swagger-ui = { version = "5.0.0", features = ["actix-web"] }
-ndarray = "0.15.6"
-
-# Internal Dependencies
-anya-core = { path = "..", version = "0.2.0" }
+# Audit Trail Compliance (BDF §5.3)
+opentelemetry = { version = "0.21.0", features = ["metrics"] }
 
 [features]
-default = []
-opendp = []
-spdz = []
-seal = []
-advanced_dlc = []
-web_interface = []
-cosmos_sdk = []
-polkadot_xcmp = []
-ipfs = []
-orbitdb = []
-ipld = []
-ipas = []
-webauthn = []
-mobile_apps = []
-ordinals_analysis = []
-taro_asset = []
-advanced_defi = []
-advanced_features = []
-
-[package.metadata.docs.rs]
-rustdoc-args = ["--cfg", "self_checkmark"]
+default = ["advanced-security"]
+advanced-security = ["secp256k1/zkp", "opentelemetry"]

@@ -1,0 +1,43 @@
+[package]
+name = "anya-core"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+bitcoin.workspace = true
+secp256k1.workspace = true
+serde.workspace = true
+
+# Cryptographic primitives
+k256 = { version = "0.13.3", features = [
+    "ecdsa",
+    "sha256",
+    "std"
+] }
+sha2 = "0.10.8"
+hmac = "0.12.1"
+
+# Security auditing
+cargo-audit = { version = "0.18.3", optional = true }
+
+# Update Web5 dependencies with security features
+web5 = { version = "0.5.1", features = [
+    "bip174",
+    "bip341",
+    "bip370",
+    "did-rotation",
+    "vc-revocation",
+    "silent-leaf"
+], default-features = false }
+
+[dev-dependencies]
+yubihsm = { version = "0.41.0", features = ["mock"] }
+bip-check = { git = "https://github.com/bitcoin/bips-check" }
+web5-test-vectors = "0.2.0"
+
+[features]
+default = ["audit"]
+audit = ["cargo-audit"]
+hardware = ["hsm-sdk", "sgx-trusted"]
+hsm = ["yubihsm", "secp256k1/hsm"]
+chaos = ["libp2p/chaos", "tokio/full"] 

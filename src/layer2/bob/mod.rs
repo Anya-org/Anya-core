@@ -392,4 +392,10 @@ impl Default for Metrics {
             network_usage: HashMap::new(),
         }
     }
+}
+
+pub struct BobIntegration {
+    l2_client: BobClient,
+    bitcoin_relay: BitcoinRelay,
+    state_manager: StateManager,
 } 

@@ -19,6 +19,10 @@ interface MobileSDK {
   // HSM Integration
   initHsm(config: HsmConfig): Promise<void>;
   signWithHsm(message: string): Promise<string>;
+
+  createTaprootWallet(mnemonic: string): Promise<TaprootAddress>;
+  signPsbt(psbt: string): Promise<string>;
+  verifyBitcoinPayment(proof: BitcoinSPV): Promise<boolean>;
 }
 
 interface WalletInfo {

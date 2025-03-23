@@ -2,17 +2,47 @@
 name = "anya-installer"
 version.workspace = true
 edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
 
 # Inherit workspace config
 workspace = ".."
 
 [dependencies]
-anyhow = "1.0"
-sysinfo = "0.29"
-tokio = { version = "1.0", features = ["full"] }
-log = "0.4"
-env_logger = "0.10"
-futures = "0.3"
-reqwest = { version = "0.11", features = ["json"] }
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
+anyhow.workspace = true
+bitcoin.workspace = true
+secp256k1.workspace = true
+tokio.workspace = true
+serde.workspace = true
+
+# Security-critical dependencies
+ring = { version = "0.17.8", features = [
+    "alloc",
+    "std",
+    "digest",
+    "hkdf",
+    "hmac",
+    "aead",
+    "chacha20-poly1305"
+] }
+sysinfo = { version = "0.30.7", default-features = false }
+
+# Network stack
+reqwest = { version = "0.11.24", features = [
+    "json",
+    "rustls-tls",
+    "stream"
+], default-features = false }
+
+# Hardware Security
+hsm-sdk = { version = "3.2.0", features = [
+    "taproot",
+    "bip340",
+    "secp256k1"
+] }
+
+[dev-dependencies]
+proptest = { version = "1.4.0", features = ["bitcoin"] }
+tempfile = "3.10.0"
+assert_fs = "1.1.1"

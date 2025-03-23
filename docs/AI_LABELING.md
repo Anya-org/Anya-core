@@ -221,11 +221,11 @@ def track_ai_items():
 
 3. **Documentation**
    - Include AI labels in:
-     * Code comments
-     * Commit messages
-     * Pull requests
-     * Documentation
-     * Issue tickets
+     - Code comments
+     - Commit messages
+     - Pull requests
+     - Documentation
+     - Issue tickets
 
 4. **Tracking**
    - Regular status updates

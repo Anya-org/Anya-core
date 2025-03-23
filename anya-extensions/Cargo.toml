@@ -26,6 +26,11 @@ web5 = { workspace = true }
 # Internal Dependencies
 anya-core = { path = "..", version = "0.2.0" }
 
+# Correct workspace inheritance
+secp256k1.workspace = true
+bitcoin.workspace = true
+bitcoincore-rpc.workspace = true
+
 [features]
 default = ["standard"]
 standard = []

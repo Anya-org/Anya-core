@@ -1,0 +1,59 @@
+name: Bitcoin Framework CI/CD
+
+on: [push, pull_request]
+
+env:
+  CARGO_TERM_COLOR: always
+  RUSTFLAGS: "-D warnings"
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        rust: [stable, 1.75.0]
+        target: [x86_64-unknown-linux-gnu, aarch64-unknown-linux-gnu]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install Rust
+      uses: actions-rs/toolchain@v1
+      with:
+        profile: minimal
+        toolchain: ${{ matrix.rust }}
+        target: ${{ matrix.target }}
+        override: true
+
+    - name: Cache dependencies
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+          target
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+    - name: Basic checks
+      run: |
+        cargo check --all-targets --verbose
+        cargo fmt --all -- --check
+        cargo clippy --all-targets -- -D warnings
+
+    - name: Run tests
+      run: |
+        cargo test --release --all-features -- --test-threads=1
+
+  security-audit:
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Security audit
+      run: |
+        cargo install cargo-audit
+        cargo audit --deny warnings
+        cargo deny check bans 

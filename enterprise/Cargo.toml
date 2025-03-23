@@ -1,19 +1,17 @@
 [package]
 name = "anya-enterprise"
-version = "0.1.0"
-edition = "2021"
-authors = ["Anya Enterprise Contributors"]
-description = "Enterprise features for Anya Core"
-license = "MIT OR Apache-2.0"
-repository = "https://github.com/anya-org/anya-core"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
 
 [dependencies]
-anya-core = { path = "../../anya-core", version = "0.1.0" }
+anya-core = { path = "../../anya-core", version.workspace = true }
 tokio = { workspace = true }
 serde = { workspace = true }
 
 [features]
-default = []
-advanced-security = ["dependency5", "dependency6"]
+default = ["zkp", "audit-logging"]
+advanced-security = ["secp256k1/zkp", "opentelemetry"]
 compliance = []
 audit-logging = []

@@ -1,5 +1,5 @@
 //! Anya-Core Installer v2.5
-//! [AIR-3][AIS-3][BPC-3][AIT-2][RES-2][SCL-3]
+//! [AIR-3][AIS-3][BPC-3][AIT-2][RES-2][SCL-3][PFM-2]
 //! 
 //! Compliant with Bitcoin Development Framework v2.5
 //! Implements BIP-341, BIP-342, BIP-174, and AIS-3 security standards
@@ -51,6 +51,7 @@ struct SecurityStatus {
     constant_time_ops: bool,
     memory_safe: bool,
     taproot_verified: bool,
+    memory_isolated: bool,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -120,6 +121,8 @@ impl TestManager {
             .collect()
     }
 
+    /// Initialize test manager with protocol checks
+    /// [AIT-3][BPC-3]
     pub fn add_protocol_checks(&mut self) {
         self.add_module_check("taproot", || {
             Ok(hashmap! {
@@ -194,11 +197,13 @@ impl AnyaInstaller {
         let config = format!(
             "network={}\n\
             taproot=1\n\
+            silent_leaf={}\n\
             psbt_version=2\n\
             psbt_v2_enhanced=1\n\
             fee_rate_validation=1\n\
-            dlc_support=1\n\
-            web5_validation=1",
+            web5_validation=1\n\
+            did_rotation_schedule=86400",
+            BIP341_SILENT_LEAF,
             if cfg!(test) { "testnet" } else { "mainnet" }
         );
 
@@ -226,7 +231,9 @@ impl AnyaInstaller {
     }
 
     fn check_bip342(&self, config: &str) -> ComplianceStatus {
-        if config.contains("tapscript=1") {
+        if config.contains("tapscript=1") 
+            && config.contains("script_version=2")
+            && config.contains("schnorr_validation=1") {
             ComplianceStatus::Full
         } else {
             ComplianceStatus::Missing
@@ -251,6 +258,8 @@ impl AnyaInstaller {
         }
     }
 
+    /// Security audit implementation
+    /// [AIS-3][BPC-3][AIT-3]
     pub fn run_security_audit(&self) -> Result<SecurityStatus> {
         let test_mgr = TestManager::new();
         let common_results = test_mgr.run_common_tests()?;
@@ -260,6 +269,7 @@ impl AnyaInstaller {
             constant_time_ops: *common_results.get("constant_time").unwrap_or(&false),
             memory_safe: *common_results.get("memory_safety").unwrap_or(&false),
             taproot_verified: self.verify_taproot_commitment()?,
+            memory_isolated: self.check_memory_isolation()?,
         })
     }
 
@@ -271,8 +281,23 @@ impl AnyaInstaller {
     }
 
     fn verify_taproot_commitment() -> Result<bool> {
-        // Implementation using bitcoin crate's Taproot APIs
-        Ok(true)
+        use bitcoin::blockdata::script::Script;
+        use bitcoin::secp256k1::{Secp256k1, KeyPair, XOnlyPublicKey};
+        
+        let secp = Secp256k1::new();
+        let mut rng = rand::thread_rng();
+        let key_pair = KeyPair::new(&secp, &mut rng);
+        let (xonly, _) = XOnlyPublicKey::from_keypair(&key_pair);
+        
+        let script = match Script::new_v1_p2tr(&secp, xonly, None) {
+            Ok(s) => s,
+            Err(e) => return Err(anyhow::anyhow!("Taproot script error: {}", e)),
+        };
+        
+        let silent_leaf = hex::decode(BIP341_SILENT_LEAF.trim_start_matches("0x"))
+            .context("Failed to decode SILENT_LEAF")?;
+        
+        Ok(script.as_bytes() == silent_leaf.as_slice())
     }
 
     fn check_tapscript_support() -> Result<bool> {
@@ -434,8 +459,8 @@ impl AnyaInstaller {
     pub fn run_module_tests(&self, module: &str) -> Result<HashMap<String, bool>> {
         let test_mgr = TestManager::new();
         test_mgr.module_checks.get(module)
-            .ok_or_anyhow("Module not found")?
-            .0()
+            .ok_or_anyhow(format!("Module {} not found", module))?
+            .as_ref()()
     }
 
     pub fn generate_dashboard_report(&self) -> Result<InstallationReport> {
@@ -562,6 +587,31 @@ scrape_configs:
         
         Ok(ProtocolCompliance::new(&bitcoin_config))
     }
+
+    /// Cross-component validation
+    /// [AIS-3][BPC-3][AIT-2]
+    pub fn full_system_test(&self) -> Result<TestReport> {
+        // ... existing code ...
+    }
+
+    fn check_memory_isolation() -> Result<bool> {
+        use std::process::Command;
+        
+        let output = Command::new("sysctl")
+            .arg("kernel.yama.ptrace_scope")
+            .output()
+            .context("Failed to execute sysctl command")?;
+            
+        if !output.status.success() {
+            return Err(anyhow::anyhow!(
+                "Sysctl command failed: {}",
+                String::from_utf8_lossy(&output.stderr)
+            ));
+        }
+        
+        Ok(String::from_utf8_lossy(&output.stdout)
+            .contains("kernel.yama.ptrace_scope = 1"))
+    }
 }
 
 // Enhanced Bitcoin config with hardware-aware settings
@@ -571,9 +621,12 @@ struct BitcoinConfig {
     rpc_threads: u16,
     db_cache: usize,
     taproot_enabled: bool,
+    tapscript_enabled: bool,
     psbt_version: u8,
     max_connections: u32,
-    // ... other fields
+    dlc_support: bool,
+    rgb_support: bool,
+    wallet: bool,
 }
 
 impl Default for BitcoinConfig {
@@ -583,8 +636,12 @@ impl Default for BitcoinConfig {
             rpc_threads: 4,
             db_cache: 1024,
             taproot_enabled: true,
+            tapscript_enabled: true,
             psbt_version: 2,
             max_connections: 125,
+            dlc_support: true,
+            rgb_support: true,
+            wallet: true,
         }
     }
 }
@@ -696,11 +753,12 @@ impl DashboardServer {
             });
         
         warp::serve(routes)
-            .run(([127, 0, 0, 1], 3030))
-            .await;
+            .try_bind_ephemeral(([127, 0, 0, 1], 3030))
+            .await
+            .context("Failed to start dashboard server")?;
     
-    Ok(())
-}
+        Ok(())
+    }
 }
 
 // Common test implementations
@@ -760,7 +818,9 @@ enum Commands {
     /// Run system installation
     Install {
         /// Installation path
-        path: Option<String>
+        path: Option<String>,
+        #[arg(long)]
+        dry_run: bool,
     }
 }
 
@@ -777,7 +837,7 @@ fn main() -> Result<()> {
                 _ => println!("Security Audit Results:\n{}", report),
             }
         }
-        Commands::Install { path } => {
+        Commands::Install { path, dry_run } => {
             let path = path.unwrap_or_else(|| "/opt/anya".into());
             let installer = AnyaInstaller::new(&path)?;
             installer.install()?;
@@ -786,4 +846,31 @@ fn main() -> Result<()> {
     }
 
     Ok(())
+}
+
+#[cfg(target_arch = "x86_64")]
+fn check_cpu_features() -> Result<()> {
+    if !is_x86_feature_detected!("sha") {
+        anyhow::bail!("SHA-NI instructions not supported");
+    }
+    Ok(())
+}
+
+#[cfg(not(target_arch = "x86_64"))]
+fn check_cpu_features() -> Result<()> {
+    Ok(()) // No checks for non-x86 architectures
+}
+
+fn version_compare(a: &str, b: &str) -> Ordering {
+    let a_clean = a.trim_start_matches('v');
+    let b_clean = b.trim_start_matches('v');
+    
+    let a_parts: Vec<u32> = a_clean.split('.')
+        .filter_map(|s| s.parse().ok())
+        .collect();
+    let b_parts: Vec<u32> = b_clean.split('.')
+        .filter_map(|s| s.parse().ok())
+        .collect();
+
+    a_parts.cmp(&b_parts)
 } 

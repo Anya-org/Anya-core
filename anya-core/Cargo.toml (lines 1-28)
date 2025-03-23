@@ -1,0 +1,13 @@
+[workspace]
+members = [
+    ".",
+    "dependencies/anya-bitcoin",  # Correct path
+    "dependencies/anya-web5",
+    "anya-enterprise",
+    "anya-extensions",
+    "dash33",
+    "mobile"
+]
+
+[workspace.dependencies]
+secp256k1 = { version = "0.28.0", features = ["bitcoin_hashes", "std", "serde"] } 
