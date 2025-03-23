@@ -49,7 +49,7 @@ graph TB
     subgraph Submodules[Primary Submodules]
         dash33[dash33 - AI Decision Engine]
         enterprise[Enterprise Integration]
-        mobile[Mobile Interface]
+        mobile[Mobile Interface (React Native)]
         web5[Web5 Implementation]
         tokenomics[Bitcoin-Style Tokenomics]
     end

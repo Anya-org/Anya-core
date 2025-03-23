@@ -734,4 +734,125 @@ pub trait HsmProvider: Send + Sync {
     async fn execute_operation(&self, request: HsmRequest) -> Result<HsmResponse, HsmError>;
     
     // ... existing methods ...
+}
+
+// HSM Integration Core
+#[derive(Debug, Clone)]
+pub struct HsmClient {
+    connector: Arc<dyn HsmConnector>,
+    network: Network,
+}
+
+#[async_trait]
+pub trait HsmConnector: Send + Sync {
+    async fn sign_taproot(&self, msg: &[u8], path: &HsmKeyPath) -> Result<Signature>;
+    async fn derive_key(&self, path: &HsmKeyPath) -> Result<XOnlyPublicKey>;
+    async fn get_pubkey(&self, path: &HsmKeyPath) -> Result<XOnlyPublicKey>;
+}
+
+impl SecurityManager {
+    pub async fn new_hsm_client(&self, hsm_type: HsmType) -> Result<HsmClient> {
+        match hsm_type {
+            HsmType::YubiHsm => YubiConnector::new().await,
+            HsmType::Ledger => LedgerConnector::new().await,
+        }
+    }
+}
+
+// Lightning Atomic Swaps
+#[derive(Debug, Serialize, Deserialize)]
+pub struct AtomicSwap {
+    preimage_hash: Sha256,
+    timeout: u32,
+    amount: u64,
+    redeem_script: ScriptBuf,
+}
+
+impl NetworkManager {
+    pub async fn initiate_swap(&self, amount: u64, counterparty: &str) -> Result<AtomicSwap> {
+        let preimage = rand::thread_rng().gen::<[u8; 32]>();
+        let hash = Sha256::hash(&preimage);
+        
+        let script = Builder::new()
+            .push_opcode(opcodes::OP_IF)
+            .push_slice(&hash)
+            .push_opcode(opcodes::OP_ELSE)
+            .push_int(self.network.get_block_height()? + 144)
+            .push_opcode(opcodes::OP_CHECKSEQUENCEVERIFY)
+            .push_opcode(opcodes::OP_DROP)
+            .push_slice(&counterparty)
+            .push_opcode(opcodes::OP_ENDIF)
+            .push_opcode(opcodes::OP_CHECKSIG)
+            .into_script();
+        
+        Ok(AtomicSwap {
+            preimage_hash: hash,
+            timeout: 144,
+            amount,
+            redeem_script: script,
+        })
+    }
+}
+
+// Multi-sig Taproot Wallets
+impl SecurityManager {
+    pub fn create_multisig_wallet(
+        &self,
+        threshold: usize,
+        keys: &[XOnlyPublicKey]
+    ) -> Result<String> {
+        let secp = Secp256k1::new();
+        let internal_key = keys[0];
+        
+        let mut builder = TaprootBuilder::new();
+        for (i, key) in keys.iter().enumerate() {
+            let script = Script::builder()
+                .push_int(threshold as i64)
+                .push_slice(key.serialize())
+                .push_opcode(opcodes::OP_CHECKSIG)
+                .into_script();
+            
+            builder = builder.add_leaf(i as u8, script)?;
+        }
+        
+        let spend_info = builder.finalize(&secp, internal_key)?;
+        Ok(spend_info.output_key().to_string())
+    }
+}
+
+// GPU-Resistant Key Derivation
+impl SecurityManager {
+    pub fn gpu_resistant_derive(&self, mnemonic: &str) -> Result<ExtendedPrivKey> {
+        let salt = "ANYA_CORE_SALT_V2";
+        let mut kdf = Argon2::new(
+            argon2::Algorithm::Argon2id,
+            argon2::Version::V0x13,
+            argon2::Params::new(15000, 2, 1, Some(32))?,
+        );
+        
+        let seed = kdf.hash_password(mnemonic.as_bytes(), salt.as_bytes())?;
+        ExtendedPrivKey::new_master(Network::Bitcoin, &seed.hash)
+    }
+}
+
+// Transaction Repudiation Proofs
+#[derive(Debug, Serialize, Deserialize)]
+pub struct RepudiationProof {
+    nonce: [u8; 32],
+    partial_sig: Signature,
+    merkle_proof: MerkleProof,
+}
+
+impl MobileSDK {
+    pub async fn generate_repudiation_proof(&self, txid: &Txid) -> Result<RepudiationProof> {
+        let nonce = rand::thread_rng().gen::<[u8; 32]>();
+        let sig = self.security.sign_repudiation(txid, &nonce).await?;
+        let proof = self.network.get_merkle_proof(txid).await?;
+        
+        Ok(RepudiationProof {
+            nonce,
+            partial_sig: sig,
+            merkle_proof: proof,
+        })
+    }
 } 

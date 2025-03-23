@@ -46,29 +46,17 @@ pub mod wallet;         // Secure HD wallet implementation
 pub mod transaction;    // Transaction creation and signing
 
 // Advanced Bitcoin functionality
-pub mod taproot;        // Taproot support
-pub mod dlc;           // Discrete Log Contracts
-pub mod rgb;           // RGB asset issuance
+pub mod taproot;        // Taproot support (BIP 341/342)
+pub mod rgb;           // RGB-20/21 asset issuance
 
-// Explicitly re-export DLC submodules
-pub use dlc::{
-    create_contract,
-    execute_contract,
-    refund_contract,
-    list_contracts,
-    get_contract_status,
-    ContractStatus,
-    contract::{DlcContract, ContractInfo, ContractOutcome},
-    oracle::{Oracle, OracleEvent, OracleAttestation, OraclePublicKey},
-    cet::ContractExecutionTransaction,
-    adaptor::AdaptorSignature,
-};
+// Re-export unified DLC implementation
+pub use rgb::dlc::*;  // Unified DLC implementation
 
 // Web5 functionality
-pub mod web5;          // Web5 implementation
+pub mod web5;          // Web5 with Bitcoin anchoring
 
 // Integrations
-pub mod lightning;      // Lightning Network support
+pub mod lightning;      // BOLT11-compliant LN support
 pub mod rsk;           // RSK sidechain integration
 pub mod stacks;        // Stacks blockchain integration
 

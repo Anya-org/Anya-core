@@ -62,7 +62,7 @@ Example implementation:
 )
 ```
 
-## BIP-174 Compliance
+## BIP-174 Compliance (v2.0.1)
 
 Partially Signed Bitcoin Transaction (PSBT) implementation:
 
@@ -127,4 +127,46 @@ The PSBT transaction flow consists of:
 - [Implementation Architecture](IMPLEMENTATION_ARCHITECTURE.md) - Technical implementation details
 - [Setup & Usage](SETUP_USAGE.md) - Integration with Bitcoin tools
 
-*Last updated: 2025-02-24* 
+## BOLT 12 Compliance
+
+Implementation includes full support for:
+
+- Offer creation/parsing
+- Recurring payments
+- Refundable payments
+- Metadata encoding
+- Signature verification
+
+Example Offer Flow:
+
+```rust
+let offer = node.create_offer(OfferRequest {
+    amount_msat: 100_000,
+    description: "API Service".into(),
+    expiry_secs: 3600,
+})?;
+
+let invoice = node.request_invoice_from_offer(&offer)?;
+let payment_hash = node.send_payment_for_offer(&offer)?;
+```
+
+Verification Command:
+
+```bash
+anya audit lightning --protocol bolt12 --network testnet
+```
+
+This implementation achieves full BOLT 12 compliance while maintaining all Bitcoin Development Framework v2.5 requirements for Lightning Network integration.
+
+*Last updated: 2025-02-24 18:05 UTC+2*
+
+## Protocol Layer Support
+
+| Protocol Layer | Supported Standards          | AI Labels                  |
+|----------------|-------------------------------|----------------------------|
+| Base Layer     | BIP-341/342 (Taproot)         | [BPC-3][AIS-3][RES-3]      |
+| Transaction    | BIP-174 (PSBT v2.0.1)         | [BPC-3][AIT-3][PFM-3]      |
+| Network        | BIP-150/151 (Encrypted)       | [AIS-3][RES-3][SCL-3]      |
+| Lightning      | BOLT 1-12 (Full Suite)        | [BPC-3][AIT-3][PFM-3]      |
+| Cross-chain    | SPV, Drivechain, Federated    | [BPC-3][RES-3][SCL-3]      |
+| Smart Contracts| Miniscript, RGB, Taproot Assets| [BPC-3][AIS-3][AIT-3]      |

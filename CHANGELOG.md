@@ -25,6 +25,9 @@ All notable changes to the Anya Core project will be documented in this file.
 - Git hooks for enforcing AI labeling standards in commits
 - Documentation deprecation script for legacy AI labeling files
 - Repository branch structure documentation and organization
+- React Native 0.72+ support
+- react-native-bitcoin integration
+- TurboModule-based performance optimizations
 
 ### Changed
 
@@ -52,6 +55,9 @@ All notable changes to the Anya Core project will be documented in this file.
 - TripleDesCbc encryption algorithm
 - Insecure Merkle proof verification implementation
 - Overlapping acronyms in AI labeling system
+- Dart/Flutter mobile implementation
+- dart-bitcoin dependencies
+- Flutter-specific toolchain
 
 ### Security
 
@@ -67,6 +73,10 @@ All notable changes to the Anya Core project will be documented in this file.
 - Improved SPV verification with proper double-SHA256 implementation and constant-time comparisons
 - Enhanced Bitcoin payment verification with secure cryptographic operations
 - Standardized security documentation using consistent AI labeling system
+- Replaced insecure Math.random() with crypto-safe RNG
+- Added BIP-341 SILENT_LEAF validation
+- Implemented constant-time hash comparisons
+- Removed DES algorithm usage
 
 ## [0.9.5] - 2025-03-16
 
