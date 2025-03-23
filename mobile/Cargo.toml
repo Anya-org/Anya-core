@@ -1,10 +1,27 @@
+[package]
+name = "anya-mobile"
+version.workspace = true
+edition.workspace = true
+
 [target.'cfg(mobile)'.dependencies]
-anya-mobile = { git = "https://github.com/anya-org/anya-mobile" }
-secp256k1 = { workspace = true, features = ["mobile", "bip340", "bip341"] }
 bitcoin = { workspace = true, features = ["mobile", "taproot", "bip341"] }
+secp256k1 = { workspace = true, features = ["mobile", "bip340", "bip341"] }
+jsi = { version = "0.12", features = ["bitcoin-bindings"] }
 
 [features]
-default = ["bip340", "bip341", "bip342"]
+default = ["bip340", "bip341"]
 bip340 = ["secp256k1/bip340"]
-bip341 = ["bitcoin/bip341", "secp256k1/bip341"]
-bip342 = ["bitcoin/bip342", "secp256k1/bip342"] 
+bip341 = [
+    "bitcoin/bip341", 
+    "secp256k1/bip341",
+    "web5/bip341"  # Add missing feature
+]
+
+[dependencies]
+# Sync with external repo
+bitcoin = { workspace = true, features = ["mobile", "taproot", "bip341"] }
+jsi = { version = "0.12", features = ["bitcoin-bindings"] }  # Keep local version
+
+# Add missing from external
+bdk = { workspace = true, features = ["psbt-v2"] }
+web5 = { workspace = true, features = ["mobile", "bip341"], optional = true } 
