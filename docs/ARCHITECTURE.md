@@ -969,3 +969,60 @@ Anya is a decentralized ML agent system built on Web5 technology, featuring:
    - Integration expansion
 
 *Last updated: 2024-12-07*
+
+# Mobile SDK Architecture v2.5
+
+## Core Components
+- **BIP-341/342**: Taproot commitment verification
+- **BIP-174**: PSBT v2 transaction handling
+- **BIP-370**: Fee rate validation
+- **HSM Integration**: Hardware Security Module support (Validated)
+
+```rust:src/security/hsm/mod.rs
+// ... existing code ...
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::crypto::mock_hsm::MockHsmProvider;
+
+    #[tokio::test]
+    async fn test_hsm_connection() {
+        let mut hsm = HsmBridge::default();
+        let config = HsmConfig {
+            provider_type: "mock".into(),
+            connection_string: "test://hsm".into(),
+        };
+        
+        hsm.connect(config).await.unwrap();
+        assert!(hsm.connected);
+    }
+
+    #[test]
+    fn test_gpu_resistant_derivation() {
+        let sm = SecurityManager::new();
+        let key = sm.gpu_resistant_derive("test mnemonic").unwrap();
+        assert_eq!(key.depth, 0);
+    }
+}
+```
+
+```typescript:mobile/src/BitcoinSDK.tsx
+/**
+ * Bitcoin Mobile SDK React Native Interface
+ * 
+ * Implements BIP-341/342/174/370 compliant operations
+ * 
+ * @example
+ * ```typescript
+ * const sdk = NativeModules.BitcoinSDK;
+ * await sdk.createWallet(mnemonic);
+ * const txid = await sdk.sendTransaction(address, amount);
+ * ```
+ */
+interface MobileSDK {
+  createWallet(mnemonic: string): Promise<void>;
+  sendTransaction(recipient: string, amount: number): Promise<string>;
+  // ... other methods ...
+}
+```

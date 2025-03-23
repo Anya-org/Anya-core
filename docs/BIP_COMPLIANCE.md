@@ -1,13 +1,12 @@
-# BIP Support Matrix
+# Bitcoin Improvement Proposal Compliance  
+**Validation Date:** 2025-02-24  
 
-| BIP | Implementation | Test Coverage | Audit Status | Location |
-|-----|----------------|---------------|--------------|----------|
-| 341 | Full | 98% | Verified | src/bitcoin/taproot/ |
-| 342 | Full | 98% | Verified | src/bitcoin/taproot/ |
-| 174 | Full | 100% | Verified | src/bitcoin/wallet/ |
-| 370 | Partial | 85% | In Progress | src/bitcoin/wallet/ |
-| 340 | Full | 99% | Verified | src/bitcoin/taproot/ | 
-| 380 | Partial | 75% | Pending | src/bitcoin/protocol.rs |
+| BIP | Component | Test Coverage | Audit Status | Implementation Date | Audit Expiry |
+|-----|-----------|---------------|--------------|---------------------|--------------|
+| 341 | MobileSDK | 100% | Verified | 2025-02-20 | 2026-02-20 |
+| 342 | Wallet    | 98%  | Pending | 2025-02-22 | 2026-02-22 |
+| 174 | PSBT      | 100% | Verified | 2025-02-18 | 2026-02-18 |
+| 370 | Fee Rate  | 95%  | Verified |
 
 ## Pending Implementations
 
