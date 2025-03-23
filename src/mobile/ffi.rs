@@ -1,10 +1,17 @@
-// Unified FFI for React Native
+// Unified mobile FFI interface
 #[react-native::bridge]
 mod ffi {
     extern "Rust" {
-        fn create_wallet(mnemonic: String) -> Result<()>;
-        fn send_transaction(recipient: String, amount: u64) -> Result<String>;
-        fn create_lightning_invoice(amount: u64) -> Result<String>;
-        fn init_hsm(config: HsmConfig) -> Result<()>;
+        // Core wallet operations
+        fn create_taproot_wallet(mnemonic: String) -> Result<String>;
+        fn sign_psbt(psbt: String) -> Result<String>;
+        fn verify_payment(proof: String) -> Result<bool>;
+        
+        // HSM operations
+        fn init_hsm(config: String) -> Result<()>;
+        fn hsm_sign(message: String) -> Result<String>;
+        
+        // Compliance features
+        fn generate_compliance_badge() -> Result<String>;
     }
 } 

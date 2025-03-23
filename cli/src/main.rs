@@ -77,6 +77,10 @@ enum Commands {
     }
 }
 
+fn main() {
+    println!("Anya CLI v2.5 - Bitcoin Development Framework");
+}
+
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     let cli = Cli::parse();
