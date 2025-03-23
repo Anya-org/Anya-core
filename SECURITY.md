@@ -11,6 +11,7 @@
 ## Security Principles
 
 ### 1. Cryptographic Integrity
+
 - All cryptographic implementations must adhere to Bitcoin Core security standards
 - Use only well-vetted, open-source cryptographic libraries
 - Implement constant-time comparison algorithms
@@ -19,6 +20,7 @@
 ### 2. Vulnerability Management
 
 #### Reporting Process
+
 1. **Confidential Disclosure**
    - Email: `security@anya-project.org`
    - PGP Key: [Available in `/security/pgp-key.asc`]
@@ -39,12 +41,14 @@
 ### 3. Responsible Disclosure Guidelines
 
 #### For Security Researchers
+
 - Always act in good faith
 - Do not exploit discovered vulnerabilities
 - Provide detailed, reproducible proof-of-concept
 - Allow reasonable time for mitigation before public disclosure
 
 #### For Project Maintainers
+
 - Transparent communication
 - No retaliation against good-faith researchers
 - Clear, documented remediation process
@@ -53,6 +57,7 @@
 ### 4. Threat Model Considerations
 
 #### Attack Vectors
+
 - Cryptographic weaknesses
 - Side-channel attacks
 - Economic incentive manipulation
@@ -69,12 +74,14 @@
 ## Bug Bounty Program
 
 ### Reward Tiers
+
 - **Critical Vulnerabilities**: $10,000 - $50,000
 - **High Impact Vulnerabilities**: $5,000 - $10,000
 - **Medium Impact**: $1,000 - $5,000
 - **Low Impact**: $100 - $1,000
 
 ### Eligibility Criteria
+
 - First verified reporter
 - Unique and previously unreported vulnerability
 - Detailed reproduction steps
@@ -96,3 +103,12 @@
 **Version**: 1.0.0
 
 *Last updated: 2024-12-07*
+
+## Cryptographic Implementation [AIS-3][BPC-3]
+Aligned with Bitcoin Development Framework v2.5 Chapter 7
+
+### Mandatory Requirements
+- 256-bit keys for all operations
+- SHA-256 for integrity checks
+- Constant-time comparisons
+- BIP-341/342 compliant Taproot scripts

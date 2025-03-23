@@ -36,4 +36,28 @@
   - Steps: ...
   - Expected Result: ...
 
+## Compliance Testing [AIT-3][RES-3]
+
+### BIP Validation Suite
+```bash
+anya test-bip --bip=341,342,174
+```
+
+### Security Validation
+```bash
+anya validate-security --level=bpc3
+```
+
+### Audit Requirements
+```javascript
+// Sample audit configuration
+const auditConfig = {
+  bip341: {
+    silentLeaf: true,
+    merkleValidation: 'constant-time'
+  },
+  rng: 'secure'
+};
+```
+
 *Last updated: 2024-12-07*
