@@ -111,3 +111,21 @@ Welcome to the Anya Core documentation. This index will help you navigate the va
 ## Mobile Interface
 
 - [React Native Components](https://reactnative.directory/anya-mobile)
+
+## Mobile Development
+
+- [React Native SDK](https://github.com/anya-org/anya-mobile) - Production-ready mobile components
+- [Mobile Security](docs/mobile/SECURITY.md) - Secure Bitcoin wallet implementation
+- [Taproot Mobile Guide](docs/mobile/TAPROOT.md) - Mobile Taproot transactions
+
+*Last updated: 2025-03-23 14:30 UTC+2*
+
+- **Mobile Development** (Verified ✅)
+  - React Native SDK: v3.1.0
+  - Taproot Support: Full BIP-341/342 compliance
+  - Security: HSM-integrated wallet
+
+- **Bitcoin Protocol** (Verified ✅)
+  - Core: 0.32.1
+  - Taproot: Enabled
+  - PSBT: v2 support

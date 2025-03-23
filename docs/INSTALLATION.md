@@ -1,6 +1,7 @@
 # Anya Core Installation v2.5
 
 ## Compliance Requirements
+
 - **BIP-341 (Taproot)**: SILENT_LEAF pattern verification
 - **BIP-174 (PSBT)**: Version 2 mandatory
 - **AIS-3 Security**:
@@ -9,6 +10,7 @@
   - Memory-safe practices
 
 ## Updated Security Requirements
+
 - **BIP-370 (PSBT v2)**: Fee rate validation mandatory
 - **AIS-3 Enhancements**:
   - Constant-time hash comparisons for all security operations
@@ -78,10 +80,12 @@ This implementation provides:
    - Compliance status tracking
 
 To use:
+
 1. Build with `cargo build --release`
 2. Run with elevated privileges: `sudo ./target/release/anya_installer`
 
 The installer automatically:
+
 - Creates secure Bitcoin configuration
 - Generates audit logs
 - Validates against BIP standards
@@ -430,6 +434,7 @@ If you encounter issues:
 9. Verify router configuration
 
 **Error**: "PSBT version 2 required"
+
 - Verify Bitcoin Core 24.0+ is installed
 - Check config contains `psbt_version=2`
 - Run `anya-installer reconfigure --psbt-v2`
@@ -461,5 +466,46 @@ For support and documentation, visit: <https://anya.org/docs>
 - [Router Configuration](https://lightningdevkit.org/book/router.html)
 
 Mobile:
+
   - React Native 0.72+
   - Android Studio/Xcode with Rust toolchain
+
+## Continuous Integration
+
+```bash
+# Run CI checks locally
+act -j build-and-test
+act -j security-audit
+
+# Run security tests
+cargo test --release --lib --bins -p anya-installer -- security::
+```
+
+## Audit Process
+
+1. Weekly automated security audits
+2. On-demand compliance checks
+3. Fuzz testing integration
+4. Hardware Security Module (HSM) validation
+
+![Audit Workflow](docs/images/audit_workflow.png)
+
+## Web5 Security Requirements
+
+- **DID Configuration**:
+  ```bash
+  anya-cli web5 configure-did --method did:key --format jwk
+  ```
+  
+- **Credential Validation**:
+  ```rust
+  let vc = VerifiableCredential::new()
+      .add_context("https://www.w3.org/2022/credentials/v1")
+      .add_type("VerifiableCredential")
+      .validate_format(VCFormat::JWT2020)?;
+  ```
+
+- **Revocation Checks**:
+  ```bash
+  anya-validator check-revocation --credential credential.json
+  ```

@@ -70,4 +70,22 @@ pub fn verify_all() {
         .expect("Failed to write compliance report");
     
     info!("Comprehensive compliance report generated in {}/compliance_report.md", report_dir);
+}
+
+pub struct ComplianceCheck {
+    pub bip341_verified: bool,
+    pub psbt_v2_compliant: bool,
+    pub taproot_ready: bool,
+    pub dlc_valid: bool,
+}
+
+impl AnyaCore {
+    pub fn verify_transaction_compliance(&self, tx: &Transaction) -> ComplianceCheck {
+        ComplianceCheck {
+            bip341_verified: verify_bip341(&tx),
+            psbt_v2_compliant: check_psbt_version(&tx, 2),
+            taproot_ready: is_taproot_script(&tx.output),
+            dlc_valid: verify_dlc_conditions(&tx),
+        }
+    }
 } 

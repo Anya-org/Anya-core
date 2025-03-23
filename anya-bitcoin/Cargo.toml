@@ -1,25 +1,28 @@
-[package]
 name = "anya-bitcoin"
 version.workspace = true
 edition.workspace = true
-description = "Bitcoin-specific functionality for Anya project"
 authors.workspace = true
 license.workspace = true
+description.workspace = true
 
 [dependencies]
-# Core Dependencies
-bitcoin = { version = "0.32.1", features = ["rand", "serde", "taproot"] }
-bitcoincore-rpc = { workspace = true }
-secp256k1 = { workspace = true, version = "0.28.0" }
-
-# Workspace Dependencies
-tokio = { workspace = true }
-serde = { workspace = true }
+# Workspace inheritance
+secp256k1.workspace = true
+bitcoin.workspace = true
+bitcoincore-rpc.workspace = true
+tokio.workspace = true
+serde.workspace = true
 
 [lib]
 name = "anya_bitcoin"
 path = "src/lib.rs"
 
 [features]
-default = []
-advanced = []
+default = ["mobile"]
+mobile = [
+    "bitcoin/mobile", 
+    "secp256k1/mobile",
+    "secp256k1-zkp/mobile",
+    "jsi"
+]
+advanced = ["bip340", "bip341", "bip342"]

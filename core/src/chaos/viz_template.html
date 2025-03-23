@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BDF Network Visualization</title>
+    <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+    <style>
+        #network {
+            width: 100vw;
+            height: 100vh;
+            border: 1px solid #2d2d2d;
+        }
+    </style>
+</head>
+<body>
+    <div id="network"></div>
+    <div id="metrics-panel">
+        <div>FPS: <span id="fps-counter">0</span></div>
+        <div>Nodes: <span id="node-count">0</span></div>
+        <div>Latency: <span id="data-latency">0ms</span></div>
+    </div>
+    <script>
+        const container = document.getElementById('network');
+        let network = null;
+
+        async function updateData() {
+            const response = await fetch('/data');
+            const {nodes, edges, metrics} = await response.json();
+            
+            const data = {
+                nodes: new vis.DataSet(nodes),
+                edges: new vis.DataSet(edges)
+            };
+            
+            const options = {
+                nodes: {
+                    shape: 'dot',
+                    size: 30
+                },
+                edges: {
+                    arrows: 'to',
+                    smooth: true
+                }
+            };
+            
+            if (!network) {
+                network = new vis.Network(container, data, options);
+            } else {
+                network.setData(data);
+            }
+            
+            document.title = `BDF Network | TPS: ${metrics.tps} | Latency: ${metrics.latency}ms`;
+        }
+
+        setInterval(updateData, 1000);
+        updateData();
+
+        let frameCount = 0;
+        let lastFrameTime = performance.now();
+
+        function trackPerformance() {
+            const now = performance.now();
+            const delta = now - lastFrameTime;
+            frameCount++;
+            
+            if (delta > 1000) {
+                const fps = Math.round((frameCount * 1000) / delta);
+                document.getElementById('fps-counter').textContent = fps;
+                frameCount = 0;
+                lastFrameTime = now;
+            }
+            
+            requestAnimationFrame(trackPerformance);
+        }
+        trackPerformance();
+    </script>
+</body>
+</html> 

@@ -445,4 +445,21 @@ Current implementation status:
 
 ## Last Updated
 
-March 20, 2025 
+*Last updated: 2025-03-23 14:30 UTC+2*
+
++----------------------------+
+| Mobile Interface           |
+| (React Native)             |
+| - Taproot Wallet           |
+| - Lightning Payments       |
+| - BIP-174 PSBT Support     |
++------------+---------------+
+             |
++------------v---------------+
+| Mobile Security Layer      |
+| - Hardware Key Storage     |
+| - Secure SPV Proofs        |
+| - BIP-341 Compliance       |
++----------------------------+
+
+*Last updated: 2025-02-24 18:05 UTC+2* 

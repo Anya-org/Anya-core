@@ -479,6 +479,12 @@ impl Default for AgentSystem {
     }
 }
 
+pub struct MLAgentCoordinator {
+    agents: Vec<Box<dyn MLAgent>>,
+    resource_pool: ResourcePool,
+    health_monitor: HealthMonitor,
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

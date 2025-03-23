@@ -855,4 +855,16 @@ impl MobileSDK {
             merkle_proof: proof,
         })
     }
+}
+
+pub struct HsmBridge {
+    provider: Box<dyn HsmProvider>,
+    connected: bool,
+}
+
+impl HsmBridge {
+    pub async fn sign_transaction(&mut self, psbt: &mut Psbt) -> Result<()> {
+        self.provider.sign_psbt(psbt).await?;
+        Ok(())
+    }
 } 

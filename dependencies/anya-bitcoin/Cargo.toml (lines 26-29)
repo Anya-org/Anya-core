@@ -1,0 +1,2 @@
+[features]
+default = ["bip174", "bip341"] 

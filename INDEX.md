@@ -79,6 +79,7 @@ Welcome to the Anya Core documentation. This index will help you navigate the va
 ## Key Features at a Glance
 
 ### DAO & Tokenomics System
+
 - **Bitcoin-Style Tokenomics**: 21 billion token supply with halving mechanism
 - **Strategic Distribution**: 30% DEX, 15% development team, 55% DAO/community
 - **Enhanced Governance**: Advanced proposal creation, voting, and execution
@@ -86,24 +87,28 @@ Welcome to the Anya Core documentation. This index will help you navigate the va
 - **Comprehensive Logging**: Complete transparency for all operations
 
 ### Hexagonal Architecture
+
 - Clean separation of concerns with ports and adapters
 - Domain-driven design principles
 - Advanced error handling and telemetry
 - Circuit breaker pattern implementation
 
 ### Bitcoin & Lightning Integration
+
 - Bitcoin Core support
 - Lightning Network capabilities
 - DLC (Discreet Log Contracts)
 - Taproot/Schnorr signatures
 
 ### Web5 Integration
+
 - Decentralized Web Nodes (DWN)
 - Decentralized Identity (DID)
 - Protocol-based data management
 - Encrypted storage
 
 ### AI & Machine Learning
+
 - Model management and execution
 - Real-time inference
 - Performance monitoring
@@ -118,7 +123,7 @@ Welcome to the Anya Core documentation. This index will help you navigate the va
 ## Release Information
 
 - **Current Version**: 3.1.0
-- **Last Updated**: 2025-03-12
+- **Last Updated**: 2025-03-23 14:30 UTC+2
 - **Compatibility**:
   - Stacks v2.4
   - Web5 Protocol v1.0
@@ -137,6 +142,9 @@ Welcome to the Anya Core documentation. This index will help you navigate the va
 - [scripts/bitcoin/mcp-server.js](./scripts/bitcoin/mcp-server.js) - MCP server implementation
 - [scripts/bitcoin/validate-bip-compliance.js](./scripts/bitcoin/validate-bip-compliance.js) - BIP compliance validation
 - [scripts/bitcoin/validate-security.js](./scripts/bitcoin/validate-security.js) - Bitcoin security validation
+- [BIP Compliance Matrix](docs/BIP_COMPLIANCE.md) - Full BIP-341/342 implementation status
+- [PSBT v2 Support](docs/PSBT_V2.md) - Partially Signed Bitcoin Transactions
+- [DLC Implementation](docs/DLC_IMPLEMENTATION.md) - Discrete Log Contracts
 
 ## Security Analysis Components
 
@@ -185,3 +193,11 @@ For full details on the AI labeling system, see [docs/standards/AI_LABELING.md](
 ## React Native Components
 
 - [React Native Components](https://reactnative.directory/anya-mobile)
+
+## Mobile Integration
+
+- [React Native SDK](https://github.com/anya-org/anya-mobile) - Bitcoin-compliant mobile components
+- [Mobile Security Guide](docs/mobile/SECURITY.md) - Secure mobile implementation
+- [Taproot Mobile Demo](docs/mobile/TAPROOT_DEMO.md) - Mobile Taproot examples
+
+*Last updated: 2025-02-24 18:05 UTC+2*

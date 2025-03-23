@@ -973,6 +973,7 @@ Anya is a decentralized ML agent system built on Web5 technology, featuring:
 # Mobile SDK Architecture v2.5
 
 ## Core Components
+
 - **BIP-341/342**: Taproot commitment verification
 - **BIP-174**: PSBT v2 transaction handling
 - **BIP-370**: Fee rate validation

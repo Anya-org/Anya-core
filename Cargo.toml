@@ -1,20 +1,57 @@
-[package]
-name = "anya-core"
-version = "0.1.0"
-edition = "2021"
-authors = ["Anya Core Team"]
-license = "MIT"
-repository = "https://github.com/anya-org/anya"
+# Remove all package-specific configuration
+[workspace]
+members = ["installer", "cli", "core", "network"]
+resolver = "2"
 
-[dependencies]
+[workspace.package]
+version = "2.5.0"
+edition = "2021"
+description = "Bitcoin Development Framework CLI"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/anya-core/bitcoin-framework"
+rust-version = "1.75"
+
+[workspace.dependencies]
+# Unified cryptographic stack (BDF §1.1)
+secp256k1 = { version = "0.28.1", features = [
+    "serde",
+    "recovery",
+    "alloc",
+    "bitcoin_hashes"
+] }
+bitcoin = { version = "0.31.0", features = [
+    "std", 
+    "base64",
+    "rand-std",
+    "serde",
+    "taproot"
+] }
+bitcoincore-rpc = { version = "0.17.0", features = ["bip174"] }
+
+# Protocol Adapters (BDF §2.1)
+web5 = { version = "0.5.0", features = [
+    "bip174", 
+    "bip341",
+    "secure-transport"
+], default-features = false }
+bdk = { version = "0.30.0", features = ["psbt-v2", "miniscript"] }
+
+# Shared Workspace Dependencies
+tokio = { version = "1.37.0", features = [
+    "full",
+    "tracing"
+] }
+serde = { version = "1.0.203", features = ["derive"] }
+
+# Shared workspace dependencies
+bitcoin-wallet = "1.1.0"
+
 # Core dependencies
-tokio = { version = "1.41.1", features = ["full"] }
 futures = "0.3.30"
-serde = { version = "1.0.215", features = ["derive"] }
 serde_json = "1.0.133"
 serde_yaml = "0.9.25"
 toml = "0.8.8"
-anyhow = "1.0.75"
+anyhow = { version = "1.0.79", features = ["backtrace"] }
 thiserror = "1.0"
 async-trait = "0.1.77"
 pyo3 = { version = "0.19.2", features = ["extension-module"] }
@@ -27,15 +64,9 @@ chrono = { version = "0.4", features = ["serde"] }
 reqwest = { version = "0.11", features = ["blocking", "json"] }
 
 # Web5 Integration
-web5 = { git = "https://github.com/TBD54566975/web5-rs", package = "web5", tag = "v4.0.0" }
 jsonschema = "0.17.1"
 
 # Blockchain Integration
-bitcoin = { version = "0.30.0", features = ["psbt-v2", "serde"] }
-bitcoincore-rpc = "0.17.0"
-secp256k1 = "0.27.0"
-bitcoin-wallet = "1.1.0"
-bdk = { version = "0.30.0", features = ["psbt-v2", "all-keys", "compiler"] }
 
 # Networking
 libp2p = { version = "0.53.1", features = ["full"] }
@@ -64,77 +95,4 @@ tokio-test = "0.4"
 rgb-core = { git = "https://github.com/RGB-WG/rgb-core", tag = "v0.10.0", features = ["dlc-utils"] }
 
 # Mobile dependencies
-react-native-bitcoin = { git = "https://github.com/anya-org/react-native-bitcoin", tag = "v2.5" }
 jsi = "0.10"
-
-[workspace]
-members = [
-    "anya-bitcoin",
-    "anya-lightning",
-    "anya-mobile",
-    "anya-crosschain",
-    "tests/integration",
-    "src/extensions/anya-extensions"
-]
-
-resolver = "2"
-
-[workspace.dependencies]
-anyhow = "1.0.80"
-bitcoin = { version = "0.30.2", features = ["std"] }
-lightning = { version = "0.0.117", features = ["std"] }
-tokio = { version = "1.37.0", features = ["full"] }
-serde = { version = "1.0.197", features = ["derive"] }
-
-[features]
-dlc = ["rgb-core/dlc-utils"]  # Discrete Log Contracts
-psbt-v2 = ["bitcoin/psbt-v2"]
-web5 = ["web5/web5"]
-
-[target.'cfg(unix)'.dependencies]
-std = { version = "1.0", features = ["os", "unix", "fs"] }
-
-[target.'cfg(windows)'.dependencies]
-std = { version = "1.0", features = ["os", "windows", "fs"] }
-
-[dev-dependencies]
-tokio-test = "0.4"
-mockall = "0.11"
-
-[profile.release]
-lto = true
-codegen-units = 1
-opt-level = 3
-strip = true
-
-[profile.dev]
-opt-level = 0
-debug = true
-
-[[bin]]
-name = "anya"
-path = "src/main.rs"
-
-[[bin]]
-name = "api_server"
-path = "src/bin/api_server.rs"
-
-[[bin]]
-name = "installer"
-path = "src/bin/installer.rs"
-
-[[bin]]
-name = "lightning_demo"
-path = "src/bin/lightning_demo.rs"
-
-[[bin]]
-name = "main"
-path = "src/bin/main.rs"
-
-[[bin]]
-name = "anya_validator"
-path = "src/bin/anya_validator.rs"
-
-[lib]
-name = "anya"
-path = "src/lib.rs"

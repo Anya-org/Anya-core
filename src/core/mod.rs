@@ -155,4 +155,32 @@ pub mod ports {
     }
     
     // Additional ports from BDF v2.5
+}
+
+// Hexagonal architecture implementation
+pub struct AnyaCore {
+    bitcoin_adapter: BitcoinAdapter,
+    web5_adapter: Web5Adapter,
+    ml_agent_system: MLAgentSystem,
+    dao_governance: DaoGovernance,
+    tokenomics: TokenomicsEngine,
+}
+
+impl AnyaCore {
+    // Core initialization with dependency injection
+    pub async fn new(config: Config) -> Result<Self> {
+        let bitcoin = BitcoinAdapter::new(config.bitcoin).await?;
+        let web5 = Web5Adapter::build(config.web5).await?;
+        let agents = MLAgentSystem::init(config.ml).await?;
+        let dao = DaoGovernance::initialize(config.dao).await?;
+        let tokenomics = TokenomicsEngine::new(config.tokenomics)?;
+        
+        Ok(Self {
+            bitcoin_adapter: bitcoin,
+            web5_adapter: web5,
+            ml_agent_system: agents,
+            dao_governance: dao,
+            tokenomics,
+        })
+    }
 } 

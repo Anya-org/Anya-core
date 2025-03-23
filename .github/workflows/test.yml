@@ -32,7 +32,7 @@ jobs:
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
           
       - name: Run tests
-        run: cargo test --features bip174,bip341
+        run: cargo test --features bip174,bip341,secp256k1
         
       - name: Update AI labelling
         run: cargo run --bin anya_validator -- update-labels

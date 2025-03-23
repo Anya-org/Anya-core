@@ -1,0 +1,32 @@
+[package]
+name = "anya-cli"
+version.workspace = true
+edition.workspace = true
+description.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
+[[bin]]
+name = "anya-cli"
+path = "src/main.rs"
+
+[dependencies]
+anya-core = { path = "../core", version = "2.5.0" }
+clap = { version = "4.5.4", features = [
+    "derive",
+    "env",
+    "unicode"
+] }
+console = "0.15.8"
+indicatif = "0.17.8"
+
+[target.'cfg(unix)'.dependencies]
+nix = "0.28.0"
+
+[build-dependencies]
+vergen = { version = "8.3.1", features = [
+    "build",
+    "git",
+    "gitcl"
+] } 
