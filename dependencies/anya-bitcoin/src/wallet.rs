@@ -507,46 +507,34 @@ mod tests {
     use super::*;
     use tempfile::tempdir;
     
-    #[tokio::test]
-    async fn test_wallet_creation() {
-        let temp_dir = tempdir().unwrap();
-        let db_path = temp_dir.path().join("wallet.db");
-        
+    #[test]
+    fn test_taproot_wallet_creation() {
+        let dir = tempdir().unwrap();
         let config = WalletConfig {
-            name: "test_wallet".to_string(),
-            database_path: db_path,
+            name: "test_wallet".into(),
+            database_path: dir.path().join("wallet.db"),
             network: Network::Testnet,
-            electrum_url: "ssl://electrum.blockstream.info:60002".to_string(),
-            password: None,
-            mnemonic: None,
+            electrum_url: "tcp://explorerzydxu5ecjrkwceayqybizmpjjznk5izmitf2modhcusuqlid.onion:60001".into(),
             use_taproot: true,
+            ..Default::default()
         };
         
-        let wallet = BitcoinWallet::new(config).await;
-        assert!(wallet.is_ok());
+        let wallet = Wallet::new(&config).unwrap();
+        let address = wallet.get_address(AddressIndex::New).unwrap();
+        assert!(address.to_string().starts_with("tb1p"));
     }
     
     #[tokio::test]
-    async fn test_address_generation() {
-        let temp_dir = tempdir().unwrap();
-        let db_path = temp_dir.path().join("wallet.db");
-        
-        let config = WalletConfig {
-            name: "test_wallet".to_string(),
-            database_path: db_path,
-            network: Network::Testnet,
-            electrum_url: "ssl://electrum.blockstream.info:60002".to_string(),
-            password: None,
-            mnemonic: None,
-            use_taproot: true,
-        };
-        
-        let wallet = BitcoinWallet::new(config).await.unwrap();
-        let address = wallet.get_address(AddressIndex::New).await;
-        assert!(address.is_ok());
-        
-        let address_info = address.unwrap();
-        assert!(address_info.address.starts_with("tb1p")); // Testnet taproot address
+    async fn test_psbt_v2_signing() {
+        let wallet = create_test_wallet();
+        let mut builder = wallet.build_tx();
+        builder
+            .add_recipient("tb1qsgx55dp6gn53gmyth8k4jnlv3awx2wkd5j43l3".parse().unwrap(), 1000)
+            .enable_rbf()
+            .version(2);
+
+        let (psbt, _) = builder.finish().unwrap();
+        assert_eq!(psbt.version, 2);
     }
 }
 

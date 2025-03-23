@@ -48,10 +48,11 @@ The current focus is on hardening security, ensuring BIP compliance, and prepari
 
 ### Mobile and Embedded Support
 
-- Complete React Native integration for mobile applications
-- Optimize for resource-constrained environments
-- Create embeddable Bitcoin verification components
-- Enhance offline capabilities
+- Complete React Native integration
+- Optimize Bitcoin ops for JS/Native bridge
+- Implement TurboModule for performance
+- Add React Native Web support
+- Deprecate Dart/Flutter implementation
 
 ### Enterprise Features
 

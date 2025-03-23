@@ -10,7 +10,7 @@ license.workspace = true
 # Core Dependencies
 bitcoin = { version = "0.32.1", features = ["rand", "serde", "taproot"] }
 bitcoincore-rpc = { workspace = true }
-secp256k1 = { workspace = true }
+secp256k1 = { workspace = true, version = "0.28.0" }
 
 # Workspace Dependencies
 tokio = { workspace = true }

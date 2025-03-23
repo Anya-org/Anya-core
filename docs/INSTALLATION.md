@@ -8,6 +8,13 @@
   - Constant-time operations
   - Memory-safe practices
 
+## Updated Security Requirements
+- **BIP-370 (PSBT v2)**: Fee rate validation mandatory
+- **AIS-3 Enhancements**:
+  - Constant-time hash comparisons for all security operations
+  - Memory isolation for cryptographic operations
+  - Hardware-backed RNG where available
+
 ## Audit Trail Format
 ```json
 {
@@ -42,6 +49,12 @@ anya-validator --check crypto --algo sha256
 
 # Generate audit report
 anya-audit --format json > installation_audit.json
+
+# Verify PSBT v2 compliance
+anya-validator --check psbt-v2 --level strict
+
+# Test Taproot commitments
+anya-validator --check taproot --silent-leaf
 ```
 
 This implementation provides:
@@ -416,6 +429,11 @@ If you encounter issues:
 8. Check network graph sync
 9. Verify router configuration
 
+**Error**: "PSBT version 2 required"
+- Verify Bitcoin Core 24.0+ is installed
+- Check config contains `psbt_version=2`
+- Run `anya-installer reconfigure --psbt-v2`
+
 ## Support
 
 For support and documentation, visit: <https://anya.org/docs>
@@ -441,3 +459,7 @@ For support and documentation, visit: <https://anya.org/docs>
 - [LDK Wallet Management](https://lightningdevkit.org/book/working_with_wallets.html)
 - [Channel Management](https://lightningdevkit.org/book/channel_management.html)
 - [Router Configuration](https://lightningdevkit.org/book/router.html)
+
+Mobile:
+  - React Native 0.72+
+  - Android Studio/Xcode with Rust toolchain
