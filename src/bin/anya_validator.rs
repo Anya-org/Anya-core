@@ -5,6 +5,7 @@ use anya_core::bitcoin::taproot::TaprootValidator;
 use clap::{Parser, Subcommand};
 use std::path::PathBuf;
 use std::fs;
+use serde::{Serialize, Deserialize};
 
 #[derive(Parser)]
 #[clap(
@@ -74,6 +75,42 @@ enum Commands {
         #[clap(short, long, default_value = "REPO_INDEX.json")]
         output: PathBuf,
     },
+}
+
+#[derive(Serialize, Deserialize)]
+struct SystemMapValidation {
+    components: Vec<ComponentStatus>,
+    bitcoin_adherence: f64,
+    security_status: SecurityPosture,
+}
+
+impl SystemMapValidation {
+    pub fn new() -> Self {
+        Self {
+            components: Vec::new(),
+            bitcoin_adherence: 0.0,
+            security_status: SecurityPosture::new(),
+        }
+    }
+    
+    pub fn validate_hexagonal(&mut self, installer: &AnyaInstaller) -> Result<()> {
+        let compliance = installer.validate_system_map()?;
+        
+        self.components.push(ComponentStatus {
+            name: "Bitcoin Core".into(),
+            status: compliance.bitcoin_core,
+        });
+        
+        self.bitcoin_adherence = calculate_adherence(installer);
+        
+        Ok(())
+    }
+}
+
+fn calculate_adherence(installer: &AnyaInstaller) -> f64 {
+    let total_bips = 15.0; // Total BIPs in SYSTEM_MAP.md
+    let implemented = installer.bitcoin_config.implemented_bips().len() as f64;
+    (implemented / total_bips) * 100.0
 }
 
 /// Update validation status in system map

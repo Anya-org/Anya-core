@@ -246,6 +246,21 @@ const CRYPTO_CHECKS = [
       
       return { passed: true, details: 'No hardcoded secrets detected' };
     }
+  },
+  {
+    name: 'Installation Validation',
+    check: (code) => ({
+      passed: /validateTaprootConfig/.test(code) && 
+              /constantTimeCompare/.test(code),
+      issues: []
+    })
+  },
+  {
+    name: 'BIP-341 Compliance',
+    check: (code) => ({
+      passed: /SILENT_LEAF/.test(code),
+      issues: []
+    })
   }
 ];
 

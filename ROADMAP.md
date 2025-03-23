@@ -1474,3 +1474,19 @@ lru = "0.10"
    - Risk management
 
 *Last updated: 2025-03-12*
+
+### Q3 2025 Security Updates [BPC-3][AIS-3]
+1. **Taproot Implementation Hardening**
+   - [ ] Add SILENT_LEAF pattern validation (mcp-server.js:486)
+   - [ ] Implement constant-time Merkle proof verification
+   - [ ] Enforce BIP-341 script structure validation
+
+2. **PSBT Compliance**
+   - [ ] Require unsigned_tx field in all PSBTs (mcp-server.js:497)
+   - [ ] Add PSBT version 2 validation
+   - [ ] Implement PSBT signature aggregation
+
+3. **Cryptographic Security**
+   - [ ] Replace all Math.random() usage with secureRandomBytes() (secureKeyGenerator.js)
+   - [ ] Add auxiliary data handling for Schnorr sigs (mcp-server.js:508)
+   - [ ] Enforce SHA-256 for all integrity checks

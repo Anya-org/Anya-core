@@ -848,6 +848,25 @@ impl AnyaInstaller {
         
         Ok(())
     }
+
+    /// Updated to include BIP-341 SILENT_LEAF validation
+    fn verify_taproot_installation(&self) -> Result<()> {
+        let config_path = self.data_dir.join("bitcoin.conf");
+        let config = fs::read_to_string(&config_path)
+            .context("Failed to read bitcoin config")?;
+
+        // BIP-341 Compliance Check
+        if !config.contains("SILENT_LEAF") {
+            return Err(anyhow!("BIP-341 Violation: Missing SILENT_LEAF pattern"));
+        }
+
+        // BIP-174 PSBT v2 Validation
+        if !config.contains("psbt_version=2") {
+            return Err(anyhow!("BIP-174 Violation: PSBT v2 not enabled"));
+        }
+        
+        Ok(())
+    }
 }
 
 fn main() -> Result<()> {

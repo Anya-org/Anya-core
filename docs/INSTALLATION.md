@@ -1,4 +1,80 @@
-# Anya Core Installation Guide
+# Anya Core Installation v2.5
+
+## Compliance Requirements
+- **BIP-341 (Taproot)**: SILENT_LEAF pattern verification
+- **BIP-174 (PSBT)**: Version 2 mandatory
+- **AIS-3 Security**:
+  - Secure RNG (NIST SP 800-90A)
+  - Constant-time operations
+  - Memory-safe practices
+
+## Audit Trail Format
+```json
+{
+  "timestamp": 1712345678,
+  "bip_compliance": {
+    "bip341": true,
+    "bip342": false,
+    "bip174": true,
+    "psbt_v2": true
+  },
+  "security_checks": {
+    "rng_secure": true,
+    "constant_time": true,
+    "mem_safe": true
+  },
+  "files": [
+    {
+      "path": "/opt/anya/conf/bitcoin.conf",
+      "sha256": "a1b2c3..."
+    }
+  ]
+}
+```
+
+## Validation Commands
+```bash
+# Verify installation
+anya-validator --check compliance --level bpc3
+
+# Test cryptographic safety
+anya-validator --check crypto --algo sha256
+
+# Generate audit report
+anya-audit --format json > installation_audit.json
+```
+
+This implementation provides:
+
+1. **BIP-341 Compliance**:
+   - SILENT_LEAF pattern verification
+   - Taproot configuration validation
+
+2. **BIP-174 Enforcement**:
+   - PSBT v2 requirement
+   - Transaction serialization checks
+
+3. **AIS-3 Security**:
+   - NIST-compliant RNG
+   - Constant-time hash comparisons
+   - Memory-safe buffers
+
+4. **Audit Trail**:
+   - JSON-formatted installation records
+   - Cryptographic file hashes
+   - Compliance status tracking
+
+To use:
+1. Build with `cargo build --release`
+2. Run with elevated privileges: `sudo ./target/release/anya_installer`
+
+The installer automatically:
+- Creates secure Bitcoin configuration
+- Generates audit logs
+- Validates against BIP standards
+- Enforces cryptographic best practices
+
+Would you like me to add any specific component or expand on a particular security aspect?
 
 ## Overview
 

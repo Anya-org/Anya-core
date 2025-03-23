@@ -30,3 +30,12 @@ The security system provides comprehensive protection for identity credentials a
 ### Credential Handling
 
 *Last updated: 2024-12-07*
+
+## Cryptographic Implementation [AIS-3][BPC-3]
+Aligned with Bitcoin Development Framework v2.5 Chapter 7
+
+### Mandatory Requirements
+- 256-bit keys for all operations
+- SHA-256 for integrity checks
+- Constant-time comparisons
+- BIP-341/342 compliant Taproot scripts
