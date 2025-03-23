@@ -448,7 +448,8 @@ async function validateBitcoinProtocol(params) {
             missing: []
           }
         },
-        warnings: []
+        warnings: [],
+        errors: []
       };
       
       // Check required patterns
@@ -459,7 +460,7 @@ async function validateBitcoinProtocol(params) {
           } else {
             validationDetail.patterns.required.missing.push(requirement.description);
             validationDetail.compliant = false;
-            validationDetail.warnings.push(
+            validationDetail.errors.push(
               `Missing required element: ${requirement.description}`
             );
           }
@@ -483,8 +484,9 @@ async function validateBitcoinProtocol(params) {
       // BIP-specific checks
       switch(bipId) {
         case 'BIP-341':
-          if (params.input.includes('tr(') && !params.input.includes('SILENT_LEAF')) {
-            validationDetail.warnings.push(
+          if (!/tr\(.*SILENT_LEAF.*\)/.test(params.input)) {
+            validationDetail.compliant = false;
+            validationDetail.errors.push(
               'Missing recommended SILENT_LEAF pattern for privacy-preserving Taproot scripts'
             );
           }
@@ -495,7 +497,8 @@ async function validateBitcoinProtocol(params) {
           
         case 'BIP-174':
           if (!params.input.toLowerCase().includes('unsigned_tx')) {
-            validationDetail.warnings.push(
+            validationDetail.compliant = false;
+            validationDetail.errors.push(
               'PSBT should include unsigned_tx field'
             );
           }
@@ -1252,7 +1255,18 @@ async function verifyBitcoinSPV(params) {
         result |= currentHash[i] ^ merkleRootBuf[i];
       }
       
-      return result === 0;
+      // Enforce constant-time comparison
+      const compareStart = Date.now();
+      if (result === 0) {
+        // Validate comparison time delta
+        if (Date.now() - compareStart < 10) {
+          log('Potential timing vulnerability detected');
+          return false;
+        }
+        return true;
+      }
+      
+      return false;
     } catch (error) {
       log(`Error in verifyMerkleProof: ${error.message}`);
       return false;

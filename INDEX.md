@@ -181,3 +181,7 @@ For full details on the AI labeling system, see [docs/standards/AI_LABELING.md](
 - Current Version: 0.9.5
 - Last Updated: March 16, 2025
 - Bitcoin Development Framework: v2.5
+
+## React Native Components
+
+- [React Native Components](https://reactnative.directory/anya-mobile)

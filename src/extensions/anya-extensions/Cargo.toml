@@ -12,13 +12,13 @@ path = "src/lib.rs"
 
 [dependencies]
 # Core Dependencies
-tokio = { workspace = true }
-serde = { workspace = true, features = ["derive"] }
+tokio.workspace = true
+serde.workspace = true
 serde_json = { workspace = true }
-anyhow = { workspace = true }
+anyhow.workspace = true
 
 # Blockchain Integration
-bitcoin = { workspace = true }
+bitcoin.workspace = true
 secp256k1 = { workspace = true }
 bitcoincore-rpc = { workspace = true }
 
