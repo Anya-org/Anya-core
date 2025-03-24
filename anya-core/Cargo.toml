@@ -1,10 +1,10 @@
 [workspace]
 members = [
-    ".",
-    "dependencies/anya-bitcoin",
-    "anya-enterprise",
-    "anya-extensions",
-    "dependencies/anya-mobile"  # Verified exists
+    "core",
+    "cli", 
+    "installer",
+    "mobile",
+    "dependencies/anya-bitcoin"  # Correct path format
 ]
 
 # Consolidated workspace dependencies

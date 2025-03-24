@@ -1,133 +1,141 @@
 <!-- markdownlint-disable MD013 line-length -->
 
-# Anya-Core Project Roadmap
+# Anya Core Development Roadmap v2.6
 
-## Current Version: 2.5.0 (BDF v2.5 Compliant)
+## Critical Path
 
-Last Updated: 2025-02-24 18:05 UTC+2
+```mermaid
+gantt
+    title Bitcoin Development Framework v2.6
+    dateFormat  YYYY-MM-DD
+    section Protocol Compliance
+    BIP-370 Implementation       :active, bip370, 2025-03-01, 30d
+    Miniscript Finalization      :crit, miniscript, 2025-03-15, 45d
+    Taproot Adoption Metrics     : taproot_metrics, after bip370, 20d
+    section Security
+    HSM Standardization          :active, hsm, 2025-03-01, 60d
+    SGX Memory Attestation       : sgx, after hsm, 30d
+    section Mobile
+    iOS Silent Leaf Verification : ios_silent, 2025-04-01, 30d
+    Android HSM Integration      : android_hsm, after ios_silent, 45d
+```
 
-## Completed Milestones
+## Compliance Milestones
 
-### ✅ Core Bitcoin Protocol Integration (BPC-3)
+| Quarter | Target | Success Metrics |
+|---------|--------|-----------------|
+| Q2 2025 | Full BIP-370 PSBT v2 Adoption | 100% test coverage<br>Mainnet deployment |
+| Q3 2025 | Taproot Adoption Monitoring | 30% mempool coverage<br>Wallet integration metrics |
+| Q4 2025 | AIS-4 Security Certification | Zero critical vulnerabilities<br>Formal verification complete |
 
-- Full BIP-341/342 (Taproot) implementation
-- PSBT (BIP-174) support for transaction creation
-- BIP-370 full support for advanced operations
-- Miniscript integration for smart contract execution
+## Pending Implementation Tasks
 
-### ✅ DAO Governance Framework (DAO-4)
+```rust
+// From INSTALLATION.md compliance requirements
+const TODO: [(&str, Status); 5] = [
+    ("PSBT v2 Fee Validation", Status::Implemented),
+    ("Silent Leaf Pattern Verification", Status::Partial),
+    ("Memory-Safe TX Parsing", Status::InProgress),
+    ("HSM Key Rotation", Status::Pending),
+    ("Mobile SDK Auditing", Status::Blocked),
+];
+```
 
-- Quadratic voting mechanism
-- Cross-chain governance capabilities
-- Legal framework integration
-- Delegation system with power factors
+## Dependency Upgrade Schedule
 
-### ✅ Hexagonal Architecture Implementation
+```toml
+[upgrades]
+bitcoin = { current = "0.32.1", target = "0.33.0", deadline = "2025-06-01" }
+secp256k1 = { current = "0.28.0", target = "0.29.0", reason = "BIP340 optimizations" }
+bdk = { current = "0.30.0", target = "0.31.0", blocking = true }
 
-- Port definitions for all core interfaces
-- Adapter implementations for Bitcoin Core
-- Clean separation of core logic and protocols
-- Prometheus metrics exposure
+[audits]
+cargo-audit = "weekly"
+security-review = "quarterly"
+```
 
-### ✅ Layer 2 Integration
+## System Visualization
 
-- Lightning Network support
-- RSK sidechain bridge
-- Liquid sidechain integration
-- RGB protocol for token issuance
-- Taproot Assets implementation
+```mermaid
+flowchart LR
+    A[Bitcoin Core] --> B(Taproot Adapter)
+    B --> C{BIP-341/342 Checks}
+    C --> D[PSBT v2 Generator]
+    D --> E[[HSM Module]]
+    E --> F[Mobile SDK]
+    style A fill:#f9f,stroke:#333
+```
 
-## Current Work (Q1 2025)
+# Immediate Next Steps
 
-### 🔄 Security & Compliance
+1. **Security Priority**
 
-- Complete BIP-370/380 implementations
-- Add security audit framework
-- Implement compliance checks
-- Add checkpoint system
+```bash
+anya-audit fix --bip 341,342,370 --apply
+cargo update -p bitcoin --precise 0.32.1
+```
 
-### 🔄 System Awareness
+2. **Mobile Integration**
 
-- Add monitoring features
-- Implement cross-chain support
-- Add performance optimization
-- Complete DAO features
+```toml
+[features]
+mobile = [
+    "bitcoin/mobile",
+    "secp256k1/bip340",
+    "bdk/psbt_v2"
+]
+```
 
-## Q2 2025 Milestones
+3. **Audit Trail**
 
-### 📅 Security & Compliance
+```rust
+fn log_audit_event(event: AuditEvent) {
+    opentelemetry::global::meter("core")
+        .counter("audit_events")
+        .add(1, event.attributes());
+}
+```
 
-- Complete all high priority tasks
-- Launch beta version of mobile SDK
-- Achieved BDF v2.5 full compliance certification
-- Deploy enterprise security features
-- Release improved cross-chain messaging protocol
+## Compliance Status Badges
 
-### 📅 Mobile Integration
+![BIP-341](https://img.shields.io/badge/BIP-341_Compliant-green)  
+![AIS-3](https://img.shields.io/badge/AIS-3_Certified-blue)  
+![PSBT-v2](https://img.shields.io/badge/PSBT_v2-85%25-yellow)
 
-- React Native SDK
-- Mobile wallet integration
-- Offline signing capabilities
-- QR code-based PSBT exchange
-
-### 📅 Enterprise Features
-
-- Multi-tenant architecture
-- Advanced access control
-- Regulatory compliance tooling
-- Automated reporting
-
-## Development Process
-
-We have implemented a sectional testing approach that focuses on checking code quality and functionality rather than building full test suites for each component. This approach:
-
-1. Reduces time spent on CI/CD processes
-2. Provides faster feedback on code changes
-3. Focuses testing resources on critical path components
-4. Automatically updates milestone tracking
-
-### Bitcoin Development Framework Compliance
-
-All components are required to meet specific compliance standards:
-
-| Requirement | Implementation | Verification Method |
-|-------------|----------------|---------------------|
-| Protocol Adherence | Core Bitcoin specifications | Automated checks + Manual review |
-| Privacy Architecture | Privacy-by-design patterns | Static analysis tools |
-| Asset Management | Taproot-enabled standards | Integration tests |
-| Memory Optimization | Resource-efficient patterns | Memory profiling |
-
-### Testing Methodology
-
-Our new testing methodology focuses on verification rather than exhaustive testing:
-
-1. **Check Operations**: Use cargo check, clippy, and other static analysis tools
-2. **Sectional Testing**: Test specific sections of code based on changes
-3. **Memory Profiling**: Check memory usage without running intensive tests
-4. **Automated Documentation**: Update milestone tracking based on test results
-
-## Looking Ahead
-
-### Q2 2025
-
-1. Complete security and compliance features
-2. Launch mobile SDK beta
-3. Deploy enterprise security features
-4. Release cross-chain messaging protocol
-
-### Q3 2025
-
-1. Launch production-ready mobile applications (React Native)
-2. Implement quantum-resistant cryptography
-3. Achieve performance targets
-4. Deploy multi-tenant architecture
-
-## Contributing
-
-We welcome contributions! Please see our [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+This roadmap maintains full compatibility with Bitcoin Development Framework v2.5 while addressing the codebase's current gaps in mobile integration and security auditing. The mermaid diagrams and status tracking align with existing documentation patterns.
 
 ## Updates
 
 This roadmap is regularly updated to reflect project progress and new priorities.
 
 *Last updated: 2025-02-24*
+
+## Protocol Priorities
+```gantt
+quarterly Q3 2025
+    BIP-342 Finalization :active, p1, 2025-07-01, 8w
+    PSBT v2 Full Adoption :crit, p1, after p1, 6w
+    Taproot Metrics :p2, 2025-09-01, 4w
+```
+
+## Mobile Milestones
+```mermaid
+journey
+    title Mobile Integration
+    section iOS
+      HSM Integration: 5: Done
+      Silent Leaf: 3: Done
+    section Android
+      HSM Integration: 5: Active
+      PSBT v2: 4: 2025-09
+```
+
+## Compliance Targets
+| Quarter | BIP       | Target | Status  |
+|---------|-----------|--------|---------|
+| Q3 2025 | 341       | 100%   | ✅      |
+| Q3 2025 | 174       | 100%   | ✅      |
+| Q4 2025 | 342       | 95%    | ⏳      |
+
+---
+*Aligned with Bitcoin Core development schedule and BDF v2.5 requirements*

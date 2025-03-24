@@ -90,4 +90,6 @@ bitcoin-framework:
     - schnorr-signatures
     - lightning-protocols
     - dlc-implementations
+    - constant-time-ops
+    - secure-rng
     

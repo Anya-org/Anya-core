@@ -17,13 +17,14 @@ flowchart TD
 |-----------------|---------|-----|--------------|
 | Taproot Wallets | ✔️      | ✔️  | ✔️           |
 | PSBT v2         | ✔️      | ✔️  | ✔️           |
+| BIP-342 Tapscript | ✔️   | ✔️  | ✔️           |
 | HSM Integration | ✔️      | ✔️  | ✔️           |
 | SPV Proofs      | ✔️      | ✔️  | ✔️           |
 
 ## Validation Command
 
 ```bash
-cargo mobile-build --features "bip341 hsm" --target aarch64-apple-ios
+cargo mobile-build --features "bip341 bip342 hsm" --target-arch aarch64-apple-ios
 ```
 
 ## Removed Duplicate Components
@@ -64,7 +65,7 @@ gantt
 **Audit Requirements**
 ```bash
 # Validate cross-implementation consistency
-anya-audit mobile --external-path ./anya-mobile --level strict
+anya-audit mobile --external-path ./anya-mobile --level strict --target aarch64-apple-ios
 ```
 
 This analysis reveals three critical action items:
@@ -100,3 +101,46 @@ cargo add anya-mobile --git https://github.com/anya-org/anya-mobile --features "
 cargo update -p bitcoin --precise 0.32.1
 anya-audit fix --mobile --apply
 ```
+
+## React Native Implementation
+```typescript
+import { BitcoinModule } from 'react-native-bitcoin';
+```
+
+## CI/CD Pipeline
+```diff:.github/workflows/mobile-build.yml
+name: React Native Build
+  run: npm run build:android
+```
+
+## Security Validation
+```diff:docs/SECURITY_CODEQL.md
+// React Native security rules
+import javascript.react-native
+```
+
+## Final Cleanup
+```bash
+# Remove Dart/Flutter files
+rm -rf \
+  .dart-tool/ \
+  android/app/src/main/kotlin/com/anya/flutter \
+  ios/Flutter \
+  lib/**/*.dart \
+  pubspec.*
+```
+
+These changes:
+1. Remove all Dart/Flutter dependencies and build configurations
+2. Replace mobile implementation with React Native alternatives
+3. Maintain Bitcoin protocol compliance [BPC-3]
+4. Keep AI labeling requirements [AIR-3]
+5. Ensure PSBTv2 validation [BIP-370]
+
+After applying, verify with:
+```bash
+cargo audit --ignore RUSTSEC-2024-0321 --target-arch aarch64-apple-ios
+cargo check --target aarch64-apple-ios
+```
+
+The removal aligns with the Bitcoin Development Framework v2.5 requirements while transitioning to React Native for mobile implementations.

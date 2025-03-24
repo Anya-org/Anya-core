@@ -7,7 +7,8 @@ edition.workspace = true
 bitcoin.workspace = true
 secp256k1.workspace = true
 serde.workspace = true
-libp2p = { version = "0.53.0", features = ["tcp", "websocket", "noise", "yamux"] }
+libp2p = { workspace = true, features = ["tcp", "websocket", "noise", "yamux"] }
+tokio = { workspace = true, features = ["full"] }
 
 # Cryptographic primitives
 k256 = { version = "0.13.3", features = [
@@ -31,14 +32,24 @@ web5 = { version = "0.5.1", features = [
     "silent-leaf"
 ], default-features = false }
 
+# Add SGX implementation
+sgx-urts = { version = "1.1.6", optional = true }
+
+# Change yubihsm to optional
+yubihsm = { version = "0.41.0", features = ["mock"], optional = true }
+
 [dev-dependencies]
-yubihsm = { version = "0.41.0", features = ["mock"] }
-bip-check = { git = "https://github.com/bitcoin/bips-check" }
+bip-check = { git = "https://github.com/bitcoin/bips", rev = "7c4b4c1d91b7d3dc6d7862ad5a8c1472332e6d84" }
 web5-test-vectors = "0.2.0"
 
 [features]
 default = ["audit"]
 audit = ["cargo-audit"]
-hardware = ["hsm-sdk", "sgx-trusted"]
+hardware = ["hsm", "sgx-urts"]
 hsm = ["yubihsm", "secp256k1/hsm"]
-chaos = ["libp2p/chaos", "tokio/full"] 
+chaos = [
+    "libp2p/chaos",
+    "tokio/full"
+]
+sgx = ["sgx-urts"]
+mobile = ["bitcoin/use-serde", "secp256k1/global-context"] 
