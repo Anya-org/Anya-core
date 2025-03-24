@@ -1,0 +1,31 @@
+# [BPC-3][AIS-3] Bitcoin protocol dependencies
+[dependencies]
+bitcoin = { version = "0.30.0", features = ["serde", "bitcoinconsensus"] }
+secp256k1 = { version = "0.27.0", features = ["serde", "bitcoin_hashes"] }
+react-native-bitcoin = { version = "0.72", features = ["bip341"] }
+taproot-assets = { git = "https://github.com/bitcoin/taproot-assets.git", tag = "v0.2.5" }
+
+# [AIR-3] AI labeling requirements
+[package.metadata.ai]
+compliance = { bip341 = true, bip370 = true }
+security = { constant_time = true, rng = "secure" }
+
+# [AIS-3] Security-critical dependencies
+[dev-dependencies]
+bitcoin-test-utils = { version = "0.8.0", features = ["secp256k1-serde"] }
+test-strategy = "0.3.1"
+
+# [AIS-3] Security-critical compilation settings
+[profile.release]
+opt-level = 3
+codegen-units = 1
+lto = true
+panic = "abort"
+strip = true
+
+# [AIS-3] Constant-time enforcement
+[features]
+constant-time = [
+    "secp256k1/constant_time",
+    "bitcoin/constant_time"
+] 

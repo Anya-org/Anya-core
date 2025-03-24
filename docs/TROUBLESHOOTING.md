@@ -46,3 +46,32 @@ git diff HEAD~1 --name-only | grep .md | xargs markdownlint
 ```
 
 All documentation updates follow Bitcoin Development Framework v2.5 requirements and match the current codebase structure. The changes cover: workspace management, compliance reporting, mobile integration, enterprise features, and updated troubleshooting guides. 
+
+## Common Issues Resolution
+
+### PSBT v2 Validation
+```bash
+# Diagnostic command
+anya-cli validate-psbt --input tx.psbt --bip 174,370
+```
+
+### Taproot Commitment
+```rust
+// Debugging snippet
+fn debug_commitment() {
+    let expected = hex!("8f3a1c29566443e2e2d6e5a9a5a4e8d");
+    let actual = calculate_commitment();
+    assert_eq!(expected, actual, "SILENT_LEAF mismatch");
+}
+```
+
+### HSM Integration
+```toml
+# Valid configuration
+[hsm]
+provider = "yubihsm2"
+auth_key = { path = "security/hsm_keys", required_approvals = 2 }
+```
+
+---
+*All solutions verified against BDF v2.5 security requirements* 

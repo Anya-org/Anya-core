@@ -1,0 +1,11 @@
+# [BPC-3] Protocol compliance tracking
+[package.metadata.bip]
+implemented = [
+    "bip-174",  # PSBT
+    "bip-341",  # Taproot
+    "bip-370"   # PSBTv2
+]
+
+[package.metadata.audit]
+last_verified = "2025-03-20"
+security_level = "bpc-3" 

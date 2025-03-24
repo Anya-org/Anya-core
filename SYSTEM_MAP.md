@@ -462,4 +462,17 @@ Current implementation status:
 | - BIP-341 Compliance       |
 +----------------------------+
 
-*Last updated: 2025-02-24 18:05 UTC+2* 
+*Last updated: 2025-02-24 18:05 UTC+2*
+
+            +----------------------------+
+            | React Native TurboModules   |
+            | - Taproot Wallet (BIP-341)  |
+            | - PSBTv2 Transactions       |
+            | - SILENT_LEAF Validation    |
+            +-------------+---------------+
+                           |
+            +--------------v---------------+
+            | Mobile Security Layer        |
+            | - Hardware Key Storage       |
+            | - BIP-341 Compliance         |
+            +------------------------------+ 
