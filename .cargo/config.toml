@@ -33,3 +33,6 @@ protocol = "sparse"
 
 [alias]
 bdf-check = "check --workspace --all-targets --all-features --tests"
+
+[net]
+git-fetch-with-cli = true

@@ -1,0 +1,15 @@
+- name: Install React Native
+  run: |
+    npm install -g react-native-cli
+    yarn install
+    cd android && ./gradlew clean
+
+- name: Android Build
+  run: |
+    react-native run-android --variant release
+
+- name: React Native Build
+  run: |
+    npm install -g react-native-cli
+    cd android && ./gradlew assembleRelease 
+    react-native run-android --variant release 

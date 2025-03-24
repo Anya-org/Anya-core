@@ -1,0 +1,5 @@
+name: Validate TOML
+  run: |
+    npm install -g @iarna/toml
+    toml-verify Cargo.toml
+    cargo check 

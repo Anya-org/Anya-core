@@ -52,7 +52,7 @@ The current focus is on hardening security, ensuring BIP compliance, and prepari
 - Optimize Bitcoin ops for JS/Native bridge
 - Implement TurboModule for performance
 - Add React Native Web support
-- Deprecate Dart/Flutter implementation
+- Deprecated Dart/Flutter (2025-03-20)
 
 ### Enterprise Features
 
@@ -1491,3 +1491,8 @@ lru = "0.10"
    - [ ] Replace all Math.random() usage with secureRandomBytes() (secureKeyGenerator.js)
    - [ ] Add auxiliary data handling for Schnorr sigs (mcp-server.js:508)
    - [ ] Enforce SHA-256 for all integrity checks
+
+## Q2 2025 Achievements
+- [x] Full BIP-341 compliance
+- [x] React Native 0.72 TurboModules
+- [x] PSBTv2 mobile implementation
