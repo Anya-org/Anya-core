@@ -25,7 +25,8 @@ jobs:
       - name: Run cargo audit
         run: |
           cargo install cargo-audit
-          cargo audit
+          cargo audit --deny warnings
+          cargo run --bin anya-audit -- mobile --level strict
           
       - name: Run Secret Scanning
         uses: gitleaks/gitleaks-action@v2
@@ -47,11 +48,10 @@ jobs:
         with:
           fetch-depth: 0
       
-      - name: Initialize CodeQL
+      - name: Setup CodeQL
         uses: github/codeql-action/init@v2
         with:
-          languages: 'javascript, rust'
-          config-file: ./.github/codeql/codeql-config.yml
+          config-file: .github/codeql/codeql-config.yml
           
       - name: Build for Analysis
         uses: github/codeql-action/autobuild@v2

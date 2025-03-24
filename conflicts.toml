@@ -1,0 +1,6 @@
+[mobile]
+bitcoin = { required = "0.32.1", current = "0.31.0" }
+jsi = { required = "0.12", external = "0.10" }
+
+[web5]
+bdk = { required = "0.30.0", current = "0.29.1" } 

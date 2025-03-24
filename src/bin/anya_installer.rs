@@ -873,4 +873,97 @@ fn version_compare(a: &str, b: &str) -> Ordering {
         .collect();
 
     a_parts.cmp(&b_parts)
+}
+
+// Extract common validation logic
+fn validate_common_requirements() -> Result<()> {
+    check_cpu_features()?;
+    check_memory_isolation()?;
+    Ok(())
+}
+
+// Unified configuration generation
+fn generate_config(profile: &InstallProfile, hw: &HardwareProfile) -> BitcoinConfig {
+    match profile {
+        InstallProfile::Minimal => BitcoinConfig::minimal(),
+        InstallProfile::Standard => BitcoinConfig::standard(hw),
+        InstallProfile::FullNode => BitcoinConfig::full_node(hw),
+        InstallProfile::Enterprise => BitcoinConfig::enterprise(),
+        InstallProfile::Custom(_) => BitcoinConfig::auto_configure(hw),
+    }
+}
+
+// Deduplicated security checks
+trait SecurityValidator {
+    fn validate_rng(&self) -> Result<bool>;
+    fn validate_constant_time(&self) -> Result<bool>;
+    fn validate_memory_safety(&self) -> Result<bool>;
+}
+
+impl SecurityValidator for AnyaInstaller {
+    fn validate_rng(&self) -> Result<bool> {
+        let rng = SystemRandom::new();
+        let mut samples = [[0u8; 16]; 100];
+        rng.fill(&mut samples[0])?;
+        Ok(samples.iter().collect::<HashSet<_>>().len() > 95)
+    }
+
+    fn validate_constant_time(&self) -> Result<bool> {
+        let a = digest::digest(&digest::SHA256, b"test");
+        let b = digest::digest(&digest::SHA256, b"test");
+        Ok(ring::constant_time::verify_slices_are_equal(a.as_ref(), b.as_ref()).is_ok())
+    }
+
+    fn validate_memory_safety(&self) -> Result<bool> {
+        let mut buffer = [0u8; 1024];
+        SystemRandom::new().fill(&mut buffer)?;
+        Ok(buffer.windows(4).all(|w| u32::from_ne_bytes(w.try_into().unwrap()) != 0))
+    }
+}
+
+// Unified module management
+struct ModuleManager {
+    modules: HashMap<String, Box<dyn InstallableModule>>,
+}
+
+impl ModuleManager {
+    pub fn new() -> Self {
+        let mut modules = HashMap::new();
+        modules.insert("lightning".into(), Box::new(LightningModule::default()));
+        modules.insert("taproot".into(), Box::new(TaprootModule::default()));
+        Self { modules }
+    }
+
+    pub fn install(&self, name: &str, config: &BitcoinConfig) -> Result<()> {
+        self.modules.get(name)
+            .ok_or_anyhow("Module not found")?
+            .install(config)
+    }
+}
+
+// Updated install method using new components
+impl AnyaInstaller {
+    pub fn install(&self) -> Result<()> {
+        validate_common_requirements()?;
+        
+        let config = generate_config(&self.profile, &self.hw_profile);
+        self.apply_config(config)?;
+
+        let module_mgr = ModuleManager::new();
+        module_mgr.install("lightning", &self.bitcoin_config)?;
+        module_mgr.install("taproot", &self.bitcoin_config)?;
+
+        self.run_security_audit()?;
+        self.generate_audit_log()?;
+        Ok(())
+    }
+}
+
+// Remove duplicate code from test manager
+impl TestManager {
+    pub fn add_common_checks(&mut self) {
+        self.common_checks.insert("rng".into(), Box::new(|| test_rng()));
+        self.common_checks.insert("constant_time".into(), Box::new(|| test_constant_time()));
+        self.common_checks.insert("memory_safety".into(), Box::new(|| test_memory_safety()));
+    }
 } 

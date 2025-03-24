@@ -1,0 +1,3 @@
+[workspace.dependencies]
+bitcoin = { version = "0.32.1", features = [...] }  # Enforce version
+jsi = { version = "0.12", features = [...] }  # Sync across repos 

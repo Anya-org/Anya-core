@@ -9,10 +9,11 @@ use subtle::ConstantTimeEq;
 use std::sync::atomic::{AtomicU32, Ordering};
 
 // Core wallet structure
+#[derive(Clone)]
 pub struct MobileSDK {
-    wallet: Arc<Mutex<MobileWallet>>,
+    wallet: Arc<Mutex<TaprootWallet>>,
     network: Arc<NetworkManager>,
-    security: Arc<SecurityManager>,
+    hsm: Option<Arc<HsmClient>>,
 }
 
 // Wallet data storage
@@ -52,61 +53,34 @@ impl MobileSDK {
             last_sync: chrono::Utc::now(),
         }));
         let network = Arc::new(NetworkManager::new());
-        let security = Arc::new(SecurityManager::new());
+        let hsm = None;
         
-        Self { wallet, network, security }
+        Self { wallet, network, hsm }
     }
 
-    // Wallet initialization with BIP-39 mnemonic
-    pub async fn initialize_wallet(&self, mnemonic: &str) -> Result<()> {
+    /// Unified wallet creation with BIP-341 compliance
+    pub async fn create_wallet(&self, mnemonic: &str) -> Result<()> {
         let mut wallet = self.wallet.lock().await;
-        wallet.addresses = self.security.generate_addresses(mnemonic)?;
-        self.sync_wallet().await?;
-        Ok(())
-    }
-
-    // Network synchronization
-    pub async fn sync_wallet(&self) -> Result<()> {
-        let mut wallet = self.wallet.lock().await;
-        let balance = self.network.get_balance(&wallet.addresses).await?;
-        let transactions = self.network.get_transactions(&wallet.addresses).await?;
+        let (sk, pubkey) = bitcoin::secp256k1::generate_taproot_key(mnemonic)?;
         
-        wallet.balance = balance;
-        wallet.transactions = transactions;
-        wallet.last_sync = chrono::Utc::now();
+        wallet.store_key(sk)?;
+        wallet.addresses = vec![pubkey.to_string()];
         
         Ok(())
     }
 
-    // BIP-174/370 compliant transaction
-    pub async fn send_transaction(&self, recipient: &str, amount: u64) -> Result<String> {
-        let wallet = self.wallet.lock().await;
-        if wallet.balance < amount {
-            return Err(anyhow::anyhow!("Insufficient balance"));
-        }
-
-        let tx = self.network.create_transaction(&wallet.addresses[0], recipient, amount).await?;
-        self.network.broadcast_transaction(&tx).await?;
-        
-        let psbt = PartiallySignedTransaction::from_str(&tx)?;
+    /// BIP-174/370 compliant PSBT signing
+    pub async fn sign_psbt(&self, psbt: &str) -> Result<String> {
+        let psbt = PartiallySignedTransaction::from_str(psbt)?;
         validate_psbt_v2(&psbt)?;
         
-        let commitment = sha256::Hash::hash(&psbt.unsigned_tx.to_bytes());
-        if !verify_taproot_commitment(&tx.taproot_proof.unwrap(), &commitment) {
-            return Err(anyhow::anyhow!("Invalid Taproot commitment"));
-        }
+        let signed_psbt = if let Some(hsm) = &self.hsm {
+            hsm.sign_psbt(&psbt).await?
+        } else {
+            self.wallet.lock().await.sign_psbt(&psbt)?
+        };
         
-        if let Some(fee_rate) = &psbt.fee_rate {
-            if fee_rate.as_sat_per_vb()? > MAX_FEE_RATE {
-                return Err(anyhow::anyhow!("Fee rate exceeds maximum allowed"));
-            }
-        }
-        
-        if !self.security.using_hardware_rng() {
-            warn!("Using software RNG - security risk!");
-        }
-        
-        Ok(tx)
+        Ok(signed_psbt.to_string())
     }
 
     // Wallet state accessor
@@ -296,7 +270,7 @@ mod tests {
     async fn test_wallet_initialization() {
         let sdk = MobileSDK::new();
         let mnemonic = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about";
-        sdk.initialize_wallet(mnemonic).await.unwrap();
+        sdk.create_wallet(mnemonic).await.unwrap();
         
         let info = sdk.get_wallet_info().await.unwrap();
         assert!(!info.address.is_empty());

@@ -215,3 +215,6 @@ cargo test --all-features
 - Configure [Revenue Tracking](REVENUE_SETUP.md)
 
 *Last updated: 2024-12-07*
+<!-- Bitcoin.org Compliance Notice -->
+> **Implementation Security Warning**: This implementation follows Bitcoin protocol specifications but actual security depends on network consensus. Regular reconciliation with Bitcoin Core 24.0.1+ is required. [Reference](https://developer.bitcoin.org/reference/intro.html)
+

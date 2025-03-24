@@ -74,3 +74,24 @@ echo -e "\n## Summary of TODOs" >> "$SUMMARY_FILE"
 echo "Total TODO files found: $(grep -c "^### " "$SUMMARY_FILE")" >> "$SUMMARY_FILE"
 
 echo "Search completed. Results written to $SUMMARY_FILE"
+
+# Add BIP compliance checks
+check_bip_compliance() {
+  grep -rnw . -e 'BIP-3[0-9]{2}' --include=\*.md | awk -F: '{print "::warning file=" $1 ",line=" $2 "::TODO needs BIP validation"}'
+}
+
+# Enhanced security scanning
+check_security_todos() {
+  rg -i 'security|audit|hsm' --type md | while read -r line; do
+    file=$(echo $line | cut -d: -f1)
+    lineno=$(echo $line | cut -d: -f2)
+    echo "::error file=$file,line=$lineno::Security-related TODO found"
+  done
+}
+
+# Update main generation
+generate_report() {
+  # ... existing code ...
+  check_bip_compliance >> "$REPORT"
+  check_security_todos >> "$REPORT"
+}

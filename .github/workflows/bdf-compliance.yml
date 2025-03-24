@@ -1,0 +1,16 @@
+name: BDF v2.5 Compliance
+on: [push, pull_request]
+
+jobs:
+  bdf-validation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: chmod +x scripts/bdf-compliance.sh
+      - run: ./scripts/bdf-compliance.sh
+      - uses: actions/upload-artifact@v3
+        with:
+          name: compliance-reports
+          path: |
+            crypto-report.json
+            BDF-STATUS.md 

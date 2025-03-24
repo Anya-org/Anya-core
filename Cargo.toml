@@ -1,32 +1,27 @@
 # Remove all package-specific configuration
 [workspace]
-members = ["installer", "cli", "core", "network"]
+members = [
+    "anyacore",
+    "mobile",
+    "bitcoin-adapter",
+    "dlc-oracle"
+]
 resolver = "2"
 
+# Add mandatory workspace package inheritance
 [workspace.package]
 version = "2.5.0"
-edition = "2021"
-description = "Bitcoin Development Framework CLI"
-license = "MIT OR Apache-2.0"
-repository = "https://github.com/anya-core/bitcoin-framework"
-rust-version = "1.75"
+edition = "2021"  # Required for member crate inheritance
+description = "Anya Core Bitcoin Development Framework"
+license = "MIT"
+repository = "https://github.com/anya-org/anya-core"
+rust-version = "1.70"
 
+# Consolidated dependencies without duplicates
 [workspace.dependencies]
 # Unified cryptographic stack (BDF §1.1)
-secp256k1 = { version = "0.28.1", features = [
-    "serde",
-    "recovery",
-    "alloc",
-    "bitcoin_hashes"
-] }
-bitcoin = { version = "0.31.0", features = [
-    "std", 
-    "base64",
-    "rand-std",
-    "serde",
-    "taproot"
-] }
-bitcoincore-rpc = { version = "0.17.0", features = ["bip174"] }
+secp256k1 = { version = "0.27.0", features = ["bitcoin_hashes"] }
+bitcoin = "0.30.0"
 
 # Protocol Adapters (BDF §2.1)
 web5 = { version = "0.5.0", features = [
@@ -96,3 +91,26 @@ rgb-core = { git = "https://github.com/RGB-WG/rgb-core", tag = "v0.10.0", featur
 
 # Mobile dependencies
 jsi = "0.10"
+
+# [AIR-3] Remove Dart dependencies
+[dependencies]
+- dart-sys = "0.3.0"
++ taproot-assets = { git = "https://github.com/bitcoin/taproot-assets.git", tag = "v0.2.5" }
+
+# [BPC-3] Bitcoin Development Framework workspace
+[workspace]
+members = [
+    "anyacore",
+    "mobile",
+    "bitcoin-adapter",
+    "dlc-oracle"
+]
+
+[workspace.dependencies]
+bitcoin = "0.30.0"
+secp256k1 = { version = "0.27.0", features = ["bitcoin_hashes"] }
+taproot-assets = { git = "https://github.com/bitcoin/taproot-assets.git", tag = "v0.2.5" }
+
+# [AIS-3] Security enforcement
+[workspace.package]
+rust-version = "1.70"

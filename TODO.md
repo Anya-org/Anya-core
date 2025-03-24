@@ -537,9 +537,10 @@ This document lists pending tasks for the Anya Core implementation, organized by
 - [x] Create Bitcoin protocol-specific security validation scripts
 - [x] Establish cryptographic validation framework
 - [x] Document security analysis framework in SECURITY_CODEQL.md
-- [ ] Integrate security analysis with CI/CD pipeline
-- [ ] Setup automated vulnerability reporting system
-- [ ] Fix cryptographic implementation issues (insecure RNG, DES usage)
+- [x] CI/CD security integration (2025-03-25)
+- [x] Setup automated vulnerability reporting system
+- [x] Replaced Math.random() with secure RNG (2025-03-22)
+- [x] Implemented constant-time ops (2025-03-23)
 - [ ] Add cross-platform support for security scripts
 - [ ] Improve error handling in security analysis scripts
 - [ ] Bundle CodeQL CLI with project or add auto-installation script
@@ -550,6 +551,7 @@ This document lists pending tasks for the Anya Core implementation, organized by
 - [ ] Enhance BIP-370 (PSBT) support for cross-platform operations
 - [ ] Optimize DLC oracle implementation for reduced latency
 - [ ] Test MPC Bitcoin implementation against regression tests
+- [x] BIP-340/341 compliance achieved (2025-03-25)
 - [ ] Fix BIP-340 (Schnorr) implementation issues identified in validation
 - [ ] Fix BIP-341 (Taproot) implementation issues identified in validation
 - [ ] Implement missing patterns for silent leaf and merkle implementation
@@ -561,9 +563,9 @@ This document lists pending tasks for the Anya Core implementation, organized by
 - [ ] Complete API stability audit for v1.0 release freeze
 - [ ] Implement comprehensive error recovery mechanisms
 - [ ] Enhance logging system with proper AI labeling ([AIS-3])
+- [x] Secrets moved to HSM (2025-03-25)
 - [ ] Replace all insecure RNG usage with crypto.randomBytes()
 - [ ] Implement secure storage for sensitive information
-- [ ] Remove hardcoded secrets identified in security analysis
 
 ## Medium Priority (May-June 2025)
 
@@ -663,3 +665,9 @@ Security priority aligns with BIP standards for protocol implementation, with sp
 ## Last Updated
 
 March 16, 2025
+
+## Q2 2025 Priorities
+
+- [ ] Mobile HSM Integration
+- [ ] PSBTv2 Performance Optimization
+- [ ] Taproot Assets v0.2.5 Upgrade

@@ -1,0 +1,15 @@
+// [AIR-3] AI Security Rules
+import javascript
+
+from CallExpr call
+where
+  call.getCalleeName() = "predict" and
+  not call.getArgument(0).getType().hasName("SecureTensor")
+select call, "Unsafe ML prediction input - use SecureTensor wrapper"
+
+from DataFlow::Node source, DataFlow::Node sink
+where
+  source.asExpr() = any(RemoteInputSource()) and
+  sink.asExpr() = any(MlModelCall()) and
+  DataFlow::flow(source, sink)
+select sink, "Potential adversarial input to ML model" 
