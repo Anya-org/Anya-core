@@ -12,7 +12,7 @@ The Anya DAO is designed to fully comply with Bitcoin protocol standards and bes
 |-----|-------------|--------|----------------|
 | 341 | Taproot | ✅ | Treasury operations, voting |
 | 174 | PSBT | ✅ | Transaction creation, multi-sig |
-| 370 | PSBT v2 | 🔄 | Advanced operations (in progress) |
+| 370 | PSBT v2 | ✅ | Advanced operations (BIP-370 full implementation) |
 | 342 | Tapscript | ✅ | Governance script validation |
 
 ## Bitcoin Development Framework Compliance
@@ -170,3 +170,18 @@ This implementation achieves full BOLT 12 compliance while maintaining all Bitco
 | Lightning      | BOLT 1-12 (Full Suite)        | [BPC-3][AIT-3][PFM-3]      |
 | Cross-chain    | SPV, Drivechain, Federated    | [BPC-3][RES-3][SCL-3]      |
 | Smart Contracts| Miniscript, RGB, Taproot Assets| [BPC-3][AIS-3][AIT-3]      |
+
+## BIP-370 Compliance (v2.0.1)
+
+- **Enhanced Validation**: PSBT v2 strict validation
+- **Fee Rate Enforcement**: Dynamic fee calculation
+- **Input Validation**: Enhanced input verification
+
+```rust:src/validation/psbt_v2.rs
+// Updated PSBT v2 validation
+fn validate_psbt_v2(psbt: &Psbt) -> Result<()> {
+    validate_fee_rate(psbt)?;
+    validate_inputs(psbt)?; 
+    validate_silent_leaf(psbt)?; // BIP-341 integration
+}
+```
