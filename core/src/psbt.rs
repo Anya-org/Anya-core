@@ -10,4 +10,4 @@ pub fn validate_version(required: u8) -> bool {
     } else {
         true
     }
-} 
+}

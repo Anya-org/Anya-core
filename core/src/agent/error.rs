@@ -1,5 +1,5 @@
 //! ML*/Agent Error Types
-//! 
+//!
 //! This module defines the error types used throughout the ML*/Agent system.
 //! It provides a comprehensive error handling framework that covers various
 //! failure scenarios across different system components.
@@ -29,8 +29,8 @@
 //! }
 //! ```
 
-use std::fmt;
 use std::error::Error;
+use std::fmt;
 
 /// Comprehensive error type for ML*/Agent system.
 ///

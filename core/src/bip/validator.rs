@@ -5,4 +5,4 @@ pub fn validate_bip_check() -> Result<()> {
         .verify_directory_structure()?
         .check_checksums();
     Ok(())
-} 
+}

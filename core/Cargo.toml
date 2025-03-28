@@ -1,55 +1,26 @@
 [package]
-name = "anya-core"
-version.workspace = true
-edition.workspace = true
+name = "core"
+version = "0.1.0"
+edition = "2021"
 
 [dependencies]
-bitcoin.workspace = true
-secp256k1.workspace = true
-serde.workspace = true
-libp2p = { workspace = true, features = ["tcp", "websocket", "noise", "yamux"] }
-tokio = { workspace = true, features = ["full"] }
+hex = "0.4"
+url = "=2.2.2"
+bitcoin = "0.29.2"
+secp256k1 = "0.24.0"
+tokio = { version = "1.28.1", features = ["full"] }
+serde = { version = "1.0.160", features = ["derive"] }
+serde_json = "1.0.96"
+anyhow = "1.0.70"
+thiserror = "1.0.40"
+log = "0.4.17"
+reqwest = { version = "0.11.11", default-features = false, features = ["json", "rustls-tls"] }
+rand = "0.8"
 
-# Cryptographic primitives
-k256 = { version = "0.13.3", features = [
-    "ecdsa",
-    "sha256",
-    "std"
-] }
-sha2 = "0.10.8"
-hmac = "0.12.1"
-
-# Security auditing
-cargo-audit = { version = "0.18.3", optional = true }
-
-# Update Web5 dependencies with security features
-web5 = { version = "0.5.1", features = [
-    "bip174",
-    "bip341",
-    "bip370",
-    "did-rotation",
-    "vc-revocation",
-    "silent-leaf"
-], default-features = false }
-
-# Add SGX implementation
-sgx-urts = { version = "1.1.6", optional = true }
-
-# Change yubihsm to optional
-yubihsm = { version = "0.41.0", features = ["mock"], optional = true }
+[lib]
+name = "core"
+path = "src/lib.rs"
 
 [dev-dependencies]
-bip-check = { git = "https://github.com/bitcoin/bips", rev = "7c4b4c1d91b7d3dc6d7862ad5a8c1472332e6d84" }
-web5-test-vectors = "0.2.0"
-
-[features]
-default = ["audit"]
-audit = ["cargo-audit"]
-hardware = ["hsm", "sgx-urts"]
-hsm = ["yubihsm", "secp256k1/hsm"]
-chaos = [
-    "libp2p/chaos",
-    "tokio/full"
-]
-sgx = ["sgx-urts"]
-mobile = ["bitcoin/use-serde", "secp256k1/global-context"] 
+tokio = { version = "1.28.1", features = ["full", "test-util", "macros"] }
+rand = "0.8.5"

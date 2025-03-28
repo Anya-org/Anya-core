@@ -23,11 +23,12 @@ impl Web5Validator {
         if psbt.version < 2 {
             anyhow::bail!("PSBT version 2 required for Web5 transactions");
         }
-        
+
         // Add BIP-370 fee rate validation
-        let fee_rate = psbt.fee_rate()
+        let fee_rate = psbt
+            .fee_rate()
             .ok_or(anyhow::anyhow!("Missing fee rate in PSBT"))?;
-        
+
         if fee_rate < 1.0 {
             anyhow::bail!("Fee rate below minimum required (1 sat/vB)");
         }
@@ -40,10 +41,11 @@ impl Web5Validator {
         let silent_leaf = hex::decode(BIP341_SILENT_LEAF.trim_start_matches("0x"))
             .context("Failed to decode SILENT_LEAF")?;
 
-        tx.output.iter()
+        tx.output
+            .iter()
             .find(|o| o.script_pubkey.as_bytes() == silent_leaf)
             .ok_or(anyhow::anyhow!("SILENT_LEAF commitment missing"))?;
 
         Ok(())
     }
-} 
+}

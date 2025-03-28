@@ -6,12 +6,12 @@ pub fn validate_hardware_capabilities() -> anyhow::Result<()> {
             anyhow::bail!("Missing required CPU features for HSM operations");
         }
     }
-    
+
     // Validate TPM presence
     if !validate_tpm_2_0() {
         anyhow::bail!("TPM 2.0 required for secure operations");
     }
-    
+
     Ok(())
 }
 
@@ -20,8 +20,9 @@ fn validate_tpm_2_0() -> bool {
     {
         Path::new("/dev/tpm0").exists() || Path::new("/dev/tpmrm0").exists()
     }
-    #[cfg(not(target_os = "linux"))] {
+    #[cfg(not(target_os = "linux"))]
+    {
         // Windows/macOS TPM validation
         false // Placeholder for platform-specific implementation
     }
-} 
+}
