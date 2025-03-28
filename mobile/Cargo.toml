@@ -1,47 +1,17 @@
 [package]
-name = "anya-mobile"
-version.workspace = true
-edition.workspace = true
-
-[target.'cfg(mobile)'.dependencies]
-bitcoin = { version = "0.32.1", features = ["mobile", "taproot", "bip341", "bip342", "psbt-v2"] }
-secp256k1 = { workspace = true, features = ["mobile", "bip340", "bip341"] }
-jsi = { version = "0.13", features = ["bip342", "psbt-v2"] }
-
-[features]
-default = ["bip340", "bip341"]
-bip340 = ["secp256k1/bip340"]
-bip341 = [
-    "bitcoin/bip341", 
-    "secp256k1/bip341",
-    "web5/bip341"
-]
-silent-leaf = ["taproot-assets/silent-leaf"]
-psbt-v2 = ["bitcoin/psbt-v2"]
+name = "mobile"
+version = "0.1.0"
+edition = "2021"
 
 [dependencies]
-# Standardized versions
-bitcoin = { workspace = true, features = [
-    "bip341", 
-    "bip342",  // Add Tapscript support
-    "taproot"
-]}
-jsi = { version = "0.12", features = ["bitcoin-bindings"] }
+hex = "0.4"
+rand = "0.8"
+tokio = { version = "1", features = ["full"] }
+rand = "0.8"
+hex = "0.4"
 
-# Add missing from external
-bdk = { workspace = true, features = ["psbt-v2"] }
+# Target specification added automatically
+[lib]
+name = "mobile"
+path = "src/lib.rs"
 
-# [BPC-3] Mobile-specific Bitcoin requirements
-react-native-bitcoin = { version = "0.72", features = ["bip341", "bip370"] }
-
-# [AIS-3] Mobile security profile
-[profile.release]
-codegen-units = 1
-lto = true
-panic = "abort"
-
-anya-secrets = { path = "../anyacore", features = ["hsm", "bip341"] }
-
-[package.metadata]
-research-tier = "Project"  # [BPC-3] Codebase classification
-bitcoin-compliance = { level = 2, features = ["bip341", "bip370"] } 

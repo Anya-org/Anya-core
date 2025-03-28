@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 #[anya_fail_safe]
 impl AnyaFailSafe {
     pub fn emergency_rollback(&self) -> Result<BlockHeight, FailSafeError> {

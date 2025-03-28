@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use crate::integration::unified_data_system::UnifiedDataSystem;
 use actix_web::{web, HttpResponse, Scope};
 use serde::{Serialize, Deserialize};

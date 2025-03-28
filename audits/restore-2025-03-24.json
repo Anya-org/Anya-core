@@ -1,0 +1,9 @@
+{
+  "action": "component_restore",
+  "commit_hashes": ["8f3a1c2...", "773677e..."],
+  "validation": {
+    "bip341": "silent_leaf:0x8f3a...",
+    "hsm_interface": "yubihsm2-v2.5",
+    "psbt_compliance": "v2-full"
+  }
+} 

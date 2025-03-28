@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // Decentralized Web Node (DWN) Implementation
 // Provides storage and messaging capabilities for Web5
 // [AIR-012] Operational Reliability and [AIP-002] Modular Architecture

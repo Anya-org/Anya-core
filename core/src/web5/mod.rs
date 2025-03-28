@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 //! Web5 Protocol Implementation Review
 #![forbid(unsafe_code)]
 

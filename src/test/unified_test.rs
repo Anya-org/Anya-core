@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use log::{info, warn, error};
 use std::sync::Arc;
 use std::time::{Duration, Instant};

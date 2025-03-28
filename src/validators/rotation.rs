@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use anyhow::{anyhow, Context, Result};
 use bitcoin::hashes::sha256;
 use bitcoin::util::bip32::{ExtendedPrivKey, ExtendedPubKey};

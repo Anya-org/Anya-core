@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 //! Machine Learning Agents Module
 //!
 //! This module provides a modular system of ML agents that enhance decision-making

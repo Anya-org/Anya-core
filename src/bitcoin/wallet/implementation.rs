@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 //! Bitcoin wallet implementation details
 //!
 //! This module contains the implementation details for the Bitcoin wallet.

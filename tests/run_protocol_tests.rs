@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use anya_core::layer2::{
     Layer2Protocol,
     ProtocolState,

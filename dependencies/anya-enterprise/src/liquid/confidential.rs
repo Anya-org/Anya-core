@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // Confidential Transactions for Liquid Assets
 // Implementation based on Elements Sidechain
 

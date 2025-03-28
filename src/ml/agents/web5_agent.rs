@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use std::sync::{Arc, Mutex};
 use log::{info, warn, error};
 use serde::{Deserialize, Serialize};

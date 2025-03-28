@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // src/bitcoin/sidechains/liquid/mod.rs
 
 //! Liquid Sidechain implementation

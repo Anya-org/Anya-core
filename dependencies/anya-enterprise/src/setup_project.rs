@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 impl ProjectSetup {
     pub fn new(user_type: UserType, user_data: HashMap<String, String>) -> Result<Self, Box<dyn Error>> {
         let decorator = slog_term::TermDecorator::new().build();

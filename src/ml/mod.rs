@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 //! Machine Learning module
 //!
 //! This module provides machine learning capabilities for the Anya system,

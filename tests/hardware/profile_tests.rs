@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 #[cfg(test)]
 mod hardware_tests {
     use super::*;

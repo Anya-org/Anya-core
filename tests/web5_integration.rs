@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 #[test]
 fn test_web5_did_rotation() {
     let mut did = Web5Did::new();

@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 //! Legal wrapper integration for DAO-4 [AIS-3][BPC-3][DAO-3]
 
 use serde::{Serialize, Deserialize};

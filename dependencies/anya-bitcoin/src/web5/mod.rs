@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // SPDX-License-Identifier: MIT
 // Copyright (C) 2023-2025 Anya Project Contributors
 

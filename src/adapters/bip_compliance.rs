@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 #[derive(Clone, Debug)]
 pub struct TaprootCompliance {
     pub version: u8,

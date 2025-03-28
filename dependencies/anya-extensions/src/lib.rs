@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 pub mod extensions {
     pub fn version() -> &'static str {
         "0.1.0"

@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // Enhanced network security for visualization
 pub async fn run_server(port: u16) -> anyhow::Result<()> {
     let server_key = generate_tls_cert()?;

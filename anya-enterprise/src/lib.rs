@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use std::error::Error;
 
 pub mod advanced_analytics;

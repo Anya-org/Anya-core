@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 //! Quadratic Voting Implementation [AIS-3][BPC-3][DAO-3]
 
 use std::collections::HashMap;

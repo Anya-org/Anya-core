@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 /// AIR-012: Operational Reliability Utilities
 /// 
 /// This module provides utilities for ensuring operational reliability,

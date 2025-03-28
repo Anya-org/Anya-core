@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use regex::Regex;
 use std::collections::HashMap;
 

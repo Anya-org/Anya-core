@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // src/gorules.rs
 use libc::{c_char, c_int};
 use std::ffi::CString;

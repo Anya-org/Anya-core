@@ -1,17 +1,17 @@
 [package]
 name = "anya-extensions"
-version = "0.2.0"
+version = "0.1.0"
 edition = "2021"
-authors = ["Anya Extensions Contributors"]
-description = "Core extensions for Anya Platform"
-license = "MIT OR Apache-2.0"
-repository = "https://github.com/anya-org/anya-core"
 
+[dependencies]
+hex = "0.4"
+rand = "0.8"
+tokio = { version = "1", features = ["full"] }
+rand = "0.8"
+hex = "0.4"
+
+# Target specification added automatically
 [lib]
 name = "anya_extensions"
 path = "src/lib.rs"
 
-[dependencies]
-anya-core = { path = "../../../anya-core", version = "0.2.0" }
-tokio = { workspace = true }
-serde = { workspace = true }

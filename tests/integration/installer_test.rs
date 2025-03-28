@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 #[cfg(test)]
 mod integration_tests {
     use super::*;

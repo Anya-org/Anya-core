@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 //! BIP-370 Implementation for improved PSBT handling [BPC-3]
 //! 
 //! This module implements BIP-370, which improves the Partially Signed Bitcoin 

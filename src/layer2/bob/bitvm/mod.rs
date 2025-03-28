@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // BitVM integration module for BOB
 // Implements BitVM integration for Bitcoin Optimistic Blockchain
 // as per Bitcoin Development Framework v2.5 requirements

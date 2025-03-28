@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use sqlx::{Pool, Postgres};
 use sea_query::{PostgresQueryBuilder, Query};
 use std::path::Path;

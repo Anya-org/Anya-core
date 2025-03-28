@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 //! DAO Types
 //!
 //! This module defines types for the DAO module, including proposals,

@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use did_key::{DIDCore, Ed25519KeyPair, KeyMaterial};
 use web5::dids::{DidResolver, DidDocument};
 use web5::dwn::{DataFormat, Message, MessageStore};

@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // [BPC-3][BIP-370] PSBTv2 Implementation
 impl PsbtV2 {
     pub fn validate(&self) -> Result<(), PsbtError> {

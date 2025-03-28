@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 #[bitcoin_protocol]  // New attribute
 impl EnterpriseTradeExecutor {
     /// Modified to include protocol validation

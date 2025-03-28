@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // Add new modules
 pub mod rgb;
 pub mod liquid;

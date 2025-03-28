@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 impl BitcoinWallet {
     pub fn new(config: &WalletConfig) -> Result<Self, Error> {
         // First check for custom RPC URL

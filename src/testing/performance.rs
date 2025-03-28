@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 //! Performance Testing Framework [BPC-3]
 //! 
 //! This module provides tools for performance testing of the Bitcoin

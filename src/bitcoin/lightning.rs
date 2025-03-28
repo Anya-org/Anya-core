@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // Lightning Network Implementation for Bitcoin Module
 // Implements Lightning Network functionality for Bitcoin operations
 // as per Bitcoin Development Framework v2.5 requirements

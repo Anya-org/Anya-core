@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // Issuance Module Sectional Tests
 //
 // This file contains sectional tests for the core issuance module.

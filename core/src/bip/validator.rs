@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 pub fn validate_bip_check() -> Result<()> {
     let repo_path = Path::new("dependencies/bips");
     BipValidator::new()

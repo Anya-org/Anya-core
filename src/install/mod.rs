@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use anyhow::{Context, Result};
 use crate::network::validation::{NetworkValidator, NetworkValidationResult};
 use crate::install::{modes::*, cluster::EnterpriseClusterManager};

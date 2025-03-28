@@ -1,29 +1,17 @@
+[package]
 name = "anya-bitcoin"
-version.workspace = true
-edition.workspace = true
-authors.workspace = true
-license.workspace = true
-description.workspace = true
+version = "0.1.0"
+edition = "2021"
 
 [dependencies]
-# Inherited cryptographic stack
-secp256k1.workspace = true
-bitcoin.workspace = true
-bitcoincore-rpc.workspace = true
+hex = "0.4"
+rand = "0.8"
+tokio = { version = "1", features = ["full"] }
+rand = "0.8"
+hex = "0.4"
 
-# Taproot Implementation (BIP 341)
-bdk = { workspace = true, features = ["taproot"] }
-
-[dev-dependencies]
-tokio-test = "0.4"
-tracing-subscriber = "0.3.17"
-
+# Target specification added automatically
 [lib]
 name = "anya_bitcoin"
 path = "src/lib.rs"
 
-[features]
-default = ["bip174", "bip341"]
-
-
-default = ["bip174", "bip341"]

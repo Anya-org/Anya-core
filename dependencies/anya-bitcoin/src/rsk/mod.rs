@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // RSK Smart Contract Integration for OPSource
 // Enables EVM-compatible smart contracts secured by Bitcoin through merge-mining
 

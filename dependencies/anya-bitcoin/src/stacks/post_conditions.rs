@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // Post conditions for Stacks transactions
 
 use serde::{Deserialize, Serialize};

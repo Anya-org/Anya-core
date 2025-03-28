@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use anya_core::{
     auth::{AuthManager, enterprise::advanced_security::AdvancedSecurity},
     ml::advanced_processing::AdvancedMLProcessor,

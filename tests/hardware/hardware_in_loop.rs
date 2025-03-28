@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 #[cfg(test)]
 mod hil_tests {
     use super::*;

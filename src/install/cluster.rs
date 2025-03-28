@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use anyhow::{Context, Result};
 use bitcoin::blockdata::transaction::Transaction;
 use bitcoin::consensus::encode::deserialize;

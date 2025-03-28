@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // AIR-008: Performance Optimization Implementation
 // Priority: HIGH - Performance tuning with in-memory auto-save
 

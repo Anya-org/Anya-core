@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // Web5 Module for Anya Core
 // Implements Web5 specification with focus on decentralized identity and protocols
 // [AIR-012] Operational Reliability and [AIP-002] Modular Architecture

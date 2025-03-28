@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 pub mod cluster;
 pub mod failover;
 pub mod health_check;

@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use super::data_manager::{Web5DataManager, DataRecord};
 use web5::dwn::{DwnClient, SyncOptions, RecordFilter};
 use std::time::Duration;

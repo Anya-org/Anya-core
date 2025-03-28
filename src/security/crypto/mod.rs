@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 //! Cryptographic Utilities Module
 //! [AIR-1][AIS-1][BPC-1][AIT-1][RES-1]
 //!

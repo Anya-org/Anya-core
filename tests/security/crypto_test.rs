@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 #[test]
 fn verify_schnorr_implementation() {
     let secp = Secp256k1::new();

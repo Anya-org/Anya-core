@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use crate::{
     auth::enterprise::advanced_security::AdvancedSecurity,
     revenue::advanced_tracking::AdvancedRevenueTracker,

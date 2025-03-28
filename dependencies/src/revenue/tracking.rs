@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use crate::{
     auth::{AuthManager, BlockchainAuth},
     ml::enterprise_integration::MLEnterpriseIntegration,

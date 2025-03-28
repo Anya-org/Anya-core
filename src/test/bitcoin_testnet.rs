@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use bitcoin::Network;
 use bitcoincore_rpc::{Auth, Client, RpcApi};
 use anyhow::Result;

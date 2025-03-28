@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use super::model::{MLModel, Feature, FeatureCategory};
 use std::path::PathBuf;
 use regex::Regex;

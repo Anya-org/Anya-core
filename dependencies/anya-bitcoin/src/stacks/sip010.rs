@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // SIP-010 Fungible Token Standard implementation for Stacks
 // https://github.com/stacksgov/sips/blob/main/sips/sip-010/sip-010-fungible-token-standard.md
 

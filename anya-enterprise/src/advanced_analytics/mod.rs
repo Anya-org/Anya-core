@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use crate::user_metrics::UserMetrics;
 use crate::blockchain::BlockchainInterface;
 use crate::data_feed::{DataFeed, DataSource};

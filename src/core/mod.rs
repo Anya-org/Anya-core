@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // AIR-008: Core Module Integration
 // Integrates all Priority 1 implementations with auto-save functionality
 

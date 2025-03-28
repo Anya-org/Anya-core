@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use super::{IdentityError, Credential, CredentialProof};
 use crate::auth::web5::metrics::identity::IdentityMetrics;
 use sqlx::PgPool;

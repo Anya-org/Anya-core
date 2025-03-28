@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use log::{info, error};
 use tokio::time::{Duration, sleep};
 use std::sync::Arc;

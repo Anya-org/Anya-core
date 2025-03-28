@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 #[test]
 fn test_taproot_integration() {
     let test_vectors = vec![

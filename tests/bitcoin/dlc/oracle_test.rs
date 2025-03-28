@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use anya_core::bitcoin::dlc::{
     oracle::{
         implement_non_interactive_oracle, create_privacy_preserving_oracle,

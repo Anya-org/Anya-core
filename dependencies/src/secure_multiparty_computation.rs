@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use bitcoin::secp256k1::{Secp256k1, SecretKey};
 use bitcoin::util::bip340; // For Schnorr signatures
 

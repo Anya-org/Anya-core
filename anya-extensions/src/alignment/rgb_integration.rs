@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use anyhow::Result;
 use std::sync::Arc;
 use bitcoin::{Network, OutPoint};

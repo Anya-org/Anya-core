@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use super::IdentityError;
 use crate::auth::web5::metrics::identity::IdentityMetrics;
 use did_key::{DIDCore, DID, KeyMaterial};

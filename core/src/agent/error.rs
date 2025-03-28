@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 //! ML*/Agent Error Types
 //!
 //! This module defines the error types used throughout the ML*/Agent system.

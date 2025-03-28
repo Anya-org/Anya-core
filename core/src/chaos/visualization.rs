@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 //! Network visualization dashboard
 use libp2p::PeerId;
 use serde_json::json;

@@ -1,8 +1,17 @@
-[target.'cfg(mobile)'.dependencies]
-anya-mobile = { git = "https://github.com/anya-org/anya-mobile", branch = "main" }
-bitcoin = { workspace = true, features = ["taproot", "mobile"] }
-secp256k1 = { workspace = true, features = ["mobile"] }
-jsi = { version = "0.12", features = ["bitcoin-bindings"] }
+[package]
+name = "anya-mobile"
+version = "0.1.0"
+edition = "2021"
 
-[features]
-bip341 = ["bitcoin/bip341", "secp256k1/bip341"]  # Taproot compliance 
+[dependencies]
+hex = "0.4"
+rand = "0.8"
+tokio = { version = "1", features = ["full"] }
+rand = "0.8"
+hex = "0.4"
+
+# Target specification added automatically
+[lib]
+name = "anya_mobile"
+path = "src/lib.rs"
+

@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use reqwest::Client;
 use serde::Serialize;
 use std::error::Error;

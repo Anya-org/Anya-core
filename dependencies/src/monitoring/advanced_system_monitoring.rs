@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use crate::{
     auth::enterprise::advanced_security::AdvancedSecurity,
     web5::advanced_integration::AdvancedWeb5Integration,

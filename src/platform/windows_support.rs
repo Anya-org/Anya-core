@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use anyhow::{anyhow, Context, Result};
 use std::path::{Path, PathBuf};
 use std::process::Command;

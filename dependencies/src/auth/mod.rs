@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use async_trait::async_trait;
 use bitcoin::secp256k1::{Secp256k1, SecretKey, PublicKey};
 use bitcoin::util::bip32::{ExtendedPrivKey, ExtendedPubKey, DerivationPath};

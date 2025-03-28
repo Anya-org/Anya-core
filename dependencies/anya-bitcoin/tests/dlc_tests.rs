@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use anya_bitcoin::{
     wallet::{BitcoinWallet, WalletConfig},
     dlc::{

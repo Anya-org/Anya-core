@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use criterion::{criterion_group, criterion_main, Criterion};
 
 fn benchmark(c: &mut Criterion) {

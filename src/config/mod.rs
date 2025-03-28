@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 pub struct ConfigManager {
     path: PathBuf,
 }

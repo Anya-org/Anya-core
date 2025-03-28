@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 //! Tests for Layer 4 protocol implementation
 //! [AIR-3][AIS-3][BPC-3][AIP-3][RES-3]
 

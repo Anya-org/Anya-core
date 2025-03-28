@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // AIR-008: Main Application Entry Point
 // Demonstrates P1 components with auto-save functionality
 

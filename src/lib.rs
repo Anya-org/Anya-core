@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 //! Anya Core Library
 //!
 //! This is the core library for the Anya system, providing fundamental

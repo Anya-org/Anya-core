@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 /// AIR-012: Unified Configuration Management System
 /// 
 /// This module provides a centralized configuration management system

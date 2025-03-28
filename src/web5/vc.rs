@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // Verifiable Credentials Implementation
 // Provides W3C Verifiable Credentials functionality for Web5
 // [AIR-012] Operational Reliability and [AIP-002] Modular Architecture

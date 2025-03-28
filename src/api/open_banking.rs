@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 #[openapi]
 impl OpenBankingApi {
     /// PSD2-compliant account access

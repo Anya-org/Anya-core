@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // Configuration module for Anya Core
 // Provides configuration settings for various components
 

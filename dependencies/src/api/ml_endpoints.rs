@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use actix_web::{web, HttpResponse, Scope};
 use crate::ml::enterprise_processing::MLProcessor;
 use crate::auth::enterprise::security_layers::SecurityLayers;

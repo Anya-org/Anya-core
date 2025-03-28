@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // Repository Structure Analysis
 struct RepoAnalysis {
     bitcoin: RepoCompliance,

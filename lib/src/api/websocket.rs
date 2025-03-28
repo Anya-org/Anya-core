@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // OPSource WebSocket Implementation
 // Provides real-time communication for blockchain events and notifications
 

@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // AIP-002: Agent Checker System Implementation
 // Priority: CRITICAL - ML-based system analyzer with in-memory auto-save
 

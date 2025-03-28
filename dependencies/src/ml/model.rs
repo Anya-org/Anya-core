@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use serde::{Serialize, Deserialize};
 use std::path::PathBuf;
 use tokio::fs;

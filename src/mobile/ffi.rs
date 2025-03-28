@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // Unified mobile FFI interface
 #[react-native::bridge]
 mod ffi {

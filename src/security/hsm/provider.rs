@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use async_trait::async_trait;
 use serde::{Serialize, Deserialize};
 use thiserror::Error;

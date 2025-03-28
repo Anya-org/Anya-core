@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 //! Network Chaos Engineering Scenarios
 use libp2p::swarm::Swarm;
 use tokio::time::{sleep, Duration};

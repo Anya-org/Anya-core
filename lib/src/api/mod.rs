@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // OPSource Web and API Layer
 // Replaces FastAPI with Actix Web for better performance and native Rust integration
 

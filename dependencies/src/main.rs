@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 mod ml_logic;
 
 async fn setup_license_management(config: Config) -> LicenseManager {

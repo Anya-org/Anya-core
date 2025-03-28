@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use anya_core::ml::{MLError, MLInput, MLOutput, MLModel};
 use ndarray::{Array1, Array2};
 use tch::{nn, Device, Tensor, Kind};

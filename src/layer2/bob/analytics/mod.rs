@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // Hybrid analytics module for BOB
 // Implements analytics for Bitcoin Optimistic Blockchain
 // as per Bitcoin Development Framework v2.5 requirements

@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 #[derive(Clone)]
 struct ChannelPersister {
     storage: Arc<dyn ChannelStorage>,

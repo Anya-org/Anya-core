@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 //! Documentation validator for Bitcoin compliance [AIS-3][BPC-3][DAO-3]
 
 use anya_core::tools::markdown::{DocumentationValidator, DocError};

@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // Input adapter example
 pub struct RestApi {
     handler: Arc<dyn CommandHandler>,

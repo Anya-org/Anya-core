@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 #[dao_label(DaoLabel::OPENBANK)]
 impl ComplianceManager {
     /// Automated regulatory checks

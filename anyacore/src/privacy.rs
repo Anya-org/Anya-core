@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 #[ais3]
 pub struct DataRedactor {
     #[bip341]

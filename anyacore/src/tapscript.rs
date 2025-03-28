@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 #[bip342]
 pub struct TapscriptValidator {
     #[ais3]

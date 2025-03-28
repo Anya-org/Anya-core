@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 macro_rules! impl_installable_module {
     ($struct:ty, $install:expr, $test:expr) => {
         impl InstallableModule for $struct {

@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // Security validation module
 // Implements security validation for Bitcoin operations
 // as per Bitcoin Development Framework v2.5 requirements

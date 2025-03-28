@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 /// DAO-3 Compliance Check
 impl DaoGovernance {
     #[dao_label(DaoLabel::DAO3)]

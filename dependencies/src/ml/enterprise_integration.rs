@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use crate::integration::unified_data_system::UnifiedDataSystem;
 use crate::ml::agents::Web5AgentSystem;
 use anyhow::Result;

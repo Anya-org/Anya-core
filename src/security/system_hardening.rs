@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // AIE-001: System Hardening Implementation
 // Priority: HIGH - Security configurations with in-memory state
 

@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 pub fn enforce_mobile_compliance() -> Result<()> {
     let report = validate_cross_implementation()?;
 

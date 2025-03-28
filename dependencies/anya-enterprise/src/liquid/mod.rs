@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use elements::{
     confidential::{Asset, Value, Nonce},
     encode::ElementsEncodable,

@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use crate::{
     auth::{AuthManager, BlockchainAuth},
     integration::unified_data_system::UnifiedDataSystem,

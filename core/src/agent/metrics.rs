@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 //! Metrics Collection System for ML*/Agent
 //! 
 //! This module provides comprehensive metrics collection and analysis capabilities for the ML*/Agent system.

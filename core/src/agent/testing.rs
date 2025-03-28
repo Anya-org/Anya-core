@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 //! Testing System for ML*/Agent
 //! 
 //! This module implements the testing framework for ML*/Agent, providing

@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 pub struct MLInput {
 	// Fields and methods for MLInput...
 }

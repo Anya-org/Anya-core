@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use super::super::IdentityError;
 use ring::aead::{self, BoundKey, Nonce, NonceSequence, UnboundKey, AES_256_GCM};
 use ring::rand::{SecureRandom, SystemRandom};

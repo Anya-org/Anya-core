@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use crate::{
     auth::{AuthManager, BlockchainAuth},
     web5::advanced_integration::AdvancedWeb5Integration,

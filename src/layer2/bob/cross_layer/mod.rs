@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // Cross-layer transaction handling module for BOB
 // Implements cross-layer transaction handling for Bitcoin Optimistic Blockchain
 // as per Bitcoin Development Framework v2.5 requirements

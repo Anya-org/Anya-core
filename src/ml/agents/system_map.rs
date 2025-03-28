@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 //! System Map and Index for Agent Operations
 //!
 //! This module provides the system mapping and indexing capabilities

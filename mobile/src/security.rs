@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 pub fn verify_psbt_signature(&self, psbt: &Psbt) -> Result<()> {
     let local_sig = self.derive_signature(psbt)
         .context("Failed to derive local signature")?;

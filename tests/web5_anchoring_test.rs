@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // Web5 Bitcoin anchoring test
 #[cfg(feature = "web5")]
 mod web5_tests {

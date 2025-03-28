@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use crate::auth::{AuthManager, BlockchainAuth, error::AuthError};
 use crate::web5::data_manager::Web5DataManager;
 use ring::aead::{self, SealingKey, OpeningKey};

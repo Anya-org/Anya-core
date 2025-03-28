@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use bitcoin::Network;
 use core::error::Error;
 use core::l4_protocol::{AnyaL4Protocol, PublicRPCAdapter};

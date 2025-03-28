@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use super::{IdentityError, Credential};
 use crate::auth::encryption::KeyEncryption;
 use ring::aead::{self, SealingKey, OpeningKey, Nonce, NONCE_LEN};

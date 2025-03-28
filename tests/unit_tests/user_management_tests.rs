@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 /// The above code contains asynchronous Rust test functions for user management and wallet integration
 /// with admin access control.
 /// 

@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // Anya Governance Token (AGT) Contract Implementation
 // [AIR-3][AIS-3][AIT-3][AIP-3][BPC-3][DAO-3]
 

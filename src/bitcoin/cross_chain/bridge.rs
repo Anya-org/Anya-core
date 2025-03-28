@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // src/bitcoin/cross_chain/bridge.rs
 
 use std::collections::HashMap;

@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 //! Coin selection algorithms for Bitcoin wallet
 //!
 //! This module provides various coin selection algorithms for Bitcoin transactions.

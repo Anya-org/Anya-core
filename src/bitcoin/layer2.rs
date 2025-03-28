@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use bitcoin::{Transaction, Network};
 use crate::bitcoin::error::BitcoinResult;
 

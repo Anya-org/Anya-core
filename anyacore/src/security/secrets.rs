@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 #[derive(Debug, AIS3)]
 pub struct SecretsManager {
     hsm: HsmClient,

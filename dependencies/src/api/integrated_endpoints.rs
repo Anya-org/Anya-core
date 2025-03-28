@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use actix_web::{web, HttpResponse, Scope};
 use crate::{
     auth::{AuthManager, enterprise::advanced_security::AdvancedSecurity},

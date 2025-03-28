@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // Enterprise Banking Module
 // [AIS-3][BPC-3][DAO-3]
 

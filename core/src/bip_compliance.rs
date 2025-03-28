@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 //! Automated BIP Compliance Reporting
 #![forbid(unsafe_code)]
 

@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 //! Anya-Core Installer v2.5
 //! [AIR-3][AIS-3][BPC-3][AIT-2][RES-2][SCL-3][PFM-2]
 //! 

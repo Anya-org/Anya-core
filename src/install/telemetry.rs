@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use log::{info, warn, error, LevelFilter};
 use log4rs::{
     append::{console::ConsoleAppender, file::FileAppender},

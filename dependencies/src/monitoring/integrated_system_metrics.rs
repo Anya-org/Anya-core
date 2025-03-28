@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use super::advanced_metrics::AdvancedMetrics;
 use crate::web5::advanced_integration::AdvancedWeb5Integration;
 use metrics::{Counter, Gauge, Histogram};

@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use super::IdentityError;
 use crate::auth::web5::data_manager::{DataRecord, Web5DataManager};
 use did_key::{DIDCore, Ed25519KeyPair, KeyMaterial};

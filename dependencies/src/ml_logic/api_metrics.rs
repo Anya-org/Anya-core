@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 pub struct ApiMetricsCollector {
     payment_processor: PaymentProcessor,
     usage_tracker: UsageTracker,

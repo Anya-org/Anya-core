@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 //! Lightning Network Demo
 //!
 //! This program demonstrates the Lightning Network functionality

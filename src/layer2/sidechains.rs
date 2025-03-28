@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // Sidechains module for Layer 2
 // Implements sidechains for Bitcoin Layer 2 solutions
 // as per Bitcoin Development Framework v2.5 requirements

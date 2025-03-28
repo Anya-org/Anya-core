@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // Core performance module
 // Implements performance metrics for Bitcoin operations
 // as per Bitcoin Development Framework v2.5 requirements

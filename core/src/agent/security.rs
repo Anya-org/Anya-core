@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 //! Security Management System
 //! 
 //! This module implements the security management system for ML*/Agent,

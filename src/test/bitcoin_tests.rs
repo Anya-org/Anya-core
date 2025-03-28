@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use log::{info, warn, error};
 use bitcoin::{Network, Transaction};
 use bitcoin::consensus::encode::deserialize;

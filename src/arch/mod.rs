@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 #[derive(OriginalDeepSeek)]
 pub struct AnyaAISubsystem {
     pub prediction_engine: AnyaRuntime,

@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use bitcoin::FeeRate;
 
 pub struct FeeEstimator {

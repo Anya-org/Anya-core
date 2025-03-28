@@ -1,18 +1,17 @@
 [package]
 name = "anya-enterprise"
-version.workspace = true
-edition.workspace = true
-authors.workspace = true
-license.workspace = true
-description = "Enterprise features for Anya Core"
+version = "0.1.0"
+edition = "2021"
 
 [dependencies]
-anya-core = { path = "../anya-core", version.workspace = true }
-secp256k1.workspace = true
+hex = "0.4"
+rand = "0.8"
+tokio = { version = "1", features = ["full"] }
+rand = "0.8"
+hex = "0.4"
 
-# Audit Trail Compliance (BDF §5.3)
-opentelemetry = { version = "0.21.0", features = ["metrics"] }
+# Target specification added automatically
+[lib]
+name = "anya_enterprise"
+path = "src/lib.rs"
 
-[features]
-default = ["advanced-security"]
-advanced-security = ["secp256k1/zkp", "opentelemetry"]

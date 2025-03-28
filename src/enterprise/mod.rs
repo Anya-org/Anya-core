@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 /// Enterprise Module
 /// 
 /// This module provides enterprise-specific functionality for Anya Core,

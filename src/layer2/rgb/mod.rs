@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // RGB Protocol Integration Module
 // Last Updated: 2025-03-06
 

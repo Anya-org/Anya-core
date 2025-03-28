@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 //! Chaos Visualization Performance Metrics
 use prometheus::{register, HistogramOpts, HistogramVec, IntCounterOpts, IntCounterVec};
 

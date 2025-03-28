@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 //! ML*/Agent Checker System
 //! 
 //! This module implements the core ML*/Agent Checker system, providing a comprehensive framework

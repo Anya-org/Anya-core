@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // EVM compatibility module for BOB
 // Implements EVM compatibility for Bitcoin Optimistic Blockchain
 // as per Bitcoin Development Framework v2.5 requirements

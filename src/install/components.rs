@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use std::fs;
 use std::path::Path;
 use std::process::Command;

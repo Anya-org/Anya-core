@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 impl LightningNode {
     // BDF v2.5 §7.3: Static Key Security
     pub fn rotate_node_keys(&self) -> Result<()> {

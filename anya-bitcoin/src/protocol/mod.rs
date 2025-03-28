@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 #[derive(Debug, Clone)]
 pub struct BitcoinProtocolEnforcer {
     inner: BitcoinProtocol,

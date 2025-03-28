@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // src/bitcoin/taproot/script.rs
 
 use std::collections::HashMap;

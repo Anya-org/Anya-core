@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use crate::user_metrics::UserMetrics;
 use crate::ml::advanced_models::AdvancedBitcoinPricePredictor;
 use crate::bitcoin::BitcoinClient;

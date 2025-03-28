@@ -34,7 +34,7 @@ Bitcoin Development Framework Implementation following BDF v2.5 requirements.
 
 ## Installation
 
-```bash
+   ```bash
 # Install with default settings
 cargo install --path .
 

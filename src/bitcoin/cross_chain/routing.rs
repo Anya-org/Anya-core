@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // src/bitcoin/cross_chain/routing.rs
 
 use std::collections::{HashMap, HashSet, VecDeque};

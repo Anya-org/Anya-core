@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 fn main() {
     println!("Anya Platform v{}", anya::version());
     

@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use async_trait::async_trait;
 use bitcoin::{Address, Transaction, Block, Network};
 use crate::bitcoin::error::{BitcoinError, BitcoinResult};

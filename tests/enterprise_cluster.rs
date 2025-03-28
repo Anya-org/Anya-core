@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 #[tokio::test]
 async fn test_psbt_validation() {
     let valid_psbt = hex::decode("02000000000101...").unwrap();

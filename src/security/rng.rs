@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use rand_core::OsRng;
 
 pub fn generate_key() -> [u8; 32] {

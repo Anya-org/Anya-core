@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use std::time::Instant;
 use anya_core::{
     layer2::{

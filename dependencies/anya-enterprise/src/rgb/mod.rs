@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use rgb_core::{
     contract::{Contract, ContractId},
     schema::{Schema, SchemaId, StateType, Transition},

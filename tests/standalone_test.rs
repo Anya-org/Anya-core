@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // Standalone test for validating RGB and Web5 functionality
 // This test doesn't rely on the problematic dependencies
 

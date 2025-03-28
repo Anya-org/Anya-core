@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 //! Blockchain module
 //!
 //! This module provides a hexagonal architecture implementation for

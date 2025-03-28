@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 //! Validation System for ML*/Agent
 //! 
 //! This module provides comprehensive validation capabilities for the ML*/Agent system.

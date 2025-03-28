@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};

@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use std::sync::Arc;
 use async_trait::async_trait;
 use serde::{Serialize, Deserialize};

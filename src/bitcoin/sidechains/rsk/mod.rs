@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // src/bitcoin/sidechains/rsk/mod.rs
 
 //! RSK Sidechain implementation

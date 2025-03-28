@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // src/bitcoin/dlc/contract.rs
 
 use std::collections::HashMap;

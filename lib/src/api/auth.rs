@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // OPSource API Authentication Module
 // Implements JWT-based authentication middleware for Actix Web
 

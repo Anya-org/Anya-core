@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // Add hardware capability validation
 pub fn validate_hardware_capabilities() -> anyhow::Result<()> {
     #[cfg(target_arch = "x86_64")]

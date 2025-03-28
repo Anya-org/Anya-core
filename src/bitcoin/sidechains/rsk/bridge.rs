@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // src/bitcoin/sidechains/rsk/bridge.rs
 
 //! RSK Bridge implementation for Bitcoin cross-chain operations

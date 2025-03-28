@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 mod bitcoin_tests;
 mod dao_tests;
 mod web5_tests;

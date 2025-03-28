@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 //! Performance test runner integration
 
 use crate::testing::performance::{

@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use lightning::util::message_signing::{MessageSigner, MessageSignature};
 use bitcoin::secp256k1::SecretKey;
 

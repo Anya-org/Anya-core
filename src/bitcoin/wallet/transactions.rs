@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use std::collections::HashMap;
 use crate::bitcoin::wallet::AddressType;
 

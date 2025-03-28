@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use std::process::Command;
 use log::{info, warn, error};
 use semver::Version;

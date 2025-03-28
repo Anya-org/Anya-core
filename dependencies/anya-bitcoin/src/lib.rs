@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 //! Bitcoin Core Implementation
 //! 
 //! This library provides comprehensive Bitcoin functionality for the Anya project,

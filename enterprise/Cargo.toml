@@ -1,17 +1,17 @@
 [package]
-name = "anya-enterprise"
-version.workspace = true
-edition.workspace = true
-authors.workspace = true
-license.workspace = true
+name = "enterprise"
+version = "0.1.0"
+edition = "2021"
 
 [dependencies]
-anya-core = { path = "../../anya-core", version.workspace = true }
-tokio = { workspace = true }
-serde = { workspace = true }
+hex = "0.4"
+rand = "0.8"
+tokio = { version = "1", features = ["full"] }
+rand = "0.8"
+hex = "0.4"
 
-[features]
-default = ["zkp", "audit-logging"]
-advanced-security = ["secp256k1/zkp", "opentelemetry"]
-compliance = []
-audit-logging = []
+# Target specification added automatically
+[lib]
+name = "enterprise"
+path = "src/lib.rs"
+

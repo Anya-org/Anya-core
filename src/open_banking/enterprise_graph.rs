@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 #[derive(BitcoinProtocol, GraphQLInterface)]
 pub struct EnterpriseTransactionGraph {
     #[graphql_interface]

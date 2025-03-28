@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use crate::{
     auth::{AuthManager, enterprise::advanced_security::AdvancedSecurity},
     ml::advanced_features::AdvancedMLFeatures,

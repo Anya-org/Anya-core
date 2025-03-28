@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 //! BDF v2.5 Compliance Verification Tools [BPC-3][DAO-3]
 //! 
 //! This module provides tools to verify compliance with the Bitcoin

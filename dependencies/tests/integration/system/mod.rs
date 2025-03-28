@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use anya_core::{
     auth::{AuthManager, BlockchainAuth},
     ml::advanced_features::AdvancedMLFeatures,

@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use super::model::{MLModel, Feature, FeatureCategory};
 use ndarray::{Array2, Array1};
 use rand::seq::SliceRandom;

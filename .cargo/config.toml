@@ -1,38 +1,5 @@
-[target.'cfg(target_os = "windows")']
-rustflags = ["-C", "target-feature=+crt-static"]
-
-[target.'cfg(target_os = "linux")']
-rustflags = ["-C", "link-arg=-Wl,-z,relro,-z,now"]
-
-[target.'cfg(target_os = "macos")']
-rustflags = ["-C", "link-arg=-undefined", "-C", "link-arg=dynamic_lookup"]
+[dependencies]
+native-tls = { version = "0.2.11" }
 
 [build]
-# BDF-mandated security flags
-rustflags = [
-    "-C", "link-arg=-Wl,-z,relro,-z,now",
-    "-C", "target-cpu=native",
-    "-C", "link-arg=-fuse-ld=lld"
-]
-
-[profile.release]
-opt-level = 3
-lto = true
-codegen-units = 1
-panic = "abort"
-strip = true
-
-[profile.dev]
-opt-level = 0
-debug = true
-debug-assertions = true
-overflow-checks = true
-
-[registries.crates-io]
-protocol = "sparse"
-
-[alias]
-bdf-check = "check --workspace --all-targets --all-features --tests"
-
-[net]
-git-fetch-with-cli = true
+rustflags = ["-C", "target-cpu=native"]

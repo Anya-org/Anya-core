@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 //! ML Model Integration System
 //! 
 //! This module provides integration capabilities for ML models within the ML*/Agent system.

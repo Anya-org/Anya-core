@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 //! AIM-004: Layer 2 Integration Tests
 //! 
 //! Tests for the Layer 2 implementations:

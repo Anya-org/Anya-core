@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use bitcoin::psbt::Psbt;
 use bitcoin::secp256k1::Secp256k1;
 use bitcoin::util::bip32::ExtendedPrivKey;

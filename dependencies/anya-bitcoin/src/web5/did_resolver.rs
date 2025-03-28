@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // Web5 DID Resolution Module with Caching Support
 // This module provides DID resolution for various methods with a caching layer
 

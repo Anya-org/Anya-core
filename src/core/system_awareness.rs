@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // New file for system awareness components
 
 /// Network state monitoring according to BDF v2.5

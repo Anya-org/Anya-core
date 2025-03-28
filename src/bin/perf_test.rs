@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 //! Performance testing command line tool
 
 use anya_core::testing::performance::runner::{

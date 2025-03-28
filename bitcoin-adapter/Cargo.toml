@@ -1,11 +1,17 @@
-# [BPC-3] Protocol compliance tracking
-[package.metadata.bip]
-implemented = [
-    "bip-174",  # PSBT
-    "bip-341",  # Taproot
-    "bip-370"   # PSBTv2
-]
+[package]
+name = "bitcoin-adapter"
+version = "0.1.0"
+edition = "2021"
 
-[package.metadata.audit]
-last_verified = "2025-03-20"
-security_level = "bpc-3" 
+[dependencies]
+hex = "0.4"
+rand = "0.8"
+tokio = { version = "1", features = ["full"] }
+rand = "0.8"
+hex = "0.4"
+
+# Target specification added automatically
+[lib]
+name = "bitcoin_adapter"
+path = "src/lib.rs"
+

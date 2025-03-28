@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 let security_gaps = vec![
     SecurityGap {
         repo: "mobile",

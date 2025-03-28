@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 //! Error types for HSM security module
 //!
 //! This module provides comprehensive error types for HSM operations,

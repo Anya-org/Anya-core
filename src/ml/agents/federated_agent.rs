@@ -1,3 +1,4 @@
+#![feature(edition2021)]
  an//! Federated Learning Agent
 //!
 //! This module provides agents that facilitate federated learning across the network,

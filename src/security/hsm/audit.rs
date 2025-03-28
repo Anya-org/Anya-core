@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use crate::security::hsm::{HsmError, HsmAuditEvent};
 use serde::{Serialize, Deserialize};
 use std::sync::Arc;

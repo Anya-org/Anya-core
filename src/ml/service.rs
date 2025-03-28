@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // Machine Learning Service Implementation
 // Provides ML functionality to the Anya Core system
 

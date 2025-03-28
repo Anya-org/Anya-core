@@ -1,68 +1,17 @@
 [package]
-name = "anya-core-dependencies"
-version = "0.2.7"
-authors = ["Botshelo Mokoka"]
+name = "dependencies"
+version = "0.1.0"
 edition = "2021"
-license = "MIT OR Apache-2.0"
-repository = "https://github.com/anya-org/anya-core"
-description = "Core dependencies and shared components for the Anya Bitcoin Platform"
 
 [dependencies]
-opentelemetry = { version = "0.21.0", features = ["rt-tokio"], optional = true }
+hex = "0.4"
+rand = "0.8"
+tokio = { version = "1", features = ["full"] }
+rand = "0.8"
+hex = "0.4"
 
-[features]
-default = ["standard-security"]
-standard-security = ["dependency1", "dependency2"]
-advanced-security = ["dependency3", "dependency4"]
-enterprise = ["advanced-security", "hardware-wallet", "metrics"]
-hardware-wallet = []
-metrics = ["dep:opentelemetry"]
-
-[profile.dev]
-opt-level = 1
-debug = true
-debug-assertions = true
-overflow-checks = true
-lto = false
-panic = 'unwind'
-incremental = true
-codegen-units = 256
-rpath = false
-
-[profile.release]
-opt-level = 3
-debug = false
-debug-assertions = false
-overflow-checks = false
-lto = true
-panic = 'unwind'
-incremental = false
-codegen-units = 16
-rpath = false
-strip = true
-
-[profile.test]
-opt-level = 0
-debug = 2
-debug-assertions = true
-overflow-checks = true
-lto = false
-incremental = true
-codegen-units = 256
-
-[profile.bench]
-opt-level = 3
-debug = false
-debug-assertions = false
-overflow-checks = false
-lto = true
-incremental = false
-codegen-units = 1
-
-[package.metadata.docs.rs]
-all-features = true
-rustdoc-args = ["--cfg", "docsrs"]
-
-[package.metadata.cargo-udeps]
-ignore = ["criterion"] # Used only in bench
+# Target specification added automatically
+[lib]
+name = "dependencies"
+path = "src/lib.rs"
 

@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 #[derive(Debug, thiserror::Error)]
 pub enum SecretError {
     #[error("HSM communication failure")]

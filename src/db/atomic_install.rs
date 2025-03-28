@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use anyhow::{anyhow, Context, Result};
 use serde::{Deserialize, Serialize};
 use sqlx::{postgres::PgPoolOptions, PgPool};

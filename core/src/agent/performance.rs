@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 //! Performance Analysis System for ML*/Agent
 //! 
 //! This module provides comprehensive performance analysis capabilities for the ML*/Agent system.

@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use std::error::Error;
 use crate::ml_core::{MLCore, ProcessedData, TrainedModel, Prediction};
 use ml_core::{MLCore, MLInput, MLOutput, TrainedModel, Prediction};

@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use super::integrated_metrics::IntegratedMetrics;
 use crate::web5::integrated_storage::IntegratedWeb5Storage;
 use metrics::{Counter, Gauge, Histogram};

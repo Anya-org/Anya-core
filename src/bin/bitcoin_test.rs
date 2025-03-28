@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use anya::bitcoin::protocol::testing::mock;
 use anyhow::Result;
 use std::env;

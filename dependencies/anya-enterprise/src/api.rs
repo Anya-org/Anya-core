@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // anya-enterprise/src/api.rs
 use actix_web::{get, post, web, App, HttpServer, Responder};
 use serde::{Serialize, Deserialize};

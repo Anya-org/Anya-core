@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 #[tokio::test]
 async fn test_full_installation() {
     let config = NetworkValidationConfig {

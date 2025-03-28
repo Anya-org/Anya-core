@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use super::*;
 use anya_core::{
     auth::{AuthManager, BlockchainAuth},

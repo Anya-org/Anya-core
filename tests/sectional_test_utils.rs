@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // Sectional Testing Utilities
 // This module provides helpers for the sectional testing approach
 

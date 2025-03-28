@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 //! Cache performance testing
 
 use crate::testing::performance::{

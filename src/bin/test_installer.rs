@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // Anya Core Unified Installer Test Suite
 // [AIR-3][AIS-3][BPC-3][AIT-3][RES-3]
 //

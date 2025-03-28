@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // Cross-Validation Findings
 
 // 1. Dependency Conflicts

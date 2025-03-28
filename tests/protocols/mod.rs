@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // Protocol Test Suite v2.5
 // [AIT-3][BPC-3][RES-3]
 

@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 mod config;
 mod components;
 mod validation;

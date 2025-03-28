@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 //! Comprehensive HSM Test Suite
 #![cfg(feature = "hsm")]
 

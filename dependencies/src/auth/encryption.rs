@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use aes_gcm::{Aes256Gcm, Key, Nonce};
 use aes_gcm::aead::{Aead, NewAead};
 use argon2::{Argon2, PasswordHasher};

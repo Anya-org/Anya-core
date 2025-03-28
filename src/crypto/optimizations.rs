@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use anyhow::{anyhow, Context, Result};
 use std::collections::HashMap;
 use std::sync::Arc;

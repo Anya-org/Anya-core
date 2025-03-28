@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 let rng = OsRng; // Secure system RNG
 
 // Add constant-time comparison

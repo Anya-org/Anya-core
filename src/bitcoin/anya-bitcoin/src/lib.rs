@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 //! Bitcoin Core Implementation
 //! Consensus-critical code only
 

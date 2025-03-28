@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // Bitcoin Mobile SDK v2.5
 // Compliant with BIP-341/342/174/370
 

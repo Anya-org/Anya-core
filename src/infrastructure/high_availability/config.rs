@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use serde::{Deserialize, Serialize};
 use std::time::Duration;
 

@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use bitcoin::{Transaction, Block, BlockHeader};
 use thiserror::Error;
 

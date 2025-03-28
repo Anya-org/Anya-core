@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // src/bitcoin/dlc/oracle.rs
 
 use std::collections::HashMap;

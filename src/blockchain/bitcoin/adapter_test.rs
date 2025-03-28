@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 //! Tests for the Bitcoin blockchain adapter
 //!
 //! These tests connect to a Bitcoin testnet node to verify functionality of the adapter

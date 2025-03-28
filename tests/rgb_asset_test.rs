@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // RGB Asset Transfer Tests
 
 #[cfg(feature = "rgb")]

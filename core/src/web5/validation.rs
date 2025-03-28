@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // Add BIP-275 and Web5 specific validation
 pub struct Web5Compliance {
     pub bip174: ComplianceLevel,

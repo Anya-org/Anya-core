@@ -1,48 +1,17 @@
 [package]
-name = "anya-installer"
-version.workspace = true
-edition.workspace = true
-rust-version.workspace = true
-license.workspace = true
-repository.workspace = true
-
-# Inherit workspace config
-workspace = ".."
+name = "installer"
+version = "0.1.0"
+edition = "2021"
 
 [dependencies]
-anyhow.workspace = true
-bitcoin.workspace = true
-secp256k1.workspace = true
-tokio.workspace = true
-serde.workspace = true
+hex = "0.4"
+rand = "0.8"
+tokio = { version = "1", features = ["full"] }
+rand = "0.8"
+hex = "0.4"
 
-# Security-critical dependencies
-ring = { version = "0.17.8", features = [
-    "alloc",
-    "std",
-    "digest",
-    "hkdf",
-    "hmac",
-    "aead",
-    "chacha20-poly1305"
-] }
-sysinfo = { version = "0.30.7", default-features = false }
+# Target specification added automatically
+[lib]
+name = "installer"
+path = "src/lib.rs"
 
-# Network stack
-reqwest = { version = "0.11.24", features = [
-    "json",
-    "rustls-tls",
-    "stream"
-], default-features = false }
-
-# Hardware Security
-hsm-sdk = { version = "3.2.0", features = [
-    "taproot",
-    "bip340",
-    "secp256k1"
-] }
-
-[dev-dependencies]
-proptest = { version = "1.4.0", features = ["bitcoin"] }
-tempfile = "3.10.0"
-assert_fs = "1.1.1"

@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use crate::ml_logic::{
     FederatedLearning,
     MLCore,

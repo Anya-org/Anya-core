@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 #[test]
 fn verify_bip341_implementation() {
     let config = BitcoinConfig::default();

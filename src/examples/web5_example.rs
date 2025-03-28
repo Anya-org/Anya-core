@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // Web5 example with Bitcoin anchoring
 
 #[cfg(feature = "web5")]

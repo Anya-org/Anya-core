@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 impl SpvCrossChainVerifier {
     /// [BIP-37] Simplified Payment Verification
     pub fn verify_cross_chain_swap(

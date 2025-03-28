@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // RGB Protocol Implementation for OPSource
 // Implements client-side validated smart contracts on Bitcoin
 

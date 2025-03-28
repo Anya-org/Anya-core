@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 #[derive(BitcoinProtocol)]
 pub struct UnifiedTester {
     #[taproot_commitment]  // BPC-2 Compliance

@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use std::time::{Duration, Instant};
 use std::process::Command;
 use log::{info, warn, error};

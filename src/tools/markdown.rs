@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use std::fs::{self, File};
 use std::io::{self, Read, Write};
 use std::path::{Path, PathBuf};

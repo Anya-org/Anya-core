@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use super::*;
 use anya_core::auth::web5::{Web5DataManager, DataRecord};
 use did_key::Ed25519KeyPair;

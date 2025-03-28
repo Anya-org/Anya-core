@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 //! Transaction throughput performance testing
 
 use crate::testing::performance::{

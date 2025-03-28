@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 //! DAO module
 //! 
 //! This module provides decentralized autonomous organization functionality,

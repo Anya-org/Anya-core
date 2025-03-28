@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 /// Bitcoin Consensus Validation Module
 /// Implements block and transaction validation logic
 

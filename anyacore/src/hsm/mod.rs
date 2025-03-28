@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 #[ais3]
 pub trait HsmStandard {
     fn sign_psbt(&self, psbt: &mut Psbt) -> Result<()>;

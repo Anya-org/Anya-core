@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 #[derive(Debug, BPC3)]
 pub struct FullCompliance {
     #[bip341]

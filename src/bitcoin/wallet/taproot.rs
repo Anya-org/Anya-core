@@ -1,3 +1,4 @@
+#![feature(edition2021)]
  //! Bitcoin Taproot wallet support module
 //!
 //! This module provides functionality for creating and managing Taproot addresses,

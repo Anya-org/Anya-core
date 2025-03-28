@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // BOLT 12 Implementation (Offers Protocol)
 use lightning::offers::offer::Offer;
 use lightning::offers::parse::Bolt12ParseError;

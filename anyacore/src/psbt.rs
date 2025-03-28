@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 #[bip370]
 pub fn validate_fee_rate(psbt: &Psbt) -> Result<()> {
     let expected_fee = psbt.fee_rate() * psbt.vsize();

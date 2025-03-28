@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use sysinfo::{System, SystemExt, CpuExt, DiskExt};
 use anyhow::Result;
 

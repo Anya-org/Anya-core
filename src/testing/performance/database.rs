@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 //! Database access pattern performance testing
 
 use crate::testing::performance::{

@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 /// Extensions Module
 /// 
 /// This module provides extension capabilities for Anya Core,

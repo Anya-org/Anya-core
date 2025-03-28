@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 pub mod rotation;
 
 #[cfg(test)]

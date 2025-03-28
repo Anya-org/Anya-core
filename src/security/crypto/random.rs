@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 //! Secure Random Number Generator Implementation
 //! [AIR-1][AIS-1][BPC-1][AIT-1][RES-1]
 //!

@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 mod rpc_adapter;
 pub use rpc_adapter::PublicRPCAdapter;
 

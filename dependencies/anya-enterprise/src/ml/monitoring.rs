@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use log::info;
 use std::time::Instant;
 

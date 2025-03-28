@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use anya_enterprise::ml::{InternalAIEngine, GitHubIntegrator, MockGitHubIntegrator, Issue};
 use tokio::runtime::Runtime;
 

@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use metrics::{Counter, Gauge, Histogram};
 use std::time::Instant;
 

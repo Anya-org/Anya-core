@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use crate::auth::web5::data_manager::Web5DataManager;
 use serde::{Serialize, Deserialize};
 use std::sync::Arc;

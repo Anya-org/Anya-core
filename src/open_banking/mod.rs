@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 #[derive(BitcoinProtocol)]
 pub struct OpenBankingEngine {
     #[psbt_required]

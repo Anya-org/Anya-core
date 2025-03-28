@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 <<<<<<< HEAD
 =======
 /// The `initialize_modules` function initializes various modules related to networking, machine

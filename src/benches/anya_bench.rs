@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 #[bench]
 fn inference_throughput(b: &mut Bencher) {
     let model = AnyaRuntime::load();

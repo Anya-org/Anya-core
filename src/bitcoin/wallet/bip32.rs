@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // src/bitcoin/wallet/bip32.rs
 
 // BIP32 Implementation for Bitcoin Wallet Module

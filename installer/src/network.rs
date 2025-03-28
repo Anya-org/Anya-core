@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use anyhow::Result;
 use tokio::net::TcpStream;
 use std::time::Duration;

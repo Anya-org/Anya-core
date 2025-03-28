@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use crate::infrastructure::high_availability::{ClusterStatus, HaError, FailoverPhase};
 use crate::infrastructure::high_availability::config::HighAvailabilityConfig;
 use std::collections::HashMap;

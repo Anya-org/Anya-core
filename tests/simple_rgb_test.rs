@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // Simple RGB test to verify core functionality
 #[cfg(test)]
 mod rgb_simple_tests {

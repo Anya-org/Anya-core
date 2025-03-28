@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 //! Bitcoin blockchain adapter implementation
 //!
 //! This module provides a Bitcoin adapter implementation for the blockchain interface

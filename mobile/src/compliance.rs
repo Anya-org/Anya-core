@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use anyhow::Context;
 
 /// Validates cross-implementation compliance between local and external mobile components

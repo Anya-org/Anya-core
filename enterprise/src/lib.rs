@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 pub fn enterprise_features_enabled() -> bool {
     true
 }

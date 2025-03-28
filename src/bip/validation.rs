@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 pub trait BipValidator {
     fn validate_bip(&self, bip: &str) -> Result<ComplianceStatus>;
 }

@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use std::sync::Once;
 use tokio::runtime::Runtime;
 use tracing::{info, Level};

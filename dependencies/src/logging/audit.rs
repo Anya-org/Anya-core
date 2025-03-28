@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use chrono::{DateTime, Utc};
 use serde::Serialize;
 

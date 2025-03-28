@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use anya_core::{
     revenue::{
         ml_revenue_features::MLRevenueFeatures,

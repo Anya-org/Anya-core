@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use std::env;
 use std::path::{Path, PathBuf};
 use std::process::{Command, exit};

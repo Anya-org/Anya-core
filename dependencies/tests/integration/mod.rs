@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use anya_core::{
     auth::{AuthManager, AuthCredentials},
     ml::{FileTracker, ModelTrainer},

@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // src/bitcoin/sidechains/liquid/client.rs
 
 //! Liquid client implementation

@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // Stacks Smart Contract Integration for OPSource
 // Enables Clarity smart contracts anchored to Bitcoin
 

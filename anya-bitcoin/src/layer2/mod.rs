@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 /// AIM-004: Layer 2 Integration Modules for Bitcoin
 /// 
 /// This module implements the hexagonal architecture for Bitcoin Layer 2 solutions:

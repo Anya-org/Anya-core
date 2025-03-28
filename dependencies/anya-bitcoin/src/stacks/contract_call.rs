@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // Contract call functionality for Stacks
 
 use anyhow::{anyhow, Result};

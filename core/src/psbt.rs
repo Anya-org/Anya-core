@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // Add PSBT version validation
 pub fn validate_version(required: u8) -> bool {
     let current = bitcoin::psbt::PSBT_VERSION;

@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 # Anya DAO Module
 
 This directory contains the Anya DAO (Decentralized Autonomous Organization) implementation, which provides a comprehensive governance system for the Anya ecosystem with Bitcoin-style tokenomics.

@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // Layer 2 Integrations
 // Last Updated: 2025-03-06
 

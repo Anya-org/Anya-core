@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // RSK (Rootstock) Integration Module
 // Last Updated: 2025-03-06
 

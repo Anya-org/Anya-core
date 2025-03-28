@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 //! Integration tests for the performance testing framework
 
 #[cfg(test)]

@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // src/bitcoin/sidechains/rsk/client.rs
 
 //! RSK client implementation

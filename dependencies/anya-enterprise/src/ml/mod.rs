@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 <<<<<<< HEAD
 =======
 mod federated_learning;

@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 /// Updated Tapscript validation per BIP-342 final spec
 fn verify_tapscript(
     script: &Script,

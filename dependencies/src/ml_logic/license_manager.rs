@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use lightning_auth::LightningAuth;
 use web5_auth::Web5Auth;
 use tokio;

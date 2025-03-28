@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // [AIR-3][BPC-3] AI Model Validation
 impl AiValidator {
     pub fn validate_transaction_pattern(

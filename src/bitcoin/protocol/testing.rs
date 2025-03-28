@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 #[cfg(test)]
 pub mod mock {
     use bitcoin::Transaction;

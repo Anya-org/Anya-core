@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // src/bitcoin/layer2/rgb/mod.rs
 
 //! RGB Layer 2 implementation

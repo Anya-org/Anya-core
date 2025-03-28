@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // SIP-009 Non-Fungible Token Standard implementation for Stacks
 // https://github.com/stacksgov/sips/blob/main/sips/sip-009/sip-009-nft-standard.md
 

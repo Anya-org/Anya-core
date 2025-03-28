@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 //! Automated compliance badge generation
 use super::BipComplianceReport;
 use urlencoding::encode;

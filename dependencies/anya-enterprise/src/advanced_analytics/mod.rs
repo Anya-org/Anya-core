@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 pub mod analytics;
 pub mod blockchain;
 pub mod dao;

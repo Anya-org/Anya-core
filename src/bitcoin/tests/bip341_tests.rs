@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 //! Tests for the BIP-341 (Taproot) implementation
 //! [AIR-3][AIS-3][BPC-3][AIT-3][RES-3]
 

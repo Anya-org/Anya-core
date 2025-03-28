@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // src/bitcoin/cross_chain/atomic_swaps.rs
 
 use chrono::{DateTime, Utc};

@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use did_key::{DIDCore, Ed25519KeyPair};
 use tbdex::protocol::Quote;
 

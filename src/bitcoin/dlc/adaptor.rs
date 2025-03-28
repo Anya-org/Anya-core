@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // src/bitcoin/dlc/adaptor.rs
 
 use bitcoin::secp256k1::{PublicKey, SecretKey, Signature};

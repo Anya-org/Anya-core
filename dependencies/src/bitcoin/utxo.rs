@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use bitcoin::OutPoint;
 use bitcoin::TxOut;
 use serde::{Serialize, Deserialize};

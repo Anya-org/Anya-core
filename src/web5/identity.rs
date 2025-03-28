@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // Web5 Identity Implementation
 // Provides DID (Decentralized Identity) functionality
 // as part of the Web5 integration - [AIR-012] Operational Reliability

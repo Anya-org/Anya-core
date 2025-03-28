@@ -1,3 +1,17 @@
-[workspace.dependencies]
-bitcoin = { version = "0.32.1", features = [...] }  # Enforce version
-jsi = { version = "0.12", features = [...] }  # Sync across repos 
+[package]
+name = "workspace"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+hex = "0.4"
+rand = "0.8"
+tokio = { version = "1", features = ["full"] }
+rand = "0.8"
+hex = "0.4"
+
+# Target specification added automatically
+[lib]
+name = "workspace"
+path = "src/lib.rs"
+

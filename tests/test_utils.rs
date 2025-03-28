@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // Test utilities for standalone tests
 use std::path::{Path, PathBuf};
 use std::fs;

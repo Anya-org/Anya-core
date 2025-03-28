@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use anyhow::Result;
 use sysinfo::{System, SystemExt, CpuExt, DiskExt};
 use std::net::TcpStream;

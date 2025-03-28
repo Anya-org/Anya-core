@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 pub struct AuditBuilder {
     timestamp: u64,
     bip_compliance: BIPCompliance,

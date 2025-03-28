@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 //! Network Visualization Integration Tests
 use anya_core::chaos::visualization::{run_server, NetworkState};
 use reqwest::StatusCode;

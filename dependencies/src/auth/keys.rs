@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use bitcoin::secp256k1::{Secp256k1, SecretKey, PublicKey, Message};
 use bitcoin::util::bip32::{ExtendedPrivKey, ExtendedPubKey};
 use bitcoin::util::key::PrivateKey;

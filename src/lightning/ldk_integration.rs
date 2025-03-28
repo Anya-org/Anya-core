@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // Lightning Network Implementation v0.0.117
 // Compliant with BOLT 1-12
 

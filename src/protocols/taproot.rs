@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 impl TaprootEngine {
     /// [BIP-341] Compliant Transaction Construction
     pub fn build_taproot_transaction(

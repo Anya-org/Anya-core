@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use super::super::data_manager::{ProtocolDefinition, SchemaDefinition};
 use serde_json::json;
 

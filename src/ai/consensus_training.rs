@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 #[bitcoin_network_aware]
 pub fn train_model(
     dataset: BlockchainDataset,

@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 // Bitcoin relay interaction module
 // Placeholder for future implementation
 

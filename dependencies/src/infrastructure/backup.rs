@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use std::path::Path;
 use tokio::process::Command;
 use chrono::Utc;

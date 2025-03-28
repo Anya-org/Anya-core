@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use crate::{
     auth::web5::{Web5DataManager, protocols::identity::SecurityManager},
     ml::{MLModel, FileAnalysisModel, agents::Web5AgentSystem},

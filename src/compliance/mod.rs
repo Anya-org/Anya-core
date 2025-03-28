@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 /// Verifies compliance with the BPC-3 (Bitcoin Protocol Compliance level 3) standard
 pub fn verify_bpc3() {
     info!("Verifying BPC-3 compliance...");

@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 pub fn register_metrics() {
     register_counter!(
         "mcp_tx_processed_total", 

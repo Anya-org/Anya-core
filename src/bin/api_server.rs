@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use actix_web::{
     web, App, HttpServer, HttpResponse, Responder, 
     dev::HttpServiceFactory, middleware::{Logger, NormalizePath},

@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 pub mod provider;
 pub mod audit;
 pub mod config;

@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 pub struct TestManager {
     common: HashMap<String, Box<dyn Fn() -> Result<bool>>>,
     modules: HashMap<String, Box<dyn Fn() -> Result<HashMap<String, bool>>>>,

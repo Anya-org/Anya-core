@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 use anya_core::tools::markdown::{DocumentationValidator, DocError};
 use anya_core::bitcoin::protocol::{BitcoinProtocol, BPCLevel};
 use anya_core::dao::governance::{DaoGovernance, DaoLevel};

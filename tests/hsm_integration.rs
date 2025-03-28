@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 //! YubiHSM2 Integration Tests
 #![cfg(feature = "hsm")]
 

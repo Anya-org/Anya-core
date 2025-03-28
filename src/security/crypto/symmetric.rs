@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 //! Symmetric Encryption Module
 //! [AIR-2][AIS-2][BPC-2][AIT-2][RES-2]
 //!
