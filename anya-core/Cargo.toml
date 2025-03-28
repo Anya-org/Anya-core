@@ -1,76 +1,23 @@
-[workspace]
-members = [
-    "core",
-    "cli", 
-    "installer",
-    "mobile",
-    "dependencies/anya-bitcoin"  # Correct path format
-]
-
-# Consolidated workspace dependencies
-[workspace.dependencies]
-# Unified cryptographic stack
-secp256k1 = { version = "0.28.0", features = ["bitcoin_hashes", "std", "serde", "mobile"] }
-bitcoin = { version = "0.32.1", features = ["std", "serde", "taproot", "mobile"] }
-bitcoincore-rpc = "0.17.0"
-
-# Shared workspace dependencies
-tokio = { version = "1.41.1", features = ["full"] }
-serde = { version = "1.0.215", features = ["derive"] }
-web5 = { git = "https://github.com/TBD54566975/web5-rs" }
-
-# Standardized versions for shared dependencies
-anyhow = "1.0.75"
-thiserror = "1.0"
-async-trait = "0.1.77"
-serde_json = "1.0.133"
-
-# Additional dependencies
-secp256k1-zkp = { version = "0.8.0", features = ["vendored"] }  # Add ZKP framework 
-
 [package]
 name = "anya-core"
-version.workspace = true
-edition.workspace = true
-authors.workspace = true
-license.workspace = true
-description.workspace = true
-repository.workspace = true
+version = "0.1.0"
+edition = "2021"
 
 [dependencies]
-# Inherited from workspace
-secp256k1.workspace = true
-bitcoin.workspace = true
-bitcoincore-rpc.workspace = true
-web5.workspace = true
-bdk.workspace = true
-
-# Security Validation (BDF §3.3)
-ring = { version = "0.17.12", features = ["alloc"] }
-sha2 = "0.10.8"
-
-[features]
-default = ["bip174", "bip341"]
-bip174 = ["bitcoin/bip174", "secp256k1/bip174"]
-bip341 = ["bitcoin/bip341", "secp256k1/bip341"]
-mobile = ["bitcoin/mobile", "secp256k1/mobile"]
+rand = "0.8"
+hex = "0.4"
+serde_json = "1.0.96"
+bitcoin = "0.29.2"
+core = { path = "../core" }
+tokio = { version = "1.28.1", features = ["full", "macros"] }
+log = "0.4.17"
+env_logger = "0.10.0"
+reqwest = { version = "0.11.11", default-features = false, features = ["json", "rustls-tls"] }
 
 [lib]
-name = "anya"
+name = "anya_core"
 path = "src/lib.rs"
 
 [[bin]]
-name = "anya"
+name = "anya-core"
 path = "src/main.rs"
-
-# ... other binary definitions ... 
-
-[profile.release]
-lto = true
-codegen-units = 1
-opt-level = 3
-strip = true
-
-[profile.dev]
-opt-level = 0
-debug = true 
