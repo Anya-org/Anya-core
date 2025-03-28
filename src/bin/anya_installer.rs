@@ -17,6 +17,17 @@ use warp;
 use clap::{Parser, Subcommand};
 use std::cmp::Ordering;
 use cargo_metadata;
+use std::time::UNIX_EPOCH;
+
+// Import from crate root
+use anya_core::{
+    HardwareFallbackTest,
+    DatabaseStateManager,
+    WindowsInstaller,
+    ValidatorRotationManager,
+    CryptoOptimizer,
+    OptimizationLevel
+};
 
 const BIP341_SILENT_LEAF: &str = "0x8f3a1c29566443e2e2d6e5a9a5a4e8d";
 const REQUIRED_BIPS: [&str; 4] = ["BIP-341", "BIP-342", "BIP-174", "BIP-370"];
@@ -612,6 +623,399 @@ scrape_configs:
         Ok(String::from_utf8_lossy(&output.stdout)
             .contains("kernel.yama.ptrace_scope = 1"))
     }
+
+    #[certik_audit]
+    fn verify_certik_compliance(&self) -> Result<ComplianceReport, ErrorCode> {
+        let audit = CertikAudit::new();
+        audit.verify_compliance(ComplianceLevel::Required)
+            .map_err(|e| ErrorCode::CertikValidationFailed(e.to_string()))
+    }
+
+    pub fn run_installation(&self) -> Result<()> {
+        // Create database state manager for atomic installation
+        let db_connection_str = "postgres://localhost/anya";
+        let db_backup_dir = "db_backups";
+        
+        #[cfg(feature = "async")]
+        let db_state_manager = match tokio::runtime::Runtime::new()
+            .unwrap()
+            .block_on(DatabaseStateManager::new(db_connection_str, db_backup_dir)) {
+                Ok(manager) => Some(manager),
+                Err(e) => {
+                    println!("Warning: Database state tracking not available: {}", e);
+                    None
+                }
+            };
+            
+        #[cfg(not(feature = "async"))]
+        let db_state_manager = None;
+            
+        // Detect platform for platform-specific installation
+        let is_windows = cfg!(target_os = "windows");
+        
+        #[cfg(target_os = "windows")]
+        let windows_installer = WindowsInstaller::new(None)?;
+        
+        // System verification phase
+        self.phase("Initializing system", || {
+            // Save DB state before making changes
+            #[cfg(feature = "async")]
+            if let Some(manager) = &db_state_manager {
+                tokio::runtime::Runtime::new()
+                    .unwrap()
+                    .block_on(manager.save_state("init"))?;
+            }
+            
+            self.check_disk_space()?;
+            self.validate_architecture()?;
+            
+            // Use CPU-specific optimizations
+            let crypto_optimizer = CryptoOptimizer::new()?;
+            println!("CPU optimization level: {:?}", crypto_optimizer.optimization_level);
+            
+            // Platform-specific initialization
+            if is_windows {
+                #[cfg(target_os = "windows")]
+                {
+                    let features = windows_installer.detect_windows_features()?;
+                    println!("Windows features detected:");
+                    println!("  - WSL: {}", features.wsl_available);
+                    println!("  - PowerShell: {}", features.powershell_version);
+                    println!("  - .NET: {}", features.net_framework_version);
+                }
+            }
+            
+            Ok(())
+        })?;
+
+        // Bitcoin Core installation phase
+        self.phase("Installing Bitcoin Core", || {
+            // Save DB state before Bitcoin Core installation
+            #[cfg(feature = "async")]
+            if let Some(manager) = &db_state_manager {
+                tokio::runtime::Runtime::new()
+                    .unwrap()
+                    .block_on(manager.save_state("bitcoin_core"))?;
+            }
+            
+            self.install_bitcoin()?;
+            self.verify_bitcoin_installation()?;
+            
+            // Platform-specific Bitcoin Core setup
+            if is_windows {
+                #[cfg(target_os = "windows")]
+                {
+                    windows_installer.create_firewall_rules()?;
+                }
+            }
+            
+            Ok(())
+        })?;
+
+        // HSM module configuration phase
+        self.phase("Configuring HSM Module", || {
+            // Save DB state before HSM configuration
+            #[cfg(feature = "async")]
+            if let Some(manager) = &db_state_manager {
+                tokio::runtime::Runtime::new()
+                    .unwrap()
+                    .block_on(manager.save_state("hsm_config"))?;
+            }
+            
+            // Hardware fallback testing
+            let mut hardware_test = HardwareFallbackTest::new();
+            hardware_test.detect_hardware()?;
+            
+            // Configure HSM with hardware fallback
+            self.detect_hardware()?;
+            let use_hardware_hsm = hardware_test.hsm_available;
+            self.configure_hsm_with_fallback(use_hardware_hsm)?;
+            
+            // Initialize validator rotation with HSM if available
+            let validator_config_path = "config/validators.json";
+            let mut validator_manager = ValidatorRotationManager::new(validator_config_path)?;
+            validator_manager.initialize_validators(2, 3, use_hardware_hsm)?;
+            
+            Ok(())
+        })?;
+
+        // PSBT engine setup phase
+        self.phase("Setting Up PSBT Engine", || {
+            // Save DB state before PSBT engine setup
+            #[cfg(feature = "async")]
+            if let Some(manager) = &db_state_manager {
+                tokio::runtime::Runtime::new()
+                    .unwrap()
+                    .block_on(manager.save_state("psbt_engine"))?;
+            }
+            
+            self.compile_psbt_v2()?;
+            self.run_psbt_validation()?;
+            
+            Ok(())
+        })?;
+
+        // CertiK integration phase
+        self.phase("Finalizing CertiK Integration", || {
+            // Save DB state before CertiK integration
+            #[cfg(feature = "async")]
+            if let Some(manager) = &db_state_manager {
+                tokio::runtime::Runtime::new()
+                    .unwrap()
+                    .block_on(manager.save_state("certik_integration"))?;
+            }
+            
+            self.generate_audit_trail()?;
+            self.run_certik_validation()?;
+            
+            // Platform-specific CertiK integration
+            if is_windows {
+                #[cfg(target_os = "windows")]
+                {
+                    windows_installer.integrate_with_certik()?;
+                }
+            }
+            
+            Ok(())
+        })?;
+
+        // Mark installation as complete
+        #[cfg(feature = "async")]
+        if let Some(manager) = &db_state_manager {
+            tokio::runtime::Runtime::new()
+                .unwrap()
+                .block_on(manager.complete_installation())?;
+        }
+        
+        // Platform-specific finalization
+        if is_windows {
+            #[cfg(target_os = "windows")]
+            {
+                windows_installer.create_start_menu_shortcut()?;
+                windows_installer.register_event_sources()?;
+                windows_installer.install_windows_service()?;
+            }
+        }
+        
+        Ok(())
+    }
+    
+    fn configure_hsm_with_fallback(&self, use_hardware_hsm: bool) -> Result<()> {
+        if use_hardware_hsm {
+            println!("Using hardware HSM for key management");
+            // Configure with real HSM
+            self.configure_hardware_hsm()
+        } else {
+            println!("Hardware HSM not available, using software fallback");
+            // Configure with software HSM emulation
+            self.configure_software_hsm()
+        }
+    }
+    
+    fn configure_hardware_hsm(&self) -> Result<()> {
+        // Implement hardware HSM configuration
+        println!("Configuring hardware HSM...");
+        // In a real implementation, this would interface with the HSM
+        Ok(())
+    }
+    
+    fn configure_software_hsm(&self) -> Result<()> {
+        // Implement software HSM emulation
+        println!("Configuring software HSM emulation...");
+        // In a real implementation, this would set up a software-based HSM
+        Ok(())
+    }
+    
+    pub fn rollback_to_phase(&self, phase_name: &str) -> Result<()> {
+        println!("Rolling back to phase: {}", phase_name);
+        
+        #[cfg(feature = "async")]
+        {
+            let db_connection_str = "postgres://localhost/anya";
+            let db_backup_dir = "db_backups";
+            
+            match tokio::runtime::Runtime::new().unwrap().block_on(
+                async {
+                    let manager = DatabaseStateManager::new(db_connection_str, db_backup_dir).await?;
+                    manager.rollback_to_phase(phase_name).await
+                }
+            ) {
+                Ok(_) => println!("Database rolled back to phase: {}", phase_name),
+                Err(e) => println!("Warning: Database rollback failed: {}", e),
+            }
+        }
+        
+        // Rollback filesystem changes
+        self.rollback_filesystem_changes(phase_name)?;
+        
+        Ok(())
+    }
+    
+    fn rollback_filesystem_changes(&self, phase_name: &str) -> Result<()> {
+        // Implement filesystem rollback based on phase
+        match phase_name {
+            "init" => {
+                // Nothing to roll back at init phase
+                Ok(())
+            },
+            "bitcoin_core" => {
+                // Roll back Bitcoin Core installation
+                println!("Rolling back Bitcoin Core installation...");
+                // This would remove Bitcoin Core files
+                Ok(())
+            },
+            "hsm_config" => {
+                // Roll back HSM configuration
+                println!("Rolling back HSM configuration...");
+                // This would reset HSM configuration
+                Ok(())
+            },
+            "psbt_engine" => {
+                // Roll back PSBT engine
+                println!("Rolling back PSBT engine setup...");
+                // This would remove PSBT engine files
+                Ok(())
+            },
+            "certik_integration" => {
+                // Roll back CertiK integration
+                println!("Rolling back CertiK integration...");
+                // This would remove CertiK integration files
+                Ok(())
+            },
+            _ => Err(anyhow::anyhow!("Unknown phase: {}", phase_name)),
+        }
+    }
+    
+    pub fn run_hardware_tests(&self) -> Result<()> {
+        println!("Running hardware fallback tests...");
+        
+        let mut hardware_test = HardwareFallbackTest::new();
+        hardware_test.detect_hardware()?;
+        
+        println!("Hardware detection results:");
+        println!("  - HSM available: {}", hardware_test.hsm_available);
+        println!("  - SGX available: {}", hardware_test.sgx_available);
+        println!("  - FPGA available: {}", hardware_test.fpga_available);
+        println!("  - TPM available: {}", hardware_test.tpm_available);
+        
+        // Test HSM fallback
+        let hsm_result = hardware_test.test_hsm_fallback()?;
+        println!("HSM test result: {}", if hsm_result { "✅ Pass" } else { "❌ Fail" });
+        
+        // Test SGX fallback
+        let sgx_result = hardware_test.test_sgx_fallback()?;
+        println!("SGX test result: {}", if sgx_result { "✅ Pass" } else { "❌ Fail" });
+        
+        // Run full test suite
+        let test_report = hardware_test.run_all_tests()?;
+        
+        println!("Hardware test summary:");
+        println!("  - HSM: {} (Hardware: {})", 
+            if test_report.hsm_test_passed { "✅ Pass" } else { "❌ Fail" },
+            if test_report.hsm_hardware_available { "Yes" } else { "No" });
+        println!("  - SGX: {} (Hardware: {})",
+            if test_report.sgx_test_passed { "✅ Pass" } else { "❌ Fail" },
+            if test_report.sgx_hardware_available { "Yes" } else { "No" });
+            
+        Ok(())
+    }
+    
+    pub fn rotate_validator_keys(&self) -> Result<()> {
+        println!("Rotating validator keys...");
+        
+        let validator_config_path = "config/validators.json";
+        let mut validator_manager = ValidatorRotationManager::new(validator_config_path)?;
+        
+        // Check if rotation is needed
+        match validator_manager.check_rotation_status() {
+            crate::validators::rotation::RotationStatus::Valid { days_remaining, .. } => {
+                println!("Validator keys are still valid. Next rotation in {} days.", days_remaining);
+                return Ok(());
+            },
+            crate::validators::rotation::RotationStatus::RotationNeeded { days_overdue, .. } => {
+                println!("Validator keys need rotation (overdue by {} days).", days_overdue);
+            },
+        }
+        
+        // Detect if HSM is available
+        let mut hardware_test = HardwareFallbackTest::new();
+        hardware_test.detect_hardware()?;
+        let use_hsm = hardware_test.hsm_available;
+        
+        // Perform rotation
+        let rotation_result = validator_manager.rotate_validators(use_hsm)?;
+        
+        if rotation_result.rotated {
+            println!("Validator keys rotated successfully.");
+            println!("New validators:");
+            for (i, validator) in rotation_result.new_validators.iter().enumerate() {
+                println!("  {}. {} (Fingerprint: {}, HSM: {})",
+                    i + 1,
+                    validator.public_key,
+                    validator.fingerprint,
+                    validator.hsm_backed);
+            }
+            
+            // Generate new multisig addresses
+            let addresses = validator_manager.get_multisig_addresses()?;
+            println!("New multisig addresses ({}-of-{}):", 
+                addresses.threshold, addresses.validator_count);
+            println!("  - Legacy: {}", addresses.legacy);
+            println!("  - SegWit: {}", addresses.segwit);
+            println!("  - Native SegWit: {}", addresses.native_segwit);
+            println!("  - Taproot: {}", addresses.taproot);
+        } else {
+            println!("Validator rotation not performed.");
+        }
+        
+        Ok(())
+    }
+    
+    pub fn optimize_crypto_operations(&self) -> Result<()> {
+        println!("Optimizing cryptographic operations...");
+        
+        let crypto_optimizer = CryptoOptimizer::new()?;
+        
+        println!("Current optimization level: {:?}", crypto_optimizer.optimization_level);
+        println!("CPU features detected:");
+        
+        let feature_names = [
+            (crate::crypto::optimizations::CpuFeature::Aes, "AES"),
+            (crate::crypto::optimizations::CpuFeature::Avx, "AVX"),
+            (crate::crypto::optimizations::CpuFeature::Avx2, "AVX2"),
+            (crate::crypto::optimizations::CpuFeature::Avx512f, "AVX512F"),
+            (crate::crypto::optimizations::CpuFeature::Sse4_1, "SSE4.1"),
+            (crate::crypto::optimizations::CpuFeature::Sse4_2, "SSE4.2"),
+            (crate::crypto::optimizations::CpuFeature::Bmi1, "BMI1"),
+            (crate::crypto::optimizations::CpuFeature::Bmi2, "BMI2"),
+            (crate::crypto::optimizations::CpuFeature::Adx, "ADX"),
+            (crate::crypto::optimizations::CpuFeature::Sha, "SHA"),
+            (crate::crypto::optimizations::CpuFeature::Sse2, "SSE2"),
+            (crate::crypto::optimizations::CpuFeature::Sse3, "SSE3"),
+        ];
+        
+        for (feature, name) in &feature_names {
+            println!("  - {}: {}", name, if crypto_optimizer.can_use(*feature) { "✅" } else { "❌" });
+        }
+        
+        println!("Optimal implementations:");
+        println!("  - SHA-256: {:?}", crypto_optimizer.get_optimal_sha256_implementation());
+        println!("  - secp256k1: {:?}", crypto_optimizer.get_optimal_secp256k1_implementation());
+        println!("  - AES: {:?}", crypto_optimizer.get_optimal_aes_implementation());
+        
+        // Run crypto benchmarks
+        let benchmark_results = crate::crypto::optimizations::benchmark_crypto_performance()?;
+        
+        println!("Benchmark results:");
+        println!("  - SHA-256: {:?} ({:?})", 
+            benchmark_results.sha256_implementation,
+            benchmark_results.sha256_time);
+        println!("  - secp256k1: {:?} ({:?})", 
+            benchmark_results.secp256k1_implementation,
+            benchmark_results.secp256k1_time);
+            
+        Ok(())
+    }
 }
 
 // Enhanced Bitcoin config with hardware-aware settings
@@ -821,13 +1225,31 @@ enum Commands {
         path: Option<String>,
         #[arg(long)]
         dry_run: bool,
-    }
+    },
+    /// Rotate validator keys
+    RotateValidators,
+    
+    /// Run hardware tests and fallback checks
+    TestHardware,
+    
+    /// Optimize cryptographic operations for current CPU
+    OptimizeCrypto {
+        /// Optimization level (none, basic, standard, advanced, maximum)
+        #[arg(long)]
+        level: Option<String>,
+    },
+    
+    /// Roll back installation to a specific phase
+    Rollback {
+        /// Phase name to roll back to
+        phase: String,
+    },
 }
 
 fn main() -> Result<()> {
     let cli = Cli::parse();
 
-    match cli.command {
+    match &cli.command {
         Commands::SecurityReport { format, full } => {
             let installer = AnyaInstaller::new("/etc/anya")?;
             let report = installer.generate_security_report(full)?;
@@ -843,6 +1265,41 @@ fn main() -> Result<()> {
             installer.install()?;
             println!("Installation completed successfully");
         }
+        Commands::RotateValidators => {
+            let installer = AnyaInstaller::new(".")?;
+            installer.rotate_validator_keys()?;
+        },
+        
+        Commands::TestHardware => {
+            let installer = AnyaInstaller::new(".")?;
+            installer.run_hardware_tests()?;
+        },
+        
+        Commands::OptimizeCrypto { level } => {
+            let installer = AnyaInstaller::new(".")?;
+            
+            if let Some(level_str) = level {
+                let opt_level = match level_str.to_lowercase().as_str() {
+                    "none" => OptimizationLevel::None,
+                    "basic" => OptimizationLevel::Basic,
+                    "standard" => OptimizationLevel::Standard,
+                    "advanced" => OptimizationLevel::Advanced,
+                    "maximum" => OptimizationLevel::Maximum,
+                    _ => return Err(anyhow::anyhow!("Invalid optimization level: {}", level_str)),
+                };
+                
+                let optimizer = CryptoOptimizer::new()?;
+                optimizer.override_optimization_level(opt_level)?;
+                println!("Optimization level set to {:?}", opt_level);
+            }
+            
+            installer.optimize_crypto_operations()?;
+        },
+        
+        Commands::Rollback { phase } => {
+            let installer = AnyaInstaller::new(".")?;
+            installer.rollback_to_phase(phase)?;
+        },
     }
 
     Ok(())
@@ -905,7 +1362,7 @@ impl SecurityValidator for AnyaInstaller {
         let rng = SystemRandom::new();
         let mut samples = [[0u8; 16]; 100];
         rng.fill(&mut samples[0])?;
-        Ok(samples.iter().collect::<HashSet<_>>().len() > 95)
+        Ok(samples.iter().collect::<std::collections::HashSet<_>>().len() > 95)
     }
 
     fn validate_constant_time(&self) -> Result<bool> {

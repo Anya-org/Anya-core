@@ -1,0 +1,13 @@
+jobs:
+  security_scan:
+    runs-on: bitcoin-nodes
+    steps:
+    - name: BIP Compliance Check
+      run: |
+        cargo bip-check --features=341,342,174
+        
+    - name: Transaction Fuzzing
+      uses: rust-fuzz/actions@v1
+      with:
+        target: mcp_transaction
+        iterations: 10_000_000 

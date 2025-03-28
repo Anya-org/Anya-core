@@ -1,7 +1,104 @@
-# Rust
+# Rust output directories
 /target/
-**/*.rs.bk
+/debug/
+/release/
+
+# Cargo.lock file (comment this line if you want to commit the file)
 Cargo.lock
+
+# Rust and Cargo artifacts
+**/*.rs.bk
+*.pdb
+
+# Generated documentation
+/doc/
+
+# Build output
+/build/
+/dist/
+
+# Installer test directories
+/anya-test/
+/test-output/
+
+# System-specific files
+.DS_Store
+Thumbs.db
+
+# Editor and IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.project
+.settings/
+.classpath
+
+# Environment files
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Log files
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Database files
+*.sqlite
+*.sqlite3
+*.db
+
+# Dependencies
+/node_modules/
+
+# Specific to Anya Core
+/config/local.toml
+/config/secrets.toml
+
+# Debian package build artifacts
+*.deb
+*.changes
+*.buildinfo
+
+# Test artifacts
+.coverage
+/coverage/
+htmlcov/
+junit/
+
+# Python artifacts (if used in scripts)
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Temporary files
+tmp/
+temp/
 
 # IDE
 .idea/

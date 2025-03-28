@@ -474,4 +474,30 @@ fn verify_bip_compliance() -> Result<(), String> {
     info!("BIP compliance report generated in {}/compliance_report.md", report_dir);
     
     Ok(())
+}
+
+#[test]
+fn test_report_cleanup() -> Result<()> {
+    let report_dir = Path::new("reports");
+    let test_file = report_dir.join("test_report.md");
+    
+    // Create test file
+    fs::write(&test_file, "Test content")?;
+    
+    // Run cleanup
+    cleanup_reports()?;
+    
+    assert!(!test_file.exists(), "Report cleanup failed");
+    Ok(())
+}
+
+fn cleanup_reports() -> Result<()> {
+    let report_dir = Path::new("reports");
+    for entry in fs::read_dir(report_dir)? {
+        let path = entry?.path();
+        if path.extension().map_or(false, |ext| ext == "md") {
+            fs::remove_file(path)?;
+        }
+    }
+    Ok(())
 } 

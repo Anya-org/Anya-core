@@ -1,0 +1,39 @@
+name: CertiK Audit Remediation
+on:
+  issues:
+    types: [opened, edited, labeled, unlabeled, closed]
+  issue_comment:
+    types: [created]
+
+jobs:
+  track_remediation:
+    if: contains(github.event.issue.labels.*.name, 'certik')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Parse Issue
+        id: parse
+        run: |
+          echo "SEVERITY=$(echo "${{ github.event.issue.body }}" | grep -oP 'Severity: \K(Critical|High|Medium|Low)')" >> $GITHUB_ENV
+          echo "AFFECTED=$(echo "${{ github.event.issue.body }}" | grep -oP 'Affected Component: \K([a-zA-Z0-9_\-]+)')" >> $GITHUB_ENV
+          echo "BIP=$(echo "${{ github.event.issue.body }}" | grep -oP 'BIP: \K([0-9]+)')" >> $GITHUB_ENV
+      
+      - name: Update Metrics
+        run: |
+          python scripts/certik/update_metrics.py \
+            --issue "${{ github.event.issue.number }}" \
+            --severity "${{ env.SEVERITY }}" \
+            --component "${{ env.AFFECTED }}" \
+            --bip "${{ env.BIP }}" \
+            --status "${{ github.event.issue.state }}"
+      
+      - name: Generate Report
+        run: |
+          python scripts/certik/generate_report.py \
+            --output reports/certik/remediation-${{ github.run_id }}.md
+      
+      - name: Alert Critical
+        if: env.SEVERITY == 'Critical'
+        run: |
+          ./scripts/notify_validators.sh "Critical finding #${{ github.event.issue.number }}"

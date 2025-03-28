@@ -1,0 +1,47 @@
+name: Security Remediation
+description: Track vulnerability resolution
+title: "[REMEDIATION] - "
+labels: [security, audit, certik]
+body:
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity Level
+      options:
+        - "Critical (CVSS ≥ 9.0)"
+        - "High (7.0 ≤ CVSS < 9.0)"
+        - "Medium (4.0 ≤ CVSS < 7.0)"
+        - "Low (CVSS < 4.0)"
+      
+  - type: textarea
+    id: description
+    attributes:
+      label: Vulnerability Description
+      placeholder: Include PoC code and impact analysis
+      
+  - type: dropdown
+    id: bip-affected
+    attributes:
+      label: Affected BIPs
+      multiple: true
+      options:
+        - "BIP-341 (Taproot)"
+        - "BIP-342 (Tapscript)"
+        - "BIP-174 (PSBT)"
+        - "BIP-370 (PSBT v2)"
+        
+  - type: input
+    id: component
+    attributes:
+      label: Affected Component
+      placeholder: "e.g., HSM Interface, PSBT Manager"
+      
+  - type: checkboxes
+    id: validation
+    attributes:
+      label: Remediation Steps
+      options:
+        - label: Unit test added
+        - label: Integration test passed
+        - label: Third-party verification
+        - label: Multisig approval (3/5)

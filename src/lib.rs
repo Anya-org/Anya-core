@@ -336,4 +336,31 @@ pub mod prelude {
     pub use crate::bitcoin::taproot::TaprootValidator;
     pub use crate::dao::governance::{DaoGovernance, DaoLevel};
     pub use crate::tools::markdown::DocumentationValidator;
-} 
+}
+
+pub mod test {
+    pub mod hardware_fallback;
+}
+
+pub mod db {
+    pub mod atomic_install;
+}
+
+pub mod platform {
+    pub mod windows_support;
+}
+
+pub mod validators {
+    pub mod rotation;
+}
+
+pub mod crypto {
+    pub mod optimizations;
+}
+
+// Export key components for the installer
+pub use test::hardware_fallback::HardwareFallbackTest;
+pub use db::atomic_install::DatabaseStateManager;
+pub use platform::windows_support::WindowsInstaller;
+pub use validators::rotation::ValidatorRotationManager;
+pub use crypto::optimizations::{CryptoOptimizer, OptimizationLevel}; 

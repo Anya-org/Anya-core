@@ -1,0 +1,20 @@
+metrics:
+  - name: ai_consensus_alignment
+    query: |
+      bitcoin_bip_compliance{component="ai"} * 
+      ai_model_accuracy{quantile="0.9"}
+    threshold:
+      warn: 0.93
+      crit: 0.90
+  
+  - name: zk_proof_generation_time
+    query: rate(zk_proof_duration_seconds_sum[5m])
+    threshold:
+      max: 2.5
+    
+  - name: model_drift_score
+    query: |
+      abs(ai_train_loss - ai_validation_loss) / 
+      (ai_validation_loss + 1e-6)
+    threshold:
+      max: 0.3 

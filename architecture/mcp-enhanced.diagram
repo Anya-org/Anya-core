@@ -1,0 +1,16 @@
++----------------+    +-----------------+    +-----------------+
+| MCP Interface  |    | Protocol        |    | Metrics         |
+| (gRPC/HTTP)    <----+ Adapters        +----> (Prometheus)   |
+| [Auth: TLS1.3] |    | [BIP-341/342]   |    | [TPS/BlockTime] |
++----------------+    +--------+--------+    +-----------------+
+                               |
+                      +--------v---------+
+                      | MCP Core        +<-------+
+                      | Context Engine  |        |
+                      | [DLC Oracle]    |        |
+                      +--------+--------+        |
+                               |           +-----+-----+
+                      +--------v---------+ | Hotfix    |
+                      | Bitcoin Network  | | Protocol  |
+                      | [SPV Validation] +-> [BIP-174] |
+                      +------------------+ +-----------+ 

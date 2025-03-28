@@ -1,0 +1,11 @@
+- name: DeepSeek-R1 Validation
+  run: |
+    cargo deepseek-validate \
+      --features bip-341,bip-370 \
+      --optimization 3 \
+      --circuit-version 2.1
+      
+- name: Model Checksum Verification
+  uses: deepseekai/model-integrity@v2
+  with:
+    expected_hash: ${{ secrets.MODEL_HASH }} 

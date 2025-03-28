@@ -1,0 +1,24 @@
+name: Model Integrity Check
+description: Verify model checksums against secured hash
+inputs:
+  expected_hash:
+    description: "Pre-computed SHA-256 hash of approved model"
+    required: true
+runs:
+  using: 'composite'
+  steps:
+    - name: Validate Model Hash
+      shell: bash
+      run: |
+        if [ ! -f "./models/active.bin" ]; then
+          echo "Error: Model file not found" >&2
+          exit 1
+        fi
+        
+        current_hash=$(sha256sum ./models/active.bin | cut -d' ' -f1)
+        if [ "$current_hash" != "${{ inputs.expected_hash }}" ]; then
+          echo "Model integrity violation detected!"
+          exit 1
+        fi
+        
+        echo "Model integrity verified ✅"

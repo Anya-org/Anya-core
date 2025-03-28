@@ -1,0 +1,148 @@
+{
+  "timestamp": "2025-03-28 07:33:29",
+  "bipCompliance": {
+    "BIP-370": {
+      "Found": false,
+      "Name": "PSBT v2",
+      "Required": false
+    },
+    "BIP-174": {
+      "Found": true,
+      "Name": "PSBT",
+      "Required": true
+    },
+    "BIP-341": {
+      "Found": true,
+      "Name": "Taproot",
+      "Required": true
+    },
+    "BIP-342": {
+      "Found": true,
+      "Name": "Tapscript",
+      "Required": true
+    }
+  },
+  "overallStatus": "FAIL",
+  "contracts": {
+    "governance_token.clar": {
+      "bips": {
+        "BIP-341": false,
+        "BIP-174": false,
+        "BIP-370": false,
+        "BIP-342": false
+      },
+      "size": 9469,
+      "path": "/home/anya/anya-core/src/contracts/governance_token.clar"
+    },
+    "dao-trait.clar": {
+      "bips": {
+        "BIP-341": false,
+        "BIP-174": false,
+        "BIP-370": false,
+        "BIP-342": false
+      },
+      "size": 3014,
+      "path": "/home/anya/anya-core/dao/traits/dao-trait.clar"
+    },
+    "dex-adapter.clar": {
+      "bips": {
+        "BIP-341": false,
+        "BIP-174": false,
+        "BIP-370": false,
+        "BIP-342": false
+      },
+      "size": 16244,
+      "path": "/home/anya/anya-core/src/contracts/dex-adapter.clar"
+    },
+    "token-economics-minimal.clar": {
+      "bips": {
+        "BIP-341": false,
+        "BIP-174": false,
+        "BIP-370": false,
+        "BIP-342": false
+      },
+      "size": 899,
+      "path": "/home/anya/anya-core/dao/extensions/token-economics-minimal.clar"
+    },
+    "dao-core.clar": {
+      "bips": {
+        "BIP-341": true,
+        "BIP-174": true,
+        "BIP-370": false,
+        "BIP-342": true
+      },
+      "size": 3935,
+      "path": "/home/anya/anya-core/src/contracts/dao-core.clar"
+    },
+    "dao-core-test.clar": {
+      "bips": {
+        "BIP-341": false,
+        "BIP-174": false,
+        "BIP-370": false,
+        "BIP-342": false
+      },
+      "size": 6691,
+      "path": "/home/anya/anya-core/dao/tests/dao-core-test.clar"
+    },
+    "bip-compliance.clar": {
+      "bips": {
+        "BIP-341": true,
+        "BIP-174": true,
+        "BIP-370": false,
+        "BIP-342": true
+      },
+      "size": 642,
+      "path": "/home/anya/anya-core/src/contracts/bip-compliance.clar"
+    },
+    "dao.clar": {
+      "bips": {
+        "BIP-341": true,
+        "BIP-174": true,
+        "BIP-370": false,
+        "BIP-342": false
+      },
+      "size": 6839,
+      "path": "/home/anya/anya-core/src/contracts/dao.clar"
+    },
+    "security-guards.clar": {
+      "bips": {
+        "BIP-341": false,
+        "BIP-174": false,
+        "BIP-370": false,
+        "BIP-342": false
+      },
+      "size": 1643,
+      "path": "/home/anya/anya-core/src/contracts/security-guards.clar"
+    },
+    "dex-integration-trait.clar": {
+      "bips": {
+        "BIP-341": false,
+        "BIP-174": false,
+        "BIP-370": false,
+        "BIP-342": false
+      },
+      "size": 1282,
+      "path": "/home/anya/anya-core/dao/traits/dex-integration-trait.clar"
+    },
+    "token-economics.clar": {
+      "bips": {
+        "BIP-341": false,
+        "BIP-174": false,
+        "BIP-370": false,
+        "BIP-342": false
+      },
+      "size": 7134,
+      "path": "/home/anya/anya-core/src/contracts/token-economics.clar"
+    },
+    "bitcoin-issuance.clar": {
+      "bips": {
+        "BIP-341": false,
+        "BIP-174": false,
+        "BIP-370": false,
+        "BIP-342": false
+      },
+      "size": 12611,
+      "path": "/home/anya/anya-core/src/contracts/bitcoin-issuance.clar"
+    }
+  }
+}

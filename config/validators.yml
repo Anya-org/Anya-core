@@ -1,0 +1,27 @@
+multisig:
+  threshold: 3/5
+  validators:
+    - name: "Node Alpha"
+      address: "tb1q9x2gqkyyj3x4jq4y5k5v8z9w6s3v4s5d6f7g8h9j0k1l2m3n4o5p6q7r8s"
+      type: "Taproot"
+      checksum: "a1b2c3d4"
+      
+    - name: "Security Node Beta"
+      address: "2NByHN6Ft6D5s7A7X1Z1J1K1L1M1N1O1P1Q1R1S1T"
+      type: "SegWit"
+      checksum: "e5f6g7h8"
+
+    - name: "Audit Node Gamma"
+      address: "mzBcJXaJr5pB6w8D7g9H0i1K2l3M4n5O6p7Q8r9S0t"
+      type: "Legacy"
+      checksum: "i9j0k1l2"
+
+    - name: "Backup Node Delta"
+      address: "tb1q3v4s5d6f7g8h9j0k1l2m3n4o5p6q7r8s9t0u1v"
+      type: "Taproot"
+      checksum: "m3n4o5p6"
+
+    - name: "Emergency Node Epsilon"
+      address: "2ND1E2F3G4H5I6J7K8L9M0N1O2P3Q4R5S6T"
+      type: "SegWit"
+      checksum: "q7r8s9t0"
