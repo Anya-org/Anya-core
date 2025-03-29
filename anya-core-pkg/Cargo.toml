@@ -11,10 +11,12 @@ readme = "README.md"
 [lib]
 path = "src/lib.rs"
 name = "anya_core"
-crate-type = ["rlib"]
+crate-type = ["rlib", "staticlib"]
 
 [dependencies]
 # Inherit workspace dependencies with BIP-341 features
-bitcoin = { workspace = true, features = ["bip341"] }
-secp256k1 = { workspace = true, features = ["bitcoin_hashes", "std"] }
+bitcoin = { workspace = true, features = ["bip341", "serde", "rand", "bitcoinconsensus"] }
+secp256k1 = { workspace = true, features = ["bitcoin_hashes", "std", "serde", "rand", "recovery"] }
 hex-literal = { workspace = true }
+tokio = { workspace = true }
+serde_json = { workspace = true }

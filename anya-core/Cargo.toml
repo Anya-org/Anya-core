@@ -1,18 +1,9 @@
 [workspace]
-members = ["anya-core-pkg"]  # Remove leading ./ for workspace member
+members = ["anya-core-pkg"]
 resolver = "2"
 default-members = ["anya-core-pkg"]
-exclude = ["target", "scripts", "docs"]  # Add standard exclusions
-required-features = ["bip341"]  # Framework v2.5 requirement
-
-# Mandatory workspace package declaration
-[package]
-name = "anya-workspace-root"
-version = "0.1.0"
-edition = "2021"
-authors = ["Anya Maintainers"]
-description = "Bitcoin Layer 4 Workspace Root"
-license = "Apache-2.0"
+exclude = ["target", "scripts", "docs"]
+required-features = ["bip341"]
 
 # Required for virtual manifest conversion
 [lib]

@@ -1,5 +1,5 @@
-[dependencies]
-native-tls = { version = "0.2.11" }
-
 [build]
-rustflags = ["-C", "target-cpu=native"]
+rustflags = ["--cfg", "bip341"]
+
+[target.'cfg(all())']
+rustflags = ["-C", "link-arg=-Wl,-z,relro,-z,now"]
