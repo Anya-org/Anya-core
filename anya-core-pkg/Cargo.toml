@@ -1,0 +1,20 @@
+[package]
+name = "anya-core-pkg"
+version = "0.1.0"
+edition = "2021"
+authors = ["Anya Maintainers"]
+license = "Apache-2.0"
+description = "Bitcoin Layer 4 Protocol Implementation"
+repository = "https://github.com/anya-org/anya-core"
+readme = "README.md"
+
+[lib]
+path = "src/lib.rs"
+name = "anya_core"
+crate-type = ["rlib"]
+
+[dependencies]
+# Inherit workspace dependencies with BIP-341 features
+bitcoin = { workspace = true, features = ["bip341"] }
+secp256k1 = { workspace = true, features = ["bitcoin_hashes", "std"] }
+hex-literal = { workspace = true }

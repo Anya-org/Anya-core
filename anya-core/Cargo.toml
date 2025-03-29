@@ -1,23 +1,53 @@
+[workspace]
+members = ["anya-core-pkg"]  # Remove leading ./ for workspace member
+resolver = "2"
+default-members = ["anya-core-pkg"]
+exclude = ["target", "scripts", "docs"]  # Add standard exclusions
+required-features = ["bip341"]  # Framework v2.5 requirement
+
+# Mandatory workspace package declaration
 [package]
-name = "anya-core"
+name = "anya-workspace-root"
 version = "0.1.0"
 edition = "2021"
+authors = ["Anya Maintainers"]
+description = "Bitcoin Layer 4 Workspace Root"
+license = "Apache-2.0"
 
-[dependencies]
-tokio = { version = "1.28.1", features = ["full", "macros"] }
-hex = "0.4"
-rand = "0.8"
-serde_json = "1.0.96"
-bitcoin = "0.29.2"
-core = { path = "../core" }
-log = "0.4.17"
-env_logger = "0.10.0"
-reqwest = { version = "0.11.11", default-features = false, features = ["json", "rustls-tls"] }
-
+# Required for virtual manifest conversion
 [lib]
-name = "anya_core"
 path = "src/lib.rs"
+name = "workspace_root"
 
-[[bin]]
-name = "anya-core"
-path = "src/main.rs"
+[workspace.metadata]
+compliance = { 
+  bip341 = true,
+  taproot_security = "v2.5",
+  silent_leaf = "0x8f3a1c29566443e2e2d6e5a9a5a4e8d"
+}
+
+[workspace.dependencies]
+# Bitcoin Development Framework v2.5 compliant dependencies
+bitcoin = { version = "0.32.0", features = ["std", "bip341", "serde", "rand", "bitcoinconsensus"] }
+secp256k1 = { version = "0.28.1", features = ["std", "serde", "bitcoin_hashes", "rand"] }
+hex = { version = "0.4.3", features = ["serde", "std"] }
+hex-literal = { version = "0.4.1", features = ["serde"] }
+rand = { version = "0.8.5", features = ["std_rng", "getrandom"] }
+anyhow = { version = "1.0.75", features = ["std"] }
+thiserror = "1.0.50"
+log = "0.4.20"
+serde = { version = "1.0", features = ["derive", "std"] }
+serde_json = "1.0.96"
+tokio = { version = "1.32.0", features = ["full", "rt-multi-thread", "parking_lot", "macros", "signal"] }
+
+[workspace.package]
+version = "0.1.0"
+authors = ["Anya Maintainers"]
+description = "Bitcoin Layer 4 Protocol Implementation"
+license = "Apache-2.0"
+repository = "https://github.com/anya-org/anya-core"
+rust-version = "1.70"
+edition = "2021"
+
+[workspace.lints.rust]
+unsafe_code = "forbid"  # Framework security requirement
