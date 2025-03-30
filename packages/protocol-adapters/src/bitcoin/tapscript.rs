@@ -7,14 +7,13 @@ use bitcoin::{
     Transaction,
     ScriptBuf,
     taproot::{TapLeafHash, LeafVersion, ControlBlock},
-    
     opcodes::all::*,
     Witness,
-use anya_core_core::tapscript;
 };
 use std::sync::Arc;
 use log::{info, warn, error, debug};
 use super::BitcoinError;
+use anya_core_core::tapscript;
 
 /// Tapscript error type
 #[derive(Debug, thiserror::Error)]
@@ -27,7 +26,6 @@ pub enum TapscriptError {
     #[error("Tapscript verification error: {0}")]
     VerificationError(String),
 }
-
 /// BIP-342 Tapscript implementation
 pub struct TapscriptHandler {
     /// Whether to enforce BIP-342 strict mode
