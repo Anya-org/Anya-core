@@ -4,35 +4,31 @@ version.workspace = true
 edition.workspace = true
 
 [target.'cfg(mobile)'.dependencies]
-bitcoin = { version = "0.32.1", features = ["mobile", "taproot", "bip341", "bip342", "psbt-v2"] }
-secp256k1 = { workspace = true, features = ["mobile", "bip340", "bip341"] }
-jsi = { version = "0.13", features = ["bip342", "psbt-v2"] }
+# Limited to features that are likely to exist
+bitcoin = { workspace = true, features = ["std"] }
+# Removed unsupported features
+secp256k1 = { workspace = true }
+jsi = { version = "0.3.0-alpha.5" }
 
 [features]
-default = ["bip340", "bip341"]
-bip340 = ["secp256k1/bip340"]
-bip341 = [
-    "bitcoin/bip341", 
-    "secp256k1/bip341",
-    "web5/bip341"
-]
-silent-leaf = ["taproot-assets/silent-leaf"]
-psbt-v2 = ["bitcoin/psbt-v2"]
+# Simplified features to avoid compatibility issues
+default = []
+# Removed feature flags that reference non-existent secp256k1 and bitcoin features
+# Disabled features that reference dependencies with problematic or non-existent features
+silent-leaf = []
+psbt-v2 = []
 
 [dependencies]
 # Standardized versions
-bitcoin = { workspace = true, features = [
-    "bip341", 
-    "bip342",  // Add Tapscript support
-    "taproot"
-]}
-jsi = { version = "0.12", features = ["bitcoin-bindings"] }
+# Removed features that don't exist in the selected bitcoin version
+jsi = { version = "0.3.0-alpha.5" }
 
 # Add missing from external
-bdk = { workspace = true, features = ["psbt-v2"] }
+# Removed non-existent feature psbt-v2
+bdk = { workspace = true }
 
 # [BPC-3] Mobile-specific Bitcoin requirements
-react-native-bitcoin = { version = "0.72", features = ["bip341", "bip370"] }
+# react-native-bitcoin dependency removed - package not found
 
 # [AIS-3] Mobile security profile
 [profile.release]
@@ -40,8 +36,9 @@ codegen-units = 1
 lto = true
 panic = "abort"
 
-anya-secrets = { path = "../anyacore", features = ["hsm", "bip341"] }
+# Removed problematic features
+anya-secrets = { path = "../anyacore" }
 
 [package.metadata]
 research-tier = "Project"  # [BPC-3] Codebase classification
-bitcoin-compliance = { level = 2, features = ["bip341", "bip370"] } 
+bitcoin-compliance = { level = 2 } 

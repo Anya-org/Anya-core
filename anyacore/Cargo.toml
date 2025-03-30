@@ -1,9 +1,29 @@
+[package]
+name = "anyacore"
+# Inherit other fields from the workspace
+version.workspace = true
+edition.workspace = true
+description.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
 # [BPC-3][AIS-3] Bitcoin protocol dependencies
 [dependencies]
-bitcoin = { version = "0.30.0", features = ["serde", "bitcoinconsensus"] }
-secp256k1 = { version = "0.27.0", features = ["serde", "bitcoin_hashes"] }
-react-native-bitcoin = { version = "0.72", features = ["bip341"] }
-taproot-assets = { git = "https://github.com/bitcoin/taproot-assets.git", tag = "v0.2.5" }
+bitcoin = { workspace = true, features = ["serde", "bitcoinconsensus"] }
+secp256k1 = { workspace = true, features = ["serde", "bitcoin_hashes"] }
+# Error handling and utility dependencies
+thiserror = { workspace = true }
+anyhow = { workspace = true }
+rand = { workspace = true }
+rand_core = { workspace = true }
+tokio = { workspace = true }
+serde = { workspace = true }
+hex = "0.4.3"
+serde_json = { workspace = true }
+
+# react-native-bitcoin dependency removed - package not found
+# taproot-assets dependency removed - repository not found
 
 # [AIR-3] AI labeling requirements
 [package.metadata.ai]
@@ -12,7 +32,7 @@ security = { constant_time = true, rng = "secure" }
 
 # [AIS-3] Security-critical dependencies
 [dev-dependencies]
-bitcoin-test-utils = { version = "0.8.0", features = ["secp256k1-serde"] }
+# bitcoin-test-utils dependency removed - package not found
 test-strategy = "0.3.1"
 
 # [AIS-3] Security-critical compilation settings
@@ -23,9 +43,7 @@ lto = true
 panic = "abort"
 strip = true
 
-# [AIS-3] Constant-time enforcement
+# [AIS-3] Constant-time enforcement - removed problematic features
+# Features have been removed due to compatibility issues
 [features]
-constant-time = [
-    "secp256k1/constant_time",
-    "bitcoin/constant_time"
-] 
+default = []

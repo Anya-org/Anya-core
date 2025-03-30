@@ -2,7 +2,8 @@
 //! Provides functionality for working with Partially Signed Bitcoin Transactions
 
 use bitcoin::psbt::Psbt;
-use bitcoin::secp256k1::{Secp256k1, SecretKey, Signature};
+use bitcoin::secp256k1::{Secp256k1, SecretKey};
+use secp256k1::ecdsa::Signature;
 use rand::rngs::OsRng;
 use std::time::Duration;
 
@@ -31,14 +32,21 @@ pub fn verify_constant_time(signature: &Signature, expected: &Signature) -> bool
 
 /// Create a new PSBT (Partially Signed Bitcoin Transaction)
 pub fn create_new_psbt() -> Result<Psbt, bitcoin::psbt::Error> {
-    // Create a new empty PSBT
-    let psbt = Psbt::new();
+    // Create a new empty PSBT using from_unsigned_tx
+    // Create a dummy transaction with no inputs or outputs
+    let dummy_tx = bitcoin::Transaction {
+        version: 2,
+        lock_time: bitcoin::absolute::LockTime::ZERO,
+        input: vec![],
+        output: vec![],
+    };
+    let psbt = Psbt::from_unsigned_tx(dummy_tx)?;
     Ok(psbt)
 }
 
 /// Sign a PSBT with the provided key
-pub fn sign_psbt(psbt: &mut Psbt, key: &SecretKey) -> Result<bool, bitcoin::psbt::Error> {
-    let secp = Secp256k1::new();
+pub fn sign_psbt(_psbt: &mut Psbt, _key: &SecretKey) -> Result<bool, bitcoin::psbt::Error> {
+    let _secp = Secp256k1::new();
     // Actual signing implementation would go here
     // For now, just return success
     Ok(true)

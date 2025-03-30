@@ -1,10 +1,19 @@
-#[derive(Debug, BPC3)]
+// Define the missing ValidationLevel enum
+#[derive(Debug, Clone, Copy)]
+pub enum ValidationLevel {
+    Strict,
+    Moderate,
+    None,
+}
+
+// Removed custom attributes that were causing build issues
+#[derive(Debug)]
 pub enum CodeTier {
-    #[ais3]
+    // Security critical (AIS-3)
     Core,
-    #[aip3]
+    // Production ready (AIP-3)
     Project,
-    #[air3]
+    // Research code (AIR-3)
     Experimental,
 }
 
