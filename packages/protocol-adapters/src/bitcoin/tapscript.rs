@@ -53,7 +53,7 @@ impl TapscriptHandler {
     }
     
     /// Validate a script for BIP-342 compliance
-    fn validate_bip342_compliance(&self, script: &ScriptBuf) -> Result<(), TapscriptError> {
+    fn validate_bip342_compliance(&self, _script: &ScriptBuf) -> Result<(), TapscriptError> {
         // In BIP-342, some opcodes are disabled
         let disabled_opcodes = [
             OP_CHECKMULTISIG,
@@ -63,7 +63,7 @@ impl TapscriptHandler {
         
         // Simple check: scan for disabled opcodes
         // In a real implementation, this would be much more thorough
-        let script_bytes = script.as_bytes();
+        let script_bytes = _script.as_bytes();
         for opcode in disabled_opcodes {
             if script_bytes.contains(&(opcode as u8)) {
                 return Err(TapscriptError::InvalidTapscript(
@@ -84,11 +84,11 @@ impl TapscriptHandler {
     /// Verify a Tapscript execution according to BIP-342 rules
     pub fn verify_tapscript(
         &self,
-        transaction: &Transaction,
-        input_index: usize,
-        script: &ScriptBuf,
+        _transaction: &Transaction,
+        _input_index: usize,
+        _script: &ScriptBuf,
         witness: &Witness,
-        control_block: &ControlBlock,
+        _control_block: &ControlBlock,
     ) -> Result<bool, TapscriptError> {
         info!("Verifying tapscript execution for BIP-342 compliance");
         
@@ -122,8 +122,8 @@ impl TapscriptHandler {
     pub fn build_spending_witness(
         &self,
         signatures: Vec<Vec<u8>>,
-        script: &ScriptBuf,
-        control_block: &ControlBlock,
+        _script: &ScriptBuf,
+        _control_block: &ControlBlock,
     ) -> Result<Witness, TapscriptError> {
         let mut witness_elements = Vec::new();
         
@@ -133,7 +133,7 @@ impl TapscriptHandler {
         }
         
         // Add script to witness
-        witness_elements.push(script.as_bytes().to_vec());
+        witness_elements.push(_script.as_bytes().to_vec());
         
         // Add control block to witness
         witness_elements.push(control_block.serialize());

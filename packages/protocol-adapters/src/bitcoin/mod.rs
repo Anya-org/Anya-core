@@ -103,7 +103,7 @@ impl BitcoinAdapter {
             .add_leaf(0, script.clone())
             .map_err(|e| BitcoinError::Bip342Error(format!("Failed to add script to taproot tree: {:?}", e)))?;
         
-        let merkle_root = taproot_builder
+        let _merkle_root = taproot_builder
             .finalize(&self.secp, internal_key)
             .map_err(|e| BitcoinError::Bip342Error(format!("Failed to finalize taproot tree: {:?}", e)))?;
         
@@ -119,7 +119,7 @@ impl BitcoinAdapter {
         }
         
         // Use our validation module to verify the transaction
-        self.validator.validate_transaction(tx, None)
+        self.validator.validate_transaction(tx)
             .map_err(|e| BitcoinError::Bip342Error(format!("Tapscript validation failed: {}", e)))?;
             
         info!("Successfully validated transaction with BIP-342 support");

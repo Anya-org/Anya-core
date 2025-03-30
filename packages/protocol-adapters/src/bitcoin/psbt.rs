@@ -178,10 +178,10 @@ impl PsbtHandler {
                 // In a real implementation, we would either compute this from the input or use a different approach
                 let sighash = [0u8; 32];
                 
-                let msg = Message::from_slice(&sighash[..])
+                let msg = Message::from_digest_slice(&sighash[..])
                     .map_err(|e| PsbtHandlerError::SignatureError(format!("{}", e)))?;
                 
-                let keypair = secp256k1::KeyPair::from_secret_key(&self.secp, *private_key);
+                let keypair = secp256k1::Keypair::from_secret_key(&self.secp, *private_key);
                 let tweaked_keypair = keypair.tap_tweak(&self.secp, *leaf_hash.as_inner())
                     .map_err(|e| PsbtHandlerError::SignatureError(format!("{}", e)))?;
                 
@@ -200,10 +200,10 @@ impl PsbtHandler {
             let sighash = psbt.sighash_taproot(input_index, &[], 1)
                 .map_err(|e| PsbtHandlerError::PsbtError(format!("Sighash error: {}", e)))?;
             
-            let msg = Message::from_slice(&sighash[..])
+            let msg = Message::from_digest_slice(&sighash[..])
                 .map_err(|e| PsbtHandlerError::SignatureError(format!("{}", e)))?;
             
-            let keypair = secp256k1::KeyPair::from_secret_key(&self.secp, *private_key);
+            let keypair = secp256k1::Keypair::from_secret_key(&self.secp, *private_key);
             let signature = self.secp.sign_schnorr_no_aux_rand(&msg, &keypair);
             
             // Store the signature for key path spending
@@ -293,7 +293,7 @@ impl PsbtHandler {
             .map_err(|e| PsbtHandlerError::PsbtError(format!("Extract error: {}", e)))?;
             
         // Verify the transaction is valid
-        self.validator.validate_transaction(&tx, None)
+        self.validator.validate_transaction(&tx)
             .map_err(|e| PsbtHandlerError::ValidationError(format!("{}", e)))?;
             
         info!("Successfully extracted valid transaction from PSBT");
