@@ -1,4 +1,4 @@
-// Partially Signed Bitcoin Transaction (PSBT) Handler
+// PSBT Implementation
 //
 // This module provides a consolidated implementation of PSBT functionality,
 // replacing multiple redundant implementations found across the codebase.
@@ -8,19 +8,18 @@ use bitcoin::{
     consensus::encode,
     psbt::{
         self, Error as PsbtError, Input as PsbtInput, 
-        Output as PsbtOutput, Psbt, PartiallySignedTransaction,
+        Output as PsbtOutput, Psbt,
     },
-    key::{TapTweak, TweakedKeyPair, TweakedPublicKey},
+    key::TapTweak,
     secp256k1::{
-        self, Message, Secp256k1, SecretKey, Signature, 
+        self, Message, Secp256k1, SecretKey,
         XOnlyPublicKey,
     },
     taproot::{
-        ControlBlock, LeafVersion, TapBranchHash, TapLeafHash, 
+        ControlBlock, LeafVersion, TapLeafHash, 
         TaprootBuilder, TaprootSpendInfo,
     },
     ScriptBuf, Transaction, TxIn, TxOut, Txid, Witness,
-    hashes::Hash,
     Network,
 };
 use std::{
@@ -142,7 +141,7 @@ impl PsbtHandler {
     pub fn sign_psbt(
         &self, 
         psbt: &mut Psbt, 
-        private_key: &SecretKey,
+        _private_key: &SecretKey,
         leaf_hashes: Option<Vec<TapLeafHash>>,
     ) -> Result<(), PsbtHandlerError> {
         if !self.tapscript_enabled && leaf_hashes.is_some() {
@@ -168,9 +167,9 @@ impl PsbtHandler {
     /// Sign a taproot input with BIP-342 support
     fn sign_taproot_input(
         &self,
-        input: &mut PsbtInput,
+        _input: &mut PsbtInput,
         input_index: u32,
-        private_key: &SecretKey,
+        _private_key: &SecretKey,
         leaf_hashes: Option<&Vec<TapLeafHash>>,
     ) -> Result<(), PsbtHandlerError> {
         if let Some(hashes) = leaf_hashes {
@@ -219,9 +218,9 @@ impl PsbtHandler {
     /// Sign a legacy input (for backward compatibility)
     fn sign_legacy_input(
         &self,
-        input: &mut PsbtInput,
+        _input: &mut PsbtInput,
         input_index: u32,
-        private_key: &SecretKey,
+        _private_key: &SecretKey,
     ) -> Result<(), PsbtHandlerError> {
         // Legacy signing code (simplified for brevity)
         debug!("Using legacy signing for input {}", input_index);
@@ -252,7 +251,7 @@ impl PsbtHandler {
     }
     
     /// Finalize a single input
-    fn finalize_input(&self, input: &mut PsbtInput, index: usize) -> Result<(), String> {
+    fn finalize_input(&self, _input: &mut PsbtInput, _index: usize) -> Result<(), String> {
         if self.tapscript_enabled && (input.tap_key_sig.is_some() || !input.tap_script_sigs.is_empty()) {
             // Finalize Taproot input
             self.finalize_taproot_input(input)
@@ -263,7 +262,7 @@ impl PsbtHandler {
     }
     
     /// Finalize a taproot input
-    fn finalize_taproot_input(&self, input: &mut PsbtInput) -> Result<(), String> {
+    fn finalize_taproot_input(&self, _input: &mut PsbtInput) -> Result<(), String> {
         if let Some(key_sig) = &input.tap_key_sig {
             // Key path spending
             let mut witness = Witness::new();
@@ -282,7 +281,7 @@ impl PsbtHandler {
     }
     
     /// Finalize a legacy input
-    fn finalize_legacy_input(&self, input: &mut PsbtInput) -> Result<(), String> {
+    fn finalize_legacy_input(&self, _input: &mut PsbtInput) -> Result<(), String> {
         // Legacy finalization (simplified for brevity)
         Ok(())
     }
