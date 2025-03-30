@@ -2,13 +2,13 @@
 name = "cli"
 version = "0.1.0"
 edition = "2021"
+rust-version = "1.70"
 
 [dependencies]
-tokio = { version = "1.28.1", features = ["full", "macros"] }
-hex = "0.4"
-rand = "0.8"
-anya-core = { path = "../anya-core" }
+anya-core-pkg = { path = "../anya-core-pkg", features = ["bip341"] }
+tokio = { workspace = true, features = ["full"] }
+clap = { version = "4.4", features = ["derive"] }
 
 [[bin]]
-name = "anya"
+name = "anya-cli"
 path = "src/main.rs"

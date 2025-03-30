@@ -14,6 +14,8 @@ use lightning::{
     offers::offer::Offer
 };
 
+pub mod mcp;
+
 pub struct ProtocolManager {
     // Bitcoin Core Protocols
     bip_handler: BipProtocolHandler,
@@ -27,6 +29,9 @@ pub struct ProtocolManager {
     // Cross-chain Protocols
     spv_verifier: SpvCrossChainVerifier,
     sidechain_bridge: SidechainBridge,
+
+    // Model Context Protocol
+    mcp_server: mcp::McpServer,
 }
 
 impl ProtocolManager {

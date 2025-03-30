@@ -1,7 +1,16 @@
 [workspace]
 members = [
-    "core",
+    "anya-core-pkg",
+    "dependencies/anya-bitcoin",
+    "dependencies/anya-web5",
     "cli"
+]
+resolver = "2"
+exclude = [
+    "target",
+    "scripts",
+    "docs",
+    "experimental"
 ]
 
 [workspace.package]
@@ -13,7 +22,38 @@ license = "Apache-2.0"
 repository = "https://github.com/anya-im/anya-core"
 
 [workspace.dependencies]
-bitcoin = { version = "0.29.2", features = ["rand", "serde"] }
-secp256k1 = { version = "0.24.0", features = ["rand", "serde"] }
+# Bitcoin Development Framework v2.5 compliant
+bitcoin = { version = "0.32.0", features = [
+    "std", 
+    "bip341", 
+    "serde", 
+    "rand", 
+    "bitcoinconsensus"
+]}
+secp256k1 = { version = "0.28.1", features = [
+    "bitcoin_hashes",
+    "std",
+    "serde"
+]}
 tokio = { version = "1.28.1", features = ["full"] }
 serde = { version = "1.0.160", features = ["derive"] }
+serde_json = "1.0.108"
+thiserror = "1.0.50"
+async-trait = "0.1.74"
+tracing = "0.1.40"
+tracing-subscriber = "0.3.18"
+axum = { version = "0.7.3", features = ["ws"] }
+dirs = "5.0.1"
+reqwest = { version = "0.11.24", features = ["json"] }
+futures = "0.3.30"
+hex-literal = "0.4.1"
+hex = "0.4.3"
+
+[workspace.metadata.compliance]
+features = ["bip341", "secp256k1/std"]
+audit = "2025-02-24"
+
+[workspace.metadata.compliance.security]
+relro = "full"
+now = true
+crt_static = true

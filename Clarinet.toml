@@ -73,7 +73,6 @@ treasury_initial_release = 0.2
 treasury_vesting_months = 48
 liquidity_initial_release = 0.5
 liquidity_vesting_months = 18
-team_cliff_months = 12
 team_vesting_months = 36
 community_initial_release = 0.1
 community_vesting_months = 48

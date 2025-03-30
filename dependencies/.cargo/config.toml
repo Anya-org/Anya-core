@@ -29,7 +29,6 @@ rustflags = [
 protocol = "sparse"
 
 [net]
-git-fetch-with-cli = true
 
 [cache]
 # Enable shared compilation cache

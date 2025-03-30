@@ -11,7 +11,7 @@ Welcome to the Anya Core documentation. This index will help you navigate the va
 ## Core Documentation
 
 - [Documentation Index](docs/INDEX.md) - Main documentation index
-- [System Architecture](docs/SYSTEM_MAP.md) - Complete system architecture
+- [System Architecture](docs/architecture/SYSTEM_MAP.md) - Complete system architecture
 - [DAO System](docs/DAO_SYSTEM_GUIDE.md) - Comprehensive DAO documentation
 - [Tokenomics System](docs/TOKENOMICS_SYSTEM.md) - Bitcoin-style tokenomics
 - [Implementation Milestones](docs/IMPLEMENTATION_MILESTONES.md) - Current progress tracking
@@ -71,7 +71,7 @@ Welcome to the Anya Core documentation. This index will help you navigate the va
 
 ## Development Resources
 
-- [API Documentation](docs/API.md) - API reference
+- [API Documentation](docs/api/api-reference.md) - API reference
 - [Contributing Guide](CONTRIBUTING.md) - How to contribute
 - [Checkpoint System](docs/CHECKPOINT_SYSTEM.md) - Development checkpoints
 - [](docs/standards/AI_LABELING.md) - Component labeling standards
