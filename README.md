@@ -1,6 +1,7 @@
 # Anya-Core
 
 [![BIP-341](https://img.shields.io/badge/BIP-341_Compliant-green)](https://bips.xyz/341)
+[![BIP-342](https://img.shields.io/badge/BIP--342-Compliant-green)](https://bips.xyz/342)
 [![AIS-3](https://img.shields.io/badge/AIS-3_Secured-blue)](https://bitcoin-development-framework.org)
 [![PSBT-v2](https://img.shields.io/badge/PSBT_v2-100%25-brightgreen)](https://bips.xyz/370)
 

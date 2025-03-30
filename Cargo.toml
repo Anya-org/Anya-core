@@ -1,17 +1,21 @@
-# Remove all package-specific configuration
+# Anya Core Workspace Configuration
 [workspace]
 members = [
-    "anyacore",
-    "mobile",
-    "bitcoin-adapter",
-    "dlc-oracle"
+    "packages/core",
+    "packages/protocol-adapters",
+    "packages/mcp-interface",
+    "packages/bitcoin-network",
+    "packages/metrics",
+    "packages/bin",
+    "extensions/enterprise",
+    "extensions/mobile"
 ]
 resolver = "2"
 
-# Add mandatory workspace package inheritance
+# Workspace package inheritance
 [workspace.package]
 version = "2.5.0"
-edition = "2021"  # Required for member crate inheritance
+edition = "2021"
 description = "Anya Core Bitcoin Development Framework"
 license = "MIT"
 repository = "https://github.com/anya-org/anya-core"
@@ -25,11 +29,8 @@ bitcoin = "0.30.0"
 # taproot-assets dependency removed - repository not found
 
 # Protocol Adapters (BDF §2.1)
-web5 = { version = "0.5.0", features = [
-    "bip174", 
-    "bip341",
-    "secure-transport"
-], default-features = false }
+bitcoin_hashes = "0.12.0"
+bitcoin-bech32 = "0.13.0"
 # Removed problematic features
 bdk = { version = "0.30.0" }
 
