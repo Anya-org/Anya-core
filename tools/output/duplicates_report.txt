@@ -1,0 +1,37 @@
+🔍 Analyzing Anya Core codebase for redundant modules...
+Found 599 Rust files to analyze
+Grouped into 103 module categories
+
+🚨 Identified 2 potentially redundant module groups:
+
+1. metrics (Similarity: 31.7%)
+   Affected modules:
+   - ./dist/anya-core/core/src/chaos/metrics.rs
+   - ./dist/anya-core/core/src/agent/metrics.rs
+   - ./dist/anya-core/core/src/metrics/mod.rs
+   - ./core/src/chaos/metrics.rs
+   - ./core/src/agent/metrics.rs
+   - ./core/src/metrics/mod.rs
+   - ./dependencies/src/infrastructure/monitoring/metrics.rs
+   - ./dependencies/src/auth/web5/metrics.rs
+   - ./packages/mcp-interface/src/metrics.rs
+   - ./packages/mcp-interface/src/metrics/mod.rs
+   ➡️ Suggested consolidation: packages/metrics/src/lib.rs
+
+2. psbt (Similarity: 30.6%)
+   Affected modules:
+   - ./dist/anya-core/core/src/psbt.rs
+   - ./anyacore/src/psbt.rs
+   - ./anyacore/src/bitcoin_internal/psbt.rs
+   - ./anyacore/src/bitcoin/psbt.rs
+   - ./core/src/psbt.rs
+   - ./packages/protocol-adapters/src/bitcoin/psbt.rs
+   - ./src/bitcoin/psbt.rs
+   ➡️ Suggested consolidation: packages/protocol-adapters/src/bitcoin/psbt.rs
+
+📋 Consolidation Recommendations:
+1. Start with highest similarity score modules first
+2. Use the 'packages/' structure for consolidated implementations
+3. Add comprehensive tests for newly consolidated modules
+4. Update imports in dependent code
+5. Run this tool again after each consolidation to check progress

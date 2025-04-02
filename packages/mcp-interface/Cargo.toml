@@ -1,0 +1,23 @@
+[package]
+name = "anya-core-mcp-interface"
+version = "2.5.0"
+edition = "2021"
+description = "MCP Interface for Anya Core"
+authors = ["Anya Team <team@anya.dev>"]
+license = "MIT"
+
+[dependencies]
+# Core dependencies
+log = "0.4"
+anyhow = "1.0"
+thiserror = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+async-trait = "0.1"
+tokio = { version = "1.0", features = ["full"] }
+axum = "0.6"
+metrics = "0.21"
+
+[features]
+default = []
+grpc = []
