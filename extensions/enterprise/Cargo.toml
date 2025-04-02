@@ -1,0 +1,23 @@
+[package]
+name = "anya-core-enterprise"
+version.workspace = true
+edition.workspace = true
+description = "Enterprise extensions for Anya Core"
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+# Core dependencies
+anya-core-core = { path = "../../packages/core" }
+anya-core-protocol-adapters = { path = "../../packages/protocol-adapters" }
+anya-core-mcp-interface = { path = "../../packages/mcp-interface" }
+
+# External dependencies
+tokio = { workspace = true }
+serde = { workspace = true }
+thiserror = { workspace = true }
+
+[features]
+default = ["bip342"]
+bip342 = []
