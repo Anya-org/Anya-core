@@ -1,0 +1,113 @@
+#![forbid(unsafe_code)]
+#![warn(
+    missing_docs,
+    clippy::all,
+    clippy::cargo,
+    clippy::nursery,
+    clippy::pedantic,
+    clippy::unwrap_used
+)]
+#![allow(clippy::module_name_repetitions)]
+//! Anya Bitcoin Development Framework Core
+//! 
+//! This is the main library for the Anya Core BDF implementation,
+//! providing consensus-critical code and Bitcoin protocol integration.
+//! Full support for BIP-342 (Tapscript) is implemented throughout this library.
+
+use bitcoin::{
+    Network,
+    consensus::encode::Error as BitcoinError,
+};
+use anyhow::{Result, Error as AnyhowError};
+use std::path::PathBuf;
+use log::{info, warn, error};
+use log::{info, warn, error};
+
+// Core modules
+pub mod consensus {
+    pub mod validation;   // Block/tx validation
+    pub mod rules;        // Consensus rules
+    pub mod params;       // Network parameters
+}
+
+pub mod mempool {
+    pub mod pool;         // Transaction mempool
+    pub mod policy;       // Mempool policies
+    pub mod fees;         // Fee estimation
+}
+
+pub mod script {
+    pub mod interpreter;  // Script verification
+    pub mod standard;     // Standard scripts
+}
+
+// Security modules
+pub mod security {
+    pub mod audit;
+    pub mod config;
+    pub mod enforcement;
+    pub mod error;
+    pub mod hsm;
+    pub mod secrets;
+}
+
+// Protocol modules (including BIP-342 support)
+pub mod l4_protocol;      // Layer 4 protocol with BIP-342 support
+pub mod tapscript;        // Enhanced tapscript implementation
+
+// Re-exports for convenient API access
+pub use bitcoin;
+
+// Library version information
+pub const VERSION: &str = env!("CARGO_PKG_VERSION");
+pub const PACKAGE_NAME: &str = env!("CARGO_PKG_NAME");
+
+/// Core configuration for Bitcoin node integration
+#[derive(Debug, Clone)]
+pub struct Config {
+    /// Bitcoin network (mainnet, testnet, regtest)
+    pub network: Network,
+    /// Data directory path
+    pub datadir: PathBuf,
+    /// Maximum number of peers (default: 125)
+    pub max_peers: u32,
+    /// Minimum number of peers (default: 8)
+    pub min_peers: u32,
+}
+
+impl Default for Config {
+    fn default() -> Self {
+        Self {
+            network: Network::Testnet,
+            datadir: PathBuf::from(".anya"),
+            max_peers: 125,
+            min_peers: 8,
+        }
+    }
+}
+
+/// Initialize the Anya Core library with default settings
+pub fn init() -> Result<()> {
+    info!("Initializing Anya Core v{}", VERSION);
+    // Perform environment verification
+    if let Err(e) = security::enforcement::verify_environment() {
+        warn!("Environment verification failed: {}", e);
+    }
+    Ok(())
+}
+
+/// Error type for Anya Core operations
+#[derive(Debug, thiserror::Error)]
+pub enum Error {
+    /// Bitcoin protocol error
+    #[error("Bitcoin error: {0}")]
+    Bitcoin(#[from] BitcoinError),
+    
+    /// General error
+    #[error("Error: {0}")]
+    General(#[from] AnyhowError),
+    
+    /// Configuration error
+    #[error("Configuration error: {0}")]
+    Config(String),
+}

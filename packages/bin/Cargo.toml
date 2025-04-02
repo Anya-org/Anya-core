@@ -1,0 +1,46 @@
+[package]
+name = "anya-core-bin"
+version.workspace = true
+edition.workspace = true
+description = "Anya Core Binary Entry Point with BIP-342 support"
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
+[[bin]]
+name = "anya-core"
+path = "src/main.rs"
+
+[dependencies]
+# Internal dependencies
+anya-core-core = { path = "../core" }
+anya-core-protocol-adapters = { path = "../protocol-adapters" }
+anya-core-mcp-interface = { path = "../mcp-interface" }
+anya-core-bitcoin-network = { path = "../bitcoin-network" }
+anya-core-metrics = { path = "../metrics" }
+
+# Command-line arguments parsing
+clap = { workspace = true }
+
+# Async runtime
+tokio = { workspace = true }
+futures = { workspace = true }
+
+# Error handling
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+
+# Logging
+log = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+
+# Configuration
+config = "0.14.0"
+serde = { workspace = true }
+serde_json = { workspace = true }
+serde_yaml = { workspace = true }
+toml = { workspace = true }
+
+# Signal handling
+tokio-signal = "0.2.9"

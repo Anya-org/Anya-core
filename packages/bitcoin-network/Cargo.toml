@@ -1,0 +1,41 @@
+[package]
+name = "anya-core-bitcoin-network"
+version.workspace = true
+edition.workspace = true
+description = "Bitcoin Network implementation for Anya Core"
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+# Internal dependencies
+anya-core-core = { path = "../core" }
+anya-core-protocol-adapters = { path = "../protocol-adapters" }
+
+# Bitcoin dependencies with correct features for BIP-342 support
+bitcoin = { version = "0.32.0", features = ["std", "serde", "rand", "bitcoinconsensus"] }
+secp256k1 = { version = "0.28.1", features = ["std", "serde", "rand"] }
+
+# P2P networking
+tokio = { workspace = true }
+futures = { workspace = true }
+socket2 = "0.5.5"
+
+# Serialization
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+# Error handling
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+
+# Logging
+log = { workspace = true }
+tracing = { workspace = true }
+
+# Async traits
+async-trait = { workspace = true }
+
+[features]
+default = ["std"]
+std = []

@@ -1,0 +1,42 @@
+[package]
+name = "anya-core-metrics"
+version.workspace = true
+edition.workspace = true
+description = "Metrics implementation for Anya Core"
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+# Internal dependencies
+anya-core-core = { path = "../core" }
+
+# Metrics dependencies
+prometheus = { version = "0.13.3", features = ["process"] }
+metrics = "0.21.1"
+metrics-exporter-prometheus = "0.12.1"
+
+# Web framework for metrics endpoint
+axum = { version = "0.7.3", features = ["macros"] }
+tower = { version = "0.4.13", features = ["full"] }
+tower-http = { version = "0.5.0", features = ["trace", "cors"] }
+
+# Async runtime
+tokio = { workspace = true }
+futures = { workspace = true }
+
+# Serialization
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+# Logging
+log = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+
+# Error handling
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+
+# System monitoring
+systemstat = "0.2.4"
