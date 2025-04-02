@@ -1,0 +1,19 @@
+--- a/packages/protocol-adapters/src/bitcoin/psbt.rs
++++ b/packages/protocol-adapters/src/bitcoin/psbt.rs
+@@ -182,13 +182,14 @@
+                 
+                 let keypair = secp256k1::Keypair::from_secret_key(&self.secp, *private_key);
+                 let tweaked_keypair = keypair.tap_tweak(&self.secp, *leaf_hash.as_inner())
+-                    .map_err(|e| PsbtHandlerError::SignatureError(format!("{}", e)))?;
++                    // TweakedKeypair doesn't have map_err, just use unwrap as it's unlikely to fail here
++                    .into();
+                 
+                 let signature = self.secp.sign_schnorr_no_aux_rand(&msg, &tweaked_keypair);
+                 
+                 // Store the signature
+                 input.tap_script_sigs.insert(
+-                    (XOnlyPublicKey::from_keypair(&self.secp, &keypair).0, *leaf_hash),
++                    (XOnlyPublicKey::from_keypair(&keypair).0, *leaf_hash),
+                     signature.as_ref().to_vec(),
+                 );
+                 

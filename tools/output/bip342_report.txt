@@ -1,0 +1,223 @@
+BIP-342 Implementation References
+===============================
+
+/home/anya/anya-core/anyacore/src/bdf_compliance.rs:impl TapscriptEngine {
+/home/anya/anya-core/anyacore/src/bdf_compliance.rs:pub struct TapscriptEngine;
+/home/anya/anya-core/anyacore/src/bdf_compliance.rs:        self.tapscript.validate_scripts(psbt)?;
+/home/anya/anya-core/anyacore/src/bdf_compliance.rs:    // Tapscript support (BIP-342)
+/home/anya/anya-core/anyacore/src/bdf_compliance.rs:    tapscript: TapscriptEngine,
+/home/anya/anya-core/anyacore/src/bdf_compliance.rs:            tapscript: TapscriptEngine::new()?,
+/home/anya/anya-core/anyacore/src/lib.rs:pub mod tapscript;
+/home/anya/anya-core/anyacore/src/tapscript.rs:// Define a custom error for tapscript validation
+/home/anya/anya-core/anyacore/src/tapscript.rs:impl TapscriptValidator {
+/home/anya/anya-core/anyacore/src/tapscript.rs:    InvalidTapscript,
+/home/anya/anya-core/anyacore/src/tapscript.rs:        let control_block = script.control_block().ok_or(anyhow!("Invalid Tapscript"))?;
+/home/anya/anya-core/anyacore/src/tapscript.rs:pub enum TapscriptError {
+/home/anya/anya-core/anyacore/src/tapscript.rs:pub struct TapscriptValidator {
+/home/anya/anya-core/anyacore/src/tapscript.rs:// Tapscript Validator (BIP-342)
+/home/anya/anya-core/core/src/bip_compliance.rs:use bitcoin::bip::{BIP340, BIP341, BIP342};
+/home/anya/anya-core/dependencies/anya-bitcoin/src/script/interpreter.rs:    // Add BIP-342 test vectors validation
+/home/anya/anya-core/dependencies/anya-bitcoin/src/script/interpreter.rs:    audit_log!("BIP342", "Tapscript validated for tx {}", tx.txid());
+/home/anya/anya-core/dependencies/anya-bitcoin/src/script/interpreter.rs:        .context("BIP-342 validation failed")?;
+/home/anya/anya-core/dependencies/anya-bitcoin/src/script/interpreter.rs:fn verify_tapscript(
+/home/anya/anya-core/dependencies/anya-bitcoin/src/script/interpreter.rs:/// Updated Tapscript validation per BIP-342 final spec
+/home/anya/anya-core/dependencies/src/auth/mod.rs:        // Can add Tapscript trees here if needed
+/home/anya/anya-core/dist/anya-core/core/src/bip_compliance.rs:use bitcoin::bip::{BIP340, BIP341, BIP342};
+/home/anya/anya-core/packages/bin/src/main.rs:/// Anya Core - Bitcoin Development Framework with BIP-342 support
+/home/anya/anya-core/packages/bin/src/main.rs:    /// Check BIP-342 compatibility
+/home/anya/anya-core/packages/bin/src/main.rs:    // Check for BIP-342 support
+/home/anya/anya-core/packages/bin/src/main.rs:    /// Disable BIP-342 support (legacy mode)
+/home/anya/anya-core/packages/bin/src/main.rs:            if bitcoin_adapter.supports_feature("BIP-342") {
+/home/anya/anya-core/packages/bin/src/main.rs:        info!("BIP-342 support enabled");
+/home/anya/anya-core/packages/bin/src/main.rs:            info!("Checking BIP-342 compatibility for script: {:?}", script_file);
+/home/anya/anya-core/packages/bin/src/main.rs:                info!("The script is compatible with BIP-342");
+/home/anya/anya-core/packages/bin/src/main.rs://! Main executable for Anya Core with BIP-342 support.
+/home/anya/anya-core/packages/bin/src/main.rs:            // Verify BIP-342 compatibility
+/home/anya/anya-core/packages/bin/src/main.rs:        warn!("BIP-342 support disabled (legacy mode)");
+/home/anya/anya-core/packages/bin/src/main.rs:                warn!("The script is not compatible with BIP-342");
+/home/anya/anya-core/packages/bitcoin-network/src/blockchain/mod.rs:        // including script validation and BIP-342 compliance checks
+/home/anya/anya-core/packages/bitcoin-network/src/blockchain/mod.rs:// Provides blockchain management for Bitcoin with BIP-342 support
+/home/anya/anya-core/packages/bitcoin-network/src/blockchain/mod.rs:        // - Transaction scripts including BIP-342 compliance
+/home/anya/anya-core/packages/bitcoin-network/src/mempool/mod.rs:// Provides mempool management for Bitcoin transactions with BIP-342 support
+/home/anya/anya-core/packages/core/src/consensus/rules.rs:/// BIP-342 related consensus rules
+/home/anya/anya-core/packages/core/src/consensus/rules.rs:        info!("Validating Taproot script according to BIP-342");
+/home/anya/anya-core/packages/core/src/consensus/rules.rs:    /// Validate a Taproot script according to BIP-342 rules
+/home/anya/anya-core/packages/core/src/l4_protocol.rs:    /// BIP-342 compliance error
+/home/anya/anya-core/packages/core/src/l4_protocol.rs:    /// Create a new contract following BIP-342 specifications
+/home/anya/anya-core/packages/core/src/l4_protocol.rs:        // Create a simple script (P2TR with a Tapscript path)
+/home/anya/anya-core/packages/core/src/l4_protocol.rs:    #[error("BIP-342 compliance error: {0}")]
+/home/anya/anya-core/packages/core/src/l4_protocol.rs:        // In a real implementation, we would verify the script against BIP-342 rules
+/home/anya/anya-core/packages/core/src/l4_protocol.rs:// including tapscript validation and secure contract management.
+/home/anya/anya-core/packages/core/src/l4_protocol.rs:        info!("Created BIP-342 compliant taproot output");
+/home/anya/anya-core/packages/core/src/l4_protocol.rs:            info!("Transaction verified according to BIP-342");
+/home/anya/anya-core/packages/core/src/l4_protocol.rs:        info!("Verifying tapscript for transaction: {}", transaction.compute_txid());
+/home/anya/anya-core/packages/core/src/l4_protocol.rs:// Layer 4 Protocol Implementation with BIP-342 Support
+/home/anya/anya-core/packages/core/src/l4_protocol.rs:    pub fn verify_tapscript(&self, transaction: &Transaction, _script_hash: TapLeafHash) -> Result<bool, L4Error> {
+/home/anya/anya-core/packages/core/src/l4_protocol.rs:        // This is a BIP-342 compliant taproot construction
+/home/anya/anya-core/packages/core/src/l4_protocol.rs:// This module implements the Layer 4 protocol for Bitcoin with full BIP-342 support,
+/home/anya/anya-core/packages/core/src/l4_protocol.rs:    /// Verify a BIP-342 compatible transaction
+/home/anya/anya-core/packages/core/src/l4_protocol.rs:            warn!("Transaction failed BIP-342 verification");
+/home/anya/anya-core/packages/core/src/lib.rs://! Full support for BIP-342 (Tapscript) is implemented throughout this library.
+/home/anya/anya-core/packages/core/src/lib.rs:// Protocol modules (including BIP-342 support)
+/home/anya/anya-core/packages/core/src/lib.rs:pub mod l4_protocol;      // Layer 4 protocol with BIP-342 support
+/home/anya/anya-core/packages/core/src/lib.rs:pub mod tapscript;        // Enhanced tapscript implementation
+/home/anya/anya-core/packages/core/src/script/interpreter.rs:    info!("Interpreting tapscript: {}", script);
+/home/anya/anya-core/packages/core/src/script/interpreter.rs:/// Interpret a tapscript (BIP-342)
+/home/anya/anya-core/packages/core/src/script/interpreter.rs:pub fn interpret_tapscript(script: &ScriptBuf) -> bool {
+/home/anya/anya-core/packages/core/src/script/tapscript.rs:/// Calculate the leaf hash for a tapscript
+/home/anya/anya-core/packages/core/src/script/tapscript.rs://! compliant with the BIP-342 specification.
+/home/anya/anya-core/packages/core/src/script/tapscript.rs:    /// Create a new tapscript context
+/home/anya/anya-core/packages/core/src/script/tapscript.rs:    /// Enable BIP-342 verification
+/home/anya/anya-core/packages/core/src/script/tapscript.rs:    /// Execute the tapscript according to BIP-342 rules
+/home/anya/anya-core/packages/core/src/script/tapscript.rs:    flags: Vec<TapscriptFlag>,
+/home/anya/anya-core/packages/core/src/script/tapscript.rs:            flags: vec![TapscriptFlag::EnableBip342],
+/home/anya/anya-core/packages/core/src/script/tapscript.rs:impl TapscriptContext {
+/home/anya/anya-core/packages/core/src/script/tapscript.rs:        // In a real implementation, this would execute the script according to BIP-342 rules
+/home/anya/anya-core/packages/core/src/script/tapscript.rs:        info!("Executing tapscript with BIP-342 validation");
+/home/anya/anya-core/packages/core/src/script/tapscript.rs:        let is_bip342_enabled = self.flags.contains(&TapscriptFlag::EnableBip342);
+/home/anya/anya-core/packages/core/src/script/tapscript.rs:pub enum TapscriptFlag {
+/home/anya/anya-core/packages/core/src/script/tapscript.rs:    pub fn with_flag(mut self, flag: TapscriptFlag) -> Self {
+/home/anya/anya-core/packages/core/src/script/tapscript.rs:pub struct TapscriptContext {
+/home/anya/anya-core/packages/core/src/script/tapscript.rs:            return Err("BIP-342 validation required for tapscript execution".to_string());
+/home/anya/anya-core/packages/core/src/script/tapscript.rs:/// Tapscript execution context
+/home/anya/anya-core/packages/core/src/script/tapscript.rs:/// Tapscript execution flags
+/home/anya/anya-core/packages/core/src/script/tapscript.rs://! Tapscript implementation for BIP-342
+/home/anya/anya-core/packages/core/src/script/tapscript.rs://! This module provides tapscript validation and execution functions
+/home/anya/anya-core/packages/core/src/security/config.rs:    /// Enforce BIP-342 compliance
+/home/anya/anya-core/packages/core/src/security/enforcement.rs:        assert_eq!(status.get("BIP-342"), Some(&"Fully Compliant".to_string()));
+/home/anya/anya-core/packages/core/src/security/enforcement.rs:    // Ensure we're using a version that supports Taproot/Tapscript
+/home/anya/anya-core/packages/core/src/security/enforcement.rs:    // For simplicity, assume BIP-342 compliance if BIP-341 is supported
+/home/anya/anya-core/packages/core/src/security/enforcement.rs:    // In a full implementation, we would add additional checks specific to BIP-342
+/home/anya/anya-core/packages/core/src/security/enforcement.rs:    info!("BIP-342 support verification complete");
+/home/anya/anya-core/packages/core/src/security/enforcement.rs:    info!("Verifying BIP-342 (Tapscript) compliance...");
+/home/anya/anya-core/packages/core/src/security/enforcement.rs:    status.insert("BIP-342".to_string(), "Fully Compliant".to_string()); 
+/home/anya/anya-core/packages/core/src/security/enforcement.rs:    // Verify BIP-342 (Tapscript) support
+/home/anya/anya-core/packages/core/src/security/enforcement.rs:/// Verify BIP-342 (Tapscript) support
+/home/anya/anya-core/packages/core/src/security/enforcement.rs:    // Verify the bitcoin crate version supports BIP-342
+/home/anya/anya-core/packages/core/src/security/enforcement.rs:        warn!("Bitcoin crate version {} may not fully support BIP-342", bitcoin_version);
+/home/anya/anya-core/packages/core/src/tapscript/mod.rs://! Enhanced tapscript implementation (BIP-342)
+/home/anya/anya-core/packages/core/src/tapscript/mod.rs:    // In a real implementation, this would verify the script against BIP-342 rules
+/home/anya/anya-core/packages/core/src/tapscript/mod.rs:    info!("Creating taproot output with BIP-342 compliance");
+/home/anya/anya-core/packages/core/src/tapscript/mod.rs:    info!("Verifying tapscript against BIP-342 rules");
+/home/anya/anya-core/packages/core/src/tapscript/mod.rs:pub fn verify_tapscript(_script: &ScriptBuf, _leaf_hash: &TapLeafHash) -> bool {
+/home/anya/anya-core/packages/core/src/tapscript/mod.rs://! This module provides an enhanced implementation of BIP-342 tapscript
+/home/anya/anya-core/packages/core/src/tapscript/mod.rs:/// Verify a tapscript against BIP-342 rules
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/mod.rs:    /// BIP-342 error
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/mod.rs:            "BIP-342" => self.bip342_enabled,  // Tapscript
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/mod.rs:    /// BIP-342 support enabled flag
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/mod.rs:/// Bitcoin adapter with BIP-342 support
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/mod.rs:    /// Create a new BIP-342 compliant taproot output
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/mod.rs:    #[error("BIP-342 error: {0}")]
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/mod.rs:        // In a real implementation, we would create the tapscript output here
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/mod.rs:            info!("Created Bitcoin adapter with BIP-342 support");
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/mod.rs:        info!("Initializing Bitcoin protocol adapter (BIP-342: {})", 
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/mod.rs:        info!("Successfully validated transaction with BIP-342 support");
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/mod.rs:            .map_err(|e| BitcoinError::Bip342Error(format!("Tapscript validation failed: {}", e)))?;
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/mod.rs:// Provides BIP-342 compliant Bitcoin protocol adapter implementation
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/mod.rs:    pub fn verify_tapscript(&self, tx: &Transaction, _leaf_hash: TapLeafHash) -> Result<bool, BitcoinError> {
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/mod.rs:pub mod tapscript;
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/mod.rs:            return Err(BitcoinError::Bip342Error("BIP-342 not enabled".to_string()));
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/mod.rs:            return Err(BitcoinError::Bip342Error("BIP-342 not enabled".to_string()));
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/mod.rs:            validation::ValidationStandard::Tapscript
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/mod.rs:    /// Verify a BIP-342 tapscript
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/mod.rs:            warn!("Created Bitcoin adapter without BIP-342 support (legacy mode)");
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/mod.rs:// with comprehensive tapscript validation and transaction handling
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/psbt.rs:            if self.tapscript_enabled {
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/psbt.rs:        if self.tapscript_enabled && (input.tap_key_sig.is_some() || !input.tap_script_sigs.is_empty()) {
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/psbt.rs:        if !self.tapscript_enabled && leaf_hashes.is_some() {
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/psbt.rs:// It includes full BIP-342 (Tapscript) support.
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/psbt.rs:        let validator = Arc::new(BitcoinValidator::new(network, tapscript_enabled));
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/psbt.rs:/// PSBT Handler with BIP-342 support
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/psbt.rs:    pub fn new(network: Network, tapscript_enabled: bool) -> Self {
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/psbt.rs:    /// Sign a taproot input with BIP-342 support
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/psbt.rs:            tapscript_enabled,
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/psbt.rs:    tapscript_enabled: bool,
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/psbt.rs:                "Tapscript is not enabled but leaf hashes were provided".to_string()
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/psbt.rs:    /// Tapscript support flag
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/tapscript.rs:        // according to BIP-342 rules, including handling of:
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/tapscript.rs:        // Additional BIP-342 checks would be performed here:
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/tapscript.rs:/// BIP-342 Tapscript implementation
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/tapscript.rs:        // BIP-342 validation checks
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/tapscript.rs:    /// Build a Tapscript spending witness
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/tapscript.rs:    /// Create a new Tapscript handler
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/tapscript.rs:    /// Create a new Tapscript with BIP-342 compliance checks
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/tapscript.rs:        // Create a script using OP_CHECKMULTISIG (invalid in BIP-342)
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/tapscript.rs:        // Create a simple script (valid in BIP-342)
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/tapscript.rs:                "Empty witness for tapscript execution".to_string()
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/tapscript.rs:        // - Enforcing tapscript specific signature validation rules
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/tapscript.rs:    #[error("Invalid tapscript: {0}")]
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/tapscript.rs:    #[error("Tapscript verification error: {0}")]
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/tapscript.rs:    fn test_invalid_tapscript() {
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/tapscript.rs:    fn test_tapscript_creation() {
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/tapscript.rs:    fn validate_bip342_compliance(&self, _script: &ScriptBuf) -> Result<(), TapscriptError> {
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/tapscript.rs:                    format!("BIP-342 violation: disabled opcode used: {:?}", opcode)
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/tapscript.rs:impl TapscriptHandler {
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/tapscript.rs:        // In BIP-342, some opcodes are disabled
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/tapscript.rs:        info!("Created BIP-342 compliant tapscript");
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/tapscript.rs:            info!("Tapscript verified according to BIP-342 rules");
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/tapscript.rs:        info!("Verifying tapscript execution for BIP-342 compliance");
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/tapscript.rs:    /// Invalid tapscript
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/tapscript.rs:    InvalidTapscript(String),
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/tapscript.rs:        let handler = TapscriptHandler::new(true);
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/tapscript.rs:        let handler = TapscriptHandler::new(true);
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/tapscript.rs:pub enum TapscriptError {
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/tapscript.rs:    pub fn create_tapscript(&self, script_body: &[u8]) -> Result<ScriptBuf, TapscriptError> {
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/tapscript.rs:    pub fn verify_tapscript(
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/tapscript.rs:pub struct TapscriptHandler {
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/tapscript.rs:    ) -> Result<bool, TapscriptError> {
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/tapscript.rs:    ) -> Result<Witness, TapscriptError> {
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/tapscript.rs:                return Err(TapscriptError::InvalidTapscript(
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/tapscript.rs:            return Err(TapscriptError::VerificationError(
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/tapscript.rs:/// Tapscript error type
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/tapscript.rs:// Tapscript Implementation (BIP-342)
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/tapscript.rs:// This module implements BIP-342 compliant Tapscript functionality
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/tapscript.rs:use anya_core_core::tapscript;
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/tapscript.rs:    /// Validate a script for BIP-342 compliance
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/tapscript.rs:    /// Verify a Tapscript execution according to BIP-342 rules
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/tapscript.rs:            warn!("Tapscript verification failed");
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/tapscript.rs:    /// Whether to enforce BIP-342 strict mode
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/validation.rs:                // Add Tapscript validation logic
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/validation.rs:    /// Enable Tapscript validation (BIP-342)
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/validation.rs:    #[error("Tapscript validation failed: {0}")]
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/validation.rs:// including BIP-342 (Tapscript) validation and other Bitcoin protocol rules.
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/validation.rs:            Self::Tapscript => 7, // 1 | 2 | 4 (standard | taproot | tapscript)
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/validation.rs:    Tapscript,
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/validation.rs:    TapscriptValidationError(String),
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/validation.rs:use anya_core_core::tapscript;
+/home/anya/anya-core/packages/protocol-adapters/src/bitcoin/validation.rs:            ValidationStandard::Tapscript => {
+/home/anya/anya-core/src/bin/anya_installer.rs:            "BIP-342" => Ok(self.tapscript_enabled),
+/home/anya/anya-core/src/bin/anya_installer.rs:const REQUIRED_BIPS: [&str; 4] = ["BIP-341", "BIP-342", "BIP-174", "BIP-370"];
+/home/anya/anya-core/src/bin/anya_installer.rs:    fn check_tapscript_support() -> Result<bool> {
+/home/anya/anya-core/src/bin/anya_installer.rs:        if config.contains("tapscript=1") 
+/home/anya/anya-core/src/bin/anya_installer.rs://! Implements BIP-341, BIP-342, BIP-174, and AIS-3 security standards
+/home/anya/anya-core/src/bin/anya_installer.rs:        let required_adapters = ["BIP-341", "BIP-342", "BIP-174", "DLC", "RGB"];
+/home/anya/anya-core/src/bin/anya_installer.rs:                "script_validation".into() => check_tapscript_support()?
+/home/anya/anya-core/src/bin/anya_installer.rs:    tapscript_enabled: bool,
+/home/anya/anya-core/src/bin/anya_installer.rs:            tapscript_enabled: true,
+/home/anya/anya-core/src/bin/anya_installer.rs:        // Verify Tapscript opcode support
+/home/anya/anya-core/src/bip/validation.rs:            "BIP-342" => Ok(self.tapscript_enabled.into()),
+/home/anya/anya-core/src/bitcoin/taproot.rs:    BIP342Violation(String),
+/home/anya/anya-core/src/bitcoin/taproot.rs:                    // Check for opcodes disabled in Tapscript
+/home/anya/anya-core/src/bitcoin/taproot.rs:    #[error("BIP-342 violation: {0}")]
+/home/anya/anya-core/src/bitcoin/taproot.rs:        // In reality, this would verify the script against BIP-342 rules
+/home/anya/anya-core/src/bitcoin/taproot.rs:    pub fn verify_tapscript(&self, script: &Script) -> Result<(), TaprootError> {
+/home/anya/anya-core/src/bitcoin/taproot.rs:                        return Err(TaprootError::BIP342Violation(
+/home/anya/anya-core/src/bitcoin/taproot.rs:            return Err(TaprootError::BIP342Violation("Empty Tapscript".to_string()));
+/home/anya/anya-core/src/bitcoin/taproot.rs:        // Verify script does not use disabled opcodes in Tapscript context
+/home/anya/anya-core/src/bitcoin/taproot.rs:    /// Verify Tapscript execution (BIP-342)
+/home/anya/anya-core/src/bitcoin/taproot/script.rs:    /// Script version (default: 0xc0 for Tapscript)
+/home/anya/anya-core/src/bitcoin/taproot/script.rs:            version: 0xc0, // Tapscript version
+/home/anya/anya-core/src/bitcoin/taproot/script.rs:            version: 0xc0, // Tapscript version
+/home/anya/anya-core/src/bitcoin/taproot/tree.rs:    /// The leaf version (usually 0xc0 for Tapscript)
+/home/anya/anya-core/src/bitcoin/taproot/tree.rs:            version: LeafVersion::from_consensus(0xc0), // Tapscript version
+/home/anya/anya-core/src/compliance/bdf_verification.rs:        // Check BIP-342 (Taproot Script)
+/home/anya/anya-core/src/install/bitcoin_compliance.rs:    // For simplicity, assume BIP-342 compliance if BIP-341 is supported
+/home/anya/anya-core/src/install/bitcoin_compliance.rs:    // In a real implementation, we would perform specific Tapscript checks
+/home/anya/anya-core/src/install/bitcoin_compliance.rs:    info!("Verifying BIP-342 (Tapscript) compliance...");
+/home/anya/anya-core/src/install/bitcoin_compliance.rs:    // Verify BIP-342 (Tapscript) compliance
+/home/anya/anya-core/src/install/main.rs:        "# Installation Compliance Report\n\nDate: {}\n\n## Components Installed\n\n* Bitcoin Core: Passed\n* DAO System: Passed\n* Web5 DWN: Passed\n* ML System: Passed\n\n## BIP Support\n\n* BIP-341: Passed\n* BIP-342: Passed\n* BIP-174: Passed\n* BIP-370: Passed\n\n## Overall Status: Passed\n", 
+/home/anya/anya-core/src/test/system_tests.rs:        "BIP-342", // Tapscript
+/home/anya/anya-core/src/test/system_tests.rs:/// Focuses on BIP-341 (Taproot), BIP-342 (Tapscript), and BIP-174 (PSBT)
+/home/anya/anya-core/src/test/system_tests.rs:    let report_content = format!("# BIP Compliance Report\n\nDate: {}\n\n## Results\n\n* BIP-341: Passed\n* BIP-342: Passed\n* BIP-174: Passed\n* BIP-370: Passed\n\n## Overall Status: Passed\n", 
+/home/anya/anya-core/tools/find_duplicates.rs:        "psbt", "tapscript", "bitcoin", "validation", "security",
+/home/anya/anya-core/tools/find_duplicates.rs:        ("tapscript", "packages/protocol-adapters/src/bitcoin/tapscript.rs"),

@@ -1,0 +1,17 @@
+Package Lines of Code Report
+==========================
+
+New Package Structure:
+- packages/core: 888 lines
+- packages/protocol-adapters: 845 lines
+- packages/mcp-interface: 867 lines
+- packages/bitcoin-network: 913 lines
+- packages/metrics: 413 lines
+- packages/bin: 246 lines
+
+Legacy Code:
+- anya-bitcoin: 800 lines
+- anyacore: 760 lines
+- anya-enterprise: 1105 lines
+- anya-extensions: 351 lines
+- core: 9576 lines
