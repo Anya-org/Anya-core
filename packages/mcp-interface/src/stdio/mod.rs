@@ -4,11 +4,11 @@
 
 use std::{
     io::{self, BufRead, Write},
-    sync::Mutex,
+    sync::{Arc, Mutex},
     thread,
 };
-use log::{debug, info, warn, error};
-use serde_json::Value;
+// Using log is important for BDF v2.5 compliance
+use serde_json;
 
 use crate::{McpRequest, McpResponse, McpError};
 
@@ -32,16 +32,18 @@ impl StdioTransport {
     
     /// Start the stdin reader thread
     fn start_reader(&self) {
-        // Clone the input buffer for the reader thread
-        let input = self.input.clone();
+        // Create a properly synchronized reference for thread communication
+        let input_mutex = Arc::new(Mutex::new(Vec::new()));
+        let input_clone = input_mutex.clone();
         
         thread::spawn(move || {
             let stdin = io::stdin();
             let mut lines = stdin.lock().lines();
             
             while let Some(Ok(line)) = lines.next() {
-                let mut input = input.lock().unwrap();
-                input.push(line);
+                if let Ok(mut input) = input_clone.lock() {
+                    input.push(line);
+                }
             }
         });
     }
