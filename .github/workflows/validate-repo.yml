@@ -1,0 +1,30 @@
+name: Validate Repository Structure
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    - cron: '0 0 * * *'  # Run daily
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+        submodules: true
+        
+    - name: Validate Repository Structure
+      run: |
+        chmod +x ./scripts/validate_repository.sh
+        ./scripts/validate_repository.sh
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Check BIP Compliance
+      run: |
+        cargo check --features "bitcoin/taproot,bitcoin/psbt-v2"

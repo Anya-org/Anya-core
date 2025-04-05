@@ -1,0 +1,64 @@
+{
+    "test_framework": {
+        "version": "3.1.0",
+        "report_dir": "reports",
+        "default_timeout": 300
+    },
+    "components": {
+        "bitcoin": {
+            "test_types": ["unit", "integration", "compliance"],
+            "required_standards": ["BIP-341", "BIP-342", "BIP-174"],
+            "test_networks": ["regtest", "testnet"]
+        },
+        "dao": {
+            "test_types": ["unit", "integration", "governance"],
+            "required_standards": ["DAO-4"],
+            "test_contracts": ["governance-token", "dao-core", "bitcoin-issuance"]
+        },
+        "web5": {
+            "test_types": ["unit", "integration", "security"],
+            "required_standards": ["W5C", "DID"],
+            "test_features": ["credentials", "identity", "storage"]
+        },
+        "ml": {
+            "test_types": ["unit", "performance"],
+            "model_validation": true,
+            "performance_thresholds": {
+                "inference_time_ms": 100,
+                "memory_usage_mb": 512
+            }
+        }
+    },
+    "performance_tests": {
+        "transaction_throughput": {
+            "iterations": 1000,
+            "warmup_iterations": 100,
+            "threads": [1, 4, 8]
+        },
+        "database_access": {
+            "operations": ["read", "write", "update", "delete"],
+            "batch_sizes": [100, 1000, 10000]
+        },
+        "cache_performance": {
+            "sizes": [1000, 10000, 100000],
+            "eviction_policies": ["lru", "random"]
+        }
+    },
+    "compliance_tests": {
+        "bpc3": {
+            "required": true,
+            "standards": ["BIP-341", "BIP-342", "BIP-174"],
+            "validation_level": "strict"
+        },
+        "dao4": {
+            "required": true,
+            "standards": ["DAO-4"],
+            "validation_level": "normal"
+        },
+        "ais3": {
+            "required": true,
+            "standards": ["AIS-3"],
+            "validation_level": "strict"
+        }
+    }
+}

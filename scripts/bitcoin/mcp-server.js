@@ -14,6 +14,7 @@ const path = require('path');
 const crypto = require('crypto');
 const readline = require('readline');
 const { execSync, spawn } = require('child_process');
+const { BIP_STANDARDS, validateBipCompliance, generateTaprootOutput } = require('../lib/bitcoin-common');
 
 // MCP Protocol constants
 const MCP_PROTOCOL_VERSION = '1.0.0';
@@ -332,260 +333,21 @@ function sendError(id, message) {
 async function validateBitcoinProtocol(params) {
   log(`Validating Bitcoin protocol: ${params.input}`);
   
-  // Enhanced BIP standards with BDF v2.5 compatibility
-  const BIP_STANDARDS = {
-    'BIP-341': {
-      name: 'Taproot',
-      regex: /tr\([A-Za-z0-9]+,\{[^}]+\}\)/i,
-      description: 'Taproot output spending conditions',
-      requiredPatterns: [
-        { pattern: /tr\(/i, description: 'Taproot descriptor format' },
-        { pattern: /\{[^}]*\}/i, description: 'Script tree' }
-      ],
-      bestPractices: [
-        { pattern: /SILENT_LEAF/i, description: 'Privacy-preserving silent leaf' }
-      ]
-    },
-    'BIP-342': {
-      name: 'Tapscript',
-      regex: /OP_CHECKSIG|OP_CHECKSIGVERIFY/i,
-      description: 'Tapscript validation rules',
-      requiredPatterns: [
-        { pattern: /OP_[A-Z0-9_]+/i, description: 'Script operations' }
-      ],
-      bestPractices: [
-        { pattern: /OP_CHECKSIGADD/i, description: 'Tapscript multi-signature support' }
-      ]
-    },
-    'BIP-174': {
-      name: 'PSBT',
-      regex: /psbt:[0-9a-f]+/i,
-      description: 'Partially Signed Bitcoin Transaction',
-      requiredPatterns: [
-        { pattern: /unsigned_tx|witness_utxo|partial_sig/i, description: 'PSBT fields' }
-      ],
-      bestPractices: [
-        { pattern: /bip32_derivation/i, description: 'Derivation paths' }
-      ]
-    },
-    'BIP-370': {
-      name: 'PSBT Version 2',
-      regex: /psbt:v2:[0-9a-f]+/i,
-      description: 'PSBT Version 2 format',
-      requiredPatterns: [
-        { pattern: /psbt:v2/i, description: 'PSBT v2 marker' }
-      ],
-      bestPractices: [
-        { pattern: /proprietary|tx_modifiable/i, description: 'PSBT v2 extended fields' }
-      ]
-    },
-    'BIP-340': {
-      name: 'Schnorr Signatures',
-      regex: /schnorr|bip340/i,
-      description: 'Schnorr signature specification',
-      requiredPatterns: [
-        { pattern: /schnorr|signature/i, description: 'Schnorr signature reference' }
-      ],
-      bestPractices: [
-        { pattern: /auxiliary_data|nonce_generation/i, description: 'Secure nonce generation' }
-      ]
-    },
-    'BIP-327': {
-      name: 'MuSig2',
-      regex: /musig2|bip327/i,
-      description: 'MuSig2 multisignature scheme',
-      requiredPatterns: [
-        { pattern: /musig|key_agg/i, description: 'Key aggregation' }
-      ],
-      bestPractices: [
-        { pattern: /stateless/i, description: 'Stateless signing' }
-      ]
-    }
-  };
-  
-  // Enhanced validation result structure with BDF v2.5 compliance
   const results = {
-    validationPerformed: true,
-    timestamp: new Date().toISOString(),
-    standardsChecked: [],
     compliant: true,
-    details: [],
-    complianceLevel: 'unknown',
-    hexagonalValidation: {
-      performed: true,
-      adapters: {
-        'bitcoin-core': true,
-        'lightning': true,
-        'rgb': true,
-        'dlc': true
-      }
-    }
+    details: []
   };
-  
-  // Track BPC compliance level
-  let bpcLevel = 0;
-  
-  // Check each BIP standard
-  for (const [bipId, bipInfo] of Object.entries(BIP_STANDARDS)) {
-    const isApplicable = bipInfo.regex.test(params.input);
-    
-    if (isApplicable) {
-      results.standardsChecked.push(bipId);
-      
-      // Perform BIP-specific validation logic
-      const validationDetail = {
-        standard: bipId,
-        name: bipInfo.name,
-        compliant: true,
-        description: bipInfo.description,
-        patterns: {
-          required: {
-            satisfied: [],
-            missing: []
-          },
-          bestPractices: {
-            satisfied: [],
-            missing: []
-          }
-        },
-        warnings: [],
-        errors: []
-      };
-      
-      // Check required patterns
-      if (bipInfo.requiredPatterns) {
-        for (const requirement of bipInfo.requiredPatterns) {
-          if (requirement.pattern.test(params.input)) {
-            validationDetail.patterns.required.satisfied.push(requirement.description);
-          } else {
-            validationDetail.patterns.required.missing.push(requirement.description);
-            validationDetail.compliant = false;
-            validationDetail.errors.push(
-              `Missing required element: ${requirement.description}`
-            );
-          }
-        }
-      }
-      
-      // Check best practices
-      if (bipInfo.bestPractices) {
-        for (const practice of bipInfo.bestPractices) {
-          if (practice.pattern.test(params.input)) {
-            validationDetail.patterns.bestPractices.satisfied.push(practice.description);
-          } else {
-            validationDetail.patterns.bestPractices.missing.push(practice.description);
-            validationDetail.warnings.push(
-              `Best practice not followed: ${practice.description}`
-            );
-          }
-        }
-      }
-      
-      // BIP-specific checks
-      switch(bipId) {
-        case 'BIP-341':
-          if (!/tr\(.*SILENT_LEAF.*\)/.test(params.input)) {
-            validationDetail.compliant = false;
-            validationDetail.errors.push(
-              'Missing recommended SILENT_LEAF pattern for privacy-preserving Taproot scripts'
-            );
-          }
-          
-          // Increment BPC level for Taproot support
-          bpcLevel = Math.max(bpcLevel, 3);
-          break;
-          
-        case 'BIP-174':
-          if (!params.input.toLowerCase().includes('unsigned_tx')) {
-            validationDetail.compliant = false;
-            validationDetail.errors.push(
-              'PSBT should include unsigned_tx field'
-            );
-          }
-          
-          // Increment BPC level for PSBT support
-          bpcLevel = Math.max(bpcLevel, 2);
-          break;
-          
-        case 'BIP-340':
-          if (!params.input.toLowerCase().includes('auxiliary_data')) {
-            validationDetail.warnings.push(
-              'Schnorr implementation should handle auxiliary data for security'
-            );
-          }
-          
-          // Increment BPC level for Schnorr support
-          bpcLevel = Math.max(bpcLevel, 2);
-          break;
-      }
-      
-      // Set overall BIP compliance
-      validationDetail.compliantStatus = validationDetail.compliant ? 'Fully Compliant' : 
-        (validationDetail.warnings.length > 0 ? 'Partially Compliant' : 'Non-Compliant');
-      
-      results.details.push(validationDetail);
-    }
-  }
-  
-  // Set overall compliance status
-  if (results.standardsChecked.length === 0) {
-    results.compliant = false;
+
+  // Use shared validation
+  for (const bipId of params.standards || ['BIP-341', 'BIP-342']) {
+    const validation = validateBipCompliance(params.input, bipId);
     results.details.push({
-      error: 'No recognized Bitcoin protocol standards found in input'
+      standard: bipId,
+      ...validation
     });
-    results.complianceLevel = 'BPC-0';
-  } else {
-    // Check if any standard is non-compliant
-    const anyNonCompliant = results.details.some(detail => detail.compliant === false);
-    
-    if (anyNonCompliant) {
-      results.compliant = false;
-      results.warning = 'One or more standards are non-compliant';
-    } else if (results.details.some(detail => detail.warnings && detail.warnings.length > 0)) {
-      results.warning = 'Protocol validation passed with warnings';
-    }
-    
-    // Set compliance level based on BPC
-    if (bpcLevel >= 3) {
-      results.complianceLevel = 'BPC-3';
-    } else if (bpcLevel >= 2) {
-      results.complianceLevel = 'BPC-2';
-    } else if (bpcLevel >= 1) {
-      results.complianceLevel = 'BPC-1';
-    } else {
-      results.complianceLevel = 'BPC-0';
-    }
+    if (!validation.passed) results.compliant = false;
   }
-  
-  // Add AI labeling recommendations
-  results.aiLabeling = {
-    recommended: [
-      `[${results.complianceLevel}]`,
-      '[AIS-3]', 
-      '[AIR-3]',
-      '[AIP-3]',
-      '[RES-2]'
-    ],
-    explanation: 'These labels are recommended based on the protocol elements detected in the input.'
-  };
-  
-  // Add BDF v2.5 hexagonal architecture validation
-  if (results.compliant) {
-    results.hexagonalValidation.adapters = {
-      'bitcoin-core': true,
-      'lightning': results.standardsChecked.includes('BIP-341'),
-      'rgb': results.standardsChecked.includes('BIP-341'),
-      'dlc': results.standardsChecked.includes('BIP-327') || results.standardsChecked.includes('BIP-340')
-    };
-    
-    results.hexagonalValidation.recommendation = 
-      'This implementation is compatible with the hexagonal architecture requirements of BDF v2.5';
-  } else {
-    results.hexagonalValidation.recommendation = 
-      'Fix compliance issues to ensure hexagonal architecture compatibility';
-  }
-  
-  log(`Validation complete: ${results.compliant ? 'Compliant' : 'Non-compliant'} (${results.complianceLevel})`);
+
   return results;
 }
 
@@ -1549,4 +1311,4 @@ fn pay_invoice(invoice_str: &str, wallet: &LightningWallet) -> Result<PaymentRes
 }
 
 // Start server
-initialize(); 
+initialize();

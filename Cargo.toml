@@ -36,18 +36,17 @@ rust-version = "1.70"
 
 # Consolidated dependencies without duplicates
 [workspace.dependencies]
-# Core Bitcoin functionality
+# Bitcoin dependencies
 bitcoin = { version = "0.32.5", features = ["rand", "serde"] }
 secp256k1 = { version = "0.27.0", features = ["bitcoin_hashes", "rand"] }
 bitcoincore-rpc = "0.19.0"
 bdk = { version = "0.30.2", default-features = false }
 
 # Async runtime & networking
-tokio = { version = "1.37.0", features = [
-    "full",
-    "tracing"
-] }
+tokio = { version = "1.37.0", features = ["full", "tracing"] }
 futures = "0.3.30"
+libp2p = { version = "0.55.0", features = ["full"] }
+tokio-signal = "0.2.9"
 
 # Serialization
 serde = { version = "1.0.195", features = ["derive"] }
@@ -63,24 +62,21 @@ thiserror = "2.0.12"
 log = "0.4.20"
 tracing = { version = "0.1.40", features = ["attributes"] }
 tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
+metrics = "0.24.1"
+
+# CLI
+structopt = "0.3"
+clap = { version = "4.0", features = ["derive"] }
+
+# Testing
+test = "0.15.4"
+mockall = "0.13.1"
+tokio-test = "0.4"
 
 # Security
 ring = "0.17.14"
 sha2 = "0.10.8"
 zeroize = "1.7.0"
-
-# Web5 Integration
-jsonschema = "0.29.1"
-
-# Blockchain Integration
-
-# Networking
-libp2p = { version = "0.55.0", features = ["full"] }
-
-# Logging and Metrics
-metrics = "0.24.1"
-
-# Cryptography
 ed25519-dalek = "2.1.1"
 x25519-dalek = "2.0.0"
 chacha20poly1305 = "0.10.1"
@@ -88,60 +84,38 @@ aes-gcm = "0.10.3"
 hmac = "0.12.1"
 pbkdf2 = "0.12.2"
 
-# Testing
-test = "0.15.4"
-mockall = "0.12.1"
-tokio-test = "0.4"
+# Utils
+walkdir = "2.3"
+glob = "0.3"
+regex = "1.5"
+chrono = "0.4"
+jsonschema = "0.29.1"
 
-# Unified DLC implementation
-rgb-core = { git = "https://github.com/RGB-WG/rgb-core", tag = "v0.10.0", features = ["dlc-utils"] }
-
-# Mobile dependencies
-jsi = "0.10"
-
-# [AIR-3] Remove Dart dependencies
-# Note: Dependencies should be defined in workspace.dependencies or individual package manifests
-
-# [BPC-3] Bitcoin Development Framework workspace
-# Workspace is already defined at the top of the file
-
-# These dependencies are already defined in the workspace.dependencies section above
-# Note: taproot-assets is added to the main workspace.dependencies section
-
-# [AIS-3] Security enforcement
-# Note: rust-version is already specified in the workspace.package section at the top
+anya-bitcoin = { path = "./anya-bitcoin" }
+anya-web5 = { path = "./anya-web5" }
+anya-core = { path = "./anya-core" }
 
 [dependencies]
-# Core dependencies
-tokio = { version = "1.28", features = ["full"] }
-anyhow = "1.0"
-thiserror = "1.0"
-tracing = "0.1"
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
+# Use workspace dependencies
+tokio = { workspace = true }
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+bdk = { workspace = true, optional = true }
+bitcoin = { workspace = true }
+anya-bitcoin = { path = "./anya-bitcoin" }
+anya-web5 = { path = "./anya-web5" }
+anya-core = { path = "./anya-core" }
 
-# Bitcoin dependencies 
-bitcoin = { version = "0.30", features = ["rand"] }
-bitcoincore-rpc = "0.16"
-lightning = "0.0.116"
-psbt = "0.9"
-
-# Security & Crypto
-ring = "0.16"
-rand = "0.8"
-sha2 = "0.10"
-zeroize = "1.6"
-
-# Required for specific features
 [features]
-default = ["bitcoin", "taproot", "psbt-v2"]
-bitcoin = ["bdk"]
+default = ["bitcoin-support", "taproot", "psbt-v2"]
+bitcoin-support = ["dep:bdk"]
 taproot = ["bitcoin/taproot"]
 psbt-v2 = ["bdk/psbt-v2"]
 hardware-wallet = ["bitcoin/hardware-wallet"]
 
-# Development dependencies
 [dev-dependencies]
 tempfile = "3.9.0"
 test-log = "0.2.14"
-mockall = "0.12.1"
+mockall = { workspace = true }
