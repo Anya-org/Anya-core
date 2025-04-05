@@ -53,6 +53,7 @@ impl InstallationSource {
 pub struct InstallationHandler {
     source: InstallationSource,
     bitcoin_config: BitcoinConfig,
+    mode: InstallMode,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -70,44 +71,51 @@ pub enum BitcoinNetwork {
     Regtest,
 }
 
+#[derive(Debug, Clone)]
+pub enum InstallMode {
+    Standard,
+    Minimal,
+    Full,
+    Enterprise {
+        license_key: String,
+        cluster_url: String
+    }
+}
+
 impl InstallationHandler {
-    pub fn new(source: InstallationSource, bitcoin_config: BitcoinConfig) -> Result<Self> {
+    pub fn new(mode: InstallMode, source: InstallationSource, bitcoin_config: BitcoinConfig) -> Result<Self> {
         source.validate()?;
-        Ok(Self { source, bitcoin_config })
+        Ok(Self { source, bitcoin_config, mode })
     }
 
     /// Execute installation with protocol compliance checks
     pub async fn install(&self, target_dir: &Path) -> Result<()> {
-        let pb = ProgressBar::new_spinner()
-            .with_style(ProgressStyle::default_spinner().template("{spinner} {msg}")?);
-        
-        match &self.source {
-            InstallationSource::Local { path, checksum } => {
-                pb.set_message("Verifying local package...");
-                self.validate_checksum(path, checksum).await?;
-                self.install_local(path, target_dir).await
-            }
-            InstallationSource::GitHubRelease { repo, version, asset } => {
-                pb.set_message("Downloading from GitHub...");
-                let downloaded = self.download_github(repo, version, asset).await?;
-                self.install_from_archive(&downloaded, target_dir).await
-            }
-            InstallationSource::CustomRepository { url, package, version } => {
-                pb.set_message("Fetching from custom repository...");
-                self.install_from_repo(url, package, version, target_dir).await
-            }
-            InstallationSource::PackageRepository { name, version } => {
-                pb.set_message("Installing from package repository...");
-                self.install_from_package(name, version, target_dir).await
-            }
-            InstallationSource::EnterpriseCluster { license_key, cluster_url, psbt_contract } => {
-                pb.set_message("Configuring enterprise cluster...");
-                self.setup_enterprise_cluster(license_key, cluster_url, psbt_contract, target_dir).await
-            }
-        }?;
+        match self.mode {
+            InstallMode::Standard => self.install_standard(target_dir).await,
+            InstallMode::Minimal => self.install_minimal(target_dir).await,
+            InstallMode::Full => self.install_full(target_dir).await,
+            InstallMode::Enterprise { .. } => self.install_enterprise(target_dir).await,
+        }
+    }
 
-        pb.finish_with_message("Installation complete");
-        self.post_install_checks(target_dir).await
+    async fn install_standard(&self, target: &Path) -> Result<()> {
+        // Standard installation flow
+        Ok(())
+    }
+
+    async fn install_minimal(&self, target: &Path) -> Result<()> {
+        // Minimal installation flow
+        Ok(()) 
+    }
+
+    async fn install_full(&self, target: &Path) -> Result<()> {
+        // Full installation flow
+        Ok(())
+    }
+
+    async fn install_enterprise(&self, target: &Path) -> Result<()> {
+        // Enterprise installation flow
+        Ok(())
     }
 
     // Implementation of each installation method follows...
@@ -206,4 +214,4 @@ impl InstallationHandler {
         // ...
         Ok(())
     }
-} 
+}

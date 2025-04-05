@@ -798,3 +798,17 @@ Current implementation status:
 For detailed progress, see the [Implementation Milestones](IMPLEMENTATION_MILESTONES.md) document.
 
 *Last updated: 2025-03-04*
+
+## Security Compliance [AIS-3]
+
+### Cryptographic Operations
+- Constant-time implementations
+- HSM integration
+- Key derivation paths
+- Signature validation
+
+### Bitcoin Protocol Compliance
+- BIP-341/342 support
+- PSBT v2 handling
+- Taproot validation
+- Script verification

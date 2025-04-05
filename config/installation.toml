@@ -1,0 +1,28 @@
+# Anya Core Installation Configuration
+# Used by the unified installer
+
+[system]
+version = "3.1.0"
+framework_version = "2.5.0"
+required_disk_gb = 50
+required_memory_gb = 16
+
+[bitcoin]
+network = "testnet" 
+rpc_url = "https://bitcoin-testnet-rpc.publicnode.com"
+data_dir = "/var/lib/anya/bitcoin"
+
+[web5]
+enabled = true
+data_dir = "/var/lib/anya/web5"
+port = 3000
+
+[machine_learning]
+enabled = true
+models_dir = "/var/lib/anya/ml/models"
+data_dir = "/var/lib/anya/ml/data"
+
+[monitoring]
+prometheus_enabled = true
+prometheus_port = 9090
+metrics_retention_days = 30

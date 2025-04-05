@@ -4,9 +4,10 @@
 
 > **IMPORTANT: This is the canonical and authoritative AI labeling documentation for Anya Core.**
 > **Version: 3.0 (2025-03-20)**
-> 
-> All other labeling documents are deprecated in favor of this standardized system.
-> For migration details, see the [Migration Guide](#migration-from-legacy-systems) section.
+> **Framework: Bitcoin Development Framework v2.5**
+
+All other labeling documents are deprecated in favor of this standardized system.
+For migration details, see the [Migration Guide](#migration-from-legacy-systems) section.
 
 ## Overview
 
@@ -405,3 +406,10 @@ All experimental code must:
 | Mobile          | ✅      | ✅      | ✅      | ✅    |
 | HSM Interface   | ✅      | ✅      | ✅      | ✅    |
 | PSBT Engine     | ✅      | ✅      | ✅      | ✅    |
+
+## References & Standards
+
+- Bitcoin Development Framework v2.5
+- BIP-341/342 Compliance Requirements
+- Security Implementation Guidelines
+- CodeQL Analysis Framework

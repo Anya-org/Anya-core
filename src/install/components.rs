@@ -2,8 +2,38 @@ use std::fs;
 use std::path::Path;
 use std::process::Command;
 use log::{info, warn, error};
+use anyhow::Result;
+use std::path::PathBuf;
 
 use crate::config;
+
+pub trait Component {
+    fn install(&self, target: &Path) -> Result<()>;
+    fn verify(&self) -> Result<()>;
+    fn get_dependencies(&self) -> Vec<String>;
+}
+
+pub struct BitcoinComponent {
+    network: String,
+    rpc_url: String,
+    data_dir: PathBuf,
+}
+
+impl Component for BitcoinComponent {
+    fn install(&self, target: &Path) -> Result<()> {
+        // Bitcoin installation logic
+        Ok(())
+    }
+
+    fn verify(&self) -> Result<()> {
+        // Bitcoin verification logic
+        Ok(())
+    }
+
+    fn get_dependencies(&self) -> Vec<String> {
+        vec!["build-essential".into(), "pkg-config".into()]
+    }
+}
 
 pub fn install_core(config_path: &str) -> Result<(), String> {
     info!("Installing Anya-Core components...");
@@ -235,4 +265,4 @@ fn install_ml_models(config: &config::MlConfig) -> Result<(), String> {
 fn configure_ml(config: &config::MlConfig) -> Result<(), String> {
     // Implementation for configuring ML system
     Ok(())
-} 
+}

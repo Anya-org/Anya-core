@@ -1,32 +1,61 @@
 use anyhow::{Context, Result};
+use std::path::PathBuf;
+
+/// Core installer trait defining required functionality
+pub trait Installer {
+    fn new(install_path: &str) -> Result<Self> where Self: Sized;
+    fn install(&self) -> Result<()>;
+    fn verify(&self) -> Result<()>;
+    fn cleanup(&self) -> Result<()>;
+}
+
 use crate::network::validation::{NetworkValidator, NetworkValidationResult};
 use crate::install::{modes::*, cluster::EnterpriseClusterManager};
 use bitcoin_protocol::BIP341Validator;
-use std::path::PathBuf;
 
 /// Main installer implementation with BIP compliance
 pub struct AnyaInstaller {
+    install_dir: PathBuf,
     network_validator: NetworkValidator,
     installation_source: InstallationSource,
     bitcoin_config: BitcoinConfig,
 }
 
-impl AnyaInstaller {
-    pub fn new(
-        network_config: NetworkValidationConfig,
-        install_source: InstallationSource,
-        bitcoin_config: BitcoinConfig
-    ) -> Result<Self> {
+impl Installer for AnyaInstaller {
+    fn new(install_path: &str) -> Result<Self> {
         // Validate BIP requirements before initialization
         BIP341Validator::check_environment()?;
         
         Ok(Self {
+            install_dir: PathBuf::from(install_path),
             network_validator: NetworkValidator::new(network_config),
             installation_source: install_source,
             bitcoin_config,
         })
     }
 
+    fn install(&self) -> Result<()> {
+        self.verify_system_requirements()?;
+        self.install_dependencies(false)?;
+        self.validate_bip_compliance()?;
+        self.run_security_audit()?;
+        Ok(())
+    }
+
+    fn verify(&self) -> Result<()> {
+        self.verify_taproot_installation()?;
+        self.verify_psbt_support()?;
+        self.verify_network_compliance()?;
+        Ok(())
+    }
+
+    fn cleanup(&self) -> Result<()> {
+        // Cleanup implementation
+        Ok(())
+    }
+}
+
+impl AnyaInstaller {
     /// Execute full installation process
     pub async fn install(&self, target_dir: PathBuf) -> Result<()> {
         // Phase 1: Network validation
@@ -99,4 +128,4 @@ pub mod protocol {
         
         Ok(())
     }
-} 
+}

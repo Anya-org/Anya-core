@@ -14,33 +14,27 @@ use crate::core::ResourceType;
 use crate::core::SecurityLevel;
 use crate::ml::SystemStage;
 
-fn main() {
-    println!("Starting Anya Core with P1 components...");
-    println!("AIR-008: Auto-save functionality set to every 20th input");
-    
-    // Initialize the core system with auto-save every 20 inputs
-    let core = CoreSystem::new(20);
-    
-    // Demo 1: Process inputs with auto-save
-    println!("\n== Demo 1: Processing inputs with auto-save ==");
-    process_demo_inputs(&core);
-    
-    // Demo 2: System hardening with auto-save
-    println!("\n== Demo 2: System hardening with auto-save ==");
-    configure_system_security(&core);
-    
-    // Demo 3: Performance optimization with auto-save
-    println!("\n== Demo 3: Performance optimization with auto-save ==");
-    optimize_system_performance(&core);
-    
-    // Display final stats
-    let (agent_inputs, hardening_changes, performance_changes) = core.get_auto_save_stats();
-    println!("\n== Final Auto-Save Statistics ==");
-    println!("Total Agent Checker inputs processed: {}", agent_inputs);
-    println!("Total System Hardening changes: {}", hardening_changes);
-    println!("Total Performance Optimizer changes: {}", performance_changes);
-    
-    println!("\nAnya Core demonstration complete!");
+use clap::Parser;
+use anya_core::cli::{Cli, Commands};
+
+#[tokio::main]
+async fn main() -> anyhow::Result<()> {
+    let cli = Cli::parse();
+
+    match cli.command {
+        Commands::UpdateAiLabels(args) => {
+            cli::ai_labels::update_references(&args)
+        },
+        Commands::ValidateAiLabels(args) => {
+            cli::ai_labels::validate_labels(&args)
+        },
+        Commands::UpdateGitHub(args) => {
+            cli::github::update_urls(&args)
+        },
+        Commands::Clean(args) => {
+            cli::clean::clean(&args)
+        }
+    }
 }
 
 // Process a series of inputs to demonstrate the agent checker
@@ -209,4 +203,4 @@ fn optimize_system_performance(core: &CoreSystem) {
             Duration::from_millis(50),
         ).unwrap();
     }
-} 
+}

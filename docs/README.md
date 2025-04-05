@@ -1,10 +1,34 @@
+# Anya System Documentation [AIR-3][AIS-3][BPC-3]
+
 <!-- markdownlint-disable MD013 line-length -->
 
-# Anya System Documentation
+Reference Implementation: Bitcoin Development Framework v2.5
 
 ## Overview
 
-Anya is an advanced integrated system combining Bitcoin/crypto functionality, ML-based analytics, and Web5 decentralized data management with enterprise-grade security and revenue tracking. Built on a hexagonal architecture, it provides a robust, scalable, and secure platform for institutional-grade operations.
+Anya provides enterprise-grade Bitcoin infrastructure with integrated ML capabilities and Web5 data management.
+
+## Quick Links
+
+- [Documentation Index](INDEX.md)
+- [System Architecture](system/architecture.md)
+- [API Reference](api/README.md)
+- [Getting Started](getting-started/README.md)
+
+## Project Status
+
+- Version: 2.5.0
+- Status: Production
+- Framework Version: 3.0
+- Last Audit: 2025-02
+
+## Support
+
+- [Issue Tracker](https://github.com/anya-org/anya-core/issues)
+- [Security Policy](SECURITY.md)
+- [Contributing Guide](CONTRIBUTING.md)
+
+*Last updated: 2024-12-07*
 
 ## Core Components
 
@@ -123,6 +147,20 @@ Anya is an advanced integrated system combining Bitcoin/crypto functionality, ML
   - Resource usage
   - Error analysis
 
+## Security Compliance [AIS-3]
+
+1. Cryptographic Requirements
+   - Use constant-time operations
+   - Implement secure RNG
+   - Validate all signatures
+   - Verify key derivations
+
+2. Protocol Requirements
+   - Follow BIP-341/342
+   - Support PSBT v2
+   - Validate Taproot
+   - Use HSM operations
+
 ## Getting Started
 
 ### Prerequisites
@@ -145,6 +183,7 @@ Anya is an advanced integrated system combining Bitcoin/crypto functionality, ML
 ### Installation
 
 1. **System Setup**
+
 ```bash
 ## Clone the repository
 git clone https://github.com/anya/anya-enterprise.git
@@ -158,6 +197,7 @@ cp .env.example .env
 ```
 
 2. **Configuration**
+
 ```env
 ## Core Settings
 DATABASE_URL=postgres://user:password@localhost/anya
@@ -183,6 +223,7 @@ TRACING_ENDPOINT=http://localhost:4317
 ```
 
 3. **Build & Deploy**
+
 ```bash
 ## Build the project
 cargo build --release
@@ -195,6 +236,7 @@ cargo test --all-features
 ```
 
 4. **Verify Installation**
+
 ```bash
 ## Check system health
 ./scripts/health-check.sh

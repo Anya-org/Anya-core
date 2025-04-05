@@ -1,6 +1,9 @@
-# Unified Testing Framework v2.5
+# Unified Testing Framework [AIR-3][AIS-3][BPC-3]
+
+Reference [Testing Strategy](./testing/STRATEGY.md) for comprehensive testing guidelines.
 
 ## Architecture
+
 ```mermaid
 graph TD
     A[Unified Test Runner] --> B[Module Tests]
@@ -14,6 +17,7 @@ graph TD
 ```
 
 ## Test Execution
+
 ```powershell
 # Full compliance test
 .\scripts\run-unified-tests.ps1 -TestType all -TestLevel compliance
@@ -23,6 +27,7 @@ graph TD
 ```
 
 ## Compliance Requirements
+
 1. All tests must validate BIP-341 signatures
 2. PSBT operations require v2 compliance
 3. Security tests must use Taproot commitments
@@ -31,6 +36,7 @@ graph TD
    - ≤500ms latency for critical paths
 
 ## Report Structure
+
 ```json
 {
     "metadata": {
@@ -49,6 +55,7 @@ graph TD
 ```
 
 ## Test Configuration
+
 ```json
 {
     "modules": [
@@ -68,6 +75,7 @@ graph TD
 ```
 
 ## Running Tests
+
 ```powershell
 # Generate test templates
 .\scripts\create-test-templates.ps1 -Module dao-core
@@ -79,7 +87,12 @@ graph TD
 code test-results/module-tests/module-test-results.json
 ```
 
+For BIP compliance requirements, see [BIP Compliance](./standards/BIP_STANDARDS.md).
+
+*Last updated: 2024-12-07*
+
 ## BIP Compliance Requirements
+
 - All contracts must implement:
   - BIP-341 Taproot verification
   - BIP-174 PSBT handling
@@ -88,6 +101,7 @@ code test-results/module-tests/module-test-results.json
 ## Enhanced Search Features
 
 ### Search Parameters
+
 ```clarity
 (search-proposals 
     (optional creator-principal) 
@@ -97,18 +111,21 @@ code test-results/module-tests/module-test-results.json
 ```
 
 ### Index Maintenance
+
 | Index Type       | Update Frequency | Storage Cost |
 |------------------|------------------|--------------|
 | Creator-Category | On submission    | 15 µSTX      |
 | Keyword Metadata | Hourly batches   | 42 µSTX      |
 
 **Compliance Requirements**
+
 - All search operations must validate BIP-341 signatures
 - Index updates require PSBT v2 compliance (BIP-370) 
 
 ## Updated Test Structure
 
 ### Directory Hierarchy
+
 ```
 
 ## Legacy System Deprecation
@@ -123,6 +140,7 @@ test/
 ```
 
 ### Active Symlinks
+
 ```bash
 # Compliance reports
 test-results/compliance -> tests/system/compliance
@@ -132,6 +150,37 @@ test-results/performance -> tests/performance
 ```
 
 **Compliance Requirements:**
+
 1. All symlinks must validate BIP-341 signatures
 2. Path references require PSBT v2 encoding
 3. Audit trails must use Taproot commitments
+
+## Layer 4 Test Requirements
+
+```rust
+// L4 Protocol test requirements
+#[test]
+fn test_l4_compliance() {
+    let l4 = L4Protocol::new(Network::Testnet);
+    
+    // Test BIP-342 compliance
+    assert!(l4.verify_tapscript(&tx).is_ok());
+    
+    // Test PSBT v2 handling
+    assert!(l4.process_psbt(&psbt_data).is_ok());
+}
+```
+
+## Required Tests
+
+1. All implementations must validate:
+   - BIP-341 (Taproot) signatures
+   - BIP-342 (Tapscript) execution
+   - BIP-370 (PSBT v2) handling
+   - Constant-time operations
+
+2. Security requirements:
+   - HSM verification
+   - Key derivation validation
+   - PSBT validation
+   - Signature verification

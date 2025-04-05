@@ -1,39 +1,22 @@
 [package]
-name = "anya-core-core"
+name = "anya-core-lib"
 version.workspace = true
 edition.workspace = true
-description = "Core implementation for Anya Bitcoin Development Framework"
+description = "Core implementation for Anya Bitcoin Framework"
 license.workspace = true
 repository.workspace = true
 rust-version.workspace = true
 
 [dependencies]
-# Bitcoin dependencies with correct features for BIP-342 support
-bitcoin = { version = "0.32.0", features = ["std", "serde", "rand", "bitcoinconsensus"] }
-secp256k1 = { version = "0.28.1", features = ["std", "serde", "rand"] }
-
-# Tokio runtime
-tokio = { workspace = true }
-futures = { workspace = true }
-
-# Serialization
-serde = { workspace = true }
-serde_json = { workspace = true }
-
-# Error handling
-anyhow = { workspace = true }
-thiserror = { workspace = true }
-
-# Logging
-log = { workspace = true }
-tracing = { workspace = true }
-tracing-subscriber = { workspace = true }
-
-# Async traits
-async-trait = { workspace = true }
+# Use workspace dependencies
+bitcoin.workspace = true
+bdk.workspace = true
+tokio.workspace = true
+anyhow.workspace = true
+thiserror.workspace = true
+serde.workspace = true
 
 [features]
-default = ["std"]
-std = []
-dlc = []  # Discrete Log Contracts
-psbt-v2 = []
+default = ["taproot", "psbt-v2"]
+taproot = ["bitcoin/taproot"]
+psbt-v2 = ["bdk/psbt-v2"]
