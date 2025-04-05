@@ -1,32 +1,59 @@
 #!/bin/bash
+# [AIR-3][AIS-3][BPC-3] Anya Core startup script
 set -euo pipefail
 
 source "$(dirname "$0")/common/utils.sh"
 
-# System startup sequence
+# System startup sequence with proper error handling
 startup() {
     log_info "Starting Anya Core system..."
 
-    # 1. Start core services
-    systemctl start bitcoind
-    wait_for_service bitcoind 30
+    # Start services with timeout handling
+    TIMEOUT=30
 
-    # 2. Start Layer 2 services
-    systemctl start lightning
-    systemctl start rgb-node
-    wait_for_port 9735 30  # LN port
-    wait_for_port 3000 30  # RGB port
+    # 1. Core services
+    systemctl is-active bitcoind || {
+        systemctl start bitcoind
+        wait_for_service bitcoind $TIMEOUT || {
+            log_error "Failed to start bitcoind"
+            exit 1
+        }
+    }
 
-    # 3. Start auxiliary services
-    systemctl start web5-dwn
-    systemctl start prometheus
-    wait_for_port 8080 30  # Web5 port
-    wait_for_port 9090 30  # Prometheus port
+    # 2. Layer 2 services with proper checks
+    for service in lightning rgb-node; do
+        systemctl is-active $service || {
+            systemctl start $service
+            wait_for_service $service $TIMEOUT || {
+                log_error "Failed to start $service"
+                exit 1
+            }
+        }
+    }
 
-    # 4. Initialize ML components
-    initialize_ml_system
+    # 3. Auxiliary services with port validation
+    declare -A services=(
+        ["web5-dwn"]=8080
+        ["prometheus"]=9090
+    )
 
-    # 5. Run health checks
+    for service in "${!services[@]}"; do
+        systemctl is-active $service || {
+            systemctl start $service
+            wait_for_port "${services[$service]}" $TIMEOUT || {
+                log_error "Failed to start $service on port ${services[$service]}"
+                exit 1
+            }
+        }
+    }
+
+    # 4. Initialize ML system with validation
+    initialize_ml_system || {
+        log_error "Failed to initialize ML system"
+        exit 1
+    }
+
+    # 5. Run health checks with detailed output
     check_system_health || {
         log_error "System health check failed"
         exit 1
@@ -35,4 +62,7 @@ startup() {
     log_success "Anya Core system started successfully"
 }
 
-startup
+# Only run if executed directly
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    startup
+fi

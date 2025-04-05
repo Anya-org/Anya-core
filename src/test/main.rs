@@ -5,17 +5,19 @@ mod ml_tests;
 mod system_tests;
 mod compliance;
 mod unified_test;
+mod performance;
 
 use clap::{App, Arg, SubCommand};
 use log::{info, error};
 use unified_test::{UnifiedTestRunner, UnifiedTestConfig};
+use performance::PerformanceTestRunner;
 
 fn main() {
     // Initialize testing environment
     let matches = App::new("Anya-Core Tester")
         .version("3.1.0")
         .author("Anya-Core Team")
-        .about("BPC-3 compliant testing framework")
+        .about("BPC-3 compliant unified testing framework")
         .arg(Arg::with_name("rpc-endpoint")
             .long("rpc-endpoint")
             .value_name("URL")
@@ -45,6 +47,13 @@ fn main() {
             .about("Verify compliance with standards")
             .arg(Arg::with_name("standard")
                 .help("Standard to verify: BPC-3, DAO-4, AIS-3, etc.")))
+        .subcommand(SubCommand::with_name("performance")
+            .about("Run performance tests")
+            .arg(Arg::with_name("test-type")
+                .long("test-type")
+                .value_name("TYPE")
+                .help("Type of performance test: throughput, database, cache, all")
+                .takes_value(true)))
         .subcommand(SubCommand::with_name("unified")
             .about("Run unified test suite")
             .arg(Arg::with_name("components")
@@ -63,28 +72,19 @@ fn main() {
         ..Default::default()
     };
 
-    // Process subcommands
-    if let Some(matches) = matches.subcommand_matches("component") {
-        let component = matches.value_of("component").unwrap();
-        config.components = vec![component.to_string()];
-        run_unified_tests(config);
-    } else if let Some(_) = matches.subcommand_matches("system") {
-        config.components = vec!["system".to_string()];
-        run_unified_tests(config);
-    } else if let Some(matches) = matches.subcommand_matches("compliance") {
-        config.components = vec!["compliance".to_string()];
-        if let Some(standard) = matches.value_of("standard") {
-            // Filter to just the requested standard
-            match standard {
-                "BPC-3" | "bpc3" => config.components = vec!["bpc3_compliance".to_string()],
-                "DAO-4" | "dao4" => config.components = vec!["dao4_compliance".to_string()],
-                "AIS-3" | "ais3" => config.components = vec!["ais3_compliance".to_string()],
-                _ => {
-                    error!("Unknown standard: {}", standard);
-                    std::process::exit(1);
-                }
-            }
+    match matches.subcommand() {
+        ("component", Some(matches)) => {
+            let component = matches.value_of("component").unwrap();
+            config.components = vec![component.to_string()];
+            run_unified_tests(config);
         }
+        ("system", _) => {
+            config.components = vec!["system".to_string()];
+            run_unified_tests(config);
+        }
+        ("compliance", Some(matches)) => {
+            if let Some(standard) = matches.value_of("standard") {
+                config.components = match standard {
         run_unified_tests(config);
     } else if let Some(matches) = matches.subcommand_matches("unified") {
         if let Some(components) = matches.value_of("components") {

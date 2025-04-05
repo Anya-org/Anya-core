@@ -61,6 +61,7 @@ graph TB
 ## Component Details
 
 ### Core Repository
+
 1. **Core Components**
    - Base system functionality
    - Configuration management
@@ -100,6 +101,7 @@ graph TB
    - Price oracle
 
 ### Bitcoin & Lightning Architecture
+
 ```mermaid
 graph TB
     subgraph Bitcoin[Bitcoin Layer]
@@ -144,6 +146,7 @@ graph TB
 ```
 
 ### DAO System Architecture
+
 ```mermaid
 graph TB
     subgraph DAO[DAO Layer]
@@ -189,6 +192,7 @@ graph TB
 ### Submodules
 
 1. **dash33 (AI Decision Engine)**
+
    ```mermaid
    graph LR
        Core[Core Engine]
@@ -202,6 +206,7 @@ graph TB
    ```
 
 2. **Enterprise Integration**
+
    ```mermaid
    graph LR
        Core[Enterprise Core]
@@ -215,6 +220,7 @@ graph TB
    ```
 
 3. **Mobile Interface**
+
    ```mermaid
    graph LR
        Core[Mobile Core]
@@ -228,6 +234,7 @@ graph TB
    ```
 
 4. **Web5 Implementation**
+
    ```mermaid
    graph LR
        Core[Web5 Core]
@@ -241,6 +248,7 @@ graph TB
    ```
 
 5. **Bitcoin-Style Tokenomics**
+
    ```mermaid
    graph LR
        Core[Tokenomics Core]
@@ -789,6 +797,7 @@ For detailed information about specific components, please see the following doc
 ## Implementation Status
 
 Current implementation status:
+
 - ✅ Core architecture and interfaces
 - ✅ Bitcoin-style issuance model with 21 billion token supply
 - 🔄 Distribution allocation mechanisms (In Progress)
@@ -802,12 +811,14 @@ For detailed progress, see the [Implementation Milestones](IMPLEMENTATION_MILEST
 ## Security Compliance [AIS-3]
 
 ### Cryptographic Operations
+
 - Constant-time implementations
 - HSM integration
 - Key derivation paths
 - Signature validation
 
 ### Bitcoin Protocol Compliance
+
 - BIP-341/342 support
 - PSBT v2 handling
 - Taproot validation

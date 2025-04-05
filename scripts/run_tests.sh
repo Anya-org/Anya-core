@@ -1,123 +1,93 @@
 #!/bin/bash
+set -e
 
-# Run all tests for Anya Core
+# Colors for output
+GREEN='\033[0;32m'
+RED='\033[0;31m'
+YELLOW='\033[0;33m'
+NC='\033[0m' # No Color
 
-# Set the project root directory
-PROJECT_ROOT=$(git rev-parse --show-toplevel)
+# Default values
+COMPONENTS=""
+REPORT_DIR="reports"
+TEST_TYPE="all"
+VERBOSE=""
 
-# Change to the project root directory
-cd "$PROJECT_ROOT" || { echo "Failed to change directory to project root"; exit 1; }
+# Print usage
+function print_usage {
+    echo "Usage: $0 [OPTIONS]"
+    echo "Run the Anya-Core unified test suite"
+    echo ""
+    echo "Options:"
+    echo "  -c, --components COMPONENTS   Comma-separated list of components to test"
+    echo "  -r, --report-dir DIR         Directory for test reports"
+    echo "  -t, --test-type TYPE         Test type (unit|integration|compliance|performance|all)"
+    echo "  -v, --verbose                Enable verbose output"
+    echo "  -h, --help                   Show this help message"
+}
 
-# Set up environment variables
-if [ -f .env ]; then
-	source .env
-else
-	echo ".env file not found, skipping environment setup."
+# Parse command line arguments
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -c|--components)
+            COMPONENTS="$2"
+            shift 2
+            ;;
+        -r|--report-dir)
+            REPORT_DIR="$2"
+            shift 2
+            ;;
+        -t|--test-type)
+            TEST_TYPE="$2"
+            shift 2
+            ;;
+        -v|--verbose)
+            VERBOSE="true"
+            shift
+            ;;
+        -h|--help)
+            print_usage
+            exit 0
+            ;;
+        *)
+            echo -e "${RED}Error: Unknown option: $1${NC}"
+            print_usage
+            exit 1
+            ;;
+    esac
+done
+
+# Build test arguments
+ARGS=()
+
+if [ ! -z "$COMPONENTS" ]; then
+    ARGS+=("--components" "$COMPONENTS")
 fi
 
-# Run cargo tests
-# echo "Running cargo tests..."
-# cargo test --all
-
-# Run integration tests
-echo "Running integration tests..."
-cargo test --test '*' --features integration
-
-# Run ML logic tests
-echo "Running ML logic tests..."
-cargo test --package anya-core --lib ml_logic
-
-# Run specific module tests
-echo "Running specific module tests..."
-cargo test --package anya-core --lib network_discovery
-cargo test --package anya-core --lib user_management
-cargo test --package anya-core --lib stx_support
-cargo test --package anya-core --lib bitcoin_support
-cargo test --package anya-core --lib lightning_support
-cargo test --package anya-core --lib dlc_support
-cargo test --package anya-core --lib kademlia
-cargo test --package anya-core --lib setup_project
-cargo test --package anya-core --lib setup_check
-
-# Run Web5 integration tests
-echo "Running Web5 integration tests..."
-cargo test --package anya-core --test web5_integration
-
-# Run DAO governance tests
-echo "Running DAO governance tests..."
-cargo test --package anya-core --lib dao_governance
-
-# Run developer ecosystem tests
-echo "Running developer ecosystem tests..."
-cargo test --package anya-core --lib developer_ecosystem
-
-# Run privacy enhancement tests
-echo "Running privacy enhancement tests..."
-cargo test --package anya-core --lib privacy_enhancements
-
-# Run libp2p integration tests
-echo "Running libp2p integration tests..."
-cargo test --package anya-core --test libp2p_integration
-
-# Run blockchain interoperability tests
-echo "Running blockchain interoperability tests..."
-cargo test --test blockchain_interoperability
-
-# Run smart contracts tests
-echo "Running smart contracts tests..."
-cargo test --test smart_contracts
-
-# Run user interface tests
-echo "Running user interface tests..."
-cargo test --test user_interface
-
-# Run code formatting check
-echo "Running code formatting check..."
-cargo fmt -- --check
-
-# Run linter
-echo "Running linter..."
-cargo clippy --fix -- -D warnings
-
-# Run security audit
-echo "Running security audit..."
-cargo audit
-
-# Check for outdated dependencies
-echo "Checking for outdated dependencies..."
-if [ "$CHECK_OUTDATED" = "true" ]; then
-	echo "Checking for outdated dependencies..."
-	cargo outdated
-else
-	echo "Skipping outdated dependencies check..."
+if [ ! -z "$REPORT_DIR" ]; then
+    ARGS+=("--report-dir" "$REPORT_DIR")
 fi
 
-# Run code coverage
-echo "Running code coverage..."
-# Run code coverage if the COVERAGE environment variable is set
-if [ "$COVERAGE" = "true" ]; then
-	echo "Running code coverage..."
-# Run benchmarks if the RUN_BENCHMARKS environment variable is set
-if [ "$RUN_BENCHMARKS" = "true" ]; then
-	echo "Running benchmarks..."
-	cargo bench
-else
-	echo "Skipping benchmarks..."
-fiping code coverage..."
+if [ ! -z "$TEST_TYPE" ]; then
+    ARGS+=("--test-type" "$TEST_TYPE")
 fi
 
-# Run benchmarks
-echo "Running benchmarks..."
-cargo bench
+if [ ! -z "$VERBOSE" ]; then
+    ARGS+=("--verbose")
+fi
 
-# New module tests
-echo "Running identity tests..."
-cargo test --test identity_tests
-echo "Running data storage tests..."
-cargo test --test data_storage_tests
-echo "Running interoperability tests..."
-echo "All tests completed successfully at $(date)!"
-echo "Running privacy tests..."
-cargo test --test privacy_tests
-
-echo "All tests completed successfully!"
+# Run the unified test runner
+echo -e "${YELLOW}Running Anya-Core unified test suite...${NC}"
+if cargo run --bin anya-tester -- "${ARGS[@]}"; then
+    echo -e "${GREEN}All tests completed successfully!${NC}"
+    
+    # Show report location if generated
+    if [ -f "$REPORT_DIR/unified_test_report.md" ]; then
+        echo -e "${GREEN}Test report generated at $REPORT_DIR/unified_test_report.md${NC}"
+    fi
+    
+    exit 0
+else
+    echo -e "${RED}Some tests failed. Check the report for details.${NC}"
+    exit 1
+fi

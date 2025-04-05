@@ -1,39 +1,39 @@
-#!/bin/sh
+#!/bin/bash
+# [AIR-3][AIS-3][BPC-3] Pre-commit validation hook
+set -euo pipefail
 
-# Run Rust formatting and linting
-cargo fmt -- --check
-if [ $? -ne 0 ]; then
-    echo "❌ Rust formatting check failed"
+source "$(dirname "$0")/../common/utils.sh"
+
+echo "Running pre-commit checks..."
+
+# Ensure Git hooks are executable
+find .git/hooks -type f -exec chmod +x {} \;
+
+# Version control validation
+REQUIRED_GIT_VERSION="2.34.0"
+git_version=$(git --version | cut -d' ' -f3)
+version_check "$git_version" "$REQUIRED_GIT_VERSION" || {
+    log_error "Git version $REQUIRED_GIT_VERSION or higher required"
     exit 1
+}
+
+# Verify Rust formatting and compilation
+run_with_header "Rust formatting" cargo fmt -- --check
+run_with_header "Rust linting" cargo clippy -- -D warnings
+run_with_header "Running tests" cargo test
+
+# Verify BIP compliance for Bitcoin-related changes
+if git diff --cached --name-only | grep -q "bitcoin"; then
+    run_with_header "BIP compliance checks" scripts/verify_bitcoin_compliance.sh || {
+        log_error "Bitcoin compliance check failed"
+        exit 1
+    }
 fi
 
-cargo clippy -- -D warnings
-if [ $? -ne 0 ]; then
-    echo "❌ Rust linting failed"
+# AI label validation for tracked files
+run_with_header "AI label validation" scripts/validate_ai_labels.sh || {
+    log_error "AI label validation failed" 
     exit 1
-fi
+}
 
-# Check mobile code
-if [ -d "src/mobile" ]; then
-    cd src/mobile
-    yarn lint
-    if [ $? -ne 0 ]; then
-        echo "❌ Mobile linting failed"
-        exit 1
-    fi
-    cd ../..
-fi
-
-# Check dashboard code
-if [ -d "packages/dash33" ]; then
-    cd packages/dash33
-    yarn lint
-    if [ $? -ne 0 ]; then
-        echo "❌ Dashboard linting failed"
-        exit 1
-    fi
-    cd ../..
-fi
-
-echo "✅ All checks passed!"
-exit 0
+log_success "All pre-commit checks passed"
