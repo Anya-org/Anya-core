@@ -1,11 +1,24 @@
 # Anya Core Workspace Configuration
+[package]
+name = "anya-core"
+version = "3.1.0"
+edition = "2021"
+authors = ["Anya Core Team"]
+description = "Enterprise Bitcoin Infrastructure with ML & Web5"
+repository = "https://github.com/anya-org/anya-core"
+license = "MIT"
+rust-version = "1.70"
+
 [workspace]
 members = [
+    "anya-bitcoin",
+    "anya-web5", 
+    "anya-ml",
     "packages/core",
-    "packages/protocol-adapters",
-    "packages/mcp-interface",
     "packages/bitcoin-network",
     "packages/metrics",
+    "packages/protocol-adapters",
+    "packages/mcp-interface",
     "packages/bin",
     "extensions/enterprise",
     "extensions/mobile"
@@ -23,65 +36,51 @@ rust-version = "1.70"
 
 # Consolidated dependencies without duplicates
 [workspace.dependencies]
-# Unified cryptographic stack (BDF §1.1)
-secp256k1 = { version = "0.27.0", features = ["bitcoin_hashes"] }
-bitcoin = "0.30.0"
-# taproot-assets dependency removed - repository not found
+# Core Bitcoin functionality
+bitcoin = { version = "0.32.5", features = ["rand", "serde"] }
+secp256k1 = { version = "0.27.0", features = ["bitcoin_hashes", "rand"] }
+bitcoincore-rpc = "0.19.0"
+bdk = { version = "0.30.2", default-features = false }
 
-# Protocol Adapters (BDF §2.1)
-bitcoin_hashes = "0.12.0"
-bitcoin-bech32 = "0.13.0"
-# Removed problematic features
-bdk = { version = "0.30.0" }
-
-# Shared Workspace Dependencies
+# Async runtime & networking
 tokio = { version = "1.37.0", features = [
     "full",
     "tracing"
 ] }
-serde = { version = "1.0.203", features = ["derive"] }
-
-# Error handling and randomness dependencies
-thiserror = "1.0.65"
-rand = "0.8.5"
-rand_core = "0.6.4"
-
-# Shared workspace dependencies
-bitcoin-wallet = "1.1.0"
-
-# Core dependencies
 futures = "0.3.30"
-serde_json = "1.0.133"
+
+# Serialization
+serde = { version = "1.0.195", features = ["derive"] }
+serde_json = "1.0.111"
 serde_yaml = "0.9.25"
 toml = "0.8.8"
+
+# Error handling
 anyhow = { version = "1.0.79", features = ["backtrace"] }
-# thiserror already defined above
-async-trait = "0.1.77"
-pyo3 = { version = "0.19.2", features = ["extension-module"] }
-once_cell = "1.18.0"
-regex = "1.9.5"
-log = "0.4"
-clap = { version = "4.5.4", features = ["derive"] }
-systemstat = "4.0"
-chrono = { version = "0.4", features = ["serde"] }
-reqwest = { version = "0.11", features = ["blocking", "json"] }
+thiserror = "2.0.12"
+
+# Logging & metrics
+log = "0.4.20"
+tracing = { version = "0.1.40", features = ["attributes"] }
+tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
+
+# Security
+ring = "0.17.14"
+sha2 = "0.10.8"
+zeroize = "1.7.0"
 
 # Web5 Integration
-jsonschema = "0.17.1"
+jsonschema = "0.29.1"
 
 # Blockchain Integration
 
 # Networking
-libp2p = { version = "0.53.1", features = ["full"] }
+libp2p = { version = "0.55.0", features = ["full"] }
 
 # Logging and Metrics
-tracing = { version = "0.1.40", features = ["attributes", "async-await"] }
-tracing-subscriber = { version = "0.3.18", features = ["env-filter", "json"] }
-metrics = "0.21.1"
+metrics = "0.24.1"
 
 # Cryptography
-ring = "0.17.12"
-sha2 = "0.10.8"
 ed25519-dalek = "2.1.1"
 x25519-dalek = "2.0.0"
 chacha20poly1305 = "0.10.1"
@@ -91,7 +90,7 @@ pbkdf2 = "0.12.2"
 
 # Testing
 test = "0.15.4"
-mockall = "0.11"
+mockall = "0.12.1"
 tokio-test = "0.4"
 
 # Unified DLC implementation
@@ -111,3 +110,38 @@ jsi = "0.10"
 
 # [AIS-3] Security enforcement
 # Note: rust-version is already specified in the workspace.package section at the top
+
+[dependencies]
+# Core dependencies
+tokio = { version = "1.28", features = ["full"] }
+anyhow = "1.0"
+thiserror = "1.0"
+tracing = "0.1"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Bitcoin dependencies 
+bitcoin = { version = "0.30", features = ["rand"] }
+bitcoincore-rpc = "0.16"
+lightning = "0.0.116"
+psbt = "0.9"
+
+# Security & Crypto
+ring = "0.16"
+rand = "0.8"
+sha2 = "0.10"
+zeroize = "1.6"
+
+# Required for specific features
+[features]
+default = ["bitcoin", "taproot", "psbt-v2"]
+bitcoin = ["bdk"]
+taproot = ["bitcoin/taproot"]
+psbt-v2 = ["bdk/psbt-v2"]
+hardware-wallet = ["bitcoin/hardware-wallet"]
+
+# Development dependencies
+[dev-dependencies]
+tempfile = "3.9.0"
+test-log = "0.2.14"
+mockall = "0.12.1"

@@ -2,6 +2,7 @@ use std::process::Command;
 use log::{info, warn, error};
 use semver::Version;
 use std::path::Path;
+use anyhow::Result;
 
 pub fn check_system_requirements() -> Result<(), String> {
     info!("Checking system requirements...");
@@ -282,4 +283,30 @@ fn verify_ml_components() -> Result<(), String> {
     }
     
     Ok(())
-} 
+}
+
+pub trait Validator {
+    fn validate(&self) -> Result<()>;
+}
+
+pub struct BipValidator {
+    required_bips: Vec<u32>,
+}
+
+impl Validator for BipValidator {
+    fn validate(&self) -> Result<()> {
+        // BIP validation logic
+        Ok(())
+    }
+}
+
+pub struct NetworkValidator {
+    endpoints: Vec<String>,
+}
+
+impl Validator for NetworkValidator {
+    fn validate(&self) -> Result<()> {
+        // Network validation logic
+        Ok(())
+    }
+}
