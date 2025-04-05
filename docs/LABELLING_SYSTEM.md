@@ -25,13 +25,13 @@ The Anya Core ecosystem uses a sophisticated labeling system that follows the Bi
 
 This script allows you to commit changes to multiple repositories with proper labeling in a single operation.
 
-##### Usage:
+##### Usage
 
 ```bash
 ./scripts/batch_commit.sh -m "Commit message" -t "feat" -s "component" -l "AIR-3,AIS-2,AIT-3" [-r "repo1,repo2"] [-v]
 ```
 
-##### Options:
+##### Options
 
 - `-m, --message MESSAGE`: Commit message (required)
 - `-t, --type TYPE`: Commit type (default: feat)
@@ -46,13 +46,13 @@ This script allows you to commit changes to multiple repositories with proper la
 
 Windows-compatible PowerShell version of the batch commit script.
 
-##### Usage:
+##### Usage
 
 ```powershell
 ./scripts/batch_commit.ps1 -Message "Commit message" -Type "feat" -Scope "component" -Labels "AIR-3,AIS-2,AIT-3" [-Repos "repo1,repo2"] [-Validate]
 ```
 
-##### Parameters:
+##### Parameters
 
 - `-Message "MESSAGE"`: Commit message (required)
 - `-Type "TYPE"`: Commit type (default: feat)
@@ -70,13 +70,13 @@ Windows-compatible PowerShell version of the batch commit script.
 
 This script synchronizes the docs/standards/AI_LABELING.md and COMMIT_RULES.md files across all repositories to ensure consistent labeling standards.
 
-##### Usage:
+##### Usage
 
 ```bash
 python scripts/sync_labelling.py [--source REPO] [--target REPOS] [--check-only] [--dry-run]
 ```
 
-##### Options:
+##### Options
 
 - `--source`: Source repository for label standards (default: anya-core)
 - `--target`: Target repositories (comma-separated, default: all repositories)
@@ -89,13 +89,13 @@ python scripts/sync_labelling.py [--source REPO] [--target REPOS] [--check-only]
 
 Windows-compatible PowerShell version of the synchronization script.
 
-##### Usage:
+##### Usage
 
 ```powershell
 ./scripts/sync_labelling.ps1 [-Source "REPO"] [-Target "REPOS"] [-CheckOnly] [-DryRun]
 ```
 
-##### Parameters:
+##### Parameters
 
 - `-Source "REPO"`: Source repository for label standards (default: anya-core)
 - `-Target "REPOS"`: Target repositories (comma-separated, default: auto-detected)
@@ -124,11 +124,13 @@ Both versions provide identical functionality with platform-appropriate syntax a
 If you're having issues running the scripts on Windows, follow these simplified steps:
 
 1. **Open PowerShell and navigate to the anya-core directory**:
+
    ```powershell
    cd C:\path\to\OPSource\anya-core
    ```
 
 2. **Run the batch commit script directly from PowerShell**:
+
    ```powershell
    # Run script with full path specification
    .\scripts\batch_commit.ps1 -Message "Your commit message" -Type "feat" -Labels "AIR-3,AIS-2"
@@ -138,16 +140,19 @@ If you're having issues running the scripts on Windows, follow these simplified 
    ```
 
 3. **Specify repositories explicitly if auto-detection fails**:
+
    ```powershell
    .\scripts\batch_commit.ps1 -Message "Update docs" -Type "docs" -Labels "AIR-3,AIS-2" -Repos "anya-core"
    ```
 
 4. **For unusual repository structures, use the RootDir parameter**:
+
    ```powershell
    .\scripts\batch_commit.ps1 -Message "Fix bug" -Type "fix" -Labels "AIR-3,AIS-2" -RootDir "C:\Users\username\Projects"
    ```
 
 5. **If you receive `-l` parameter errors**, you're likely using the wrong script format:
+
    ```powershell
    # Wrong (Bash format)
    .\scripts\batch_commit.sh -m "Message" -l "AIR-3,AIS-2"  # This won't work in PowerShell!
@@ -161,17 +166,20 @@ If you're having issues running the scripts on Windows, follow these simplified 
 When running the PowerShell scripts on Windows:
 
 1. Ensure PowerShell execution policy allows running scripts:
+
    ```powershell
    Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
    ```
 
 2. Always run the scripts from the repository's root directory:
+
    ```powershell
    cd C:\path\to\anya-core
    ./scripts/batch_commit.ps1 -Help
    ```
 
 3. If repositories are not in the expected location (i.e., not all in the same parent directory), use the `-RootDir` parameter:
+
    ```powershell
    ./scripts/batch_commit.ps1 -Message "Update" -Type "fix" -Labels "AIR-3,AIS-2" -RootDir "C:\Projects"
    ```
