@@ -14,6 +14,7 @@ mod sender;
 mod address;
 mod keys;
 mod util;
+mod storage;
 mod hsm;
 
 #[cfg(test)]
@@ -25,6 +26,7 @@ pub use keys::KeyManager;
 pub use scanner::{SilentPaymentScanner, SilentPaymentTelemetry};
 pub use sender::SilentPaymentSender;
 pub use hsm::{SilentPaymentHsm, HsmConfig, HsmProviderType};
+pub use storage::SilentPaymentStorage;
 
 use bitcoin::secp256k1::{Secp256k1, SecretKey, XOnlyPublicKey};
 use bitcoin::hashes::{sha256, Hash, HashEngine};
