@@ -1,0 +1,35 @@
+[package]
+name = "anya-ml"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "Machine Learning component for Anya Core"
+
+[dependencies]
+# Core ML dependencies 
+tensorflow = { version = "0.20.0", optional = true, features = [] }
+ndarray = "0.16.1"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Async runtime
+tokio = { version = "1.0", features = ["full"] }
+
+# Error handling
+thiserror = "2.0.12"
+anyhow = "1.0"
+
+# Shared workspace dependencies
+anya-core = { path = "../anya-core" }
+
+[dev-dependencies]
+tokio-test = "0.4"
+proptest = "1.0"
+test-strategy = "0.4.1"
+
+[features]
+default = []
+# Enable tensorflow with optional CUDA support
+ml-tensorflow = ["dep:tensorflow"] 
+cuda = ["ml-tensorflow", "tensorflow/cuda"]

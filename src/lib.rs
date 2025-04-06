@@ -52,6 +52,7 @@ pub mod security;
 pub mod enterprise;
 pub mod layer2;
 pub mod tools;
+pub mod credentials;
 
 /// Core error type for the Anya system
 #[derive(Debug)]
@@ -286,6 +287,12 @@ mod tests {
         let err = AnyaError::ML("test error".to_string());
         assert_eq!(err.to_string(), "ML error: test error");
     }
+
+    #[test]
+    fn test_btc_address_validation() {
+        let addr = "bc1p2ej8neqcl40tswxt0q0gsm8hhzqkp6fuvj006zf75ld70030m2lq4apejj";
+        assert!(bitcoin::Address::from_str(addr).is_ok());
+    }
 }
 
 // Initialize all modules
@@ -336,4 +343,4 @@ pub mod prelude {
     pub use crate::bitcoin::taproot::TaprootValidator;
     pub use crate::dao::governance::{DaoGovernance, DaoLevel};
     pub use crate::tools::markdown::DocumentationValidator;
-} 
+}

@@ -4,29 +4,46 @@ members = [
     "cli", 
     "installer",
     "mobile",
-    "dependencies/anya-bitcoin"  # Correct path format
+    "anya-ml",
+    "dependencies/anya-bitcoin"
 ]
 
-# Consolidated workspace dependencies
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+authors = ["Anya Core Team"]
+license = "MIT"
+repository = "https://github.com/anya-org/anya-core"
+description = "Anya Core - Bitcoin Development Framework Implementation"
+
 [workspace.dependencies]
-# Unified cryptographic stack
-secp256k1 = { version = "0.28.0", features = ["bitcoin_hashes", "std", "serde", "mobile"] }
-bitcoin = { version = "0.32.1", features = ["std", "serde", "taproot", "mobile"] }
+# Core Bitcoin dependencies
+bitcoin = { version = "0.32.1", features = ["std", "serde", "taproot", "mobile", "base58"] }
 bitcoincore-rpc = "0.19.0"
+bdk = { version = "0.28.0", features = ["all-keys", "keys-bip39"] }
 
-# Shared workspace dependencies
+# Cryptography0.30.0.30.2
+secp256k1 = { version = "0.28.0", features = ["bitcoin_hashes", "std", "serde", "mobile"] }
+secp256k1-zkp = { version = "0.11.0", features = ["vendored"] }
+ring = { version = "0.17.12", features = ["alloc"] }
+sha2 = "0.10.8"
+
+# Async runtime and traits
 tokio = { version = "1.41.1", features = ["full"] }
-serde = { version = "1.0.215", features = ["derive"] }
-web5 = { git = "https://github.com/TBD54566975/web5-rs" }
-
-# Standardized versions for shared dependencies
-anyhow = "1.0.75"
-thiserror = "2.0.12"
 async-trait = "0.1.77"
+
+# Serialization
+serde = { version = "1.0.215", features = ["derive"] }
 serde_json = "1.0.133"
 
-# Additional dependencies
-secp256k1-zkp = { version = "0.8.0", features = ["vendored"] }  # Add ZKP framework 
+# Error handling
+anyhow = "1.0.75"
+thiserror = "2.0.12"
+
+# Web5 integration
+web5 = { git = "https://github.com/TBD54566975/web5-rs" }
+
+# Utilities
 rand = "0.9.0"
 rand_core = "0.9.3"
 hex = "0.4.3"
@@ -48,9 +65,11 @@ bitcoin.workspace = true
 bitcoincore-rpc.workspace = true
 web5.workspace = true
 bdk.workspace = true
-rand = { workspace = true }
-rand_core = { workspace = true }
-hex = { workspace = true }
+tokio.workspace = true
+serde.workspace = true
+rand.workspace = true
+rand_core.workspace = true
+hex.workspace = true
 
 # Security Validation (BDF §3.3)
 ring = { version = "0.17.12", features = ["alloc"] }
@@ -62,11 +81,12 @@ compliance = { bip341 = true, bip370 = true }
 security = { constant_time = true, rng = "secure" }
 
 [features]
-default = ["bip174", "bip341", "constant_time"]
+default = ["bip174", "bip341", "constant_time", "btc-validation"]
 bip174 = ["bitcoin/bip174", "secp256k1/bip174"]
 bip341 = ["bitcoin/bip341", "secp256k1/bip341"]
 mobile = ["bitcoin/mobile", "secp256k1/mobile"]
-constant_time = []  # Feature flag for constant-time operations
+constant_time = []
+btc-validation = ["bitcoin/base58"]
 
 [lib]
 name = "anya"
@@ -76,14 +96,14 @@ path = "src/lib.rs"
 name = "anya"
 path = "src/main.rs"
 
-# ... other binary definitions ... 
+# ... other binary definitions ...
 
 [profile.release]
 lto = true
 codegen-units = 1
 opt-level = 3
 strip = true
-panic = "abort"  # Added from anyacore for better security
+panic = "abort"
 
 [profile.dev]
 opt-level = 0

@@ -1,165 +1,63 @@
-;; DAO Core Implementation
-;; This implements the core DAO functionality for the Anya system
-;; following Bitcoin-style governance principles
+;; DAO Core Contract [DAO-4][BPC-3]
+;; Enhanced with ML monitoring and unified governance
 
-(define-constant ERR_UNAUTHORIZED (err u1000))
-(define-constant ERR_INVALID_PROPOSAL (err u1001))
-(define-constant ERR_PROPOSAL_EXISTS (err u1002))
-(define-constant ERR_VOTING_CLOSED (err u1003))
-(define-constant ERR_INSUFFICIENT_BALANCE (err u1004))
+;; Import traits and constants
+(use-trait ft-trait .sip-010-trait.sip-010-trait)
+(impl-trait .dao-trait.dao-trait)
 
-;; Data structures
-(define-map proposals
-    { proposal-id: uint }
+;; Data vars
+(define-data-var total-proposals uint u0)
+(define-data-var total-voters uint u0)
+(define-data-var governance-token principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.governance-token)
+
+;; Storage maps - enhanced with ML metrics
+(define-map proposals 
+    uint 
     {
-        title: (string-utf8 256),
-        description: (string-utf8 4096),
         proposer: principal,
+        title: (string-ascii 100),
+        description: (string-utf8 1000),
         start-block: uint,
         end-block: uint,
+        status: (string-ascii 20),
         yes-votes: uint,
         no-votes: uint,
-        status: (string-utf8 16)
+        ml-risk-score: uint,
+        actions: (list 10 (tuple (contract principal) (function (string-ascii 100)) (args (list 10 {value: uint, data: (optional buff 100)})))),
+        execution-metrics: (optional {gas-estimate: uint, impact-score: uint})
     }
 )
 
-(define-map votes
-    { proposal-id: uint, voter: principal }
-    { vote: bool, weight: uint }
+;; Enhanced Safety Functions
+(define-private (validate-action (action {contract: principal, function: (string-ascii 100), args: (list 10 {value: uint, data: (optional buff 100)})}))
+    (let ((validation (contract-call? .security-module validate-contract-call action)))
+        (asserts! (get is-valid validation) (err ERR_UNAUTHORIZED))
+        (ok true))
 )
 
-(define-data-var proposal-count uint u0)
-(define-data-var governance-token principal 'ST000000000000000000002AMW42H.governance-token)
-
-;; Create a new proposal
-;; @param title: The proposal title
-;; @param description: The proposal description
-;; @param duration: The voting duration in blocks
-;; @returns: The proposal ID or an error
-(define-public (create-proposal (title (string-utf8 256)) (description (string-utf8 4096)) (duration uint))
-    (let
-        (
-            (proposal-id (var-get proposal-count))
-            (caller tx-sender)
-            (token-balance (contract-call? .governance-token get-balance caller))
-            (current-block block-height)
-        )
-        
-        ;; Check if proposer has enough tokens
-        (if (< token-balance u1000000)
-            ERR_INSUFFICIENT_BALANCE
-            (begin
-                ;; Store the proposal
-                (map-set proposals
-                    { proposal-id: proposal-id }
-                    {
-                        title: title,
-                        description: description,
-                        proposer: caller,
-                        start-block: current-block,
-                        end-block: (+ current-block duration),
-                        yes-votes: u0,
-                        no-votes: u0,
-                        status: "active"
-                    }
-                )
-                
-                ;; Increment proposal count
-                (var-set proposal-count (+ proposal-id u1))
-                
-                ;; Return the proposal ID
-                (ok proposal-id)
-            )
-        )
-    )
-)
-
-;; Vote on a proposal
-;; @param proposal-id: The proposal ID
-;; @param vote: true for yes, false for no
-;; @returns: Success or an error
-(define-public (vote (proposal-id uint) (vote bool))
-    (let
-        (
-            (caller tx-sender)
-            (token-balance (contract-call? .governance-token get-balance caller))
-            (proposal (unwrap! (map-get? proposals { proposal-id: proposal-id }) ERR_INVALID_PROPOSAL))
-            (current-block block-height)
-        )
-        
-        ;; Check if voting is still open
-        (if (> current-block (get end-block proposal))
-            ERR_VOTING_CLOSED
-            (begin
-                ;; Record the vote
-                (map-set votes
-                    { proposal-id: proposal-id, voter: caller }
-                    { vote: vote, weight: token-balance }
-                )
-                
-                ;; Update vote tallies
-                (if vote
-                    (map-set proposals
-                        { proposal-id: proposal-id }
-                        (merge proposal { yes-votes: (+ (get yes-votes proposal) token-balance) })
-                    )
-                    (map-set proposals
-                        { proposal-id: proposal-id }
-                        (merge proposal { no-votes: (+ (get no-votes proposal) token-balance) })
-                    )
-                )
-                
-                (ok true)
-            )
-        )
-    )
-)
-
-;; Get proposal details
-;; @param proposal-id: The proposal ID
-;; @returns: The proposal details or an error
-(define-read-only (get-proposal (proposal-id uint))
-    (map-get? proposals { proposal-id: proposal-id })
-)
-
-;; Execute a proposal (if passed)
-;; @param proposal-id: The proposal ID
-;; @returns: Success or an error
+;; Enhanced ML-driven Proposal Execution
 (define-public (execute-proposal (proposal-id uint))
-    (let
-        (
-            (proposal (unwrap! (map-get? proposals { proposal-id: proposal-id }) ERR_INVALID_PROPOSAL))
-            (current-block block-height)
-        )
+    (let ((proposal (unwrap! (map-get? proposals proposal-id) (err ERR_PROPOSAL_NOT_FOUND)))
+          (validation-result (validate-proposal proposal)))
+        (asserts! (is-eq (get status proposal) "approved") (err ERR_INVALID_STATE))
+        (asserts! (> block-height (+ (get end-block proposal) TIMELOCK_BLOCKS)) (err ERR_INVALID_STATE))
         
-        ;; Check if voting is closed
-        (if (<= current-block (get end-block proposal))
-            ERR_VOTING_CLOSED
-            (begin
-                ;; Check if proposal passed
-                (if (> (get yes-votes proposal) (get no-votes proposal))
-                    (begin
-                        ;; Update proposal status
-                        (map-set proposals
-                            { proposal-id: proposal-id }
-                            (merge proposal { status: "executed" })
-                        )
-                        
-                        ;; Execute the proposal logic
-                        ;; This would call appropriate functions based on proposal type
-                        (ok true)
-                    )
-                    (begin
-                        ;; Update proposal status
-                        (map-set proposals
-                            { proposal-id: proposal-id }
-                            (merge proposal { status: "rejected" })
-                        )
-                        
-                        (ok false)
-                    )
-                )
+        ;; Enhanced ML agent monitoring with risk assessment
+        (let ((monitor-result (contract-call? .ml-monitor check-execution proposal-id)))
+            (asserts! (get is-safe monitor-result) (err ERR_UNAUTHORIZED))
+            
+            ;; Execute each action with advanced safety checks
+            (map validate-and-execute (get actions proposal))
+            
+            ;; Update execution metrics
+            (map-set proposals proposal-id 
+                (merge proposal {
+                    status: "executed",
+                    execution-metrics: (some {
+                        gas-estimate: (get gas-used monitor-result),
+                        impact-score: (get impact-score monitor-result)
+                    })
+                })
             )
-        )
-    )
+            (ok true)))
 )

@@ -1,25 +1,28 @@
-;; Token Economics
-;; Contains the Bitcoin-style tokenomics constants and functions for the Anya protocol
-;; This contract manages the core economic parameters that govern token issuance,
-;; distribution, and halving schedule, inspired by Bitcoin's deflationary model.
+;; Token Economics Contract
+;; Contains the Bitcoin-style tokenomics implementation for the Anya protocol
+
+;; =========================================
+;; Imports
+;; =========================================
+(use-trait ft-trait .sip-010-trait.sip-010-trait)
 
 ;; =========================================
 ;; Constants & Token Supply Configuration
 ;; =========================================
 
 ;; Bitcoin-style tokenomics constants
-(define-constant TOTAL-SUPPLY u21000000000) ;; 21 billion tokens
-(define-constant INITIAL-BLOCK-REWARD u5000) ;; 5,000 tokens per block
-(define-constant HALVING-INTERVAL u210000) ;; Halving every 210,000 blocks
-(define-constant DEX-ALLOCATION-PERCENTAGE u30) ;; 30% to DEX
-(define-constant TEAM-ALLOCATION-PERCENTAGE u15) ;; 15% to team
-(define-constant DAO-ALLOCATION-PERCENTAGE u55) ;; 55% to DAO/community
-(define-constant CONTRACT-OWNER tx-sender) ;; Initial contract deployer
+(define-constant TOTAL_SUPPLY u21000000000) ;; 21 billion tokens
+(define-constant INITIAL_BLOCK_REWARD u5000) ;; 5,000 tokens per block
+(define-constant HALVING_INTERVAL u210000) ;; Halving every 210,000 blocks
+(define-constant DEX_ALLOCATION_PERCENTAGE u30) ;; 30% to DEX
+(define-constant TEAM_ALLOCATION_PERCENTAGE u15) ;; 15% to team
+(define-constant DAO_ALLOCATION_PERCENTAGE u55) ;; 55% to DAO/community
+(define-constant CONTRACT_OWNER tx-sender) ;; Initial contract deployer
 
 ;; Error codes
-(define-constant ERR-UNAUTHORIZED u401)
-(define-constant ERR-INVALID-ALLOCATION u402)
-(define-constant ERR-DISTRIBUTION-FAILED u403)
+(define-constant ERR_UNAUTHORIZED u401)
+(define-constant ERR_INVALID_ALLOCATION u402)
+(define-constant ERR_DISTRIBUTION_FAILED u403)
 
 ;; =========================================
 ;; Data Maps
@@ -43,40 +46,37 @@
 
 ;; Get the total maximum supply of tokens
 (define-read-only (get-total-supply)
-    (ok TOTAL-SUPPLY)
+    (ok TOTAL_SUPPLY)
 )
 
 ;; Get the initial block reward amount
 (define-read-only (get-initial-block-reward)
-    (ok INITIAL-BLOCK-REWARD)
+    (ok INITIAL_BLOCK_REWARD)
 )
 
 ;; Get the interval between reward halvings
 (define-read-only (get-halving-interval)
-    (ok HALVING-INTERVAL)
+    (ok HALVING_INTERVAL)
 )
 
 ;; Get the allocation percentages for different stakeholders
 (define-read-only (get-allocation-percentages)
     (ok {
-        dex: DEX-ALLOCATION-PERCENTAGE,
-        team: TEAM-ALLOCATION-PERCENTAGE,
-        dao: DAO-ALLOCATION-PERCENTAGE
+        dex: DEX_ALLOCATION_PERCENTAGE,
+        team: TEAM_ALLOCATION_PERCENTAGE,
+        dao: DAO_ALLOCATION_PERCENTAGE
     })
 )
 
 ;; Calculate the current block reward based on the block height
-;; Implements Bitcoin-style halving where reward is divided by 2 every HALVING-INTERVAL blocks
 (define-read-only (calculate-block-reward (block-height uint))
     (let 
         (
-            (halvings (/ block-height HALVING-INTERVAL))
-            (reward INITIAL-BLOCK-REWARD)
+            (halvings (/ block-height HALVING_INTERVAL))
+            (reward INITIAL_BLOCK_REWARD)
         )
         (if (>= halvings u64)
-            ;; After 64 halvings, block reward becomes 0
             (ok u0)
-            ;; Otherwise calculate based on halvings
             (ok (/ reward (pow u2 halvings)))
         )
     )
@@ -86,26 +86,23 @@
 (define-read-only (get-tokens-issued-at-height (block-height uint))
     (let
         (
-            (full-halvings (/ block-height HALVING-INTERVAL))
-            (remainder-blocks (mod block-height HALVING-INTERVAL))
+            (full-halvings (/ block-height HALVING_INTERVAL))
+            (remainder-blocks (mod block-height HALVING_INTERVAL))
         )
         (ok (+
-            ;; Sum the tokens from completed halving periods
             (fold + u0 
                 (map 
-                    ;; For each completed halving period, calculate tokens issued
                     (lambda (halving-index uint)
                         (* 
-                            (/ INITIAL-BLOCK-REWARD (pow u2 halving-index))
-                            HALVING-INTERVAL
+                            (/ INITIAL_BLOCK_REWARD (pow u2 halving-index))
+                            HALVING_INTERVAL
                         )
                     )
                     (list u0 u1 u2 u3 u4 u5 u6 u7 u8)
                 )
             )
-            ;; Add tokens from the current halving period
             (* 
-                (unwrap-panic (calculate-block-reward (* full-halvings HALVING-INTERVAL)))
+                (unwrap-panic (calculate-block-reward (* full-halvings HALVING_INTERVAL)))
                 remainder-blocks
             )
         ))
@@ -128,7 +125,7 @@
 (define-read-only (verify-allocation-percentages)
     (let 
         (
-            (total-percentage (+ (+ DEX-ALLOCATION-PERCENTAGE TEAM-ALLOCATION-PERCENTAGE) DAO-ALLOCATION-PERCENTAGE))
+            (total-percentage (+ (+ DEX_ALLOCATION_PERCENTAGE TEAM_ALLOCATION_PERCENTAGE) DAO_ALLOCATION_PERCENTAGE))
         )
         (ok (is-eq total-percentage u100))
     )
@@ -136,7 +133,7 @@
 
 ;; Verify current token issuance is within defined limits
 (define-read-only (verify-issuance (current-supply uint))
-    (ok (<= current-supply TOTAL-SUPPLY))
+    (ok (<= current-supply TOTAL_SUPPLY))
 )
 
 ;; =========================================
@@ -144,21 +141,16 @@
 ;; =========================================
 
 ;; Record a token distribution to a specific stakeholder
-;; Only callable by contract owner for security
 (define-public (record-distribution (stakeholder (string-ascii 24)) (amount uint))
     (begin
-        ;; Only contract owner can record distributions
-        (asserts! (is-eq tx-sender CONTRACT-OWNER) (err ERR-UNAUTHORIZED))
+        (asserts! (is-eq tx-sender CONTRACT_OWNER) (err ERR_UNAUTHORIZED))
         
-        ;; Get previous distribution info
         (let 
             (
                 (previous-info (default-to { amount: u0, last-distribution-height: u0 } 
                                 (map-get? token-distribution { stakeholder: stakeholder })))
                 (new-amount (+ (get amount previous-info) amount))
             )
-            
-            ;; Update distribution record
             (map-set token-distribution
                 { stakeholder: stakeholder }
                 { 
@@ -167,7 +159,6 @@
                 }
             )
             
-            ;; Update metrics
             (map-set economic-metrics
                 { metric-name: "total-distributed" }
                 {
@@ -184,8 +175,7 @@
 ;; Update a system metric
 (define-public (update-metric (metric-name (string-ascii 24)) (value uint))
     (begin
-        ;; Only contract owner can update metrics
-        (asserts! (is-eq tx-sender CONTRACT-OWNER) (err ERR-UNAUTHORIZED))
+        (asserts! (is-eq tx-sender CONTRACT_OWNER) (err ERR_UNAUTHORIZED))
         
         (map-set economic-metrics
             { metric-name: metric-name }
