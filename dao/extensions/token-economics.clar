@@ -1,6 +1,18 @@
 ;; Anya DAO Token Economics Module
 ;; Implements the token distribution logic with Bitcoin-style tokenomics
 
+;; Token Economics Implementation [DAO-3][BPC-3]
+
+(use-trait ft-trait .sip-010-trait.sip-010-trait)
+(impl-trait .constants.constant-provider-trait)
+
+;; Get distribution constants
+(define-constant TOTAL-SUPPLY (get-constant "TOTAL-SUPPLY"))
+(define-constant INITIAL-REWARD (get-constant "INITIAL-BLOCK-REWARD"))
+(define-constant HALVING-BLOCKS (get-constant "HALVING-INTERVAL"))
+(define-constant DEX-SHARE (get-constant "DEX-ALLOCATION"))
+(define-constant TEAM-SHARE (get-constant "TEAM-ALLOCATION"))
+
 ;; Constants - Token Distribution
 (define-constant TOKEN-GENESIS-BLOCK u0)
 (define-constant HALVING-INTERVAL u210000) ;; Bitcoin-style halving
@@ -303,5 +315,15 @@
         (asserts! (is-authorized tx-sender) (err ERR_UNAUTHORIZED))
         (var-set token-contract new-token-contract)
         (ok true)
+    )
+)
+
+;; Calculate block reward with halving
+(define-read-only (get-block-reward (current-block uint))
+    (let (
+        (halvings (/ current-block HALVING-BLOCKS))
+        (reward INITIAL-REWARD)
+    )
+        (/ reward (pow u2 halvings))
     )
 )

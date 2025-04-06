@@ -8,6 +8,9 @@ use crate::AnyaError;
 use std::collections::HashMap;
 use chrono::{DateTime, Utc};
 use serde_json;
+use anyhow::Result;
+use bitcoin::secp256k1::{SecretKey, PublicKey};
+use std::sync::{Arc, RwLock};
 
 pub mod types;
 pub use types::{Proposal, ProposalMetrics, RiskMetrics};
@@ -39,10 +42,33 @@ impl Default for DAOConfig {
     }
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TokenomicsParams {
+    pub max_supply: u64,                 // 21 billion with 8 decimals
+    pub initial_block_reward: u64,       // 5000 tokens per block
+    pub halving_interval: u32,           // 210,000 blocks
+    pub dex_allocation: f64,             // 35%
+    pub dao_allocation: f64,             // 50%
+    pub dev_allocation: f64,             // 15%
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct DaoConfig {
+    pub proposal_threshold: u64,         // Min tokens to propose
+    pub voting_period: u32,              // In blocks
+    pub voting_threshold: f64,           // % needed to pass
+    pub quorum: f64,                     // Min participation %
+    pub timelock: u32,                   // Blocks before execution
+}
+
 /// Core DAO implementation
 pub struct DAOManager {
     config: DAOConfig,
     proposals: HashMap<String, Proposal>,
+    pub tokenomics: TokenomicsParams,
+    pub proposals: RwLock<Vec<Proposal>>,
+    pub token_protocol: Arc<TokenProtocol>,
+    pub verification: Arc<DaoVerification>,
 }
 
 impl DAOManager {
@@ -58,6 +84,16 @@ impl DAOManager {
         Ok(Self {
             config,
             proposals: HashMap::new(),
+        })
+    }
+
+    pub fn new(params: TokenomicsParams, config: DaoConfig) -> Result<Self> {
+        Ok(Self {
+            tokenomics: params,
+            config,
+            proposals: RwLock::new(Vec::new()),
+            token_protocol: Arc::new(TokenProtocol::new()?),
+            verification: Arc::new(DaoVerification::new()?),
         })
     }
 
@@ -91,6 +127,34 @@ impl DAOManager {
         Ok(proposal)
     }
 
+    pub fn submit_proposal(&self, 
+        proposer: PublicKey,
+        title: String, 
+        description: String,
+        actions: Vec<ProposalAction>
+    ) -> Result<ProposalId> {
+        // Verify proposer has enough tokens
+        let balance = self.token_protocol.get_balance(&proposer)?;
+        if balance < self.config.proposal_threshold {
+            return Err(anyhow::anyhow!("Insufficient tokens to propose"));
+        }
+
+        // Create proposal with Taproot commitment
+        let proposal = Proposal::new(
+            proposer,
+            title,
+            description, 
+            actions,
+            self.config.voting_period,
+            &self.verification
+        )?;
+
+        // Store proposal
+        self.proposals.write()?.push(proposal.clone());
+
+        Ok(proposal.id)
+    }
+
     /// Vote on a proposal
     pub fn vote(&mut self, proposal_id: &str, vote_for: bool, amount: u64) -> AnyaResult<()> {
         let proposal = self.proposals.get_mut(proposal_id)
@@ -110,6 +174,31 @@ impl DAOManager {
         
         proposal.updated_at = Utc::now();
         
+        Ok(())
+    }
+
+    pub fn vote(&self, 
+        voter: PublicKey,
+        proposal_id: ProposalId,
+        approve: bool
+    ) -> Result<()> {
+        // Get proposal
+        let mut proposals = self.proposals.write()?;
+        let proposal = proposals.iter_mut()
+            .find(|p| p.id == proposal_id)
+            .ok_or_else(|| anyhow::anyhow!("Proposal not found"))?;
+
+        // Verify voting period
+        if proposal.is_expired() {
+            return Err(anyhow::anyhow!("Voting period ended"));
+        }
+
+        // Calculate voting power
+        let voting_power = self.token_protocol.get_voting_power(&voter)?;
+
+        // Add vote with Taproot signature
+        proposal.add_vote(voter, voting_power, approve, &self.verification)?;
+
         Ok(())
     }
 
@@ -148,6 +237,51 @@ impl DAOManager {
         proposal.execution_time = Some(Utc::now());
         proposal.updated_at = Utc::now();
         
+        Ok(())
+    }
+
+    pub fn execute_proposal(&self, proposal_id: ProposalId) -> Result<()> {
+        // Get proposal
+        let mut proposals = self.proposals.write()?;
+        let proposal = proposals.iter_mut()
+            .find(|p| p.id == proposal_id)
+            .ok_or_else(|| anyhow::anyhow!("Proposal not found"))?;
+
+        // Verify proposal passed
+        if !proposal.is_passed(&self.config) {
+            return Err(anyhow::anyhow!("Proposal did not pass"));
+        }
+
+        // Verify timelock
+        if !proposal.is_executable() {
+            return Err(anyhow::anyhow!("Proposal in timelock"));
+        }
+
+        // Execute actions with Taproot script verification
+        for action in &proposal.actions {
+            self.verification.verify_action(action)?;
+            self.execute_action(action)?;
+        }
+
+        Ok(())
+    }
+
+    fn execute_action(&self, action: &ProposalAction) -> Result<()> {
+        match action {
+            ProposalAction::UpdateConfig(config) => {
+                // Update DAO config
+                self.update_config(config)?;
+            }
+            ProposalAction::Mint { recipient, amount } => {
+                // Mint new tokens
+                self.token_protocol.mint(recipient, *amount)?;
+            }
+            ProposalAction::UpdateTokenomics(params) => {
+                // Update tokenomics
+                self.update_tokenomics(params)?;
+            }
+            // Add other action types...
+        }
         Ok(())
     }
 
@@ -206,4 +340,6 @@ pub mod governance;
 pub mod legal;
 pub mod voting;
 
-pub use governance::{DaoGovernance, DaoLevel, GovernanceError}; 
+pub use governance::{DaoGovernance, DaoLevel, GovernanceError};
+pub mod tokenomics;
+pub mod verification;
