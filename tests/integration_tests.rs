@@ -38,9 +38,30 @@ mod tests {
         assert!(transaction_result.is_ok());
         Ok(())
     }
-}
-}
 
+    #[test]
+    fn test_wallet_scanner_integration() -> Result<()> {
+        // Setup a mock wallet
+        let mock_wallet = MockWallet::new();
+        
+        // Generate a key manager and scanner
+        let key_manager = KeyManager::new_random()?;
+        let scanner = SilentPaymentScanner::new(
+            key_manager.scan_secret().clone(),
+            *key_manager.spend_pubkey(),
+        )?;
+        
+        // Ensure wallet integration works
+        mock_wallet.set_silent_payment_scanner(scanner.clone())?;
+        let retrieved_scanner = mock_wallet.get_silent_payment_scanner()?;
+        
+        // Verify scanner alignment
+        assert_eq!(retrieved_scanner.scan_pubkey(), scanner.scan_pubkey());
+        assert_eq!(retrieved_scanner.spend_pubkey, scanner.spend_pubkey);
+        
+        Ok(())
+    }
+}
 
     async fn setup_workflow(config: &Config) -> Result<(BitcoinOperations, StacksOperations, LightningOperations, BlockchainIntegration, ModelManager, MLFeeManager, UserManager, User, Model)> {
         let (bitcoin_ops, stacks_ops, lightning_ops, blockchain_integration, model_manager, ml_fee_manager, user_manager, price_model) = common_setup(config).await?;
