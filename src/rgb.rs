@@ -1,5 +1,7 @@
 use serde::{Serialize, Deserialize};
 use std::collections::HashMap;
+use async_trait::async_trait;
+use crate::network::{NetworkManager, NetworkType, NetworkClient, NetworkStatus};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct RgbConfig {
@@ -121,6 +123,49 @@ impl RgbManager {
         
         self.asset_registry.update_transfer(&transfer)?;
         Ok(transfer)
+    }
+}
+
+#[async_trait]
+impl NetworkClient for RgbManager {
+    async fn connect(&self) -> Result<(), NetworkError> {
+        // Implement RGB-specific connection logic
+        self.contract_manager.initialize().await?;
+        self.asset_registry.connect().await?;
+        Ok(())
+    }
+
+    async fn disconnect(&self) -> Result<(), NetworkError> {
+        // Implement RGB-specific disconnection
+        self.contract_manager.shutdown().await?;
+        Ok(())
+    }
+
+    async fn submit_transaction(&self, tx: &[u8]) -> Result<String, NetworkError> {
+        // RGB-specific transaction submission
+        let rgb_tx = self.contract_manager.decode_transaction(tx)?;
+        self.transfer_asset(&rgb_tx.recipient, rgb_tx.amount)
+            .map(|result| result.id)
+    }
+
+    async fn get_transaction_status(&self, tx_id: &str) -> Result<TransactionStatus, NetworkError> {
+        // Implement RGB transaction status check
+        self.asset_registry.get_transfer_status(tx_id).await
+    }
+
+    async fn get_balance(&self, address: &str) -> Result<u64, NetworkError> {
+        // Implement RGB balance check
+        self.contract_manager.get_balance(address).await
+    }
+
+    async fn sync_state(&self) -> Result<NetworkStatus, NetworkError> {
+        Ok(NetworkStatus {
+            healthy: true,
+            sync_percentage: 100.0,
+            peer_count: self.contract_manager.get_peer_count().await?,
+            last_block: self.contract_manager.get_last_block().await?,
+            network_latency: std::time::Duration::from_millis(50),
+        })
     }
 }
 

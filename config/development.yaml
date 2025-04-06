@@ -6,6 +6,14 @@ network:
   node_connection_limit: 10
   performance_threshold: 0.4
   false_positive_threshold: 0.5
+  type: "testnet"
+  bitcoin_rpc:
+    url: "https://btc-testnet.anyacore.io"
+    user: "testnet_user"
+    password: "testnet_pass"
+    timeout: 30
+    confirmations: 1
+    max_fee_rate: 100  # sat/vB
 
 # Development-specific database settings
 database:
@@ -73,3 +81,17 @@ monitoring:
   error_reporting:
     enabled: true
     detailed_traces: true
+
+wallet:
+  testnet:
+    name: "anya-testnet"
+    type: "hd"
+    gap_limit: 20
+    min_confirmations: 1
+    coin_selection: "largest_first"
+    fee_strategy: "normal"
+    backup_dir: "./backups/testnet"
+    data_dir: "./wallets/testnet"
+    descriptors:
+      receive: "wpkh([d34db33f/84h/1h/0h]tpubDC5FSnBiZDMmhiuCmWAYsLwgLYrrT9rAqvTySfuCCrgsWz8K9BnGMHjbv8uzkzXcS1kxnXg6LBMiqck6Zj1dR1K4ry3CNGTdUwKthXHRR8t/0/*)"
+      change: "wpkh([d34db33f/84h/1h/0h]tpubDC5FSnBiZDMmhiuCmWAYsLwgLYrrT9rAqvTySfuCCrgsWz8K9BnGMHjbv8uzkzXcS1kxnXg6LBMiqck6Zj1dR1K4ry3CNGTdUwKthXHRR8t/1/*)"

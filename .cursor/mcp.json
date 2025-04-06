@@ -4,8 +4,8 @@
     "anya-bitcoin-tools": {
       "command": "node",
       "args": [
-        "anya-core/scripts/bitcoin/mcp-server.js"
+        "scripts/bitcoin/mcp-server.js"
       ]
     }
   }
-} 
+}

@@ -58,3 +58,10 @@ for dir in "${DOCS_DIRS[@]}"; do
 done
 
 echo "Documentation structure generated successfully!"
+
+# Search and replace all occurrences of ".ps1" with ".sh" in markdown files under each docs directory
+for dir in "${DOCS_DIRS[@]}"; do
+    if [ -d "$dir" ]; then
+        find "$dir" -type f -name "*.md" -exec sed -i 's/\.ps1/\.sh/g' {} +
+    fi
+done
