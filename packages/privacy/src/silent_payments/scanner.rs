@@ -2,6 +2,10 @@
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::time::Instant;
 use std::collections::HashMap;
+use std::path::Path;
+use bitcoin::Network;
+use crate::{Error, Result};
+use serde::{Deserialize, Serialize};
 
 /// Telemetry data collected for Silent Payments
 /// 
@@ -171,5 +175,86 @@ impl SilentPaymentScanner {
     /// Get telemetry data if enabled
     pub fn get_telemetry(&self) -> Option<&SilentPaymentTelemetry> {
         self.telemetry.as_ref()
+    }
+    
+    /// Save scanner state to file
+    pub fn save_to_file<P: AsRef<Path>>(&self, path: P) -> Result<()> {
+        // Convert detected payments to serializable format
+        let payments = self.detected_payments
+            .iter()
+            .map(|(_, info)| SerializedPaymentInfo {
+                txid: info.txid.to_string(),
+                vout: info.vout,
+                amount: info.amount,
+                block_height: info.block_height,
+                spent: info.spent,
+            })
+            .collect();
+        
+        // Create storage object
+        let storage = SilentPaymentStorage {
+            version: 1,
+            network: Network::Bitcoin, // Use appropriate network
+            scan_pubkey: self.scan_pubkey().to_string(),
+            spend_pubkey: self.spend_pubkey.to_string(),
+            payments,
+        };
+        
+        // Save to file
+        storage.save_to_file(path)
+    }
+    
+    /// Load scanner state from file
+    pub fn load_from_file<P: AsRef<Path>>(path: P, scan_secret: SecretKey) -> Result<Self> {
+        // Load storage from file
+        let storage = SilentPaymentStorage::load_from_file(path)?;
+        
+        // Create scanner
+        let secp = Secp256k1::new();
+        let spend_pubkey = XOnlyPublicKey::from_str(&storage.spend_pubkey)
+            .map_err(|e| Error::InvalidKey(format!("Invalid spend pubkey: {}", e)))?;
+        
+        let mut scanner = Self {
+            scan_secret,
+            spend_pubkey,
+            secp,
+            detected_payments: HashMap::new(),
+            telemetry: None,
+        };
+        
+        // Import detected payments
+        for payment in storage.payments {
+            let txid = bitcoin::Txid::from_str(&payment.txid)
+                .map_err(|e| Error::DeserializationError(format!("Invalid txid: {}", e)))?;
+                
+            let outpoint = OutPoint::new(txid, payment.vout);
+            
+            let info = SilentPaymentInfo {
+                txid,
+                vout: payment.vout,
+                amount: payment.amount,
+                block_height: payment.block_height,
+                spent: payment.spent,
+            };
+            
+            scanner.detected_payments.insert(outpoint, info);
+        }
+        
+        Ok(scanner)
+    }
+    
+    /// Add a detected payment to the scanner
+    pub fn add_detected_payment(&mut self, outpoint: OutPoint, info: SilentPaymentInfo) {
+        self.detected_payments.insert(outpoint, info);
+    }
+    
+    /// Get the scan public key
+    pub fn scan_pubkey(&self) -> XOnlyPublicKey {
+        XOnlyPublicKey::from_secret_key(&self.secp, &self.scan_secret).0
+    }
+    
+    /// Get all detected payments
+    pub fn get_detected_payments(&self) -> &HashMap<OutPoint, SilentPaymentInfo> {
+        &self.detected_payments
     }
 } 
