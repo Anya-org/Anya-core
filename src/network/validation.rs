@@ -689,7 +689,7 @@ impl NetworkValidator {
         #[cfg(target_os = "macos")]
         {
             let output = Command::new("defaults")
-                .args(&["read", "/Library/Preferences/com.apple.alf", "globalstate"])
+                .args(&["read", std::path::Path::new("/").join("Library/Preferences/com.apple.alf").to_string_lossy(), "globalstate"])
                 .output();
                 
             match output {

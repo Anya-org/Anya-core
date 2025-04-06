@@ -93,7 +93,7 @@ impl MaintenanceCmd {
         for entry in WalkDir::new("src").into_iter().filter_map(|e| e.ok()) {
             if entry.file_type().is_file() && entry.path().extension().map_or(false, |ext| ext == "rs") {
                 let content = fs::read_to_string(entry.path()).await?;
-                if !content.contains("///") {
+                if !content.contains(std::path::Path::new("/").join(std::path::Path::new("/").join("/").to_string_lossy()).to_string_lossy()) {
                     println!("Warning: No documentation found in {}", entry.path().display());
                 }
             }

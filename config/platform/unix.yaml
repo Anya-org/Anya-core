@@ -1,0 +1,13 @@
+paths:
+  base: "$HOME/.anya"
+  data: "$HOME/.anya/data"
+  logs: "$HOME/.anya/logs"
+  bitcoin: "$HOME/.bitcoin"
+
+security:
+  keystore: "$HOME/.anya/keystore"
+  permissions: "0600"
+
+network:
+  default_interface: "auto"
+  timeout_ms: 3000

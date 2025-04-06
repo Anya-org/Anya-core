@@ -191,7 +191,7 @@ impl AssetRegistry {
     }
 
     pub async fn register_asset(&self, asset: &RgbAsset) -> Result<(), RgbError> {
-        let url = format!("{}/assets", self.url);
+        let url = std::path::Path::new(self.url).join("assets").to_string_lossy();
         let response = self.client.post(&url)
             .json(asset)
             .send()
@@ -207,7 +207,7 @@ impl AssetRegistry {
     }
 
     pub async fn update_issuance(&self, issuance: &RgbIssuance) -> Result<(), RgbError> {
-        let url = format!("{}/issuances", self.url);
+        let url = std::path::Path::new(self.url).join("issuances").to_string_lossy();
         let response = self.client.post(&url)
             .json(issuance)
             .send()
@@ -223,7 +223,7 @@ impl AssetRegistry {
     }
 
     pub async fn update_transfer(&self, transfer: &RgbTransfer) -> Result<(), RgbError> {
-        let url = format!("{}/transfers", self.url);
+        let url = std::path::Path::new(self.url).join("transfers").to_string_lossy();
         let response = self.client.post(&url)
             .json(transfer)
             .send()

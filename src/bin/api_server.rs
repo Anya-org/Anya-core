@@ -129,75 +129,75 @@ impl ResponseError for ApiError {
 
 // API routes
 fn api_routes() -> impl HttpServiceFactory {
-    web::scope("/api")
+    web::scope(std::path::Path::new("/").join("api").to_string_lossy())
         .service(
-            web::scope("/v1")
+            web::scope(std::path::Path::new("/").join("v1").to_string_lossy())
                 // Core system endpoints
-                .service(web::resource("/health").route(web::get().to(health_check)))
-                .service(web::resource("/config").route(web::get().to(get_config)))
+                .service(web::resource(std::path::Path::new("/").join("health").to_string_lossy()).route(web::get().to(health_check)))
+                .service(web::resource(std::path::Path::new("/").join("config").to_string_lossy()).route(web::get().to(get_config)))
                 
                 // Bitcoin wallet endpoints
                 .service(
-                    web::scope("/wallet")
-                        .service(web::resource("/create").route(web::post().to(create_wallet)))
-                        .service(web::resource("/balance").route(web::get().to(get_wallet_balance)))
-                        .service(web::resource("/address/new").route(web::get().to(get_new_address)))
-                        .service(web::resource("/transactions").route(web::get().to(get_transactions)))
-                        .service(web::resource("/send").route(web::post().to(send_transaction)))
+                    web::scope(std::path::Path::new("/").join("wallet").to_string_lossy())
+                        .service(web::resource(std::path::Path::new("/").join("create").to_string_lossy()).route(web::post().to(create_wallet)))
+                        .service(web::resource(std::path::Path::new("/").join("balance").to_string_lossy()).route(web::get().to(get_wallet_balance)))
+                        .service(web::resource(std::path::Path::new("/").join("address/new").to_string_lossy()).route(web::get().to(get_new_address)))
+                        .service(web::resource(std::path::Path::new("/").join("transactions").to_string_lossy()).route(web::get().to(get_transactions)))
+                        .service(web::resource(std::path::Path::new("/").join("send").to_string_lossy()).route(web::post().to(send_transaction)))
                 )
                 
                 // RGB asset endpoints
                 .service(
-                    web::scope("/rgb")
-                        .service(web::resource("/assets").route(web::get().to(list_assets)))
-                        .service(web::resource("/issue").route(web::post().to(issue_asset)))
-                        .service(web::resource("/transfer").route(web::post().to(transfer_asset)))
-                        .service(web::resource("/asset/{contract_id}").route(web::get().to(get_asset_info)))
+                    web::scope(std::path::Path::new("/").join("rgb").to_string_lossy())
+                        .service(web::resource(std::path::Path::new("/").join("assets").to_string_lossy()).route(web::get().to(list_assets)))
+                        .service(web::resource(std::path::Path::new("/").join("issue").to_string_lossy()).route(web::post().to(issue_asset)))
+                        .service(web::resource(std::path::Path::new("/").join("transfer").to_string_lossy()).route(web::post().to(transfer_asset)))
+                        .service(web::resource(std::path::Path::new("/").join("asset/{contract_id}").to_string_lossy()).route(web::get().to(get_asset_info)))
                 )
                 
                 // Web5 endpoints
                 .service(
-                    web::scope("/web5")
-                        .service(web::resource("/did/create").route(web::post().to(create_did)))
-                        .service(web::resource("/did/resolve/{did}").route(web::get().to(resolve_did)))
-                        .service(web::resource("/credential/issue").route(web::post().to(issue_credential)))
-                        .service(web::resource("/credential/verify").route(web::post().to(verify_credential)))
-                        .service(web::resource("/credential/revoke").route(web::post().to(revoke_credential)))
-                        .service(web::resource("/dwn/create").route(web::post().to(create_dwn)))
-                        .service(web::resource("/dwn/process").route(web::post().to(process_dwn_message)))
+                    web::scope(std::path::Path::new("/").join("web5").to_string_lossy())
+                        .service(web::resource(std::path::Path::new("/").join("did/create").to_string_lossy()).route(web::post().to(create_did)))
+                        .service(web::resource(std::path::Path::new("/").join("did/resolve/{did}").to_string_lossy()).route(web::get().to(resolve_did)))
+                        .service(web::resource(std::path::Path::new("/").join("credential/issue").to_string_lossy()).route(web::post().to(issue_credential)))
+                        .service(web::resource(std::path::Path::new("/").join("credential/verify").to_string_lossy()).route(web::post().to(verify_credential)))
+                        .service(web::resource(std::path::Path::new("/").join("credential/revoke").to_string_lossy()).route(web::post().to(revoke_credential)))
+                        .service(web::resource(std::path::Path::new("/").join("dwn/create").to_string_lossy()).route(web::post().to(create_dwn)))
+                        .service(web::resource(std::path::Path::new("/").join("dwn/process").to_string_lossy()).route(web::post().to(process_dwn_message)))
                 )
                 
                 // Lightning Network endpoints
                 .service(
-                    web::scope("/lightning")
-                        .service(web::resource("/info").route(web::get().to(get_node_info)))
-                        .service(web::resource("/connect").route(web::post().to(connect_peer)))
-                        .service(web::resource("/channel/open").route(web::post().to(open_channel)))
-                        .service(web::resource("/channel/close").route(web::post().to(close_channel)))
-                        .service(web::resource("/invoice").route(web::post().to(create_invoice)))
-                        .service(web::resource("/pay").route(web::post().to(pay_invoice)))
+                    web::scope(std::path::Path::new("/").join("lightning").to_string_lossy())
+                        .service(web::resource(std::path::Path::new("/").join("info").to_string_lossy()).route(web::get().to(get_node_info)))
+                        .service(web::resource(std::path::Path::new("/").join("connect").to_string_lossy()).route(web::post().to(connect_peer)))
+                        .service(web::resource(std::path::Path::new("/").join("channel/open").to_string_lossy()).route(web::post().to(open_channel)))
+                        .service(web::resource(std::path::Path::new("/").join("channel/close").to_string_lossy()).route(web::post().to(close_channel)))
+                        .service(web::resource(std::path::Path::new("/").join("invoice").to_string_lossy()).route(web::post().to(create_invoice)))
+                        .service(web::resource(std::path::Path::new("/").join("pay").to_string_lossy()).route(web::post().to(pay_invoice)))
                 )
                 
                 // PSBT endpoints
                 .service(
-                    web::scope("/psbt")
-                        .service(web::resource("/create").route(web::post().to(create_psbt)))
-                        .service(web::resource("/sign").route(web::post().to(sign_psbt)))
-                        .service(web::resource("/finalize").route(web::post().to(finalize_psbt)))
-                        .service(web::resource("/broadcast").route(web::post().to(broadcast_psbt)))
+                    web::scope(std::path::Path::new("/").join("psbt").to_string_lossy())
+                        .service(web::resource(std::path::Path::new("/").join("create").to_string_lossy()).route(web::post().to(create_psbt)))
+                        .service(web::resource(std::path::Path::new("/").join("sign").to_string_lossy()).route(web::post().to(sign_psbt)))
+                        .service(web::resource(std::path::Path::new("/").join("finalize").to_string_lossy()).route(web::post().to(finalize_psbt)))
+                        .service(web::resource(std::path::Path::new("/").join("broadcast").to_string_lossy()).route(web::post().to(broadcast_psbt)))
                 )
                 
                 // DWN endpoints
                 .service(
-                    web::scope("/dwn")
-                        .service(web::resource("/create").route(web::post().to(create_dwn)))
-                        .service(web::resource("/process").route(web::post().to(process_dwn_message)))
-                        .service(web::resource("/process/enhanced").route(web::post().to(process_dwn_message_enhanced)))
-                        .service(web::resource("/query").route(web::post().to(query_dwn)))
-                        .service(web::resource("/query/anchored").route(web::post().to(query_dwn_anchored)))
-                        .service(web::resource("/anchor/{did}/{message_id}").route(web::post().to(anchor_dwn_message)))
-                        .service(web::resource("/status/{did}/{message_id}").route(web::get().to(get_dwn_anchoring_status)))
-                        .service(web::resource("/verify/{did}/{message_id}").route(web::get().to(verify_dwn_anchoring)))
+                    web::scope(std::path::Path::new("/").join("dwn").to_string_lossy())
+                        .service(web::resource(std::path::Path::new("/").join("create").to_string_lossy()).route(web::post().to(create_dwn)))
+                        .service(web::resource(std::path::Path::new("/").join("process").to_string_lossy()).route(web::post().to(process_dwn_message)))
+                        .service(web::resource(std::path::Path::new("/").join("process/enhanced").to_string_lossy()).route(web::post().to(process_dwn_message_enhanced)))
+                        .service(web::resource(std::path::Path::new("/").join("query").to_string_lossy()).route(web::post().to(query_dwn)))
+                        .service(web::resource(std::path::Path::new("/").join("query/anchored").to_string_lossy()).route(web::post().to(query_dwn_anchored)))
+                        .service(web::resource(std::path::Path::new("/").join("anchor/{did}/{message_id}").to_string_lossy()).route(web::post().to(anchor_dwn_message)))
+                        .service(web::resource(std::path::Path::new("/").join("status/{did}/{message_id}").to_string_lossy()).route(web::get().to(get_dwn_anchoring_status)))
+                        .service(web::resource(std::path::Path::new("/").join("verify/{did}/{message_id}").to_string_lossy()).route(web::get().to(verify_dwn_anchoring)))
                 )
         )
 }

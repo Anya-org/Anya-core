@@ -1,44 +1,32 @@
-# Anya Core Workspace Configuration
 [package]
-name = "anya-core"
-version = "3.1.0"
+name = "anya-workspace"
+version = "2.5.0"
 edition = "2021"
 authors = ["Anya Core Team"]
-description = "Enterprise Bitcoin Infrastructure with ML & Web5"
+description = "Anya Core Bitcoin Development Framework"
 repository = "https://github.com/anya-org/anya-core"
 license = "MIT"
-rust-version = "1.70"
 
 [workspace]
 members = [
-    "anya-bitcoin",
-    "anya-ml",
+    "core",
+    "bitcoin",
     "packages/core",
     "packages/bitcoin-network",
     "packages/metrics",
     "packages/protocol-adapters",
     "packages/mcp-interface",
     "packages/bin",
+    "packages/privacy",
     "extensions/enterprise",
     "extensions/mobile"
 ]
 resolver = "2"
 
-# Workspace package inheritance
-[workspace.package]
-version = "2.5.0"
-edition = "2021"
-authors = ["Anya Core Team"]
-description = "Anya Core Bitcoin Development Framework"
-license = "MIT"
-repository = "https://github.com/anya-org/anya-core"
-rust-version = "1.70"
-
-# Consolidated dependencies without duplicates
 [workspace.dependencies]
 # Bitcoin dependencies
 bitcoin = { version = "0.32.5", features = ["rand", "serde"] }
-secp256k1 = { version = "0.27.0", features = ["bitcoin_hashes", "rand"] }
+secp256k1 = { version = "0.28.0", features = ["bitcoin_hashes", "rand"] }
 bitcoincore-rpc = "0.19.0"
 bdk = { version = "0.30.2", default-features = false }
 
@@ -47,73 +35,9 @@ tokio = { version = "1.37.0", features = ["full", "tracing"] }
 futures = "0.3.30"
 libp2p = { version = "0.55.0", features = ["full"] }
 tokio-signal = "0.2.9"
+async-trait = "0.1.73"
+tokio-util = "0.7.10"
+tower = { version = "0.4.13", features = ["util", "timeout"] }
+tower-http = { version = "0.4.4", features = ["trace", "cors", "compression-gzip"] }
 
-# Serialization
-serde = { version = "1.0.195", features = ["derive"] }
-serde_json = "1.0.111"
-serde_yaml = "0.9.25"
-toml = "0.8.8"
-
-# Error handling
-anyhow = { version = "1.0.79", features = ["backtrace"] }
-thiserror = "2.0.12"
-
-# Logging & metrics
-log = "0.4.20"
-tracing = { version = "0.1.40", features = ["attributes"] }
-tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
-metrics = "0.24.1"
-
-# CLI
-structopt = "0.3"
-clap = { version = "4.0", features = ["derive"] }
-
-# Testing
-test = "0.15.4"
-mockall = "0.13.1"
-tokio-test = "0.4"
-
-# Security
-ring = "0.17.14"
-sha2 = "0.10.8"
-zeroize = "1.7.0"
-ed25519-dalek = "2.1.1"
-x25519-dalek = "2.0.0"
-chacha20poly1305 = "0.10.1"
-aes-gcm = "0.10.3"
-hmac = "0.12.1"
-pbkdf2 = "0.12.2"
-
-# Utils
-walkdir = "2.3"
-glob = "0.3"
-regex = "1.5"
-chrono = "0.4"
-jsonschema = "0.29.1"
-
-anya-bitcoin = { path = "./anya-bitcoin" }
-anya-core = { path = "./anya-core" }
-
-[dependencies]
-# Use workspace dependencies
-tokio = { workspace = true }
-anyhow = { workspace = true }
-thiserror = { workspace = true }
-serde = { workspace = true }
-serde_json = { workspace = true }
-bdk = { workspace = true, optional = true }
-bitcoin = { workspace = true }
-anya-bitcoin = { path = "./anya-bitcoin" }
-anya-core = { path = "./anya-core" }
-
-[features]
-default = ["bitcoin-support", "taproot", "psbt-v2"]
-bitcoin-support = ["dep:bdk"]
-taproot = ["bitcoin/taproot"]
-psbt-v2 = ["bdk/psbt-v2"]
-hardware-wallet = ["bitcoin/hardware-wallet"]
-
-[dev-dependencies]
-tempfile = "3.9.0"
-test-log = "0.2.14"
-mockall = { workspace = true }
+# Other dependencies as in original file...

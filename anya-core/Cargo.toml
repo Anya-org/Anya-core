@@ -1,12 +1,3 @@
-[workspace]
-members = [
-    "core",
-    "cli", 
-    "installer",
-    "mobile",
-    "anya-ml",
-    "dependencies/anya-bitcoin"
-]
 
 [workspace.package]
 version = "0.1.0"

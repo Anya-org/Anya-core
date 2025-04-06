@@ -84,7 +84,7 @@ zmq_enabled = true
 zmq_port = {}
 "#,
             network,
-            rpc_url.unwrap_or(&format!("http://localhost:{}", if network == "mainnet" { 8332 } else { 18332 })),
+            rpc_url.unwrap_or(&std::path::Path::new(if network == "mainnet" { 8332 } else { 18332 }).join("localhost:{}").to_string_lossy()),
             if network == "mainnet" { 28332 } else { 28333 }
         );
 

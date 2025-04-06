@@ -191,10 +191,10 @@ impl Wallet {
             
             for i in 0..20 {
                 let path = match address_type {
-                    AddressType::Legacy => format!("m/44'/0'/0'/0/{}", i),
-                    AddressType::SegWit => format!("m/84'/0'/0'/0/{}", i),
-                    AddressType::NestedSegWit => format!("m/49'/0'/0'/0/{}", i),
-                    AddressType::Taproot => format!("m/86'/0'/0'/0/{}", i),
+                    AddressType::Legacy => std::path::Path::new(i).join("{}").to_string_lossy(),
+                    AddressType::SegWit => std::path::Path::new(i).join("{}").to_string_lossy(),
+                    AddressType::NestedSegWit => std::path::Path::new(i).join("{}").to_string_lossy(),
+                    AddressType::Taproot => std::path::Path::new(i).join("{}").to_string_lossy(),
                 };
                 
                 let secret_key = self.derive_key(&path)?;
@@ -276,10 +276,10 @@ impl AddressManager for Wallet {
         let index = type_addresses.len() as u32;
         
         let path = match address_type {
-            AddressType::Legacy => format!("m/44'/0'/0'/0/{}", index),
-            AddressType::SegWit => format!("m/84'/0'/0'/0/{}", index),
-            AddressType::NestedSegWit => format!("m/49'/0'/0'/0/{}", index),
-            AddressType::Taproot => format!("m/86'/0'/0'/0/{}", index),
+            AddressType::Legacy => std::path::Path::new(index).join("{}").to_string_lossy(),
+            AddressType::SegWit => std::path::Path::new(index).join("{}").to_string_lossy(),
+            AddressType::NestedSegWit => std::path::Path::new(index).join("{}").to_string_lossy(),
+            AddressType::Taproot => std::path::Path::new(index).join("{}").to_string_lossy(),
         };
         
         let secret_key = self.derive_key(&path)?;
@@ -316,10 +316,10 @@ impl AddressManager for Wallet {
         
         // Address not found, derive it
         let path = match address_type {
-            AddressType::Legacy => format!("m/44'/0'/0'/0/{}", index),
-            AddressType::SegWit => format!("m/84'/0'/0'/0/{}", index),
-            AddressType::NestedSegWit => format!("m/49'/0'/0'/0/{}", index),
-            AddressType::Taproot => format!("m/86'/0'/0'/0/{}", index),
+            AddressType::Legacy => std::path::Path::new(index).join("{}").to_string_lossy(),
+            AddressType::SegWit => std::path::Path::new(index).join("{}").to_string_lossy(),
+            AddressType::NestedSegWit => std::path::Path::new(index).join("{}").to_string_lossy(),
+            AddressType::Taproot => std::path::Path::new(index).join("{}").to_string_lossy(),
         };
         
         let secret_key = self.derive_key(&path)?;

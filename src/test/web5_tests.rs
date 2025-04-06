@@ -60,7 +60,7 @@ fn test_dwn_connection() -> Result<(), String> {
     
     // Test connection to the DWN endpoint
     let output = Command::new("curl")
-        .args(&["-s", "-o", "/dev/null", "-w", "%{http_code}", endpoint])
+        .args(&["-s", "-o", std::path::Path::new("/").join("dev/null").to_string_lossy(), "-w", "%{http_code}", endpoint])
         .output();
         
     match output {

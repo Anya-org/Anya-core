@@ -468,7 +468,7 @@ fn verify_bip_compliance() -> Result<(), String> {
     let report_content = format!("# BIP Compliance Report\n\nDate: {}\n\n## Results\n\n* BIP-341: Passed\n* BIP-342: Passed\n* BIP-174: Passed\n* BIP-370: Passed\n\n## Overall Status: Passed\n", 
         chrono::Local::now().format("%Y-%m-%d %H:%M:%S"));
     
-    fs::write(format!("{}/compliance_report.md", report_dir), report_content)
+    fs::write(std::path::Path::new(report_dir).join("compliance_report.md").to_string_lossy(), report_content)
         .map_err(|e| format!("Failed to write compliance report: {}", e))?;
     
     info!("BIP compliance report generated in {}/compliance_report.md", report_dir);

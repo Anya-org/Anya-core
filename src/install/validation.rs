@@ -190,7 +190,7 @@ fn verify_core_components() -> Result<(), String> {
     
     // Check for required binaries
     for binary in &["anya-core", "anya-cli"] {
-        let binary_path = format!("bin/{}", binary);
+        let binary_path = std::path::Path::new(binary).join("{}").to_string_lossy();
         if !Path::new(&binary_path).exists() {
             return Err(format!("Core binary not found: {}", binary_path));
         }

@@ -185,3 +185,17 @@ fn validate_psbt_v2(psbt: &Psbt) -> Result<()> {
     validate_silent_leaf(psbt)?; // BIP-341 integration
 }
 ```
+
+## BIP353 Test Vectors
+
+```rust
+#[test]
+fn test_silent_payment_generation() {
+    let secp = Secp256k1::new();
+    let scan_key = SecretKey::new(&mut rand::thread_rng());
+    let spend_key = SecretKey::new(&mut rand::thread_rng());
+    
+    let addr = generate_silent_address(&secp, &scan_key, &spend_key);
+    assert_eq!(addr.to_string().len(), 42);
+}
+```

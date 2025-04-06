@@ -66,7 +66,7 @@ pub fn verify_all() {
         chrono::Local::now().format("%Y-%m-%d %H:%M:%S")
     );
     
-    std::fs::write(format!("{}/compliance_report.md", report_dir), report_content)
+    std::fs::write(std::path::Path::new(report_dir).join("compliance_report.md").to_string_lossy(), report_content)
         .expect("Failed to write compliance report");
     
     info!("Comprehensive compliance report generated in {}/compliance_report.md", report_dir);

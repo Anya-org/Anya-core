@@ -1,6 +1,7 @@
 # Bitcoin Development Framework v2.5 Compliance
 
 ## Implementation Status
+
 ```mermaid
 pie
     title BIP Compliance
@@ -11,6 +12,7 @@ pie
 ```
 
 ## Audit Trail
+
 ```rust
 // Updated validation flow
 fn validate_transaction(tx: &Transaction) -> Result<()> {
@@ -22,6 +24,7 @@ fn validate_transaction(tx: &Transaction) -> Result<()> {
 ```
 
 ## Security Matrix
+
 ```toml
 [security]
 taproot_checks = { enabled = true, silent_leaf = "0x8f3a1c29566443e2e2d6e5a9a5a4e8d" }
@@ -34,6 +37,7 @@ hsm_integration = {
 ```
 
 ## Mobile Standards
+
 ```mermaid
 sequenceDiagram
     Mobile->>+HSM: PSBT Signing Request

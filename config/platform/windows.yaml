@@ -1,0 +1,13 @@
+paths:
+  base: "%USERPROFILE%\\.anya"
+  data: "%USERPROFILE%\\.anya\\data"
+  logs: "%USERPROFILE%\\.anya\\logs"
+  bitcoin: "%APPDATA%\\Bitcoin"
+
+security:
+  keystore: "%USERPROFILE%\\.anya\\keystore"
+  permissions: "0600"
+
+network:
+  default_interface: "auto"
+  timeout_ms: 3000 

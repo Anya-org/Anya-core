@@ -18,6 +18,7 @@
   - Hardware-backed RNG where available
 
 ## Audit Trail Format
+
 ```json
 {
   "timestamp": 1712345678,
@@ -42,6 +43,7 @@
 ```
 
 ## Validation Commands
+
 ```bash
 # Verify installation
 anya-validator --check compliance --level bpc3
@@ -57,6 +59,15 @@ anya-validator --check psbt-v2 --level strict
 
 # Test Taproot commitments
 anya-validator --check taproot --silent-leaf
+
+# Verify Silent Payments implementation
+anya-validator --check silent-payments --level strict
+
+# Test Silent Payment address generation
+anya-test silent-payments --create-address
+
+# Test Silent Payment scanning
+anya-test silent-payments --scan --tx-file test_vectors.json
 ```
 
 This implementation provides:
@@ -164,12 +175,9 @@ anya-installer configure \
   --rpc-password "custom_password"
 ```
 
-### Security Considerations
+### Advanced Channel Management
 
-1. **RPC Credentials**: Store RPC credentials securely
-2. **Wallet Backup**: Regularly backup BDK wallet files
-3. **Network Validation**: Verify RPC endpoints before use
-4. **SSL/TLS**: Use HTTPS for all RPC connections
+1. **Channel Security**: Use secure channel limits and fees
 
 ### Logging Configuration
 
@@ -334,36 +342,10 @@ The LDK wallet is configured with:
 - Storage path: `lightning/wallet`
 - Backup path: `lightning/backup`
 
-### Security Considerations
+### Advanced Channel Management
 
 1. **Channel Security**: Use secure channel limits and fees
 2. **Backup**: Regularly backup LDK wallet and network graph
-3. **Network**: Use secure listen addresses
-4. **Peer Management**: Verify peer connections
-5. **Channel Management**: Monitor channel health
-
-### Advanced Configuration
-
-```bash
-# Set custom channel limits
-anya-installer configure \
-  --network testnet \
-  --ldk-channel-limit 200 \
-  --ldk-min-channel-size 500000 \
-  --ldk-max-channel-size 20000000
-
-# Set custom fees
-anya-installer configure \
-  --network testnet \
-  --ldk-fee-base 500 \
-  --ldk-fee-proportional 2
-
-# Set custom router settings
-anya-installer configure \
-  --network testnet \
-  --ldk-sync-interval 300 \
-  --ldk-penalty-half-life 86400
-```
 
 ### Monitoring
 
@@ -467,8 +449,8 @@ For support and documentation, visit: <https://anya.org/docs>
 
 Mobile:
 
-  - React Native 0.72+
-  - Android Studio/Xcode with Rust toolchain
+- React Native 0.72+
+- Android Studio/Xcode with Rust toolchain
 
 ## Continuous Integration
 
@@ -480,32 +462,3 @@ act -j security-audit
 # Run security tests
 cargo test --release --lib --bins -p anya-installer -- security::
 ```
-
-## Audit Process
-
-1. Weekly automated security audits
-2. On-demand compliance checks
-3. Fuzz testing integration
-4. Hardware Security Module (HSM) validation
-
-![Audit Workflow](docs/images/audit_workflow.png)
-
-## Web5 Security Requirements
-
-- **DID Configuration**:
-  ```bash
-  anya-cli web5 configure-did --method did:key --format jwk
-  ```
-  
-- **Credential Validation**:
-  ```rust
-  let vc = VerifiableCredential::new()
-      .add_context("https://www.w3.org/2022/credentials/v1")
-      .add_type("VerifiableCredential")
-      .validate_format(VCFormat::JWT2020)?;
-  ```
-
-- **Revocation Checks**:
-  ```bash
-  anya-validator check-revocation --credential credential.json
-  ```
