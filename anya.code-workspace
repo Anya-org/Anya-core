@@ -12,7 +12,6 @@
         "gitlens.views.branches.branches.layout": "list",
         "gitlens.views.repositories.branches.layout": "list",
         "gitlens.views.repositories.files.layout": "tree",
-        "gitlens.views.repositories.enabled": true,
         "gitlens.views.branches.enabled": true,
         "gitlens.advanced.messages": {
             "suppressCommitHasNoPreviousCommitWarning": false,

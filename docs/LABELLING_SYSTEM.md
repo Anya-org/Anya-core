@@ -42,28 +42,6 @@ This script allows you to commit changes to multiple repositories with proper la
 - `-d, --dry-run`: Show what would be committed without making changes
 - `-h, --help`: Show help message
 
-#### PowerShell Version (`batch_commit.ps1`)
-
-Windows-compatible PowerShell version of the batch commit script.
-
-##### Usage
-
-```powershell
-./scripts/batch_commit.ps1 -Message "Commit message" -Type "feat" -Scope "component" -Labels "AIR-3,AIS-2,AIT-3" [-Repos "repo1,repo2"] [-Validate]
-```
-
-##### Parameters
-
-- `-Message "MESSAGE"`: Commit message (required)
-- `-Type "TYPE"`: Commit type (default: feat)
-- `-Scope "SCOPE"`: Commit scope (optional)
-- `-Labels "LABELS"`: Comma-separated labels (required)
-- `-Repos "REPOSITORIES"`: Comma-separated repository list (default: auto-detected)
-- `-Validate`: Validate labels before committing
-- `-DryRun`: Show what would be committed without making changes
-- `-RootDir "PATH"`: Root directory containing all repositories (optional)
-- `-Help`: Show help message
-
 ### 2. Label Synchronization Script
 
 #### Python Version (`sync_labelling.py`)
@@ -85,27 +63,6 @@ python scripts/sync_labelling.py [--source REPO] [--target REPOS] [--check-only]
 - `--no-commit`: Do not commit changes after synchronization
 - `--batch-commit`: Use batch_commit.sh for committing changes
 
-#### PowerShell Version (`sync_labelling.ps1`)
-
-Windows-compatible PowerShell version of the synchronization script.
-
-##### Usage
-
-```powershell
-./scripts/sync_labelling.ps1 [-Source "REPO"] [-Target "REPOS"] [-CheckOnly] [-DryRun]
-```
-
-##### Parameters
-
-- `-Source "REPO"`: Source repository for label standards (default: anya-core)
-- `-Target "REPOS"`: Target repositories (comma-separated, default: auto-detected)
-- `-CheckOnly`: Only check for differences without making changes
-- `-DryRun`: Show what would be done without making actual changes
-- `-NoCommit`: Do not commit changes after synchronization
-- `-BatchCommit`: Use batch_commit.ps1 for committing changes
-- `-RootDir "PATH"`: Root directory containing all repositories (optional)
-- `-Help`: Show help message
-
 ### 3. GitHub Actions Workflow
 
 The `sync-labelling.yml` workflow automatically synchronizes labeling files whenever changes are made to `docs/standards/AI_LABELING.md` or `COMMIT_RULES.md` in the main repository. It can also be manually triggered from the GitHub Actions tab.
@@ -115,7 +72,7 @@ The `sync-labelling.yml` workflow automatically synchronizes labeling files when
 The labeling system is designed to work seamlessly across different operating systems:
 
 - **Linux/macOS**: Use the Bash scripts (`.sh` extension)
-- **Windows**: Use the PowerShell scripts (`.ps1` extension)
+- **Windows**: Use the Bash scripts via WSL or Git Bash
 
 Both versions provide identical functionality with platform-appropriate syntax and error handling.
 
@@ -130,58 +87,43 @@ If you're having issues running the scripts on Windows, follow these simplified 
    ```
 
 2. **Run the batch commit script directly from PowerShell**:
-
-   ```powershell
+   ```bash
    # Run script with full path specification
-   .\scripts\batch_commit.ps1 -Message "Your commit message" -Type "feat" -Labels "AIR-3,AIS-2"
+   ./scripts/batch_commit.sh -Message "Your commit message" -Type "feat" -Labels "AIR-3,AIS-2"
    
    # If running outside the repository:
-   & "C:\path\to\OPSource\anya-core\scripts\batch_commit.ps1" -Message "Your commit message" -Type "feat" -Labels "AIR-3,AIS-2"
+   ./scripts/batch_commit.sh -Message "Your commit message" -Type "feat" -Labels "AIR-3,AIS-2"
    ```
 
 3. **Specify repositories explicitly if auto-detection fails**:
-
-   ```powershell
-   .\scripts\batch_commit.ps1 -Message "Update docs" -Type "docs" -Labels "AIR-3,AIS-2" -Repos "anya-core"
+   ```bash
+   ./scripts/batch_commit.sh -Message "Update docs" -Type "docs" -Labels "AIR-3,AIS-2" -Repos "anya-core"
    ```
 
 4. **For unusual repository structures, use the RootDir parameter**:
-
-   ```powershell
-   .\scripts\batch_commit.ps1 -Message "Fix bug" -Type "fix" -Labels "AIR-3,AIS-2" -RootDir "C:\Users\username\Projects"
+   ```bash
+   ./scripts/batch_commit.sh -Message "Fix bug" -Type "fix" -Labels "AIR-3,AIS-2" -RootDir "C:\Users\username\Projects"
    ```
 
 5. **If you receive `-l` parameter errors**, you're likely using the wrong script format:
-
-   ```powershell
+   ```bash
    # Wrong (Bash format)
-   .\scripts\batch_commit.sh -m "Message" -l "AIR-3,AIS-2"  # This won't work in PowerShell!
+   ./scripts/batch_commit.sh -m "Message" -l "AIR-3,AIS-2"  # This won't work in PowerShell!
    
-   # Correct (PowerShell format)
-   .\scripts\batch_commit.ps1 -Message "Message" -Labels "AIR-3,AIS-2"  # Use this instead
+   # Correct (Bash format)
+   ./scripts/batch_commit.sh -Message "Message" -Labels "AIR-3,AIS-2"  # Use this instead
    ```
 
 ### Windows-Specific Setup
 
-When running the PowerShell scripts on Windows:
-
-1. Ensure PowerShell execution policy allows running scripts:
-
-   ```powershell
-   Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
-   ```
-
-2. Always run the scripts from the repository's root directory:
-
-   ```powershell
+When running scripts on Windows use the Bash versions (via WSL or Git Bash) to have uniform behavior:
+   ```bash
    cd C:\path\to\anya-core
-   ./scripts/batch_commit.ps1 -Help
+   ./scripts/batch_commit.sh -Help
    ```
-
-3. If repositories are not in the expected location (i.e., not all in the same parent directory), use the `-RootDir` parameter:
-
+   Instead of:
    ```powershell
-   ./scripts/batch_commit.ps1 -Message "Update" -Type "fix" -Labels "AIR-3,AIS-2" -RootDir "C:\Projects"
+   .\scripts\batch_commit.ps1 -Help
    ```
 
 ## Repository Structure
@@ -193,12 +135,9 @@ parent-directory/
 ├── anya-core/
 │   ├── .git/
 │   ├── scripts/
-│   │   ├── batch_commit.ps1
 │   │   ├── batch_commit.sh
-│   │   ├── sync_labelling.ps1
 │   │   ├── sync_labelling.py
-│   │   ├── update_github_url.ps1
-│   │   └── update_github_url.sh
+│   │   ├── update_github_url.sh
 │   └── docs/standards/AI_LABELING.md
 ├── anya-bitcoin/
 │   ├── .git/
@@ -248,20 +187,12 @@ To ensure consistent labeling across all repositories:
 
 To update GitHub repository URLs across the codebase:
 
-1. **Run Update Script**: Execute `update_github_url.ps1` (Windows) or `update_github_url.sh` (Linux/macOS)
+1. **Run Update Script**: Execute `update_github_url.sh` (Linux/macOS)
 2. **Verify Changes**: Review the log file and check critical files
 3. **Test**: Ensure all references work correctly after the update
 4. **Commit**: Commit changes in logical groups (documentation, configuration, scripts, etc.)
 
 Example usage:
-
-```powershell
-## Windows (PowerShell)
-./scripts/update_github_url.ps1 -DryRun
-
-## Actually perform the updates
-./scripts/update_github_url.ps1
-```
 
 ```bash
 ## Linux/macOS
@@ -326,17 +257,17 @@ If label synchronization fails:
 On Windows systems:
 
 1. Make sure PowerShell execution policy allows running scripts (`Set-ExecutionPolicy RemoteSigned`)
-2. Use the `.ps1` versions of the scripts
+2. Use the `.sh` versions of the scripts via WSL or Git Bash
 3. If encountering path issues, ensure proper repository structure or use the `-RootDir` parameter
 4. For Git operations, verify that Git is in your PATH environment variable
-5. If you receive errors with `-l` parameter, make sure you're using the PowerShell script (.ps1) not the Bash script (.sh)
+5. If you receive errors with `-l` parameter, make sure you're using the Bash script (.sh) not the PowerShell script (.ps1)
 
 ### Common Errors and Solutions
 
 | Error | Solution |
 |-------|----------|
-| `The term './scripts/batch_commit.sh' is not recognized...` | Use PowerShell script (`batch_commit.ps1`) on Windows |
-| `The term '-l' is not recognized...` | Use PowerShell parameter format: `-Labels` instead of `-l` |
+| `The term './scripts/batch_commit.sh' is not recognized...` | Use Bash script (`batch_commit.sh`) on Windows via WSL or Git Bash |
+| `The term '-l' is not recognized...` | Use Bash parameter format: `-Labels` instead of `-l` |
 | Repository not found | Use `-RootDir` to specify the correct parent directory |
 | Git not found | Install Git and ensure it's in the PATH environment variable |
 | Failed to commit changes | Check Git error message and fix the issue (e.g., configuration problems) |
@@ -353,28 +284,6 @@ On Windows systems:
 8. **Check Results**: Always verify that commits were successful in the output summary
 
 ## Examples
-
-### PowerShell Examples
-
-```powershell
-## Batch commit with labels - simple example
-./scripts/batch_commit.ps1 -Message "Update ML models" -Type "feat" -Scope "ml" -Labels "AIR-3,AIS-2,AIT-3,AIM-2"
-
-## Batch commit with validation and specific repositories
-./scripts/batch_commit.ps1 -Message "Fix security issues" -Type "fix" -Scope "security" -Labels "AIR-3,AIS-3" -Repos "anya-core,anya-bitcoin" -Validate
-
-## Batch commit with custom root directory
-./scripts/batch_commit.ps1 -Message "Update configs" -Type "chore" -Labels "AIR-3,AIS-2" -RootDir "C:\Projects\Anya"
-
-## Synchronize labels across all repositories
-./scripts/sync_labelling.ps1
-
-## Check for label differences only
-./scripts/sync_labelling.ps1 -CheckOnly
-
-## Synchronize labels to specific repositories
-./scripts/sync_labelling.ps1 -Target "anya-web5,anya-bitcoin" -DryRun
-```
 
 ### Bash Examples
 

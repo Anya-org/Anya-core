@@ -23,8 +23,8 @@ This directory contains scripts for building, testing, and maintaining the Bitco
 The security analysis framework consists of multiple components:
 
 1. **CodeQL Analysis**:
-   ```powershell
-   .\scripts\security\run-codeql-analysis.ps1
+   ```bash
+   ./scripts/ops/run-codeql-analysis.sh
    ```
    
 2. **Component-specific Analysis**:
@@ -71,4 +71,4 @@ For more information on security analysis and compliance, see `SECURITY_CODEQL.m
 
 - **March 2025**: Cleaned up redundant scripts and standardized the security analysis framework
 - **March 2025**: Enhanced BIP compliance validation (BIP-340, BIP-341, BIP-342, BIP-174, BIP-370, BIP-327)
-- **March 2025**: Added CodeQL integration for comprehensive security analysis 
+- **March 2025**: Added CodeQL integration for comprehensive security analysis

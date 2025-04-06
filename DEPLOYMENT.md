@@ -49,13 +49,13 @@ This document provides instructions for deploying Anya Core to a remote server.
 ### Option 2: Automated Deployment via PowerShell
 
 1. Run the test script to verify the setup files:
-   ```powershell
-   .\Test-AnyaCore.ps1
+   ```bash
+   ./Test-AnyaCore.sh
    ```
 
 2. Push the files to the remote server and run the setup:
-   ```powershell
-   .\push_to_server.ps1 -ServerHost "192.168.0.212" -ServerUser "anya" -RunSetup
+   ```bash
+   ./push_to_server.sh -ServerHost "192.168.0.212" -ServerUser "anya" -RunSetup
    ```
 
 ### Option 3: GitHub Actions Deployment
@@ -127,4 +127,4 @@ After successful deployment:
 1. Set up monitoring and alerts
 2. Configure regular backups
 3. Implement additional security measures
-4. Deploy your application code to interact with the infrastructure 
+4. Deploy your application code to interact with the infrastructure
