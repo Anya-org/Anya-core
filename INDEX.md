@@ -12,7 +12,7 @@ Welcome to the Anya Core documentation. This index will help you navigate the va
 
 - [Documentation Index](docs/INDEX.md) - Main documentation index
 - [System Architecture](docs/SYSTEM_MAP.md) - Complete system architecture
-- [DAO System](docs/DAO_SYSTEM_GUIDE.md) - Comprehensive DAO documentation
+- [DAO System](./DAO_SYSTEM.md) - Comprehensive DAO documentation
 - [Tokenomics System](docs/TOKENOMICS_SYSTEM.md) - Bitcoin-style tokenomics
 - [Implementation Milestones](docs/IMPLEMENTATION_MILESTONES.md) - Current progress tracking
 - [Testing Strategy](docs/TESTING_STRATEGY.md) - Sectional testing methodology

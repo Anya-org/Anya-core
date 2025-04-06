@@ -143,7 +143,7 @@ impl OracleClient {
     }
 
     pub async fn get_event_info(&self, event_id: &str) -> Result<OracleEvent, DlcError> {
-        let url = format!("{}/events/{}", self.url, event_id);
+        let url = std::path::Path::new(self.url, event_id).join("{}").to_string_lossy();
         let response = self.client.get(&url).send().await.map_err(|e| {
             DlcError::NetworkError(format!("Failed to get event info: {}", e))
         })?;

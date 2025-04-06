@@ -743,7 +743,7 @@ impl UnifiedTestRunner {
     
     /// Generate a unified test report
     fn generate_unified_report(&self) -> Result<(), String> {
-        let report_path = format!("{}/unified_test_report.md", self.config.report_dir);
+        let report_path = std::path::Path::new(self.config.report_dir).join("unified_test_report.md").to_string_lossy();
         
         let mut report_content = format!(
             "# Anya-Core Unified Test Report\n\n" +

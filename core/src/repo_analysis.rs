@@ -23,7 +23,7 @@ impl RepoAnalysis {
                 psbt_v2: ComplianceStatus::Full,
                 security: SecurityStatus::Partial,
                 dependencies: vec![
-                    ("bitcoin", "0.31.0"),  // Version mismatch
+                    ("bitcoin", "0.32.1"),
                     ("jsi", "0.12"),
                 ],
             },

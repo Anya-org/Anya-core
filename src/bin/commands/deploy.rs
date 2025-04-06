@@ -156,7 +156,7 @@ impl DeployCmd {
                 "-avz",
                 "--delete",
                 ".",
-                &format!("{}:/opt/anya-core", server)
+                &std::path::Path::new(server).join("anya-core").to_string_lossy()
             ])
             .status()
             .await

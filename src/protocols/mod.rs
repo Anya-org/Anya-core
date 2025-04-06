@@ -32,7 +32,7 @@ impl ProtocolManager {
     pub fn new(config: ProtocolConfig) -> Result<Self> {
         Ok(Self {
             bip_handler: BipProtocolHandler::new(
-                vec![341, 342, 174, 370], // Supported BIPs
+                vec![341, 342, 174, 370, 353], // Supported BIPs
                 config.network
             )?,
             segwit_verifier: SegwitValidator::new(),

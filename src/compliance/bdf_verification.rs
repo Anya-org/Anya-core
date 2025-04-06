@@ -252,6 +252,15 @@ impl BdfComplianceVerifier {
             audit_status: "In Progress".to_string(),
         });
         
+        // Add BIP353 Compliance Check
+        report.bip_support.insert(353, BipSupport {
+            bip_number: 353,
+            support_level: BipSupportLevel::Partial,
+            implementation_location: "src/bitcoin/silent_payments/".to_string(),
+            test_coverage: 0.0,
+            audit_status: "Not Started".to_string(),
+        });
+        
         // Verify that all required BIPs are supported
         for bip in &self.required_bips {
             if !report.bip_support.contains_key(bip) {

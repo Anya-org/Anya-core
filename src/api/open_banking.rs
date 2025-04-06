@@ -1,7 +1,7 @@
 #[openapi]
 impl OpenBankingApi {
     /// PSD2-compliant account access
-    #[get("/accounts/{account_id}")]
+    #[get(std::path::Path::new("/").join("accounts/{account_id}").to_string_lossy())]
     async fn get_account(&self, account_id: String) -> Result<AccountInfo> {
         let proof = verify_psd2_headers()?;
         let data = self.ledger.get_account(account_id, proof).await?;
@@ -9,7 +9,7 @@ impl OpenBankingApi {
     }
 
     /// Initiate SEPA payment
-    #[post("/payments")]
+    #[post(std::path::Path::new("/").join("payments").to_string_lossy())]
     async fn create_payment(&self, payment: PaymentInitiation) -> Result<PaymentStatus> {
         let compliance = self.compliance.check_payment(&payment).await?;
         let tx_hash = self.settlement_engine.execute(payment, compliance).await?;
@@ -20,7 +20,7 @@ impl OpenBankingApi {
 #[openapi]
 impl EnterpriseBankingApi {
     /// Bulk payment processing
-    #[post("/bulk-payments")]
+    #[post(std::path::Path::new("/").join("bulk-payments").to_string_lossy())]
     async fn create_bulk_payments(
         &self,
         payments: Vec<EnterprisePayment>,
@@ -43,7 +43,7 @@ impl EnterpriseBankingApi {
     }
 
     /// Real-time liquidity management
-    #[get("/liquidity")]
+    #[get(std::path::Path::new("/").join("liquidity").to_string_lossy())]
     async fn get_liquidity_dashboard(
         &self, 
         currencies: Vec<Currency>,

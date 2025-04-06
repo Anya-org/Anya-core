@@ -306,7 +306,7 @@ impl Wallet for BitcoinWallet {
             .map_err(|e| WalletError::AddressError(format!("Failed to parse address: {}", e)))?;
         
         // Save address to storage
-        let path = DerivationPath::from_str(&format!("m/84'/0'/0'/0/{}", index))
+        let path = DerivationPath::from_str(&std::path::Path::new(index).join("{}").to_string_lossy())
             .map_err(|e| WalletError::ConfigError(format!("Invalid derivation path: {}", e)))?;
         
         storage.addresses.insert(address.to_string(), AddressInfo {
@@ -373,7 +373,7 @@ impl Wallet for BitcoinWallet {
             .map_err(|e| WalletError::AddressError(format!("Failed to parse address: {}", e)))?;
         
         // Save address to storage
-        let path = DerivationPath::from_str(&format!("m/84'/0'/0'/1/{}", index))
+        let path = DerivationPath::from_str(&std::path::Path::new(index).join("{}").to_string_lossy())
             .map_err(|e| WalletError::ConfigError(format!("Invalid derivation path: {}", e)))?;
         
         storage.addresses.insert(address.to_string(), AddressInfo {

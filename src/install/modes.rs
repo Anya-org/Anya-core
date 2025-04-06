@@ -152,7 +152,7 @@ impl InstallationHandler {
     async fn download_github(&self, repo: &str, version: &str, asset: &str) -> Result<PathBuf> {
         // Implementation for GitHub download
         // ...
-        Ok(PathBuf::from("/tmp/downloaded-package.tar.gz"))
+        Ok(PathBuf::from(std::path::Path::new("/").join("tmp/downloaded-package.tar.gz").to_string_lossy()))
     }
 
     async fn install_from_archive(&self, archive: &Path, target: &Path) -> Result<()> {

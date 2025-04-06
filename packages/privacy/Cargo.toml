@@ -1,0 +1,47 @@
+[package]
+name = "anya-privacy"
+version = "1.0.0"
+edition = "2021"
+authors = ["Anya Core Team"]
+description = "Privacy enhancements including BIP-353 Silent Payments for Anya Core"
+repository = "https://github.com/anya-org/anya-core"
+license = "MIT"
+rust-version = "1.70"
+
+[dependencies]
+# Bitcoin dependencies
+bitcoin = { version = "0.32.5", features = ["rand", "serde", "taproot"] }
+secp256k1 = { version = "0.27.0", features = ["bitcoin_hashes", "rand"] }
+bdk = { version = "0.30.2", default-features = false, optional = true }
+
+# Async runtime
+tokio = { version = "1.37.0", features = ["full", "tracing"], optional = true }
+
+# Serialization
+serde = { version = "1.0.195", features = ["derive"] }
+serde_json = "1.0.111"
+
+# Error handling
+anyhow = { version = "1.0.79", features = ["backtrace"] }
+thiserror = "2.0.12"
+
+# Logging & metrics
+tracing = { version = "0.1.40", features = ["attributes"] }
+metrics = "0.24.1"
+
+# Security
+sha2 = "0.10.8"
+zeroize = "1.7.0"
+chacha20poly1305 = "0.10.1"
+aes-gcm = "0.10.3"
+hmac = "0.12.1"
+
+[features]
+default = ["bdk-wallet", "async"]
+bdk-wallet = ["dep:bdk"]
+async = ["dep:tokio"]
+hardware-security = []
+
+[dev-dependencies]
+tempfile = "3.9.0"
+test-log = "0.2.14" 

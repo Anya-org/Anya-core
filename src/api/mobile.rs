@@ -2,7 +2,7 @@ use actix_web::{web, HttpResponse, Scope};
 use serde::{Deserialize, Serialize};
 
 pub fn mobile_api_scope() -> Scope {
-    web::scope("/mobile")
+    web::scope(std::path::Path::new("/").join("mobile").to_string_lossy())
         .service(create_wallet)
         .service(get_balance)
         .service(send_transaction)
@@ -24,7 +24,7 @@ struct WalletResponse {
     security_info: SecurityInfo,
 }
 
-#[post("/wallets")]
+#[post(std::path::Path::new("/").join("wallets").to_string_lossy())]
 async fn create_wallet(
     data: web::Data<AppState>,
     req: web::Json<CreateWalletRequest>
@@ -39,7 +39,7 @@ async fn create_wallet(
     }
 }
 
-#[get("/wallets/{id}/balance")]
+#[get(std::path::Path::new("/").join("wallets/{id}/balance").to_string_lossy())]
 async fn get_balance(
     data: web::Data<AppState>,
     path: web::Path<String>
@@ -47,7 +47,7 @@ async fn get_balance(
     // Secure balance retrieval implementation
 }
 
-#[post("/transactions")] 
+#[post(std::path::Path::new("/").join("transactions").to_string_lossy())] 
 async fn send_transaction(
     data: web::Data<AppState>,
     req: web::Json<SendRequest>
@@ -55,7 +55,7 @@ async fn send_transaction(
     // Secure transaction sending implementation
 }
 
-#[post("/verify")]
+#[post(std::path::Path::new("/").join("verify").to_string_lossy())]
 async fn verify_payment(
     data: web::Data<AppState>, 
     req: web::Json<VerifyRequest>

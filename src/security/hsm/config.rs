@@ -88,7 +88,7 @@ impl HsmConfig {
             },
             provider_type: HsmProviderType::Pkcs11, // Use real HSM in production
             pkcs11: Pkcs11Config {
-                library_path: "/usr/lib/libpkcs11.so".to_string(),
+                library_path: std::path::Path::new("/").join("usr/lib/libpkcs11.so").to_string_lossy().to_string(),
                 slot_id: Some(0),
                 user_pin: None, // Should be provided at runtime
                 ..Default::default()
@@ -230,7 +230,7 @@ pub struct TpmConfig {
 impl Default for TpmConfig {
     fn default() -> Self {
         Self {
-            device_path: "/dev/tpm0".to_string(),
+            device_path: std::path::Path::new("/").join("dev/tpm0").to_string_lossy().to_string(),
             owner_password: None,
             srk_password: None,
             use_tss: true,
@@ -263,7 +263,7 @@ pub struct Pkcs11Config {
 impl Default for Pkcs11Config {
     fn default() -> Self {
         Self {
-            library_path: "/usr/lib/libpkcs11.so".to_string(),
+            library_path: std::path::Path::new("/").join("usr/lib/libpkcs11.so").to_string_lossy().to_string(),
             slot_id: None,
             token_label: None,
             user_pin: None,

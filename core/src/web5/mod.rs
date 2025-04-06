@@ -32,6 +32,11 @@ impl Web5Validator {
             anyhow::bail!("Fee rate below minimum required (1 sat/vB)");
         }
 
+        // BIP353: Silent Payments validation
+        if psbt.inputs.iter().any(|i| i.silent_payment_address.is_none()) {
+            anyhow::bail!("BIP353: Missing silent payment addresses in PSBT inputs");
+        }
+
         Ok(())
     }
 

@@ -653,6 +653,7 @@ This document lists pending tasks for the Anya Core implementation, organized by
 All implementations must follow the Bitcoin Development Framework v2.5 standards and include proper AI labeling. Currently focused on security hardening and scalability improvements for the Bitcoin protocol integration.
 
 Based on workflow testing conducted on March 16, 2025, several critical security issues need addressing:
+
 1. Replace insecure RNG usage with crypto-secure alternatives
 2. Remove DES algorithm usage and replace with modern standards
 3. Implement constant-time operations for all cryptographic functions

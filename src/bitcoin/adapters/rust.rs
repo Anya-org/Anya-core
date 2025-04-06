@@ -93,12 +93,12 @@ impl RustBitcoinImplementation {
             .map_err(|e| BitcoinError::WalletError(format!("Failed to create xprv: {}", e)))?;
         
         // Create a descriptor for receiving addresses
-        let receive_descriptor = format!("wpkh({}/0/*)", xprv);
+        let receive_descriptor = std::path::Path::new(xprv).join("*)").to_string_lossy();
         let receive_descriptor = Descriptor::new(receive_descriptor)
             .map_err(|e| BitcoinError::WalletError(format!("Failed to create receive descriptor: {}", e)))?;
         
         // Create a descriptor for change addresses
-        let change_descriptor = format!("wpkh({}/1/*)", xprv);
+        let change_descriptor = std::path::Path::new(xprv).join("*)").to_string_lossy();
         let change_descriptor = Descriptor::new(change_descriptor)
             .map_err(|e| BitcoinError::WalletError(format!("Failed to create change descriptor: {}", e)))?;
         

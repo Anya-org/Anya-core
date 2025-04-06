@@ -111,6 +111,7 @@ This roadmap is regularly updated to reflect project progress and new priorities
 *Last updated: 2025-02-24*
 
 ## Protocol Priorities
+
 ```gantt
 quarterly Q3 2025
     BIP-342 Finalization :active, p1, 2025-07-01, 8w
@@ -119,6 +120,7 @@ quarterly Q3 2025
 ```
 
 ## Mobile Milestones
+
 ```mermaid
 journey
     title Mobile Integration
@@ -131,6 +133,7 @@ journey
 ```
 
 ## Compliance Targets
+
 | Quarter | BIP       | Target | Status  |
 |---------|-----------|--------|---------|
 | Q3 2025 | 341       | 100%   | ✅      |

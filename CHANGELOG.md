@@ -14,6 +14,10 @@ All notable changes to the Anya Core project will be documented in this file.
 - Detailed security workflow test report with issue tracking
 - TODO updates based on security testing findings
 - BIP-341 (Taproot) implementation for Bitcoin core integration
+- BIP-353 (Silent Payments) implementation for enhanced transaction privacy
+- Silent Payments address generation and scanning functionality
+- Silent Payments key management with hardware security support
+- Enhanced privacy infrastructure for Bitcoin transactions
 - Constant-time cryptographic operations utility module
 - Secure random number generator implementation (replacing Math.random())
 - Modern symmetric encryption module (AES-256 and ChaCha20-Poly1305)

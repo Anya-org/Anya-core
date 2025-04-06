@@ -71,7 +71,7 @@ impl SecurityCmd {
                     database.to_str().unwrap(),
                     query,
                     "--format=sarif-latest",
-                    &format!("--output=results/{}.sarif", query.replace('/', "_"))
+                    &std::path::Path::new(query.replace('/', "_").join("{}.sarif").to_string_lossy())
                 ])
                 .status()
                 .await

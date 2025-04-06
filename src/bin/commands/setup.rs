@@ -210,12 +210,12 @@ log_level = "info"
 
     async fn install_clarinet(&self, version: Option<&str>) -> Result<()> {
         let release_url = match version {
-            Some(v) => format!("https://github.com/hirosystems/clarinet/releases/download/v{}/clarinet-linux-x64", v),
+            Some(v) => std::path::Path::new(v).join("clarinet-linux-x64").to_string_lossy(),
             None => "https://github.com/hirosystems/clarinet/releases/latest/download/clarinet-linux-x64".to_string(),
         };
 
         // Create installation directory
-        let install_dir = PathBuf::from("/usr/local/bin");
+        let install_dir = PathBuf::from(std::path::Path::new("/").join("usr/local/bin").to_string_lossy());
         fs::create_dir_all(&install_dir).await?;
 
         // Download Clarinet
@@ -233,7 +233,7 @@ log_level = "info"
             .context("Failed to make Clarinet executable")?;
 
         Command::new("mv")
-            .args(["clarinet", "/usr/local/bin/"])
+            .args(["clarinet", std::path::Path::new("/").join("usr/local/bin/").to_string_lossy()])
             .status()
             .await
             .context("Failed to install Clarinet")?;

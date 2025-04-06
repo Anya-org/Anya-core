@@ -1,6 +1,7 @@
 # Progressive Linting Implementation [AIS-3][BPC-3]
 
 ## Phase 1: Baseline Establishment
+
 ```mermaid
 gantt
     title Linting Rollout
@@ -16,7 +17,9 @@ gantt
 ```
 
 ## Implementation Steps
+
 1. **Existing Violations Tracking**
+
 ```javascript:scripts/lint/baseline.js
 // Track current violations without failing
 module.exports = {
@@ -28,6 +31,7 @@ module.exports = {
 ```
 
 2. **Incremental Enforcement**
+
 ```yaml:.github/workflows/lint.yml
 - name: Lint Changed Files
   run: |
@@ -36,6 +40,7 @@ module.exports = {
 ```
 
 3. **Security-Critical Rules**
+
 ```codeql:github/codeql/bitcoin-security.qls
 // Immediate enforcement for critical rules
 security:
@@ -48,6 +53,7 @@ security:
 ```
 
 4. **Bitcoin Protocol Rules**
+
 ```codeql:github/codeql/bitcoin-protocol-security.qls
 // Warn first, enforce after Q3 2025
 warnings:
@@ -61,6 +67,7 @@ errors:
 This approach follows best practices from [Software Engineering Stack Exchange](https://softwareengineering.stackexchange.com/a/419328) while maintaining Bitcoin protocol compliance.
 
 2. **Automated Fixes** (from SE answer):
+
 ```json:package.json
 {
   "scripts": {
@@ -72,6 +79,7 @@ This approach follows best practices from [Software Engineering Stack Exchange](
 ```
 
 3. **CI Integration** (from SE answer):
+
 ```yaml:.github/workflows/ci.yml
 - name: Lint Changed Files
   uses: reviewdog/action-eslint@v1
@@ -84,6 +92,7 @@ This approach follows best practices from [Software Engineering Stack Exchange](
 ```
 
 4. **Security Linter Configuration** (from PixelFreeStudio):
+
 ```javascript:.eslintrc.js
 module.exports = {
   extends: ['plugin:security/recommended'],
@@ -96,6 +105,7 @@ module.exports = {
 ```
 
 5. **Documentation Warnings** (from Bitcoin.org):
+
 ```markdown:docs/SECURITY.md
 <!-- Bitcoin.org Compliance -->
 > **Implementation Notice**: This documentation describes intended behavior,  

@@ -2,6 +2,7 @@
 
 [![BIP-341](https://img.shields.io/badge/BIP-341_Compliant-green)](https://bips.xyz/341)
 [![BIP-342](https://img.shields.io/badge/BIP--342-Compliant-green)](https://bips.xyz/342)
+[![BIP-353](https://img.shields.io/badge/BIP--353-Planned-yellow)](https://bips.xyz/353)
 [![AIS-3](https://img.shields.io/badge/AIS-3_Secured-blue)](https://bitcoin-development-framework.org)
 [![PSBT-v2](https://img.shields.io/badge/PSBT_v2-100%25-brightgreen)](https://bips.xyz/370)
 
@@ -36,6 +37,23 @@ free use, modification, and distribution. However, please note that the
 [Enterprise features](./enterprise/README.md) are subject to a separate
 proprietary license with different terms, including revenue sharing requirements.
 See the [Enterprise License](./enterprise/LICENSE) for details.
+
+## Security Implementation Features
+
+```rust
+// From src/security/hsm/mod.rs
+#[bip341]
+fn verify_taproot(commitment: [u8; 32]) -> Result<()> {
+    use bitcoin::secp256k1::{Secp256k1, XOnlyPublicKey};
+    
+    let secp = Secp256k1::new();
+    let (xonly, _) = XOnlyPublicKey::from_slice(&commitment)?;
+    
+    let script = Script::new_v1_p2tr(&secp, xonly, None)?;
+    assert_eq!(script.as_bytes(), SILENT_LEAF);
+    Ok(())
+}
+```
 
 ## Core Features
 
@@ -79,6 +97,7 @@ See the [Enterprise License](./enterprise/LICENSE) for details.
 - Bitcoin Core & Lightning Network support
 - DLC (Discreet Log Contracts)
 - Taproot/Schnorr signatures
+- Silent Payments (BIP-353) privacy enhancement
 - Layer 2 solutions
 - Cross-chain capabilities
 - Custom chain support
@@ -761,6 +780,7 @@ Special thanks to our contributors and the following projects:
 *2025-03-12*
 
 ## Validation
+
 Run the following to verify system compliance:
 
 ```shell
@@ -768,12 +788,15 @@ Run the following to verify system compliance:
 ```
 
 ## Standards Compliance
+
 This project adheres to:
+
 - Bitcoin Protocol Compliance Level 3 (BPC-3)
 - DAO Governance Standard Level 4 (DAO-4)
 - AI Security Standard Level 3 (AIS-3)
 
 ## Bitcoin Protocol Compliance
+
 ```mermaid
 graph TD
     A[Bitcoin Core] --> B{{BIP-341}}
@@ -785,23 +808,8 @@ graph TD
     style E fill:#9f9,stroke:#333
 ```
 
-## Core Features
-```rust
-// From src/security/hsm/mod.rs
-#[bip341]
-fn verify_taproot(commitment: [u8; 32]) -> Result<()> {
-    use bitcoin::secp256k1::{Secp256k1, XOnlyPublicKey};
-    
-    let secp = Secp256k1::new();
-    let (xonly, _) = XOnlyPublicKey::from_slice(&commitment)?;
-    
-    let script = Script::new_v1_p2tr(&secp, xonly, None)?;
-    assert_eq!(script.as_bytes(), SILENT_LEAF);
-    Ok(())
-}
-```
-
 ## Dependency Matrix
+
 ```toml
 [workspace.dependencies]
 bitcoin = { version = "0.32.1", features = ["bip341"] }
@@ -818,6 +826,7 @@ last-audit = "2025-08-24"
 ```
 
 ## Security Implementation
+
 ```mermaid
 sequenceDiagram
     User->>+HSM: Sign Transaction
@@ -828,6 +837,7 @@ sequenceDiagram
 ```
 
 ## Mobile Integration
+
 ```toml
 [features]
 mobile = [
@@ -841,6 +851,7 @@ jsi = { version = "0.12", features = ["bip341"] }
 ```
 
 ## Audit Trail
+
 ```json
 {
   "2025-08": {
@@ -853,6 +864,7 @@ jsi = { version = "0.12", features = ["bip341"] }
 ```
 
 ## Compliance Checklist
+
 - [x] BIP-341 (Taproot)
 - [x] BIP-174 (PSBT v2)
 - [x] BIP-342 (Tapscript)

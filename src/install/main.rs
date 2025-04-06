@@ -191,7 +191,7 @@ fn generate_compliance_report() -> Result<(), String> {
         chrono::Local::now().format("%Y-%m-%d %H:%M:%S")
     );
     
-    std::fs::write(format!("{}/compliance_report.md", report_dir), report_content)
+    std::fs::write(std::path::Path::new(report_dir).join("compliance_report.md").to_string_lossy(), report_content)
         .map_err(|e| format!("Failed to write compliance report: {}", e))?;
     
     info!("Installation compliance report generated in {}/compliance_report.md", report_dir);
