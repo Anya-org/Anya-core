@@ -1,7 +1,7 @@
 use anyhow::{Result, Context};
 use tokio::net::TcpStream;
 use std::time::Duration;
-use crate::platform::{self, PlatformType};
+use core::platform::{self, PlatformType};
 use serde::{Serialize, Deserialize};
 use std::net::{SocketAddr, ToSocketAddrs};
 use tokio::time::timeout;
@@ -255,6 +255,8 @@ impl NetworkChecker {
             PlatformType::Windows => PathBuf::from(r"C:\ProgramData\AnyaCore"),
             PlatformType::MacOS => PathBuf::from("/Library/Application Support/AnyaCore"),
             PlatformType::Linux => PathBuf::from("/etc/anya-core"),
+            PlatformType::Android => PathBuf::from("/data/data/org.anya.core/files"),
+            PlatformType::IOS => PathBuf::from("Documents/AnyaCore"),
             _ => platform::data_dir(),
         }
     }
@@ -316,10 +318,29 @@ impl NetworkChecker {
     pub fn get_service_directories(&self) -> ServiceDirectories {
         let base_dir = self.get_data_directory();
         
+        let (bitcoin, lightning, web5) = match self.platform_type {
+            PlatformType::Android | PlatformType::IOS => {
+                // Mobile platforms use different directory structure
+                (
+                    platform::get_bitcoin_data_dir(),
+                    base_dir.join("lightning"),
+                    platform::get_web5_data_dir()
+                )
+            },
+            _ => {
+                // Desktop platforms
+                (
+                    base_dir.join("bitcoin"),
+                    base_dir.join("lightning"),
+                    base_dir.join("web5")
+                )
+            }
+        };
+        
         ServiceDirectories {
-            bitcoin: base_dir.join("bitcoin"),
-            lightning: base_dir.join("lightning"),
-            web5: base_dir.join("web5"),
+            bitcoin,
+            lightning,
+            web5,
         }
     }
 }
