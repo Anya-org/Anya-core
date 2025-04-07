@@ -10,6 +10,31 @@ using module ./Configuration/InstallationConfig.psm1
 using module ./Infrastructure/CheckpointManager.psm1
 using module ./Utils/SystemChecks.psm1  # This module provides Test-SystemChecks
 
+# Detect OS
+$OSIsWindows = $env:OS -like "*Windows*"
+$OSIsMacOS = $false
+$OSIsLinux = $false
+
+# Safely detect Unix-based OS without using automatic variables
+if (-not $OSIsWindows) {
+    try { 
+        $unameOutput = uname 2>$null
+        $OSIsMacOS = $unameOutput -eq "Darwin"
+        $OSIsLinux = $unameOutput -eq "Linux"
+    } catch { 
+        # Ignore errors from uname command
+    }
+}
+
+# Use platform-specific paths
+$dataPath = if ($OSIsWindows) {
+    "$env:ProgramData\AnyaCore"
+} elseif ($OSIsMacOS) {
+    "/Library/Application Support/AnyaCore"
+} else {
+    "/etc/anya-core"
+}
+
 function Install-AnyaCore {
     param(
         [string]$DeploymentType = 'Standalone',
@@ -33,13 +58,13 @@ function Install-AnyaCore {
         }
         
         # Optionally, verify that the dashboard is deployed (interactive dashboard prompt)
-        if (-not (Test-Path "$env:ProgramData\AnyaCore\dash33")) {
-            Write-Host "Warning: Dashboard (dash33) not detected under ProgramData\AnyaCore." -ForegroundColor Yellow
+        if (-not (Test-Path "$dataPath\dash33")) {
+            Write-Host "Warning: Dashboard (dash33) not detected under $dataPath." -ForegroundColor Yellow
         }
         
         # Initialize virtual environment
         Write-Host "Initializing virtual environment..." -ForegroundColor Cyan
-        if (-not $venvManager.InitializeVenv("$env:ProgramData\AnyaCore\venv", "3.9", "21.3.1")) {
+        if (-not $venvManager.InitializeVenv("$dataPath\venv", "3.9", "21.3.1")) {
             throw "Failed to initialize virtual environment."
         }
         

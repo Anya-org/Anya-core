@@ -41,8 +41,8 @@ anya governance check --proposal proposal.yaml
 
 ## Installation Enhancements
 
-```markdown:docs/INSTALLATION.md
 ### Advanced Installation
+
 ```bash
 # Enterprise deployment
 anya install enterprise \
@@ -68,8 +68,8 @@ anya security rotate-credentials --rpc --api
 
 ## Enhanced User Manual Structure
 
-```markdown:docs/USER_MANUAL.md
 ### Bitcoin Transaction Flow
+
 ```mermaid
 graph TD
   A[User Request] --> B{Validation}
@@ -88,10 +88,9 @@ graph TD
 | **Network** | Encrypted P2P, SPV Proofs | BIP-37/157/158 |
 | **Storage** | HSM Integration, SGX Enclaves | BIP-32/39/44 |
 
-```
+## System Map Integration
 
-2. **System Map Integration**
-```powershell:scripts/map_based_index.ps1
+```powershell
 // ... existing code ...
 $index = @{
     core = @{
@@ -116,9 +115,9 @@ $index = @{
 // ... existing code ...
 ```
 
-3. **Search Index Update**
+## Search Index Update
 
-```json:docs/search-index.json
+```json
 {
   "title": "CLI Reference",
   "url": "/pages/cli-reference.html",
@@ -135,10 +134,10 @@ $index = @{
 }
 ```
 
-4. **DAO CLI Integration** [DAO-3][BPC-3]
+## DAO CLI Integration [DAO-3][BPC-3]
 
-```markdown:docs/DAO_INDEX.md
 ### Governance CLI
+
 ```bash
 # Submit DAO proposal
 anya dao submit-proposal \
@@ -180,4 +179,4 @@ anya verify documentation --check links,labels
 anya audit security --component cli
 ```
 
-These changes improve CLI usability while maintaining strict Bitcoin protocol compliance and AI security standards. 
+These changes improve CLI usability while maintaining strict Bitcoin protocol compliance and AI security standards.

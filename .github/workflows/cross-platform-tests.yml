@@ -1,0 +1,99 @@
+name: Cross-Platform Tests
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master, develop ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    name: Build and Test on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        include:
+          - os: ubuntu-latest
+            dependencies: libssl-dev
+          - os: windows-latest
+            dependencies: ''
+          - os: macos-latest
+            dependencies: ''
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Install Rust
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+        override: true
+        profile: minimal
+    
+    - name: Install Linux dependencies
+      if: runner.os == 'Linux'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y ${{ matrix.dependencies }}
+    
+    - name: Run fix scripts
+      shell: bash
+      run: |
+        if [ "${{ runner.os }}" == "Windows" ]; then
+          powershell -File ./fix_cargo_edition.ps1
+          powershell -File ./fix_core_package_refs.ps1
+        else
+          chmod +x ./fix_cargo_edition.sh ./fix_core_package_refs.sh
+          ./fix_cargo_edition.sh
+          ./fix_core_package_refs.sh
+        fi
+    
+    - name: Build
+      uses: actions-rs/cargo@v1
+      with:
+        command: build
+    
+    - name: Run tests
+      uses: actions-rs/cargo@v1
+      with:
+        command: test
+        args: --all
+    
+    - name: Check formatting
+      uses: actions-rs/cargo@v1
+      with:
+        command: fmt
+        args: --all -- --check
+    
+    - name: Clippy
+      uses: actions-rs/cargo@v1
+      with:
+        command: clippy
+        args: -- -D warnings
+    
+    - name: Build Rust fix scripts
+      run: |
+        cd rust-fix-scripts
+        cargo build --release
+    
+    - name: Upload Rust fix scripts artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: anya-fix-scripts-${{ matrix.os }}
+        path: |
+          rust-fix-scripts/target/release/anya-fix-scripts*
+        if-no-files-found: error
+
+  # Special job that only runs if all platforms pass
+  cross-platform-success:
+    name: Cross-Platform Build Success
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Cross-Platform Compatibility Confirmed
+      run: echo "✅ All platforms built and tested successfully!" 

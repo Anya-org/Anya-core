@@ -1,7 +1,7 @@
 [package]
 name = "anya-installer"
 version.workspace = true
-edition.workspace = true
+edition = "2021"
 rust-version.workspace = true
 license.workspace = true
 repository.workspace = true
@@ -10,11 +10,17 @@ repository.workspace = true
 workspace = ".."
 
 [dependencies]
-anyhow.workspace = true
+# Add our platform module
+platform = { path = "../platform" }
+# Other existing dependencies
+clap = { workspace = true }
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
 bitcoin.workspace = true
 secp256k1.workspace = true
-tokio.workspace = true
-serde.workspace = true
+tokio = { workspace = true, features = ["full", "macros", "rt-multi-thread"] }
 
 # Security-critical dependencies
 ring = { version = "0.17.8", features = [
@@ -46,3 +52,4 @@ hsm-sdk = { version = "3.2.0", features = [
 proptest = { version = "1.4.0", features = ["bitcoin"] }
 tempfile = "3.10.0"
 assert_fs = "1.1.1"
+

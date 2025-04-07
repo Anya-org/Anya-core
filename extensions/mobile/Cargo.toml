@@ -1,7 +1,7 @@
 [package]
 name = "anya-core-mobile"
 version.workspace = true
-edition.workspace = true
+edition = "2021"
 description = "Mobile extensions for Anya Core"
 license.workspace = true
 repository.workspace = true
@@ -9,7 +9,7 @@ rust-version.workspace = true
 
 [dependencies]
 # Core dependencies
-anya-core-core = { path = "../../packages/core" }
+anya-core-lib = { path = "../../packages/core" }
 anya-core-protocol-adapters = { path = "../../packages/protocol-adapters" }
 
 # External dependencies
@@ -20,3 +20,5 @@ thiserror = { workspace = true }
 [features]
 default = ["bip342"]
 bip342 = []
+
+

@@ -1,7 +1,7 @@
 [package]
 name = "anya-core-bitcoin-network"
 version.workspace = true
-edition.workspace = true
+edition = "2021"
 description = "Bitcoin Network implementation for Anya Core"
 license.workspace = true
 repository.workspace = true
@@ -9,7 +9,7 @@ rust-version.workspace = true
 
 [dependencies]
 # Internal dependencies
-anya-core-core = { path = "../core" }
+anya-core-lib = { path = "../core" }
 anya-core-protocol-adapters = { path = "../protocol-adapters" }
 
 # Bitcoin dependencies with correct features for BIP-342 support
@@ -39,3 +39,4 @@ async-trait = { workspace = true }
 [features]
 default = ["std"]
 std = []
+

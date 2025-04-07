@@ -2,7 +2,7 @@
 name = "bitcoin-adapter"
 # Inherit other fields from the workspace
 version.workspace = true
-edition.workspace = true
+edition = "2021"
 description.workspace = true
 license.workspace = true
 repository.workspace = true

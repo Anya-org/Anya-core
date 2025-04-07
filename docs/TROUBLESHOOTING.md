@@ -15,6 +15,7 @@ graph LR
 ```
 
 **New Resolution Script:**
+
 ```powershell
 # Fixes common workspace issues
 $ErrorActionPreference = "Stop"
@@ -38,7 +39,8 @@ cargo metadata --format-version=1 | jq '.workspace_members'
 cargo build --workspace --features "bip174 bip341 secp256k1/std"
 ```
 
-**Documentation Validation Protocol**  
+**Documentation Validation Protocol**
+
 ```bash
 # Check doc consistency
 cargo doc --workspace --no-deps --open
@@ -50,12 +52,14 @@ All documentation updates follow Bitcoin Development Framework v2.5 requirements
 ## Common Issues Resolution
 
 ### PSBT v2 Validation
+
 ```bash
 # Diagnostic command
 anya-cli validate-psbt --input tx.psbt --bip 174,370
 ```
 
 ### Taproot Commitment
+
 ```rust
 // Debugging snippet
 fn debug_commitment() {
@@ -66,6 +70,7 @@ fn debug_commitment() {
 ```
 
 ### HSM Integration
+
 ```toml
 # Valid configuration
 [hsm]

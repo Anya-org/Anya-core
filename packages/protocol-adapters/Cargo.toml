@@ -8,7 +8,7 @@ license = "MIT"
 
 [dependencies]
 # Core dependencies
-anya-core-core = { path = "../core" }
+anya-core-lib = { path = "../core" }
 log = "0.4"
 anyhow = "1.0"
 thiserror = "1.0"
