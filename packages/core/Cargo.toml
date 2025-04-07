@@ -1,7 +1,7 @@
 [package]
 name = "anya-core-lib"
 version.workspace = true
-edition.workspace = true
+edition = "2021"
 description = "Core implementation for Anya Bitcoin Framework"
 license.workspace = true
 repository.workspace = true
@@ -17,6 +17,6 @@ thiserror.workspace = true
 serde.workspace = true
 
 [features]
-default = ["taproot", "psbt-v2"]
-taproot = ["bitcoin/taproot"]
-psbt-v2 = ["bdk/psbt-v2"]
+default = ["std"]
+std = []
+

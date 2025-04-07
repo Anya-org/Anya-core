@@ -1,6 +1,6 @@
 name = "anya-bitcoin"
 version.workspace = true
-edition.workspace = true
+edition = "2021"
 authors.workspace = true
 license.workspace = true
 description.workspace = true
@@ -27,3 +27,4 @@ default = ["bip174", "bip341"]
 
 
 default = ["bip174", "bip341"]
+

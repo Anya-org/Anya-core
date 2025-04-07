@@ -6,7 +6,7 @@ All notable changes to the Anya Core project will be documented in this file.
 
 ## [Unreleased]
 
-### Added
+### Added in Unreleased
 
 - Enhanced Bitcoin protocol security validation framework
 - CodeQL integration for automated security analysis
@@ -33,7 +33,7 @@ All notable changes to the Anya Core project will be documented in this file.
 - react-native-bitcoin integration
 - TurboModule-based performance optimizations
 
-### Changed
+### Changed in Unreleased
 
 - Improved script directory organization for security focus
 - Updated documentation to reflect Bitcoin Development Framework v2.5 compliance
@@ -51,7 +51,7 @@ All notable changes to the Anya Core project will be documented in this file.
 - Created standards directory for canonical documentation
 - Improved script organization for better maintainability
 
-### Removed
+### Removed in Unreleased
 
 - Redundant and deprecated security scripts
 - Legacy test implementation files
@@ -63,7 +63,7 @@ All notable changes to the Anya Core project will be documented in this file.
 - dart-bitcoin dependencies
 - Flutter-specific toolchain
 
-### Security
+### Security in Unreleased
 
 - Identified critical RNG vulnerabilities in cryptographic implementations
 - Found insecure algorithm usage (DES) that needs replacement
@@ -84,7 +84,7 @@ All notable changes to the Anya Core project will be documented in this file.
 
 ## [0.9.5] - 2025-03-16
 
-### Added
+### Added in 0.9.5
 
 - Bitcoin MCP server security analysis script
 - Bitcoin BIP compliance validation script
@@ -94,25 +94,25 @@ All notable changes to the Anya Core project will be documented in this file.
 - AI labeling compliance for all security components [AIR-3][AIS-3][BPC-3][AIT-3][RES-3]
 - Comprehensive workflow testing and issue tracking
 
-### Changed
+### Changed in 0.9.5
 
 - Restructured scripts directory for better organization
 - Updated scripts README.md with security focus
 - Enhanced documentation with proper AI labeling
 - Updated TODO.md with security implementation priorities
 
-### Removed
+### Removed in 0.9.5
 
 - Redundant security scripts and empty files
 - Deprecated test implementation files
 - Legacy documentation scripts
 
-### Fixed
+### Fixed in 0.9.5
 
 - Security validation for Taproot (BIP-341) implementation
 - Performance issues in cryptographic validation
 
-### Security
+### Security in 0.9.5
 
 - Implemented basic security validation mechanisms
 - Created framework for BIP compliance validation

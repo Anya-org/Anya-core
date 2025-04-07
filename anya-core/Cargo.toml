@@ -43,7 +43,7 @@ test-strategy = "0.4.1"
 [package]
 name = "anya-core"
 version.workspace = true
-edition.workspace = true
+edition = "2021"
 authors.workspace = true
 license.workspace = true
 description.workspace = true

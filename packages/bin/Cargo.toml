@@ -1,7 +1,7 @@
 [package]
 name = "anya-core-bin"
 version.workspace = true
-edition.workspace = true
+edition = "2021"
 description = "Anya Core Binary Entry Point with BIP-342 support"
 license.workspace = true
 repository.workspace = true
@@ -13,7 +13,7 @@ path = "src/main.rs"
 
 [dependencies]
 # Internal dependencies
-anya-core-core = { path = "../core" }
+anya-core-lib = { path = "../core" }
 anya-core-protocol-adapters = { path = "../protocol-adapters" }
 anya-core-mcp-interface = { path = "../mcp-interface" }
 anya-core-bitcoin-network = { path = "../bitcoin-network" }
@@ -44,3 +44,4 @@ toml = { workspace = true }
 
 # Signal handling
 tokio-signal = "0.2.9"
+

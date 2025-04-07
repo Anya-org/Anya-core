@@ -11,7 +11,7 @@ description = "Core dependencies and shared components for the Anya Bitcoin Plat
 opentelemetry = { version = "0.21.0", features = ["rt-tokio"], optional = true }
 
 [features]
-default = ["standard-security"]
+default = ["bip174", "bip341"]
 standard-security = ["dependency1", "dependency2"]
 advanced-security = ["dependency3", "dependency4"]
 enterprise = ["advanced-security", "hardware-wallet", "metrics"]

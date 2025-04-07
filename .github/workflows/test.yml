@@ -10,8 +10,8 @@ jobs:
   test:
     runs-on: ubuntu-latest
     env:
-      BITCOIN_TESTNET_URL: ${{ secrets.BITCOIN_TESTNET_URL }}
-      BITCOIN_TESTNET_AUTH: ${{ secrets.BITCOIN_TESTNET_AUTH }}
+      BITCOIN_TESTNET_URL: ${{ secrets.BITCOIN_TESTNET_URL || 'http://localhost:18332' }}
+      BITCOIN_TESTNET_AUTH: ${{ secrets.BITCOIN_TESTNET_AUTH || 'testuser:testpass' }}
     
     steps:
       - uses: actions/checkout@v3

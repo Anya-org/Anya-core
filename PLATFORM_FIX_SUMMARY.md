@@ -78,6 +78,7 @@ let config_path = std::path::Path::new(base_dir).join("config").join("settings.y
 Platform-specific configuration files now handle environment variables and path differences:
 
 **Windows (`config/platform/windows.yaml`):**
+
 ```yaml
 paths:
   base: "%USERPROFILE%\\.anya"
@@ -87,6 +88,7 @@ paths:
 ```
 
 **Unix (`config/platform/unix.yaml`):**
+
 ```yaml
 paths:
   base: "$HOME/.anya"
@@ -98,6 +100,7 @@ paths:
 ### Testing
 
 Added a configuration loading test script (`scripts/test_config_loading.py`) that verifies:
+
 - Platform detection
 - Configuration file loading
 - Environment variable expansion

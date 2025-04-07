@@ -8,7 +8,7 @@ This guide provides technical details for developers implementing or working wit
 
 The Silent Payments implementation is located in the `packages/privacy` module and consists of:
 
-```
+```text
 packages/privacy/
 ├── Cargo.toml
 └── src/
@@ -188,22 +188,26 @@ Test vectors are available in `src/silent_payments/tests.rs`.
 ### Key Cryptographic Operations
 
 1. **Shared Secret Derivation**: 
-   ```
+
+   ```text
    shared_point = scan_pubkey * sender_secret
    ```
 
 2. **Output Key Tweak**:
-   ```
+
+   ```text
    tweak = SHA256(shared_point || outpoint || spend_pubkey)
    ```
 
 3. **Output Key Derivation**:
-   ```
+
+   ```text
    output_key = spend_pubkey + tweak*G
    ```
 
 4. **Script Generation**:
-   ```
+
+   ```text
    script = P2TR(output_key)  # Pay-to-Taproot
    ```
 
@@ -217,4 +221,4 @@ RUST_LOG=anya_privacy=debug cargo run --example scan_payments
 
 ## Specification Compliance
 
-The implementation follows the official BIP-353 specification. Any deviations or implementation-specific decisions are documented in `COMPLIANCE.md`. 
+The implementation follows the official BIP-353 specification. Any deviations or implementation-specific decisions are documented in `COMPLIANCE.md`.

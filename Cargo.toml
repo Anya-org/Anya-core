@@ -6,11 +6,11 @@ authors = ["Anya Core Team"]
 description = "Anya Core Bitcoin Development Framework"
 repository = "https://github.com/anya-org/anya-core"
 license = "MIT"
+rust-version = "1.70"
 
 [workspace]
 members = [
     "core",
-    "bitcoin",
     "packages/core",
     "packages/bitcoin-network",
     "packages/metrics",
@@ -23,12 +23,38 @@ members = [
 ]
 resolver = "2"
 
+[workspace.package]
+version = "2.5.0"
+edition = "2021"
+authors = ["Anya Core Team"]
+description = "Bitcoin Development Framework Implementation"
+repository = "https://github.com/anya-org/anya-core"
+license = "MIT"
+rust-version = "1.70"
+
 [workspace.dependencies]
 # Bitcoin dependencies
 bitcoin = { version = "0.32.5", features = ["rand", "serde"] }
-secp256k1 = { version = "0.28.0", features = ["bitcoin_hashes", "rand"] }
+secp256k1 = { version = "0.27.0", features = ["bitcoin_hashes", "rand", "global-context"] }
 bitcoincore-rpc = "0.19.0"
 bdk = { version = "0.30.2", default-features = false }
+
+# Serialization
+serde = { version = "1.0.195", features = ["derive"] }
+serde_json = "1.0.111"
+serde_yaml = "0.9.32"
+toml = "0.8.8"
+
+# Error handling
+anyhow = { version = "1.0.79", features = ["backtrace"] }
+thiserror = "2.0.12"
+
+# Security
+sha2 = "0.10.8"
+zeroize = "1.7.0"
+chacha20poly1305 = "0.10.1"
+aes-gcm = "0.10.3"
+hmac = "0.12.1"
 
 # Async runtime & networking
 tokio = { version = "1.37.0", features = ["full", "tracing"] }
@@ -40,4 +66,15 @@ tokio-util = "0.7.10"
 tower = { version = "0.4.13", features = ["util", "timeout"] }
 tower-http = { version = "0.4.4", features = ["trace", "cors", "compression-gzip"] }
 
-# Other dependencies as in original file...
+# Logging & metrics
+tracing = { version = "0.1.40", features = ["attributes"] }
+tracing-subscriber = { version = "0.3.18", features = ["env-filter", "json"] }
+metrics = "0.24.1"
+log = "0.4.20"
+
+# CLI
+clap = { version = "4.4.18", features = ["derive", "env"] }
+
+# Testing
+tempfile = "3.9.0"
+test-log = "0.2.14"

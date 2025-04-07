@@ -1,7 +1,7 @@
 [package]
 name = "anya-core-metrics"
 version.workspace = true
-edition.workspace = true
+edition = "2021"
 description = "Metrics implementation for Anya Core"
 license.workspace = true
 repository.workspace = true
@@ -26,3 +26,4 @@ tracing.workspace = true
 tracing-subscriber.workspace = true
 anyhow.workspace = true
 thiserror.workspace = true
+
