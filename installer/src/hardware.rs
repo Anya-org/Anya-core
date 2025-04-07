@@ -4,6 +4,7 @@ use std::time::{Duration, Instant};
 use std::thread;
 use std::path::PathBuf;
 use std::fmt;
+use crate::platform::{self, PlatformType};
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum SystemCheckStatus {
@@ -82,8 +83,22 @@ impl<'a> HardwareAnalyzer<'a> {
     }
 
     pub fn get_available_disk_gb(&self) -> u64 {
+        // Filter disks based on platform
+        let current_platform = platform::current_platform();
+        
         self.system.disks().iter()
             .filter(|disk| disk.is_removable() == false)
+            .filter(|disk| {
+                match current_platform {
+                    PlatformType::Windows => disk.mount_point().to_string_lossy().starts_with("C:"),
+                    PlatformType::MacOS => disk.mount_point().to_string_lossy() == "/",
+                    PlatformType::Linux => {
+                        let mount = disk.mount_point().to_string_lossy();
+                        mount == "/" || mount == "/home"
+                    },
+                    _ => true,
+                }
+            })
             .map(|disk| disk.available_space() / 1024 / 1024 / 1024)
             .sum()
     }
@@ -239,15 +254,53 @@ impl<'a> HardwareAnalyzer<'a> {
             lightning_enabled: false,
         };
         
-        // Set DB cache based on available memory
-        if report.memory_total_gb >= 32 {
-            config.db_cache_mb = 8192;
-        } else if report.memory_total_gb >= 16 {
-            config.db_cache_mb = 4096;
-        } else if report.memory_total_gb >= 8 {
-            config.db_cache_mb = 2048;
-        } else if report.memory_total_gb >= 4 {
-            config.db_cache_mb = 1024;
+        // Platform-specific optimizations
+        let current_platform = platform::current_platform();
+        
+        // Adjust cache based on platform and memory
+        match current_platform {
+            PlatformType::Windows => {
+                // Windows typically has more background processes
+                if report.memory_total_gb >= 32 {
+                    config.db_cache_mb = 6144;
+                } else if report.memory_total_gb >= 16 {
+                    config.db_cache_mb = 3072;
+                } else if report.memory_total_gb >= 8 {
+                    config.db_cache_mb = 1536;
+                }
+            },
+            PlatformType::MacOS => {
+                // macOS is typically more memory efficient
+                if report.memory_total_gb >= 32 {
+                    config.db_cache_mb = 8192;
+                } else if report.memory_total_gb >= 16 {
+                    config.db_cache_mb = 4096;
+                } else if report.memory_total_gb >= 8 {
+                    config.db_cache_mb = 2048;
+                }
+            },
+            PlatformType::Linux => {
+                // Linux can be very efficient with memory
+                if report.memory_total_gb >= 32 {
+                    config.db_cache_mb = 10240;
+                } else if report.memory_total_gb >= 16 {
+                    config.db_cache_mb = 5120;
+                } else if report.memory_total_gb >= 8 {
+                    config.db_cache_mb = 2560;
+                }
+            },
+            _ => {
+                // Generic fallback
+                if report.memory_total_gb >= 32 {
+                    config.db_cache_mb = 8192;
+                } else if report.memory_total_gb >= 16 {
+                    config.db_cache_mb = 4096;
+                } else if report.memory_total_gb >= 8 {
+                    config.db_cache_mb = 2048;
+                } else if report.memory_total_gb >= 4 {
+                    config.db_cache_mb = 1024;
+                }
+            }
         }
         
         // Set max connections based on available CPU cores

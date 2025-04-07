@@ -26,36 +26,39 @@ param(
 )
 
 # Detect platform
-$IsWindows = $global:IsWindows -eq $true
-$IsMacOS = $global:IsMacOS -eq $true
-$IsLinux = $global:IsLinux -eq $true
+$OsWindows = $false
+$OsMacOS = $false
+$OsLinux = $false
 
-# For older PowerShell versions without automatic variables
-if ($null -eq $IsWindows -and $null -eq $IsMacOS -and $null -eq $IsLinux) {
+# Use built-in variables if available (PowerShell 6+)
+if ($null -ne $global:IsWindows) {
+    $OsWindows = $global:IsWindows
+    $OsMacOS = $global:IsMacOS
+    $OsLinux = $global:IsLinux
+} else {
+    # For older PowerShell versions without automatic variables
     $osInfo = [System.Environment]::OSVersion
-    $IsWindows = $osInfo.Platform -eq "Win32NT"
-    $IsMacOS = $false
-    $IsLinux = $false
+    $OsWindows = $osInfo.Platform -eq "Win32NT"
     
-    if (-not $IsWindows) {
+    if (-not $OsWindows) {
         try {
             $uname = if (Get-Command uname -ErrorAction SilentlyContinue) { uname }
             if ($uname -eq "Darwin") {
-                $IsMacOS = $true
+                $OsMacOS = $true
             } elseif ($uname -eq "Linux") {
-                $IsLinux = $true
+                $OsLinux = $true
             }
         } catch {
             # Default to Windows if detection fails
-            $IsWindows = $true
+            $OsWindows = $true
         }
     }
 }
 
 # Determine data path based on platform
-$dataDirPath = if ($IsWindows) {
+$dataDirPath = if ($OsWindows) {
     "$env:ProgramData\AnyaCore"
-} elseif ($IsMacOS) {
+} elseif ($OsMacOS) {
     "/Library/Application Support/AnyaCore"
 } else {
     # Linux
@@ -64,7 +67,7 @@ $dataDirPath = if ($IsWindows) {
 
 # Check for elevated permissions
 function Test-AdminPrivileges {
-    if ($IsWindows) {
+    if ($OsWindows) {
         $identity = [System.Security.Principal.WindowsIdentity]::GetCurrent()
         $principal = New-Object System.Security.Principal.WindowsPrincipal($identity)
         return $principal.IsInRole([System.Security.Principal.WindowsBuiltInRole]::Administrator)
@@ -96,7 +99,7 @@ function Test-RustInstalled {
 
 # Install Rust if needed
 function Install-Rust {
-    if ($IsWindows) {
+    if ($OsWindows) {
         Write-Host "Installing Rust using rustup-init.exe..."
         Invoke-WebRequest -Uri "https://static.rust-lang.org/rustup/dist/x86_64-pc-windows-msvc/rustup-init.exe" -OutFile "rustup-init.exe"
         Start-Process -FilePath ".\rustup-init.exe" -ArgumentList "-y" -Wait
@@ -127,9 +130,9 @@ function Install-AnyaCore {
         cargo build --release
         
         # Copy binaries to appropriate location
-        $binDir = if ($IsWindows) {
+        $binDir = if ($OsWindows) {
             "$env:ProgramFiles\AnyaCore\bin"
-        } elseif ($IsMacOS) {
+        } elseif ($OsMacOS) {
             "/Applications/AnyaCore.app/Contents/MacOS"
         } else {
             # Linux
@@ -141,8 +144,8 @@ function Install-AnyaCore {
         }
         
         Write-Host "Copying binaries to $binDir" -ForegroundColor Cyan
-        $sourceFile = Join-Path (Get-Location) "target/release/anya-installer$(if ($IsWindows) { '.exe' } else { '' })"
-        $destFile = Join-Path $binDir "anya-installer$(if ($IsWindows) { '.exe' } else { '' })"
+        $sourceFile = Join-Path (Get-Location) "target/release/anya-installer$(if ($OsWindows) { '.exe' } else { '' })"
+        $destFile = Join-Path $binDir "anya-installer$(if ($OsWindows) { '.exe' } else { '' })"
         Copy-Item -Path $sourceFile -Destination $destFile -Force
         
         # Run the installer
@@ -152,7 +155,7 @@ function Install-AnyaCore {
             $installArgs += " --config `"$Config`""
         }
         
-        if ($IsWindows) {
+        if ($OsWindows) {
             Start-Process -FilePath $destFile -ArgumentList $installArgs -Wait -NoNewWindow
         } else {
             & $destFile $installArgs.Split(" ")
@@ -174,10 +177,10 @@ function Uninstall-AnyaCore {
     try {
         cargo build --release
         
-        $installerPath = Join-Path (Get-Location) "target/release/anya-installer$(if ($IsWindows) { '.exe' } else { '' })"
+        $installerPath = Join-Path (Get-Location) "target/release/anya-installer$(if ($OsWindows) { '.exe' } else { '' })"
         
         # Run the uninstaller
-        if ($IsWindows) {
+        if ($OsWindows) {
             Start-Process -FilePath $installerPath -ArgumentList "uninstall" -Wait -NoNewWindow
         } else {
             & $installerPath uninstall
