@@ -1,7 +1,7 @@
 use anyhow::{Result, Context};
 use tokio::net::TcpStream;
 use std::time::Duration;
-use platform::{self, PlatformType};
+use crate::platform::{self, PlatformType};
 use serde::{Serialize, Deserialize};
 use std::net::{SocketAddr, ToSocketAddrs};
 use tokio::time::timeout;
