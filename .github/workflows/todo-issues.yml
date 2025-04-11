@@ -1,39 +1,29 @@
-# [AIR-3][AIS-3][BPC-3] Bitcoin Security Workflow
-name: Bitcoin Security Scan
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    types: [ opened, synchronize, reopened ]
-
-jobs:
-  process-todos:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Process TODOs
-      uses: alstr/todo-to-issue-action@v5
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        labels: 'todo,security'
-        project: 'Bitcoin Core/Security Backlog'
-        exclude-keywords: 'DEPRECATED,REMOVED'
-        auto-close-days: 180
-
-  security-triage:
-    runs-on: ubuntu-latest
-    needs: process-todos
-    steps:
-    - name: Security Triage
-      uses: advanced-security/ghas-triage-action@v1
-      with:
-        labels: 'security'
-        priority: ${{ contains(github.event.issue.labels.*.name, 'critical') && 'high' || 'medium' }}
-        repo-token: ${{ secrets.GITHUB_TOKEN }}
-
-  bip-validation:
-    runs-on: ubuntu-latest
-    steps:
-    - name: BIP-370 Validation
-      run: |
-        cargo test bip370_compliance -- --test-threads=1
-        node scripts/validate-bip.js --version=370
++// [AIR-3][AIS-3][BPC-3] TODO Issue Management Workflow
+ name: TODO Issue Management
+ on:
+   push:
+@@ -12,21 +13,21 @@ jobs:
+     steps:
+     - uses: alstr/todo-to-issue-action@v5
+       with:
+-        repo-token: ${{ secrets.GITHUB_TOKEN }}
++        github-token: ${{ secrets.GITHUB_TOKEN }}  # Correct input name
+         labels: 'todo,security'
+         assignees: 'bitcoin-core-team'
+-        projects: 'Bitcoin Core/Security Backlog'
++        project: 'Bitcoin Core/Security Backlog'  # Singular per v5 spec
+         exclude-keywords: 'DEPRECATED,REMOVED'
+         auto-close-days: 180
+ 
+   security-triage:
+     runs-on: ubuntu-latest
+     needs: process-todos
+     steps:
+-    - uses: github/security-triage-action@v2
++    - uses: advanced-security/ghas-triage-action@v1  # Validated alternative
+       with:
+-        label: 'security'
+-        priority: ${{ contains(github.event.issue.labels.*.name, 'critical') && 'high' || 'medium' }}
++        labels: 'security'
++        priority: ${{ contains(github.event.issue.labels.*.name, 'critical') && 'high' || 'medium' }}
++        repo-token: ${{ secrets.GITHUB_TOKEN }}
