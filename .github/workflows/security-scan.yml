@@ -118,3 +118,19 @@ jobs:
                 });
               }
             }
+
+      - name: AI Label Compliance Check
+        run: |
+          echo "Verifying AI labeling standards..."
+          grep -rE '\[(AIR|AIS|BPC)-[0-9]{3}\]' src/ bitcoin/ tests/
+          if [ $? -ne 0 ]; then
+            echo "Missing AI labeling in critical components"
+            exit 1
+          fi
+
+      - name: Documentation Validation
+        run: |
+          echo "Checking documentation standards..."
+          node scripts/validate-docs.js --check-labels
+          node scripts/validate-docs.js --check-bip-references
+          node scripts/validate-docs.js --check-deprecated

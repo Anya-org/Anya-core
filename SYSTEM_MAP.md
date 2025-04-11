@@ -1,3 +1,27 @@
+# Anya Core Architecture [AIR-3][BPC-3]
+
+## Hexagonal Architecture Diagram
+
+```mermaid
+graph TD
+    BC[Bitcoin Core] --> AL[Adapter Layer]
+    AL --> CL[Core Logic]
+    CL --> EI[External Interfaces]
+    CL --> MM[Monitoring & Metrics]
+    MM --> PM[Prometheus]
+    AL --> PA[Protocol Adapters]
+    PA --> LN[Lightning Network]
+    PA --> TA[Taproot Assets]
+```
+
+## Component Matrix
+| Component          | BIP Compliance | AI Labels               | Status      |
+|--------------------|----------------|-------------------------|-------------|
+| Bitcoin Core       | 341, 342, 370  | [BPC-3][AIS-3]          | Production  |
+| DLC Oracle         | 341, 327       | [AIR-3][AIS-3]          | Beta        |
+| PSBT Engine        | 370            | [BPC-3][RES-3]          | Production  |
+| Mobile Integration | 341            | [AIS-2][BPC-2]          | Development |
+
 # Anya Core System Architecture Map
 
 [AIR-3][AIS-3][BPC-3][AIT-3][RES-3]

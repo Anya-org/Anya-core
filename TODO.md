@@ -1,5 +1,27 @@
 # Anya Core Setup Requirements
 
+## Critical Security
+- [ ] Implement hardware security module (HSM) integration for key management [AIS-3][RES-3]
+- [ ] Complete transition to constant-time cryptographic operations (3 remaining functions)
+- [ ] Finalize BIP-341/342 compliance audit for mobile components
+
+## High Priority
+- [ ] Develop PSBTv2 implementation with Miniscript support 
+- [ ] Create comprehensive test suite for DLC oracles (Current coverage: 82%)
+- [ ] Implement automatic AI label validation in CI pipeline
+
+## Medium Priority
+- [ ] Optimize UTXO handling for large transaction sets
+- [ ] Develop Web5 DID integration guide
+- [ ] Create performance benchmarks for Taproot operations
+
+## Deprecated/Removed
+- ~~[x] Migrate from Math.random() to crypto-safe RNG~~ (Completed 2025-03-15)
+- ~~[x] Implement BIP-341 SILENT_LEAF validation~~ (Completed 2025-03-18)
+- ~~[x] Remove legacy Flutter implementation~~ (Completed 2025-02-28)
+
+# Anya Core Setup Requirements
+
 ## Production Environment Setup
 
 ### 1. Core System (Phase 1 - Complete)

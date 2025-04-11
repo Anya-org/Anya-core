@@ -18,3 +18,10 @@
 # CI/CD and automation
 /.github/ @botshelomokoka/devops-team
 /scripts/ @botshelomokoka/devops-team
+
+# Security reviews
+/src/bitcoin/hsm/    @bitcoin-security-lead
+/src/bitcoin/psbt/   @bip-compliance-officer
+
+# AI governance
+/**                  @ai-labeling-bot

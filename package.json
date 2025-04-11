@@ -7,13 +7,13 @@
     "update-roadmap": "node scripts/update-roadmap.js"
   },
   "dependencies": {
-    "bip-schnorr": "^0.6.3",
+    "bip-schnorr": "^0.7.0",
     "bitcoin-core": "^5.0.0",
     "bitcoinjs-lib": "^6.1.5",
     "crypto-js": "^4.2.0",
     "glob": "^11.0.1",
     "lightning": "^10.25.0",
-    "node-fetch": "^2.7.0",
+    "node-fetch": "^3.3.2",
     "secp256k1": "^5.0.1"
   },
   "directories": {
