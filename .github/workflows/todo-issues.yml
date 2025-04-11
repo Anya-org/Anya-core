@@ -13,11 +13,11 @@ jobs:
     - name: Process TODOs
       uses: alstr/todo-to-issue-action@v5
       with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        issue-labels: 'todo,security'
-        projects: 'Bitcoin Core/Security Backlog'
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        labels: 'todo,security'
+        project: 'Bitcoin Core/Security Backlog'
         exclude-keywords: 'DEPRECATED,REMOVED'
-        days-before-close: 180
+        auto-close-days: 180
 
   security-triage:
     runs-on: ubuntu-latest
