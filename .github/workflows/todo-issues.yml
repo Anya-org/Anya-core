@@ -17,7 +17,7 @@ jobs:
         labels: 'todo,security'
         project: 'Bitcoin Core/Security Backlog'
         exclude-keywords: 'DEPRECATED,REMOVED'
-        auto-close-days: 180
+        days-before-close: 180
 
   security-triage:
     runs-on: ubuntu-latest

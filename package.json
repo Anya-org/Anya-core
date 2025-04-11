@@ -4,7 +4,8 @@
   "description": "Anya Core Project",
   "main": "index.js",
   "scripts": {
-    "update-roadmap": "node scripts/update-roadmap.js"
+    "update-roadmap": "node scripts/update-roadmap.js",
+    "bip-compliance-check": "anya validate-bip --341 --342 --174 --psbt-v2"
   },
   "dependencies": {
     "bip-schnorr": "^0.7.0",
