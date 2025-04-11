@@ -24,9 +24,9 @@ jobs:
     needs: process-todos
     steps:
     - name: Security Triage
-      uses: advanced-security/ghas-triage-action@v1
+      uses: github/advanced-security/ghas-triage-action@v1
       with:
-        label: 'security'
+        labels: 'security'
         priority: ${{ contains(github.event.issue.labels.*.name, 'critical') && 'high' || 'medium' }}
         repo-token: ${{ secrets.GITHUB_TOKEN }}
 
