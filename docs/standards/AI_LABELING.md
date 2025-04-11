@@ -434,3 +434,12 @@ All experimental code must:
 - BIP-341/342 Compliance Requirements
 - Security Implementation Guidelines
 - CodeQL Analysis Framework
+
+## Updated AI Labeling Standards [AIR-3][AIS-3][BPC-3]
+
+| Component Type       | Mandatory Labels          | Documentation Requirements              |
+|----------------------|---------------------------|------------------------------------------|
+| Bitcoin Core         | [BPC-3][AIS-3][AIR-3]     | BIP references, security considerations |
+| Layer 2              | [BPC-2][AIS-2]            | Fallback mechanisms, L1 guarantees      |
+| DLC Oracles          | [AIR-3][AIS-3][BPC-3]     | Non-interactive patterns, MuSig details |
+| Cryptographic Primitives | [AIS-3][RES-3]        | Constant-time proofs, RNG sources       |

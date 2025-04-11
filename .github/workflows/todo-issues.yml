@@ -1,0 +1,39 @@
+# [AIR-3][AIS-3][BPC-3] Bitcoin Security Workflow
+name: Bitcoin Security Scan
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    types: [ opened, synchronize, reopened ]
+
+jobs:
+  process-todos:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Process TODOs
+      uses: alstr/todo-to-issue-action@v5
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        labels: 'todo,security'
+        project: 'Bitcoin Core/Security Backlog'
+        exclude-keywords: 'DEPRECATED,REMOVED'
+        auto-close-days: 180
+
+  security-triage:
+    runs-on: ubuntu-latest
+    needs: process-todos
+    steps:
+    - name: Security Triage
+      uses: advanced-security/ghas-triage-action@v1
+      with:
+        labels: 'security'
+        priority: ${{ contains(github.event.issue.labels.*.name, 'critical') && 'high' || 'medium' }}
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+  bip-validation:
+    runs-on: ubuntu-latest
+    steps:
+    - name: BIP-370 Validation
+      run: |
+        cargo test bip370_compliance -- --test-threads=1
+        node scripts/validate-bip.js --version=370

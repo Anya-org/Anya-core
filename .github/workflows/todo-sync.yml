@@ -1,0 +1,20 @@
+# [AIR-3][BPC-3] TODO Synchronization Workflow
+name: Sync TODOs
+on:
+  push:
+    paths:
+      - '**.rs'
+      - '**.md'
+
+jobs:
+  todo-sync:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: alstr/todo-to-issue-action@v5
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        labels: 'todo,bip-compliance'
+        project: 'Bitcoin Core/Protocol Backlog'
+        exclude-completed: 'true'
+        auto-close: 'true'
+        keywords: 'TODO,FIXME,REVIEW'

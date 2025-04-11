@@ -1,0 +1,58 @@
+name: Automated Code Review
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  security-review:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check HSM changes
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const files = context.payload.pull_request.files.map(f => f.filename)
+          const hsmFiles = files.filter(f => f.startsWith('src/bitcoin/hsm/'))
+          if (hsmFiles.length > 0) {
+            await github.rest.pulls.requestReviewers({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+              reviewers: ['bitcoin-security-lead']
+            })
+          }
+
+  protocol-review:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check PSBT changes
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const files = context.payload.pull_request.files.map(f => f.filename)
+          const psbtFiles = files.filter(f => f.startsWith('src/bitcoin/psbt/'))
+          if (psbtFiles.length > 0) {
+            await github.rest.pulls.requestReviewers({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+              reviewers: ['bip-compliance-officer']
+            })
+          }
+
+  ai-review:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check AI labels
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const labels = context.payload.pull_request.labels.map(l => l.name)
+          if (labels.includes('AI')) {
+            await github.rest.pulls.requestReviewers({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+              reviewers: ['ai-labeling-bot']
+            })
+          }

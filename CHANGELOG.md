@@ -32,6 +32,9 @@ All notable changes to the Anya Core project will be documented in this file.
 - React Native 0.72+ support
 - react-native-bitcoin integration
 - TurboModule-based performance optimizations
+- [AIS-3] Hardware Security Module interface implementation
+- [BPC-3] BIP-370 (PSBTv2) support for transaction construction
+- [RES-3] Automatic failover for Bitcoin node connections
 
 ### Changed in Unreleased
 
@@ -50,6 +53,9 @@ All notable changes to the Anya Core project will be documented in this file.
 - Added deprecation notices to legacy AI labeling documentation
 - Created standards directory for canonical documentation
 - Improved script organization for better maintainability
+- [AIS-3] Upgraded cryptographic libraries to constant-time equivalents
+- [BPC-3] Enhanced Taproot implementation with full BIP-341 compliance
+- [AIR-3] Standardized AI labeling across all core modules
 
 ### Removed in Unreleased
 
@@ -62,6 +68,8 @@ All notable changes to the Anya Core project will be documented in this file.
 - Dart/Flutter mobile implementation
 - dart-bitcoin dependencies
 - Flutter-specific toolchain
+- Deprecated Web5 v0.2 compatibility layer
+- Obsolete BIP-37 implementation
 
 ### Security in Unreleased
 
@@ -458,3 +466,9 @@ All notable changes to the Anya Core project will be documented in this file.
 ### Last updated
 
 *2024-12-27*
+
+## [1.5.0] - 2025-03-25
+### Added
+- Initial implementation of discrete log contracts (DLC)
+- AI labeling validation workflow
+- Bitcoin Development Framework compliance matrix

@@ -1,0 +1,35 @@
+reviewers:
+  security:
+    required: true
+    team: bitcoin-security-lead
+    conditions:
+      - path: 'src/bitcoin/hsm/**'
+      - label: 'security'
+      - keywords: ['HSM', 'YubiHSM2', 'audit logging']
+    checks:
+      - BIP-341 §4.1.3
+      - CodeQL security suite
+      - HSM hardware validation
+
+  protocol:
+    required: true
+    team: bip-compliance-officer
+    conditions:
+      - path: 'src/bitcoin/psbt/**'
+      - label: 'protocol'
+      - keywords: ['BIP-370', 'PSBTv2', 'Miniscript']
+    checks:
+      - BIP-370 test vectors
+      - Bitcoin Core 25.0 compatibility
+      - Transaction validation benchmarks
+
+  ai-governance:
+    required: true
+    bot: ai-labeling-bot
+    conditions:
+      - path: '**'
+      - label: 'AI'
+    checks:
+      - [AIR-3][AIS-3][BPC-3] presence
+      - AI_LABELING.md compliance
+      - Documentation references 
