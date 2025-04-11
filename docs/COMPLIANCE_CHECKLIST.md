@@ -36,6 +36,7 @@
 - [x] BIP-275 transaction anchoring
 - [x] Credential revocation list support
 - [x] SILENT_LEAF pattern verification
+- [x] Verifiable Credential formats (W3C VC-DATA-MODEL)
 
 ## Validation Matrix
 
@@ -87,6 +88,11 @@ anya-test hardware --hsm --sgx --fpga --duration 24h
 Would you like me to generate a specific compliance report or update the validation matrix? 
 
 ## Missing Web5-specific requirements:
-- [ ] Web5-BIP174 alignment
-- [ ] Decentralized Identifier (DID) validation
-- [ ] Verifiable Credential formats 
+- [x] Web5-BIP174 alignment
+- [x] Decentralized Identifier (DID) validation
+- [x] Verifiable Credential formats (W3C VC-DATA-MODEL) 
+
+## Mobile Compliance
+- [x] BIP-341 (Taproot Mobile)
+- [x] BIP-275 (PSBT Metadata)
+- [x] DID v1 (Web5-RS 0.6) 
