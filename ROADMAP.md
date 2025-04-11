@@ -1,3 +1,27 @@
+# Anya Core Roadmap [AIR-3][BPC-3]
+
+## Q2 2025 - Protocol Maturity
+- Complete BIP-341/342/370 implementation [BPC-3]
+- Finalize hardware security integration [AIS-3][RES-3]
+- Launch mainnet-ready DLC oracle network
+
+## Q3 2025 - Ecosystem Expansion
+- Integrate Taproot Asset Protocol (BIP-0341)
+- Develop Lightning Network adapter (BOLT11)
+- Implement RGB protocol v3.0 compatibility
+
+## Q4 2025 - Enterprise Features
+- Multi-sig HSM orchestration [AIS-3]
+- Privacy-preserving transaction batching
+- Zero-knowledge proof integration for UTXO management
+
+## Compliance Milestones
+| Quarter | Target BIPs          | AI Label Requirements       |
+|---------|----------------------|-----------------------------|
+| 2025 Q2 | 341, 342, 370        | [AIR-3][AIS-3][BPC-3]       |
+| 2025 Q3 | 371, 372, 173        | [AIS-3][BPC-3][RES-3]       |
+| 2025 Q4 | 370+, 173+           | [AIR-3][AIS-3][BPC-3][RES-3] |
+
 # Anya Core Project Roadmap
 
 > Note: For Enterprise features and roadmap, please see [Enterprise Roadmap](./enterprise/ROADMAP.md)
