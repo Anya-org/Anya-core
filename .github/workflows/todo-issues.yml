@@ -13,7 +13,7 @@ jobs:
     - name: Process TODOs
       uses: alstr/todo-to-issue-action@v5
       with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
         labels: 'todo,security'
         project: 'Bitcoin Core/Security Backlog'
         exclude-keywords: 'DEPRECATED,REMOVED'
@@ -26,7 +26,7 @@ jobs:
     - name: Security Triage
       uses: advanced-security/ghas-triage-action@v1
       with:
-        labels: 'security'
+        label: 'security'
         priority: ${{ contains(github.event.issue.labels.*.name, 'critical') && 'high' || 'medium' }}
         repo-token: ${{ secrets.GITHUB_TOKEN }}
 
