@@ -1,0 +1,10 @@
+[dependencies]
+anya-network = { path = "../core/network" }
+
+[package]
+name = "anya-mcp-server"
+version = "2.5.1"
+authors = [
+    "bo_thebig <botshelomokoka@gmail.com> [AIS-3][BPC-3][SCL-3]"
+]
+license-file = "LICENSES.d/anya.md"  # Contains upstream licenses 
