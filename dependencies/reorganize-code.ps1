@@ -26,6 +26,16 @@ $FILE_MAPPINGS = @{
         Required = $true
         ValidateContent = { param($content) $content -match "use bitcoin::" }
     }
+    # PSBT Validation
+    "src/bitcoin/psbt.rs" = @{
+        Destination = "anya-core/src/bitcoin/psbt.rs"
+        Required = $true
+        ValidateContent = { 
+            param($content) 
+            $content -match "impl PsbtV2Validation" -and 
+            $content -match "BIP_174_COMPLIANCE"
+        }
+    }
     # Add more mappings...
 }
 

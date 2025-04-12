@@ -1,27 +1,20 @@
 [submodule "enterprise"]
-	path = enterprise
-	url = https://github.com/botshelomokoka/anya-enterprise.git
-	branch = main
+	path = anya-enterprise
+	url = https://github.com/anya-org/anya-enterprise.git
+	branch = v2.5
 	update = merge
 	fetchRecurseSubmodules = true
 
 [submodule "dash33"]
 	path = dash33
-	url = https://github.com/botshelomokoka/dash33.git
+	url = https://github.com/anya-org/dash33.git
 	branch = main
 	update = merge
 	fetchRecurseSubmodules = true
 
 [submodule "dependencies"]
 	path = dependencies
-	url = https://github.com/botshelomokoka/anya-dependencies.git
-	branch = main
-	update = merge
-	fetchRecurseSubmodules = true
-
-[submodule "mobile"]
-	path = mobile
-	url = https://github.com/botshelomokoka/anya-mobile.git
+	url = https://github.com/anya-org/anya-dependencies.git
 	branch = main
 	update = merge
 	fetchRecurseSubmodules = true
@@ -33,3 +26,8 @@
 	update = merge
 	fetchRecurseSubmodules = true
 
+ [submodule "anya-mobile"]
+	path = mobile-sdk
+	url = https://github.com/Anya-org/mobile-sdk
+	branch = v3.1.1
+	update = rebase

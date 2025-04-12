@@ -1,5 +1,5 @@
 [target.'cfg(mobile)'.dependencies]
-web5-rs = { git = "https://github.com/TBD54566975/web5-rs", rev = "v0.6.0" }
+web5-rs = { git = "https://github.com/TBD54566975/web5-rs", rev = "v1.0.0" }
 anya-web5-mobile = { path = "../anya-web5", features = ["bip340", "taproot"] }
 bitcoin = { version = "0.33.0", features = ["taproot", "mobile", "bip370", "bip275"] }
 secp256k1 = { workspace = true, features = ["mobile"] }

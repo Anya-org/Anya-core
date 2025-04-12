@@ -34,7 +34,7 @@ impl Web5ValidatorV2 {
             .ok_or(anyhow!("Missing fee_rate (BIP-370)"))?;
         
         if fee_rate < self.min_fee_rate {
-            anyhow::bail!("Fee rate below minimum {self.min_fee_rate} sat/vB");
+            anyhow::bail!(format!("Fee rate below minimum {} sat/vB", self.min_fee_rate));
         }
         
         // Validate Web5 extensions

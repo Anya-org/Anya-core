@@ -861,3 +861,13 @@ jsi = { version = "0.12", features = ["bip341"] }
 ---
 
 **Last Updated**: 2025-08-24 | [Full Roadmap](ROADMAP.md) | [Audit Reports](docs/SECURITY.md)
+
+## CI/CD Pipeline
+```mermaid
+sequenceDiagram
+    User->>+HSM: Sign Transaction
+    HSM->>+Security: Verify BIP-341
+    Security-->>-HSM: Valid Signature
+    HSM->>+Mobile: Signed PSBT
+    Mobile->>+Network: Broadcast
+```
