@@ -10,18 +10,16 @@ Welcome to the Anya Core documentation. This index will help you navigate the va
 
 ## Core Documentation
 
-- [Documentation Index](docs/INDEX.md) - Main documentation index
 - [System Architecture](docs/SYSTEM_MAP.md) - Complete system architecture
-- [DAO System](docs/DAO_SYSTEM_GUIDE.md) - Comprehensive DAO documentation
-- [Tokenomics System](docs/TOKENOMICS_SYSTEM.md) - Bitcoin-style tokenomics
-- [Implementation Milestones](docs/IMPLEMENTATION_MILESTONES.md) - Current progress tracking
+- [Mobile Integration](docs/MOBILE_INTEGRATION.md) - React Native implementation
+- [Security Framework](docs/SECURITY.md) - AIS-3 compliance details
 
 ## System Components
 
-### Bitcoin & Lightning
+### Core Protocols
 
-- [Bitcoin Integration](docs/bitcoin/README.md) - Bitcoin protocol features
-- [Lightning Integration](docs/lightning/README.md) - Lightning Network features
+- [BIP-341/342 Implementation](docs/BIP-341-342.md) - Taproot/Tapscript
+- [PSBTv2 Guide](docs/PSBT-GUIDE.md) - BIP-174/370 compliance
 
 ### DAO & Tokenomics
 
@@ -114,9 +112,8 @@ Welcome to the Anya Core documentation. This index will help you navigate the va
 
 ## Mobile Development
 
-- [React Native SDK](https://github.com/anya-org/anya-mobile) - Production-ready mobile components
-- [Mobile Security](docs/mobile/SECURITY.md) - Secure Bitcoin wallet implementation
-- [Taproot Mobile Guide](docs/mobile/TAPROOT.md) - Mobile Taproot transactions
+- [Mobile Security](docs/mobile/SECURITY.md) - HSM 2.5 implementation
+- [Taproot Mobile Guide](docs/mobile/TAPROOT.md) - SILENT_LEAF patterns
 
 *Last updated: 2025-03-23 14:30 UTC+2*
 

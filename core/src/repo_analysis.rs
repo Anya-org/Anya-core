@@ -18,15 +18,15 @@ impl RepoAnalysis {
                     ("secp256k1", "0.28.0"),
                 ],
             },
-            mobile: RepoCompliance {
-                bip341: ComplianceStatus::Partial,
-                psbt_v2: ComplianceStatus::Full,
-                security: SecurityStatus::Partial,
-                dependencies: vec![
-                    ("bitcoin", "0.31.0"),  // Version mismatch
-                    ("jsi", "0.12"),
-                ],
-            },
+            mobile: RepoCompliance::new_v2(
+                ComplianceStatus::Full, 
+                ComplianceStatus::Full,
+                SecurityStatus::AIS3,
+                vec![
+                    ("bitcoin", "0.33.0"),
+                    ("web5-rs", "0.6.0")
+                ]
+            ),
             enterprise: RepoCompliance {
                 bip341: ComplianceStatus::Full,
                 psbt_v2: ComplianceStatus::Full,
