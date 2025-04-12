@@ -1,10 +1,11 @@
 # Remove all package-specific configuration
 [workspace]
 members = [
-    "anyacore",
-    "mobile",
-    "bitcoin-adapter",
-    "dlc-oracle"
+    "core",
+    "cli",
+    "installer",
+    "mobile-sdk",
+    "dependencies/anya-bitcoin"
 ]
 resolver = "2"
 
@@ -97,7 +98,7 @@ tokio-test = "0.4"
 rgb-core = { git = "https://github.com/RGB-WG/rgb-core", tag = "v0.10.0", features = ["dlc-utils"] }
 
 # Mobile dependencies
-jsi = "0.10"
+anya-mobile = { path = "mobile-sdk" }
 
 # [AIR-3] Remove Dart dependencies
 # Note: Dependencies should be defined in workspace.dependencies or individual package manifests
@@ -110,3 +111,5 @@ jsi = "0.10"
 
 # [AIS-3] Security enforcement
 # Note: rust-version is already specified in the workspace.package section at the top
+
+anya-enterprise = { path = "anya-enterprise" }

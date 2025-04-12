@@ -1,0 +1,8 @@
+  - name: Web5 Compliance Check
+    id: web5-check
+    run: |
+      cargo run --bin web5-validator \
+        --features "web5" \
+        -- check \
+        --dwn-node ${{ secrets.DWN_NODE_URL }} \
+        --level strict 

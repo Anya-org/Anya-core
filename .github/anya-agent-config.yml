@@ -8,6 +8,7 @@ agent:
     - performance-optimization
     - bitcoin-standards
     - web5-integration
+    - web5-audit
 
 ml_models:
   code_analysis:
@@ -38,6 +39,8 @@ review_rules:
     - dwn: "Decentralized Web Node compliance"
     - privacy: "Data sovereignty principles"
     - integration: "Seamless Web5 protocol integration"
+    - bip174_alignment: "PSBTv2 Web5 extensions"
+    - verifiable_credentials: "W3C VC-DATA-MODEL"
 
 security_checks:
   critical:
@@ -52,6 +55,8 @@ security_checks:
     - transaction_signing
     - seed_phrase_protection
     - network_security
+    - taproot_audit_trail
+    - psbt_v2_validation
     
   web5_specific:
     - did_security

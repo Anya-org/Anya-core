@@ -69,14 +69,14 @@
 
 ### 5. Architecture Diagram Update
 ```diff:docs/MOBILE_INTEGRATION.md
- flowchart TD
-     A[Mobile App] --> B{Anya Mobile SDK}
-     B --> C[Bitcoin Core]
-     B --> D[Lightning Network]
-     B --> E[HSM Interface]
-     C --> F[BIP-341/342]
-     D --> G[BOLT11]
-     E --> H[FIDO2]
+flowchart TD
+    A[Mobile App] --> B{Anya Mobile Submodule}
+    B --> C[Bitcoin Core]
+    B --> D[Lightning Network]
+    B --> E[HSM Interface]
+    C --> F[BIP-341/342]
+    D --> G[BOLT11]
+    E --> H[FIDO2]
 +    F --> I[Silent Leaf]
 +    G --> J[AMP]
 +    H --> K[WebAuthn]

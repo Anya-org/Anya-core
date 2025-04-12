@@ -56,3 +56,10 @@ Aligned with Bitcoin Development Framework v2.5 Chapter 7
 - Timing attack protection for all cryptographic operations
 - Memory isolation for key material
 - Transaction repudiation safeguards (BIP-342 compliant)
+
+## Audit Process
+```console
+$ anya audit security \
+  --exclude RUSTSEC-2024-0321 \
+  --level strict
+```

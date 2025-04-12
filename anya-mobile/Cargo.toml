@@ -1,8 +1,8 @@
 [target.'cfg(mobile)'.dependencies]
-anya-mobile = { git = "https://github.com/anya-org/anya-mobile", branch = "main" }
-bitcoin = { workspace = true, features = ["taproot", "mobile"] }
+web5-rs = { git = "https://github.com/TBD54566975/web5-rs", rev = "v0.6.0" }
+anya-web5-mobile = { path = "../anya-web5", features = ["bip340", "taproot"] }
+bitcoin = { version = "0.33.0", features = ["taproot", "mobile", "bip370", "bip275"] }
 secp256k1 = { workspace = true, features = ["mobile"] }
-jsi = { version = "0.12", features = ["bitcoin-bindings"] }
 
 [features]
-bip341 = ["bitcoin/bip341", "secp256k1/bip341"]  # Taproot compliance 
+web5 = ["web5-rs/v1", "bitcoin/web5-v2", "secp256k1/bitcoin_hashes"] 

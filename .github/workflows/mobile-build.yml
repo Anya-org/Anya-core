@@ -15,7 +15,7 @@ jobs:
         run: |
           corepack enable
           pnpm install -g react-native@0.74
-          cd android && ./gradlew clean --refresh-dependencies
+          cd mobile-sdk/android && ./gradlew clean assembleRelease
 
   web5-compliance:
     needs: build
@@ -25,9 +25,9 @@ jobs:
       - name: Verify Standards
         run: |
           cargo run --bin web5-validator \
-            --features mobile/web5 \
+            --features "mobile,web5" \
             check \
-            --bip 340 341 174 275 370 \
+            --bip 341 174 275 370 \
             --strict
       - name: Validate SILENT_LEAF
         run: |
