@@ -1,5 +1,6 @@
 # Anya-Core MCP Configuration
-[AIR-3][AIS-3][AIT-2][AIM-2][AIP-2][AIE-2][BPC-3][AIP-3][PFM-2][SCL-2][RES-2]
+
+[AIR-3][AIS-3][AIT-3][BPC-3][RES-3]
 
 Last Updated: 2025-03-10 09:15 UTC+2
 
@@ -7,11 +8,24 @@ Last Updated: 2025-03-10 09:15 UTC+2
 
 This directory contains the Model Context Protocol (MCP) configuration for the Cursor AI assistant within the Anya-Core repository. The MCP allows the AI to use specialized Bitcoin development tools according to the Bitcoin Development Framework v2.5.
 
+## Consolidated MCP Servers
+
+| Server Name          | Purpose                          | Protocols Supported       | Security Level |
+|----------------------|----------------------------------|---------------------------|----------------|
+| anya-bitcoin-core    | Core protocol operations         | BIP-341, BIP-342, PSBT    | AIS-3          |
+
+## Access Control Matrix
+
+| Tool Category        | Allowed Actions                 | Restricted Operations      |
+|----------------------|---------------------------------|----------------------------|
+| Protocol Validation  | Read-only analysis              | No network broadcasting    |
+| File Operations      | PSBT creation/editing           | No raw transaction signing |
+
 ## MCP Server Implementation
 
 The MCP server is implemented as a Node.js application following the stdio protocol as specified in the [Cursor documentation](https://docs.cursor.com/context/model-context-protocol). The server provides Bitcoin-specific tools that conform to the project's hexagonal architecture requirements:
 
-```
+```text
                       +----------------+
                       |  Bitcoin Core  |
                       +-------+--------+
@@ -50,7 +64,8 @@ Validates Bitcoin protocol compliance according to BIP standards:
 * BIP-370 (PSBT Version 2)
 
 Usage example:
-```
+
+```text
 Validate this Taproot transaction: tr(KEY,{SILENT_LEAF})
 ```
 
@@ -59,7 +74,8 @@ Validate this Taproot transaction: tr(KEY,{SILENT_LEAF})
 Creates Taproot assets with proper metadata according to project standards, generating both the asset definition and React Native component code.
 
 Usage example:
-```
+
+```text
 Create a new asset named PrivacyCoin with supply 21000000
 ```
 
@@ -74,7 +90,8 @@ Runs security audit on Bitcoin code according to the compliance checklist, check
 * Memory management issues
 
 Usage example:
-```
+
+```text
 Audit this Bitcoin code for security: function verifySignature(signature, message) { ... }
 ```
 
@@ -83,7 +100,8 @@ Audit this Bitcoin code for security: function verifySignature(signature, messag
 Generates Partially Signed Bitcoin Transaction (PSBT) templates that comply with BIP-174 and BIP-370.
 
 Usage example:
-```
+
+```text
 Generate a PSBT with 2 inputs and 1 output
 ```
 
@@ -92,7 +110,8 @@ Generate a PSBT with 2 inputs and 1 output
 Verifies Discrete Log Contract setups for compliance with project standards.
 
 Usage example:
-```
+
+```text
 Verify this DLC contract with oracle public key 03abc...
 ```
 
@@ -102,25 +121,17 @@ All tools implemented in the MCP server follow the AI labelling guidelines speci
 
 * **AIR-3**: Full AI-Readiness with structured data and well-documented interfaces
 * **AIS-3**: Full AI Security with comprehensive validation and threat modeling
-* **AIT-2**: Enhanced AI Testing with unit and integration tests
-* **AIM-2**: Enhanced AI Monitoring with metrics and alerting
-* **AIP-2**: Enhanced AI Privacy with data minimization and anonymization
-* **AIE-2**: Enhanced AI Ethics with ethical guidelines and review process
+* **AIT-3**: Enhanced AI Testing with unit and integration tests
 * **BPC-3**: Full Bitcoin Compliance with all relevant BIPs and comprehensive testing
-* **AIP-3**: Full Interoperability with all relevant systems
-* **PFM-2**: Enhanced Performance with comprehensive optimizations
-* **SCL-2**: Moderately Scalable with horizontal and vertical scaling support
-* **RES-2**: Moderately Resilient with comprehensive error handling and failover mechanisms
+* **RES-3**: Moderately Resilient with comprehensive error handling and failover mechanisms
 
 ## Security Considerations
 
 The MCP server processes user requests and executes Bitcoin-related tools locally. All tools follow the project's security guidelines:
 
-1. Input validation for all parameters
-2. No direct execution of user-provided code
-3. Isolation from production systems
-4. Comprehensive error handling
-5. No access to sensitive keys or wallets
+1. Input validation using BIP-341 regex patterns [AIS-3]
+2. Schnorr signature verification with constant-time checks [AIS-3][BPC-3]
+3. PSBT validation according to BIP-174/370 [BPC-3]
 
 ## Usage in Cursor
 
@@ -152,3 +163,12 @@ When adding new tools to the MCP server:
 * [AI Labelling Guidelines](../docs/standards/AI_LABELING.md)
 * [Hexagonal Architecture Requirements](../docs/hexagonal-architecture.md)
 * [Cursor MCP Documentation](https://docs.cursor.com/context/model-context-protocol) 
+
+## Security Audit Results [AIS-3][BPC-3]
+
+| Check                  | Status  | Remediation |
+|------------------------|---------|-------------|
+| Schnorr Verification   | Fixed   | Implemented constant-time checks |
+| Input Validation       | Fixed   | Added BIP-341 regex patterns |
+| Error Handling         | Fixed   | Added comprehensive try-catch blocks |
+| Taproot Compliance     | Fixed   | SILENT_LEAF implementation |

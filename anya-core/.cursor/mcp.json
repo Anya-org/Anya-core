@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "mcpServers": {
+    "anya-bitcoin-core": {
+      "command": "node",
+      "args": ["scripts/bitcoin/mcp-server.js"],
+      "environment": {
+        "BITCOIN_NETWORK": "mainnet",
+        "MAX_PSBT_SIZE": "1048576",
+        "ALLOWED_SIGNERS": "0234abcd...:0256efgh..."
+      }
+    }
+  }
+} 

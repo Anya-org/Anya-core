@@ -1,0 +1,66 @@
+{
+  "timestamp": "2025-04-17T14:46:53.683Z",
+  "target": "scripts/bitcoin/mcp-server.js",
+  "passed": false,
+  "checkResults": [
+    {
+      "name": "Schnorr Implementation",
+      "description": "Schnorr signature implementation validation",
+      "passed": false
+    },
+    {
+      "name": "Secure Random Number Generation",
+      "description": "Checks for proper secure random number generation",
+      "passed": true
+    },
+    {
+      "name": "Signature Verification",
+      "description": "Checks for proper signature verification in DLCs",
+      "passed": true
+    },
+    {
+      "name": "Input Validation",
+      "description": "Checks for proper input validation",
+      "passed": true
+    },
+    {
+      "name": "Error Handling",
+      "description": "Checks for proper error handling",
+      "passed": true
+    },
+    {
+      "name": "BIP-341 Taproot Compliance",
+      "description": "Checks for proper BIP-341 Taproot implementation",
+      "passed": false
+    },
+    {
+      "name": "AI Labeling Compliance",
+      "description": "AI labeling verification",
+      "passed": true
+    },
+    {
+      "name": "PSBT Handling",
+      "description": "Checks for proper PSBT handling according to BIP-174/370",
+      "passed": true
+    },
+    {
+      "name": "Lightning Invoice Security",
+      "description": "Checks for secure Lightning invoice implementation",
+      "passed": true
+    }
+  ],
+  "issues": [
+    {
+      "name": "Schnorr Implementation",
+      "severity": "critical",
+      "file": "scripts/bitcoin/mcp-server.js"
+    },
+    {
+      "name": "BIP-341 Taproot Compliance",
+      "severity": "high",
+      "description": "Missing proper Taproot structure according to BIP-341",
+      "recommendation": "Implement proper Taproot structure with SILENT_LEAF for privacy preservation",
+      "file": "scripts/bitcoin/mcp-server.js"
+    }
+  ]
+}

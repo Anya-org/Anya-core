@@ -183,4 +183,24 @@ impl AnyaCore {
             tokenomics,
         })
     }
+}
+
+// [AIR-3][BPC-3] Hexagonal RPC ports
+pub mod rpc_ports {
+    pub trait BitcoinRpc {
+        async fn call_method(&self, method: &str, params: JsonValue) -> Result<JsonValue>;
+        async fn validate_response(&self, response: JsonValue) -> Result<()>;
+    }
+
+    pub trait LightningRpc {
+        async fn create_invoice(&self, amount_msat: u64, description: &str) -> Result<String>;
+        async fn verify_payment(&self, payment_hash: &str) -> Result<bool>;
+    }
+
+    // BDF v2.5 compliant adapter
+    pub struct AnyaRpcAdapter {
+        bitcoin: Arc<dyn BitcoinRpc>,
+        lightning: Arc<dyn LightningRpc>,
+        metrics: Arc<Mutex<PrometheusMetrics>>
+    }
 } 

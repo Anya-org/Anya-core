@@ -1,4 +1,5 @@
 # Script Directory
+
 [AIR-3][AIS-3][BPC-3][AIT-3][RES-3]
 
 This directory contains scripts for building, testing, and maintaining the Bitcoin MCP Server implementation according to the Bitcoin Development Framework v2.5.
@@ -23,11 +24,13 @@ This directory contains scripts for building, testing, and maintaining the Bitco
 The security analysis framework consists of multiple components:
 
 1. **CodeQL Analysis**:
+
    ```powershell
    .\scripts\security\run-codeql-analysis.ps1
    ```
    
 2. **Component-specific Analysis**:
+
    ```bash
    node scripts/security/analyze-mcp-server.js --file=scripts/bitcoin/mcp-server.js
    node scripts/security/crypto-validation.js
