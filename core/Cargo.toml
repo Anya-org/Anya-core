@@ -1,7 +1,7 @@
 [package]
 name = "anya-core"
-version.workspace = true
-edition.workspace = true
+version = "0.1.0-rc.1"
+edition = "2021"
 
 [dependencies]
 bitcoin.workspace = true
@@ -9,7 +9,7 @@ secp256k1.workspace = true
 serde.workspace = true
 libp2p = { workspace = true, features = ["tcp", "websocket", "noise", "yamux"] }
 tokio = { workspace = true, features = ["full"] }
-anya-mobile = { path = "mobile-sdk" }
+mobile-sdk = { git = "https://github.com/anya-org/anya-mobile.git", tag = "v3.1.1" }
 
 # Cryptographic primitives
 k256 = { version = "0.13.3", features = [

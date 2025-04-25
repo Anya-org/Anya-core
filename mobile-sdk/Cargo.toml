@@ -1,21 +1,14 @@
-[dependencies]
-anya-mobile.workspace = true
-mobile-sdk.workspace = true
+[package]
+name = "mobile-sdk"
+version = "0.1.0"
+edition = "2021"
+build = "build.rs"
+description = "Rust SDK for mobile integration"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/anya-org/anya-mobile.git"
 
-# [BPC-3] Remove legacy dependencies
-# taproot-assets = { version = "0.3" }  # Removed
-# anya-legacy-mobile = "0.2"  # Removed
 [dependencies]
-anya-mobile.workspace = true
-mobile-sdk.workspace = true
+subtle = "2.4"
 
-# [BPC-3] Remove legacy dependencies
-# taproot-assets = { version = "0.3" }  # Removed
-# anya-legacy-mobile = "0.2"  # Removed
-[dependencies]
-anya-mobile.workspace = true
-mobile-sdk.workspace = true
-
-# [BPC-3] Remove legacy dependencies
-# taproot-assets = { version = "0.3" }  # Removed
-# anya-legacy-mobile = "0.2"  # Removed
+[dev-dependencies]
+# add tests dependencies here if needed
