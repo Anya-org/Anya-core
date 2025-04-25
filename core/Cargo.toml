@@ -30,7 +30,7 @@ web5 = { git = "https://github.com/decentralized-identity/web5-rs.git", branch =
 sgx_urts = { version = "1.1.1", optional = true }
 
 # Change yubihsm to optional
-yubihsm = { version = "0.41.0", features = ["mock"], optional = true }
+yubihsm = { version = "0.41.0", optional = true }
 
 [dev-dependencies]
 
