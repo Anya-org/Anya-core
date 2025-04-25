@@ -1,0 +1,16 @@
+#!/usr/bin/env sh
+# Pre-commit hook: AI label validation
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM)
+if [ -z "$STAGED_FILES" ]; then
+  echo "No staged files to validate."
+  exit 0
+fi
+printf "%s\n" $STAGED_FILES > "$(git rev-parse --git-dir)/tmp_staged_files.txt"
+pwsh -ExecutionPolicy Bypass -File scripts/validate_ai_labels.ps1 -stagedFiles "$(git rev-parse --git-dir)/tmp_staged_files.txt"
+RESULT=$?
+rm "$(git rev-parse --git-dir)/tmp_staged_files.txt"
+if [ $RESULT -ne 0 ]; then
+  echo "AI label validation failed. Please fix issues before committing."
+  exit 1
+fi
+exit 0
