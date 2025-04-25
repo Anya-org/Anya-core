@@ -1,3 +1,3 @@
 [toolchain]
-channel = "stable"
-components = ["rust-src"] 
+channel = "stable-x86_64-pc-windows-gnu"
+components = ["rust-src"]
