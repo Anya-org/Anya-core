@@ -11,12 +11,8 @@ description = "Core dependencies and shared components for the Anya Bitcoin Plat
 opentelemetry = { version = "0.21.0", features = ["rt-tokio"], optional = true }
 
 [features]
-default = ["standard-security"]
-standard-security = ["dependency1", "dependency2"]
-advanced-security = ["dependency3", "dependency4"]
-enterprise = ["advanced-security", "hardware-wallet", "metrics"]
-hardware-wallet = []
-metrics = ["dep:opentelemetry"]
+default = ["metrics"]
+metrics = ["opentelemetry"]
 
 [profile.dev]
 opt-level = 1
@@ -65,4 +61,3 @@ rustdoc-args = ["--cfg", "docsrs"]
 
 [package.metadata.cargo-udeps]
 ignore = ["criterion"] # Used only in bench
-
