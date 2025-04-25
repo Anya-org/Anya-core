@@ -23,15 +23,8 @@ hmac = "0.12.1"
 # Security auditing
 cargo-audit = { version = "0.18.3", optional = true }
 
-# Update Web5 dependency to decentralized-identity/web5-rs at tag v0.5.1
-web5 = { git = "https://github.com/decentralized-identity/web5-rs.git", tag = "v0.5.1", features = [
-    "bip174",
-    "bip341",
-    "bip370",
-    "did-rotation",
-    "vc-revocation",
-    "silent-leaf"
-], default-features = false }
+# Update Web5 dependency to decentralized-identity/web5-rs at branch main without custom features
+web5 = { git = "https://github.com/decentralized-identity/web5-rs.git", branch = "main" }
 
 # Add SGX implementation
 sgx_urts = { version = "1.1.1", optional = true }
