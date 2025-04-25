@@ -14,3 +14,13 @@
 *.exe binary
 *.key binary
 *.pem binary
+*.rs text eol=lf
+*.toml text eol=lf
+*.js text eol=lf
+*.ts text eol=lf
+*.tsx text eol=lf
+*.md text eol=lf
+*.yml text eol=lf
+*.sh text eol=lf
+*.ps1 text eol=lf
+
