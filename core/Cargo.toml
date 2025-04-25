@@ -9,7 +9,7 @@ secp256k1.workspace = true
 serde.workspace = true
 libp2p = { workspace = true, features = ["tcp", "websocket", "noise", "yamux"] }
 tokio = { workspace = true, features = ["full"] }
-mobile-sdk = { git = "https://github.com/anya-org/anya-mobile.git", tag = "v3.1.1" }
+mobile-sdk = { path = "../mobile-sdk" }
 
 # Cryptographic primitives
 k256 = { version = "0.13.3", features = [
