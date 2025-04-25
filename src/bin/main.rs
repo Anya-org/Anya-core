@@ -1,4 +1,5 @@
-fn main() {
+use std::error::Error;
+fn main()  -> Result<(), Box<dyn Error>> {
     println!("Anya Platform v{}", anya::version());
     
     #[cfg(feature = "bitcoin_integration")]

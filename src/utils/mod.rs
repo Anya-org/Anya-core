@@ -1,3 +1,4 @@
+use std::error::Error;
 use std::fs::{self, File};
 use std::io::{self, Read, Write};
 use std::path::{Path, PathBuf};
@@ -89,7 +90,7 @@ impl MarkdownDocument {
     
     /// Check for trailing whitespace
     pub fn has_trailing_whitespace(&self) -> bool {
-        let re = Regex::new(r"[ \t]+$").unwrap();
+        let re = Regex::new(r"[ \t]+$")?;
         for line in self.content.lines() {
             if re.is_match(line) {
                 return true;
@@ -100,7 +101,7 @@ impl MarkdownDocument {
     
     /// Fix trailing whitespace
     pub fn fix_trailing_whitespace(&mut self) -> Result<bool, DocError> {
-        let re = Regex::new(r"[ \t]+$").unwrap();
+        let re = Regex::new(r"[ \t]+$")?;
         let original = self.content.clone();
         self.content = re.replace_all(&self.content, "").to_string();
         

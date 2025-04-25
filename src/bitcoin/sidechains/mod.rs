@@ -1,3 +1,4 @@
+use std::error::Error;
 // Migrated from OPSource to anya-core
 // This file was automatically migrated as part of the Rust-only implementation
 // Original file: C:\Users\bmokoka\Downloads\OPSource\src\bitcoin\sidechains\mod.rs
@@ -27,7 +28,7 @@ pub struct StacksIntegration {
 }
 
 impl StacksIntegration {
-    pub fn new(network: &str, endpoint: &str) -> Self {
+    pub fn new(network: &str, endpoint: &str) -> Self  -> Result<(), Box<dyn Error>> {
         Self {
             network: network.to_string(),
             endpoint: endpoint.to_string(),
@@ -35,7 +36,7 @@ impl StacksIntegration {
     }
     
     // Placeholder for stacks functionality
-    pub fn is_enabled(&self) -> bool {
+    pub fn is_enabled(&self) -> bool  -> Result<(), Box<dyn Error>> {
         false
     }
 }
@@ -134,7 +135,7 @@ pub trait SidechainManager {
 
 /// Status of a sidechain
 #[derive(Debug, Clone)]
-pub struct SidechainStatus {
+pub struct SidechainStatus  -> Result<(), Box<dyn Error>> {
     /// Sidechain type
     pub sidechain_type: SidechainType,
     
@@ -159,7 +160,7 @@ pub struct SidechainFactory;
 
 impl SidechainFactory {
     /// Creates a new sidechain manager
-    pub fn create_manager() -> Box<dyn SidechainManager> {
+    pub fn create_manager() -> Box<dyn SidechainManager>  -> Result<(), Box<dyn Error>> {
         Box::new(DefaultSidechainManager::new())
     }
 }
@@ -171,13 +172,13 @@ struct DefaultSidechainManager {
 
 impl DefaultSidechainManager {
     /// Creates a new default sidechain manager
-    fn new() -> Self {
+    fn new() -> Self  -> Result<(), Box<dyn Error>> {
         Self {}
     }
 }
 
 impl SidechainManager for DefaultSidechainManager {
-    fn list_sidechains(&self) -> AnyaResult<Vec<SidechainType>> {
+    fn list_sidechains(&self) -> AnyaResult<Vec<SidechainType>>  -> Result<(), Box<dyn Error>> {
         // Implementation goes here
         Ok(vec![
             SidechainType::RSK,
@@ -185,22 +186,22 @@ impl SidechainManager for DefaultSidechainManager {
         ])
     }
     
-    fn get_sidechain_status(&self, sidechain: &SidechainType) -> AnyaResult<SidechainStatus> {
+    fn get_sidechain_status(&self, sidechain: &SidechainType) -> AnyaResult<SidechainStatus>  -> Result<(), Box<dyn Error>> {
         // Implementation goes here
         unimplemented!("Sidechain status querying not yet implemented")
     }
     
-    fn list_cross_chain_txs(&self) -> AnyaResult<Vec<CrossChainTx>> {
+    fn list_cross_chain_txs(&self) -> AnyaResult<Vec<CrossChainTx>>  -> Result<(), Box<dyn Error>> {
         // Implementation goes here
         unimplemented!("Cross-chain transaction listing not yet implemented")
     }
     
-    fn get_cross_chain_tx(&self, tx_id: &str) -> AnyaResult<Option<CrossChainTx>> {
+    fn get_cross_chain_tx(&self, tx_id: &str) -> AnyaResult<Option<CrossChainTx>>  -> Result<(), Box<dyn Error>> {
         // Implementation goes here
         unimplemented!("Cross-chain transaction querying not yet implemented")
     }
     
-    fn get_cross_chain_tx_status(&self, tx_id: &str) -> AnyaResult<CrossChainTxStatus> {
+    fn get_cross_chain_tx_status(&self, tx_id: &str) -> AnyaResult<CrossChainTxStatus>  -> Result<(), Box<dyn Error>> {
         // Implementation goes here
         unimplemented!("Cross-chain transaction status querying not yet implemented")
     }

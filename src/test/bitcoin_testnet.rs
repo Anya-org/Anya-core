@@ -1,3 +1,4 @@
+use std::error::Error;
 use bitcoin::Network;
 use bitcoincore_rpc::{Auth, Client, RpcApi};
 use anyhow::Result;

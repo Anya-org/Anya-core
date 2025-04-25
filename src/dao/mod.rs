@@ -1,3 +1,4 @@
+use std::error::Error;
 //! DAO module
 //! 
 //! This module provides decentralized autonomous organization functionality,
@@ -28,7 +29,7 @@ pub struct DAOConfig {
 }
 
 impl Default for DAOConfig {
-    fn default() -> Self {
+    fn default() -> Self  -> Result<(), Box<dyn Error>> {
         Self {
             enabled: true,
             contract_address: None,
@@ -47,7 +48,7 @@ pub struct DAOManager {
 
 impl DAOManager {
     /// Create a new DAOManager with the given configuration
-    pub fn new(config: DAOConfig) -> AnyaResult<Self> {
+    pub fn new(config: DAOConfig) -> AnyaResult<Self>  -> Result<(), Box<dyn Error>> {
         if !config.enabled {
             return Ok(Self {
                 config,
@@ -62,7 +63,7 @@ impl DAOManager {
     }
 
     /// Create a new proposal
-    pub fn create_proposal(&mut self, title: &str, description: &str, amount: u64) -> AnyaResult<Proposal> {
+    pub fn create_proposal(&mut self, title: &str, description: &str, amount: u64) -> AnyaResult<Proposal>  -> Result<(), Box<dyn Error>> {
         if amount < self.config.proposal_threshold {
             return Err(AnyaError::DAO(format!(
                 "Proposal amount ({}) is below the threshold ({})",
@@ -92,7 +93,7 @@ impl DAOManager {
     }
 
     /// Vote on a proposal
-    pub fn vote(&mut self, proposal_id: &str, vote_for: bool, amount: u64) -> AnyaResult<()> {
+    pub fn vote(&mut self, proposal_id: &str, vote_for: bool, amount: u64) -> AnyaResult<()>  -> Result<(), Box<dyn Error>> {
         let proposal = self.proposals.get_mut(proposal_id)
             .ok_or_else(|| AnyaError::DAO(format!("Proposal not found: {}", proposal_id)))?;
         
@@ -114,19 +115,19 @@ impl DAOManager {
     }
 
     /// Get a proposal by ID
-    pub fn get_proposal(&self, proposal_id: &str) -> AnyaResult<Proposal> {
+    pub fn get_proposal(&self, proposal_id: &str) -> AnyaResult<Proposal>  -> Result<(), Box<dyn Error>> {
         self.proposals.get(proposal_id)
             .cloned()
             .ok_or_else(|| AnyaError::DAO(format!("Proposal not found: {}", proposal_id)))
     }
 
     /// List all proposals
-    pub fn list_proposals(&self) -> Vec<Proposal> {
+    pub fn list_proposals(&self) -> Vec<Proposal>  -> Result<(), Box<dyn Error>> {
         self.proposals.values().cloned().collect()
     }
 
     /// Execute a proposal
-    pub fn execute_proposal(&mut self, proposal_id: &str) -> AnyaResult<()> {
+    pub fn execute_proposal(&mut self, proposal_id: &str) -> AnyaResult<()>  -> Result<(), Box<dyn Error>> {
         let proposal = self.proposals.get_mut(proposal_id)
             .ok_or_else(|| AnyaError::DAO(format!("Proposal not found: {}", proposal_id)))?;
         
@@ -152,7 +153,7 @@ impl DAOManager {
     }
 
     /// Get the system status
-    pub fn get_status(&self) -> (bool, u8) {
+    pub fn get_status(&self) -> (bool, u8)  -> Result<(), Box<dyn Error>> {
         let operational = self.config.enabled;
         let health = if operational {
             // Basic health check based on configuration
@@ -169,7 +170,7 @@ impl DAOManager {
     }
     
     /// Get system metrics
-    pub fn get_metrics(&self) -> HashMap<String, serde_json::Value> {
+    pub fn get_metrics(&self) -> HashMap<String, serde_json::Value>  -> Result<(), Box<dyn Error>> {
         let mut metrics = HashMap::new();
         
         // Add basic metrics

@@ -1,3 +1,4 @@
+use std::error::Error;
 // src/bitcoin/dlc/execution.rs
 
 use std::collections::HashMap;
@@ -70,7 +71,7 @@ pub struct ExecutionRecord {
 
 impl ExecutionRecord {
     /// Creates a new execution record
-    pub fn new(contract_id: String) -> Self {
+    pub fn new(contract_id: String) -> Self  -> Result<(), Box<dyn Error>> {
         Self {
             id: uuid::Uuid::new_v4().to_string(),
             contract_id,
@@ -87,7 +88,7 @@ impl ExecutionRecord {
     }
     
     /// Updates the status of the execution
-    pub fn update_status(&mut self, status: ExecutionStatus) {
+    pub fn update_status(&mut self, status: ExecutionStatus)  -> Result<(), Box<dyn Error>> {
         self.status = status;
         
         if status == ExecutionStatus::Successful || 
@@ -99,24 +100,24 @@ impl ExecutionRecord {
     }
     
     /// Sets the oracle attestation
-    pub fn set_attestation(&mut self, attestation: OracleAttestation) {
+    pub fn set_attestation(&mut self, attestation: OracleAttestation)  -> Result<(), Box<dyn Error>> {
         self.attestation = Some(attestation.clone());
         self.outcome = Some(attestation.outcome);
     }
     
     /// Sets the execution transaction ID
-    pub fn set_execution_txid(&mut self, txid: Txid) {
+    pub fn set_execution_txid(&mut self, txid: Txid)  -> Result<(), Box<dyn Error>> {
         self.execution_txid = Some(txid);
     }
     
     /// Sets the final distribution amounts
-    pub fn set_final_amounts(&mut self, offer_amount: u64, accept_amount: u64) {
+    pub fn set_final_amounts(&mut self, offer_amount: u64, accept_amount: u64)  -> Result<(), Box<dyn Error>> {
         self.final_offer_amount = Some(offer_amount);
         self.final_accept_amount = Some(accept_amount);
     }
     
     /// Adds metadata to the execution record
-    pub fn add_metadata(&mut self, key: &str, value: &str) {
+    pub fn add_metadata(&mut self, key: &str, value: &str)  -> Result<(), Box<dyn Error>> {
         self.metadata.insert(key.to_string(), value.to_string());
     }
 }
@@ -129,14 +130,14 @@ pub struct ExecutionManager {
 
 impl ExecutionManager {
     /// Creates a new execution manager
-    pub fn new() -> Self {
+    pub fn new() -> Self  -> Result<(), Box<dyn Error>> {
         Self {
             executions: HashMap::new(),
         }
     }
     
     /// Creates a new execution record for a contract
-    pub fn create_execution(&mut self, contract_id: &str) -> AnyaResult<ExecutionRecord> {
+    pub fn create_execution(&mut self, contract_id: &str) -> AnyaResult<ExecutionRecord>  -> Result<(), Box<dyn Error>> {
         let record = ExecutionRecord::new(contract_id.to_string());
         
         let records = self.executions.entry(contract_id.to_string())
@@ -148,20 +149,20 @@ impl ExecutionManager {
     }
     
     /// Gets all execution records for a contract
-    pub fn get_executions(&self, contract_id: &str) -> Vec<ExecutionRecord> {
+    pub fn get_executions(&self, contract_id: &str) -> Vec<ExecutionRecord>  -> Result<(), Box<dyn Error>> {
         self.executions.get(contract_id)
             .map(|records| records.clone())
             .unwrap_or_else(Vec::new)
     }
     
     /// Gets the latest execution record for a contract
-    pub fn get_latest_execution(&self, contract_id: &str) -> Option<ExecutionRecord> {
+    pub fn get_latest_execution(&self, contract_id: &str) -> Option<ExecutionRecord>  -> Result<(), Box<dyn Error>> {
         self.executions.get(contract_id)
             .and_then(|records| records.last().cloned())
     }
     
     /// Gets an execution record by ID
-    pub fn get_execution(&self, execution_id: &str) -> Option<ExecutionRecord> {
+    pub fn get_execution(&self, execution_id: &str) -> Option<ExecutionRecord>  -> Result<(), Box<dyn Error>> {
         for records in self.executions.values() {
             if let Some(record) = records.iter().find(|r| r.id == execution_id) {
                 return Some(record.clone());
@@ -172,7 +173,7 @@ impl ExecutionManager {
     }
     
     /// Updates an execution record
-    pub fn update_execution(&mut self, record: ExecutionRecord) -> AnyaResult<()> {
+    pub fn update_execution(&mut self, record: ExecutionRecord) -> AnyaResult<()>  -> Result<(), Box<dyn Error>> {
         if let Some(records) = self.executions.get_mut(&record.contract_id) {
             if let Some(index) = records.iter().position(|r| r.id == record.id) {
                 records[index] = record;
@@ -188,7 +189,7 @@ impl ExecutionManager {
         &mut self, 
         contract: &mut Contract, 
         attestation: OracleAttestation
-    ) -> AnyaResult<ExecutionRecord> {
+    ) -> AnyaResult<ExecutionRecord>  -> Result<(), Box<dyn Error>> {
         // Validate the contract state
         if contract.state != ContractState::Funded {
             return Err(format!("Contract is not in funded state: {:?}", contract.state).into());
@@ -213,7 +214,7 @@ impl ExecutionManager {
     }
     
     /// Processes a refund for a contract
-    pub fn process_refund(&mut self, contract: &mut Contract) -> AnyaResult<ExecutionRecord> {
+    pub fn process_refund(&mut self, contract: &mut Contract) -> AnyaResult<ExecutionRecord>  -> Result<(), Box<dyn Error>> {
         // Validate contract state
         if contract.state != ContractState::Funded {
             return Err(format!("Contract is not in funded state: {:?}", contract.state).into());

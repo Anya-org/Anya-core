@@ -1,3 +1,4 @@
+use std::error::Error;
 // Web5 example with Bitcoin anchoring
 
 #[cfg(feature = "web5")]
@@ -14,7 +15,7 @@ pub mod web5_examples {
 
     // Example: Create and verify a credential with Bitcoin anchoring
     #[allow(dead_code)]
-    pub async fn create_anchored_credential() -> anyhow::Result<()> {
+    pub async fn create_anchored_credential() -> anyhow::Result<()>  -> Result<(), Box<dyn Error>> {
         // Initialize managers
         let did_manager = Arc::new(DidManager::new_in_memory()?);
         let dwn_manager = DwnManager::new_in_memory();
@@ -51,14 +52,14 @@ pub mod web5_examples {
         assert!(is_valid);
         
         println!("Credential created and verified with Bitcoin anchoring!");
-        println!("Anchoring transaction ID: {}", credential.bitcoin_anchoring.unwrap().txid);
+        println!("Anchoring transaction ID: {}", credential.bitcoin_anchoring?.txid);
         
         Ok(())
     }
 
     // Example: Store data in DWN with Bitcoin anchoring
     #[allow(dead_code)]
-    pub async fn store_data_with_anchoring() -> anyhow::Result<()> {
+    pub async fn store_data_with_anchoring() -> anyhow::Result<()>  -> Result<(), Box<dyn Error>> {
         // Initialize managers
         let did_manager = Arc::new(DidManager::new_in_memory()?);
         let dwn_manager = DwnManager::new_in_memory();
@@ -90,7 +91,7 @@ pub mod web5_examples {
         assert!(anchoring_info.is_some());
         
         println!("Data stored and retrieved with Bitcoin anchoring!");
-        println!("Anchoring transaction ID: {}", anchoring_info.unwrap().txid);
+        println!("Anchoring transaction ID: {}", anchoring_info?.txid);
         
         let content = String::from_utf8(retrieved_data)?;
         println!("Retrieved content: {}", content);
@@ -98,3 +99,4 @@ pub mod web5_examples {
         Ok(())
     }
 }
+

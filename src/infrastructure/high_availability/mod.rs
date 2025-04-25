@@ -1,3 +1,4 @@
+use std::error::Error;
 pub mod cluster;
 pub mod failover;
 pub mod health_check;

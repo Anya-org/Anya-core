@@ -1,3 +1,4 @@
+use std::error::Error;
 // [AIS-3][BPC-3] Constant-time Merkle verification
 pub fn verify_merkle_proof(tx_hash: &[u8], merkle_path: &[Vec<u8>], root: &[u8]) -> Result<bool, MerkleError> {
     let mut current = tx_hash.to_vec();

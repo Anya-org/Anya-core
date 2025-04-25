@@ -1,3 +1,4 @@
+use std::error::Error;
 //! Lightning Network Demo
 //!
 //! This program demonstrates the Lightning Network functionality
@@ -13,7 +14,7 @@ use std::sync::Arc;
 use std::thread;
 use std::time::Duration;
 
-fn main() -> AnyaResult<()> {
+fn main() -> AnyaResult<()>  -> Result<(), Box<dyn Error>> {
     println!("===================================================");
     println!("⚡ Anya Core Lightning Network Demonstration");
     println!("===================================================");

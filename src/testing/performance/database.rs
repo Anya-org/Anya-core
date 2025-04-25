@@ -1,3 +1,4 @@
+use std::error::Error;
 //! Database access pattern performance testing
 
 use crate::testing::performance::{

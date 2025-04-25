@@ -1,3 +1,4 @@
+use std::error::Error;
 //! Symmetric Encryption Module
 //! [AIR-2][AIS-2][BPC-2][AIT-2][RES-2]
 //!
@@ -287,14 +288,14 @@ mod tests {
         
         // Encrypt
         let ciphertext = crypto.encrypt(&key, &nonce, plaintext, Some(aad))
-            .expect("Encryption failed");
+            ?;
         
         // Verify not the same as plaintext
         assert_ne!(&ciphertext, plaintext);
         
         // Decrypt
         let decrypted = crypto.decrypt(&key, &nonce, &ciphertext, Some(aad))
-            .expect("Decryption failed");
+            ?;
         
         // Verify decrypted matches original
         assert_eq!(&decrypted, plaintext);
@@ -318,14 +319,14 @@ mod tests {
         
         // Encrypt
         let ciphertext = crypto.encrypt(&key, &nonce, plaintext, None)
-            .expect("Encryption failed");
+            ?;
         
         // Verify not the same as plaintext
         assert_ne!(&ciphertext, plaintext);
         
         // Decrypt
         let decrypted = crypto.decrypt(&key, &nonce, &ciphertext, None)
-            .expect("Decryption failed");
+            ?;
         
         // Verify decrypted matches original
         assert_eq!(&decrypted, plaintext);

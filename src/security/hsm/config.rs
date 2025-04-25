@@ -1,3 +1,4 @@
+use std::error::Error;
 use serde::{Serialize, Deserialize};
 use std::path::PathBuf;
 use std::time::Duration;
@@ -41,7 +42,7 @@ pub struct HsmConfig {
 }
 
 impl Default for HsmConfig {
-    fn default() -> Self {
+    fn default() -> Self  -> Result<(), Box<dyn Error>> {
         Self {
             general: GeneralConfig::default(),
             provider_type: HsmProviderType::SoftHsm,
@@ -57,7 +58,7 @@ impl Default for HsmConfig {
 
 impl HsmConfig {
     /// Creates a new configuration for development environment
-    pub fn development() -> Self {
+    pub fn development() -> Self  -> Result<(), Box<dyn Error>> {
         Self {
             general: GeneralConfig {
                 enabled: true,
@@ -79,7 +80,7 @@ impl HsmConfig {
     }
     
     /// Creates a new configuration for production environment
-    pub fn production() -> Self {
+    pub fn production() -> Self  -> Result<(), Box<dyn Error>> {
         Self {
             general: GeneralConfig {
                 enabled: true,
@@ -126,7 +127,7 @@ pub struct GeneralConfig {
 }
 
 impl Default for GeneralConfig {
-    fn default() -> Self {
+    fn default() -> Self  -> Result<(), Box<dyn Error>> {
         Self {
             enabled: true,
             log_level: LogLevel::Info,
@@ -165,7 +166,7 @@ pub struct SoftHsmConfig {
 }
 
 impl Default for SoftHsmConfig {
-    fn default() -> Self {
+    fn default() -> Self  -> Result<(), Box<dyn Error>> {
         Self {
             token_dir: "./hsm/tokens".to_string(),
             slot_id: 0,
@@ -199,7 +200,7 @@ pub struct CloudHsmConfig {
 }
 
 impl Default for CloudHsmConfig {
-    fn default() -> Self {
+    fn default() -> Self  -> Result<(), Box<dyn Error>> {
         Self {
             cluster_id: None,
             endpoint: None,
@@ -228,7 +229,7 @@ pub struct TpmConfig {
 }
 
 impl Default for TpmConfig {
-    fn default() -> Self {
+    fn default() -> Self  -> Result<(), Box<dyn Error>> {
         Self {
             device_path: "/dev/tpm0".to_string(),
             owner_password: None,
@@ -261,7 +262,7 @@ pub struct Pkcs11Config {
 }
 
 impl Default for Pkcs11Config {
-    fn default() -> Self {
+    fn default() -> Self  -> Result<(), Box<dyn Error>> {
         Self {
             library_path: "/usr/lib/libpkcs11.so".to_string(),
             slot_id: None,
@@ -298,7 +299,7 @@ pub struct KeyManagementConfig {
 }
 
 impl Default for KeyManagementConfig {
-    fn default() -> Self {
+    fn default() -> Self  -> Result<(), Box<dyn Error>> {
         Self {
             auto_rotation: false,
             rotation_interval: Duration::from_secs(7776000), // 90 days
@@ -327,7 +328,7 @@ pub struct DefaultKeyTypes {
 }
 
 impl Default for DefaultKeyTypes {
-    fn default() -> Self {
+    fn default() -> Self  -> Result<(), Box<dyn Error>> {
         Self {
             signing: "ec/p256".to_string(),
             encryption: "rsa/2048".to_string(),

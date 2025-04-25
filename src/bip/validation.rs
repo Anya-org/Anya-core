@@ -1,3 +1,4 @@
+use std::error::Error;
 pub trait BipValidator {
     fn validate_bip(&self, bip: &str) -> Result<ComplianceStatus>;
 }

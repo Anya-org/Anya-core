@@ -1,3 +1,4 @@
+use std::error::Error;
 use anyhow::Result;
 use std::sync::Arc;
 use bitcoin::{Network, OutPoint};
@@ -137,3 +138,4 @@ impl MLMonitor {
         )
     }
 }
+

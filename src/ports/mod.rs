@@ -1,3 +1,4 @@
+use std::error::Error;
 /// Define all required ports according to BDF v2.5 Hexagonal Architecture
 pub mod node_communication {
     use crate::bitcoin::protocol::BitcoinError;

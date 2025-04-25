@@ -5,7 +5,7 @@ members = [
     "installer",
     "mobile",
     "dependencies/anya-bitcoin"  # Correct path format
-]
+, "core/mobile-sdk"]
 
 # Consolidated workspace dependencies
 [workspace.dependencies]

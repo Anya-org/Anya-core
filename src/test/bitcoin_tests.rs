@@ -1,3 +1,4 @@
+use std::error::Error;
 use log::{info, warn, error};
 use bitcoin::{Network, Transaction};
 use bitcoin::consensus::encode::deserialize;

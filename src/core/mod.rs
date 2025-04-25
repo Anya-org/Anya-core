@@ -1,3 +1,4 @@
+use std::error::Error;
 // AIR-008: Core Module Integration
 // Integrates all Priority 1 implementations with auto-save functionality
 
@@ -93,7 +94,7 @@ mod tests {
                 format!("normal message {}", i)
             };
             
-            core.process_input(&input).unwrap();
+            core.process_input(&input)?;
         }
         
         // Set up a resource in the performance optimizer
@@ -107,7 +108,7 @@ mod tests {
             0.8,
             500.0,
             Duration::from_millis(50),
-        ).unwrap();
+        )?;
         
         // Set up a component in the system hardening
         let mut security_settings = HashMap::new();
@@ -118,7 +119,7 @@ mod tests {
             SecurityLevel::Enhanced,
             security_settings,
             true
-        ).unwrap();
+        )?;
         
         // Get stats
         let (agent_inputs, hardening_changes, performance_changes) = core.get_auto_save_stats();

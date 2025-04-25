@@ -1,3 +1,4 @@
+use std::error::Error;
 use serde::{Serialize, Deserialize};
 use std::collections::HashMap;
 
@@ -314,3 +315,4 @@ impl BdkWallet {
         Ok(tx.clone())
     }
 }
+

@@ -1,3 +1,4 @@
+use std::error::Error;
 // Migrated from OPSource to anya-core
 // This file was automatically migrated as part of the Rust-only implementation
 // Original file: C:\Users\bmokoka\Downloads\OPSource\src\bitcoin\error.rs
@@ -115,55 +116,55 @@ pub enum BitcoinError {
 }
 
 impl From<TaprootBuilderError> for BitcoinError {
-    fn from(err: TaprootBuilderError) -> Self {
+    fn from(err: TaprootBuilderError) -> Self  -> Result<(), Box<dyn Error>> {
         BitcoinError::TaprootBuilderError(err)
     }
 }
 
 impl From<TaprootError> for BitcoinError {
-    fn from(err: TaprootError) -> Self {
+    fn from(err: TaprootError) -> Self  -> Result<(), Box<dyn Error>> {
         BitcoinError::TaprootError(err.to_string())
     }
 }
 
 impl From<TaprootBuilder> for BitcoinError {
-    fn from(_: TaprootBuilder) -> Self {
+    fn from(_: TaprootBuilder) -> Self  -> Result<(), Box<dyn Error>> {
         BitcoinError::TaprootError("Taproot builder error".to_string())
     }
 }
 
 impl From<SigFromSliceError> for BitcoinError {
-    fn from(_: SigFromSliceError) -> Self {
+    fn from(_: SigFromSliceError) -> Self  -> Result<(), Box<dyn Error>> {
         BitcoinError::SignatureConversionError
     }
 }
 
 impl From<FromHexError> for BitcoinError {
-    fn from(_: FromHexError) -> Self {
+    fn from(_: FromHexError) -> Self  -> Result<(), Box<dyn Error>> {
         BitcoinError::HexDecodingError
     }
 }
 
 impl From<FromSliceError> for BitcoinError {
-    fn from(_: FromSliceError) -> Self {
+    fn from(_: FromSliceError) -> Self  -> Result<(), Box<dyn Error>> {
         BitcoinError::KeyConversionError
     }
 }
 
 impl From<secp256k1::Error> for BitcoinError {
-    fn from(error: secp256k1::Error) -> Self {
+    fn from(error: secp256k1::Error) -> Self  -> Result<(), Box<dyn Error>> {
         BitcoinError::Secp256k1Error(error.to_string())
     }
 }
 
 impl From<&str> for BitcoinError {
-    fn from(error: &str) -> Self {
+    fn from(error: &str) -> Self  -> Result<(), Box<dyn Error>> {
         BitcoinError::Other(error.to_string())
     }
 }
 
 impl From<P2wpkhError> for BitcoinError {
-    fn from(err: P2wpkhError) -> Self {
+    fn from(err: P2wpkhError) -> Self  -> Result<(), Box<dyn Error>> {
         BitcoinError::P2wpkhError(err.to_string())
     }
 }

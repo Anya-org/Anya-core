@@ -1,3 +1,4 @@
+use std::error::Error;
 // src/bitcoin/sidechains/rsk/client.rs
 
 //! RSK client implementation

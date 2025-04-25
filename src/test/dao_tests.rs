@@ -1,3 +1,4 @@
+use std::error::Error;
 use log::{info, warn, error};
 use std::process::Command;
 use std::path::Path;

@@ -1,3 +1,4 @@
+use std::error::Error;
 // ... existing code ...
 pub async fn handle_did_creation(request: Web5Request) -> Result<DidDocument> {
     // Add BIP-340 based DID method

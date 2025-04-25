@@ -1,3 +1,4 @@
+use std::error::Error;
 // Migrated from OPSource to anya-core
 // This file was automatically migrated as part of the Rust-only implementation
 // Original file: C:\Users\bmokoka\Downloads\OPSource\src\bitcoin\interface\mod.rs
@@ -212,7 +213,7 @@ pub trait BitcoinInterface: Send + Sync {
 pub fn create_bitcoin_interface(
     implementation_type: BitcoinImplementationType,
     config: &Config,
-) -> Arc<dyn BitcoinInterface> {
+) -> Arc<dyn BitcoinInterface>  -> Result<(), Box<dyn Error>> {
     match implementation_type {
         BitcoinImplementationType::Rust => {
             let implementation = crate::bitcoin::rust::RustBitcoinImplementation::new(config);
@@ -229,7 +230,7 @@ pub fn create_bitcoin_interface(
 /// 
 /// This function returns the appropriate Bitcoin interface implementation
 /// based on the current configuration settings.
-pub fn get_current_bitcoin_interface(config: &Config) -> Arc<dyn BitcoinInterface> {
+pub fn get_current_bitcoin_interface(config: &Config) -> Arc<dyn BitcoinInterface>  -> Result<(), Box<dyn Error>> {
     // Always use Rust implementation
     create_bitcoin_interface(BitcoinImplementationType::Rust, config)
 }
@@ -243,7 +244,7 @@ pub struct BitcoinInterfaceConfig {
 }
 
 impl Default for BitcoinInterfaceConfig {
-    fn default() -> Self {
+    fn default() -> Self  -> Result<(), Box<dyn Error>> {
         Self {
             implementation_type: BitcoinImplementationType::Rust,
             network: Network::Bitcoin,
@@ -259,7 +260,7 @@ mod tests {
     use super::*;
     
     #[test]
-    fn test_interface_creation() {
+    fn test_interface_creation()  -> Result<(), Box<dyn Error>> {
         let config = Config::default();
         
         // Test Rust implementation
@@ -267,3 +268,4 @@ mod tests {
         assert_eq!(rust_impl.implementation_type(), BitcoinImplementationType::Rust);
     }
 } 
+

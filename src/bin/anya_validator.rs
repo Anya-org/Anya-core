@@ -1,3 +1,4 @@
+use std::error::Error;
 use anya_core::tools::markdown::{DocumentationValidator, DocError};
 use anya_core::bitcoin::protocol::{BitcoinProtocol, BPCLevel};
 use anya_core::dao::governance::{DaoGovernance, DaoLevel};
@@ -118,11 +119,11 @@ fn update_system_map(map_path: &PathBuf, adherence: f64) -> Result<(), DocError>
     let content = fs::read_to_string(map_path)?;
     
     // Find validation status section and update
-    let re = regex::Regex::new(r"Bitcoin Protocol Adherence: \d+\.\d+%").unwrap();
+    let re = regex::Regex::new(r"Bitcoin Protocol Adherence: \d+\.\d+%")?;
     let updated = re.replace(&content, &format!("Bitcoin Protocol Adherence: {:.2}%", adherence)).to_string();
     
     // Update timestamp
-    let re = regex::Regex::new(r"Last Crawled: .*Z").unwrap();
+    let re = regex::Regex::new(r"Last Crawled: .*Z")?;
     let now = chrono::Utc::now().to_rfc3339();
     let updated = re.replace(&updated, &format!("Last Crawled: {}", now)).to_string();
     

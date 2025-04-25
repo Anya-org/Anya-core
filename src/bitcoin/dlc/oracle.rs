@@ -1,3 +1,4 @@
+use std::error::Error;
 // src/bitcoin/dlc/oracle.rs
 
 use std::collections::HashMap;

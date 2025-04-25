@@ -1,3 +1,4 @@
+use std::error::Error;
 // Unified Protocol Support v2.5
 // [AIR-3][AIS-3][BPC-3][AIT-3][RES-3]
 

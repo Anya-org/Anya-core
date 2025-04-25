@@ -1,3 +1,4 @@
+use std::error::Error;
 use std::collections::HashMap;
 use std::sync::Arc;
 use anyhow::Result;
@@ -145,3 +146,4 @@ impl TenantSecurity {
         self.access_policies.insert(policy.permissions[0].clone(), policy);
     }
 }
+

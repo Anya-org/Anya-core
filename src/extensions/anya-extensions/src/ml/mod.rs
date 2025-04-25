@@ -1,3 +1,4 @@
+use std::error::Error;
 use anyhow::Result;
 
 pub mod research;
@@ -23,3 +24,4 @@ impl MLManager {
         self.bip_monitor.start_monitoring().await
     }
 }
+

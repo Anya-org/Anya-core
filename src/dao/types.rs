@@ -1,3 +1,4 @@
+use std::error::Error;
 //! DAO Types
 //!
 //! This module defines types for the DAO module, including proposals,
@@ -125,7 +126,7 @@ pub struct GovernanceParams {
 }
 
 impl Default for GovernanceParams {
-    fn default() -> Self {
+    fn default() -> Self  -> Result<(), Box<dyn Error>> {
         Self {
             proposal_threshold: 100_000_000,  // 1 token with 8 decimals
             quorum: 1_000_000_000,            // 10 tokens with 8 decimals
@@ -138,7 +139,7 @@ impl Default for GovernanceParams {
 }
 
 impl Default for Proposal {
-    fn default() -> Self {
+    fn default() -> Self  -> Result<(), Box<dyn Error>> {
         Self {
             id: String::new(),
             title: String::new(),
@@ -156,7 +157,7 @@ impl Default for Proposal {
 }
 
 impl Proposal {
-    pub fn new(title: String, description: String) -> Self {
+    pub fn new(title: String, description: String) -> Self  -> Result<(), Box<dyn Error>> {
         Self {
             id: String::new(),
             title,
@@ -174,7 +175,7 @@ impl Proposal {
 }
 
 impl Vote {
-    pub fn new(voter: String, proposal_id: String, amount: u64, vote_for: bool) -> Self {
+    pub fn new(voter: String, proposal_id: String, amount: u64, vote_for: bool) -> Self  -> Result<(), Box<dyn Error>> {
         Self {
             voter,
             proposal_id,
@@ -186,7 +187,7 @@ impl Vote {
 }
 
 impl Default for ProposalMetrics {
-    fn default() -> Self {
+    fn default() -> Self  -> Result<(), Box<dyn Error>> {
         Self {
             sentiment_score: 0.0,
             risk_assessment: RiskMetrics::default(),
@@ -198,7 +199,7 @@ impl Default for ProposalMetrics {
 }
 
 impl Default for RiskMetrics {
-    fn default() -> Self {
+    fn default() -> Self  -> Result<(), Box<dyn Error>> {
         Self {
             risk_score: 0.0,
             risk_factors: Vec::new(),

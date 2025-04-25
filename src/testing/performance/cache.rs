@@ -1,3 +1,4 @@
+use std::error::Error;
 //! Cache performance testing
 
 use crate::testing::performance::{
@@ -310,7 +311,7 @@ impl CachePerformanceTest {
             AccessPattern::Zipfian => {
                 let mut rng = thread_rng();
                 let zipf = Zipf::new(self.config.key_space_size as u64, self.config.zipf_param)
-                    .expect("Invalid Zipf distribution parameters");
+                    ?;
                 let idx = zipf.sample(&mut rng) as usize - 1;
                 self.keys[idx].clone()
             }

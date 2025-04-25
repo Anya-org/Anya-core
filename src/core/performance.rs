@@ -1,3 +1,4 @@
+use std::error::Error;
 // Core performance module
 // Implements performance metrics for Bitcoin operations
 // as per Bitcoin Development Framework v2.5 requirements
@@ -19,7 +20,7 @@ pub struct Metrics {
 
 impl Metrics {
     /// Create new metrics
-    pub fn new() -> Self {
+    pub fn new() -> Self  -> Result<(), Box<dyn Error>> {
         Self {
             transactions_per_second: 0.0,
             block_time: 0.0,
@@ -29,7 +30,7 @@ impl Metrics {
     }
     
     /// Add a network usage metric
-    pub fn add_network_usage(&mut self, key: &str, value: f64) {
+    pub fn add_network_usage(&mut self, key: &str, value: f64)  -> Result<(), Box<dyn Error>> {
         self.network_usage.insert(key.to_string(), value);
     }
 } 

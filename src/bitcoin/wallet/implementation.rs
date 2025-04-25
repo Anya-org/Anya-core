@@ -1,3 +1,4 @@
+use std::error::Error;
 //! Bitcoin wallet implementation details
 //!
 //! This module contains the implementation details for the Bitcoin wallet.

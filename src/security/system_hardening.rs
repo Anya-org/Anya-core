@@ -1,3 +1,4 @@
+use std::error::Error;
 // AIE-001: System Hardening Implementation
 // Priority: HIGH - Security configurations with in-memory state
 
@@ -57,7 +58,7 @@ impl SystemHardening {
                               level: SecurityLevel, 
                               settings: HashMap<String, String>,
                               auto_save: bool) -> Result<(), String> {
-        let mut configs = self.configs.lock().unwrap();
+        let mut configs = self.configs.lock()?;
         
         let config = HardeningConfig {
             name: name.to_string(),
@@ -78,7 +79,7 @@ impl SystemHardening {
     
     /// Record an input and check if auto-save is needed
     fn record_input_and_check_save(&self) {
-        let mut counter = self.input_counter.lock().unwrap();
+        let mut counter = self.input_counter.lock()?;
         *counter += 1;
         
         // Auto-save every Nth input (e.g., every 20th input)
@@ -92,7 +93,7 @@ impl SystemHardening {
     fn save_state_to_memory(&self) {
         // In a real implementation, this would create a backup of security configurations
         // For this implementation, we're just keeping everything in memory
-        let configs = self.configs.lock().unwrap();
+        let configs = self.configs.lock()?;
         println!("In-memory security configuration snapshot created: {} components", configs.len());
         
         // Here you would normally serialize the state and store it
@@ -100,7 +101,7 @@ impl SystemHardening {
     
     /// Apply security hardening configuration for a component
     pub fn apply_hardening(&self, component_name: &str) -> Result<ConfigStatus, String> {
-        let mut configs = self.configs.lock().unwrap();
+        let mut configs = self.configs.lock()?;
         
         let config = match configs.get_mut(component_name) {
             Some(config) => config,
@@ -123,7 +124,7 @@ impl SystemHardening {
     
     /// Set a specific security setting
     pub fn set_security_setting(&self, component_name: &str, key: &str, value: &str) -> Result<(), String> {
-        let mut configs = self.configs.lock().unwrap();
+        let mut configs = self.configs.lock()?;
         
         let config = match configs.get_mut(component_name) {
             Some(config) => config,
@@ -143,27 +144,27 @@ impl SystemHardening {
     
     /// Get the configuration for a component
     pub fn get_component_config(&self, component_name: &str) -> Option<HardeningConfig> {
-        let configs = self.configs.lock().unwrap();
+        let configs = self.configs.lock()?;
         configs.get(component_name).cloned()
     }
     
     /// Get all component configurations
     pub fn get_all_configs(&self) -> Vec<HardeningConfig> {
-        let configs = self.configs.lock().unwrap();
+        let configs = self.configs.lock()?;
         configs.values().cloned().collect()
     }
     
     /// Get number of changes and configs
     pub fn get_stats(&self) -> (usize, usize) {
-        let counter = self.input_counter.lock().unwrap();
-        let configs = self.configs.lock().unwrap();
+        let counter = self.input_counter.lock()?;
+        let configs = self.configs.lock()?;
         
         (*counter, configs.len())
     }
     
     /// Apply all pending configurations
     pub fn apply_all_pending(&self) -> Vec<(String, Result<ConfigStatus, String>)> {
-        let configs = self.configs.lock().unwrap();
+        let configs = self.configs.lock()?;
         let pending_components: Vec<String> = configs
             .iter()
             .filter(|(_, config)| config.status == ConfigStatus::Pending)
@@ -202,7 +203,7 @@ mod tests {
                 SecurityLevel::Enhanced,
                 settings,
                 true
-            ).unwrap();
+            )?;
         }
         
         // Check stats
@@ -218,15 +219,15 @@ mod tests {
         // Create a configuration
         let mut settings = HashMap::new();
         settings.insert("firewall".to_string(), "enabled".to_string());
-        hardening.configure_component("network", SecurityLevel::Strict, settings, true).unwrap();
+        hardening.configure_component("network", SecurityLevel::Strict, settings, true)?;
         
         // Apply the hardening
         let result = hardening.apply_hardening("network");
         assert!(result.is_ok());
-        assert_eq!(result.unwrap(), ConfigStatus::Applied);
+        assert_eq!(result?, ConfigStatus::Applied);
         
         // Verify the status
-        let config = hardening.get_component_config("network").unwrap();
+        let config = hardening.get_component_config("network")?;
         assert_eq!(config.status, ConfigStatus::Applied);
     }
 } 

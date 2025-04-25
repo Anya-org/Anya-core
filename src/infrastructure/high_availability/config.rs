@@ -1,3 +1,4 @@
+use std::error::Error;
 use serde::{Deserialize, Serialize};
 use std::time::Duration;
 
@@ -28,7 +29,7 @@ pub struct HighAvailabilityConfig {
 }
 
 impl Default for HighAvailabilityConfig {
-    fn default() -> Self {
+    fn default() -> Self  -> Result<(), Box<dyn Error>> {
         Self {
             general: GeneralConfig::default(),
             cluster: ClusterConfig::default(),
@@ -43,7 +44,7 @@ impl Default for HighAvailabilityConfig {
 
 impl HighAvailabilityConfig {
     /// Creates a new configuration for development environment
-    pub fn development() -> Self {
+    pub fn development() -> Self  -> Result<(), Box<dyn Error>> {
         Self {
             general: GeneralConfig {
                 enabled: true,
@@ -62,7 +63,7 @@ impl HighAvailabilityConfig {
     }
 
     /// Creates a new configuration for production environment
-    pub fn production() -> Self {
+    pub fn production() -> Self  -> Result<(), Box<dyn Error>> {
         Self {
             general: GeneralConfig {
                 enabled: true,
@@ -126,7 +127,7 @@ pub struct GeneralConfig {
 }
 
 impl Default for GeneralConfig {
-    fn default() -> Self {
+    fn default() -> Self  -> Result<(), Box<dyn Error>> {
         Self {
             enabled: true,
             environment: Environment::Development,
@@ -189,7 +190,7 @@ pub struct ClusterConfig {
 }
 
 impl Default for ClusterConfig {
-    fn default() -> Self {
+    fn default() -> Self  -> Result<(), Box<dyn Error>> {
         Self {
             node_count: 1,
             cluster_name: "anya-cluster".to_string(),
@@ -240,7 +241,7 @@ pub struct HealthCheckConfig {
 }
 
 impl Default for HealthCheckConfig {
-    fn default() -> Self {
+    fn default() -> Self  -> Result<(), Box<dyn Error>> {
         Self {
             enabled: true,
             check_interval: Duration::from_secs(30),
@@ -284,7 +285,7 @@ pub struct FailoverConfig {
 }
 
 impl Default for FailoverConfig {
-    fn default() -> Self {
+    fn default() -> Self  -> Result<(), Box<dyn Error>> {
         Self {
             enabled: true,
             auto_failover: true,
@@ -322,7 +323,7 @@ pub struct ReplicationConfig {
 }
 
 impl Default for ReplicationConfig {
-    fn default() -> Self {
+    fn default() -> Self  -> Result<(), Box<dyn Error>> {
         Self {
             mode: ReplicationMode::SemiSynchronous,
             sync_timeout: Duration::from_secs(5),
@@ -371,7 +372,7 @@ pub struct LoadBalancingConfig {
 }
 
 impl Default for LoadBalancingConfig {
-    fn default() -> Self {
+    fn default() -> Self  -> Result<(), Box<dyn Error>> {
         Self {
             algorithm: LoadBalancingAlgorithm::LeastConnections,
             health_check_enabled: true,

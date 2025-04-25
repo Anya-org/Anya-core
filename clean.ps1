@@ -30,3 +30,21 @@ cargo run --bin anya_audit -- update-labels --scope all
 
 # Full system check
 cargo run --bin anya_audit -- check --rules bip341,bip174,secp256k1 --fix 
+
+# Add module initialization
+function Initialize-CoreModules {
+    param(
+        [string]$ModulePath = ".\anya-core"
+    )
+    
+    # [AIS-3] Verify cryptographic signatures
+    $manifest = Get-Content "$ModulePath\manifest.sha256"
+    if (-not (Test-FileIntegrity -Path $ModulePath -Hash $manifest)) {
+        throw "[SECURITY] Module integrity check failed"
+    }
+
+    # [BPC-3] BIP compliance check
+    & "$ModulePath\scripts\security\validate-bip.ps1" -Path $ModulePath `
+        -ValidationType Full `
+        -ComplianceLevel BPC-3
+} 

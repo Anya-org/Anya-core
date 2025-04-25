@@ -1,3 +1,4 @@
+use std::error::Error;
 //! Machine Learning Agents Module
 //!
 //! This module provides a modular system of ML agents that enhance decision-making
@@ -398,7 +399,7 @@ impl AgentSystem {
                 })?;
                 
                 metrics.total_observations += 1;
-                if result.is_ok() && result.as_ref().unwrap().is_some() {
+                if result.is_ok() && result.as_ref()?.is_some() {
                     metrics.total_actions += 1;
                 }
                 if result.is_err() {
@@ -504,3 +505,4 @@ mod tests {
         // Test that ethical compliance is properly enforced
     }
 }
+

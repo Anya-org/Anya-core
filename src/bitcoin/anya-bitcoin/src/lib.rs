@@ -1,3 +1,4 @@
+use std::error::Error;
 //! Bitcoin Core Implementation
 //! Consensus-critical code only
 
@@ -82,3 +83,4 @@ impl BitcoinNode {
         Ok(())
     }
 }
+

@@ -1,3 +1,4 @@
+use std::error::Error;
 // Web5 Module for Anya Core
 // Implements Web5 specification with focus on decentralized identity and protocols
 // [AIR-012] Operational Reliability and [AIP-002] Modular Architecture
@@ -28,7 +29,7 @@ pub struct Web5Config {
 }
 
 impl Default for Web5Config {
-    fn default() -> Self {
+    fn default() -> Self  -> Result<(), Box<dyn Error>> {
         Self {
             enabled: true,
             did_method: "ion".to_string(),
@@ -51,7 +52,7 @@ pub struct Web5Manager {
 
 impl Web5Manager {
     /// Create a new Web5 manager with the specified configuration
-    pub fn new(config: Web5Config) -> Web5Result<Self> {
+    pub fn new(config: Web5Config) -> Web5Result<Self>  -> Result<(), Box<dyn Error>> {
         let did_manager = identity::DIDManager::new(&config.did_method);
         let protocol_manager = protocols::ProtocolManager::new();
         
@@ -63,17 +64,17 @@ impl Web5Manager {
     }
     
     /// Access the DID manager component
-    pub fn did_manager(&self) -> &identity::DIDManager {
+    pub fn did_manager(&self) -> &identity::DIDManager  -> Result<(), Box<dyn Error>> {
         &self.did_manager
     }
     
     /// Access the protocol manager component
-    pub fn protocol_manager(&self) -> &protocols::ProtocolManager {
+    pub fn protocol_manager(&self) -> &protocols::ProtocolManager  -> Result<(), Box<dyn Error>> {
         &self.protocol_manager
     }
     
     /// Initialize the Web5 subsystem with default protocols
-    pub fn initialize(&mut self) -> Web5Result<()> {
+    pub fn initialize(&mut self) -> Web5Result<()>  -> Result<(), Box<dyn Error>> {
         // Register standard protocols
         let profile_handler = protocols::ProfileProtocolHandler::new();
         self.protocol_manager.register_protocol(Box::new(profile_handler))?;
@@ -88,7 +89,7 @@ impl Web5Manager {
     }
     
     /// Get the system status
-    pub fn status(&self) -> Web5Result<Web5Status> {
+    pub fn status(&self) -> Web5Result<Web5Status>  -> Result<(), Box<dyn Error>> {
         let did_count = self.did_manager.dids().len();
         let protocol_count = self.protocol_manager.get_all_protocols().len();
         
@@ -101,7 +102,7 @@ impl Web5Manager {
     }
 
     /// Get metrics for the Web5 system
-    pub fn get_metrics(&self) -> HashMap<String, serde_json::Value> {
+    pub fn get_metrics(&self) -> HashMap<String, serde_json::Value>  -> Result<(), Box<dyn Error>> {
         let mut metrics = HashMap::new();
         
         // Add basic metrics
@@ -131,23 +132,24 @@ mod tests {
     use super::*;
     
     #[test]
-    fn test_web5_manager_creation() {
+    fn test_web5_manager_creation()  -> Result<(), Box<dyn Error>> {
         let config = Web5Config::default();
-        let manager = Web5Manager::new(config).unwrap();
+        let manager = Web5Manager::new(config)?;
         
         assert!(manager.config.enabled);
         assert_eq!(manager.config.did_method, "ion");
     }
     
     #[test]
-    fn test_web5_status() {
+    fn test_web5_status()  -> Result<(), Box<dyn Error>> {
         let config = Web5Config::default();
-        let manager = Web5Manager::new(config).unwrap();
+        let manager = Web5Manager::new(config)?;
         
-        let status = manager.status().unwrap();
+        let status = manager.status()?;
         assert!(status.enabled);
         assert_eq!(status.did_count, 0);
         assert_eq!(status.protocol_count, 0);
         assert!(!status.dwn_connected);
     }
 }
+

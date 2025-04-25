@@ -1,3 +1,4 @@
+use std::error::Error;
 // Machine Learning Service Implementation
 // Provides ML functionality to the Anya Core system
 
@@ -16,7 +17,7 @@ pub struct Array1<T> {
 }
 
 impl<T: Clone> Array1<T> {
-    pub fn new(data: Vec<T>) -> Self {
+    pub fn new(data: Vec<T>) -> Self  -> Result<(), Box<dyn Error>> {
         let shape = (data.len(),);
         Self { data, shape }
     }
@@ -28,7 +29,7 @@ pub struct Array2<T> {
 }
 
 impl<T: Clone> Array2<T> {
-    pub fn new(data: Vec<T>, rows: usize, cols: usize) -> Self {
+    pub fn new(data: Vec<T>, rows: usize, cols: usize) -> Self  -> Result<(), Box<dyn Error>> {
         let shape = (rows, cols);
         Self { data, shape }
     }
@@ -37,16 +38,16 @@ impl<T: Clone> Array2<T> {
 pub struct Device {}
 
 impl Device {
-    pub fn Cuda(device_id: i64) -> Self {
+    pub fn Cuda(device_id: i64) -> Self  -> Result<(), Box<dyn Error>> {
         // In a real implementation, this would initialize CUDA
         Self {}
     }
     
-    pub fn Cpu() -> Self {
+    pub fn Cpu() -> Self  -> Result<(), Box<dyn Error>> {
         Self {}
     }
     
-    pub fn is_cuda(&self) -> bool {
+    pub fn is_cuda(&self) -> bool  -> Result<(), Box<dyn Error>> {
         // This is a placeholder implementation
         false
     }
@@ -61,7 +62,7 @@ pub struct RandomForestClassifier<T> {
 }
 
 impl<T> Default for RandomForestClassifier<T> {
-    fn default() -> Self {
+    fn default() -> Self  -> Result<(), Box<dyn Error>> {
         Self {
             features: Vec::new(),
             classes: Vec::new(),
@@ -73,7 +74,7 @@ impl<T> Default for RandomForestClassifier<T> {
 }
 
 impl<T> RandomForestClassifier<T> {
-    pub fn new() -> Self {
+    pub fn new() -> Self  -> Result<(), Box<dyn Error>> {
         Self {
             features: Vec::new(),
             classes: Vec::new(),
@@ -83,27 +84,27 @@ impl<T> RandomForestClassifier<T> {
         }
     }
     
-    pub fn with_n_trees(mut self, _n_trees: usize) -> Self {
+    pub fn with_n_trees(mut self, _n_trees: usize) -> Self  -> Result<(), Box<dyn Error>> {
         // In a real implementation, this would configure the number of trees
         // For now, it's just a placeholder
         self
     }
     
-    pub fn with_max_depth(mut self, _max_depth: usize) -> Self {
+    pub fn with_max_depth(mut self, _max_depth: usize) -> Self  -> Result<(), Box<dyn Error>> {
         // Placeholder for future implementation
         self
     }
     
-    pub fn with_min_samples_leaf(mut self, _min_samples_leaf: usize) -> Self {
+    pub fn with_min_samples_leaf(mut self, _min_samples_leaf: usize) -> Self  -> Result<(), Box<dyn Error>> {
         // Placeholder for future implementation
         self
     }
     
-    pub fn fit(&mut self, _: &Array2<T>, _: &Array1<T>) -> bool {
+    pub fn fit(&mut self, _: &Array2<T>, _: &Array1<T>) -> bool  -> Result<(), Box<dyn Error>> {
         true
     }
     
-    pub fn predict(&self, _: &Array1<T>) -> Vec<f64> {
+    pub fn predict(&self, _: &Array1<T>) -> Vec<f64>  -> Result<(), Box<dyn Error>> {
         vec![0.0]
     }
 }
@@ -119,7 +120,7 @@ pub struct MLService {
 
 impl MLService {
     /// Create a new ML service instance
-    pub fn new() -> Self {
+    pub fn new() -> Self  -> Result<(), Box<dyn Error>> {
         let device = if tch::Cuda::is_available() {
             Device::Cuda(0)
         } else {
@@ -136,12 +137,12 @@ impl MLService {
     }
 
     /// Initialize the ML service with a specific model
-    pub fn initialize(&mut self, features_dim: usize, model_version: &str) -> AnyaResult<()> {
+    pub fn initialize(&mut self, features_dim: usize, model_version: &str) -> AnyaResult<()>  -> Result<(), Box<dyn Error>> {
         self.features_dim = features_dim;
         self.model_version = model_version.to_string();
         
         // Would typically load a pre-trained model here
-        *self.model.lock().unwrap() = RandomForestClassifier::default()
+        *self.model.lock()? = RandomForestClassifier::default()
             .with_n_trees(100)
             .with_max_depth(10)
             .with_min_samples_leaf(5);
@@ -152,7 +153,7 @@ impl MLService {
     }
 
     /// Analyze a DAO proposal and return metrics
-    pub async fn analyze_proposal(&self, proposal: &Proposal) -> AnyaResult<ProposalMetrics> {
+    pub async fn analyze_proposal(&self, proposal: &Proposal) -> AnyaResult<ProposalMetrics>  -> Result<(), Box<dyn Error>> {
         if !self.is_initialized {
             return Err(AnyaError::ML("ML service not initialized".to_string()));
         }
@@ -170,7 +171,7 @@ impl MLService {
     }
 
     /// Extract features from a proposal
-    fn extract_features(&self, proposal: &Proposal) -> AnyaResult<Array1<f64>> {
+    fn extract_features(&self, proposal: &Proposal) -> AnyaResult<Array1<f64>>  -> Result<(), Box<dyn Error>> {
         // In a real implementation, this would extract meaningful features from the proposal
         let mut features = Vec::with_capacity(self.features_dim);
         
@@ -188,7 +189,7 @@ impl MLService {
     }
 
     /// Predict outcomes based on features
-    fn predict(&self, features: &Array1<f64>) -> AnyaResult<HashMap<String, f64>> {
+    fn predict(&self, features: &Array1<f64>) -> AnyaResult<HashMap<String, f64>>  -> Result<(), Box<dyn Error>> {
         // In a real implementation, this would use the actual model for predictions
         let mut predictions = HashMap::new();
         
@@ -205,7 +206,7 @@ impl MLService {
     }
 
     /// Calculate confidence for the prediction
-    fn calculate_confidence(&self, features: &Array1<f64>) -> f64 {
+    fn calculate_confidence(&self, features: &Array1<f64>) -> f64  -> Result<(), Box<dyn Error>> {
         // In a real implementation, this would be based on model certainty
         // This is a placeholder implementation
         let feature_sum: f64 = features.data.iter().sum();
@@ -215,7 +216,7 @@ impl MLService {
     }
 
     /// Assess risks for a proposal
-    fn assess_risks(&self, proposal: &Proposal) -> AnyaResult<RiskMetrics> {
+    fn assess_risks(&self, proposal: &Proposal) -> AnyaResult<RiskMetrics>  -> Result<(), Box<dyn Error>> {
         // In a real implementation, this would perform detailed risk analysis
         
         let market_risk = 0.2;
@@ -242,7 +243,7 @@ impl MLService {
     }
 
     /// Get consensus from federated model nodes
-    fn get_federated_consensus(&self) -> AnyaResult<HashMap<String, f64>> {
+    fn get_federated_consensus(&self) -> AnyaResult<HashMap<String, f64>>  -> Result<(), Box<dyn Error>> {
         // In a real implementation, this would fetch data from federated nodes
         
         let mut consensus = HashMap::new();
@@ -254,8 +255,8 @@ impl MLService {
     }
 
     /// Train the model with new data
-    pub async fn train(&mut self, features: Array2<f64>, labels: Array1<f64>) -> AnyaResult<()> {
-        let mut model = self.model.lock().unwrap();
+    pub async fn train(&mut self, features: Array2<f64>, labels: Array1<f64>) -> AnyaResult<()>  -> Result<(), Box<dyn Error>> {
+        let mut model = self.model.lock()?;
         
         // Call the fit method which returns a bool
         let fit_success = model.fit(&features, &labels);
@@ -268,7 +269,7 @@ impl MLService {
     }
     
     /// Get model health metrics
-    pub fn get_health_metrics(&self) -> HashMap<String, f64> {
+    pub fn get_health_metrics(&self) -> HashMap<String, f64>  -> Result<(), Box<dyn Error>> {
         let mut metrics = HashMap::new();
         
         metrics.insert("model_version".to_string(), 
@@ -282,7 +283,7 @@ impl MLService {
     }
     
     /// Apply federated learning update
-    pub async fn apply_federated_update(&mut self, weights: Vec<f64>) -> AnyaResult<()> {
+    pub async fn apply_federated_update(&mut self, weights: Vec<f64>) -> AnyaResult<()>  -> Result<(), Box<dyn Error>> {
         // In a real implementation, this would update the model with federated weights
         // This is a simplified placeholder
         
@@ -293,7 +294,7 @@ impl MLService {
     }
     
     /// Export model to bytes for sharing
-    pub fn export_model(&self) -> AnyaResult<Vec<u8>> {
+    pub fn export_model(&self) -> AnyaResult<Vec<u8>>  -> Result<(), Box<dyn Error>> {
         // In a real implementation, this would serialize the model
         // This is a simplified placeholder
         
@@ -301,7 +302,7 @@ impl MLService {
     }
     
     /// Import model from bytes
-    pub fn import_model(&mut self, bytes: &[u8]) -> AnyaResult<()> {
+    pub fn import_model(&mut self, bytes: &[u8]) -> AnyaResult<()>  -> Result<(), Box<dyn Error>> {
         // In a real implementation, this would deserialize the model
         // This is a simplified placeholder
         

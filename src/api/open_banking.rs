@@ -1,3 +1,4 @@
+use std::error::Error;
 #[openapi]
 impl OpenBankingApi {
     /// PSD2-compliant account access

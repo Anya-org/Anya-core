@@ -1,3 +1,4 @@
+use std::error::Error;
 // AIP-002: Agent Checker System Implementation
 // Priority: CRITICAL - ML-based system analyzer with in-memory auto-save
 
@@ -70,13 +71,13 @@ impl AgentChecker {
     pub fn process_input(&self, input: &str) -> Result<(), String> {
         // Add input to buffer
         {
-            let mut buffer = self.input_buffer.lock().unwrap();
+            let mut buffer = self.input_buffer.lock()?;
             buffer.push(input.to_string());
         }
 
         // Increment counter and check for auto-save
         {
-            let mut counter = self.input_counter.lock().unwrap();
+            let mut counter = self.input_counter.lock()?;
             *counter += 1;
 
             // Auto-save every Nth input (e.g., every 20th input)
@@ -94,7 +95,7 @@ impl AgentChecker {
     fn save_state_to_memory(&self) {
         // In a real implementation, this would create a checkpoint of the current state
         // For now, we'll just update the last_save timestamp
-        let mut last_save = self.last_save.lock().unwrap();
+        let mut last_save = self.last_save.lock()?;
         *last_save = Instant::now();
         
         // This is where we'd normally serialize our state to a string or binary format
@@ -104,7 +105,7 @@ impl AgentChecker {
     /// Analyze input for agent checking
     fn analyze_input(&self, input: &str) -> Result<(), String> {
         // Simplified implementation for demo purposes
-        let mut health = self.health.lock().unwrap();
+        let mut health = self.health.lock()?;
         
         // Update overall system health based on input
         // This is a placeholder for actual ML-based analysis
@@ -133,25 +134,25 @@ impl AgentChecker {
 
     /// Get current system stage
     pub fn get_system_stage(&self) -> SystemStage {
-        let health = self.health.lock().unwrap();
+        let health = self.health.lock()?;
         health.stage
     }
     
     /// Get system health metrics
     pub fn get_system_health(&self) -> SystemHealth {
-        let health = self.health.lock().unwrap();
+        let health = self.health.lock()?;
         health.clone()
     }
     
     /// Check component readiness
     pub fn check_component_status(&self, component_name: &str) -> Option<ComponentStatus> {
-        let health = self.health.lock().unwrap();
+        let health = self.health.lock()?;
         health.components.get(component_name).cloned()
     }
     
     /// Update component status
     pub fn update_component_status(&self, component_name: &str, status: f64, metrics: HashMap<String, f64>, issues: Vec<String>) {
-        let mut health = self.health.lock().unwrap();
+        let mut health = self.health.lock()?;
         
         let component = ComponentStatus {
             name: component_name.to_string(),
@@ -174,7 +175,7 @@ impl AgentChecker {
     
     /// Validate system readiness against thresholds
     pub fn validate_system_readiness(&self) -> (bool, SystemStage, Vec<String>) {
-        let health = self.health.lock().unwrap();
+        let health = self.health.lock()?;
         let stage = health.stage;
         
         let mut issues = Vec::new();
@@ -196,9 +197,9 @@ impl AgentChecker {
     
     /// Get input buffer stats
     pub fn get_input_stats(&self) -> (usize, usize, Duration) {
-        let buffer = self.input_buffer.lock().unwrap();
-        let counter = self.input_counter.lock().unwrap();
-        let last_save = self.last_save.lock().unwrap();
+        let buffer = self.input_buffer.lock()?;
+        let counter = self.input_counter.lock()?;
+        let last_save = self.last_save.lock()?;
         
         (buffer.len(), *counter, last_save.elapsed())
     }
@@ -221,7 +222,7 @@ mod tests {
                 format!("normal message {}", i)
             };
             
-            checker.process_input(&input).unwrap();
+            checker.process_input(&input)?;
         }
         
         // Check the stats

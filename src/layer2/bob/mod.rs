@@ -1,3 +1,4 @@
+use std::error::Error;
 // Migrated from OPSource to anya-core
 // This file was automatically migrated as part of the Rust-only implementation
 // Original file: C:\Users\bmokoka\Downloads\OPSource\src\layer2\bob\mod.rs

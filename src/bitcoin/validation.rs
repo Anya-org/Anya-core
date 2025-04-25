@@ -1,3 +1,4 @@
+use std::error::Error;
 //! Bitcoin transaction validation [AIS-3][BPC-3][DAO-3]
 
 use bitcoin::{Transaction, Block, BlockHeader};

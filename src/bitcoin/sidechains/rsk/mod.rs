@@ -1,3 +1,4 @@
+use std::error::Error;
 // src/bitcoin/sidechains/rsk/mod.rs
 
 //! RSK Sidechain implementation
@@ -49,18 +50,18 @@ mod bridge {
     
     impl RSKBridge {
         /// Create a new RSK bridge
-        pub fn new(config: BridgeConfig) -> Self {
+        pub fn new(config: BridgeConfig) -> Self  -> Result<(), Box<dyn Error>> {
             Self { config }
         }
         
         /// Create peg-in transaction
-        pub fn create_peg_in(&self, params: PegInParams) -> AnyaResult<String> {
+        pub fn create_peg_in(&self, params: PegInParams) -> AnyaResult<String>  -> Result<(), Box<dyn Error>> {
             // Placeholder implementation
             Ok("peg_in_tx_id".to_string())
         }
         
         /// Create peg-out transaction
-        pub fn create_peg_out(&self, params: PegOutParams) -> AnyaResult<String> {
+        pub fn create_peg_out(&self, params: PegOutParams) -> AnyaResult<String>  -> Result<(), Box<dyn Error>> {
             // Placeholder implementation
             Ok("peg_out_tx_id".to_string())
         }
@@ -97,7 +98,7 @@ mod client {
     
     impl RSKClient {
         /// Create a new RSK client
-        pub fn new(config: ClientConfig) -> Self {
+        pub fn new(config: ClientConfig) -> Self  -> Result<(), Box<dyn Error>> {
             Self { config }
         }
     }
@@ -142,7 +143,7 @@ mod contract {
     
     impl SmartContract {
         /// Create a new smart contract
-        pub fn new(params: ContractParams) -> Self {
+        pub fn new(params: ContractParams) -> Self  -> Result<(), Box<dyn Error>> {
             Self { params }
         }
     }
@@ -176,7 +177,7 @@ mod wallet {
     
     impl RSKWallet {
         /// Create a new RSK wallet
-        pub fn new(config: WalletConfig) -> Self {
+        pub fn new(config: WalletConfig) -> Self  -> Result<(), Box<dyn Error>> {
             Self { config }
         }
     }
@@ -421,9 +422,9 @@ pub trait RSKManager {
 /// Factory for creating RSK managers
 pub struct RSKFactory;
 
-impl RSKFactory {
+impl RSKFactory  -> Result<(), Box<dyn Error>> {
     /// Creates a new RSK manager
-    pub fn create_manager(config: RSKConfig) -> Box<dyn RSKManager> {
+    pub fn create_manager(config: RSKConfig) -> Box<dyn RSKManager>  -> Result<(), Box<dyn Error>> {
         Box::new(DefaultRSKManager::new(config))
     }
 }
@@ -451,7 +452,7 @@ pub struct RSKConfig {
 }
 
 impl Default for RSKConfig {
-    fn default() -> Self {
+    fn default() -> Self  -> Result<(), Box<dyn Error>> {
         Self {
             data_dir: PathBuf::from("./rsk_data"),
             network: NetworkType::Testnet,
@@ -471,7 +472,7 @@ struct DefaultRSKManager {
 
 impl DefaultRSKManager {
     /// Creates a new default RSK manager
-    fn new(config: RSKConfig) -> Self {
+    fn new(config: RSKConfig) -> Self  -> Result<(), Box<dyn Error>> {
         Self {
             config,
             client: None,
@@ -480,67 +481,67 @@ impl DefaultRSKManager {
 }
 
 impl RSKManager for DefaultRSKManager {
-    fn init(&self, config: RSKConfig) -> AnyaResult<()> {
+    fn init(&self, config: RSKConfig) -> AnyaResult<()>  -> Result<(), Box<dyn Error>> {
         // Implementation goes here
         unimplemented!("RSK initialization not yet implemented")
     }
     
-    fn get_block_number(&self) -> AnyaResult<u64> {
+    fn get_block_number(&self) -> AnyaResult<u64>  -> Result<(), Box<dyn Error>> {
         // Implementation goes here
         unimplemented!("Block number querying not yet implemented")
     }
     
-    fn get_block(&self, block_id: &str) -> AnyaResult<RSKBlock> {
+    fn get_block(&self, block_id: &str) -> AnyaResult<RSKBlock>  -> Result<(), Box<dyn Error>> {
         // Implementation goes here
         unimplemented!("Block querying not yet implemented")
     }
     
-    fn get_transaction(&self, tx_hash: &str) -> AnyaResult<RSKTransaction> {
+    fn get_transaction(&self, tx_hash: &str) -> AnyaResult<RSKTransaction>  -> Result<(), Box<dyn Error>> {
         // Implementation goes here
         unimplemented!("Transaction querying not yet implemented")
     }
     
-    fn get_account(&self, address: &str) -> AnyaResult<RSKAccount> {
+    fn get_account(&self, address: &str) -> AnyaResult<RSKAccount>  -> Result<(), Box<dyn Error>> {
         // Implementation goes here
         unimplemented!("Account querying not yet implemented")
     }
     
-    fn send_transaction(&self, params: RSKTransactionParams) -> AnyaResult<String> {
+    fn send_transaction(&self, params: RSKTransactionParams) -> AnyaResult<String>  -> Result<(), Box<dyn Error>> {
         // Implementation goes here
         unimplemented!("Transaction sending not yet implemented")
     }
     
-    fn call_contract(&self, call: ContractCall) -> AnyaResult<String> {
+    fn call_contract(&self, call: ContractCall) -> AnyaResult<String>  -> Result<(), Box<dyn Error>> {
         // Implementation goes here
         unimplemented!("Contract calling not yet implemented")
     }
     
-    fn deploy_contract(&self, deployment: ContractDeployment) -> AnyaResult<String> {
+    fn deploy_contract(&self, deployment: ContractDeployment) -> AnyaResult<String>  -> Result<(), Box<dyn Error>> {
         // Implementation goes here
         unimplemented!("Contract deployment not yet implemented")
     }
     
-    fn peg_in(&self, params: PegInParams) -> AnyaResult<String> {
+    fn peg_in(&self, params: PegInParams) -> AnyaResult<String>  -> Result<(), Box<dyn Error>> {
         // Implementation goes here
         unimplemented!("Peg-in not yet implemented")
     }
     
-    fn get_peg_in_status(&self, peg_in_id: &str) -> AnyaResult<PegInStatus> {
+    fn get_peg_in_status(&self, peg_in_id: &str) -> AnyaResult<PegInStatus>  -> Result<(), Box<dyn Error>> {
         // Implementation goes here
         unimplemented!("Peg-in status querying not yet implemented")
     }
     
-    fn peg_out(&self, params: PegOutParams) -> AnyaResult<String> {
+    fn peg_out(&self, params: PegOutParams) -> AnyaResult<String>  -> Result<(), Box<dyn Error>> {
         // Implementation goes here
         unimplemented!("Peg-out not yet implemented")
     }
     
-    fn get_peg_out_status(&self, peg_out_id: &str) -> AnyaResult<PegOutStatus> {
+    fn get_peg_out_status(&self, peg_out_id: &str) -> AnyaResult<PegOutStatus>  -> Result<(), Box<dyn Error>> {
         // Implementation goes here
         unimplemented!("Peg-out status querying not yet implemented")
     }
     
-    fn verify_spv_proof(&self, proof: SPVProof) -> AnyaResult<bool> {
+    fn verify_spv_proof(&self, proof: SPVProof) -> AnyaResult<bool>  -> Result<(), Box<dyn Error>> {
         // Implementation goes here
         unimplemented!("SPV proof verification not yet implemented")
     }
@@ -550,7 +551,7 @@ impl RSKManager for DefaultRSKManager {
 #[cfg(test)]
 mod tests {
     #[test]
-    fn test_placeholder() {
+    fn test_placeholder()  -> Result<(), Box<dyn Error>> {
         // Placeholder test to ensure this module compiles
         assert!(true);
     }

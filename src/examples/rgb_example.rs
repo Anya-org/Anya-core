@@ -1,3 +1,4 @@
+use std::error::Error;
 // RGB Asset Transfer Examples
 
 #[cfg(feature = "rgb")]
@@ -14,7 +15,7 @@ pub mod rgb_examples {
 
     // Example: Issue a new RGB asset
     #[allow(dead_code)]
-    pub async fn issue_rgb_asset(wallet: Arc<BitcoinWallet>) -> anyhow::Result<AssetInfo> {
+    pub async fn issue_rgb_asset(wallet: Arc<BitcoinWallet>) -> anyhow::Result<AssetInfo>  -> Result<(), Box<dyn Error>> {
         // Create RGB manager
         let data_dir = std::env::temp_dir().join("rgb_example");
         std::fs::create_dir_all(&data_dir)?;
@@ -47,7 +48,7 @@ pub mod rgb_examples {
         contract_id: &str,
         recipient_address: &str,
         amount: u64
-    ) -> anyhow::Result<String> {
+    ) -> anyhow::Result<String>  -> Result<(), Box<dyn Error>> {
         // Create RGB manager
         let data_dir = std::env::temp_dir().join("rgb_example");
         let rgb_manager = RgbManager::new(Network::Testnet, &data_dir)?;
@@ -76,7 +77,7 @@ pub mod rgb_examples {
 
     // Example: Get RGB asset information
     #[allow(dead_code)]
-    pub async fn get_asset_info(contract_id: &str) -> anyhow::Result<AssetInfo> {
+    pub async fn get_asset_info(contract_id: &str) -> anyhow::Result<AssetInfo>  -> Result<(), Box<dyn Error>> {
         // Create RGB manager
         let data_dir = std::env::temp_dir().join("rgb_example");
         let rgb_manager = RgbManager::new(Network::Testnet, &data_dir)?;
@@ -99,7 +100,7 @@ pub mod rgb_examples {
     pub async fn get_transfer_metadata(
         contract_id: &str,
         txid: &str
-    ) -> anyhow::Result<Option<AssetMetadata>> {
+    ) -> anyhow::Result<Option<AssetMetadata>>  -> Result<(), Box<dyn Error>> {
         // Create RGB manager
         let data_dir = std::env::temp_dir().join("rgb_example");
         let rgb_manager = RgbManager::new(Network::Testnet, &data_dir)?;
@@ -121,7 +122,7 @@ pub mod rgb_examples {
 
     // Helper to create a test wallet
     #[allow(dead_code)]
-    pub fn create_test_wallet() -> anyhow::Result<Arc<BitcoinWallet>> {
+    pub fn create_test_wallet() -> anyhow::Result<Arc<BitcoinWallet>>  -> Result<(), Box<dyn Error>> {
         let data_dir = std::env::temp_dir().join("wallet_example");
         std::fs::create_dir_all(&data_dir)?;
         
@@ -138,3 +139,4 @@ pub mod rgb_examples {
         Ok(wallet)
     }
 }
+

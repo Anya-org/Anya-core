@@ -1,3 +1,4 @@
+use std::error::Error;
 //! Anya-Core Installer v2.5
 //! [AIR-3][AIS-3][BPC-3][AIT-2][RES-2][SCL-3][PFM-2]
 //! 
@@ -398,7 +399,7 @@ impl AnyaInstaller {
         let result = self.install()
             .map_err(|e| {
                 self.rollback_installation(&cleanup_manifest)
-                    .expect("Failed to rollback installation");
+                    ?;
                 e
             });
         
@@ -748,8 +749,8 @@ impl DashboardServer {
     pub async fn start(&self) -> Result<()> {
         let routes = warp::path!("dashboard" / "status")
             .map(|| {
-                let installer = self.installer.lock().unwrap();
-                warp::reply::json(&installer.generate_dashboard_report().unwrap())
+                let installer = self.installer.lock()?;
+                warp::reply::json(&installer.generate_dashboard_report()?)
             });
         
         warp::serve(routes)
@@ -791,7 +792,7 @@ fn test_memory_safety() -> Result<bool> {
         ptr.read_volatile()
     };
     
-    Ok(buffer.windows(4).all(|w| u32::from_ne_bytes(w.try_into().unwrap()) != result))
+    Ok(buffer.windows(4).all(|w| u32::from_ne_bytes(w.try_into()?) != result))
 }
 
 #[derive(Parser)]
@@ -917,7 +918,7 @@ impl SecurityValidator for AnyaInstaller {
     fn validate_memory_safety(&self) -> Result<bool> {
         let mut buffer = [0u8; 1024];
         SystemRandom::new().fill(&mut buffer)?;
-        Ok(buffer.windows(4).all(|w| u32::from_ne_bytes(w.try_into().unwrap()) != 0))
+        Ok(buffer.windows(4).all(|w| u32::from_ne_bytes(w.try_into()?) != 0))
     }
 }
 

@@ -1,3 +1,4 @@
+use std::error::Error;
 // src/bitcoin/taproot/tree.rs
 
 use std::collections::HashMap;
@@ -25,7 +26,7 @@ pub struct TapLeaf {
 
 impl TapLeaf {
     /// Creates a new tap leaf from a script
-    pub fn new(script: TaprootScript, weight: u32) -> Self {
+    pub fn new(script: TaprootScript, weight: u32) -> Self  -> Result<(), Box<dyn Error>> {
         Self {
             script,
             version: LeafVersion::from_consensus(0xc0), // Tapscript version
@@ -35,7 +36,7 @@ impl TapLeaf {
     }
     
     /// Gets the leaf hash for this leaf
-    pub fn leaf_hash(&self) -> AnyaResult<TapLeafHash> {
+    pub fn leaf_hash(&self) -> AnyaResult<TapLeafHash>  -> Result<(), Box<dyn Error>> {
         // Implementation goes here
         // Compute the TapLeafHash
         
@@ -44,7 +45,7 @@ impl TapLeaf {
     }
     
     /// Adds metadata to this leaf
-    pub fn add_metadata(&mut self, key: &str, value: &str) {
+    pub fn add_metadata(&mut self, key: &str, value: &str)  -> Result<(), Box<dyn Error>> {
         self.metadata.insert(key.to_string(), value.to_string());
     }
 }
@@ -61,7 +62,7 @@ pub struct TapBranch {
 
 impl TapBranch {
     /// Creates a new branch from left and right nodes
-    pub fn new(left: TapNodeHash, right: TapNodeHash) -> Self {
+    pub fn new(left: TapNodeHash, right: TapNodeHash) -> Self  -> Result<(), Box<dyn Error>> {
         // Ensure lexicographic ordering
         if left[..] < right[..] {
             Self { left, right }
@@ -71,7 +72,7 @@ impl TapBranch {
     }
     
     /// Computes the branch hash
-    pub fn branch_hash(&self) -> TapBranchHash {
+    pub fn branch_hash(&self) -> TapBranchHash  -> Result<(), Box<dyn Error>> {
         // Implementation goes here
         // Compute the TapBranchHash
         
@@ -101,7 +102,7 @@ pub struct TapTree {
 
 impl TapTree {
     /// Creates a new empty Taproot tree
-    pub fn new() -> Self {
+    pub fn new() -> Self  -> Result<(), Box<dyn Error>> {
         Self {
             leaves: Vec::new(),
             branches: Vec::new(),
@@ -111,14 +112,14 @@ impl TapTree {
     }
     
     /// Adds a leaf to the tree
-    pub fn add_leaf(&mut self, leaf: TapLeaf) {
+    pub fn add_leaf(&mut self, leaf: TapLeaf)  -> Result<(), Box<dyn Error>> {
         self.leaves.push(leaf);
         // Reset the tree structure since we modified the leaves
         self.root_hash = None;
     }
     
     /// Builds the tree from the current leaves
-    pub fn build(&mut self) -> AnyaResult<TapNodeHash> {
+    pub fn build(&mut self) -> AnyaResult<TapNodeHash>  -> Result<(), Box<dyn Error>> {
         // Reset the tree structure
         self.branches.clear();
         self.leaf_positions.clear();
@@ -131,13 +132,13 @@ impl TapTree {
         
         // Placeholder for now
         let placeholder_hash = [0u8; 32];
-        self.root_hash = Some(TapNodeHash::from_slice(&placeholder_hash).unwrap());
+        self.root_hash = Some(TapNodeHash::from_slice(&placeholder_hash)?);
         
-        Ok(self.root_hash.unwrap())
+        Ok(self.root_hash?)
     }
     
     /// Gets the Merkle proof for a specific leaf
-    pub fn get_proof(&self, leaf_index: usize) -> AnyaResult<Vec<TapNodeHash>> {
+    pub fn get_proof(&self, leaf_index: usize) -> AnyaResult<Vec<TapNodeHash>>  -> Result<(), Box<dyn Error>> {
         if let Some(path) = self.leaf_positions.get(&leaf_index) {
             Ok(path.clone())
         } else {
@@ -146,7 +147,7 @@ impl TapTree {
     }
     
     /// Gets the control block for a specific leaf (for script path spending)
-    pub fn get_control_block(&self, leaf_index: usize, internal_key: [u8; 32]) -> AnyaResult<Vec<u8>> {
+    pub fn get_control_block(&self, leaf_index: usize, internal_key: [u8; 32]) -> AnyaResult<Vec<u8>>  -> Result<(), Box<dyn Error>> {
         // Implementation goes here
         // Construct the control block
         
@@ -163,27 +164,27 @@ pub struct TapTreeBuilder {
 
 impl TapTreeBuilder {
     /// Creates a new Taproot tree builder
-    pub fn new() -> Self {
+    pub fn new() -> Self  -> Result<(), Box<dyn Error>> {
         Self {
             leaves: Vec::new(),
         }
     }
     
     /// Adds a script to the tree
-    pub fn add_script(mut self, script: TaprootScript, weight: u32) -> Self {
+    pub fn add_script(mut self, script: TaprootScript, weight: u32) -> Self  -> Result<(), Box<dyn Error>> {
         let leaf = TapLeaf::new(script, weight);
         self.leaves.push(leaf);
         self
     }
     
     /// Adds a raw leaf to the tree
-    pub fn add_leaf(mut self, leaf: TapLeaf) -> Self {
+    pub fn add_leaf(mut self, leaf: TapLeaf) -> Self  -> Result<(), Box<dyn Error>> {
         self.leaves.push(leaf);
         self
     }
     
     /// Builds the Taproot tree
-    pub fn build(self) -> AnyaResult<TapTree> {
+    pub fn build(self) -> AnyaResult<TapTree>  -> Result<(), Box<dyn Error>> {
         let mut tree = TapTree::new();
         
         // Add all leaves to the tree

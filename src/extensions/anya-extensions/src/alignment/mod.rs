@@ -1,3 +1,4 @@
+use std::error::Error;
 use anyhow::Result;
 use std::sync::Arc;
 use bitcoin::{Network, Block, Transaction, BlockHeader};
@@ -146,21 +147,22 @@ mod tests {
 
     #[tokio::test]
     async fn test_alignment_manager() {
-        let manager = AlignmentManager::new().await.unwrap();
-        let analysis = manager.analyze_system().await.unwrap();
+        let manager = AlignmentManager::new().await?;
+        let analysis = manager.analyze_system().await?;
         assert!(analysis.bitcoin_compatibility);
         assert!(analysis.security_score >= 0.8);
     }
 
     #[tokio::test]
     async fn test_consensus_rules() {
-        let manager = AlignmentManager::new().await.unwrap();
+        let manager = AlignmentManager::new().await?;
         assert!(manager.verify_consensus_rules().await.is_ok());
     }
 
     #[tokio::test]
     async fn test_quantum_resistance() {
-        let manager = AlignmentManager::new().await.unwrap();
+        let manager = AlignmentManager::new().await?;
         assert!(manager.verify_quantum_resistance().await.is_ok());
     }
 }
+

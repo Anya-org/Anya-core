@@ -26,7 +26,7 @@
 	update = merge
 	fetchRecurseSubmodules = true
 
- [submodule "anya-mobile"]
+[submodule "mobile-sdk"]
 	path = mobile-sdk
 	url = https://github.com/Anya-org/mobile-sdk
 	branch = v3.1.1

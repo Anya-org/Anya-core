@@ -1,3 +1,4 @@
+use std::error::Error;
 // Migrated from OPSource to anya-core
 // This file was automatically migrated as part of the Rust-only implementation
 // Original file: C:\Users\bmokoka\Downloads\OPSource\src\bitcoin\cross_chain\liquid.rs
@@ -481,7 +482,7 @@ mod tests {
             "VJL7xGMPkX4BoKYvCBNqYUNLd3UcguxHyA",
             1_000_000,
             LiquidAssetType::LBTC,
-        ).unwrap();
+        )?;
         
         assert_eq!(bridge_tx.btc_sender, "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4");
         assert_eq!(bridge_tx.liquid_recipient, "VJL7xGMPkX4BoKYvCBNqYUNLd3UcguxHyA");
@@ -499,7 +500,7 @@ mod tests {
             1_000_000,
             true,
             &[1, 2, 3, 4],
-        ).unwrap();
+        )?;
         
         assert_eq!(issuance.name, "Test Asset");
         assert_eq!(issuance.ticker, "TEST");
@@ -523,7 +524,7 @@ pub fn create_liquid_peg_out_transaction(
     // Create a dummy input
     let input = TxIn {
         previous_output: OutPoint {
-            txid: Txid::from_str("0000000000000000000000000000000000000000000000000000000000000001").unwrap(),
+            txid: Txid::from_str("0000000000000000000000000000000000000000000000000000000000000001")?,
             vout: 0,
         },
         script_sig: ScriptBuf::new(),

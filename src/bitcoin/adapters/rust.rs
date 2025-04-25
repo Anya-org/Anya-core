@@ -1,3 +1,4 @@
+use std::error::Error;
 // Migrated from OPSource to anya-core
 // This file was automatically migrated as part of the Rust-only implementation
 // Original file: C:\Users\bmokoka\Downloads\OPSource\src\bitcoin\rust.rs
@@ -40,7 +41,7 @@ pub struct RustBitcoinImplementation {
 
 impl RustBitcoinImplementation {
     /// Create a new Rust Bitcoin implementation.
-    pub fn new(config: &crate::config::Config) -> Self {
+    pub fn new(config: &crate::config::Config) -> Self  -> Result<(), Box<dyn Error>> {
         let network_str = config.bitcoin_network.clone().unwrap_or_else(|| "testnet".to_string());
         
         // Parse the network string
@@ -74,7 +75,7 @@ impl RustBitcoinImplementation {
     }
     
     /// Initialize a new wallet and blockchain connection
-    fn initialize_wallet(&self) -> BitcoinResult<()> {
+    fn initialize_wallet(&self) -> BitcoinResult<()>  -> Result<(), Box<dyn Error>> {
         // Generate a new mnemonic
         let mnemonic = Mnemonic::generate(WordCount::Words12)
             .map_err(|e| BitcoinError::WalletError(format!("Failed to generate mnemonic: {}", e)))?;
@@ -82,7 +83,7 @@ impl RustBitcoinImplementation {
         println!("Generated new wallet with mnemonic: {}", mnemonic.to_string());
         
         // Store the mnemonic
-        *self.mnemonic.lock().unwrap() = Some(mnemonic.clone());
+        *self.mnemonic.lock()? = Some(mnemonic.clone());
         
         // Create extended key from mnemonic
         let xkey: ExtendedKey = mnemonic.into_extended_key()
@@ -111,7 +112,7 @@ impl RustBitcoinImplementation {
         ).map_err(|e| BitcoinError::WalletError(format!("Failed to create wallet: {}", e)))?;
         
         // Store the wallet
-        *self.wallet.lock().unwrap() = Some(wallet);
+        *self.wallet.lock()? = Some(wallet);
         
         // Connect to Electrum server
         let electrum_url = match self.network {
@@ -134,11 +135,11 @@ impl RustBitcoinImplementation {
             .map_err(|e| BitcoinError::NetworkError(format!("Failed to connect to Electrum server: {}", e)))?;
         
         // Store the blockchain
-        *self.blockchain.lock().unwrap() = Some(blockchain);
+        *self.blockchain.lock()? = Some(blockchain);
         
         // Sync the wallet if blockchain is available
-        if let Some(blockchain) = &*self.blockchain.lock().unwrap() {
-            if let Some(wallet) = &mut *self.wallet.lock().unwrap() {
+        if let Some(blockchain) = &*self.blockchain.lock()? {
+            if let Some(wallet) = &mut *self.wallet.lock()? {
                 wallet.sync(blockchain, SyncOptions::default())
                     .map_err(|e| BitcoinError::NetworkError(format!("Failed to sync wallet: {}", e)))?;
                 
@@ -150,33 +151,33 @@ impl RustBitcoinImplementation {
     }
     
     /// Get the wallet instance, initializing it if needed
-    fn get_wallet(&self) -> BitcoinResult<std::sync::MutexGuard<Option<Wallet<MemoryDatabase>>>> {
-        let wallet_guard = self.wallet.lock().unwrap();
+    fn get_wallet(&self) -> BitcoinResult<std::sync::MutexGuard<Option<Wallet<MemoryDatabase>>>>  -> Result<(), Box<dyn Error>> {
+        let wallet_guard = self.wallet.lock()?;
         
         if wallet_guard.is_none() {
             drop(wallet_guard); // Release the lock before initializing
             self.initialize_wallet()?;
-            return Ok(self.wallet.lock().unwrap());
+            return Ok(self.wallet.lock()?);
         }
         
         Ok(wallet_guard)
     }
     
     /// Get the blockchain instance, initializing it if needed
-    fn get_blockchain(&self) -> BitcoinResult<std::sync::MutexGuard<Option<ElectrumBlockchain>>> {
-        let blockchain_guard = self.blockchain.lock().unwrap();
+    fn get_blockchain(&self) -> BitcoinResult<std::sync::MutexGuard<Option<ElectrumBlockchain>>>  -> Result<(), Box<dyn Error>> {
+        let blockchain_guard = self.blockchain.lock()?;
         
         if blockchain_guard.is_none() {
             drop(blockchain_guard); // Release the lock before initializing
             self.initialize_wallet()?;
-            return Ok(self.blockchain.lock().unwrap());
+            return Ok(self.blockchain.lock()?);
         }
         
         Ok(blockchain_guard)
     }
     
     /// Convert a BDK transaction to our common BitcoinTransaction format
-    fn convert_transaction(&self, tx: &Transaction) -> BitcoinResult<BitcoinTransaction> {
+    fn convert_transaction(&self, tx: &Transaction) -> BitcoinResult<BitcoinTransaction>  -> Result<(), Box<dyn Error>> {
         // Convert inputs
         let inputs = tx.input.iter().map(|input| {
             TransactionInput {
@@ -224,7 +225,7 @@ impl RustBitcoinImplementation {
 }
 
 impl BitcoinInterface for RustBitcoinImplementation {
-    fn get_transaction(&self, txid: &str) -> BitcoinResult<BitcoinTransaction> {
+    fn get_transaction(&self, txid: &str) -> BitcoinResult<BitcoinTransaction>  -> Result<(), Box<dyn Error>> {
         // Get blockchain connection
         let blockchain_guard = self.get_blockchain()?;
         let blockchain = blockchain_guard.as_ref()
@@ -273,7 +274,7 @@ impl BitcoinInterface for RustBitcoinImplementation {
         }
     }
     
-    fn get_block(&self, hash: &str) -> BitcoinResult<Vec<BitcoinTransaction>> {
+    fn get_block(&self, hash: &str) -> BitcoinResult<Vec<BitcoinTransaction>>  -> Result<(), Box<dyn Error>> {
         // Get blockchain connection
         let blockchain_guard = self.get_blockchain()?;
         let blockchain = blockchain_guard.as_ref()
@@ -289,7 +290,7 @@ impl BitcoinInterface for RustBitcoinImplementation {
         Ok(vec![tx])
     }
     
-    fn get_block_height(&self) -> BitcoinResult<u32> {
+    fn get_block_height(&self) -> BitcoinResult<u32>  -> Result<(), Box<dyn Error>> {
         // Get blockchain connection
         let blockchain_guard = self.get_blockchain()?;
         let blockchain = blockchain_guard.as_ref()
@@ -317,7 +318,7 @@ impl BitcoinInterface for RustBitcoinImplementation {
         }
     }
     
-    fn generate_address(&self, address_type: AddressType) -> BitcoinResult<BitcoinAddress> {
+    fn generate_address(&self, address_type: AddressType) -> BitcoinResult<BitcoinAddress>  -> Result<(), Box<dyn Error>> {
         // Get wallet
         let mut wallet_guard = self.get_wallet()?;
         let wallet = wallet_guard.as_mut()
@@ -365,7 +366,7 @@ impl BitcoinInterface for RustBitcoinImplementation {
         &self,
         outputs: Vec<(String, u64)>,
         fee_rate: u64,
-    ) -> BitcoinResult<BitcoinTransaction> {
+    ) -> BitcoinResult<BitcoinTransaction>  -> Result<(), Box<dyn Error>> {
         // Get wallet
         let mut wallet_guard = self.get_wallet()?;
         let wallet = wallet_guard.as_mut()
@@ -455,7 +456,7 @@ impl BitcoinInterface for RustBitcoinImplementation {
         }
     }
     
-    fn broadcast_transaction(&self, transaction: &BitcoinTransaction) -> BitcoinResult<String> {
+    fn broadcast_transaction(&self, transaction: &BitcoinTransaction) -> BitcoinResult<String>  -> Result<(), Box<dyn Error>> {
         // Get blockchain connection
         let blockchain_guard = self.get_blockchain()?;
         let blockchain = blockchain_guard.as_ref()
@@ -473,7 +474,7 @@ impl BitcoinInterface for RustBitcoinImplementation {
         Ok(transaction.txid.clone())
     }
     
-    fn get_balance(&self) -> BitcoinResult<u64> {
+    fn get_balance(&self) -> BitcoinResult<u64>  -> Result<(), Box<dyn Error>> {
         // Get wallet
         let wallet_guard = self.get_wallet()?;
         let wallet = wallet_guard.as_ref()
@@ -495,7 +496,7 @@ impl BitcoinInterface for RustBitcoinImplementation {
         }
     }
     
-    fn estimate_fee(&self, target_blocks: u8) -> BitcoinResult<u64> {
+    fn estimate_fee(&self, target_blocks: u8) -> BitcoinResult<u64>  -> Result<(), Box<dyn Error>> {
         // Get blockchain connection
         let blockchain_guard = self.get_blockchain()?;
         let blockchain = blockchain_guard.as_ref()
@@ -512,7 +513,8 @@ impl BitcoinInterface for RustBitcoinImplementation {
         }
     }
     
-    fn implementation_type(&self) -> BitcoinImplementationType {
+    fn implementation_type(&self) -> BitcoinImplementationType  -> Result<(), Box<dyn Error>> {
         BitcoinImplementationType::Rust
     }
 } 
+

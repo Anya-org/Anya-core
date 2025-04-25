@@ -1,3 +1,4 @@
+use std::error::Error;
 //! BDF v2.5 Compliance Verification Tools [BPC-3][DAO-3]
 //! 
 //! This module provides tools to verify compliance with the Bitcoin
@@ -261,7 +262,7 @@ impl BdfComplianceVerifier {
                 ));
             }
             
-            let support = report.bip_support.get(bip).unwrap();
+            let support = report.bip_support.get(bip)?;
             if support.support_level == BipSupportLevel::None {
                 report.critical_issues.push(format!("No support for required BIP-{}", bip));
                 return Err(ComplianceError::VerificationFailed(
@@ -365,7 +366,7 @@ impl BdfComplianceVerifier {
                 ));
             }
             
-            let comp = report.architecture_components.get(component).unwrap();
+            let comp = report.architecture_components.get(component)?;
             if !comp.implemented {
                 report.critical_issues.push(format!("Component not implemented: {}", component));
                 return Err(ComplianceError::VerificationFailed(
@@ -432,7 +433,7 @@ impl BdfComplianceVerifier {
                 ));
             }
             
-            let prot = report.protocol_compliance.get(protocol).unwrap();
+            let prot = report.protocol_compliance.get(protocol)?;
             if prot.support_level == BipSupportLevel::None {
                 report.critical_issues.push(format!("No support for required protocol: {}", protocol));
                 return Err(ComplianceError::VerificationFailed(
@@ -506,7 +507,7 @@ impl BdfComplianceVerifier {
         bips.sort();
         
         for bip in bips {
-            let support = report.bip_support.get(bip).unwrap();
+            let support = report.bip_support.get(bip)?;
             markdown.push_str(&format!(
                 "| {} | {:?} | {} | {:.1}% | {} |\n",
                 support.bip_number,
@@ -529,7 +530,7 @@ impl BdfComplianceVerifier {
         components.sort();
         
         for component in components {
-            let comp = report.architecture_components.get(component).unwrap();
+            let comp = report.architecture_components.get(component)?;
             markdown.push_str(&format!(
                 "| {} | {} | {} | {:?} | {} |\n",
                 comp.name,
@@ -552,7 +553,7 @@ impl BdfComplianceVerifier {
         protocols.sort();
         
         for protocol in protocols {
-            let prot = report.protocol_compliance.get(protocol).unwrap();
+            let prot = report.protocol_compliance.get(protocol)?;
             markdown.push_str(&format!(
                 "| {} | {:?} | {:?} | {} |\n",
                 prot.protocol_name,

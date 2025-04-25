@@ -1,3 +1,4 @@
+use std::error::Error;
 use bitcoin::{Transaction, Block, BlockHeader};
 use thiserror::Error;
 

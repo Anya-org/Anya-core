@@ -1,3 +1,4 @@
+use std::error::Error;
 // Configuration module for Anya Core
 // Provides configuration settings for various components
 
@@ -59,7 +60,7 @@ pub struct Config {
 }
 
 impl Default for Config {
-    fn default() -> Self {
+    fn default() -> Self  -> Result<(), Box<dyn Error>> {
         let mut features = HashMap::new();
         features.insert("taproot".to_string(), true);
         features.insert("lightning".to_string(), false);
@@ -91,7 +92,7 @@ impl Default for Config {
 
 impl Config {
     /// Create a configuration from environment variables
-    pub fn from_env() -> Self {
+    pub fn from_env() -> Self  -> Result<(), Box<dyn Error>> {
         let mut config = Config::default();
         
         // Bitcoin configuration
@@ -180,33 +181,33 @@ impl Config {
     }
     
     /// Check if a feature is enabled
-    pub fn is_feature_enabled(&self, feature: &str) -> bool {
+    pub fn is_feature_enabled(&self, feature: &str) -> bool  -> Result<(), Box<dyn Error>> {
         self.features.get(feature).copied().unwrap_or(false)
     }
     
     /// Set a feature flag
-    pub fn set_feature(&mut self, feature: &str, enabled: bool) {
+    pub fn set_feature(&mut self, feature: &str, enabled: bool)  -> Result<(), Box<dyn Error>> {
         self.features.insert(feature.to_string(), enabled);
     }
     
     /// Get the Bitcoin implementation type
-    pub fn get_bitcoin_implementation_type(&self) -> crate::bitcoin::interface::BitcoinImplementationType {
+    pub fn get_bitcoin_implementation_type(&self) -> crate::bitcoin::interface::BitcoinImplementationType  -> Result<(), Box<dyn Error>> {
         crate::bitcoin::interface::BitcoinImplementationType::Rust
     }
     
     /// Check if Liquid is enabled
-    pub fn is_liquid_enabled(&self) -> bool {
+    pub fn is_liquid_enabled(&self) -> bool  -> Result<(), Box<dyn Error>> {
         self.is_feature_enabled("liquid")
     }
     
     /// Check if Web5 is enabled
-    pub fn is_web5_enabled(&self) -> bool {
+    pub fn is_web5_enabled(&self) -> bool  -> Result<(), Box<dyn Error>> {
         self.is_feature_enabled("web5")
     }
 }
 
 /// Create a test configuration for unit tests
-pub fn test_config() -> Config {
+pub fn test_config() -> Config  -> Result<(), Box<dyn Error>> {
     let mut config = Config::default();
     config.bitcoin_network = "regtest".to_string();
     config.bitcoin_rpc_url = "http://localhost:18443".to_string();

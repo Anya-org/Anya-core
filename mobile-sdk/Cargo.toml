@@ -1,1 +1,21 @@
- 
+[dependencies]
+anya-mobile.workspace = true
+mobile-sdk.workspace = true
+
+# [BPC-3] Remove legacy dependencies
+# taproot-assets = { version = "0.3" }  # Removed
+# anya-legacy-mobile = "0.2"  # Removed
+[dependencies]
+anya-mobile.workspace = true
+mobile-sdk.workspace = true
+
+# [BPC-3] Remove legacy dependencies
+# taproot-assets = { version = "0.3" }  # Removed
+# anya-legacy-mobile = "0.2"  # Removed
+[dependencies]
+anya-mobile.workspace = true
+mobile-sdk.workspace = true
+
+# [BPC-3] Remove legacy dependencies
+# taproot-assets = { version = "0.3" }  # Removed
+# anya-legacy-mobile = "0.2"  # Removed

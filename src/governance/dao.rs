@@ -1,3 +1,4 @@
+use std::error::Error;
 use std::sync::Arc;
 use tokio::sync::{RwLock, Mutex};
 use serde::{Serialize, Deserialize};
@@ -175,3 +176,4 @@ pub enum VoteDecision {
     Against,
     Abstain,
 }
+

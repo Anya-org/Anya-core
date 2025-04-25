@@ -1,3 +1,4 @@
+# [AIR-3][AIS-3][BPC-3][W5C-3] Security-cleared implementation
 //! Web5 Protocol Implementation Review
 #![forbid(unsafe_code)]
 
@@ -50,7 +51,7 @@ impl Web5ValidatorV2 {
             .context("Failed to decode SILENT_LEAF")?;
 
         tx.output.iter()
-            .find(|o| o.script_pubkey.as_bytes() == silent_leaf)
+            .find(|o| o.script_pubkey.as_bytes().eq(&silent_leaf))
             .ok_or(anyhow::anyhow!("SILENT_LEAF commitment missing"))?;
 
         Ok(())

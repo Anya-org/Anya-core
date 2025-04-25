@@ -1,3 +1,4 @@
+use std::error::Error;
 pub mod provider;
 pub mod audit;
 pub mod config;

@@ -1,3 +1,4 @@
+use std::error::Error;
 // Web5 Protocols Implementation
 // Provides protocol handlers for Web5 interactions
 // [AIR-012] Operational Reliability and [AIP-002] Modular Architecture
@@ -25,7 +26,7 @@ pub trait ProtocolHandler: Send + Sync {
 /// 
 /// Describes a protocol's capabilities and structure.
 #[derive(Clone, Serialize, Deserialize)]
-pub struct ProtocolDefinition {
+pub struct ProtocolDefinition  -> Result<(), Box<dyn Error>> {
     /// Protocol ID (URI)
     pub protocol: String,
     /// Protocol version
@@ -74,7 +75,7 @@ pub struct ProtocolManager {
 
 impl ProtocolManager {
     /// Create a new protocol manager
-    pub fn new() -> Self {
+    pub fn new() -> Self  -> Result<(), Box<dyn Error>> {
         Self {
             protocols: HashMap::new(),
             handlers: HashMap::new(),
@@ -82,7 +83,7 @@ impl ProtocolManager {
     }
     
     /// Register a protocol handler
-    pub fn register_protocol(&mut self, handler: Box<dyn ProtocolHandler>) -> Web5Result<()> {
+    pub fn register_protocol(&mut self, handler: Box<dyn ProtocolHandler>) -> Web5Result<()>  -> Result<(), Box<dyn Error>> {
         let protocol_id = handler.protocol_id().to_string();
         let definition = handler.get_definition();
         
@@ -93,14 +94,14 @@ impl ProtocolManager {
     }
     
     /// Get a protocol definition by ID
-    pub fn get_protocol(&self, protocol_id: &str) -> Web5Result<&ProtocolDefinition> {
+    pub fn get_protocol(&self, protocol_id: &str) -> Web5Result<&ProtocolDefinition>  -> Result<(), Box<dyn Error>> {
         self.protocols.get(protocol_id).ok_or_else(|| {
             Web5Error::Protocol(format!("Protocol not found: {}", protocol_id))
         })
     }
     
     /// Handle a message for a specific protocol
-    pub fn handle_message(&self, protocol_id: &str, message: &[u8]) -> Web5Result<Vec<u8>> {
+    pub fn handle_message(&self, protocol_id: &str, message: &[u8]) -> Web5Result<Vec<u8>>  -> Result<(), Box<dyn Error>> {
         let handler = self.handlers.get(protocol_id).ok_or_else(|| {
             Web5Error::Protocol(format!("Protocol handler not found: {}", protocol_id))
         })?;
@@ -109,12 +110,12 @@ impl ProtocolManager {
     }
     
     /// Check if a protocol is registered
-    pub fn has_protocol(&self, protocol_id: &str) -> bool {
+    pub fn has_protocol(&self, protocol_id: &str) -> bool  -> Result<(), Box<dyn Error>> {
         self.protocols.contains_key(protocol_id)
     }
     
     /// Get all registered protocol definitions
-    pub fn get_all_protocols(&self) -> Vec<&ProtocolDefinition> {
+    pub fn get_all_protocols(&self) -> Vec<&ProtocolDefinition>  -> Result<(), Box<dyn Error>> {
         self.protocols.values().collect()
     }
 }
@@ -126,22 +127,22 @@ pub struct ProfileProtocolHandler;
 
 impl ProfileProtocolHandler {
     /// Create a new profile protocol handler
-    pub fn new() -> Self {
+    pub fn new() -> Self  -> Result<(), Box<dyn Error>> {
         Self {}
     }
 }
 
 impl ProtocolHandler for ProfileProtocolHandler {
-    fn protocol_id(&self) -> &str {
+    fn protocol_id(&self) -> &str  -> Result<(), Box<dyn Error>> {
         "https://identity.foundation/schemas/profile"
     }
     
-    fn handle_message(&self, message: &[u8]) -> Web5Result<Vec<u8>> {
+    fn handle_message(&self, message: &[u8]) -> Web5Result<Vec<u8>>  -> Result<(), Box<dyn Error>> {
         // Simple echo implementation for demonstration
         Ok(message.to_vec())
     }
     
-    fn get_definition(&self) -> ProtocolDefinition {
+    fn get_definition(&self) -> ProtocolDefinition  -> Result<(), Box<dyn Error>> {
         let mut types = HashMap::new();
         types.insert(
             "profile".to_string(),
@@ -189,22 +190,22 @@ pub struct CredentialProtocolHandler;
 
 impl CredentialProtocolHandler {
     /// Create a new credentials protocol handler
-    pub fn new() -> Self {
+    pub fn new() -> Self  -> Result<(), Box<dyn Error>> {
         Self {}
     }
 }
 
 impl ProtocolHandler for CredentialProtocolHandler {
-    fn protocol_id(&self) -> &str {
+    fn protocol_id(&self) -> &str  -> Result<(), Box<dyn Error>> {
         "https://identity.foundation/schemas/credentials"
     }
     
-    fn handle_message(&self, message: &[u8]) -> Web5Result<Vec<u8>> {
+    fn handle_message(&self, message: &[u8]) -> Web5Result<Vec<u8>>  -> Result<(), Box<dyn Error>> {
         // Simple echo implementation for demonstration
         Ok(message.to_vec())
     }
     
-    fn get_definition(&self) -> ProtocolDefinition {
+    fn get_definition(&self) -> ProtocolDefinition  -> Result<(), Box<dyn Error>> {
         let mut types = HashMap::new();
         types.insert(
             "credential".to_string(),
@@ -252,12 +253,12 @@ mod tests {
     use super::*;
     
     #[test]
-    fn test_protocol_manager() {
+    fn test_protocol_manager()  -> Result<(), Box<dyn Error>> {
         let mut manager = ProtocolManager::new();
         let profile_handler = ProfileProtocolHandler::new();
         
         // Register the protocol
-        manager.register_protocol(Box::new(profile_handler)).unwrap();
+        manager.register_protocol(Box::new(profile_handler))?;
         
         // Check if the protocol is registered
         assert!(manager.has_protocol("https://identity.foundation/schemas/profile"));
@@ -267,18 +268,18 @@ mod tests {
         assert_eq!(protocols.len(), 1);
         
         // Get the protocol definition
-        let definition = manager.get_protocol("https://identity.foundation/schemas/profile").unwrap();
+        let definition = manager.get_protocol("https://identity.foundation/schemas/profile")?;
         assert_eq!(definition.protocol, "https://identity.foundation/schemas/profile");
         assert_eq!(definition.version, "1.0");
     }
     
     #[test]
-    fn test_profile_protocol_handler() {
+    fn test_profile_protocol_handler()  -> Result<(), Box<dyn Error>> {
         let handler = ProfileProtocolHandler::new();
         let message = b"test message";
         
         // Handle a message
-        let response = handler.handle_message(message).unwrap();
+        let response = handler.handle_message(message)?;
         assert_eq!(response, message);
         
         // Get the protocol definition
@@ -289,7 +290,7 @@ mod tests {
     }
     
     #[test]
-    fn test_credential_protocol_handler() {
+    fn test_credential_protocol_handler()  -> Result<(), Box<dyn Error>> {
         let handler = CredentialProtocolHandler::new();
         
         // Get the protocol definition

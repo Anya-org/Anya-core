@@ -1,3 +1,4 @@
+use std::error::Error;
 use bitcoin::{Transaction, Network};
 use crate::bitcoin::error::BitcoinResult;
 
@@ -38,32 +39,32 @@ pub trait Layer2Protocol {
 }
 
 /// Registry of Layer 2 protocols
-pub struct Layer2Registry {
+pub struct Layer2Registry  -> Result<(), Box<dyn Error>> {
     protocols: Vec<(String, Box<dyn Layer2Protocol>)>,
 }
 
 impl Layer2Registry {
     /// Create a new Layer 2 registry
-    pub fn new() -> Self {
+    pub fn new() -> Self  -> Result<(), Box<dyn Error>> {
         Self {
             protocols: Vec::new(),
         }
     }
     
     /// Register a Layer 2 protocol
-    pub fn register(&mut self, name: &str, protocol: Box<dyn Layer2Protocol>) {
+    pub fn register(&mut self, name: &str, protocol: Box<dyn Layer2Protocol>)  -> Result<(), Box<dyn Error>> {
         self.protocols.push((name.to_string(), protocol));
     }
     
     /// Get a Layer 2 protocol by name
-    pub fn get(&self, name: &str) -> Option<&Box<dyn Layer2Protocol>> {
+    pub fn get(&self, name: &str) -> Option<&Box<dyn Layer2Protocol>>  -> Result<(), Box<dyn Error>> {
         self.protocols.iter()
             .find(|(n, _)| n == name)
             .map(|(_, p)| p)
     }
     
     /// List all registered Layer 2 protocols
-    pub fn list_protocols(&self) -> Vec<String> {
+    pub fn list_protocols(&self) -> Vec<String>  -> Result<(), Box<dyn Error>> {
         self.protocols.iter()
             .map(|(n, _)| n.clone())
             .collect()

@@ -1,3 +1,4 @@
+use std::error::Error;
 use std::sync::Arc;
 use anyhow::Result;
 use rand::Rng;
@@ -86,3 +87,4 @@ impl QuantumResistantCrypto {
         Ok(cipher.decrypt(nonce, ciphertext)?)
     }
 }
+

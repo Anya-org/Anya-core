@@ -1,3 +1,4 @@
+use std::error::Error;
 //! BIP-341 (Taproot) Implementation
 //! [AIR-3][AIS-3][BPC-3][AIT-3][RES-3]
 //!
@@ -189,7 +190,7 @@ impl TaprootMerkleTree {
         
         // If there's only one leaf, return its hash
         if self.leaves.len() == 1 {
-            let leaf = self.leaves.values().next().unwrap();
+            let leaf = self.leaves.values().next()?;
             let hash = leaf.compute_leaf_hash();
             self.root = Some(hash);
             return hash;
@@ -243,7 +244,7 @@ impl TaprootMerkleTree {
         }
         
         // The root is the hash of the only node at the top level
-        let root_branch = self.branches.get(&(current_level, 0)).unwrap();
+        let root_branch = self.branches.get(&(current_level, 0))?;
         let root = root_branch.compute_branch_hash();
         
         self.root = Some(root);
@@ -477,7 +478,7 @@ mod tests {
         
         // Create a Taproot output
         let output = taproot.create_taproot_output(internal_key, merkle_root)
-            .expect("Failed to create Taproot output");
+            ?;
         
         // Verify that the output key is different from the internal key
         assert_ne!(output.internal_key.to_bytes(), output.output_key.to_bytes());

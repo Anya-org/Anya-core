@@ -1,3 +1,4 @@
+use std::error::Error;
 #[gdpr_article(17)]  // Right to Erasure
 pub fn right_to_erasure(&self) -> Result<RedactionProof> {
     let merkle_root = self.build_merkle_tree()?;

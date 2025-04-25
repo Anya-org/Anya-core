@@ -1,3 +1,4 @@
+use std::error::Error;
 // src/bitcoin/cross_chain/routing.rs
 
 use std::collections::{HashMap, HashSet, VecDeque};
@@ -10,7 +11,7 @@ pub struct PathFinder {
 }
 
 impl PathFinder {
-    pub fn new() -> Self {
+    pub fn new() -> Self  -> Result<(), Box<dyn Error>> {
         let mut chain_graph = HashMap::new();
         
         // Bitcoin connections
@@ -44,7 +45,7 @@ impl PathFinder {
         Self { chain_graph }
     }
     
-    pub fn find_best_path(&self, from: &str, to: &str) -> AnyaResult<Vec<String>> {
+    pub fn find_best_path(&self, from: &str, to: &str) -> AnyaResult<Vec<String>>  -> Result<(), Box<dyn Error>> {
         if from == to {
             return Ok(vec![from.to_string()]);
         }
@@ -90,7 +91,7 @@ impl PathFinder {
         )).into())
     }
     
-    pub fn calculate_total_fee(&self, path: &[String]) -> AnyaResult<u32> {
+    pub fn calculate_total_fee(&self, path: &[String]) -> AnyaResult<u32>  -> Result<(), Box<dyn Error>> {
         if path.len() < 2 {
             return Ok(0);
         }

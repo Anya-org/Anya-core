@@ -1,3 +1,4 @@
+use std::error::Error;
 // Anya Governance Token (AGT) Contract Implementation
 // [AIR-3][AIS-3][AIT-3][AIP-3][BPC-3][DAO-3]
 
@@ -402,27 +403,27 @@ impl TokenContract {
     fn get_treasury_principal(&self) -> Result<PrincipalData, Error> {
         // Implementation for getting the treasury principal
         // Typically would be derived from contract_id or configuration
-        Ok(PrincipalData::parse("ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG.treasury").unwrap())
+        Ok(PrincipalData::parse("ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG.treasury")?)
     }
     
     fn get_liquidity_principal(&self) -> Result<PrincipalData, Error> {
-        Ok(PrincipalData::parse("ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG.liquidity").unwrap())
+        Ok(PrincipalData::parse("ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG.liquidity")?)
     }
     
     fn get_team_principal(&self) -> Result<PrincipalData, Error> {
-        Ok(PrincipalData::parse("ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG.team").unwrap())
+        Ok(PrincipalData::parse("ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG.team")?)
     }
     
     fn get_community_principal(&self) -> Result<PrincipalData, Error> {
-        Ok(PrincipalData::parse("ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG.community").unwrap())
+        Ok(PrincipalData::parse("ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG.community")?)
     }
     
     fn get_partners_principal(&self) -> Result<PrincipalData, Error> {
-        Ok(PrincipalData::parse("ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG.partners").unwrap())
+        Ok(PrincipalData::parse("ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG.partners")?)
     }
     
     fn get_mining_rewards_principal(&self) -> Result<PrincipalData, Error> {
-        Ok(PrincipalData::parse("ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG.mining").unwrap())
+        Ok(PrincipalData::parse("ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG.mining")?)
     }
     
     fn validate_governance_action(&self, proposal_id: ProposalId) -> Result<(), GovernanceError> {

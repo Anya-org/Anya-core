@@ -1,3 +1,4 @@
+use std::error::Error;
 pub struct RollbackManager {
     manifest: Vec<PathBuf>,
 }

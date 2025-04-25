@@ -1,3 +1,4 @@
+use std::error::Error;
 //! Tests for the BIP-341 (Taproot) implementation
 //! [AIR-3][AIS-3][BPC-3][AIT-3][RES-3]
 
@@ -9,14 +10,14 @@ use crate::bitcoin::bip340::{XOnlyPublicKey, SchnorrSignature, Bip340Schnorr};
 use bitcoin::hashes::{sha256, Hash};
 
 // Helper function to create a test key
-fn create_test_key(seed: u8) -> XOnlyPublicKey {
+fn create_test_key(seed: u8) -> XOnlyPublicKey  -> Result<(), Box<dyn Error>> {
     let mut key_bytes = [0u8; 32];
     key_bytes.iter_mut().for_each(|b| *b = seed);
     XOnlyPublicKey::from_bytes(key_bytes)
 }
 
 #[test]
-fn test_leaf_creation() {
+fn test_leaf_creation()  -> Result<(), Box<dyn Error>> {
     // Create a leaf with default version
     let script = vec![0x51, 0x21, 0x03]; // OP_1 OP_SIZE OP_PUSH3
     let leaf = TaprootLeaf::new(LeafVersion::Default, script.clone());
@@ -35,7 +36,7 @@ fn test_leaf_creation() {
 }
 
 #[test]
-fn test_leaf_hash() {
+fn test_leaf_hash()  -> Result<(), Box<dyn Error>> {
     // Create two different leaves
     let script1 = vec![0x51]; // OP_1
     let script2 = vec![0x52]; // OP_2
@@ -55,7 +56,7 @@ fn test_leaf_hash() {
 }
 
 #[test]
-fn test_merkle_tree_creation() {
+fn test_merkle_tree_creation()  -> Result<(), Box<dyn Error>> {
     // Create a new Merkle tree
     let mut tree = TaprootMerkleTree::new();
     
@@ -72,7 +73,7 @@ fn test_merkle_tree_creation() {
 }
 
 #[test]
-fn test_merkle_root_single_leaf() {
+fn test_merkle_root_single_leaf()  -> Result<(), Box<dyn Error>> {
     // Create a new Merkle tree with a single leaf
     let mut tree = TaprootMerkleTree::new();
     let script = vec![0x51]; // OP_1
@@ -88,7 +89,7 @@ fn test_merkle_root_single_leaf() {
 }
 
 #[test]
-fn test_merkle_root_multiple_leaves() {
+fn test_merkle_root_multiple_leaves()  -> Result<(), Box<dyn Error>> {
     // Create a new Merkle tree with multiple leaves
     let mut tree = TaprootMerkleTree::new();
     
@@ -113,7 +114,7 @@ fn test_merkle_root_multiple_leaves() {
 }
 
 #[test]
-fn test_merkle_proof() {
+fn test_merkle_proof()  -> Result<(), Box<dyn Error>> {
     // Create a new Merkle tree with multiple leaves
     let mut tree = TaprootMerkleTree::new();
     
@@ -147,7 +148,7 @@ fn test_merkle_proof() {
 }
 
 #[test]
-fn test_taproot_output_creation() {
+fn test_taproot_output_creation()  -> Result<(), Box<dyn Error>> {
     // Create a Taproot implementation
     let taproot = Bip341Taproot::new();
     
@@ -164,7 +165,7 @@ fn test_taproot_output_creation() {
     let merkle_root = Some(tree.root_hash());
     
     // Create a Taproot output
-    let output = taproot.create_taproot_output(internal_key, merkle_root).unwrap();
+    let output = taproot.create_taproot_output(internal_key, merkle_root)?;
     
     // Verify output contains the correct internal key and Merkle root
     assert_eq!(output.internal_key.to_bytes(), internal_key.to_bytes());
@@ -175,7 +176,7 @@ fn test_taproot_output_creation() {
 }
 
 #[test]
-fn test_taproot_output_creation_no_scripts() {
+fn test_taproot_output_creation_no_scripts()  -> Result<(), Box<dyn Error>> {
     // Create a Taproot implementation
     let taproot = Bip341Taproot::new();
     
@@ -183,7 +184,7 @@ fn test_taproot_output_creation_no_scripts() {
     let internal_key = create_test_key(42);
     
     // Create a Taproot output with no script tree
-    let output = taproot.create_taproot_output(internal_key, None).unwrap();
+    let output = taproot.create_taproot_output(internal_key, None)?;
     
     // Verify output contains the correct internal key and no Merkle root
     assert_eq!(output.internal_key.to_bytes(), internal_key.to_bytes());
@@ -194,7 +195,7 @@ fn test_taproot_output_creation_no_scripts() {
 }
 
 #[test]
-fn test_silent_leaf_creation() {
+fn test_silent_leaf_creation()  -> Result<(), Box<dyn Error>> {
     // Create a Taproot implementation
     let taproot = Bip341Taproot::new();
     
@@ -212,7 +213,7 @@ fn test_silent_leaf_creation() {
 }
 
 #[test]
-fn test_taproot_tweak() {
+fn test_taproot_tweak()  -> Result<(), Box<dyn Error>> {
     // Create a Taproot implementation
     let taproot = Bip341Taproot::new();
     
@@ -246,7 +247,7 @@ fn test_taproot_tweak() {
 // This is a simplified integration test for key path spending
 // In a real implementation, this would use actual Bitcoin transactions
 #[test]
-fn test_key_path_spending() {
+fn test_key_path_spending()  -> Result<(), Box<dyn Error>> {
     // Create a Taproot implementation
     let taproot = Bip341Taproot::new();
     let schnorr = Bip340Schnorr::new();
@@ -256,13 +257,13 @@ fn test_key_path_spending() {
     let internal_key = key_pair.public_key;
     
     // Create a Taproot output
-    let output = taproot.create_taproot_output(internal_key, None).unwrap();
+    let output = taproot.create_taproot_output(internal_key, None)?;
     
     // Create a message to sign (in real world, this would be a transaction)
     let message = b"Test message for key path spending";
     
     // Sign the message using the internal key
-    let signature = schnorr.sign(&key_pair, message).unwrap();
+    let signature = schnorr.sign(&key_pair, message)?;
     
     // Create a key path spend
     let spend = TaprootSpend::KeyPath {
@@ -277,7 +278,7 @@ fn test_key_path_spending() {
     assert!(result.is_ok());
     
     // For key path spending, we expect the result to be true
-    assert!(result.unwrap());
+    assert!(result?);
 }
 
 // Integration test for script path spending would be more complex
@@ -286,7 +287,7 @@ fn test_key_path_spending() {
 // tests that construct and verify actual Bitcoin transactions.
 
 #[test]
-fn test_version_conversions() {
+fn test_version_conversions()  -> Result<(), Box<dyn Error>> {
     // Test default version
     let default_version = LeafVersion::Default;
     let default_byte: u8 = default_version.into();

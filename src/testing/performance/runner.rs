@@ -1,3 +1,4 @@
+use std::error::Error;
 //! Performance test runner integration
 
 use crate::testing::performance::{

@@ -1,3 +1,4 @@
+use std::error::Error;
 use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
 use tokio::sync::{RwLock, Mutex};
@@ -355,3 +356,4 @@ impl MLModelManager {
         manager
     }
 }
+

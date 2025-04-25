@@ -1,3 +1,4 @@
+use std::error::Error;
 // AIR-008: Performance Optimization Implementation
 // Priority: HIGH - Performance tuning with in-memory auto-save
 
@@ -77,7 +78,7 @@ impl PerformanceOptimizer {
                              target_utilization: f64,
                              target_throughput: f64,
                              target_latency: Duration) -> Result<(), String> {
-        let mut resources = self.resources.lock().unwrap();
+        let mut resources = self.resources.lock()?;
         
         let config = OptimizationConfig {
             resource_type,
@@ -107,17 +108,17 @@ impl PerformanceOptimizer {
                          additional_metrics: HashMap<String, f64>) -> Result<(), String> {
         // Check if resource exists
         {
-            let resources = self.resources.lock().unwrap();
+            let resources = self.resources.lock()?;
             if !resources.contains_key(resource_name) {
                 return Err(format!("Resource not found: {}", resource_name));
             }
         }
         
         // Update metrics
-        let mut metrics_map = self.metrics.lock().unwrap();
+        let mut metrics_map = self.metrics.lock()?;
         let resource_type = {
-            let resources = self.resources.lock().unwrap();
-            resources.get(resource_name).unwrap().resource_type
+            let resources = self.resources.lock()?;
+            resources.get(resource_name)?.resource_type
         };
         
         let metrics = PerformanceMetrics {
@@ -139,7 +140,7 @@ impl PerformanceOptimizer {
     
     /// Record an input and check if auto-save is needed
     fn record_input_and_check_save(&self) {
-        let mut counter = self.input_counter.lock().unwrap();
+        let mut counter = self.input_counter.lock()?;
         *counter += 1;
         
         // Auto-save every Nth input (e.g., every 20th input)
@@ -153,8 +154,8 @@ impl PerformanceOptimizer {
     fn save_state_to_memory(&self) {
         // In a real implementation, this would create a snapshot of current performance state
         // For this implementation, we're just keeping everything in memory
-        let resources = self.resources.lock().unwrap();
-        let metrics = self.metrics.lock().unwrap();
+        let resources = self.resources.lock()?;
+        let metrics = self.metrics.lock()?;
         
         println!("In-memory performance snapshot created: {} resources, {} metrics", 
                 resources.len(), metrics.len());
@@ -165,7 +166,7 @@ impl PerformanceOptimizer {
     /// Optimize a specific resource
     pub fn optimize_resource(&self, resource_name: &str) -> Result<OptimizationStatus, String> {
         // Get resource configuration
-        let mut resources = self.resources.lock().unwrap();
+        let mut resources = self.resources.lock()?;
         
         let config = match resources.get_mut(resource_name) {
             Some(config) => config,
@@ -174,7 +175,7 @@ impl PerformanceOptimizer {
         
         // Check if metrics exist
         let metrics = {
-            let metrics_map = self.metrics.lock().unwrap();
+            let metrics_map = self.metrics.lock()?;
             match metrics_map.get(resource_name) {
                 Some(metrics) => metrics.clone(),
                 None => return Err(format!("No metrics available for resource: {}", resource_name)),
@@ -224,7 +225,7 @@ impl PerformanceOptimizer {
     
     /// Optimize all resources
     pub fn optimize_all_resources(&self) -> HashMap<String, Result<OptimizationStatus, String>> {
-        let resources = self.resources.lock().unwrap();
+        let resources = self.resources.lock()?;
         let resource_names: Vec<String> = resources.keys().cloned().collect();
         
         drop(resources); // Release the lock
@@ -240,33 +241,33 @@ impl PerformanceOptimizer {
     
     /// Get resource configuration
     pub fn get_resource_config(&self, resource_name: &str) -> Option<OptimizationConfig> {
-        let resources = self.resources.lock().unwrap();
+        let resources = self.resources.lock()?;
         resources.get(resource_name).cloned()
     }
     
     /// Get resource metrics
     pub fn get_resource_metrics(&self, resource_name: &str) -> Option<PerformanceMetrics> {
-        let metrics = self.metrics.lock().unwrap();
+        let metrics = self.metrics.lock()?;
         metrics.get(resource_name).cloned()
     }
     
     /// Get all resource configurations
     pub fn get_all_resources(&self) -> Vec<OptimizationConfig> {
-        let resources = self.resources.lock().unwrap();
+        let resources = self.resources.lock()?;
         resources.values().cloned().collect()
     }
     
     /// Get all resource metrics
     pub fn get_all_metrics(&self) -> Vec<PerformanceMetrics> {
-        let metrics = self.metrics.lock().unwrap();
+        let metrics = self.metrics.lock()?;
         metrics.values().cloned().collect()
     }
     
     /// Get number of changes and resources
     pub fn get_stats(&self) -> (usize, usize, usize) {
-        let counter = self.input_counter.lock().unwrap();
-        let resources = self.resources.lock().unwrap();
-        let metrics = self.metrics.lock().unwrap();
+        let counter = self.input_counter.lock()?;
+        let resources = self.resources.lock()?;
+        let metrics = self.metrics.lock()?;
         
         (*counter, resources.len(), metrics.len())
     }
@@ -294,7 +295,7 @@ mod tests {
                 0.7,
                 1000.0,
                 Duration::from_millis(100),
-            ).unwrap();
+            )?;
         }
         
         // Check stats
@@ -318,7 +319,7 @@ mod tests {
             0.8,
             500.0,
             Duration::from_millis(50),
-        ).unwrap();
+        )?;
         
         // Add metrics
         let mut additional_metrics = HashMap::new();
@@ -331,15 +332,15 @@ mod tests {
             450.0, // Lower than target
             Duration::from_millis(60), // Higher than target
             additional_metrics,
-        ).unwrap();
+        )?;
         
         // Optimize the resource
         let result = optimizer.optimize_resource("database");
         assert!(result.is_ok());
-        assert_eq!(result.unwrap(), OptimizationStatus::Optimized);
+        assert_eq!(result?, OptimizationStatus::Optimized);
         
         // Verify the status
-        let config = optimizer.get_resource_config("database").unwrap();
+        let config = optimizer.get_resource_config("database")?;
         assert_eq!(config.status, OptimizationStatus::Optimized);
     }
 } 

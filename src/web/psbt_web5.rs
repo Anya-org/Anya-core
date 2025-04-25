@@ -1,3 +1,4 @@
+use std::error::Error;
 // ... existing code ...
 pub fn validate_web5_psbt(psbt: &Psbt) -> Result<()> {
     // Add Web5 specific validation

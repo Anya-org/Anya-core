@@ -1,3 +1,4 @@
+use std::error::Error;
 // Decentralized Web Node (DWN) Implementation
 // Provides storage and messaging capabilities for Web5
 // [AIR-012] Operational Reliability and [AIP-002] Modular Architecture
@@ -21,7 +22,7 @@ pub struct DWNConfig {
 }
 
 impl Default for DWNConfig {
-    fn default() -> Self {
+    fn default() -> Self  -> Result<(), Box<dyn Error>> {
         Self {
             endpoint: None,
             use_local_storage: true,
@@ -67,7 +68,7 @@ pub struct DWNClient {
 
 impl DWNClient {
     /// Create a new DWN client with the specified configuration
-    pub fn new(config: DWNConfig) -> Self {
+    pub fn new(config: DWNConfig) -> Self  -> Result<(), Box<dyn Error>> {
         Self {
             config,
             local_storage: Arc::new(Mutex::new(HashMap::new())),
@@ -76,12 +77,12 @@ impl DWNClient {
     }
     
     /// Set the identity DID for the client
-    pub fn set_identity(&mut self, did: &str) {
+    pub fn set_identity(&mut self, did: &str)  -> Result<(), Box<dyn Error>> {
         self.identity = Some(did.to_string());
     }
     
     /// Send a message to a DID through the DWN
-    pub fn send_message(&self, to: &str, protocol: &str, message_type: &str, data: &[u8]) -> Web5Result<String> {
+    pub fn send_message(&self, to: &str, protocol: &str, message_type: &str, data: &[u8]) -> Web5Result<String>  -> Result<(), Box<dyn Error>> {
         // Check if identity is set
         let from = self.identity.as_ref().ok_or_else(|| {
             Web5Error::Identity("Identity not set for DWN client".to_string())
@@ -113,7 +114,7 @@ impl DWNClient {
         
         // Store locally if configured
         if self.config.use_local_storage {
-            let mut storage = self.local_storage.lock().unwrap();
+            let mut storage = self.local_storage.lock()?;
             let message_for_storage = message.clone();
             storage.insert(id.clone(), message_for_storage);
         }
@@ -129,13 +130,13 @@ impl DWNClient {
     }
     
     /// Get messages for the identity DID
-    pub fn get_messages(&self, protocol: Option<&str>) -> Web5Result<Vec<DWNMessage>> {
+    pub fn get_messages(&self, protocol: Option<&str>) -> Web5Result<Vec<DWNMessage>>  -> Result<(), Box<dyn Error>> {
         // Check if identity is set
         let identity = self.identity.as_ref().ok_or_else(|| {
             Web5Error::Identity("Identity not set for DWN client".to_string())
         })?;
         
-        let storage = self.local_storage.lock().unwrap();
+        let storage = self.local_storage.lock()?;
         
         // Filter messages by recipient and optionally by protocol
         let messages: Vec<DWNMessage> = storage.values()
@@ -149,20 +150,20 @@ impl DWNClient {
 }
 
 /// Generate a random ID
-fn generate_id() -> String {
+fn generate_id() -> String  -> Result<(), Box<dyn Error>> {
     let now = SystemTime::now()
         .duration_since(UNIX_EPOCH)
-        .unwrap()
+        ?
         .as_secs();
     
     format!("{:x}", now)
 }
 
 /// Get current time in seconds
-fn current_time() -> u64 {
+fn current_time() -> u64  -> Result<(), Box<dyn Error>> {
     SystemTime::now()
         .duration_since(UNIX_EPOCH)
-        .unwrap()
+        ?
         .as_secs()
 }
 
@@ -293,7 +294,7 @@ pub struct DWNQueryPagination {
 
 impl DWNManager {
     /// Create a new DWN Manager
-    pub fn new(endpoints: Vec<String>) -> Self {
+    pub fn new(endpoints: Vec<String>) -> Self  -> Result<(), Box<dyn Error>> {
         Self {
             endpoints,
             records: Arc::new(Mutex::new(HashMap::new())),
@@ -301,7 +302,7 @@ impl DWNManager {
     }
     
     /// Store a record in a DWN
-    pub fn store_record(&self, record: DWNRecord) -> Web5Result<String> {
+    pub fn store_record(&self, record: DWNRecord) -> Web5Result<String>  -> Result<(), Box<dyn Error>> {
         // In a real implementation, this would store the record in a DWN
         // For this example, we're storing it locally
         
@@ -313,7 +314,7 @@ impl DWNManager {
     }
     
     /// Query records from a DWN
-    pub fn query_records(&self, owner: &str, schema: &str) -> Web5Result<Vec<DWNRecord>> {
+    pub fn query_records(&self, owner: &str, schema: &str) -> Web5Result<Vec<DWNRecord>>  -> Result<(), Box<dyn Error>> {
         // In a real implementation, this would query records from a DWN
         // For this example, we're querying locally
         
@@ -331,7 +332,7 @@ impl DWNManager {
     }
     
     /// Delete a record from a DWN
-    pub fn delete_record(&self, id: &str) -> Web5Result<()> {
+    pub fn delete_record(&self, id: &str) -> Web5Result<()>  -> Result<(), Box<dyn Error>> {
         // In a real implementation, this would delete the record from a DWN
         // For this example, we're deleting it locally
         
@@ -343,7 +344,7 @@ impl DWNManager {
     }
     
     /// Send a message to a DWN
-    pub fn send_message(&self, message: DWNMessage) -> Web5Result<DWNMessage> {
+    pub fn send_message(&self, message: DWNMessage) -> Web5Result<DWNMessage>  -> Result<(), Box<dyn Error>> {
         // In a real implementation, this would send the message to a DWN
         // For this example, we're handling it locally
         
@@ -434,7 +435,7 @@ impl DWNManager {
     }
     
     /// Create a record in a DWN
-    pub fn create_record(&self, owner: &str, schema: &str, data: serde_json::Value) -> Web5Result<String> {
+    pub fn create_record(&self, owner: &str, schema: &str, data: serde_json::Value) -> Web5Result<String>  -> Result<(), Box<dyn Error>> {
         let id = generate_random_id();
         
         let record = DWNRecord {
@@ -452,7 +453,7 @@ impl DWNManager {
     }
     
     /// Read a record from a DWN
-    pub fn read_record(&self, id: &str) -> Web5Result<DWNRecord> {
+    pub fn read_record(&self, id: &str) -> Web5Result<DWNRecord>  -> Result<(), Box<dyn Error>> {
         if let Ok(records) = self.records.lock() {
             if let Some(record) = records.get(id) {
                 return Ok(record.clone());
@@ -463,7 +464,7 @@ impl DWNManager {
     }
     
     /// Update a record in a DWN
-    pub fn update_record(&self, id: &str, data: serde_json::Value) -> Web5Result<()> {
+    pub fn update_record(&self, id: &str, data: serde_json::Value) -> Web5Result<()>  -> Result<(), Box<dyn Error>> {
         if let Ok(mut records) = self.records.lock() {
             if let Some(record) = records.get_mut(id) {
                 record.data = data;
@@ -476,7 +477,7 @@ impl DWNManager {
 }
 
 /// Generate a random ID
-fn generate_random_id() -> String {
+fn generate_random_id() -> String  -> Result<(), Box<dyn Error>> {
     use rand::Rng;
     let mut rng = rand::thread_rng();
     let id: u64 = rng.gen();
@@ -488,7 +489,7 @@ mod tests {
     use super::*;
     
     #[test]
-    fn test_store_record() {
+    fn test_store_record()  -> Result<(), Box<dyn Error>> {
         let dwn_manager = DWNManager::new(vec!["https://dwn.tbddev.org".to_string()]);
         
         let record = DWNRecord {
@@ -503,17 +504,17 @@ mod tests {
             attestations: Vec::new(),
         };
         
-        let id = dwn_manager.store_record(record.clone()).unwrap();
+        let id = dwn_manager.store_record(record.clone())?;
         assert_eq!(id, "record1");
         
-        let records = dwn_manager.query_records("did:ion:123", "https://schema.org/Person").unwrap();
+        let records = dwn_manager.query_records("did:ion:123", "https://schema.org/Person")?;
         assert_eq!(records.len(), 1);
         assert_eq!(records[0].id, "record1");
         assert_eq!(records[0].owner, "did:ion:123");
     }
     
     #[test]
-    fn test_create_and_read_record() {
+    fn test_create_and_read_record()  -> Result<(), Box<dyn Error>> {
         let dwn_manager = DWNManager::new(vec!["https://dwn.tbddev.org".to_string()]);
         
         let data = serde_json::json!({
@@ -521,16 +522,16 @@ mod tests {
             "email": "bob@example.com"
         });
         
-        let id = dwn_manager.create_record("did:ion:456", "https://schema.org/Person", data.clone()).unwrap();
+        let id = dwn_manager.create_record("did:ion:456", "https://schema.org/Person", data.clone())?;
         
-        let record = dwn_manager.read_record(&id).unwrap();
+        let record = dwn_manager.read_record(&id)?;
         assert_eq!(record.owner, "did:ion:456");
         assert_eq!(record.schema, "https://schema.org/Person");
         assert_eq!(record.data, data);
     }
     
     #[test]
-    fn test_update_record() {
+    fn test_update_record()  -> Result<(), Box<dyn Error>> {
         let dwn_manager = DWNManager::new(vec!["https://dwn.tbddev.org".to_string()]);
         
         let data = serde_json::json!({
@@ -538,21 +539,21 @@ mod tests {
             "email": "charlie@example.com"
         });
         
-        let id = dwn_manager.create_record("did:ion:789", "https://schema.org/Person", data.clone()).unwrap();
+        let id = dwn_manager.create_record("did:ion:789", "https://schema.org/Person", data.clone())?;
         
         let new_data = serde_json::json!({
             "name": "Charlie",
             "email": "charlie.updated@example.com"
         });
         
-        dwn_manager.update_record(&id, new_data.clone()).unwrap();
+        dwn_manager.update_record(&id, new_data.clone())?;
         
-        let record = dwn_manager.read_record(&id).unwrap();
+        let record = dwn_manager.read_record(&id)?;
         assert_eq!(record.data, new_data);
     }
     
     #[test]
-    fn test_delete_record() {
+    fn test_delete_record()  -> Result<(), Box<dyn Error>> {
         let dwn_manager = DWNManager::new(vec!["https://dwn.tbddev.org".to_string()]);
         
         let data = serde_json::json!({
@@ -560,9 +561,9 @@ mod tests {
             "email": "dave@example.com"
         });
         
-        let id = dwn_manager.create_record("did:ion:abc", "https://schema.org/Person", data.clone()).unwrap();
+        let id = dwn_manager.create_record("did:ion:abc", "https://schema.org/Person", data.clone())?;
         
-        dwn_manager.delete_record(&id).unwrap();
+        dwn_manager.delete_record(&id)?;
         
         let result = dwn_manager.read_record(&id);
         assert!(result.is_err());

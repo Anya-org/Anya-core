@@ -1,3 +1,4 @@
+use std::error::Error;
 // Verifiable Credentials Implementation
 // Provides W3C Verifiable Credentials functionality for Web5
 // [AIR-012] Operational Reliability and [AIP-002] Modular Architecture
@@ -71,7 +72,7 @@ pub struct CredentialManager {
 
 impl CredentialManager {
     /// Create a new credential manager
-    pub fn new(did_manager: DIDManager) -> Self {
+    pub fn new(did_manager: DIDManager) -> Self  -> Result<(), Box<dyn Error>> {
         Self {
             did_manager,
             credentials: HashMap::new(),
@@ -85,7 +86,7 @@ impl CredentialManager {
         subject_did: &str,
         credential_type: &str,
         claims: HashMap<String, serde_json::Value>,
-    ) -> Web5Result<VerifiableCredential> {
+    ) -> Web5Result<VerifiableCredential>  -> Result<(), Box<dyn Error>> {
         // Create credential ID
         let id = format!("urn:uuid:{}", generate_uuid());
         
@@ -123,7 +124,7 @@ impl CredentialManager {
     }
     
     /// Verify a credential
-    pub fn verify_credential(&self, credential: &VerifiableCredential) -> Web5Result<bool> {
+    pub fn verify_credential(&self, credential: &VerifiableCredential) -> Web5Result<bool>  -> Result<(), Box<dyn Error>> {
         // Check if proof exists
         let proof = match &credential.proof {
             Some(p) => p,
@@ -136,25 +137,25 @@ impl CredentialManager {
     }
     
     /// Store a credential
-    pub fn store_credential(&mut self, credential: VerifiableCredential) -> Web5Result<()> {
+    pub fn store_credential(&mut self, credential: VerifiableCredential) -> Web5Result<()>  -> Result<(), Box<dyn Error>> {
         self.credentials.insert(credential.id.clone(), credential);
         Ok(())
     }
     
     /// Get a credential by ID
-    pub fn get_credential(&self, id: &str) -> Web5Result<VerifiableCredential> {
+    pub fn get_credential(&self, id: &str) -> Web5Result<VerifiableCredential>  -> Result<(), Box<dyn Error>> {
         self.credentials.get(id).cloned().ok_or_else(|| {
             Web5Error::Credential(format!("Credential not found: {}", id))
         })
     }
     
     /// List all credentials
-    pub fn list_credentials(&self) -> Vec<&VerifiableCredential> {
+    pub fn list_credentials(&self) -> Vec<&VerifiableCredential>  -> Result<(), Box<dyn Error>> {
         self.credentials.values().collect()
     }
     
     /// Create a proof for a credential
-    fn create_proof(&self, credential: &VerifiableCredential, issuer_did: &str) -> Web5Result<CredentialProof> {
+    fn create_proof(&self, credential: &VerifiableCredential, issuer_did: &str) -> Web5Result<CredentialProof>  -> Result<(), Box<dyn Error>> {
         // In a real implementation, this would sign the credential
         // For this example, we create a placeholder proof
         
@@ -180,12 +181,12 @@ impl CredentialManager {
 }
 
 /// Generate a UUID
-fn generate_uuid() -> String {
+fn generate_uuid() -> String  -> Result<(), Box<dyn Error>> {
     use std::time::{SystemTime, UNIX_EPOCH};
     
     let now = SystemTime::now()
         .duration_since(UNIX_EPOCH)
-        .unwrap()
+        ?
         .as_secs();
     
     format!("{:x}-{:x}-{:x}-{:x}-{:x}", 
@@ -197,12 +198,12 @@ fn generate_uuid() -> String {
 }
 
 /// Get current date in ISO 8601 format
-fn current_iso_date() -> String {
+fn current_iso_date() -> String  -> Result<(), Box<dyn Error>> {
     use std::time::{SystemTime, UNIX_EPOCH};
     
     let now = SystemTime::now()
         .duration_since(UNIX_EPOCH)
-        .unwrap()
+        ?
         .as_secs();
     
     // Simplified ISO 8601 format for demonstration
@@ -215,7 +216,7 @@ mod tests {
     use crate::web5::identity::DIDManager;
     
     #[test]
-    fn test_issue_credential() {
+    fn test_issue_credential()  -> Result<(), Box<dyn Error>> {
         let did_manager = DIDManager::new("ion");
         let mut credential_manager = CredentialManager::new(did_manager);
         
@@ -232,7 +233,7 @@ mod tests {
             subject_did,
             "ExampleCredential",
             claims,
-        ).unwrap();
+        )?;
         
         // Verify basic properties
         assert_eq!(credential.issuer, issuer_did);

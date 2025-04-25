@@ -1,3 +1,4 @@
+use std::error::Error;
 // RGB Protocol Integration Module
 // Last Updated: 2025-03-06
 
@@ -170,7 +171,7 @@ impl ContractManager {
     /// Validate a contract
     pub async fn validate_contract(&self, contract_id: &str) -> Result<ValidationResult, RgbError> {
         // Implementation would validate contract based on its ID
-        let contracts = self.contracts.lock().unwrap();
+        let contracts = self.contracts.lock()?;
         
         if let Some(_contract) = contracts.get(contract_id) {
             Ok(ValidationResult::Valid)
@@ -181,7 +182,7 @@ impl ContractManager {
     
     /// Get a contract's info
     pub async fn get_contract_info(&self, contract_id: &str) -> Result<ContractInfo, RgbError> {
-        let contracts = self.contracts.lock().unwrap();
+        let contracts = self.contracts.lock()?;
         
         if let Some(contract) = contracts.get(contract_id) {
             Ok(contract.clone())
@@ -226,7 +227,7 @@ impl AssetManager {
             metadata: HashMap::new(),
         };
         
-        let mut assets = self.assets.lock().unwrap();
+        let mut assets = self.assets.lock()?;
         assets.insert(asset_id, asset.clone());
         
         Ok(asset)
@@ -254,7 +255,7 @@ impl AssetManager {
             metadata,
         };
         
-        let mut assets = self.assets.lock().unwrap();
+        let mut assets = self.assets.lock()?;
         assets.insert(asset_id, asset.clone());
         
         Ok(asset)
@@ -262,7 +263,7 @@ impl AssetManager {
     
     /// Get asset information
     pub async fn get_asset_info(&self, asset_id: &str) -> Result<AssetInfo, RgbError> {
-        let assets = self.assets.lock().unwrap();
+        let assets = self.assets.lock()?;
         
         if let Some(asset) = assets.get(asset_id) {
             Ok(asset.clone())
@@ -273,13 +274,13 @@ impl AssetManager {
     
     /// Get all assets owned by this client
     pub async fn get_owned_assets(&self) -> Result<Vec<AssetInfo>, RgbError> {
-        let assets = self.assets.lock().unwrap();
+        let assets = self.assets.lock()?;
         Ok(assets.values().cloned().collect())
     }
     
     /// Burn an amount of a fungible asset
     pub async fn burn_asset(&self, asset_id: &str, amount: u64) -> Result<(), RgbError> {
-        let mut assets = self.assets.lock().unwrap();
+        let mut assets = self.assets.lock()?;
         
         if let Some(asset) = assets.get_mut(asset_id) {
             if asset.asset_type == AssetType::Fungible && amount <= asset.total_supply {
@@ -330,7 +331,7 @@ impl SchemaValidator {
     
     /// Validate a schema
     pub fn validate_schema(&self, schema_id: &str) -> Result<bool, RgbError> {
-        let schemas = self.schemas.lock().unwrap();
+        let schemas = self.schemas.lock()?;
         
         if schemas.contains_key(schema_id) {
             Ok(true)
@@ -341,7 +342,7 @@ impl SchemaValidator {
     
     /// Get schema information
     pub fn get_schema_info(&self, schema_id: &str) -> Result<SchemaInfo, RgbError> {
-        let schemas = self.schemas.lock().unwrap();
+        let schemas = self.schemas.lock()?;
         
         if let Some(schema) = schemas.get(schema_id) {
             Ok(schema.clone())
@@ -387,7 +388,7 @@ impl TransactionManager {
             confirmed_at: None,
         };
         
-        let mut transfers = self.transfers.lock().unwrap();
+        let mut transfers = self.transfers.lock()?;
         transfers.insert(transfer_id, transfer.clone());
         
         Ok(transfer)
@@ -395,7 +396,7 @@ impl TransactionManager {
     
     /// Get transfer information
     pub async fn get_transfer_info(&self, transfer_id: &str) -> Result<TransferInfo, RgbError> {
-        let transfers = self.transfers.lock().unwrap();
+        let transfers = self.transfers.lock()?;
         
         if let Some(transfer) = transfers.get(transfer_id) {
             Ok(transfer.clone())
@@ -406,7 +407,7 @@ impl TransactionManager {
     
     /// Get all transfers
     pub async fn get_all_transfers(&self) -> Result<Vec<TransferInfo>, RgbError> {
-        let transfers = self.transfers.lock().unwrap();
+        let transfers = self.transfers.lock()?;
         Ok(transfers.values().cloned().collect())
     }
 }
@@ -576,7 +577,7 @@ pub mod tests {
         let config = RgbConfig::default();
         let client = RgbClient::new(config);
         
-        let asset = client.create_fungible_asset("TestToken", 1000000, 8).await.unwrap();
+        let asset = client.create_fungible_asset("TestToken", 1000000, 8).await?;
         
         assert_eq!(asset.name, "TestToken");
         assert_eq!(asset.asset_type, AssetType::Fungible);
@@ -590,7 +591,7 @@ pub mod tests {
         let client = RgbClient::new(config);
         
         let data = b"Test NFT Data";
-        let asset = client.create_non_fungible_asset("TestNFT", data).await.unwrap();
+        let asset = client.create_non_fungible_asset("TestNFT", data).await?;
         
         assert_eq!(asset.name, "TestNFT");
         assert_eq!(asset.asset_type, AssetType::NonFungible);
@@ -603,8 +604,8 @@ pub mod tests {
         let config = RgbConfig::default();
         let client = RgbClient::new(config);
         
-        let asset = client.create_fungible_asset("TransferToken", 1000000, 8).await.unwrap();
-        let transfer = client.transfer_asset(&asset.id, "recipient123", 50000).await.unwrap();
+        let asset = client.create_fungible_asset("TransferToken", 1000000, 8).await?;
+        let transfer = client.transfer_asset(&asset.id, "recipient123", 50000).await?;
         
         assert_eq!(transfer.asset_id, asset.id);
         assert_eq!(transfer.recipient_id, "recipient123");
@@ -617,10 +618,10 @@ pub mod tests {
         let config = RgbConfig::default();
         let client = RgbClient::new(config);
         
-        let asset = client.create_fungible_asset("BurnToken", 1000000, 8).await.unwrap();
-        client.burn_asset(&asset.id, 50000).await.unwrap();
+        let asset = client.create_fungible_asset("BurnToken", 1000000, 8).await?;
+        client.burn_asset(&asset.id, 50000).await?;
         
-        let updated_asset = client.get_asset_info(&asset.id).await.unwrap();
+        let updated_asset = client.get_asset_info(&asset.id).await?;
         assert_eq!(updated_asset.total_supply, 950000);
     }
     
@@ -639,11 +640,11 @@ pub mod tests {
         let config = RgbConfig::default();
         let client = RgbClient::new(config);
         
-        client.create_fungible_asset("Token1", 1000000, 8).await.unwrap();
-        client.create_fungible_asset("Token2", 2000000, 8).await.unwrap();
-        client.create_non_fungible_asset("NFT1", b"Test NFT Data").await.unwrap();
+        client.create_fungible_asset("Token1", 1000000, 8).await?;
+        client.create_fungible_asset("Token2", 2000000, 8).await?;
+        client.create_non_fungible_asset("NFT1", b"Test NFT Data").await?;
         
-        let assets = client.get_owned_assets().await.unwrap();
+        let assets = client.get_owned_assets().await?;
         assert_eq!(assets.len(), 3);
     }
 } 

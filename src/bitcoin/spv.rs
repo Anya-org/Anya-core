@@ -1,3 +1,4 @@
+use std::error::Error;
 //! Bitcoin SPV (Simplified Payment Verification) Implementation
 //! [AIR-3][AIS-3][BPC-3][AIT-3][RES-3]
 //!
@@ -285,11 +286,11 @@ mod tests {
         let right_hex = "1b4741e858a7b7c0a851a35c43858bc8902c0a91b5bd7043b9a27e8b00e2a8e2";
         let expected_parent_hex = "eb42a05772f296e9fe8a7f0d8a7c9abad734cc7dd31799a2b12a728a5d4ad891";
         
-        let left = TxMerkleNode::from_hex(left_hex).unwrap();
-        let right = TxMerkleNode::from_hex(right_hex).unwrap();
-        let expected_parent = TxMerkleNode::from_hex(expected_parent_hex).unwrap();
+        let left = TxMerkleNode::from_hex(left_hex)?;
+        let right = TxMerkleNode::from_hex(right_hex)?;
+        let expected_parent = TxMerkleNode::from_hex(expected_parent_hex)?;
         
-        let computed_parent = compute_merkle_parent(&left, &right).unwrap();
+        let computed_parent = compute_merkle_parent(&left, &right)?;
         assert_eq!(computed_parent, expected_parent);
     }
     
@@ -300,7 +301,7 @@ mod tests {
         
         // Create a sample transaction ID
         let tx_id_hex = "b67e5c13dd78c212e64e2fa8d153c6f6a5cc741a1ec9c9fb3045f9854c881ae4";
-        let tx_id = Txid::from_hex(tx_id_hex).unwrap();
+        let tx_id = Txid::from_hex(tx_id_hex)?;
         
         // Create a sample merkle path (2 nodes)
         let merkle_path_hex = [
@@ -309,15 +310,15 @@ mod tests {
         ];
         
         let merkle_path = merkle_path_hex.iter()
-            .map(|h| TxMerkleNode::from_hex(h).unwrap())
+            .map(|h| TxMerkleNode::from_hex(h)?)
             .collect::<Vec<_>>();
         
         // The expected merkle root
         let expected_root_hex = "eb98e9a0a41c33a68f53cf547ba78f349c6522f2c41ccec2934e3b324d0a67e2";
-        let expected_root = TxMerkleNode::from_hex(expected_root_hex).unwrap();
+        let expected_root = TxMerkleNode::from_hex(expected_root_hex)?;
         
         // Verify the proof (assuming tx_index = 0)
-        let computed_root = verify_merkle_proof(&tx_id, &merkle_path, 0).unwrap();
+        let computed_root = verify_merkle_proof(&tx_id, &merkle_path, 0)?;
         
         // Verify that the computed root matches the expected root
         assert_eq!(computed_root, expected_root);
@@ -330,7 +331,7 @@ mod tests {
         
         // Create a sample transaction ID
         let tx_id_hex = "b67e5c13dd78c212e64e2fa8d153c6f6a5cc741a1ec9c9fb3045f9854c881ae4";
-        let tx_id = Txid::from_hex(tx_id_hex).unwrap();
+        let tx_id = Txid::from_hex(tx_id_hex)?;
         
         // Create a sample merkle path (2 nodes)
         let merkle_path_hex = [
@@ -339,12 +340,12 @@ mod tests {
         ];
         
         let merkle_path = merkle_path_hex.iter()
-            .map(|h| TxMerkleNode::from_hex(h).unwrap())
+            .map(|h| TxMerkleNode::from_hex(h)?)
             .collect::<Vec<_>>();
         
         // The merkle root that will be included in the block header
         let root_hex = "eb98e9a0a41c33a68f53cf547ba78f349c6522f2c41ccec2934e3b324d0a67e2";
-        let root = TxMerkleNode::from_hex(root_hex).unwrap();
+        let root = TxMerkleNode::from_hex(root_hex)?;
         
         // Create a minimal block header with just the merkle root
         let mut header = BlockHeader::default();
@@ -354,7 +355,7 @@ mod tests {
         let proof = SpvProof::new(tx_id, None, header, merkle_path, 0);
         
         // Verify the proof
-        let result = proof.verify().unwrap();
+        let result = proof.verify()?;
         assert!(result);
     }
 } 

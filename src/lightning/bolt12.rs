@@ -1,3 +1,4 @@
+use std::error::Error;
 // BOLT 12 Implementation (Offers Protocol)
 use lightning::offers::offer::Offer;
 use lightning::offers::parse::Bolt12ParseError;
@@ -30,7 +31,7 @@ impl Bolt12Offer {
 
     pub fn serialize(&self) -> Vec<u8> {
         let mut buffer = Vec::new();
-        self.inner.write(&mut buffer).unwrap();
+        self.inner.write(&mut buffer)?;
         buffer
     }
 

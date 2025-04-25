@@ -1,3 +1,4 @@
+use std::error::Error;
 // RSK (Rootstock) Integration Module
 // Last Updated: 2025-03-06
 
@@ -210,7 +211,7 @@ impl NodeConnector {
             size: 1000,
         };
         
-        let mut last_block = self.last_block.lock().unwrap();
+        let mut last_block = self.last_block.lock()?;
         *last_block = Some(block.clone());
         
         Ok(block)
@@ -259,7 +260,7 @@ impl BridgeInterface {
             rsk_tx_hash: None,
         };
         
-        let mut peg_ins = self.peg_ins.lock().unwrap();
+        let mut peg_ins = self.peg_ins.lock()?;
         peg_ins.insert(peg_in_id, peg_in.clone());
         
         Ok(peg_in)
@@ -283,7 +284,7 @@ impl BridgeInterface {
             rsk_tx_hash: None,
         };
         
-        let mut peg_outs = self.peg_outs.lock().unwrap();
+        let mut peg_outs = self.peg_outs.lock()?;
         peg_outs.insert(peg_out_id, peg_out.clone());
         
         Ok(peg_out)
@@ -291,7 +292,7 @@ impl BridgeInterface {
     
     /// Get peg-in information
     pub async fn get_peg_in_info(&self, peg_in_id: &str) -> Result<PegInInfo, RskError> {
-        let peg_ins = self.peg_ins.lock().unwrap();
+        let peg_ins = self.peg_ins.lock()?;
         
         if let Some(peg_in) = peg_ins.get(peg_in_id) {
             Ok(peg_in.clone())
@@ -302,7 +303,7 @@ impl BridgeInterface {
     
     /// Get peg-out information
     pub async fn get_peg_out_info(&self, peg_out_id: &str) -> Result<PegOutInfo, RskError> {
-        let peg_outs = self.peg_outs.lock().unwrap();
+        let peg_outs = self.peg_outs.lock()?;
         
         if let Some(peg_out) = peg_outs.get(peg_out_id) {
             Ok(peg_out.clone())
@@ -353,7 +354,7 @@ impl SmartContractCaller {
             timestamp: chrono::Utc::now(),
         };
         
-        let mut contract_calls = self.contract_calls.lock().unwrap();
+        let mut contract_calls = self.contract_calls.lock()?;
         contract_calls.insert(call_id, result.clone());
         
         Ok(result)
@@ -377,7 +378,7 @@ impl SmartContractCaller {
             deploy_tx_hash: format!("0x{}", uuid::Uuid::new_v4()),
         };
         
-        let mut deployed_contracts = self.deployed_contracts.lock().unwrap();
+        let mut deployed_contracts = self.deployed_contracts.lock()?;
         deployed_contracts.insert(contract_address.clone(), contract_info);
         
         let result = ContractDeployResult {
@@ -393,7 +394,7 @@ impl SmartContractCaller {
     
     /// Get contract information
     pub fn get_contract_info(&self, contract_address: &str) -> Result<ContractInfo, RskError> {
-        let deployed_contracts = self.deployed_contracts.lock().unwrap();
+        let deployed_contracts = self.deployed_contracts.lock()?;
         
         if let Some(contract) = deployed_contracts.get(contract_address) {
             Ok(contract.clone())
@@ -442,7 +443,7 @@ impl TransactionManager {
             timestamp: chrono::Utc::now(),
         };
         
-        let mut transactions = self.transactions.lock().unwrap();
+        let mut transactions = self.transactions.lock()?;
         transactions.insert(tx_hash.clone(), transaction.clone());
         
         Ok(transaction)
@@ -450,7 +451,7 @@ impl TransactionManager {
     
     /// Get transaction information
     pub async fn get_transaction(&self, tx_hash: &str) -> Result<TransactionInfo, RskError> {
-        let transactions = self.transactions.lock().unwrap();
+        let transactions = self.transactions.lock()?;
         
         if let Some(transaction) = transactions.get(tx_hash) {
             Ok(transaction.clone())
@@ -692,7 +693,7 @@ pub mod tests {
         let config = RskConfig::default();
         let client = RskClient::new(config);
         
-        let peg_in = client.peg_in("1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa", 0.1).await.unwrap();
+        let peg_in = client.peg_in("1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa", 0.1).await?;
         
         assert_eq!(peg_in.btc_address, "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa");
         assert_eq!(peg_in.amount, 0.1);
@@ -706,7 +707,7 @@ pub mod tests {
         let config = RskConfig::default();
         let client = RskClient::new(config);
         
-        let peg_out = client.peg_out("1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa", 0.1).await.unwrap();
+        let peg_out = client.peg_out("1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa", 0.1).await?;
         
         assert_eq!(peg_out.btc_address, "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa");
         assert_eq!(peg_out.amount, 0.1);
@@ -724,7 +725,7 @@ pub mod tests {
             "0x1234567890123456789012345678901234567890",
             "balanceOf",
             vec!["0x1234567890123456789012345678901234567890".to_string()]
-        ).await.unwrap();
+        ).await?;
         
         assert_eq!(result.method, "balanceOf");
         assert_eq!(result.status, CallStatus::Success);
@@ -738,7 +739,7 @@ pub mod tests {
         
         let bytecode = "0x60806040526000805534801561001457600080fd5b5060cc806100236000396000f3fe6080604052348015600f57600080fd5b506004361060325760003560e01c806306661abd1460375780634f2be91f146053575b600080fd5b603d605b565b6040518082815260200191505060405180910390f35b60596061565b005b60005481565b6000808154809291906001019190505550560000000000000000000000000000000000000000000000000000000000";
         
-        let result = client.deploy_contract(bytecode, vec![]).await.unwrap();
+        let result = client.deploy_contract(bytecode, vec![]).await?;
         
         assert!(!result.contract_address.is_empty());
         assert!(!result.transaction_hash.is_empty());
@@ -750,7 +751,7 @@ pub mod tests {
         let config = RskConfig::default();
         let client = RskClient::new(config);
         
-        let tx = client.transfer_rbtc("0x1234567890123456789012345678901234567890", 0.1).await.unwrap();
+        let tx = client.transfer_rbtc("0x1234567890123456789012345678901234567890", 0.1).await?;
         
         assert_eq!(tx.to, "0x1234567890123456789012345678901234567890");
         assert_eq!(tx.value, 0.1);
@@ -762,7 +763,7 @@ pub mod tests {
         let config = RskConfig::default();
         let client = RskClient::new(config);
         
-        let block = client.get_block(1000000).await.unwrap();
+        let block = client.get_block(1000000).await?;
         
         assert_eq!(block.number, 1000000);
         assert!(!block.hash.is_empty());

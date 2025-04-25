@@ -1,3 +1,4 @@
+use std::error::Error;
 // src/bitcoin/dlc/contract.rs
 
 use std::collections::HashMap;
@@ -78,7 +79,7 @@ pub struct Contract {
 
 impl Contract {
     /// Creates a new contract from the given parameters
-    pub fn new(descriptor: ContractDescriptor) -> Self {
+    pub fn new(descriptor: ContractDescriptor) -> Self  -> Result<(), Box<dyn Error>> {
         let id = uuid::Uuid::new_v4().to_string();
         let now = Utc::now();
         
@@ -98,31 +99,31 @@ impl Contract {
     }
     
     /// Validates that the contract is well-formed
-    pub fn validate(&self) -> AnyaResult<()> {
+    pub fn validate(&self) -> AnyaResult<()>  -> Result<(), Box<dyn Error>> {
         // Check if the contract has valid parameters
         // Implementation goes here
         Ok(())
     }
     
     /// Adds an oracle announcement to the contract
-    pub fn add_oracle_announcement(&mut self, announcement: OracleAnnouncement) {
+    pub fn add_oracle_announcement(&mut self, announcement: OracleAnnouncement)  -> Result<(), Box<dyn Error>> {
         self.oracle_announcements.push(announcement);
         self.updated_at = Utc::now();
     }
     
     /// Updates the state of the contract
-    pub fn update_state(&mut self, new_state: ContractState) {
+    pub fn update_state(&mut self, new_state: ContractState)  -> Result<(), Box<dyn Error>> {
         self.state = new_state;
         self.updated_at = Utc::now();
     }
     
     /// Checks if the contract is ready for execution
-    pub fn is_ready_for_execution(&self) -> bool {
+    pub fn is_ready_for_execution(&self) -> bool  -> Result<(), Box<dyn Error>> {
         self.state == ContractState::Funded && !self.oracle_announcements.is_empty()
     }
     
     /// Gets the total collateral amount in satoshis
-    pub fn total_collateral(&self) -> u64 {
+    pub fn total_collateral(&self) -> u64  -> Result<(), Box<dyn Error>> {
         self.descriptor.offer_collateral + self.descriptor.accept_collateral
     }
 }

@@ -1,3 +1,4 @@
+use std::error::Error;
 use crate::infrastructure::high_availability::{ClusterStatus, HaError, FailoverPhase};
 use crate::infrastructure::high_availability::config::HighAvailabilityConfig;
 use std::collections::HashMap;
@@ -185,7 +186,7 @@ impl ClusterManager {
         let new_leader = active_nodes.iter()
             .min_by_key(|n| &n.id)
             .map(|n| n.id.clone())
-            .unwrap();
+            ?;
             
         // Update leader
         let mut leader = self.current_leader.write().await;

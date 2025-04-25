@@ -1,3 +1,4 @@
+use std::error::Error;
 /// Extensions Module
 /// 
 /// This module provides extension capabilities for Anya Core,
@@ -6,7 +7,7 @@
 #[cfg(test)]
 mod tests {
     #[test]
-    fn it_works() {
+    fn it_works()  -> Result<(), Box<dyn Error>> {
         assert!(true);
     }
 } 

@@ -1,3 +1,4 @@
+use std::error::Error;
 // Layer 2 Integrations
 // Last Updated: 2025-03-06
 
@@ -37,7 +38,7 @@ pub enum Layer2Type {
 }
 
 impl std::fmt::Display for Layer2Type {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result  -> Result<(), Box<dyn Error>> {
         match self {
             Layer2Type::Bob => write!(f, "BOB"),
             Layer2Type::Lightning => write!(f, "Lightning Network"),
@@ -64,7 +65,7 @@ pub struct Layer2ManagerConfig {
 }
 
 impl Default for Layer2ManagerConfig {
-    fn default() -> Self {
+    fn default() -> Self  -> Result<(), Box<dyn Error>> {
         Self {
             bob_config: Some(bob::BobConfig::default()),
             lightning_config: None,
@@ -127,7 +128,7 @@ pub struct Layer2Manager {
 
 impl Layer2Manager {
     /// Create a new Layer 2 manager with the provided configuration
-    pub fn new(config: Layer2ManagerConfig) -> Self {
+    pub fn new(config: Layer2ManagerConfig) -> Self  -> Result<(), Box<dyn Error>> {
         let bob_client = if config.enabled_solutions.contains(&Layer2Type::Bob) {
             config.bob_config.clone().map(bob::BobClient::new)
         } else {
@@ -151,7 +152,7 @@ impl Layer2Manager {
     }
 
     /// Get a list of supported Layer 2 solution types
-    pub fn get_supported_types(&self) -> Vec<Layer2Type> {
+    pub fn get_supported_types(&self) -> Vec<Layer2Type>  -> Result<(), Box<dyn Error>> {
         vec![
             Layer2Type::Bob,
             Layer2Type::Lightning,
@@ -161,17 +162,17 @@ impl Layer2Manager {
     }
 
     /// Get a list of enabled Layer 2 solution types
-    pub fn get_enabled_types(&self) -> Vec<Layer2Type> {
+    pub fn get_enabled_types(&self) -> Vec<Layer2Type>  -> Result<(), Box<dyn Error>> {
         self.config.enabled_solutions.clone()
     }
 
     /// Check if a Layer 2 solution type is enabled
-    pub fn is_enabled(&self, l2_type: Layer2Type) -> bool {
+    pub fn is_enabled(&self, l2_type: Layer2Type) -> bool  -> Result<(), Box<dyn Error>> {
         self.config.enabled_solutions.contains(&l2_type)
     }
 
     /// Get the status of a specific Layer 2 solution
-    pub async fn get_status(&self, l2_type: Layer2Type) -> Layer2Result<Layer2Status> {
+    pub async fn get_status(&self, l2_type: Layer2Type) -> Layer2Result<Layer2Status>  -> Result<(), Box<dyn Error>> {
         if !self.is_enabled(l2_type) {
             return Err(Layer2ManagerError::SolutionNotEnabled(l2_type.to_string()));
         }
@@ -219,7 +220,7 @@ impl Layer2Manager {
     }
 
     /// Get the status of all enabled Layer 2 solutions
-    pub async fn get_all_status(&self) -> Vec<Layer2Result<Layer2Status>> {
+    pub async fn get_all_status(&self) -> Vec<Layer2Result<Layer2Status>>  -> Result<(), Box<dyn Error>> {
         let mut results = Vec::new();
         
         for l2_type in &self.config.enabled_solutions {
@@ -230,12 +231,12 @@ impl Layer2Manager {
     }
 
     /// Get the BOB client if enabled
-    pub fn bob_client(&self) -> Option<&bob::BobClient> {
+    pub fn bob_client(&self) -> Option<&bob::BobClient>  -> Result<(), Box<dyn Error>> {
         self.bob_client.as_ref()
     }
 
     /// Get the Lightning client if enabled
-    pub fn lightning_client(&self) -> Option<&lightning::LightningClient> {
+    pub fn lightning_client(&self) -> Option<&lightning::LightningClient>  -> Result<(), Box<dyn Error>> {
         self.lightning_client.as_ref()
     }
 }
@@ -313,7 +314,7 @@ pub trait Layer2Protocol {
 
 /// Transaction status for Layer 2 protocols
 #[derive(Debug, Clone, PartialEq)]
-pub enum TransactionStatus {
+pub enum TransactionStatus  -> Result<(), Box<dyn Error>> {
     /// Transaction is pending
     Pending,
     /// Transaction is confirmed
@@ -420,7 +421,7 @@ pub enum ValidationResult {
 // Add Default implementations for the Layer2 types
 
 impl Default for ProtocolState {
-    fn default() -> Self {
+    fn default() -> Self  -> Result<(), Box<dyn Error>> {
         Self {
             initialized: false,
             connected: false,
@@ -432,7 +433,7 @@ impl Default for ProtocolState {
 }
 
 impl Default for AssetParams {
-    fn default() -> Self {
+    fn default() -> Self  -> Result<(), Box<dyn Error>> {
         Self {
             name: String::new(),
             symbol: String::new(),
@@ -444,7 +445,7 @@ impl Default for AssetParams {
 }
 
 impl Default for AssetTransfer {
-    fn default() -> Self {
+    fn default() -> Self  -> Result<(), Box<dyn Error>> {
         Self {
             asset_id: String::new(),
             from: String::new(),
@@ -456,7 +457,7 @@ impl Default for AssetTransfer {
 }
 
 impl Default for TransferResult {
-    fn default() -> Self {
+    fn default() -> Self  -> Result<(), Box<dyn Error>> {
         Self {
             tx_id: String::new(),
             asset_id: String::new(),
@@ -467,7 +468,7 @@ impl Default for TransferResult {
 }
 
 impl Default for Proof {
-    fn default() -> Self {
+    fn default() -> Self  -> Result<(), Box<dyn Error>> {
         Self {
             id: String::new(),
             proof_type: String::new(),
@@ -478,13 +479,13 @@ impl Default for Proof {
 }
 
 impl Default for VerificationResult {
-    fn default() -> Self {
+    fn default() -> Self  -> Result<(), Box<dyn Error>> {
         Self::Valid
     }
 }
 
 impl Default for ValidationResult {
-    fn default() -> Self {
+    fn default() -> Self  -> Result<(), Box<dyn Error>> {
         Self::Valid
     }
 } 

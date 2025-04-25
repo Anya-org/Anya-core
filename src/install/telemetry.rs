@@ -1,3 +1,4 @@
+use std::error::Error;
 use log::{info, warn, error, LevelFilter};
 use log4rs::{
     append::{console::ConsoleAppender, file::FileAppender},

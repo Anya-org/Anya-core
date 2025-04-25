@@ -1,3 +1,4 @@
+use std::error::Error;
 pub struct TestManager {
     common: HashMap<String, Box<dyn Fn() -> Result<bool>>>,
     modules: HashMap<String, Box<dyn Fn() -> Result<HashMap<String, bool>>>>,

@@ -1,3 +1,4 @@
+use std::error::Error;
 use std::sync::{Arc, Mutex};
 use log::{info, warn, error};
 use serde::{Deserialize, Serialize};
@@ -439,7 +440,7 @@ mod tests {
         
         // Verify success
         assert!(result.is_ok());
-        assert!(result.unwrap());
+        assert!(result?);
         
         // Verify metrics
         let metrics = manager.get_metrics();
@@ -449,3 +450,4 @@ mod tests {
         assert_eq!(metrics.compliance_rate(), 100.0);
     }
 }
+

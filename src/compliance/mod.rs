@@ -1,5 +1,6 @@
+use std::error::Error;
 /// Verifies compliance with the BPC-3 (Bitcoin Protocol Compliance level 3) standard
-pub fn verify_bpc3() {
+pub fn verify_bpc3()  -> Result<(), Box<dyn Error>> {
     info!("Verifying BPC-3 compliance...");
     let verifier = BdfComplianceVerifier::new();
     
@@ -16,7 +17,7 @@ pub fn verify_bpc3() {
 }
 
 /// Verifies compliance with the DAO-4 (DAO Governance Compliance level 4) standard
-pub fn verify_dao4() {
+pub fn verify_dao4()  -> Result<(), Box<dyn Error>> {
     info!("Verifying DAO-4 compliance...");
     let verifier = DaoComplianceVerifier::new();
     
@@ -33,7 +34,7 @@ pub fn verify_dao4() {
 }
 
 /// Verifies compliance with the AIS-3 (AI Security level 3) standard
-pub fn verify_ais3() {
+pub fn verify_ais3()  -> Result<(), Box<dyn Error>> {
     info!("Verifying AIS-3 compliance...");
     let verifier = AiSecurityVerifier::new();
     
@@ -50,7 +51,7 @@ pub fn verify_ais3() {
 }
 
 /// Verifies compliance with all standards
-pub fn verify_all() {
+pub fn verify_all()  -> Result<(), Box<dyn Error>> {
     verify_bpc3();
     verify_dao4();
     verify_ais3();
@@ -58,7 +59,7 @@ pub fn verify_all() {
     // Generate comprehensive compliance report
     let report_dir = "reports";
     if !std::path::Path::new(report_dir).exists() {
-        std::fs::create_dir_all(report_dir).expect("Failed to create reports directory");
+        std::fs::create_dir_all(report_dir)?;
     }
     
     let report_content = format!(
@@ -67,7 +68,7 @@ pub fn verify_all() {
     );
     
     std::fs::write(format!("{}/compliance_report.md", report_dir), report_content)
-        .expect("Failed to write compliance report");
+        ?;
     
     info!("Comprehensive compliance report generated in {}/compliance_report.md", report_dir);
 }
@@ -80,7 +81,7 @@ pub struct ComplianceCheck {
 }
 
 impl AnyaCore {
-    pub fn verify_transaction_compliance(&self, tx: &Transaction) -> ComplianceCheck {
+    pub fn verify_transaction_compliance(&self, tx: &Transaction) -> ComplianceCheck  -> Result<(), Box<dyn Error>> {
         ComplianceCheck {
             bip341_verified: verify_bip341(&tx),
             psbt_v2_compliant: check_psbt_version(&tx, 2),

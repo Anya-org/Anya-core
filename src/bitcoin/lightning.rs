@@ -1,3 +1,4 @@
+use std::error::Error;
 // Lightning Network Implementation for Bitcoin Module
 // Implements Lightning Network functionality for Bitcoin operations
 // as per Bitcoin Development Framework v2.5 requirements
@@ -391,7 +392,7 @@ impl LightningNode {
         let pubkey = LightningPublicKey::from_str(node_pubkey)
             .map_err(|e| AnyaError::Bitcoin(format!("Invalid node pubkey: {}", e)))?;
             
-        let mut state = self.state.lock().unwrap();
+        let mut state = self.state.lock()?;
         
         // Check if already connected
         if state.peers.contains_key(node_pubkey) {
@@ -416,7 +417,7 @@ impl LightningNode {
     
     /// List connected peers
     pub fn list_peers(&self) -> AnyaResult<Vec<PeerInfo>> {
-        let state = self.state.lock().unwrap();
+        let state = self.state.lock()?;
         Ok(state.peers.values().cloned().collect())
     }
     
@@ -431,7 +432,7 @@ impl LightningNode {
         let pubkey = LightningPublicKey::from_str(node_pubkey)
             .map_err(|e| AnyaError::Bitcoin(format!("Invalid node pubkey: {}", e)))?;
             
-        let mut state = self.state.lock().unwrap();
+        let mut state = self.state.lock()?;
         
         // Check if connected to peer
         if !state.peers.contains_key(node_pubkey) {
@@ -472,13 +473,13 @@ impl LightningNode {
     
     /// List all channels
     pub fn list_channels(&self) -> AnyaResult<Vec<Channel>> {
-        let state = self.state.lock().unwrap();
+        let state = self.state.lock()?;
         Ok(state.channels.values().cloned().collect())
     }
     
     /// Close a channel
     pub fn close_channel(&self, channel_id: &str, force: bool) -> AnyaResult<LightningTxid> {
-        let mut state = self.state.lock().unwrap();
+        let mut state = self.state.lock()?;
         
         // Find channel
         let channel = state.channels.get_mut(channel_id)
@@ -503,7 +504,7 @@ impl LightningNode {
         description: &str,
         expiry: Option<u32>,
     ) -> AnyaResult<Invoice> {
-        let mut state = self.state.lock().unwrap();
+        let mut state = self.state.lock()?;
         let now = current_time();
         
         // Generate payment hash
@@ -550,7 +551,7 @@ impl LightningNode {
     
     /// Pay an invoice
     pub fn pay_invoice(&self, bolt11: &str, amount_msat: Option<u64>) -> AnyaResult<Payment> {
-        let mut state = self.state.lock().unwrap();
+        let mut state = self.state.lock()?;
         let now = current_time();
         
         // Parse invoice (simplified)
@@ -602,7 +603,7 @@ impl LightningNode {
     
     /// Get a payment by hash
     pub fn get_payment(&self, payment_hash: &str) -> AnyaResult<Option<Payment>> {
-        let state = self.state.lock().unwrap();
+        let state = self.state.lock()?;
         
         // Find payment by hash
         let payment = state.payments.values()
@@ -614,7 +615,7 @@ impl LightningNode {
     
     /// List all payments
     pub fn list_payments(&self) -> AnyaResult<Vec<Payment>> {
-        let state = self.state.lock().unwrap();
+        let state = self.state.lock()?;
         Ok(state.payments.values().cloned().collect())
     }
 }
@@ -632,7 +633,7 @@ impl BitcoinLightningBridge {
     
     /// Initialize the bridge with the current block height
     pub fn init(&self, current_height: u32) -> AnyaResult<()> {
-        let mut last_height = self.last_scanned_height.lock().unwrap();
+        let mut last_height = self.last_scanned_height.lock()?;
         *last_height = current_height;
         Ok(())
     }
@@ -674,7 +675,7 @@ impl BitcoinLightningBridge {
             created_at: current_time(),
         };
         
-        let mut funding_addresses = self.funding_addresses.lock().unwrap();
+        let mut funding_addresses = self.funding_addresses.lock()?;
         funding_addresses.insert(address.clone(), funding_address);
         
         Ok(address)
@@ -709,7 +710,7 @@ impl BitcoinLightningBridge {
         channel_id: &str,
         closing_txid: LightningTxid,
     ) -> AnyaResult<()> {
-        let mut channel_txs = self.channel_transactions.lock().unwrap();
+        let mut channel_txs = self.channel_transactions.lock()?;
         
         match channel_txs.get_mut(channel_id) {
             Some(tx_info) => {
@@ -724,13 +725,13 @@ impl BitcoinLightningBridge {
     
     /// Get a channel transaction by ID
     pub fn get_channel_transaction(&self, channel_id: &str) -> AnyaResult<Option<ChannelTransaction>> {
-        let channel_txs = self.channel_transactions.lock().unwrap();
+        let channel_txs = self.channel_transactions.lock()?;
         Ok(channel_txs.get(channel_id).cloned())
     }
     
     /// List all channel transactions
     pub fn list_channel_transactions(&self) -> AnyaResult<Vec<ChannelTransaction>> {
-        let channel_txs = self.channel_transactions.lock().unwrap();
+        let channel_txs = self.channel_transactions.lock()?;
         Ok(channel_txs.values().cloned().collect())
     }
 }

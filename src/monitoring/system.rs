@@ -1,3 +1,4 @@
+use std::error::Error;
 use std::collections::HashMap;
 use std::sync::Arc;
 use anyhow::Result;
@@ -55,8 +56,8 @@ struct NetworkMetric {
 
 impl NetworkMetric {
     pub fn new(registry: &Registry) -> Self {
-        let gauge = Gauge::new("network_health", "Network health status").unwrap();
-        registry.register(Box::new(gauge.clone())).unwrap();
+        let gauge = Gauge::new("network_health", "Network health status")?;
+        registry.register(Box::new(gauge.clone()))?;
         Self { gauge }
     }
 }
@@ -82,13 +83,13 @@ struct FeeMetric {
 
 impl FeeMetric {
     pub fn new(registry: &Registry) -> Self {
-        let gauge = Gauge::new("fee_rate", "Current fee rate").unwrap();
+        let gauge = Gauge::new("fee_rate", "Current fee rate")?;
         let histogram_opts = HistogramOpts::new("fee_rate_distribution", "Fee rate distribution")
             .buckets(vec![1.0, 2.0, 3.0, 4.0, 5.0]);
-        let histogram = Histogram::with_opts(histogram_opts).unwrap();
+        let histogram = Histogram::with_opts(histogram_opts)?;
         
-        registry.register(Box::new(gauge.clone())).unwrap();
-        registry.register(Box::new(histogram.clone())).unwrap();
+        registry.register(Box::new(gauge.clone()))?;
+        registry.register(Box::new(histogram.clone()))?;
         
         Self { gauge, histogram }
     }
@@ -108,3 +109,4 @@ impl Metric for FeeMetric {
         "Current fee rate and distribution"
     }
 }
+

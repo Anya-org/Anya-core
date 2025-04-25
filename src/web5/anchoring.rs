@@ -1,3 +1,4 @@
+use std::error::Error;
 pub async fn validate_testnet_anchoring(&self) -> Result<()> {
     let network = self.bitcoin_config.network();
     if network != Network::Testnet {

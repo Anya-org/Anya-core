@@ -1,3 +1,4 @@
+use std::error::Error;
 // src/bitcoin/sidechains/liquid/client.rs
 
 //! Liquid client implementation
@@ -714,7 +715,7 @@ impl LiquidClientTrait for LiquidClient {
             .map_err(|e| LiquidError::RpcError(format!("Failed to get block: {}", e)))?;
             
         // Parse block
-        elements::encode::deserialize(&hex::decode(block_hex).unwrap())
+        elements::encode::deserialize(&hex::decode(block_hex)?)
             .map_err(|e| LiquidError::EncodingError(format!("Failed to decode block: {}", e)))
     }
     
@@ -728,7 +729,7 @@ impl LiquidClientTrait for LiquidClient {
             .map_err(|e| LiquidError::RpcError(format!("Failed to get transaction: {}", e)))?;
             
         // Parse transaction
-        elements::encode::deserialize(&hex::decode(tx_hex).unwrap())
+        elements::encode::deserialize(&hex::decode(tx_hex)?)
             .map_err(|e| LiquidError::EncodingError(format!("Failed to decode transaction: {}", e)))
     }
     

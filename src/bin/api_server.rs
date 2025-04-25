@@ -1,3 +1,4 @@
+use std::error::Error;
 use actix_web::{
     web, App, HttpServer, HttpResponse, Responder, 
     dev::HttpServiceFactory, middleware::{Logger, NormalizePath},
@@ -1133,12 +1134,12 @@ async fn main() -> std::io::Result<()> {
     setup_logging(&args.log_level);
     
     // Load configuration
-    let config = load_config(args.config).expect("Failed to load configuration");
+    let config = load_config(args.config)?;
     
     // Initialize Bitcoin node
     let bitcoin_node = Arc::new(RwLock::new(
         BitcoinNode::new(config.bitcoin.clone())
-            .expect("Failed to initialize Bitcoin node")
+            ?
     ));
     
     // Create application state
@@ -1176,3 +1177,4 @@ async fn main() -> std::io::Result<()> {
     .run()
     .await
 }
+

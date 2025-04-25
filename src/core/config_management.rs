@@ -1,3 +1,4 @@
+use std::error::Error;
 /// AIR-012: Unified Configuration Management System
 /// 
 /// This module provides a centralized configuration management system
@@ -276,7 +277,7 @@ impl ConfigManager {
         // Validate the configuration value
         self.validate_value(key, &value)?;
         
-        let mut entries = self.entries.write().unwrap();
+        let mut entries = self.entries.write()?;
         
         // Get the old value for event notification
         let old_value = entries.get(key).map(|entry| entry.value.clone());
@@ -314,7 +315,7 @@ impl ConfigManager {
     
     /// Add a change event to history
     fn add_to_history(&self, event: ConfigChangeEvent) {
-        let mut history = self.history.write().unwrap();
+        let mut history = self.history.write()?;
         
         // Add the event to history
         history.push(event);
@@ -328,7 +329,7 @@ impl ConfigManager {
     
     /// Notify listeners of a configuration change
     fn notify_listeners(&self, event: &ConfigChangeEvent) {
-        let listeners = self.listeners.read().unwrap();
+        let listeners = self.listeners.read()?;
         
         for listener in listeners.iter() {
             listener(event);
@@ -337,7 +338,7 @@ impl ConfigManager {
     
     /// Get a configuration value
     pub fn get_value(&self, key: &str) -> Result<ConfigValue, ConfigError> {
-        let entries = self.entries.read().unwrap();
+        let entries = self.entries.read()?;
         
         entries.get(key)
             .map(|entry| entry.value.clone())
@@ -346,7 +347,7 @@ impl ConfigManager {
     
     /// Check if a configuration key exists
     pub fn has_key(&self, key: &str) -> bool {
-        let entries = self.entries.read().unwrap();
+        let entries = self.entries.read()?;
         entries.contains_key(key)
     }
     
@@ -393,7 +394,7 @@ impl ConfigManager {
     
     /// Add a validation rule for a configuration key
     pub fn add_validation_rule(&self, key: &str, rule: ValidationRule) {
-        let mut rules = self.validation_rules.write().unwrap();
+        let mut rules = self.validation_rules.write()?;
         
         let key_rules = rules.entry(key.to_string()).or_insert_with(Vec::new);
         key_rules.push(rule);
@@ -401,7 +402,7 @@ impl ConfigManager {
     
     /// Validate a configuration value against the rules
     fn validate_value(&self, key: &str, value: &ConfigValue) -> Result<(), ConfigError> {
-        let rules = self.validation_rules.read().unwrap();
+        let rules = self.validation_rules.read()?;
         
         if let Some(key_rules) = rules.get(key) {
             for rule in key_rules {
@@ -490,19 +491,19 @@ impl ConfigManager {
     
     /// Add a configuration change listener
     pub fn add_listener(&self, listener: ConfigChangeListener) {
-        let mut listeners = self.listeners.write().unwrap();
+        let mut listeners = self.listeners.write()?;
         listeners.push(listener);
     }
     
     /// Get the configuration history
     pub fn get_history(&self) -> Vec<ConfigChangeEvent> {
-        let history = self.history.read().unwrap();
+        let history = self.history.read()?;
         history.clone()
     }
     
     /// Save the configuration to a file
     pub fn save_to_file(&self, path: &PathBuf) -> Result<(), ConfigError> {
-        let entries = self.entries.read().unwrap();
+        let entries = self.entries.read()?;
         
         // Convert entries to a map
         let mut config_map = HashMap::new();
@@ -536,7 +537,7 @@ impl ConfigManager {
     
     /// Mark a configuration key as sensitive
     pub fn mark_as_sensitive(&self, key: &str, sensitive: bool) -> Result<(), ConfigError> {
-        let mut entries = self.entries.write().unwrap();
+        let mut entries = self.entries.write()?;
         
         let entry = entries.get_mut(key)
             .ok_or(ConfigError::KeyNotFound(key.to_string()))?;
@@ -548,7 +549,7 @@ impl ConfigManager {
     
     /// Mark a configuration key as read-only
     pub fn mark_as_read_only(&self, key: &str, read_only: bool) -> Result<(), ConfigError> {
-        let mut entries = self.entries.write().unwrap();
+        let mut entries = self.entries.write()?;
         
         let entry = entries.get_mut(key)
             .ok_or(ConfigError::KeyNotFound(key.to_string()))?;
@@ -560,13 +561,13 @@ impl ConfigManager {
     
     /// Get all configuration keys
     pub fn get_keys(&self) -> Vec<String> {
-        let entries = self.entries.read().unwrap();
+        let entries = self.entries.read()?;
         entries.keys().cloned().collect()
     }
     
     /// Reset a configuration key to its default value
     pub fn reset_to_default(&self, key: &str) -> Result<(), ConfigError> {
-        let entries = self.entries.read().unwrap();
+        let entries = self.entries.read()?;
         
         // Find a default value
         let default_entry = entries.values()
@@ -613,10 +614,10 @@ mod tests {
             "test.key", 
             ConfigValue::String("test value".to_string()), 
             ConfigSource::Default
-        ).unwrap();
+        )?;
         
         // Get the value
-        let value = config.get_value("test.key").unwrap();
+        let value = config.get_value("test.key")?;
         assert!(matches!(value, ConfigValue::String(s) if s == "test value"));
         
         // Check if key exists
@@ -624,7 +625,7 @@ mod tests {
         assert!(!config.has_key("non.existent.key"));
         
         // Get typed value
-        let string_value = config.get_string("test.key").unwrap();
+        let string_value = config.get_string("test.key")?;
         assert_eq!(string_value, "test value");
     }
     
@@ -672,19 +673,19 @@ mod tests {
             "history.test",
             ConfigValue::Integer(1),
             ConfigSource::Default
-        ).unwrap();
+        )?;
         
         config.set_value(
             "history.test",
             ConfigValue::Integer(2),
             ConfigSource::Default
-        ).unwrap();
+        )?;
         
         config.set_value(
             "history.test",
             ConfigValue::Integer(3),
             ConfigSource::Default
-        ).unwrap();
+        )?;
         
         // Check history
         let history = config.get_history();

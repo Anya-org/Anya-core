@@ -1,3 +1,4 @@
+use std::error::Error;
 mod config;
 mod components;
 mod validation;

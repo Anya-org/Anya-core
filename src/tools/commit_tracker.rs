@@ -1,3 +1,4 @@
+use std::error::Error;
 pub fn update_ai_labelling_file(commit_info: &CommitInfo) -> Result<()> {
     let mut content = std::fs::read_to_string("docs/standards/AI_LABELING.md")?;
     

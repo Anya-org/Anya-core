@@ -1,3 +1,4 @@
+use std::error::Error;
 //! BIP-340 (Schnorr Signatures) Implementation
 //! [AIR-3][AIS-3][BPC-3][AIT-3][RES-3]
 //!
@@ -306,10 +307,10 @@ mod tests {
         
         // Sign a message
         let message = b"Hello, BIP-340!";
-        let signature = schnorr.sign(&secret_bytes, message, &aux_rand).unwrap();
+        let signature = schnorr.sign(&secret_bytes, message, &aux_rand)?;
         
         // Verify the signature
-        let valid = schnorr.verify(&x_only_pubkey, message, &signature).unwrap();
+        let valid = schnorr.verify(&x_only_pubkey, message, &signature)?;
         assert!(valid);
     }
 } 

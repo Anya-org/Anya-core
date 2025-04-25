@@ -1,3 +1,4 @@
+use std::error::Error;
 // New file for system awareness components
 
 /// Network state monitoring according to BDF v2.5

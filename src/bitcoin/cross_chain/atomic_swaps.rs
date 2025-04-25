@@ -1,3 +1,4 @@
+use std::error::Error;
 // src/bitcoin/cross_chain/atomic_swaps.rs
 
 use chrono::{DateTime, Utc};
@@ -66,7 +67,7 @@ pub struct CrossChainDLC {
 }
 
 impl AtomicSwap {
-    pub fn initialize(&mut self, initiator_tx: &str) -> AnyaResult<()> {
+    pub fn initialize(&mut self, initiator_tx: &str) -> AnyaResult<()>  -> Result<(), Box<dyn Error>> {
         if self.status != SwapStatus::Created {
             return Err(BitcoinError::CrossChain(
                 format!("Cannot initialize swap in state {:?}", self.status)
@@ -79,7 +80,7 @@ impl AtomicSwap {
         Ok(())
     }
     
-    pub fn fund(&mut self, counterparty_tx: &str) -> AnyaResult<()> {
+    pub fn fund(&mut self, counterparty_tx: &str) -> AnyaResult<()>  -> Result<(), Box<dyn Error>> {
         if self.status != SwapStatus::Initialized {
             return Err(BitcoinError::CrossChain(
                 format!("Cannot fund swap in state {:?}", self.status)
@@ -92,7 +93,7 @@ impl AtomicSwap {
         Ok(())
     }
     
-    pub fn redeem(&mut self, secret: [u8; 32], redeem_tx: &str) -> AnyaResult<()> {
+    pub fn redeem(&mut self, secret: [u8; 32], redeem_tx: &str) -> AnyaResult<()>  -> Result<(), Box<dyn Error>> {
         if self.status != SwapStatus::Funded {
             return Err(BitcoinError::CrossChain(
                 format!("Cannot redeem swap in state {:?}", self.status)
@@ -112,7 +113,7 @@ impl AtomicSwap {
         Ok(())
     }
     
-    pub fn refund(&mut self, refund_tx: &str) -> AnyaResult<()> {
+    pub fn refund(&mut self, refund_tx: &str) -> AnyaResult<()>  -> Result<(), Box<dyn Error>> {
         if self.status != SwapStatus::Funded {
             return Err(BitcoinError::CrossChain(
                 format!("Cannot refund swap in state {:?}", self.status)
@@ -128,7 +129,7 @@ impl AtomicSwap {
 }
 
 impl CrossChainDLC {
-    pub fn initialize(&mut self, contracts: HashMap<String, String>) -> AnyaResult<()> {
+    pub fn initialize(&mut self, contracts: HashMap<String, String>) -> AnyaResult<()>  -> Result<(), Box<dyn Error>> {
         if self.status != DLCStatus::Created {
             return Err(BitcoinError::CrossChain(
                 format!("Cannot initialize DLC in state {:?}", self.status)
@@ -141,7 +142,7 @@ impl CrossChainDLC {
         Ok(())
     }
     
-    pub fn fund(&mut self) -> AnyaResult<()> {
+    pub fn fund(&mut self) -> AnyaResult<()>  -> Result<(), Box<dyn Error>> {
         if self.status != DLCStatus::Initialized {
             return Err(BitcoinError::CrossChain(
                 format!("Cannot fund DLC in state {:?}", self.status)
@@ -153,7 +154,7 @@ impl CrossChainDLC {
         Ok(())
     }
     
-    pub fn execute(&mut self, outcome: &str) -> AnyaResult<()> {
+    pub fn execute(&mut self, outcome: &str) -> AnyaResult<()>  -> Result<(), Box<dyn Error>> {
         if self.status != DLCStatus::Funded {
             return Err(BitcoinError::CrossChain(
                 format!("Cannot execute DLC in state {:?}", self.status)

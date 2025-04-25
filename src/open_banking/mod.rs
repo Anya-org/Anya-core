@@ -1,3 +1,4 @@
+use std::error::Error;
 #[derive(BitcoinProtocol)]
 pub struct OpenBankingEngine {
     #[psbt_required]

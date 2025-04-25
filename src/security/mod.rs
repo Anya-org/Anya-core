@@ -1,3 +1,4 @@
+use std::error::Error;
 // AIE-001: Security Module Integration
 // Exports system hardening functionality
 

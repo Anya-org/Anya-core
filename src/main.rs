@@ -1,3 +1,4 @@
+use std::error::Error;
 // AIR-008: Main Application Entry Point
 // Demonstrates P1 components with auto-save functionality
 
@@ -14,7 +15,7 @@ use crate::core::ResourceType;
 use crate::core::SecurityLevel;
 use crate::ml::SystemStage;
 
-fn main() {
+fn main()  -> Result<(), Box<dyn Error>> {
     println!("Starting Anya Core with P1 components...");
     println!("AIR-008: Auto-save functionality set to every 20th input");
     
@@ -44,7 +45,7 @@ fn main() {
 }
 
 // Process a series of inputs to demonstrate the agent checker
-fn process_demo_inputs(core: &CoreSystem) {
+fn process_demo_inputs(core: &CoreSystem)  -> Result<(), Box<dyn Error>> {
     // Process 25 inputs to trigger auto-save (every 20 inputs)
     println!("Processing 25 inputs (auto-save at 20)...");
     
@@ -58,7 +59,7 @@ fn process_demo_inputs(core: &CoreSystem) {
         };
         
         println!("  Input [{}]: {}", i+1, input);
-        core.process_input(&input).unwrap();
+        core.process_input(&input)?;
     }
     
     // Check the system stage
@@ -67,7 +68,7 @@ fn process_demo_inputs(core: &CoreSystem) {
 }
 
 // Configure system security components to demonstrate hardening functionality
-fn configure_system_security(core: &CoreSystem) {
+fn configure_system_security(core: &CoreSystem)  -> Result<(), Box<dyn Error>> {
     let hardening = core.system_hardening();
     
     // Configure network security
@@ -80,7 +81,7 @@ fn configure_system_security(core: &CoreSystem) {
         SecurityLevel::Strict,
         network_settings,
         true
-    ).unwrap();
+    )?;
     
     // Configure database security
     println!("Configuring database security...");
@@ -91,7 +92,7 @@ fn configure_system_security(core: &CoreSystem) {
         SecurityLevel::Enhanced,
         db_settings,
         true
-    ).unwrap();
+    )?;
     
     // Configure API security
     println!("Configuring API security...");
@@ -102,13 +103,13 @@ fn configure_system_security(core: &CoreSystem) {
         SecurityLevel::Enhanced,
         api_settings,
         true
-    ).unwrap();
+    )?;
     
     // Apply hardening to configured components
     println!("Applying security hardening...");
-    hardening.apply_hardening("network").unwrap();
-    hardening.apply_hardening("database").unwrap();
-    hardening.apply_hardening("api").unwrap();
+    hardening.apply_hardening("network")?;
+    hardening.apply_hardening("database")?;
+    hardening.apply_hardening("api")?;
     
     // Configure 20 more components to trigger auto-save
     println!("Configuring 20 additional components to trigger auto-save...");
@@ -121,12 +122,12 @@ fn configure_system_security(core: &CoreSystem) {
             SecurityLevel::Basic,
             settings,
             true
-        ).unwrap();
+        )?;
     }
 }
 
 // Configure and optimize system performance
-fn optimize_system_performance(core: &CoreSystem) {
+fn optimize_system_performance(core: &CoreSystem)  -> Result<(), Box<dyn Error>> {
     let optimizer = core.performance_optimizer();
     
     // Configure CPU resource
@@ -142,7 +143,7 @@ fn optimize_system_performance(core: &CoreSystem) {
         0.8, // Target utilization
         1000.0, // Target throughput
         Duration::from_millis(10), // Target latency
-    ).unwrap();
+    )?;
     
     // Configure memory resource
     println!("Configuring memory optimization...");
@@ -157,7 +158,7 @@ fn optimize_system_performance(core: &CoreSystem) {
         0.7, // Target utilization
         2000.0, // Target throughput
         Duration::from_millis(5), // Target latency
-    ).unwrap();
+    )?;
     
     // Update metrics to simulate resource states
     println!("Updating performance metrics...");
@@ -173,7 +174,7 @@ fn optimize_system_performance(core: &CoreSystem) {
         950.0, // Current throughput (below target)
         Duration::from_millis(15), // Current latency (above target)
         cpu_metrics,
-    ).unwrap();
+    )?;
     
     // Memory metrics - needs optimization
     let mut mem_metrics = HashMap::new();
@@ -186,12 +187,12 @@ fn optimize_system_performance(core: &CoreSystem) {
         1800.0, // Current throughput (below target)
         Duration::from_millis(8), // Current latency (above target)
         mem_metrics,
-    ).unwrap();
+    )?;
     
     // Optimize resources
     println!("Optimizing resources...");
-    optimizer.optimize_resource("cpu").unwrap();
-    optimizer.optimize_resource("memory").unwrap();
+    optimizer.optimize_resource("cpu")?;
+    optimizer.optimize_resource("memory")?;
     
     // Configure additional resources to trigger auto-save
     println!("Configuring 18 additional resources to trigger auto-save...");
@@ -207,6 +208,6 @@ fn optimize_system_performance(core: &CoreSystem) {
             0.7,
             500.0,
             Duration::from_millis(50),
-        ).unwrap();
+        )?;
     }
 } 

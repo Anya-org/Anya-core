@@ -1,3 +1,4 @@
+use std::error::Error;
 // Migrated from OPSource to anya-core
 // This file was automatically migrated as part of the Rust-only implementation
 // Original file: C:\Users\bmokoka\Downloads\OPSource\src\bitcoin\dlc\mod.rs
@@ -209,7 +210,7 @@ pub fn create_funding_transaction(
     let witness_program = WitnessProgram::new(
         WitnessVersion::V0,
         script_hash.as_byte_array(),
-    ).expect("Failed to create witness program");
+    )?;
     let contract_script = ScriptBuf::new_witness_program(&witness_program);
     
     // Create the contract output
@@ -223,8 +224,8 @@ pub fn create_funding_transaction(
     let party_b_change = party_b_input_amount - contract.collateral_amount - 1000; // Fee
     
     // Create change output for party A
-    let party_a_pubkey_obj = bitcoin::PublicKey::from_slice(&party_a_pubkey.serialize()).unwrap();
-    let party_a_script = ScriptBuf::new_p2wpkh(&party_a_pubkey_obj.wpubkey_hash().unwrap());
+    let party_a_pubkey_obj = bitcoin::PublicKey::from_slice(&party_a_pubkey.serialize())?;
+    let party_a_script = ScriptBuf::new_p2wpkh(&party_a_pubkey_obj.wpubkey_hash()?);
     
     let party_a_change_output = TxOut {
         value: Amount::from_sat(party_a_change),
@@ -232,8 +233,8 @@ pub fn create_funding_transaction(
     };
     
     // Create change output for party B
-    let party_b_pubkey_obj = bitcoin::PublicKey::from_slice(&party_b_pubkey.serialize()).unwrap();
-    let party_b_script = ScriptBuf::new_p2wpkh(&party_b_pubkey_obj.wpubkey_hash().unwrap());
+    let party_b_pubkey_obj = bitcoin::PublicKey::from_slice(&party_b_pubkey.serialize())?;
+    let party_b_script = ScriptBuf::new_p2wpkh(&party_b_pubkey_obj.wpubkey_hash()?);
     
     let party_b_change_output = TxOut {
         value: Amount::from_sat(party_b_change),
@@ -304,8 +305,8 @@ pub fn create_execution_transactions(
         
         // Add party A output if they receive a payout
         if party_a_payout > 0 {
-            let party_a_pubkey_obj = bitcoin::PublicKey::from_slice(&party_a_pubkey.serialize()).unwrap();
-            let party_a_script = ScriptBuf::new_p2wpkh(&party_a_pubkey_obj.wpubkey_hash().unwrap());
+            let party_a_pubkey_obj = bitcoin::PublicKey::from_slice(&party_a_pubkey.serialize())?;
+            let party_a_script = ScriptBuf::new_p2wpkh(&party_a_pubkey_obj.wpubkey_hash()?);
             outputs.push(TxOut {
                 value: Amount::from_sat(party_a_payout),
                 script_pubkey: party_a_script,
@@ -314,8 +315,8 @@ pub fn create_execution_transactions(
         
         // Add party B output if they receive a payout
         if party_b_payout > 0 {
-            let party_b_pubkey_obj = bitcoin::PublicKey::from_slice(&party_b_pubkey.serialize()).unwrap();
-            let party_b_script = ScriptBuf::new_p2wpkh(&party_b_pubkey_obj.wpubkey_hash().unwrap());
+            let party_b_pubkey_obj = bitcoin::PublicKey::from_slice(&party_b_pubkey.serialize())?;
+            let party_b_script = ScriptBuf::new_p2wpkh(&party_b_pubkey_obj.wpubkey_hash()?);
             outputs.push(TxOut {
                 value: Amount::from_sat(party_b_payout),
                 script_pubkey: party_b_script,
@@ -457,7 +458,7 @@ pub fn create_execution_transaction(
     let input = TxIn {
         previous_output: OutPoint {
             txid: funding_tx.compute_txid(),
-            vout: contract.funding_output_index.unwrap() as u32,
+            vout: contract.funding_output_index? as u32,
         },
         script_sig: Script::new().into(),
         sequence: bitcoin::Sequence(0xFFFFFFFF),
@@ -470,8 +471,8 @@ pub fn create_execution_transaction(
     // Party A output
     if party_a_payout > 0 {
         let party_a_pubkey = &contract.party_a_pubkey;
-        let party_a_pubkey_obj = bitcoin::PublicKey::from_slice(&party_a_pubkey.serialize()).unwrap();
-        let party_a_script = ScriptBuf::new_p2wpkh(&party_a_pubkey_obj.wpubkey_hash().unwrap());
+        let party_a_pubkey_obj = bitcoin::PublicKey::from_slice(&party_a_pubkey.serialize())?;
+        let party_a_script = ScriptBuf::new_p2wpkh(&party_a_pubkey_obj.wpubkey_hash()?);
         
         outputs.push(TxOut {
             value: Amount::from_sat(party_a_payout),
@@ -482,8 +483,8 @@ pub fn create_execution_transaction(
     // Party B output
     if party_b_payout > 0 {
         let party_b_pubkey = &contract.party_b_pubkey;
-        let party_b_pubkey_obj = bitcoin::PublicKey::from_slice(&party_b_pubkey.serialize()).unwrap();
-        let party_b_script = ScriptBuf::new_p2wpkh(&party_b_pubkey_obj.wpubkey_hash().unwrap());
+        let party_b_pubkey_obj = bitcoin::PublicKey::from_slice(&party_b_pubkey.serialize())?;
+        let party_b_script = ScriptBuf::new_p2wpkh(&party_b_pubkey_obj.wpubkey_hash()?);
         
         outputs.push(TxOut {
             value: Amount::from_sat(party_b_payout),
@@ -520,11 +521,11 @@ pub fn sign_execution_transaction(
     let contract_output_index = execution_tx.input
         .iter()
         .position(|input| input.previous_output.txid == funding_tx.compute_txid() && 
-                          input.previous_output.vout == contract.funding_output_index.unwrap() as u32)
+                          input.previous_output.vout == contract.funding_output_index? as u32)
         .ok_or("Contract input not found in execution transaction")?;
     
     // Get the contract script
-    let contract_script = &funding_tx.output[contract.funding_output_index.unwrap()].script_pubkey;
+    let contract_script = &funding_tx.output[contract.funding_output_index?].script_pubkey;
     
     // Create a sighash for the execution transaction
     let mut sighash_cache = bitcoin::sighash::SighashCache::new(&*execution_tx);
@@ -538,10 +539,10 @@ pub fn sign_execution_transaction(
     ).map_err(|e| anyhow!("Failed to calculate sighash: {}", e))?;
     
     // Sign the transaction with party A's key
-    let party_a_sig = secp.sign_ecdsa(&Message::from_digest_slice(&sighash[..]).unwrap(), party_a_key);
+    let party_a_sig = secp.sign_ecdsa(&Message::from_digest_slice(&sighash[..])?, party_a_key);
     
     // Sign the transaction with party B's key
-    let party_b_sig = secp.sign_ecdsa(&Message::from_digest_slice(&sighash[..]).unwrap(), party_b_key);
+    let party_b_sig = secp.sign_ecdsa(&Message::from_digest_slice(&sighash[..])?, party_b_key);
     
     // Create the witness stack
     let mut witness_stack = Vec::new();
@@ -617,7 +618,7 @@ mod tests {
     #[test]
     fn test_create_dlc_contract() {
         let secp = Secp256k1::new();
-        let oracle_key = SecretKey::from_slice(&[1; 32]).unwrap();
+        let oracle_key = SecretKey::from_slice(&[1; 32])?;
         let oracle_pubkey = PublicKey::from_secret_key(&secp, &oracle_key);
         
         let outcomes = vec![
@@ -637,7 +638,7 @@ mod tests {
             &outcomes,
             collateral_amount,
             timelock,
-        ).unwrap();
+        )?;
         
         assert_eq!(contract.oracle_pubkey, oracle_pubkey);
         assert_eq!(contract.outcomes, outcomes_map);
@@ -647,9 +648,10 @@ mod tests {
     
     #[test]
     fn test_create_oracle() {
-        let oracle = create_oracle("Sports Oracle").unwrap();
+        let oracle = create_oracle("Sports Oracle")?;
         
         assert_eq!(oracle.name, "Sports Oracle");
         assert!(oracle.secret_key.is_some());
     }
 }
+

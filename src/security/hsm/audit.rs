@@ -1,3 +1,4 @@
+use std::error::Error;
 use crate::security::hsm::{HsmError, HsmAuditEvent};
 use serde::{Serialize, Deserialize};
 use std::sync::Arc;

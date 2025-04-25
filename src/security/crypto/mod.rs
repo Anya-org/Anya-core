@@ -1,3 +1,4 @@
+use std::error::Error;
 //! Cryptographic Utilities Module
 //! [AIR-1][AIS-1][BPC-1][AIT-1][RES-1]
 //!
@@ -25,16 +26,16 @@ pub mod signature;
 pub mod kdf;
 
 /// Helper function to generate a secure cryptographic key of specified length
-pub fn generate_key(length_bytes: usize) -> Vec<u8> {
+pub fn generate_key(length_bytes: usize) -> Vec<u8>  -> Result<(), Box<dyn Error>> {
     random_bytes(length_bytes)
 }
 
 /// Helper function to generate a secure initialization vector
-pub fn generate_iv(length_bytes: usize) -> Vec<u8> {
+pub fn generate_iv(length_bytes: usize) -> Vec<u8>  -> Result<(), Box<dyn Error>> {
     random_bytes(length_bytes)
 }
 
 /// Helper function to generate a secure nonce
-pub fn generate_nonce(length_bytes: usize) -> Vec<u8> {
+pub fn generate_nonce(length_bytes: usize) -> Vec<u8>  -> Result<(), Box<dyn Error>> {
     random_bytes(length_bytes)
 } 

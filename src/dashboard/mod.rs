@@ -1,3 +1,4 @@
+use std::error::Error;
 use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::Duration;
@@ -17,7 +18,7 @@ pub struct DashboardConfig {
 }
 
 impl Default for DashboardConfig {
-    fn default() -> Self {
+    fn default() -> Self  -> Result<(), Box<dyn Error>> {
         Self {
             title: "Anya-Core Dashboard".to_string(),
             refresh_rate_ms: 500,
@@ -39,7 +40,7 @@ pub struct DashboardState {
 }
 
 impl Default for DashboardState {
-    fn default() -> Self {
+    fn default() -> Self  -> Result<(), Box<dyn Error>> {
         Self {
             current_operation: "Initializing...".to_string(),
             operation_type: OperationType::Info,
@@ -69,7 +70,7 @@ pub struct Dashboard {
 
 impl Dashboard {
     /// Create a new dashboard
-    pub fn new(config: DashboardConfig) -> Self {
+    pub fn new(config: DashboardConfig) -> Self  -> Result<(), Box<dyn Error>> {
         let state = Arc::new(Mutex::new(DashboardState::default()));
         Self {
             config,
@@ -79,10 +80,10 @@ impl Dashboard {
     }
     
     /// Start the dashboard
-    pub fn start(&mut self) {
+    pub fn start(&mut self)  -> Result<(), Box<dyn Error>> {
         // Save terminal state
-        execute!(stdout(), terminal::EnterAlternateScreen).unwrap();
-        terminal::enable_raw_mode().unwrap();
+        execute!(stdout(), terminal::EnterAlternateScreen)?;
+        terminal::enable_raw_mode()?;
         
         // Clone state for the dashboard thread
         let state = Arc::clone(&self.state);
@@ -93,16 +94,16 @@ impl Dashboard {
             let spinner_chars = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
             let mut spinner_idx = 0;
             
-            while state.lock().unwrap().is_running {
+            while state.lock()?.is_running {
                 // Clear the screen
                 execute!(
                     stdout(),
                     terminal::Clear(terminal::ClearType::All),
                     cursor::MoveTo(0, 0)
-                ).unwrap();
+                )?;
                 
                 // Get the current state
-                let dash_state = state.lock().unwrap().clone();
+                let dash_state = state.lock()?.clone();
                 
                 // Print the title
                 let title = format!(" {} ", config.title);
@@ -158,27 +159,27 @@ impl Dashboard {
                 spinner_idx = (spinner_idx + 1) % spinner_chars.len();
                 
                 // Flush and sleep
-                stdout().flush().unwrap();
+                stdout().flush()?;
                 thread::sleep(Duration::from_millis(config.refresh_rate_ms));
             }
             
             // Restore terminal state
-            terminal::disable_raw_mode().unwrap();
-            execute!(stdout(), terminal::LeaveAlternateScreen).unwrap();
+            terminal::disable_raw_mode()?;
+            execute!(stdout(), terminal::LeaveAlternateScreen)?;
         });
         
         self.handle = Some(handle);
     }
     
     /// Update the dashboard state
-    pub fn update(&self, update_fn: impl FnOnce(&mut DashboardState)) {
+    pub fn update(&self, update_fn: impl FnOnce(&mut DashboardState))  -> Result<(), Box<dyn Error>> {
         if let Ok(mut state) = self.state.lock() {
             update_fn(&mut state);
         }
     }
     
     /// Set the current operation
-    pub fn set_operation(&self, operation: &str, operation_type: OperationType) {
+    pub fn set_operation(&self, operation: &str, operation_type: OperationType)  -> Result<(), Box<dyn Error>> {
         self.update(|state| {
             state.current_operation = operation.to_string();
             state.operation_type = operation_type;
@@ -195,7 +196,7 @@ impl Dashboard {
     }
     
     /// Set the progress
-    pub fn set_progress(&self, progress: usize, total: usize) {
+    pub fn set_progress(&self, progress: usize, total: usize)  -> Result<(), Box<dyn Error>> {
         self.update(|state| {
             state.progress = progress;
             state.total = total;
@@ -203,14 +204,14 @@ impl Dashboard {
     }
     
     /// Add a detail message
-    pub fn add_detail(&self, detail: &str) {
+    pub fn add_detail(&self, detail: &str)  -> Result<(), Box<dyn Error>> {
         self.update(|state| {
             state.details.push(detail.to_string());
         });
     }
     
     /// Stop the dashboard
-    pub fn stop(&mut self) {
+    pub fn stop(&mut self)  -> Result<(), Box<dyn Error>> {
         self.update(|state| {
             state.is_running = false;
         });
@@ -222,7 +223,7 @@ impl Dashboard {
 }
 
 impl Drop for Dashboard {
-    fn drop(&mut self) {
+    fn drop(&mut self)  -> Result<(), Box<dyn Error>> {
         self.stop();
     }
 } 

@@ -1,3 +1,4 @@
+use std::error::Error;
 // src/bitcoin/wallet/bip32.rs
 
 // BIP32 Implementation for Bitcoin Wallet Module
@@ -21,14 +22,14 @@ pub struct ExtendedKey {
 }
 
 /// Generate a new seed from an optional password
-pub fn generate_seed(_password: &str) -> BitcoinResult<[u8; 64]> {
+pub fn generate_seed(_password: &str) -> BitcoinResult<[u8; 64]>  -> Result<(), Box<dyn Error>> {
     let mut seed = [0u8; 64];
     rand::thread_rng().fill_bytes(&mut seed);
     Ok(seed)
 }
 
 /// Generate a seed from an existing mnemonic phrase and optional password
-pub fn seed_from_mnemonic(mnemonic_phrase: &str, password: &str) -> BitcoinResult<[u8; 64]> {
+pub fn seed_from_mnemonic(mnemonic_phrase: &str, password: &str) -> BitcoinResult<[u8; 64]>  -> Result<(), Box<dyn Error>> {
     // Parse the mnemonic
     #[cfg(feature = "bip39")]
     {
@@ -52,7 +53,7 @@ pub fn seed_from_mnemonic(mnemonic_phrase: &str, password: &str) -> BitcoinResul
 }
 
 /// Derive a private key from a seed and derivation path
-pub fn derive_key_from_seed(seed: &[u8; 64], path: &str) -> BitcoinResult<Secp256k1SecretKey> {
+pub fn derive_key_from_seed(seed: &[u8; 64], path: &str) -> BitcoinResult<Secp256k1SecretKey>  -> Result<(), Box<dyn Error>> {
     // Create a secp256k1 context
     let secp = Secp256k1::new();
     
@@ -72,18 +73,18 @@ pub fn derive_key_from_seed(seed: &[u8; 64], path: &str) -> BitcoinResult<Secp25
 }
 
 /// Parse a BIP32 extended private key from string
-pub fn parse_xpriv(xpriv: &str) -> BitcoinResult<Xpriv> {
+pub fn parse_xpriv(xpriv: &str) -> BitcoinResult<Xpriv>  -> Result<(), Box<dyn Error>> {
     Xpriv::from_str(xpriv)
         .map_err(|e| BitcoinError::Wallet(format!("Invalid extended private key: {}", e)))
 }
 
 /// Format a BIP32 extended private key as string
-pub fn format_xpriv(xpriv: &Xpriv) -> String {
+pub fn format_xpriv(xpriv: &Xpriv) -> String  -> Result<(), Box<dyn Error>> {
     xpriv.to_string()
 }
 
 /// Derive a master key from a seed
-pub fn derive_master_key(seed: &[u8], network: Network) -> BitcoinResult<ExtendedKey> {
+pub fn derive_master_key(seed: &[u8], network: Network) -> BitcoinResult<ExtendedKey>  -> Result<(), Box<dyn Error>> {
     let secp = Secp256k1::new();
     
     let xpriv = Xpriv::new_master(network, seed)
@@ -99,7 +100,7 @@ pub fn derive_master_key(seed: &[u8], network: Network) -> BitcoinResult<Extende
 }
 
 /// Derive a child key from a parent key and path
-pub fn derive_child_key(parent: &ExtendedKey, path: &DerivationPath) -> BitcoinResult<ExtendedKey> {
+pub fn derive_child_key(parent: &ExtendedKey, path: &DerivationPath) -> BitcoinResult<ExtendedKey>  -> Result<(), Box<dyn Error>> {
     let secp = Secp256k1::new();
     
     let child_xpriv = parent.xpriv.derive_priv(&secp, path)
@@ -119,23 +120,23 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_seed_generation() {
-        let seed = generate_seed("test_password").unwrap();
+    fn test_seed_generation()  -> Result<(), Box<dyn Error>> {
+        let seed = generate_seed("test_password")?;
         assert_eq!(seed.len(), 64);
     }
 
     #[test]
-    fn test_derive_master_key() {
+    fn test_derive_master_key()  -> Result<(), Box<dyn Error>> {
         let seed = [0u8; 64];
         let result = derive_master_key(&seed, Network::Bitcoin);
         assert!(result.is_ok());
     }
 
     #[test]
-    fn test_derive_child_key() {
+    fn test_derive_child_key()  -> Result<(), Box<dyn Error>> {
         let seed = [0u8; 64];
-        let master = derive_master_key(&seed, Network::Bitcoin).unwrap();
-        let path = DerivationPath::from_str("m/44'/0'/0'/0/0").unwrap();
+        let master = derive_master_key(&seed, Network::Bitcoin)?;
+        let path = DerivationPath::from_str("m/44'/0'/0'/0/0")?;
         let result = derive_child_key(&master, &path);
         assert!(result.is_ok());
     }

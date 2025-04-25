@@ -1,3 +1,4 @@
+use std::error::Error;
 // Hybrid analytics module for BOB
 // Implements analytics for Bitcoin Optimistic Blockchain
 // as per Bitcoin Development Framework v2.5 requirements
@@ -12,14 +13,14 @@ pub struct HybridAnalyticsEngine {
 
 impl HybridAnalyticsEngine {
     /// Create a new hybrid analytics engine
-    pub fn new(config: &BobConfig) -> Self {
+    pub fn new(config: &BobConfig) -> Self  -> Result<(), Box<dyn Error>> {
         Self {
             config: config.clone(),
         }
     }
     
     /// Collect metrics from the BOB network
-    pub fn collect_metrics(&self) -> Metrics {
+    pub fn collect_metrics(&self) -> Metrics  -> Result<(), Box<dyn Error>> {
         // In a real implementation, this would collect metrics from the BOB network
         // For now, we'll just return dummy metrics
         Metrics {

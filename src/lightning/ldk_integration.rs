@@ -1,3 +1,4 @@
+use std::error::Error;
 // Lightning Network Implementation v0.0.117
 // Compliant with BOLT 1-12
 

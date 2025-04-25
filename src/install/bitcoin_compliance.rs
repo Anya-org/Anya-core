@@ -1,3 +1,4 @@
+use std::error::Error;
 use std::process::Command;
 use log::{info, warn, error};
 use bitcoin::blockdata::transaction::Transaction;

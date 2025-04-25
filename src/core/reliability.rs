@@ -1,3 +1,4 @@
+use std::error::Error;
 /// AIR-012: Operational Reliability Utilities
 /// 
 /// This module provides utilities for ensuring operational reliability,
@@ -27,7 +28,7 @@ pub struct Watchdog {
 
 impl Watchdog {
     /// Create a new watchdog timer
-    pub fn new(name: &str, timeout_duration: Duration) -> Self {
+    pub fn new(name: &str, timeout_duration: Duration) -> Self  -> Result<(), Box<dyn Error>> {
         let watchdog = Self {
             name: name.to_string(),
             start_time: Instant::now(),
@@ -42,7 +43,7 @@ impl Watchdog {
         
         tokio::spawn(async move {
             tokio::time::sleep(timeout_duration_clone + Duration::from_secs(1)).await;
-            let is_active = { *active_clone.lock().unwrap() };
+            let is_active = { *active_clone.lock()? };
             
             if is_active {
                 error!(
@@ -57,8 +58,8 @@ impl Watchdog {
     }
     
     /// Stop the watchdog timer
-    pub fn stop(&self) {
-        let mut active = self.active.lock().unwrap();
+    pub fn stop(&self)  -> Result<(), Box<dyn Error>> {
+        let mut active = self.active.lock()?;
         *active = false;
         
         info!(
@@ -69,7 +70,7 @@ impl Watchdog {
     }
     
     /// Trigger an alert (for manual invocation)
-    pub fn trigger_alert(&self) {
+    pub fn trigger_alert(&self)  -> Result<(), Box<dyn Error>> {
         error!(
             "Operation '{}' explicitly marked as hung after {:?}",
             self.name,
@@ -80,8 +81,8 @@ impl Watchdog {
 }
 
 impl Drop for Watchdog {
-    fn drop(&mut self) {
-        let is_active = { *self.active.lock().unwrap() };
+    fn drop(&mut self)  -> Result<(), Box<dyn Error>> {
+        let is_active = { *self.active.lock()? };
         
         if is_active {
             warn!(
@@ -111,7 +112,7 @@ pub struct ProgressTracker {
 
 impl ProgressTracker {
     /// Create a new progress tracker
-    pub fn new(name: &str) -> Self {
+    pub fn new(name: &str) -> Self  -> Result<(), Box<dyn Error>> {
         let now = Instant::now();
         Self {
             name: name.to_string(),
@@ -124,26 +125,26 @@ impl ProgressTracker {
     }
     
     /// Set a timeout for the operation
-    pub fn with_timeout(mut self, timeout: Duration) -> Self {
+    pub fn with_timeout(mut self, timeout: Duration) -> Self  -> Result<(), Box<dyn Error>> {
         self.timeout = Some(timeout);
         self
     }
     
     /// Set verbosity (whether to log progress updates)
-    pub fn with_verbosity(mut self, verbose: bool) -> Self {
+    pub fn with_verbosity(mut self, verbose: bool) -> Self  -> Result<(), Box<dyn Error>> {
         self.verbose = verbose;
         self
     }
     
     /// Update the current progress
-    pub fn update(&self, progress: f64) -> AnyaResult<()> {
+    pub fn update(&self, progress: f64) -> AnyaResult<()>  -> Result<(), Box<dyn Error>> {
         let progress = progress.max(0.0).min(1.0);
         
         {
-            let mut progress_lock = self.progress.lock().unwrap();
+            let mut progress_lock = self.progress.lock()?;
             *progress_lock = progress;
             
-            let mut last_update_lock = self.last_update.lock().unwrap();
+            let mut last_update_lock = self.last_update.lock()?;
             *last_update_lock = Instant::now();
         }
         
@@ -164,12 +165,12 @@ impl ProgressTracker {
     }
     
     /// Get the current progress
-    pub fn get_progress(&self) -> f64 {
-        *self.progress.lock().unwrap()
+    pub fn get_progress(&self) -> f64  -> Result<(), Box<dyn Error>> {
+        *self.progress.lock()?
     }
     
     /// Check if the operation has timed out
-    pub fn has_timed_out(&self) -> bool {
+    pub fn has_timed_out(&self) -> bool  -> Result<(), Box<dyn Error>> {
         if let Some(timeout) = self.timeout {
             self.start_time.elapsed() > timeout
         } else {
@@ -178,8 +179,8 @@ impl ProgressTracker {
     }
     
     /// Mark the operation as complete
-    pub fn complete(&self) {
-        let mut progress_lock = self.progress.lock().unwrap();
+    pub fn complete(&self)  -> Result<(), Box<dyn Error>> {
+        let mut progress_lock = self.progress.lock()?;
         *progress_lock = 1.0;
         
         if self.verbose {
@@ -218,7 +219,7 @@ pub struct AiVerification {
 
 impl AiVerification {
     /// Create new AI verification utilities with default settings
-    pub fn new() -> Self {
+    pub fn new() -> Self  -> Result<(), Box<dyn Error>> {
         Self {
             min_confidence: 0.75,
             verify_against_blockchain: true,
@@ -228,31 +229,31 @@ impl AiVerification {
     }
     
     /// Set minimum confidence threshold
-    pub fn with_min_confidence(mut self, min_confidence: f64) -> Self {
+    pub fn with_min_confidence(mut self, min_confidence: f64) -> Self  -> Result<(), Box<dyn Error>> {
         self.min_confidence = min_confidence.max(0.0).min(1.0);
         self
     }
     
     /// Set whether to verify against blockchain
-    pub fn with_blockchain_verification(mut self, verify: bool) -> Self {
+    pub fn with_blockchain_verification(mut self, verify: bool) -> Self  -> Result<(), Box<dyn Error>> {
         self.verify_against_blockchain = verify;
         self
     }
     
     /// Set whether to verify against external data
-    pub fn with_external_data_verification(mut self, verify: bool) -> Self {
+    pub fn with_external_data_verification(mut self, verify: bool) -> Self  -> Result<(), Box<dyn Error>> {
         self.verify_against_external_data = verify;
         self
     }
     
     /// Set whether human verification is required
-    pub fn with_human_verification(mut self, require: bool) -> Self {
+    pub fn with_human_verification(mut self, require: bool) -> Self  -> Result<(), Box<dyn Error>> {
         self.require_human_verification = require;
         self
     }
     
     /// Verify an AI-generated output
-    pub fn verify<T>(&self, assessment: ConfidenceAssessment<T>) -> AnyaResult<T> {
+    pub fn verify<T>(&self, assessment: ConfidenceAssessment<T>) -> AnyaResult<T>  -> Result<(), Box<dyn Error>> {
         if assessment.confidence < self.min_confidence {
             let error_msg = format!(
                 "AI output confidence too low: {:.2} (required: {:.2})",
@@ -288,7 +289,7 @@ pub async fn execute_with_monitoring<T, F>(
 ) -> AnyaResult<T> 
 where
     F: Future<Output = AnyaResult<T>>,
-{
+ -> Result<(), Box<dyn Error>> {
     // Create watchdog
     let watchdog = Watchdog::new(operation_name, timeout_duration);
     
@@ -320,7 +321,7 @@ pub async fn execute_with_recovery<T, F, R>(
 where
     F: Future<Output = AnyaResult<T>>,
     R: Future<Output = AnyaResult<T>>,
-{
+ -> Result<(), Box<dyn Error>> {
     // Create watchdog for the entire operation
     let watchdog = Watchdog::new(operation_name, primary_timeout + recovery_timeout + Duration::from_secs(1));
     

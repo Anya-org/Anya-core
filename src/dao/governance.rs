@@ -1,3 +1,4 @@
+use std::error::Error;
 /// DAO-3 Compliance Check
 impl DaoGovernance {
     #[dao_label(DaoLabel::DAO3)]

@@ -1,3 +1,4 @@
+use std::error::Error;
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Web5PsbtExtension {
     #[serde(rename = "web5:context")]

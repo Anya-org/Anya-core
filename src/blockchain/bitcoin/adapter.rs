@@ -1,3 +1,4 @@
+use std::error::Error;
 //! Bitcoin blockchain adapter implementation
 //!
 //! This module provides a Bitcoin adapter implementation for the blockchain interface
@@ -290,7 +291,7 @@ impl BitcoinAdapter {
         };
 
         // Cache the block info
-        let mut blocks_cache = self.blocks_cache.lock().unwrap();
+        let mut blocks_cache = self.blocks_cache.lock()?;
         blocks_cache.insert(hash.to_string(), block_info.clone());
         
         // Limit cache size
@@ -381,7 +382,7 @@ impl BitcoinAdapter {
         };
         
         // Cache the transaction info
-        let mut tx_cache = self.tx_cache.lock().unwrap();
+        let mut tx_cache = self.tx_cache.lock()?;
         tx_cache.insert(txid.to_string(), tx_info.clone());
         
         // Limit cache size
@@ -403,7 +404,7 @@ impl BitcoinAdapter {
         
         // Check cache first
         {
-            let utxo_cache = self.utxo_cache.lock().unwrap();
+            let utxo_cache = self.utxo_cache.lock()?;
             if let Some(utxo) = utxo_cache.get(&cache_key) {
                 return Ok(Some(utxo.clone()));
             }
@@ -430,7 +431,7 @@ impl BitcoinAdapter {
                 };
                 
                 // Cache the UTXO
-                let mut utxo_cache = self.utxo_cache.lock().unwrap();
+                let mut utxo_cache = self.utxo_cache.lock()?;
                 utxo_cache.insert(cache_key, utxo.clone());
                 
                 // Limit cache size
@@ -615,7 +616,7 @@ impl NodePort for BitcoinAdapter {
     async fn get_block_by_hash(&self, hash: &str) -> Result<BlockInfo, BlockchainError> {
         // Check if the block is in the cache
         {
-            let blocks_cache = self.blocks_cache.lock().unwrap();
+            let blocks_cache = self.blocks_cache.lock()?;
             if let Some(block) = blocks_cache.get(hash) {
                 return Ok(block.clone());
             }
@@ -641,7 +642,7 @@ impl NodePort for BitcoinAdapter {
         
         // Check if the block is in the cache
         {
-            let blocks_cache = self.blocks_cache.lock().unwrap();
+            let blocks_cache = self.blocks_cache.lock()?;
             if let Some(block) = blocks_cache.get(&hash) {
                 return Ok(block.clone());
             }
@@ -665,7 +666,7 @@ impl NodePort for BitcoinAdapter {
     async fn get_transaction(&self, txid: &str) -> Result<TransactionInfo, BlockchainError> {
         // Check if the transaction is in the cache
         {
-            let tx_cache = self.tx_cache.lock().unwrap();
+            let tx_cache = self.tx_cache.lock()?;
             if let Some(tx) = tx_cache.get(txid) {
                 return Ok(tx.clone());
             }
@@ -728,10 +729,10 @@ impl NodePort for BitcoinAdapter {
                 // Find the closest target
                 let closest_target = fee_estimates.keys()
                     .min_by_key(|k| ((**k as i32 - confirmation_target as i32).abs()))
-                    .unwrap();
+                    ?;
                 
                 // Return the fee for the closest target
-                return Ok(*fee_estimates.get(closest_target).unwrap());
+                return Ok(*fee_estimates.get(closest_target)?);
             }
         }
         
@@ -1939,9 +1940,9 @@ impl Clone for BitcoinAdapter {
             state: RwLock::new(self.state.try_read().unwrap_or_else(|_| None).clone()),
             metrics: RwLock::new(self.metrics.try_read().unwrap_or_else(|_| None).clone()),
             mempool: RwLock::new(self.mempool.try_read().unwrap_or_else(|_| None).clone()),
-            blocks_cache: Mutex::new(self.blocks_cache.lock().unwrap().clone()),
-            tx_cache: Mutex::new(self.tx_cache.lock().unwrap().clone()),
-            utxo_cache: Mutex::new(self.utxo_cache.lock().unwrap().clone()),
+            blocks_cache: Mutex::new(self.blocks_cache.lock()?.clone()),
+            tx_cache: Mutex::new(self.tx_cache.lock()?.clone()),
+            utxo_cache: Mutex::new(self.utxo_cache.lock()?.clone()),
             fee_estimates: RwLock::new(self.fee_estimates.try_read().unwrap_or_else(|_| HashMap::new()).clone()),
             unusual_txs: RwLock::new(self.unusual_txs.try_read().unwrap_or_else(|_| Vec::new()).clone()),
             security_alerts: RwLock::new(self.security_alerts.try_read().unwrap_or_else(|_| Vec::new()).clone()),

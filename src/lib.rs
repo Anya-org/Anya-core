@@ -134,7 +134,10 @@ impl AnyaCore {
         };
 
         let web5_manager = if config.web5_config.enabled {
-            Some(web5::Web5Manager::new(config.web5_config)?)
+            Some(web5::Web5Manager::new(config.web5_config)
+                .with_metrics(metrics.clone())
+                .with_bip_compliance(vec![174, 341, 342])
+                .build()?)
         } else {
             None
         };

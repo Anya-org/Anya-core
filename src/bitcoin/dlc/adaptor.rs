@@ -1,3 +1,4 @@
+use std::error::Error;
 // src/bitcoin/dlc/adaptor.rs
 
 use bitcoin::secp256k1::{PublicKey, SecretKey, Signature};
@@ -20,7 +21,7 @@ pub struct AdaptorSignature {
 
 impl AdaptorSignature {
     /// Creates a new adaptor signature
-    pub fn new(encrypted_data: Vec<u8>, encryption_point: PublicKey) -> Self {
+    pub fn new(encrypted_data: Vec<u8>, encryption_point: PublicKey) -> Self  -> Result<(), Box<dyn Error>> {
         Self {
             encrypted_data,
             encryption_point,
@@ -28,7 +29,7 @@ impl AdaptorSignature {
     }
     
     /// Verifies that this adaptor signature is valid for the given message and public key
-    pub fn verify(&self, message: &[u8], public_key: &PublicKey) -> AnyaResult<bool> {
+    pub fn verify(&self, message: &[u8], public_key: &PublicKey) -> AnyaResult<bool>  -> Result<(), Box<dyn Error>> {
         // Implementation goes here
         // In a real implementation, this would verify that the adaptor signature
         // is valid for the given message and public key
@@ -36,7 +37,7 @@ impl AdaptorSignature {
     }
     
     /// Decrypts the adaptor signature using the given secret key
-    pub fn decrypt(&self, secret: &SecretKey) -> AnyaResult<Signature> {
+    pub fn decrypt(&self, secret: &SecretKey) -> AnyaResult<Signature>  -> Result<(), Box<dyn Error>> {
         // Implementation goes here
         // In a real implementation, this would decrypt the adaptor signature
         // using the given secret key
@@ -80,9 +81,9 @@ pub trait AdaptorSigner {
 /// Implementation of the AdaptorSigner trait using Schnorr signatures
 pub struct SchnorrAdaptorSigner;
 
-impl SchnorrAdaptorSigner {
+impl SchnorrAdaptorSigner  -> Result<(), Box<dyn Error>> {
     /// Creates a new Schnorr adaptor signer
-    pub fn new() -> Self {
+    pub fn new() -> Self  -> Result<(), Box<dyn Error>> {
         Self
     }
 }
@@ -93,7 +94,7 @@ impl AdaptorSigner for SchnorrAdaptorSigner {
         transaction: &Transaction,
         secret_key: &SecretKey,
         encryption_point: &PublicKey,
-    ) -> AnyaResult<AdaptorSignature> {
+    ) -> AnyaResult<AdaptorSignature>  -> Result<(), Box<dyn Error>> {
         // Implementation goes here
         // In a real implementation, this would create an adaptor signature
         // for the given transaction using the secret key and encryption point
@@ -105,7 +106,7 @@ impl AdaptorSigner for SchnorrAdaptorSigner {
         transaction: &Transaction,
         signature: &AdaptorSignature,
         public_key: &PublicKey,
-    ) -> AnyaResult<bool> {
+    ) -> AnyaResult<bool>  -> Result<(), Box<dyn Error>> {
         // Implementation goes here
         // In a real implementation, this would verify that the adaptor signature
         // is valid for the given transaction and public key
@@ -116,7 +117,7 @@ impl AdaptorSigner for SchnorrAdaptorSigner {
         &self,
         signature: &AdaptorSignature,
         decryption_key: &SecretKey,
-    ) -> AnyaResult<Signature> {
+    ) -> AnyaResult<Signature>  -> Result<(), Box<dyn Error>> {
         // Implementation goes here
         // In a real implementation, this would decrypt the adaptor signature
         // using the given decryption key
@@ -127,7 +128,7 @@ impl AdaptorSigner for SchnorrAdaptorSigner {
         &self,
         signature: &Signature,
         encryption_point: &PublicKey,
-    ) -> AnyaResult<AdaptorSignature> {
+    ) -> AnyaResult<AdaptorSignature>  -> Result<(), Box<dyn Error>> {
         // Implementation goes here
         // In a real implementation, this would encrypt the signature
         // using the given encryption point
@@ -140,7 +141,7 @@ pub struct AdaptorSignerFactory;
 
 impl AdaptorSignerFactory {
     /// Creates a new adaptor signer of the specified type
-    pub fn create_signer(signer_type: AdaptorSignerType) -> Box<dyn AdaptorSigner> {
+    pub fn create_signer(signer_type: AdaptorSignerType) -> Box<dyn AdaptorSigner>  -> Result<(), Box<dyn Error>> {
         match signer_type {
             AdaptorSignerType::Schnorr => Box::new(SchnorrAdaptorSigner::new()),
         }
@@ -155,7 +156,7 @@ pub enum AdaptorSignerType {
 }
 
 impl Default for AdaptorSignerType {
-    fn default() -> Self {
+    fn default() -> Self  -> Result<(), Box<dyn Error>> {
         Self::Schnorr
     }
 } 

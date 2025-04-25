@@ -1,3 +1,4 @@
+use std::error::Error;
 // Migrated from OPSource to anya-core
 // This file was automatically migrated as part of the Rust-only implementation
 // Original file: C:\Users\bmokoka\Downloads\OPSource\src\bitcoin\wallet\mod.rs
@@ -168,7 +169,7 @@ impl Wallet {
             bip32::generate_seed(password.unwrap_or(""))?
         };
         
-        let mut seed_guard = self.seed.lock().unwrap();
+        let mut seed_guard = self.seed.lock()?;
         *seed_guard = Some(seed);
         
         // Generate initial addresses
@@ -178,7 +179,7 @@ impl Wallet {
     }
     
     fn init_addresses(&self) -> AnyaResult<()> {
-        let mut addresses = self.addresses.lock().unwrap();
+        let mut addresses = self.addresses.lock()?;
         
         // Generate 20 addresses of each type
         for address_type in [
@@ -203,7 +204,7 @@ impl Wallet {
                 // Convert to bitcoin::PublicKey
                 let bitcoin_pubkey = bitcoin::PublicKey::new(public_key);
                 // Get compressed public key for p2wpkh and p2shwpkh
-                let compressed_pubkey = bitcoin::key::CompressedPublicKey::from_slice(&bitcoin_pubkey.inner.serialize()).unwrap();
+                let compressed_pubkey = bitcoin::key::CompressedPublicKey::from_slice(&bitcoin_pubkey.inner.serialize())?;
                 
                 let address = match address_type {
                     AddressType::Legacy => Address::p2pkh(&bitcoin_pubkey, self.config.network),
@@ -227,7 +228,7 @@ impl Wallet {
 
 impl KeyManager for Wallet {
     fn derive_key(&self, path: &str) -> AnyaResult<SecretKey> {
-        let seed_guard = self.seed.lock().unwrap();
+        let seed_guard = self.seed.lock()?;
         let seed = seed_guard.as_ref()
             .ok_or_else(|| BitcoinError::Wallet("Wallet not initialized".to_string()))?;
         
@@ -268,7 +269,7 @@ impl KeyManager for Wallet {
 
 impl AddressManager for Wallet {
     fn get_new_address(&self, address_type: AddressType) -> AnyaResult<Address> {
-        let mut addresses = self.addresses.lock().unwrap();
+        let mut addresses = self.addresses.lock()?;
         
         let type_addresses = addresses.entry(address_type)
             .or_insert_with(Vec::new);
@@ -288,7 +289,7 @@ impl AddressManager for Wallet {
         // Convert to bitcoin::PublicKey
         let bitcoin_pubkey = bitcoin::PublicKey::new(public_key);
         // Get compressed public key for p2wpkh and p2shwpkh
-        let compressed_pubkey = bitcoin::key::CompressedPublicKey::from_slice(&bitcoin_pubkey.inner.serialize()).unwrap();
+        let compressed_pubkey = bitcoin::key::CompressedPublicKey::from_slice(&bitcoin_pubkey.inner.serialize())?;
         
         let address = match address_type {
             AddressType::Legacy => Address::p2pkh(&bitcoin_pubkey, self.config.network),
@@ -306,7 +307,7 @@ impl AddressManager for Wallet {
     }
     
     fn get_address(&self, index: u32, address_type: AddressType) -> AnyaResult<Address> {
-        let addresses = self.addresses.lock().unwrap();
+        let addresses = self.addresses.lock()?;
         
         if let Some(type_addresses) = addresses.get(&address_type) {
             if let Some(address) = type_addresses.get(index as usize) {
@@ -328,7 +329,7 @@ impl AddressManager for Wallet {
         // Convert to bitcoin::PublicKey
         let bitcoin_pubkey = bitcoin::PublicKey::new(public_key);
         // Get compressed public key for p2wpkh and p2shwpkh
-        let compressed_pubkey = bitcoin::key::CompressedPublicKey::from_slice(&bitcoin_pubkey.inner.serialize()).unwrap();
+        let compressed_pubkey = bitcoin::key::CompressedPublicKey::from_slice(&bitcoin_pubkey.inner.serialize())?;
         
         let address = match address_type {
             AddressType::Legacy => Address::p2pkh(&bitcoin_pubkey, self.config.network),
@@ -344,7 +345,7 @@ impl AddressManager for Wallet {
     }
     
     fn is_address_mine(&self, address: &str) -> AnyaResult<bool> {
-        let addresses = self.addresses.lock().unwrap();
+        let addresses = self.addresses.lock()?;
         
         for type_addresses in addresses.values() {
             for addr in type_addresses {
@@ -358,7 +359,7 @@ impl AddressManager for Wallet {
     }
     
     fn get_all_addresses(&self) -> AnyaResult<Vec<Address>> {
-        let addresses = self.addresses.lock().unwrap();
+        let addresses = self.addresses.lock()?;
         
         let mut result = Vec::new();
         for type_addresses in addresses.values() {
@@ -435,7 +436,7 @@ impl BalanceManager for Wallet {
     }
     
     fn get_asset_balance(&self, asset_id: &str) -> AnyaResult<u64> {
-        let assets = self.assets.lock().unwrap();
+        let assets = self.assets.lock()?;
         
         if let Some(asset) = assets.get(asset_id) {
             Ok(asset.balance)
@@ -445,7 +446,7 @@ impl BalanceManager for Wallet {
     }
     
     fn get_all_asset_balances(&self) -> AnyaResult<HashMap<String, u64>> {
-        let assets = self.assets.lock().unwrap();
+        let assets = self.assets.lock()?;
         
         let mut balances = HashMap::new();
         for (id, asset) in assets.iter() {
@@ -497,7 +498,7 @@ impl UnifiedWallet for Wallet {
     }
     
     fn add_asset(&self, asset_id: &str, name: &str, asset_type: &str) -> AnyaResult<()> {
-        let mut assets = self.assets.lock().unwrap();
+        let mut assets = self.assets.lock()?;
         
         if assets.contains_key(asset_id) {
             return Err(BitcoinError::Wallet(format!("Asset already exists: {}", asset_id)).into());
@@ -518,7 +519,7 @@ impl UnifiedWallet for Wallet {
     }
     
     fn remove_asset(&self, asset_id: &str) -> AnyaResult<()> {
-        let mut assets = self.assets.lock().unwrap();
+        let mut assets = self.assets.lock()?;
         
         if assets.remove(asset_id).is_none() {
             return Err(BitcoinError::Wallet(format!("Asset not found: {}", asset_id)).into());
@@ -528,7 +529,7 @@ impl UnifiedWallet for Wallet {
     }
     
     fn get_assets(&self) -> AnyaResult<Vec<Asset>> {
-        let assets = self.assets.lock().unwrap();
+        let assets = self.assets.lock()?;
         Ok(assets.values().cloned().collect())
     }
     

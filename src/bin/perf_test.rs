@@ -1,3 +1,4 @@
+use std::error::Error;
 //! Performance testing command line tool
 
 use anya_core::testing::performance::runner::{
@@ -35,7 +36,7 @@ enum Opt {
     },
 }
 
-fn main() {
+fn main()  -> Result<(), Box<dyn Error>> {
     let opt = Opt::from_args();
     
     match opt {

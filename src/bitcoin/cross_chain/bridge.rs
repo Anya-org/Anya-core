@@ -1,3 +1,4 @@
+use std::error::Error;
 // src/bitcoin/cross_chain/bridge.rs
 
 use std::collections::HashMap;
@@ -47,7 +48,7 @@ pub trait BridgeService {
     fn list_bridge_transactions(&self) -> AnyaResult<Vec<BridgeTransaction>>;
 }
 
-pub struct BridgeServiceImpl {
+pub struct BridgeServiceImpl  -> Result<(), Box<dyn Error>> {
     supported_bridges: Vec<(String, String)>,
     transactions: HashMap<String, BridgeTransaction>,
     bitcoin_manager: Arc<BitcoinManager>,
@@ -55,7 +56,7 @@ pub struct BridgeServiceImpl {
 }
 
 impl BridgeServiceImpl {
-    pub fn new(bitcoin_manager: Arc<BitcoinManager>) -> Self {
+    pub fn new(bitcoin_manager: Arc<BitcoinManager>) -> Self  -> Result<(), Box<dyn Error>> {
         // Default supported bridges
         let supported_bridges = vec![
             ("bitcoin".to_string(), "liquid".to_string()),
@@ -74,22 +75,22 @@ impl BridgeServiceImpl {
         }
     }
     
-    pub fn initialize(&mut self) -> AnyaResult<()> {
+    pub fn initialize(&mut self) -> AnyaResult<()>  -> Result<(), Box<dyn Error>> {
         self.initialized = true;
         Ok(())
     }
 }
 
 impl BridgeService for BridgeServiceImpl {
-    fn is_bridge_supported(&self, source: &str, destination: &str) -> bool {
+    fn is_bridge_supported(&self, source: &str, destination: &str) -> bool  -> Result<(), Box<dyn Error>> {
         self.supported_bridges.contains(&(source.to_string(), destination.to_string()))
     }
     
-    fn get_supported_bridges(&self) -> Vec<(String, String)> {
+    fn get_supported_bridges(&self) -> Vec<(String, String)>  -> Result<(), Box<dyn Error>> {
         self.supported_bridges.clone()
     }
     
-    fn create_bridge_transaction(&self, params: BridgeParams) -> AnyaResult<BridgeTransaction> {
+    fn create_bridge_transaction(&self, params: BridgeParams) -> AnyaResult<BridgeTransaction>  -> Result<(), Box<dyn Error>> {
         if !self.is_bridge_supported(&params.source_chain, &params.destination_chain) {
             return Err(BitcoinError::CrossChain(format!(
                 "Bridge from {} to {} is not supported",
@@ -117,11 +118,11 @@ impl BridgeService for BridgeServiceImpl {
         Ok(tx)
     }
     
-    fn get_bridge_transaction(&self, id: &str) -> AnyaResult<Option<BridgeTransaction>> {
+    fn get_bridge_transaction(&self, id: &str) -> AnyaResult<Option<BridgeTransaction>>  -> Result<(), Box<dyn Error>> {
         Ok(self.transactions.get(id).cloned())
     }
     
-    fn list_bridge_transactions(&self) -> AnyaResult<Vec<BridgeTransaction>> {
+    fn list_bridge_transactions(&self) -> AnyaResult<Vec<BridgeTransaction>>  -> Result<(), Box<dyn Error>> {
         Ok(self.transactions.values().cloned().collect())
     }
 } 

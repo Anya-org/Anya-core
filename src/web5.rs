@@ -1,3 +1,4 @@
+use std::error::Error;
 use serde::{Serialize, Deserialize};
 use std::collections::HashMap;
 
@@ -274,3 +275,4 @@ pub struct IpfsClient {
 pub struct EncryptionManager {
     // Encryption implementation
 }
+

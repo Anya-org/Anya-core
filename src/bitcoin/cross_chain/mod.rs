@@ -1,3 +1,4 @@
+use std::error::Error;
 // Migrated from OPSource to anya-core
 // This file was automatically migrated as part of the Rust-only implementation
 // Original file: C:\Users\bmokoka\Downloads\OPSource\src\bitcoin\cross_chain\mod.rs
@@ -255,7 +256,7 @@ pub fn execute_transaction(
             let bridge_tx = rsk::RSKBridgeTransaction {
                 prev_tx_id: transaction.source_txid.clone(),
                 prev_vout: 0, // This would be set properly in a real implementation
-                sender_pubkey: bitcoin::PublicKey::from_slice(&hex::decode(&transaction.source_sender).unwrap()).unwrap(),
+                sender_pubkey: bitcoin::PublicKey::from_slice(&hex::decode(&transaction.source_sender)?)?,
                 amount: transaction.amount,
                 change_amount: 0, // This would be calculated in a real implementation
                 status: rsk::RSKBridgeStatus::PendingBitcoin,
@@ -448,7 +449,7 @@ mod tests {
             "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
             "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
             1000000, // 0.01 BTC
-        ).unwrap();
+        )?;
         
         assert_eq!(transaction.source_sender, "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4");
         assert_eq!(transaction.target_recipient, "0x71C7656EC7ab88b098defB751B7401B5f6d8976F");
@@ -473,7 +474,7 @@ mod tests {
             "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
             "VJL7xGMPkX4BoKYvCBNqYUNLd3UcguxHyA",
             1000000, // 0.01 BTC
-        ).unwrap();
+        )?;
         
         assert_eq!(transaction.source_sender, "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4");
         assert_eq!(transaction.target_recipient, "VJL7xGMPkX4BoKYvCBNqYUNLd3UcguxHyA");
@@ -482,3 +483,4 @@ mod tests {
         assert_eq!(transaction.status, CrossChainStatus::PendingSource);
     }
 }
+

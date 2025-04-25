@@ -1,3 +1,4 @@
+use std::error::Error;
 // Updated Payment Handling with BOLT 12
 impl LightningNode {
     pub fn create_offer(&self, request: OfferRequest) -> Result<Bolt12Offer> {

@@ -1,3 +1,4 @@
+use std::error::Error;
 use std::process::Command;
 use log::{info, warn, error};
 use semver::Version;
@@ -75,7 +76,7 @@ fn check_rust_version() -> Result<(), String> {
                 Err(e) => return Err(format!("Failed to parse rustc version: {}", e)),
             };
             
-            let min_version = Version::parse("1.70.0").unwrap();
+            let min_version = Version::parse("1.70.0")?;
             if version < min_version {
                 return Err(format!("Rust version {} is too old, minimum required is 1.70.0", version));
             }

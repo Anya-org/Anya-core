@@ -1,3 +1,4 @@
+use std::error::Error;
 impl LabelValidator {
     pub fn validate_component(&self, component: &Component) -> Result<()> {
         let required_labels = match component.category {

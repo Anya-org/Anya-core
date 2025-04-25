@@ -1,3 +1,4 @@
+use std::error::Error;
 use serde::{Serialize, Deserialize};
 use std::collections::HashMap;
 
@@ -211,3 +212,4 @@ pub enum BridgeStatus {
     Paused,
     Maintenance,
 }
+

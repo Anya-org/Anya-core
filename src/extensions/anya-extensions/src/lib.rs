@@ -19,3 +19,4 @@ mod tests {
         assert!(init().is_ok());
     }
 }
+

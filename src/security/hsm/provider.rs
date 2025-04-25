@@ -1,3 +1,4 @@
+use std::error::Error;
 use async_trait::async_trait;
 use serde::{Serialize, Deserialize};
 use thiserror::Error;
@@ -538,12 +539,12 @@ impl HsmProvider for SoftHsmProvider {
             HsmOperation::Sign => {
                 // Parse the parameters
                 let key_id: String = match request.parameters.get("key_id") {
-                    Some(value) if value.is_string() => value.as_str().unwrap().to_string(),
+                    Some(value) if value.is_string() => value.as_str()?.to_string(),
                     _ => return Err(HsmError::InvalidParameter("Missing or invalid key_id parameter".to_string())),
                 };
                 
                 let data_base64: String = match request.parameters.get("data") {
-                    Some(value) if value.is_string() => value.as_str().unwrap().to_string(),
+                    Some(value) if value.is_string() => value.as_str()?.to_string(),
                     _ => return Err(HsmError::InvalidParameter("Missing or invalid data parameter".to_string())),
                 };
                 
@@ -600,7 +601,7 @@ impl HsmProvider for SoftHsmProvider {
             HsmOperation::ExportPublicKey => {
                 // Parse the parameters
                 let key_id: String = match request.parameters.get("key_id") {
-                    Some(value) if value.is_string() => value.as_str().unwrap().to_string(),
+                    Some(value) if value.is_string() => value.as_str()?.to_string(),
                     _ => return Err(HsmError::InvalidParameter("Missing or invalid key_id parameter".to_string())),
                 };
                 
@@ -635,7 +636,7 @@ impl HsmProvider for SoftHsmProvider {
             HsmOperation::DeleteKey => {
                 // Parse the parameters
                 let key_id: String = match request.parameters.get("key_id") {
-                    Some(value) if value.is_string() => value.as_str().unwrap().to_string(),
+                    Some(value) if value.is_string() => value.as_str()?.to_string(),
                     _ => return Err(HsmError::InvalidParameter("Missing or invalid key_id parameter".to_string())),
                 };
                 

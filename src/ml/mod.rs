@@ -1,3 +1,4 @@
+use std::error::Error;
 //! Machine Learning module
 //!
 //! This module provides machine learning capabilities for the Anya system,
@@ -28,7 +29,7 @@ pub struct MLConfig {
 }
 
 impl Default for MLConfig {
-    fn default() -> Self {
+    fn default() -> Self  -> Result<(), Box<dyn Error>> {
         Self {
             enabled: true,
             model_path: Some("./data/models".to_string()),
@@ -48,7 +49,7 @@ pub struct MLSystem {
 
 impl MLSystem {
     /// Create a new MLSystem with the given configuration
-    pub fn new(config: MLConfig) -> AnyaResult<Self> {
+    pub fn new(config: MLConfig) -> AnyaResult<Self>  -> Result<(), Box<dyn Error>> {
         if !config.enabled {
             return Ok(Self {
                 config,
@@ -77,28 +78,28 @@ impl MLSystem {
     }
 
     /// Get the ML service
-    pub fn service(&self) -> &MLService {
+    pub fn service(&self) -> &MLService  -> Result<(), Box<dyn Error>> {
         &self.service
     }
 
     /// Register a model with the ML system
-    pub fn register_model<M: MLModel + 'static>(&mut self, name: &str, model: M) -> AnyaResult<()> {
+    pub fn register_model<M: MLModel + 'static>(&mut self, name: &str, model: M) -> AnyaResult<()>  -> Result<(), Box<dyn Error>> {
         self.models.insert(name.to_string(), Arc::new(Mutex::new(model)));
         Ok(())
     }
 
     /// Get a model by name
-    pub fn get_model(&self, name: &str) -> Option<Arc<Mutex<dyn MLModel>>> {
+    pub fn get_model(&self, name: &str) -> Option<Arc<Mutex<dyn MLModel>>>  -> Result<(), Box<dyn Error>> {
         self.models.get(name).cloned()
     }
 
     /// List all registered models
-    pub fn list_models(&self) -> Vec<String> {
+    pub fn list_models(&self) -> Vec<String>  -> Result<(), Box<dyn Error>> {
         self.models.keys().cloned().collect()
     }
 
     /// Get health metrics for all models
-    pub fn get_health_metrics(&self) -> HashMap<String, HashMap<String, f64>> {
+    pub fn get_health_metrics(&self) -> HashMap<String, HashMap<String, f64>>  -> Result<(), Box<dyn Error>> {
         let mut metrics = HashMap::new();
         
         // Add service metrics
@@ -129,7 +130,7 @@ pub trait MLModel: Send + Sync {
 
 /// ML model input
 #[derive(Debug, Clone)]
-pub struct MLInput {
+pub struct MLInput  -> Result<(), Box<dyn Error>> {
     /// Features for the model
     pub features: Vec<f64>,
     /// Label for supervised learning
@@ -169,7 +170,7 @@ pub struct FederatedLearningManager {
 
 impl FederatedLearningManager {
     /// Create a new federated learning manager
-    pub fn new() -> Self {
+    pub fn new() -> Self  -> Result<(), Box<dyn Error>> {
         Self {
             nodes: Vec::new(),
             aggregation_method: "average".to_string(),
@@ -177,17 +178,17 @@ impl FederatedLearningManager {
     }
     
     /// Add a node to the federation
-    pub fn add_node(&mut self, node: FederatedNode) {
+    pub fn add_node(&mut self, node: FederatedNode)  -> Result<(), Box<dyn Error>> {
         self.nodes.push(node);
     }
     
     /// Remove a node from the federation
-    pub fn remove_node(&mut self, node_id: &str) {
+    pub fn remove_node(&mut self, node_id: &str)  -> Result<(), Box<dyn Error>> {
         self.nodes.retain(|n| n.id != node_id);
     }
     
     /// List all nodes in the federation
-    pub fn list_nodes(&self) -> &[FederatedNode] {
+    pub fn list_nodes(&self) -> &[FederatedNode]  -> Result<(), Box<dyn Error>> {
         &self.nodes
     }
 }
@@ -210,12 +211,12 @@ pub const PROD_THRESHOLD: f64 = 0.90;
 pub const RELEASE_THRESHOLD: f64 = 0.99;
 
 /// Helper function to create an agent checker with default auto-save frequency (20)
-pub fn create_agent_checker() -> AgentChecker {
+pub fn create_agent_checker() -> AgentChecker  -> Result<(), Box<dyn Error>> {
     AgentChecker::new(20)
 }
 
 /// Helper function to determine if a system is ready for a given stage
-pub fn is_ready_for_stage(health: f64, stage: SystemStage) -> bool {
+pub fn is_ready_for_stage(health: f64, stage: SystemStage) -> bool  -> Result<(), Box<dyn Error>> {
     match stage {
         SystemStage::Development => health >= DEV_THRESHOLD,
         SystemStage::Production => health >= PROD_THRESHOLD,
@@ -229,10 +230,11 @@ mod tests {
     use super::*;
     
     #[test]
-    fn test_stage_readiness() {
+    fn test_stage_readiness()  -> Result<(), Box<dyn Error>> {
         assert_eq!(is_ready_for_stage(0.55, SystemStage::Development), false);
         assert_eq!(is_ready_for_stage(0.65, SystemStage::Development), true);
         assert_eq!(is_ready_for_stage(0.85, SystemStage::Production), false);
         assert_eq!(is_ready_for_stage(0.95, SystemStage::Production), true);
     }
 }
+

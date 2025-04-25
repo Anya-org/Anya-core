@@ -1,3 +1,4 @@
+use std::error::Error;
 #[dao_label(DaoLabel::OPENBANK)]
 impl ComplianceManager {
     /// Automated regulatory checks

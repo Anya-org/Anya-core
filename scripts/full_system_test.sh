@@ -97,6 +97,12 @@ cargo test --test performance_framework_integration || log_error "Performance fr
 log_info "Running protocol tests"
 cargo test --test run_protocol_tests || log_error "Protocol tests failed"
 
+log_info "Starting Testnet simulation"
+docker-compose -f testnet-orchestration.yml up -d || log_error "Failed to start Testnet nodes"
+
+log_info "Running Testnet integration tests"
+cargo test --test testnet_integration --features testnet || log_error "Testnet integration tests failed"
+
 log_success "All tests passed successfully"
 
 # Step 5: Check BDF v2.5 compliance

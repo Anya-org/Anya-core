@@ -1,3 +1,4 @@
+use std::error::Error;
 //! Secure Random Number Generator Implementation
 //! [AIR-1][AIS-1][BPC-1][AIT-1][RES-1]
 //!
@@ -25,7 +26,7 @@ pub struct SecureRng {
 
 impl SecureRng {
     /// Create a new secure RNG
-    pub fn new() -> Self {
+    pub fn new() -> Self  -> Result<(), Box<dyn Error>> {
         // Create a cryptographically secure RNG seeded from the system entropy source
         let rng = ChaCha20Rng::from_entropy();
         
@@ -33,97 +34,97 @@ impl SecureRng {
     }
     
     /// Generate random bytes
-    pub fn random_bytes(&mut self, len: usize) -> Vec<u8> {
+    pub fn random_bytes(&mut self, len: usize) -> Vec<u8>  -> Result<(), Box<dyn Error>> {
         let mut bytes = vec![0u8; len];
         self.rng.fill_bytes(&mut bytes);
         bytes
     }
     
     /// Generate a random u64
-    pub fn random_u64(&mut self) -> u64 {
+    pub fn random_u64(&mut self) -> u64  -> Result<(), Box<dyn Error>> {
         self.rng.next_u64()
     }
     
     /// Generate a random u32
-    pub fn random_u32(&mut self) -> u32 {
+    pub fn random_u32(&mut self) -> u32  -> Result<(), Box<dyn Error>> {
         self.rng.next_u32()
     }
     
     /// Generate a random usize
-    pub fn random_usize(&mut self) -> usize {
+    pub fn random_usize(&mut self) -> usize  -> Result<(), Box<dyn Error>> {
         self.rng.gen::<usize>()
     }
     
     /// Generate a random f64 between 0.0 and 1.0
-    pub fn random_f64(&mut self) -> f64 {
+    pub fn random_f64(&mut self) -> f64  -> Result<(), Box<dyn Error>> {
         self.rng.gen::<f64>()
     }
     
     /// Generate a random integer in range [min, max)
-    pub fn random_in_range(&mut self, min: i64, max: i64) -> i64 {
+    pub fn random_in_range(&mut self, min: i64, max: i64) -> i64  -> Result<(), Box<dyn Error>> {
         self.rng.gen_range(min..max)
     }
     
     /// Generate a random boolean
-    pub fn random_bool(&mut self) -> bool {
+    pub fn random_bool(&mut self) -> bool  -> Result<(), Box<dyn Error>> {
         self.rng.gen::<bool>()
     }
     
     /// Shuffle a slice
-    pub fn shuffle<T>(&mut self, slice: &mut [T]) {
+    pub fn shuffle<T>(&mut self, slice: &mut [T])  -> Result<(), Box<dyn Error>> {
         use rand::seq::SliceRandom;
         slice.shuffle(&mut self.rng);
     }
     
     /// Reseed the RNG
-    pub fn reseed(&mut self) {
+    pub fn reseed(&mut self)  -> Result<(), Box<dyn Error>> {
         self.rng = ChaCha20Rng::from_entropy();
     }
 }
 
 /// Generate random bytes
-pub fn random_bytes(len: usize) -> Vec<u8> {
-    SECURE_RNG.lock().unwrap().random_bytes(len)
+pub fn random_bytes(len: usize) -> Vec<u8>  -> Result<(), Box<dyn Error>> {
+    SECURE_RNG.lock()?.random_bytes(len)
 }
 
 /// Generate a random u64
-pub fn random_u64() -> u64 {
-    SECURE_RNG.lock().unwrap().random_u64()
+pub fn random_u64() -> u64  -> Result<(), Box<dyn Error>> {
+    SECURE_RNG.lock()?.random_u64()
 }
 
 /// Generate a random u32
-pub fn random_u32() -> u32 {
-    SECURE_RNG.lock().unwrap().random_u32()
+pub fn random_u32() -> u32  -> Result<(), Box<dyn Error>> {
+    SECURE_RNG.lock()?.random_u32()
 }
 
 /// Generate a random usize
-pub fn random_usize() -> usize {
-    SECURE_RNG.lock().unwrap().random_usize()
+pub fn random_usize() -> usize  -> Result<(), Box<dyn Error>> {
+    SECURE_RNG.lock()?.random_usize()
 }
 
 /// Generate a random f64 between 0.0 and 1.0
-pub fn random_f64() -> f64 {
-    SECURE_RNG.lock().unwrap().random_f64()
+pub fn random_f64() -> f64  -> Result<(), Box<dyn Error>> {
+    SECURE_RNG.lock()?.random_f64()
 }
 
 /// Generate a random integer in range [min, max)
-pub fn random_in_range(min: i64, max: i64) -> i64 {
-    SECURE_RNG.lock().unwrap().random_in_range(min, max)
+pub fn random_in_range(min: i64, max: i64) -> i64  -> Result<(), Box<dyn Error>> {
+    SECURE_RNG.lock()?.random_in_range(min, max)
 }
 
 /// Generate a random boolean
-pub fn random_bool() -> bool {
-    SECURE_RNG.lock().unwrap().random_bool()
+pub fn random_bool() -> bool  -> Result<(), Box<dyn Error>> {
+    SECURE_RNG.lock()?.random_bool()
 }
 
 /// Shuffle a slice
-pub fn shuffle<T>(slice: &mut [T]) {
-    SECURE_RNG.lock().unwrap().shuffle(slice)
+pub fn shuffle<T>(slice: &mut [T])  -> Result<(), Box<dyn Error>> {
+    SECURE_RNG.lock()?.shuffle(slice)
 }
 
 /// Reseed the global RNG
-pub fn reseed() {
-    SECURE_RNG.lock().unwrap().reseed()
+pub fn reseed()  -> Result<(), Box<dyn Error>> {
+    SECURE_RNG.lock()?.reseed()
 }
 
 #[cfg(test)]
@@ -131,7 +132,7 @@ mod tests {
     use super::*;
     
     #[test]
-    fn test_random_bytes() {
+    fn test_random_bytes()  -> Result<(), Box<dyn Error>> {
         let bytes1 = random_bytes(32);
         let bytes2 = random_bytes(32);
         
@@ -144,7 +145,7 @@ mod tests {
     }
     
     #[test]
-    fn test_random_in_range() {
+    fn test_random_in_range()  -> Result<(), Box<dyn Error>> {
         let min = 10;
         let max = 100;
         
@@ -156,7 +157,7 @@ mod tests {
     }
     
     #[test]
-    fn test_shuffle() {
+    fn test_shuffle()  -> Result<(), Box<dyn Error>> {
         let original = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
         let mut shuffled = original.clone();
         

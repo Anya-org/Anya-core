@@ -72,7 +72,7 @@ const BIP_STANDARDS = {
     name: 'PSBT Version 2',
     description: 'PSBT Version 2 updates',
     requiredPatterns: [
-      'psbt', 'version: 2'
+      'psbt', 'version: 2', 'fee_rate'
     ],
     bestPractices: [
       'tx_modifiable'
@@ -95,6 +95,30 @@ const BIP_STANDARDS = {
     ]
   }
 };
+
+// Unified compliance matrix
+const COMPLIANCE_MATRIX = {
+    'BIP-341': {
+        required: ['tr(', 'SILENT_LEAF', 'merkle_root'],
+        threshold: 1.0,
+        crypto: {
+            schnorr: true,
+            taproot: true,
+            hsm: true,
+            fpga: true
+        }
+    },
+    'BIP-370': {
+        required: ['psbt', 'version: 2', 'fee_rate'],
+        threshold: 1.0,
+        crypto: {
+            ecdsa: true,
+            fpga: true
+        }
+    }
+};
+
+const SILENT_LEAF_REGEX = /tr\([^)]*SILENT_LEAF[^)]*\)/i;
 
 // Output validation header
 console.log('\n===== BIP Standards Compliance Validation =====');
@@ -274,4 +298,52 @@ fs.writeFileSync(reportPath, JSON.stringify(report, null, 2));
 console.log(`\nDetailed report saved to: ${reportPath}`);
 
 // Exit with appropriate code
-process.exit(overallCompliance ? 0 : 1); 
+process.exit(overallCompliance ? 0 : 1);
+
+function generateComplianceReport(results) {
+    return Object.entries(results).map(([bip, data]) => ({
+        standard: bip,
+        status: data.score >= COMPLIANCE_MATRIX[bip].threshold ? 
+               'Compliant' : 'Non-Compliant',
+        cryptoVerified: COMPLIANCE_MATRIX[bip].crypto
+    }));
+}
+
+function validateTaprootCommitment(content) {
+    if (!SILENT_LEAF_REGEX.test(content)) {
+        throw new Error('[BIP-341][AIS-3] Missing SILENT_LEAF pattern');
+    }
+    // Add hardware validation path
+    if (!hardwareValidateCommitment(content)) {
+        throw new Error('[HSM] Invalid silent leaf commitment');
+    }
+    return { compliant: true };
+}
+
+function hardwareValidateCommitment(content) {
+    const hsm = require('@anya/hsm-interface');
+    const commitmentHash = hsm.extractSilentLeaf(content);
+    return hsm.verifyCommitment(commitmentHash);
+}
+
+// Add installation path verification
+function validateInstallPaths() {
+    const REQUIRED_PATHS = [
+        'anya-core/src/bitcoin',
+        'anya-core/core/src/validation',
+        'dependencies/anya-bitcoin/src'
+    ];
+    
+    REQUIRED_PATHS.forEach(path => {
+        if (!fs.existsSync(path)) {
+            throw new Error(`[INSTALL] Missing critical path: ${path}`);
+        }
+    });
+    
+    // Verify HSM interface presence
+    try {
+        require.resolve('@anya/hsm-interface');
+    } catch (e) {
+        throw new Error('[HSM] Hardware Security Module interface not installed');
+    }
+}

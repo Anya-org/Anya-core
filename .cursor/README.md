@@ -1,4 +1,5 @@
 # Anya-Core MCP Configuration
+
 [AIR-3][AIS-3][AIT-2][AIM-2][AIP-2][AIE-2][BPC-3][AIP-3][PFM-2][SCL-2][RES-2]
 
 Last Updated: 2025-03-10 09:15 UTC+2
@@ -50,6 +51,7 @@ Validates Bitcoin protocol compliance according to BIP standards:
 * BIP-370 (PSBT Version 2)
 
 Usage example:
+
 ```
 Validate this Taproot transaction: tr(KEY,{SILENT_LEAF})
 ```
@@ -59,6 +61,7 @@ Validate this Taproot transaction: tr(KEY,{SILENT_LEAF})
 Creates Taproot assets with proper metadata according to project standards, generating both the asset definition and React Native component code.
 
 Usage example:
+
 ```
 Create a new asset named PrivacyCoin with supply 21000000
 ```
@@ -74,6 +77,7 @@ Runs security audit on Bitcoin code according to the compliance checklist, check
 * Memory management issues
 
 Usage example:
+
 ```
 Audit this Bitcoin code for security: function verifySignature(signature, message) { ... }
 ```
@@ -83,6 +87,7 @@ Audit this Bitcoin code for security: function verifySignature(signature, messag
 Generates Partially Signed Bitcoin Transaction (PSBT) templates that comply with BIP-174 and BIP-370.
 
 Usage example:
+
 ```
 Generate a PSBT with 2 inputs and 1 output
 ```
@@ -92,6 +97,7 @@ Generate a PSBT with 2 inputs and 1 output
 Verifies Discrete Log Contract setups for compliance with project standards.
 
 Usage example:
+
 ```
 Verify this DLC contract with oracle public key 03abc...
 ```

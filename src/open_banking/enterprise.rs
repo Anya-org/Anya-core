@@ -1,3 +1,4 @@
+use std::error::Error;
 // Enterprise Banking Module
 // [AIS-3][BPC-3][DAO-3]
 

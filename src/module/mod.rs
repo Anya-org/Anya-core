@@ -1,3 +1,4 @@
+use std::error::Error;
 macro_rules! impl_installable_module {
     ($struct:ty, $install:expr, $test:expr) => {
         impl InstallableModule for $struct {

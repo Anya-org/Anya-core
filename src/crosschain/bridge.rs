@@ -1,3 +1,4 @@
+use std::error::Error;
 use std::collections::HashMap;
 use std::sync::Arc;
 use anyhow::Result;
@@ -74,3 +75,4 @@ impl CrossChainBridge {
         }
     }
 }
+

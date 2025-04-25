@@ -1,3 +1,4 @@
+use std::error::Error;
 #[derive(Clone)]
 struct ChannelPersister {
     storage: Arc<dyn ChannelStorage>,

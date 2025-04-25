@@ -1,3 +1,4 @@
+use std::error::Error;
 use std::time::Instant;
 use anya_core::{
     layer2::{
@@ -46,7 +47,7 @@ struct MilestoneResult {
 }
 
 #[tokio::main]
-async fn main() {
+async fn main()  -> Result<(), Box<dyn Error>> {
     // Initialize logging
     tracing_subscriber::fmt::init();
     
@@ -94,7 +95,7 @@ async fn main() {
         let protocol_result = ProtocolResult {
             name: name.to_string(),
             status: if result.is_ok() { "Success".to_string() } else { "Failed".to_string() },
-            completion_time: Some(suite.milestones.last().unwrap().completion_time.unwrap().as_secs_f64()),
+            completion_time: Some(suite.milestones.last()?.completion_time?.as_secs_f64()),
             milestones: suite.milestones.into_iter().map(|m| MilestoneResult {
                 name: m.name,
                 status: match m.status {
@@ -123,15 +124,15 @@ async fn main() {
     report.total_time = start_time.elapsed().as_secs_f64();
     
     // Generate report
-    let report_json = serde_json::to_string_pretty(&report).unwrap();
+    let report_json = serde_json::to_string_pretty(&report)?;
     let report_dir = Path::new("test_reports");
     if !report_dir.exists() {
-        fs::create_dir(report_dir).unwrap();
+        fs::create_dir(report_dir)?;
     }
     
     let report_path = report_dir.join(format!("protocol_test_report_{}.json", 
         chrono::Utc::now().format("%Y%m%d_%H%M%S")));
-    fs::write(&report_path, report_json).unwrap();
+    fs::write(&report_path, report_json)?;
     
     // Print summary
     println!("\nTest Summary:");

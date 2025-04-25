@@ -1,3 +1,4 @@
+use std::error::Error;
 // Migrated from OPSource to anya-core
 // This file was automatically migrated as part of the Rust-only implementation
 // Original file: C:\Users\bmokoka\Downloads\OPSource\src\bitcoin\cross_chain\rsk.rs
@@ -199,7 +200,7 @@ pub fn create_rsk_bridge_transaction(
 
     if bridge_tx.change_amount > 0 {
         // Create a P2WPKH script using the public key hash
-        let sender_script = ScriptBuf::new_p2wpkh(&WPubkeyHash::from_slice(&bridge_tx.sender_pubkey.pubkey_hash()).unwrap());
+        let sender_script = ScriptBuf::new_p2wpkh(&WPubkeyHash::from_slice(&bridge_tx.sender_pubkey.pubkey_hash())?);
         let change_output = TxOut {
             value: Amount::from_sat(bridge_tx.change_amount),
             script_pubkey: sender_script.clone().into(),
@@ -241,7 +242,7 @@ pub fn execute_rsk_bridge_transaction(
 
     // For simplicity, we'll create a single input from a previous transaction
     let btc_outpoint = OutPoint {
-        txid: Txid::from_str("0000000000000000000000000000000000000000000000000000000000000001").unwrap(),
+        txid: Txid::from_str("0000000000000000000000000000000000000000000000000000000000000001")?,
         vout: 0,
     };
 
@@ -448,7 +449,7 @@ mod tests {
         let bridge_tx = RSKBridgeTransaction {
             prev_tx_id: "0000000000000000000000000000000000000000000000000000000000000001".to_string(),
             prev_vout: 0,
-            sender_pubkey: bitcoin::PublicKey::from_str("02eec7245d6b7d2ccb30380bfbe2a3648cd7a942653f5aa340edcea1f283686619").unwrap(),
+            sender_pubkey: bitcoin::PublicKey::from_str("02eec7245d6b7d2ccb30380bfbe2a3648cd7a942653f5aa340edcea1f283686619")?,
             amount: 1_000_000,
             change_amount: 500_000,
             status: RSKBridgeStatus::PendingBitcoin,
@@ -459,10 +460,10 @@ mod tests {
         };
 
         // Create a federation script
-        let federation_script = ScriptBuf::new_p2wpkh(&WPubkeyHash::from_slice(&bridge_tx.sender_pubkey.pubkey_hash()).unwrap());
+        let federation_script = ScriptBuf::new_p2wpkh(&WPubkeyHash::from_slice(&bridge_tx.sender_pubkey.pubkey_hash())?);
 
         // Create the bridge transaction
-        let tx = create_rsk_bridge_transaction(&bridge_tx, federation_script).unwrap();
+        let tx = create_rsk_bridge_transaction(&bridge_tx, federation_script)?;
 
         // Verify the transaction
         assert_eq!(tx.input.len(), 1);
@@ -536,3 +537,4 @@ impl RskBridge {
         Err(BridgeError::NotSupported("Method not fully implemented".to_string()))
     }
 }
+

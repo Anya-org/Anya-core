@@ -1,3 +1,4 @@
+use std::error::Error;
 // src/bitcoin/sidechains/rsk/bridge.rs
 
 //! RSK Bridge implementation for Bitcoin cross-chain operations
@@ -565,7 +566,7 @@ impl RskBridge {
         // Create a placeholder transaction for now
         let tx = TransactionRequest {
             from: None, // Will be filled by the sender's account
-            to: Some(Address::from_str(&self.config.bridge_contract_address).unwrap()),
+            to: Some(Address::from_str(&self.config.bridge_contract_address)?),
             gas: Some(gas_limit.into()),
             gas_price: Some(gas_price.into()),
             value: Some(amount.into()),
@@ -913,11 +914,11 @@ impl BridgeOperations for RskBridge {
 impl Clone for RskBridge {
     fn clone(&self) -> Self {
         // Create a new HTTP transport
-        let transport = Http::new(&self.rsk_client.get_node_url()).unwrap();
+        let transport = Http::new(&self.rsk_client.get_node_url())?;
         let web3 = Web3::new(transport);
         
         // Create a new contract instance
-        let contract_address = Address::from_str(&self.config.bridge_contract_address).unwrap();
+        let contract_address = Address::from_str(&self.config.bridge_contract_address)?;
         let contract = Contract::from_json(web3.eth(), contract_address, BRIDGE_ABI).ok();
         
         Self {

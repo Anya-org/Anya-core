@@ -1,3 +1,4 @@
+use std::error::Error;
 mod bitcoin_tests;
 mod dao_tests;
 mod web5_tests;
@@ -10,7 +11,7 @@ use clap::{App, Arg, SubCommand};
 use log::{info, error};
 use unified_test::{UnifiedTestRunner, UnifiedTestConfig};
 
-fn main() {
+fn main()  -> Result<(), Box<dyn Error>> {
     // Initialize testing environment
     let matches = App::new("Anya-Core Tester")
         .version("3.1.0")
@@ -65,7 +66,7 @@ fn main() {
 
     // Process subcommands
     if let Some(matches) = matches.subcommand_matches("component") {
-        let component = matches.value_of("component").unwrap();
+        let component = matches.value_of("component")?;
         config.components = vec![component.to_string()];
         run_unified_tests(config);
     } else if let Some(_) = matches.subcommand_matches("system") {
@@ -97,7 +98,7 @@ fn main() {
     }
 }
 
-fn run_unified_tests(config: UnifiedTestConfig) {
+fn run_unified_tests(config: UnifiedTestConfig)  -> Result<(), Box<dyn Error>> {
     info!("Running unified tests with components: {}", config.components.join(", "));
     
     match UnifiedTestRunner::new(config) {

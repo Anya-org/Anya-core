@@ -1,3 +1,4 @@
+use std::error::Error;
 // Bitcoin relay interaction module
 // Placeholder for future implementation
 

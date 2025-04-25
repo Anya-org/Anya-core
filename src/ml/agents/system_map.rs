@@ -1,3 +1,4 @@
+use std::error::Error;
 //! System Map and Index for Agent Operations
 //!
 //! This module provides the system mapping and indexing capabilities
@@ -278,7 +279,7 @@ impl SystemIndexManager {
             AgentError::InternalError("Failed to acquire write lock on system index".to_string())
         })?;
         
-        index.model_paths.insert(model_id, semver::Version::parse(path.split('.').last().unwrap_or("0.0.0")).unwrap());
+        index.model_paths.insert(model_id, semver::Version::parse(path.split('.').last().unwrap_or("0.0.0"))?);
         
         // Update metadata
         index.last_updated.store(
@@ -337,7 +338,7 @@ impl SystemIndexManager {
 
     async fn analyze_rust_file(&self, path: &str) -> RustCodeMetrics {
         let content = std::fs::read_to_string(path).unwrap_or_default();
-        let syntax = syn::parse_file(&content).unwrap();
+        let syntax = syn::parse_file(&content)?;
         
         let mut metrics = RustCodeMetrics {
             cyclomatic_complexity: calculate_cyclomatic_complexity(&syntax),
@@ -372,7 +373,7 @@ impl SystemIndexManager {
             });
 
         walker.for_each(|(path, metrics)| {
-            self.index.write().unwrap().rust_metrics.insert(path, metrics);
+            self.index.write()?.rust_metrics.insert(path, metrics);
         });
 
         Ok(())
@@ -607,3 +608,4 @@ mod tests {
         // Test map operations
     }
 }
+

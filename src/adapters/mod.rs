@@ -1,3 +1,4 @@
+use std::error::Error;
 // Input adapter example
 pub struct RestApi {
     handler: Arc<dyn CommandHandler>,

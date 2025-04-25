@@ -1,3 +1,4 @@
+use std::error::Error;
 //! Transaction throughput performance testing
 
 use crate::testing::performance::{
@@ -182,7 +183,7 @@ impl TransactionThroughputTest {
                     match test.generate_transaction() {
                         Ok(tx) => {
                             let _ = test.validator.validate_taproot_transaction(&tx);
-                            let mut counter = counter.lock().unwrap();
+                            let mut counter = counter.lock()?;
                             *counter += 1;
                             
                             if *counter % 100 == 0 {

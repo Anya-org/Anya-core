@@ -1,3 +1,4 @@
+use std::error::Error;
 //! Tests for the performance testing framework
 
 #[cfg(test)]
@@ -13,7 +14,7 @@ mod tests {
     use std::time::Duration;
 
     #[test]
-    fn test_timer() {
+    fn test_timer()  -> Result<(), Box<dyn Error>> {
         let mut timer = Timer::new();
         
         // Test elapsed time without starting
@@ -26,17 +27,17 @@ mod tests {
         let result = timer.elapsed_ms();
         assert!(result.is_ok(), "Timer should work after starting");
         
-        let elapsed = result.unwrap();
+        let elapsed = result?;
         assert!(elapsed >= 10, "Timer should measure at least 10ms");
         
         // Test with stop
         timer.stop();
-        let elapsed_after_stop = timer.elapsed_ms().unwrap();
+        let elapsed_after_stop = timer.elapsed_ms()?;
         assert_eq!(elapsed_after_stop, elapsed, "Elapsed time should not change after stop");
     }
     
     #[test]
-    fn test_cache_performance_test() {
+    fn test_cache_performance_test()  -> Result<(), Box<dyn Error>> {
         // Create a small cache test that completes quickly
         let config = CacheConfig {
             size: 10,
@@ -60,17 +61,17 @@ mod tests {
         let result = test.run_test(&test_config);
         assert!(result.is_ok(), "Cache test should complete successfully");
         
-        let test_result = result.unwrap();
+        let test_result = result?;
         assert_eq!(test_result.name, "cache_performance_LRU_Uniform");
         assert!(test_result.metrics.contains_key("cache_hit_rate"));
         assert!(test_result.metrics.contains_key("operations_per_second"));
         
-        let hit_rate = test_result.metrics.get("cache_hit_rate").unwrap();
+        let hit_rate = test_result.metrics.get("cache_hit_rate")?;
         assert!(*hit_rate >= 0.0 && *hit_rate <= 100.0, "Hit rate should be between 0-100%");
     }
     
     #[test]
-    fn test_performance_test_runner() {
+    fn test_performance_test_runner()  -> Result<(), Box<dyn Error>> {
         let mut runner = PerformanceTestRunner::new();
         
         // Add a test configuration
@@ -87,7 +88,7 @@ mod tests {
         struct DummyTest;
         
         impl crate::testing::performance::PerformanceTestable for DummyTest {
-            fn run_test(&self, config: &TestConfig) -> crate::testing::performance::Result<crate::testing::performance::TestResult> {
+            fn run_test(&self, config: &TestConfig) -> crate::testing::performance::Result<crate::testing::performance::TestResult>  -> Result<(), Box<dyn Error>> {
                 let mut metrics = HashMap::new();
                 metrics.insert("dummy_metric".to_string(), 42.0);
                 
@@ -104,7 +105,7 @@ mod tests {
                 })
             }
             
-            fn name(&self) -> &str {
+            fn name(&self) -> &str  -> Result<(), Box<dyn Error>> {
                 "test"
             }
         }

@@ -1,3 +1,4 @@
+use std::error::Error;
 //! Blockchain module
 //!
 //! This module provides a hexagonal architecture implementation for

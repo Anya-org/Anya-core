@@ -1,3 +1,4 @@
+use std::error::Error;
 //! Error types for HSM security module
 //!
 //! This module provides comprehensive error types for HSM operations,

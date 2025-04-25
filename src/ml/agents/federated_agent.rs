@@ -1,3 +1,4 @@
+use std::error::Error;
  an//! Federated Learning Agent
 //!
 //! This module provides agents that facilitate federated learning across the network,
@@ -508,3 +509,4 @@ mod tests {
         // Test that the read-first principle is enforced
     }
 }
+

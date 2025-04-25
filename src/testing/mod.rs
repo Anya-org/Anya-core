@@ -1,3 +1,4 @@
+use std::error::Error;
 #[derive(BitcoinProtocol)]
 pub struct UnifiedTester {
     #[taproot_commitment]  // BPC-2 Compliance

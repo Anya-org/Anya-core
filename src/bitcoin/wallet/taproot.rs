@@ -1,3 +1,4 @@
+use std::error::Error;
  //! Bitcoin Taproot wallet support module
 //!
 //! This module provides functionality for creating and managing Taproot addresses,
@@ -504,9 +505,9 @@ impl TaprootWallet {
         // Add a change output if needed
         if change_amount > 0 {
             let change_address = Address::p2wpkh(
-                &PublicKey::from_slice(&keypair.public_key().serialize()).unwrap(),
+                &PublicKey::from_slice(&keypair.public_key().serialize())?,
                 self.network,
-            ).expect("Failed to create change address");
+            )?;
             
             tx_outputs.push(TxOut {
                 value: change_amount,
@@ -537,7 +538,7 @@ impl TaprootWallet {
                     .map_err(|e| TaprootError::BitcoinError(format!("Failed to generate sighash: {}", e)))?;
                 
                 let sig = self.secp.sign_ecdsa(
-                    &Message::from_slice(&sighash).unwrap(),
+                    &Message::from_slice(&sighash)?,
                     issuer_key,
                 );
                 
@@ -561,7 +562,7 @@ impl TaprootWallet {
                 let (_, tweaked_seckey) = keypair.tap_tweak(&self.secp, spend_info.merkle_root());
                 
                 let sig = self.secp.sign_schnorr(
-                    &Message::from_slice(&sighash).unwrap(),
+                    &Message::from_slice(&sighash)?,
                     &tweaked_seckey,
                 );
                 
@@ -664,16 +665,16 @@ mod tests {
         let wallet = TaprootWallet::new(Network::Testnet);
         
         // Generate a keypair
-        let (secret_key, public_key) = wallet.generate_keypair().unwrap();
+        let (secret_key, public_key) = wallet.generate_keypair()?;
         
         // Create a simple Taproot address
-        let (address, spend_info) = wallet.create_taproot_address(&public_key, None).unwrap();
+        let (address, spend_info) = wallet.create_taproot_address(&public_key, None)?;
         
         // Verify the address starts with "tb1p" (testnet Taproot)
         assert!(address.to_string().starts_with("tb1p"));
         
         // Verify the address can be spent with the key
-        let result = wallet.verify_taproot_address(&address.to_string(), &public_key, None).unwrap();
+        let result = wallet.verify_taproot_address(&address.to_string(), &public_key, None)?;
         assert!(result);
     }
     
@@ -686,13 +687,13 @@ mod tests {
         let script2 = ScriptBuf::new_op_return(&[5, 6, 7, 8]);
         
         // Create a script tree
-        let tree = wallet.create_script_tree(&[&script1, &script2]).unwrap();
+        let tree = wallet.create_script_tree(&[&script1, &script2])?;
         
         // Generate a keypair
-        let (_, public_key) = wallet.generate_keypair().unwrap();
+        let (_, public_key) = wallet.generate_keypair()?;
         
         // Create a Taproot address with the script tree
-        let (address, _) = wallet.create_taproot_address(&public_key, Some(&tree)).unwrap();
+        let (address, _) = wallet.create_taproot_address(&public_key, Some(&tree))?;
         
         // Verify the address starts with "tb1p" (testnet Taproot)
         assert!(address.to_string().starts_with("tb1p"));
@@ -703,22 +704,22 @@ mod tests {
         let musig = MuSig::new();
         
         // Generate keypairs for three participants
-        let (secret1, public1) = musig.generate_keypair().unwrap();
-        let (secret2, public2) = musig.generate_keypair().unwrap();
-        let (secret3, public3) = musig.generate_keypair().unwrap();
+        let (secret1, public1) = musig.generate_keypair()?;
+        let (secret2, public2) = musig.generate_keypair()?;
+        let (secret3, public3) = musig.generate_keypair()?;
         
         // Combine public keys
-        let combined_pubkey = musig.combine_public_keys(&[public1, public2, public3]).unwrap();
+        let combined_pubkey = musig.combine_public_keys(&[public1, public2, public3])?;
         
         // Create a message to sign
         let message = b"This is a test message";
         
         // Create partial signatures (simplified)
-        let sig1 = musig.create_partial_signature(&secret1, &[public1, public2, public3], message).unwrap();
+        let sig1 = musig.create_partial_signature(&secret1, &[public1, public2, public3], message)?;
         
         // In a real implementation, we would combine partial signatures
         // Here we just verify the signature directly
-        let result = musig.verify_signature(&combined_pubkey, message, &sig1).unwrap();
+        let result = musig.verify_signature(&combined_pubkey, message, &sig1)?;
         
         // This will fail because we're using a simplified version
         // In a real MuSig implementation, we would need proper key aggregation and signature combination

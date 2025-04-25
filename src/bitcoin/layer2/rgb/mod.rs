@@ -1,3 +1,4 @@
+use std::error::Error;
 // src/bitcoin/layer2/rgb/mod.rs
 
 //! RGB Layer 2 implementation
@@ -110,9 +111,9 @@ pub trait RGBManager {
 /// Factory for creating RGB managers
 pub struct RGBFactory;
 
-impl RGBFactory {
+impl RGBFactory  -> Result<(), Box<dyn Error>> {
     /// Creates a new RGB manager
-    pub fn create_manager(config: RGBConfig) -> Box<dyn RGBManager> {
+    pub fn create_manager(config: RGBConfig) -> Box<dyn RGBManager>  -> Result<(), Box<dyn Error>> {
         Box::new(DefaultRGBManager::new(config))
     }
 }
@@ -137,7 +138,7 @@ pub struct RGBConfig {
 }
 
 impl Default for RGBConfig {
-    fn default() -> Self {
+    fn default() -> Self  -> Result<(), Box<dyn Error>> {
         Self {
             data_dir: PathBuf::from("./rgb_data"),
             network: "testnet".to_string(),
@@ -226,7 +227,7 @@ struct DefaultRGBManager {
 
 impl DefaultRGBManager {
     /// Creates a new default RGB manager
-    fn new(config: RGBConfig) -> Self {
+    fn new(config: RGBConfig) -> Self  -> Result<(), Box<dyn Error>> {
         Self {
             config,
             client: None,
@@ -235,52 +236,52 @@ impl DefaultRGBManager {
 }
 
 impl RGBManager for DefaultRGBManager {
-    fn init(&self, config: RGBConfig) -> AnyaResult<()> {
+    fn init(&self, config: RGBConfig) -> AnyaResult<()>  -> Result<(), Box<dyn Error>> {
         // Implementation goes here
         unimplemented!("RGB initialization not yet implemented")
     }
     
-    fn create_asset(&self, params: AssetCreationParams) -> AnyaResult<RGBAsset> {
+    fn create_asset(&self, params: AssetCreationParams) -> AnyaResult<RGBAsset>  -> Result<(), Box<dyn Error>> {
         // Implementation goes here
         unimplemented!("Asset creation not yet implemented")
     }
     
-    fn list_assets(&self) -> AnyaResult<Vec<RGBAsset>> {
+    fn list_assets(&self) -> AnyaResult<Vec<RGBAsset>>  -> Result<(), Box<dyn Error>> {
         // Implementation goes here
         unimplemented!("Asset listing not yet implemented")
     }
     
-    fn get_asset_balance(&self, asset_id: &str) -> AnyaResult<u64> {
+    fn get_asset_balance(&self, asset_id: &str) -> AnyaResult<u64>  -> Result<(), Box<dyn Error>> {
         // Implementation goes here
         unimplemented!("Asset balance querying not yet implemented")
     }
     
-    fn create_invoice(&self, asset_id: &str, amount: u64) -> AnyaResult<String> {
+    fn create_invoice(&self, asset_id: &str, amount: u64) -> AnyaResult<String>  -> Result<(), Box<dyn Error>> {
         // Implementation goes here
         unimplemented!("Invoice creation not yet implemented")
     }
     
-    fn transfer_asset(&self, transfer: AssetTransfer) -> AnyaResult<String> {
+    fn transfer_asset(&self, transfer: AssetTransfer) -> AnyaResult<String>  -> Result<(), Box<dyn Error>> {
         // Implementation goes here
         unimplemented!("Asset transfer not yet implemented")
     }
     
-    fn get_transfer_status(&self, transfer_id: &str) -> AnyaResult<TransferStatus> {
+    fn get_transfer_status(&self, transfer_id: &str) -> AnyaResult<TransferStatus>  -> Result<(), Box<dyn Error>> {
         // Implementation goes here
         unimplemented!("Transfer status querying not yet implemented")
     }
     
-    fn validate_transfer(&self, transfer_id: &str) -> AnyaResult<bool> {
+    fn validate_transfer(&self, transfer_id: &str) -> AnyaResult<bool>  -> Result<(), Box<dyn Error>> {
         // Implementation goes here
         unimplemented!("Transfer validation not yet implemented")
     }
     
-    fn get_asset_metadata(&self, asset_id: &str) -> AnyaResult<HashMap<String, String>> {
+    fn get_asset_metadata(&self, asset_id: &str) -> AnyaResult<HashMap<String, String>>  -> Result<(), Box<dyn Error>> {
         // Implementation goes here
         unimplemented!("Asset metadata querying not yet implemented")
     }
     
-    fn get_asset_history(&self, asset_id: &str) -> AnyaResult<Vec<HistoryEntry>> {
+    fn get_asset_history(&self, asset_id: &str) -> AnyaResult<Vec<HistoryEntry>>  -> Result<(), Box<dyn Error>> {
         // Implementation goes here
         unimplemented!("Asset history querying not yet implemented")
     }

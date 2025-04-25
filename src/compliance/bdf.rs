@@ -1,3 +1,4 @@
+use std::error::Error;
 use std::collections::HashMap;
 use anyhow::Result;
 
@@ -77,3 +78,4 @@ impl ComplianceCheck for PrivacyCheck {
         "Verify privacy-by-design patterns implementation"
     }
 }
+

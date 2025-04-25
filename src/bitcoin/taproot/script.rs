@@ -1,3 +1,4 @@
+use std::error::Error;
 // src/bitcoin/taproot/script.rs
 
 use std::collections::HashMap;
@@ -68,7 +69,7 @@ pub struct TaprootScript {
 
 impl TaprootScript {
     /// Creates a new Taproot script from a Bitcoin script
-    pub fn new(script: ScriptBuf, script_type: TaprootScriptType) -> Self {
+    pub fn new(script: ScriptBuf, script_type: TaprootScriptType) -> Self  -> Result<(), Box<dyn Error>> {
         Self {
             script_type,
             script,
@@ -79,7 +80,7 @@ impl TaprootScript {
     }
     
     /// Creates a new Taproot script from a Miniscript
-    pub fn from_miniscript(miniscript_str: &str) -> AnyaResult<Self> {
+    pub fn from_miniscript(miniscript_str: &str) -> AnyaResult<Self>  -> Result<(), Box<dyn Error>> {
         // Implementation goes here
         // Parse miniscript, convert to Script
         
@@ -94,7 +95,7 @@ impl TaprootScript {
     }
     
     /// Creates a multi-signature script
-    pub fn create_multisig(threshold: usize, public_keys: &[&str]) -> AnyaResult<Self> {
+    pub fn create_multisig(threshold: usize, public_keys: &[&str]) -> AnyaResult<Self>  -> Result<(), Box<dyn Error>> {
         // Implementation goes here
         // Create a threshold signature script
         
@@ -112,7 +113,7 @@ impl TaprootScript {
     }
     
     /// Creates a time-locked script
-    pub fn create_timelock(base_script: &TaprootScript, lock_value: u32, is_relative: bool) -> AnyaResult<Self> {
+    pub fn create_timelock(base_script: &TaprootScript, lock_value: u32, is_relative: bool) -> AnyaResult<Self>  -> Result<(), Box<dyn Error>> {
         // Implementation goes here
         // Create a timelock wrapper around base_script
         
@@ -130,7 +131,7 @@ impl TaprootScript {
     }
     
     /// Creates a hash lock script
-    pub fn create_hashlock(hash_hex: &str, hash_type: &str) -> AnyaResult<Self> {
+    pub fn create_hashlock(hash_hex: &str, hash_type: &str) -> AnyaResult<Self>  -> Result<(), Box<dyn Error>> {
         // Implementation goes here
         // Create a hash lock script
         
@@ -147,12 +148,12 @@ impl TaprootScript {
     }
     
     /// Adds metadata to the script
-    pub fn add_metadata(&mut self, key: &str, value: &str) {
+    pub fn add_metadata(&mut self, key: &str, value: &str)  -> Result<(), Box<dyn Error>> {
         self.metadata.insert(key.to_string(), value.to_string());
     }
     
     /// Gets the leaf hash of this script
-    pub fn leaf_hash(&self) -> AnyaResult<Vec<u8>> {
+    pub fn leaf_hash(&self) -> AnyaResult<Vec<u8>>  -> Result<(), Box<dyn Error>> {
         // Implementation goes here
         // Calculate TapLeafHash
         
@@ -161,7 +162,7 @@ impl TaprootScript {
     }
     
     /// Converts this script to a witness
-    pub fn to_witness(&self, control_block: Vec<u8>) -> Witness {
+    pub fn to_witness(&self, control_block: Vec<u8>) -> Witness  -> Result<(), Box<dyn Error>> {
         // Implementation goes here
         // Create a witness for spending this script
         
@@ -180,7 +181,7 @@ pub struct TaprootScriptBuilder {
 
 impl TaprootScriptBuilder {
     /// Creates a new Taproot script builder
-    pub fn new(script_type: TaprootScriptType) -> Self {
+    pub fn new(script_type: TaprootScriptType) -> Self  -> Result<(), Box<dyn Error>> {
         Self {
             script_type,
             version: 0xc0, // Tapscript version
@@ -190,25 +191,25 @@ impl TaprootScriptBuilder {
     }
     
     /// Sets the script version
-    pub fn with_version(mut self, version: u8) -> Self {
+    pub fn with_version(mut self, version: u8) -> Self  -> Result<(), Box<dyn Error>> {
         self.version = version;
         self
     }
     
     /// Adds an operation to the script
-    pub fn add_op(mut self, op: &str) -> Self {
+    pub fn add_op(mut self, op: &str) -> Self  -> Result<(), Box<dyn Error>> {
         self.operations.push(op.to_string());
         self
     }
     
     /// Adds metadata to the script
-    pub fn add_metadata(mut self, key: &str, value: &str) -> Self {
+    pub fn add_metadata(mut self, key: &str, value: &str) -> Self  -> Result<(), Box<dyn Error>> {
         self.metadata.insert(key.to_string(), value.to_string());
         self
     }
     
     /// Builds the Taproot script
-    pub fn build(self) -> AnyaResult<TaprootScript> {
+    pub fn build(self) -> AnyaResult<TaprootScript>  -> Result<(), Box<dyn Error>> {
         // Implementation goes here
         // Convert operations to ScriptBuf
         
@@ -228,7 +229,7 @@ pub struct ScriptParser;
 
 impl ScriptParser {
     /// Parses a Bitcoin script
-    pub fn parse_script(script: &ScriptBuf) -> AnyaResult<TaprootScriptType> {
+    pub fn parse_script(script: &ScriptBuf) -> AnyaResult<TaprootScriptType>  -> Result<(), Box<dyn Error>> {
         // Implementation goes here
         // Detect script type from script
         
@@ -237,7 +238,7 @@ impl ScriptParser {
     }
     
     /// Parses a Miniscript
-    pub fn parse_miniscript(miniscript_str: &str) -> AnyaResult<Miniscript<String>> {
+    pub fn parse_miniscript(miniscript_str: &str) -> AnyaResult<Miniscript<String>>  -> Result<(), Box<dyn Error>> {
         // Implementation goes here
         
         // Placeholder for now

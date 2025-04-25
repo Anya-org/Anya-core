@@ -1,3 +1,4 @@
+use std::error::Error;
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -61,7 +62,7 @@ mod tests {
         let result = hsm_manager.generate_key_pair(key_params).await;
         assert!(result.is_ok(), "Key generation failed: {:?}", result);
         
-        let public_key_info = result.unwrap();
+        let public_key_info = result?;
         assert_eq!(public_key_info.id, "test-key-1", "Key ID should match");
         
         // Sign data
@@ -69,12 +70,12 @@ mod tests {
         let result = hsm_manager.sign("test-key-1", SigningAlgorithm::EcdsaSha256, data).await;
         assert!(result.is_ok(), "Signing failed: {:?}", result);
         
-        let signature = result.unwrap();
+        let signature = result?;
         
         // Verify signature
         let result = hsm_manager.verify("test-key-1", SigningAlgorithm::EcdsaSha256, data, &signature).await;
         assert!(result.is_ok(), "Verification failed: {:?}", result);
-        assert!(result.unwrap(), "Signature should be valid");
+        assert!(result?, "Signature should be valid");
         
         // Close HSM manager
         let result = hsm_manager.close().await;
@@ -117,7 +118,7 @@ mod tests {
         ).await;
         assert!(result.is_ok(), "Bitcoin key generation failed: {:?}", result);
         
-        let bitcoin_key = result.unwrap();
+        let bitcoin_key = result?;
         assert_eq!(bitcoin_key.key_type, BitcoinKeyType::Taproot, "Key type should be Taproot");
         
         // Sign Bitcoin message
@@ -147,7 +148,7 @@ mod tests {
         ).await;
         assert!(result.is_ok(), "Taproot asset creation failed: {:?}", result);
         
-        let asset_id = result.unwrap();
+        let asset_id = result?;
         assert!(!asset_id.is_empty(), "Asset ID should not be empty");
     }
     */
@@ -183,7 +184,7 @@ mod tests {
         let result = hsm_manager.get_audit_events(filter).await;
         assert!(result.is_ok(), "Getting audit events failed: {:?}", result);
         
-        let events = result.unwrap();
+        let events = result?;
         assert!(!events.is_empty(), "There should be audit events");
         
         // Check if initialization event is present
@@ -202,15 +203,15 @@ mod tests {
         // Test parsing various key types
         let result = KeyType::from_str("rsa/2048");
         assert!(result.is_ok(), "Parsing RSA key type failed: {:?}", result);
-        assert!(matches!(result.unwrap(), KeyType::Rsa { bits: 2048 }));
+        assert!(matches!(result?, KeyType::Rsa { bits: 2048 }));
         
         let result = KeyType::from_str("ec/p256");
         assert!(result.is_ok(), "Parsing EC key type failed: {:?}", result);
-        assert!(matches!(result.unwrap(), KeyType::Ec { curve: EcCurve::P256 }));
+        assert!(matches!(result?, KeyType::Ec { curve: EcCurve::P256 }));
         
         let result = KeyType::from_str("aes/256");
         assert!(result.is_ok(), "Parsing AES key type failed: {:?}", result);
-        assert!(matches!(result.unwrap(), KeyType::Aes { bits: 256 }));
+        assert!(matches!(result?, KeyType::Aes { bits: 256 }));
         
         let result = KeyType::from_str("invalid");
         assert!(result.is_err(), "Parsing invalid key type should fail");

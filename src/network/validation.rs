@@ -1,3 +1,4 @@
+use std::error::Error;
 use std::time::{Duration, Instant};
 use std::process::Command;
 use log::{info, warn, error};
@@ -23,7 +24,7 @@ pub struct NetworkValidationConfig {
 }
 
 impl Default for NetworkValidationConfig {
-    fn default() -> Self {
+    fn default() -> Self  -> Result<(), Box<dyn Error>> {
         Self {
             endpoints: vec![
                 "https://bitcoin-rpc.publicnode.com".to_string(),
@@ -132,12 +133,12 @@ pub struct NetworkValidator {
 }
 
 impl NetworkValidator {
-    pub fn new(config: NetworkValidationConfig) -> Self {
+    pub fn new(config: NetworkValidationConfig) -> Self  -> Result<(), Box<dyn Error>> {
         Self { config }
     }
 
     /// Run comprehensive network validation
-    pub async fn validate_network(&self) -> NetworkValidationResult {
+    pub async fn validate_network(&self) -> NetworkValidationResult  -> Result<(), Box<dyn Error>> {
         info!("Running comprehensive network validation...");
         
         // Run connectivity check
@@ -239,7 +240,7 @@ impl NetworkValidator {
     }
     
     /// Validate basic internet connectivity
-    async fn validate_connectivity(&self) -> NetworkConnectivityResult {
+    async fn validate_connectivity(&self) -> NetworkConnectivityResult  -> Result<(), Box<dyn Error>> {
         info!("Validating internet connectivity...");
         
         // Check if we can reach a reliable internet endpoint
@@ -285,7 +286,7 @@ impl NetworkValidator {
     }
     
     /// Check if endpoint is reachable
-    async fn is_endpoint_reachable(&self, endpoint: &str) -> bool {
+    async fn is_endpoint_reachable(&self, endpoint: &str) -> bool  -> Result<(), Box<dyn Error>> {
         // Parse the URL to get host and port
         if let Ok(url) = url::Url::parse(endpoint) {
             let host = match url.host_str() {
@@ -317,7 +318,7 @@ impl NetworkValidator {
     }
     
     /// Validate DNS resolution
-    async fn validate_dns(&self) -> DnsValidationResult {
+    async fn validate_dns(&self) -> DnsValidationResult  -> Result<(), Box<dyn Error>> {
         info!("Validating DNS resolution...");
         
         let mut resolvers_available = Vec::new();
@@ -379,7 +380,7 @@ impl NetworkValidator {
     }
     
     /// Validate bandwidth
-    async fn validate_bandwidth(&self) -> BandwidthValidationResult {
+    async fn validate_bandwidth(&self) -> BandwidthValidationResult  -> Result<(), Box<dyn Error>> {
         info!("Validating network bandwidth...");
         
         // Simple bandwidth test
@@ -441,7 +442,7 @@ impl NetworkValidator {
     }
     
     /// Validate network latency
-    async fn validate_latency(&self) -> LatencyValidationResult {
+    async fn validate_latency(&self) -> LatencyValidationResult  -> Result<(), Box<dyn Error>> {
         info!("Validating network latency...");
         
         let mut endpoint_latencies = Vec::new();
@@ -489,7 +490,7 @@ impl NetworkValidator {
     }
     
     /// Measure latency to a host
-    async fn measure_latency(&self, host: &str) -> u64 {
+    async fn measure_latency(&self, host: &str) -> u64  -> Result<(), Box<dyn Error>> {
         let mut total_ms = 0u64;
         let mut successful_pings = 0u64;
         
@@ -512,7 +513,7 @@ impl NetworkValidator {
     }
     
     /// Validate open ports
-    async fn validate_ports(&self) -> PortValidationResult {
+    async fn validate_ports(&self) -> PortValidationResult  -> Result<(), Box<dyn Error>> {
         info!("Validating required ports with BIP-341 compliance...");
         
         let mut open_ports = Vec::new();
@@ -552,7 +553,7 @@ impl NetworkValidator {
     }
     
     /// Check if a port is open
-    async fn is_port_open(&self, host: &str, port: u16) -> bool {
+    async fn is_port_open(&self, host: &str, port: u16) -> bool  -> Result<(), Box<dyn Error>> {
         let addr = format!("{}:{}", host, port);
         match timeout(Duration::from_secs(3), TcpStream::connect(&addr)).await {
             Ok(Ok(_)) => true,
@@ -561,7 +562,7 @@ impl NetworkValidator {
     }
     
     /// Validate SSL certificates
-    async fn validate_ssl(&self) -> SslValidationResult {
+    async fn validate_ssl(&self) -> SslValidationResult  -> Result<(), Box<dyn Error>> {
         info!("Validating SSL certificates...");
         
         let mut endpoints_secure = Vec::new();
@@ -624,7 +625,7 @@ impl NetworkValidator {
     }
     
     /// Validate firewall settings
-    async fn validate_firewall(&self) -> FirewallValidationResult {
+    async fn validate_firewall(&self) -> FirewallValidationResult  -> Result<(), Box<dyn Error>> {
         info!("Validating firewall settings...");
         
         // Detect if a firewall is present and active
@@ -654,7 +655,7 @@ impl NetworkValidator {
     }
     
     /// Detect if a firewall is present
-    async fn detect_firewall(&self) -> bool {
+    async fn detect_firewall(&self) -> bool  -> Result<(), Box<dyn Error>> {
         // Platform-specific firewall detection
         #[cfg(target_os = "windows")]
         {
@@ -708,7 +709,7 @@ impl NetworkValidator {
     }
     
     /// Check if firewall blocks Bitcoin connections
-    async fn check_firewall_blocks_bitcoin(&self) -> bool {
+    async fn check_firewall_blocks_bitcoin(&self) -> bool  -> Result<(), Box<dyn Error>> {
         // Updated to check Taproot port requirements from BIP-341
         !(self.is_port_open("bitcoin.org", 8333).await ||   // Mainnet
           self.is_port_open("bitcoin.org", 18333).await ||  // Testnet
@@ -716,7 +717,7 @@ impl NetworkValidator {
     }
     
     /// Check which required ports are blocked
-    async fn check_blocked_ports(&self) -> Vec<u16> {
+    async fn check_blocked_ports(&self) -> Vec<u16>  -> Result<(), Box<dyn Error>> {
         let mut blocked_ports = Vec::new();
         
         for &port in &self.config.required_ports {
@@ -729,7 +730,7 @@ impl NetworkValidator {
     }
     
     /// Validate network routes
-    async fn validate_routes(&self) -> RouteValidationResult {
+    async fn validate_routes(&self) -> RouteValidationResult  -> Result<(), Box<dyn Error>> {
         info!("Validating network routes...");
         
         let mut routes = Vec::new();
@@ -773,7 +774,7 @@ impl NetworkValidator {
     }
     
     /// Trace route to host
-    async fn trace_route(&self, host: &str) -> (Vec<String>, Vec<String>) {
+    async fn trace_route(&self, host: &str) -> (Vec<String>, Vec<String>)  -> Result<(), Box<dyn Error>> {
         let mut hops = Vec::new();
         let mut problematic = Vec::new();
         
@@ -826,7 +827,7 @@ impl NetworkValidator {
     }
     
     /// Detect if a VPN is in use
-    async fn detect_vpn(&self) -> bool {
+    async fn detect_vpn(&self) -> bool  -> Result<(), Box<dyn Error>> {
         // Platform-specific VPN detection
         #[cfg(target_os = "windows")]
         {
@@ -890,7 +891,7 @@ impl NetworkValidator {
         ssl: &Option<SslValidationResult>,
         firewall: &Option<FirewallValidationResult>,
         route: &Option<RouteValidationResult>,
-    ) -> Vec<String> {
+    ) -> Vec<String>  -> Result<(), Box<dyn Error>> {
         let mut recommendations = Vec::new();
         
         // Connectivity recommendations
@@ -989,7 +990,7 @@ impl NetworkValidator {
         ssl: &Option<SslValidationResult>,
         firewall: &Option<FirewallValidationResult>,
         route: &Option<RouteValidationResult>,
-    ) -> ValidationStatus {
+    ) -> ValidationStatus  -> Result<(), Box<dyn Error>> {
         // Critical failures
         if connectivity.status == ValidationStatus::Fail || 
            dns.status == ValidationStatus::Fail ||
@@ -1024,7 +1025,7 @@ impl NetworkValidator {
     }
 
     /// BIP-341 specific port validation
-    async fn validate_taproot_port(&self, port: u16) -> bool {
+    async fn validate_taproot_port(&self, port: u16) -> bool  -> Result<(), Box<dyn Error>> {
         // Implement Taproot-specific validation logic
         let taproot_check = Command::new("bitcoin-cli")
             .args(&["getnetworkinfo"])
