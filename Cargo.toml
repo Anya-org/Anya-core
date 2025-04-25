@@ -1,10 +1,11 @@
 [workspace]
-members = ["core", "mobile-sdk"]  # Simplified workspace
+members = [
+  ".",
+  "core",
+  "mobile-sdk",
+  "dependencies"
+]
 resolver = "2"
-
-[workspace.dependencies]
-anya-mobile = { git = "https://github.com/anya-org/anya-mobile", tag = "v2.5" }
-mobile-sdk = { path = "mobile-sdk" }
 
 # Remove duplicate mobile entries
 # [AIS-3] Security: Enforce single source of truth
