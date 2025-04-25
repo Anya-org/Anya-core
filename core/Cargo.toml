@@ -7,8 +7,8 @@ edition = "2021"
 bitcoin.workspace = true
 secp256k1.workspace = true
 serde.workspace = true
-libp2p = { workspace = true, features = ["tcp", "websocket", "noise", "yamux"] }
-tokio = { workspace = true, features = ["full"] }
+libp2p = { workspace = true }
+tokio = { workspace = true }
 mobile-sdk = { path = "../mobile-sdk" }
 
 # Cryptographic primitives
@@ -39,9 +39,6 @@ default = ["audit"]
 audit = ["cargo-audit"]
 hardware = ["hsm", "sgx_urts"]
 hsm = ["yubihsm", "secp256k1/hsm"]
-chaos = [
-    "libp2p/chaos",
-    "tokio/full"
-]
+chaos = ["tokio/full"]
 sgx = ["sgx_urts"]
 mobile = ["bitcoin/use-serde", "secp256k1/global-context"] 

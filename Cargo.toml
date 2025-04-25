@@ -11,7 +11,7 @@ resolver = "2"
 bitcoin = "0.30.0"
 secp256k1 = "0.24.0"
 serde = { version = "1.0", features = ["derive"] }
-libp2p = { version = "0.48.0", features = ["tcp","websocket","noise","yamux"] }
+libp2p = "0.48.0"
 tokio = { version = "1.28.0", features = ["full"] }
 
 # Remove duplicate mobile entries
