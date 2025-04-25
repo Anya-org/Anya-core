@@ -34,23 +34,23 @@ web5 = { version = "0.5.1", features = [
 ], default-features = false }
 
 # Add SGX implementation
-sgx-urts = { version = "1.1.6", optional = true }
+sgx_urts = { version = "1.1.6", optional = true }
 
 # Change yubihsm to optional
 yubihsm = { version = "0.41.0", features = ["mock"], optional = true }
 
 [dev-dependencies]
-bip-check = { git = "https://github.com/bitcoin/bips", rev = "7c4b4c1d91b7d3dc6d7862ad5a8c1472332e6d84" }
+bip-check = "0.1.0"
 web5-test-vectors = "0.2.0"
 
 [features]
 default = ["audit"]
 audit = ["cargo-audit"]
-hardware = ["hsm", "sgx-urts"]
+hardware = ["hsm", "sgx_urts"]
 hsm = ["yubihsm", "secp256k1/hsm"]
 chaos = [
     "libp2p/chaos",
     "tokio/full"
 ]
-sgx = ["sgx-urts"]
+sgx = ["sgx_urts"]
 mobile = ["bitcoin/use-serde", "secp256k1/global-context"] 
