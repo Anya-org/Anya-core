@@ -209,6 +209,7 @@ Multiple labels should be grouped together without spaces:
 ### Code Examples
 
 **Rust:**
+
 ```rust
 //! Bitcoin SPV verification module
 //! [AIR-3][AIS-3][BPC-3][AIT-3][RES-3]
@@ -221,6 +222,7 @@ pub fn verify_bitcoin_spv(proof: BitcoinSPV) -> Result<bool, Error> {
 ```
 
 **JavaScript:**
+
 ```javascript
 /**
  * Bitcoin Protocol Security Validator
@@ -232,6 +234,7 @@ function validateBitcoinProtocol(params) {
 ```
 
 **Documentation:**
+
 ```markdown
 ## SPV Verification [AIR-3][AIS-3][BPC-3]
 
@@ -239,6 +242,7 @@ This section describes the SPV verification process...
 ```
 
 **Commit Message:**
+
 ```
 [AIR-3][AIS-3][BPC-3] Implement secure SPV verification with BIP-341 compliance
 ```
@@ -282,6 +286,7 @@ A script is available to validate AI labels in code and documentation:
 - v3.0 (2025-03-20): Standardized labeling system (this document) 
 
 ## Mandatory Labels
+
 | Label | Scope | Description |
 |-------|-------|-------------|
 | [AIR-3] | System-wide | AI readiness and integration |
@@ -290,6 +295,7 @@ A script is available to validate AI labels in code and documentation:
 | [RES-3] | Infrastructure | System resilience |
 
 ## Implementation Example
+
 ```rust
 // [AIS-3][BPC-3] Secure key generation
 fn generate_key() -> Result<Key, Error> {
@@ -298,6 +304,7 @@ fn generate_key() -> Result<Key, Error> {
 ```
 
 3. **FPGA Validation Suite**
+
 ```bash:scripts/hardware/fpga-test.sh
 #!/bin/bash
 # [RES-3][BPC-3] FPGA Validation
@@ -326,6 +333,7 @@ run_validation() {
 ```
 
 4. **Network Layer Security (AIS-3)**
+
 ```javascript:scripts/security/network-validation.js
 // [AIS-3] Network security validation
 function validateNetworkSecurity(config) {
@@ -342,6 +350,7 @@ function validateNetworkSecurity(config) {
 ```
 
 5. **Update Compliance Checklist**
+
 ```markdown:docs/COMPLIANCE_CHECKLIST.md
 | Requirement         | Target  | Current | Status  |
 |---------------------|---------|---------|---------|
@@ -352,6 +361,7 @@ function validateNetworkSecurity(config) {
 ```
 
 6. **Security Workflow Update**
+
 ```yaml:.github/workflows/security-scan.yml
 - name: Validate PSBTv2
   run: |
@@ -364,20 +374,26 @@ function validateNetworkSecurity(config) {
 ```
 
 These changes address all reported issues while maintaining:
+
 - Full BIP-341/370 compliance
 - AI labeling requirements [AIR-3]
 - Hardware security validation [RES-3]
 - Cryptographic best practices [AIS-3]
 
 The implementation passes all CodeQL checks and maintains the hexagonal architecture requirements. Would you like me to elaborate on any specific component? 
+
 ## Mobile Security [AIS-3][BPC-3]
+
 All mobile implementations must:
+
 - Use TurboModules for native crypto
 - Validate SILENT_LEAF commitments
 - Enforce PSBTv2 standards 
 
 ## Secret Management [AIS-3][BPC-3]
+
 All cryptographic secrets must:
+
 - Use HSM-backed storage
 - Follow BIP-32/BIP-44 derivation paths
 - Require 2+ HSM approvals for sensitive operations
@@ -385,20 +401,25 @@ All cryptographic secrets must:
 - Never appear in plaintext outside secure enclaves 
 
 ## Audit Requirements [AIS-3][BPC-3]
+
 All security audits must:
+
 - Use cryptographically signed audit reports
 - Validate against Bitcoin Core 24.0+ 
 - Include HSM hardware verification
 - Enforce constant-time comparison primitives 
 
 ## Research Code Requirements [RES-3]
+
 All experimental code must:
+
 - Be isolated in /experimental directory
 - Avoid dependencies on core modules
 - Include expiration dates
 - Follow Bitcoin protocol testing guidelines
 
 ## Full BDF Compliance Matrix [BPC-3][AIS-3]
+
 | Component       | BIP-341 | BIP-342 | BIP-370 | AIS-3 |
 |-----------------|---------|---------|---------|-------|
 | Core            | ✅      | ✅      | ✅      | ✅    |
