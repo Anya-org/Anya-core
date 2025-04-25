@@ -23,8 +23,8 @@ hmac = "0.12.1"
 # Security auditing
 cargo-audit = { version = "0.18.3", optional = true }
 
-# Update Web5 dependencies with security features
-web5 = { version = "0.5.1", features = [
+# Update Web5 dependencies with security features via Git repo
+web5 = { git = "https://github.com/decentralized-id/web5.git", tag = "v0.5.1", features = [
     "bip174",
     "bip341",
     "bip370",
@@ -34,7 +34,7 @@ web5 = { version = "0.5.1", features = [
 ], default-features = false }
 
 # Add SGX implementation
-sgx_urts = { version = "1.1.6", optional = true }
+sgx_urts = { version = "1.1.1", optional = true }
 
 # Change yubihsm to optional
 yubihsm = { version = "0.41.0", features = ["mock"], optional = true }
