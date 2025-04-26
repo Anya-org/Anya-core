@@ -4,7 +4,7 @@
     "anya-bitcoin-tools": {
       "command": "node",
       "args": [
-        "anya-core/scripts/bitcoin/mcp-server.js"
+        "scripts/bitcoin/mcp-server.js"
       ],
       "features": {
         "schnorrVerify": true,
@@ -13,13 +13,52 @@
         "key_path": true,
         "script_path": true,
         "validateTaprootStructure": true,
+        "secureRandomGeneration": true,
+        "inputValidation": true,
+        "errorHandling": true,
+        "taprootCompliance": true,
+        "signatureAggregation": true,
         "BIPs": ["BIP-340", "BIP-341", "BIP-342", "BIP-370"]
+      },
+      "bitcoinPrinciples": {
+        "decentralization": {
+          "permissionless": true,
+          "trustless": true,
+          "userSelfSovereignty": true
+        },
+        "security": {
+          "constantTimeOperations": true,
+          "secureRandomNumberGeneration": true,
+          "inputValidation": true,
+          "errorHandling": true
+        },
+        "privacy": {
+          "scriptPathWithSilentLeaf": true,
+          "keyPathIndistinguishable": true,
+          "crossInputSignatureAggregation": true,
+          "muSigKeyAggregation": true
+        },
+        "immutability": {
+          "properTransactionSigning": true,
+          "bip341CompliantStructure": true,
+          "taprootOutputConstruction": true
+        },
+        "verifiability": {
+          "oracleSignatureVerification": true,
+          "schnorrSignatureVerification": true,
+          "independentContractVerification": true
+        }
       }
     }
   },
   "aiLabels": {
     "BPC-3": true,
     "AIR-3": true,
-    "AIS-3": true
+    "AIS-3": true,
+    "AIT-3": true,
+    "PFM-3": true,
+    "SCL-3": true,
+    "RES-3": true,
+    "DID-3": true
   }
 }

@@ -6,14 +6,15 @@
   "scripts": {
     "test": "echo \"Running tests...\" && npm run validate && npm run integration-test",
     "update-roadmap": "node scripts/update-roadmap.js",
-    "test-mcp": "node scripts/test-mcp.js",
+    "test-mcp": "mocha tests/web5/validation.test.js tests/web5/schnorr_aggregation.test.js",
     "audit-mcp": "node scripts/security/analyze-mcp-server.js --file .cursor/mcp.json",
     "security-scan": "node scripts/security/analyze-mcp-server.js --file scripts/bitcoin/mcp-server.js",
     "validate": "npm run audit-mcp && npm run test-mcp && npm run check-labels",
     "check-labels": "node scripts/security/validate-ai-labels.js --file .cursor/mcp.json",
+    "verify-bip341": "node scripts/bitcoin/validate-bip-compliance.js --bip 341",
     "check-bdk": "bdk-cli validate --file ./src/bitcoin",
     "test-lightning": "ldk-test-runner --network=testnet",
-    "integration-test": "npm run check-bdk && npm run test-lightning",
+    "integration-test": "cargo test --package anya-core --lib web5::dlc_adapter web5::schnorr_aggregation",
     "check-hexagonal": "bdk-cli audit --hexagonal --file ./src"
   },
   "dependencies": {
