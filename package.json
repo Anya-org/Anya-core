@@ -4,10 +4,27 @@
   "description": "Anya Core Project",
   "main": "index.js",
   "scripts": {
-    "update-roadmap": "node scripts/update-roadmap.js"
+    "update-roadmap": "node scripts/update-roadmap.js",
+    "test-mcp": "node scripts/test-mcp.js",
+    "audit-mcp": "node scripts/security/analyze-mcp-server.js --file .cursor/mcp.json",
+    "security-scan": "node scripts/security/analyze-mcp-server.js --file scripts/bitcoin/mcp-server.js",
+    "validate": "npm run audit-mcp && npm run test-mcp && npm run check-labels",
+    "check-labels": "node scripts/security/validate-ai-labels.js --file .cursor/mcp.json",
+    "check-bdk": "bdk-cli validate --file ./src/bitcoin",
+    "test-lightning": "ldk-test-runner --network=testnet",
+    "integration-test": "npm run check-bdk && npm run test-lightning",
+    "check-hexagonal": "bdk-cli audit --hexagonal --file ./src"
   },
   "dependencies": {
-    "node-fetch": "^2.7.0"
+    "@noble/curves": "1.2.0",
+    "crypto-js": "4.2.0",
+    "node-fetch": "^2.7.0",
+    "zod": "3.22.4",
+    "schnorr-signatures": "2.1.4",
+    "bdk-wallet": "^1.0.0",
+    "lightningdevkit": "^0.8.2",
+    "bdk-descriptor": "^1.0.0",
+    "bdk-crypto": "^1.0.0"
   },
   "directories": {
     "doc": "docs",
@@ -34,6 +51,9 @@
   },
   "homepage": "https://github.com/anya-org/anya-core#readme",
   "devDependencies": {
-    "markdownlint-cli2": "^0.17.2"
+    "markdownlint-cli2": "^0.17.2",
+    "bdk-cli": "1.2.0",
+    "ldk-test-vectors": "0.8.0",
+    "@lightningdevkit/ldk-node": "^0.8.2"
   }
 }

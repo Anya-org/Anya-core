@@ -12,6 +12,7 @@ pub struct Web5ValidatorV2 {
     taproot_verifier: TaprootVerifier,
     #[bip275(fee_rate)]
     min_fee_rate: u64,
+    #[bip370(fee_rate = "min_fee_rate")]
 }
 
 impl Web5ValidatorV2 {
@@ -47,13 +48,10 @@ impl Web5ValidatorV2 {
 
     // Security Risk: Silent leaf pattern not enforced
     pub fn verify_taproot_commitment(&self, tx: &Transaction) -> Result<()> {
-        let silent_leaf = hex::decode(BIP341_SILENT_LEAF.trim_start_matches("0x"))
-            .context("Failed to decode SILENT_LEAF")?;
-
+        let silent_leaf = hex::decode(BIP341_SILENT_LEAF)?;
         tx.output.iter()
-            .find(|o| o.script_pubkey.as_bytes().eq(&silent_leaf))
-            .ok_or(anyhow::anyhow!("SILENT_LEAF commitment missing"))?;
-
+            .find(|o| o.script_pubkey.as_bytes() == silent_leaf)
+            .ok_or(anyhow!("SILENT_LEAF commitment missing"))?;
         Ok(())
     }
 }

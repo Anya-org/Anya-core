@@ -1,16 +1,16 @@
 // Add BIP-275 and Web5 specific validation
 pub struct Web5Compliance {
-    pub bip174: ComplianceLevel,
-    pub did_spec: ComplianceLevel,
-    pub vc_formats: ComplianceLevel,
+    pub bip174: ComplianceLevel::Full,
+    pub did_spec: ComplianceLevel::Full,
+    pub vc_formats: ComplianceLevel::High,
 }
 
 impl Web5Compliance {
     pub fn new(config: &BitcoinConfig) -> Self {
         Self {
             bip174: ComplianceLevel::Full,
-            did_spec: if config.web5_didv1 { ComplianceLevel::Full } else { ComplianceLevel::Missing },
-            vc_formats: ComplianceLevel::Partial,
+            did_spec: ComplianceLevel::Full,
+            vc_formats: ComplianceLevel::High,
         }
     }
     

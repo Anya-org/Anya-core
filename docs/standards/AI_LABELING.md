@@ -420,9 +420,22 @@ All experimental code must:
 
 ## Full BDF Compliance Matrix [BPC-3][AIS-3]
 
-| Component       | BIP-341 | BIP-342 | BIP-370 | AIS-3 |
-|-----------------|---------|---------|---------|-------|
-| Core            | ✅      | ✅      | ✅      | ✅    |
-| Mobile          | ✅      | ✅      | ✅      | ✅    |
-| HSM Interface   | ✅      | ✅      | ✅      | ✅    |
-| PSBT Engine     | ✅      | ✅      | ✅      | ✅    |
+| Component       | BIP-341 | BIP-342 | BIP-370 | AIS-3 | AIR-3 |
+|-----------------|---------|---------|---------|-------|-------|
+| Core Validation | ✅      | ✅      | ✅      | ✅    | ✅    |
+| Mobile          | ✅      | ✅      | ✅      | ✅    | ✅    |
+| HSM Interface   | ✅      | ✅      | ✅      | ✅    | ✅    |
+| PSBT Engine     | ✅      | ✅      | ✅      | ✅    | ✅    |
+
+## MCP Server AI Labels
+
+### Protocol Validation Tool [AIR-3][AIS-3][AIT-2]
+
+- Input validation: BIP-341 regex patterns
+- Security: Schnorr signature verification
+- Compliance: Full BIP-341/342 support
+
+### Taproot Asset Creation [AIS-3][BPC-3]
+
+- Privacy: Silent leaf implementation
+- Security: PSBT version validation

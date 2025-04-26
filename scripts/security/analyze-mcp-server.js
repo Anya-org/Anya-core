@@ -34,8 +34,27 @@ if (!fs.existsSync(targetFile)) {
   process.exit(1);
 }
 
+// Add BIP-340 verification check
+function checkSchnorrImplementation(code) {
+  const hasVerify = /verifySignatureSafely\(/.test(code);
+  const hasConstantTime = /crypto\.timingSafeEqual/.test(code);
+  return {
+    passed: hasVerify && hasConstantTime,
+    issues: [
+      !hasVerify && 'Missing Schnorr verification implementation',
+      !hasConstantTime && 'Missing constant-time comparison'
+    ].filter(Boolean)
+  };
+}
+
 // Security checks based on BDF v2.5 requirements
 const securityChecks = [
+  {
+    name: 'Schnorr Implementation',
+    description: 'Schnorr signature implementation validation',
+    severity: 'critical',
+    check: checkSchnorrImplementation
+  },
   {
     name: 'Secure Random Number Generation',
     description: 'Checks for proper secure random number generation',
@@ -140,10 +159,9 @@ const securityChecks = [
                                  code.includes('BIP-341');
       
       // Check for proper taproot validation
-      const hasTaprootValidation = code.includes('verify_taproot') || 
-                                 code.includes('Taproot validation');
+      const hasTaprootValidation = code.includes('verify_taproot');
       
-      if (!hasTaprootComponents) {
+      if (!/(tr\(0x[0-9a-f]{66},\{)/.test(code)) {
         return {
           passed: false,
           description: 'Missing proper Taproot structure according to BIP-341',
@@ -164,8 +182,8 @@ const securityChecks = [
   },
   {
     name: 'AI Labeling Compliance',
-    description: 'Checks for proper AI labeling according to project guidelines',
-    severity: 'medium',
+    description: 'AI labeling verification',
+    severity: 'high',
     check: (code) => {
       // Check for AI labeling headers
       const hasAILabels = code.includes('[AIR-') && 
