@@ -1,6 +1,6 @@
 {
-  "timestamp": "2025-04-26T07:07:07.085Z",
-  "target": ".cursor/mcp.json",
+  "timestamp": "2025-04-26T07:29:57.451Z",
+  "target": "scripts/bitcoin/mcp-server.js",
   "passed": false,
   "checkResults": [
     {
@@ -16,17 +16,17 @@
     {
       "name": "Signature Verification",
       "description": "Checks for proper signature verification in DLCs",
-      "passed": false
+      "passed": true
     },
     {
       "name": "Input Validation",
       "description": "Checks for proper input validation",
-      "passed": false
+      "passed": true
     },
     {
       "name": "Error Handling",
       "description": "Checks for proper error handling",
-      "passed": false
+      "passed": true
     },
     {
       "name": "BIP-341 Taproot Compliance",
@@ -36,7 +36,7 @@
     {
       "name": "AI Labeling Compliance",
       "description": "AI labeling verification",
-      "passed": false
+      "passed": true
     },
     {
       "name": "PSBT Handling",
@@ -46,49 +46,28 @@
     {
       "name": "Lightning Invoice Security",
       "description": "Checks for secure Lightning invoice implementation",
-      "passed": true
+      "passed": false
     }
   ],
   "issues": [
     {
       "name": "Schnorr Implementation",
       "severity": "critical",
-      "file": ".cursor/mcp.json"
-    },
-    {
-      "name": "Signature Verification",
-      "severity": "critical",
-      "description": "Missing Schnorr signature verification in cryptographic functions",
-      "recommendation": "Implement proper Schnorr signature verification according to BIP-340",
-      "file": ".cursor/mcp.json"
-    },
-    {
-      "name": "Input Validation",
-      "severity": "high",
-      "description": "Missing input validation for user-supplied data",
-      "recommendation": "Implement input validation for all user-supplied parameters",
-      "file": ".cursor/mcp.json"
-    },
-    {
-      "name": "Error Handling",
-      "severity": "medium",
-      "description": "Insufficient error handling which could lead to crashes",
-      "recommendation": "Implement comprehensive error handling with try-catch blocks and proper error reporting",
-      "file": ".cursor/mcp.json"
+      "file": "scripts/bitcoin/mcp-server.js"
     },
     {
       "name": "BIP-341 Taproot Compliance",
       "severity": "high",
       "description": "Missing proper Taproot structure according to BIP-341",
       "recommendation": "Implement proper Taproot structure with SILENT_LEAF for privacy preservation",
-      "file": ".cursor/mcp.json"
+      "file": "scripts/bitcoin/mcp-server.js"
     },
     {
-      "name": "AI Labeling Compliance",
+      "name": "Lightning Invoice Security",
       "severity": "high",
-      "description": "Missing or incomplete AI labeling according to project standards",
-      "recommendation": "Add proper AI labels according to the docs/standards/AI_LABELING.md guidelines",
-      "file": ".cursor/mcp.json"
+      "description": "Lightning invoice without secure preimage generation",
+      "recommendation": "Ensure payment preimages are generated using crypto.randomBytes",
+      "file": "scripts/bitcoin/mcp-server.js"
     }
   ]
 }

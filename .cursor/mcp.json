@@ -5,7 +5,21 @@
       "command": "node",
       "args": [
         "anya-core/scripts/bitcoin/mcp-server.js"
-      ]
+      ],
+      "features": {
+        "schnorrVerify": true,
+        "constantTimeComparison": true,
+        "SILENT_LEAF": true,
+        "key_path": true,
+        "script_path": true,
+        "validateTaprootStructure": true,
+        "BIPs": ["BIP-340", "BIP-341", "BIP-342", "BIP-370"]
+      }
     }
+  },
+  "aiLabels": {
+    "BPC-3": true,
+    "AIR-3": true,
+    "AIS-3": true
   }
-} 
+}
