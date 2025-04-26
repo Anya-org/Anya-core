@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-04-17T14:46:53.683Z",
+  "timestamp": "2025-04-26T07:29:57.451Z",
   "target": "scripts/bitcoin/mcp-server.js",
   "passed": false,
   "checkResults": [
@@ -46,7 +46,7 @@
     {
       "name": "Lightning Invoice Security",
       "description": "Checks for secure Lightning invoice implementation",
-      "passed": true
+      "passed": false
     }
   ],
   "issues": [
@@ -60,6 +60,13 @@
       "severity": "high",
       "description": "Missing proper Taproot structure according to BIP-341",
       "recommendation": "Implement proper Taproot structure with SILENT_LEAF for privacy preservation",
+      "file": "scripts/bitcoin/mcp-server.js"
+    },
+    {
+      "name": "Lightning Invoice Security",
+      "severity": "high",
+      "description": "Lightning invoice without secure preimage generation",
+      "recommendation": "Ensure payment preimages are generated using crypto.randomBytes",
       "file": "scripts/bitcoin/mcp-server.js"
     }
   ]

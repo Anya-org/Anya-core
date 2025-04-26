@@ -21,8 +21,94 @@ const CRITICAL_FILES = [
   'src/bitcoin/dlc/**/*.rs'
 ];
 
+/**
+ * Schnorr Signature Verification Check
+ * [AIR-3][AIS-3][BPC-3]
+ */
+function checkSchnorrSignatureVerification(filePath, content) {
+  const fileExt = path.extname(filePath);
+  
+  if (fileExt === '.js') {
+    // JavaScript Schnorr checks
+    const hasSchnorrImport = /@noble\/curves\/secp256k1|schnorr/.test(content);
+    const hasVerify = /verifySchnorrSignature|schnorr\.verify/.test(content);
+    const hasConstantTime = /constantTimeEqual|timingSafeEqual|utils\.equalBytes/.test(content);
+    
+    return {
+      passed: hasSchnorrImport && hasVerify && hasConstantTime,
+      details: !hasVerify ? 'Missing Schnorr signature verification' : 
+               !hasConstantTime ? 'Missing constant-time comparison for signature verification' :
+               !hasSchnorrImport ? 'Missing proper Schnorr library import' : 'Proper Schnorr verification implemented'
+    };
+  } else if (fileExt === '.rs') {
+    // Rust Schnorr checks
+    const hasSchnorrImport = /use bitcoin::secp256k1::Schnorr|use secp256k1::Schnorr/.test(content);
+    const hasVerify = /verify_schnorr|schnorr_verify|schnorr::verify/.test(content);
+    const hasConstantTime = /subtle::ConstantTimeEq|constant_time_eq|subtle::ct_eq/.test(content);
+    
+    return {
+      passed: hasSchnorrImport && hasVerify && hasConstantTime,
+      details: !hasVerify ? 'Missing Schnorr signature verification' : 
+               !hasConstantTime ? 'Missing constant-time comparison for signature verification' :
+               !hasSchnorrImport ? 'Missing proper Schnorr library import' : 'Proper Schnorr verification implemented'
+    };
+  }
+  
+  return { passed: true, details: 'Not applicable for this file type' };
+}
+
+/**
+ * Taproot Structure Validation Check
+ * [AIR-3][AIS-3][BPC-3]
+ */
+function checkTaprootImplementation(filePath, content) {
+  const fileExt = path.extname(filePath);
+  
+  if (fileExt === '.js') {
+    // JavaScript Taproot checks
+    const hasTaprootKeyword = /taproot|BIP-341|BIP341/.test(content);
+    const hasSilentLeaf = /SILENT_LEAF|has_silent_leaf/.test(content);
+    const hasKeyPath = /key_path|hasKeyPath/.test(content);
+    const hasScriptPath = /script_path|hasScriptPath/.test(content);
+    
+    return {
+      passed: hasTaprootKeyword && hasSilentLeaf && (hasKeyPath || hasScriptPath),
+      details: !hasTaprootKeyword ? 'Missing Taproot implementation' :
+               !hasSilentLeaf ? 'Missing SILENT_LEAF for Taproot privacy' :
+               (!hasKeyPath && !hasScriptPath) ? 'Missing key_path or script_path spending logic' :
+               'Proper Taproot structure implemented'
+    };
+  } else if (fileExt === '.rs') {
+    // Rust Taproot checks
+    const hasTaprootKeyword = /taproot|BIP341|BIP-341/.test(content);
+    const hasSilentLeaf = /TapLeaf::SILENT|silent_leaf|TapLeafHash/.test(content);
+    const hasKeyPath = /key_spend|key_path|spend_key_path/.test(content);
+    const hasScriptPath = /script_spend|script_path|spend_script_path/.test(content);
+    
+    return {
+      passed: hasTaprootKeyword && hasSilentLeaf && (hasKeyPath || hasScriptPath),
+      details: !hasTaprootKeyword ? 'Missing Taproot implementation' :
+               !hasSilentLeaf ? 'Missing SILENT_LEAF for Taproot privacy' :
+               (!hasKeyPath && !hasScriptPath) ? 'Missing key_path or script_path spending logic' :
+               'Proper Taproot structure implemented'
+    };
+  }
+  
+  return { passed: true, details: 'Not applicable for this file type' };
+}
+
 // Define crypto security checks
 const CRYPTO_CHECKS = [
+  {
+    name: 'Schnorr Signature Verification',
+    description: 'Check for proper implementation of Schnorr signature verification according to BIP-340',
+    check: checkSchnorrSignatureVerification
+  },
+  {
+    name: 'Taproot Implementation',
+    description: 'Check for proper implementation of Taproot structure according to BIP-341',
+    check: checkTaprootImplementation
+  },
   {
     name: 'Secure RNG Usage',
     description: 'Check for proper use of cryptographically secure random number generation',
