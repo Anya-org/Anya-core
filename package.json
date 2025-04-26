@@ -4,6 +4,7 @@
   "description": "Anya Core Project",
   "main": "index.js",
   "scripts": {
+    "test": "echo \"Running tests...\" && npm run validate && npm run integration-test",
     "update-roadmap": "node scripts/update-roadmap.js",
     "test-mcp": "node scripts/test-mcp.js",
     "audit-mcp": "node scripts/security/analyze-mcp-server.js --file .cursor/mcp.json",

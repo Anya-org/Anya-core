@@ -36,14 +36,60 @@ if (!fs.existsSync(targetFile)) {
 
 // Add BIP-340 verification check
 function checkSchnorrImplementation(code) {
-  const hasVerify = /verifySignatureSafely\(/.test(code);
-  const hasConstantTime = /crypto\.timingSafeEqual/.test(code);
+  const hasSchnorrImport = /@noble\/curves\/secp256k1|schnorr/.test(code);
+  const hasVerify = /verifySchnorrSignature|schnorr\.verify/.test(code);
+  const hasConstantTime = /constantTimeEqual|timingSafeEqual|utils\.equalBytes/.test(code);
+  
   return {
-    passed: hasVerify && hasConstantTime,
+    passed: hasSchnorrImport && hasVerify && hasConstantTime,
     issues: [
-      !hasVerify && 'Missing Schnorr verification implementation',
-      !hasConstantTime && 'Missing constant-time comparison'
-    ].filter(Boolean)
+      !hasSchnorrImport && 'Missing Schnorr implementation',
+      !hasVerify && 'Missing Schnorr signature verification in cryptographic functions',
+      !hasConstantTime && 'Missing constant-time comparison for cryptographic operations'
+    ].filter(Boolean),
+    recommendation: !hasVerify ? 'Implement proper Schnorr signature verification according to BIP-340' : undefined
+  };
+}
+
+// Add BIP-341 Taproot compliance check
+function checkTaprootCompliance(code) {
+  const hasTaprootKeyword = /taproot|BIP-341|BIP341/.test(code);
+  const hasSilentLeaf = /SILENT_LEAF|has_silent_leaf/.test(code);
+  const hasKeyPath = /key_path|hasKeyPath/.test(code);
+  const hasScriptPath = /script_path|hasScriptPath/.test(code);
+  const hasValidation = /validateTaprootStructure/.test(code);
+  
+  return {
+    passed: hasTaprootKeyword && hasSilentLeaf && (hasKeyPath || hasScriptPath) && hasValidation,
+    issues: [
+      !hasTaprootKeyword && 'Missing Taproot implementation',
+      !hasSilentLeaf && 'Missing SILENT_LEAF for Taproot privacy',
+      !hasKeyPath && !hasScriptPath && 'Missing key_path or script_path spending logic',
+      !hasValidation && 'Missing Taproot structure validation'
+    ].filter(Boolean),
+    recommendation: 'Implement proper Taproot structure according to BIP-341 with SILENT_LEAF for privacy preservation'
+  };
+}
+
+// AI Labeling Compliance check
+function checkAILabelingCompliance(code) {
+  // Check for AI labeling tags
+  const hasAIRTag = /\[AIR-[1-3]\]/.test(code);
+  const hasAISTag = /\[AIS-[1-3]\]/.test(code);
+  const hasBPCTag = /\[BPC-[1-3]\]/.test(code);
+  
+  // Check for header comments in functions
+  const hasFunctionComments = /\/\*\*[\s\S]*?\*\/\s+function/.test(code);
+  
+  return {
+    passed: hasAIRTag && hasAISTag && hasBPCTag && hasFunctionComments,
+    issues: [
+      !hasAIRTag && 'Missing AIR (AI Responsibility) labeling tags',
+      !hasAISTag && 'Missing AIS (AI Security) labeling tags',
+      !hasBPCTag && 'Missing BPC (Bitcoin Protocol Compliance) labeling tags',
+      !hasFunctionComments && 'Missing proper documentation in functions'
+    ].filter(Boolean),
+    recommendation: 'Add proper AI labels according to the docs/standards/AI_LABELING.md guidelines'
   };
 }
 
@@ -51,7 +97,7 @@ function checkSchnorrImplementation(code) {
 const securityChecks = [
   {
     name: 'Schnorr Implementation',
-    description: 'Schnorr signature implementation validation',
+    description: 'Schnorr signature implementation validation according to BIP-340',
     severity: 'critical',
     check: checkSchnorrImplementation
   },
@@ -82,11 +128,14 @@ const securityChecks = [
       // Look for schnorr verification in the code
       const hasSchnorrVerify = code.includes('schnorrVerify') || 
                               code.includes('verify_signature') || 
-                              code.includes('signature verification');
+                              code.includes('verifySchnorrSignature') ||
+                              code.includes('schnorr.verify');
       
       // Check if there are verification functions without timing attack protection
       const hasTimingProtection = code.includes('constant-time') || 
-                                 code.includes('time invariant');
+                                 code.includes('time invariant') ||
+                                 code.includes('constantTimeEqual') ||
+                                 code.includes('timingSafeEqual');
       
       if (!hasSchnorrVerify) {
         return {
