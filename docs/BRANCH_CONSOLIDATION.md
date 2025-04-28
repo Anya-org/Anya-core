@@ -86,18 +86,22 @@ On 2025-05-03 11:42:18, all unnecessary branches were removed after successful i
 - Cleaned up worktree references
 
 ### Worktree Resolution
+
 A Git worktree was discovered linking the `chore/auto-clean-maintenance` branch, which required special handling:
+
 ```
 C:/Users/bmokoka/Projects/anya-core                 fa490e8 [main]
 C:/Users/bmokoka/Projects/anya-core.worktrees/main  4609797 [chore/auto-clean-maintenance]
 ```
 
 The worktree was removed with force option to allow branch cleanup:
+
 ```
 git worktree remove --force "C:/Users/bmokoka/Projects/anya-core.worktrees/main"
 ```
 
 ### Final Branch Structure
+
 After cleanup, the repository has been simplified to only the essential branches:
 
 ```
@@ -108,6 +112,7 @@ After cleanup, the repository has been simplified to only the essential branches
 ```
 
 This clean branch structure ensures:
+
 1. Clear development path
 2. Proper code ownership
 3. Simplified contributor onboarding 
