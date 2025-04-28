@@ -101,6 +101,47 @@ gpg --armor --export YOUR_KEY_ID
 
 4. Paste your key and save
 
+## Retroactively Signing Previous Commits
+
+If you have existing commits that need to be signed, we provide scripts to help with this process:
+
+- **Windows/PowerShell**: Run `.\scripts\sign-previous-commits.ps1`
+- **Linux/Mac**: Run `./scripts/sign-previous-commits.sh`
+
+These scripts will help you identify and sign previous commits in your branch. By default, they examine the last 10 commits and provide a safe way to rewrite your Git history by adding proper GPG signatures.
+
+### Usage Examples
+
+**Windows**:
+```powershell
+# Show help
+.\scripts\sign-previous-commits.ps1 -h
+
+# Sign the last 5 commits
+.\scripts\sign-previous-commits.ps1 -CommitCount 5
+
+# Dry run to preview the process without making changes
+.\scripts\sign-previous-commits.ps1 -DryRun
+```
+
+**Linux/Mac**:
+```bash
+# Show help
+./scripts/sign-previous-commits.sh -h
+
+# Sign the last 5 commits
+./scripts/sign-previous-commits.sh -c 5
+
+# Dry run to preview the process without making changes
+./scripts/sign-previous-commits.sh -d
+```
+
+### Important Notes on Retroactive Signing
+
+- **Force Push Required**: After signing previous commits, you'll need to force push your branch.
+- **Caution with Shared Branches**: Only use retroactive signing on branches that haven't been used by other contributors, as it rewrites Git history.
+- **Public Repositories**: For public repositories, consider only signing new commits going forward rather than rewriting history.
+
 ## Troubleshooting
 
 ### "secret key not available"
