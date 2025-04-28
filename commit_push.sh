@@ -30,6 +30,21 @@ check_git_config() {
     fi
 }
 
+check_gpg_signing() {
+    local signing_key
+    local gpg_sign
+    
+    signing_key=$(git config --get user.signingkey 2>/dev/null || echo "")
+    gpg_sign=$(git config --get commit.gpgsign 2>/dev/null || echo "")
+    
+    if [[ -n "$signing_key" && "$gpg_sign" == "true" ]]; then
+        log_info "GPG signing is enabled with key: $signing_key"
+        return 0
+    else
+        return 1
+    fi
+}
+
 validate_commit_message() {
     local message=$1
     
@@ -68,7 +83,15 @@ commit_changes() {
     if ! git diff --quiet || ! git diff --cached --quiet; then
         git add .github/workflows/update-roadmap.yml scripts/update-roadmap.js package.json .github/ISSUE_TEMPLATE/roadmap_item.md
         validate_commit_message "$message"
-        git commit -m "$message"
+        
+        # Check if GPG signing is enabled
+        if check_gpg_signing; then
+            # Use -S flag to explicitly sign the commit
+            git commit -S -m "$message"
+            log_info "Commit signed with GPG"
+        else
+            git commit -m "$message"
+        fi
     else
         log_warn "No changes to commit"
         exit 0
