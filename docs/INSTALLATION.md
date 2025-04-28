@@ -509,3 +509,4 @@ cargo test --release --lib --bins -p anya-installer -- security::
   ```bash
   anya-validator check-revocation --credential credential.json
   ```
+

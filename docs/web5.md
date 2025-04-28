@@ -1,22 +1,16 @@
-<!-- markdownlint-disable MD013 line-length -->
-
-# Web5 Integration Guide
+# Web5 Integration [AIR-3][W5C-3][BPC-3]
 
 ## Overview
-Anya integrates with Web5 for decentralized data management and identity.
+This document describes the Web5 protocol integration with Anya Core, including BIP-341 compliance and DID support.
 
-### Components
-1. Data Management
-   - Decentralized Web Nodes (DWN)
-   - Protocol Definitions
-   - Schema Validation
+## Components
+- Decentralized Web Nodes (DWN)
+- Decentralized Identifiers (DIDs)
+- Verifiable Credentials
+- BIP-341 Integration
 
-2. Identity Management
-   - DID Creation and Resolution
-   - Key Management
-   - Authentication
-
-### Usage Examples
-
-
-*Last updated: 2024-12-07*
+## BIP-341 Compliance
+The Web5 implementation includes full BIP-341 (Taproot) support:
+- SILENT_LEAF implementation
+- Taproot script validation
+- Privacy-preserving operations

@@ -48,7 +48,7 @@ The following README files provide documentation for specific modules:
 
 ## Last Updated
 
-This index was last updated on 2025-03-12.
+This index was last updated on 2025-04-28.
 
 ## Future Documentation
 
@@ -148,7 +148,7 @@ The state channel integration provides:
 - **Conditional Logic**: Complex conditional state transitions
 - **Dispute Resolution**: On-chain dispute resolution mechanisms
 
-## Latest Features (2025-03-12)
+## Latest Features (2025-04-28)
 
 ### Priority 1 Components
 
@@ -195,7 +195,7 @@ The state channel integration provides:
 
 ## Latest Updates
 
-### Version {{ site.version }} (2025-03-12)
+### Version {{ site.version }} (2025-04-28)
 
 - P1 component implementation complete (AIP-002, AIE-001, AIR-008)
 - Bitcoin-style DAO implementation
@@ -268,4 +268,5 @@ async fn main() -> Result<()> {
 
 ## Last Update
 
-*Last updated: 2025-03-12*
+*Last updated: 2025-04-28*
+
