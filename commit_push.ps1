@@ -49,6 +49,25 @@ function Check-GitConfig {
     }
 }
 
+function Check-GPGSigning {
+    $signingKey = $null
+    $gpgSign = $null
+    
+    try {
+        $signingKey = git config --get user.signingkey
+        $gpgSign = git config --get commit.gpgsign
+    } catch {
+        # Ignore errors if configs don't exist
+    }
+    
+    if ($signingKey -and $gpgSign -eq "true") {
+        Write-Log "GPG signing is enabled with key: $signingKey" -Level Info
+        return $true
+    } else {
+        return $false
+    }
+}
+
 function Test-CommitMessage {
     param(
         [Parameter(Mandatory=$true)]
@@ -96,7 +115,14 @@ function Invoke-CommitChanges {
     if ($status) {
         git add .
         if (Test-CommitMessage $Message) {
-            git commit -m $Message
+            # Check if GPG signing is enabled
+            if (Check-GPGSigning) {
+                # Use -S flag to explicitly sign the commit
+                git commit -S -m $Message
+                Write-Log "Commit signed with GPG" -Level Info
+            } else {
+                git commit -m $Message
+            }
         } else {
             exit 1
         }
