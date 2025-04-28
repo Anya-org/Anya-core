@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 /// AIM-004: RSK Sidechain Implementation with Bitcoin-backed Verification
 /// 
 /// Implementation of RSK Sidechain with Bitcoin-backed verification support

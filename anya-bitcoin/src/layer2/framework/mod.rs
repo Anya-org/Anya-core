@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 /// AIM-004: Framework for Layer 2 Solutions
 /// 
 /// Modular framework for implementing future Layer 2 solutions

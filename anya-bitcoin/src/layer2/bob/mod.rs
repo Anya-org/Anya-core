@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 /// AIM-004: BOB (Bitcoin Optimistic Blockchain) Implementation
 /// 
 /// Implementation of BOB Layer 2 solution with PSBT support

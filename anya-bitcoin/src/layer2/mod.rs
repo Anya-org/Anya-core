@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 /// AIM-004: Layer 2 Integration Modules for Bitcoin
 /// 
 /// This module implements the hexagonal architecture for Bitcoin Layer 2 solutions:
@@ -9,9 +10,23 @@
 /// Implementation follows Bitcoin Development Framework v2.5 standards
 /// Related to: AIR-342, AIT-367
 
+use std::sync::Arc;
+use async_trait::async_trait;
+use bitcoin::secp256k1::{SecretKey, PublicKey};
+use chrono::{DateTime, Utc};
+use serde::{Serialize, Deserialize};
+use rand::Rng;
+use base64::{Engine as _, engine::general_purpose::STANDARD as BASE64};
+use sha2::{Sha256, Digest};
+
+use crate::error::{Error, Result};
+
 pub mod bob;
+pub mod dlc;
+pub mod lightning;
 pub mod rgb;
 pub mod rsk;
+pub mod taproot;
 pub mod framework;
 
 /// Common traits and interfaces for Layer 2 protocols

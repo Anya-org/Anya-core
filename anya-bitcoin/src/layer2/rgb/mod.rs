@@ -1,3 +1,4 @@
+#![feature(edition2021)]
 /// AIM-004: RGB Protocol Implementation with Taproot Asset Capabilities
 /// 
 /// Implementation of RGB Protocol with BIP-341 (Taproot) support
