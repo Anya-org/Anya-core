@@ -35,95 +35,74 @@ The Anya Core system follows a hexagonal architecture pattern, separating core b
 
 ## Repository Structure
 
-```mermaid
-graph TB
-    subgraph anya-core[Anya Core]
-        Core[Core Components]
-        AI[AI Engine]
-        Security[Security Layer]
-        Bitcoin[Bitcoin & Lightning]
-        DAO[DAO System]
-        DEX[DEX Integration]
-    end
+The repository is organized according to the following structure:
 
-    subgraph Submodules[Primary Submodules]
-        dash33[dash33 - AI Decision Engine]
-        enterprise[Enterprise Integration]
-        mobile[Mobile Interface (React Native)]
-        web5[Web5 Implementation]
-        tokenomics[Bitcoin-Style Tokenomics]
-    end
-
-    subgraph Integration[Integration Points]
-        API[API Layer]
-        Events[Event System]
-        Data[Data Layer]
-    end
-
-    %% Core Connections
-    Core --> AI
-    Core --> Security
-    Core --> Bitcoin
-    Core --> DAO
-    AI --> Security
-    DAO --> tokenomics
-    DAO --> DEX
-
-    %% Submodule Connections
-    dash33 --> AI
-    enterprise --> Core
-    mobile --> API
-    web5 --> Security
-    Bitcoin --> Security
-    tokenomics --> Bitcoin
-
-    %% Integration Layer
-    API --> Security
-    Events --> Core
-    Data --> Security
+```
+/anya-core
+├── src/                     # Main source code
+│   ├── adapters/            # Hexagonal architecture adapters
+│   ├── api/                 # API implementations
+│   ├── bitcoin/             # Bitcoin protocol implementation
+│   ├── core/                # Core functionality
+│   ├── crypto/              # Cryptographic implementations
+│   ├── dao/                 # DAO implementation
+│   ├── layer2/              # Layer 2 solutions
+│   │   ├── bob/             # BOB Layer 2
+│   │   ├── dlc/             # Discreet Log Contracts
+│   │   ├── lightning/       # Lightning Network
+│   │   ├── rgb/             # RGB Protocol
+│   │   └── rsk/             # RSK Integration
+│   ├── lightning/           # Lightning Network implementation
+│   ├── ml/                  # Machine learning components
+│   ├── security/            # Security framework
+│   │   └── crypto/          # Cryptographic security
+│   └── web5/                # Web5 implementation
+├── docs/                    # Documentation
+├── tests/                   # Tests
+└── scripts/                 # Utility scripts
 ```
 
 ## Key Components
 
-### Core Bitcoin Implementation (scripts/bitcoin/)
+### Core Bitcoin Implementation (src/bitcoin/)
 
-- **MCP Server** (mcp-server.js)
+- **Bitcoin Core Protocol**
   - Main Bitcoin protocol implementation
   - Handles transaction validation and processing
   - Manages UTXO state
   - Implements BIP standards
 
-- **BIP Compliance Validation** (validate-bip-compliance.js)
+- **BIP Compliance**
   - Validates implementation against Bitcoin Improvement Proposals
   - Checks for BIP-340, BIP-341, BIP-342, BIP-174, BIP-370 compliance
   - Reports compliance status
 
-- **Security Validation** (validate-security.js)
+- **Security Validation**
   - Basic security validation for Bitcoin components
   - Initial security checks for core functionality
 
-### Security Analysis Framework (scripts/security/)
+### Security Analysis Framework (src/security/)
 
-- **CodeQL Analysis** (run-codeql-analysis.ps1)
+- **CodeQL Analysis**
   - Automated static code analysis
   - Security vulnerability detection
   - Custom Bitcoin-specific security rules
   - Integration with CI/CD pipeline
 
-- **Cryptographic Validation** (crypto-validation.js)
+- **Cryptographic Validation**
   - Validates cryptographic implementations
   - Checks for secure random number generation
   - Validates constant-time operations
   - Ensures appropriate key sizes
   - Checks for modern cryptographic algorithms
 
-- **MCP Server Analysis** (analyze-mcp-server.js)
-  - Deep analysis of MCP server implementation
+- **Protocol Analysis**
+  - Deep analysis of protocol implementation
   - Checks for Bitcoin protocol compliance
   - Validates security measures
   - Reports vulnerabilities and compliance issues
 
-- **Permissions Setup** (setup-permissions.sh)
+- **Permissions Setup**
   - Sets up secure permissions for scripts
   - Ensures least privilege principle
   - Manages access control
@@ -248,195 +227,82 @@ graph TB
 
 ## Layer 2 Solutions Architecture
 
-Anya Core provides comprehensive support for a variety of Bitcoin Layer 2 solutions, each integrated with our hexagonal architecture pattern.
+### Lightning Network (src/lightning/)
 
-```mermaid
-graph TB
-    subgraph L2Manager[Layer 2 Manager]
-        TypeRegistry[Layer 2 Type Registry]
-        ClientFactory[Layer 2 Client Factory]
-        Config[Layer 2 Configuration]
-    end
+1. **Node Implementation** - Lightning Network node
+2. **Channel Management** - Lightning Network channels
+3. **Payment Processing** - Lightning Network payments
+4. **BOLT Compliance** - BOLT standard compliance
 
-    subgraph Solutions[Layer 2 Solutions]
-        BOB[BOB - Bitcoin Optimistic Blockchain]
-        Lightning[Lightning Network]
-        RGB[RGB Protocol]
-        RSK[RSK Sidechain]
-        Stacks[Stacks Blockchain]
-        DLC[Discreet Log Contracts]
-        StateChannels[State Channels]
-        Taproot[Taproot Assets]
-    end
+### RGB Protocol (src/layer2/rgb/)
 
-    subgraph Integration[Bitcoin Integration]
-        Wallet[Bitcoin Wallet]
-        Scripts[Script Engine]
-        UTXO[UTXO Management]
-        TxBroadcast[Transaction Broadcasting]
-    end
+1. **Schema Implementation** - RGB schema implementation
+2. **Asset Management** - RGB asset management
+3. **Validation** - RGB validation
 
-    %% Connections
-    L2Manager --> TypeRegistry
-    L2Manager --> ClientFactory
-    L2Manager --> Config
+### RSK Integration (src/layer2/rsk/)
 
-    ClientFactory --> Solutions
+1. **Bridge Implementation** - RSK bridge implementation
+2. **Smart Contract Interface** - RSK smart contract interface
 
-    Solutions --> BOB
-    Solutions --> Lightning
-    Solutions --> RGB
-    Solutions --> RSK
-    Solutions --> Stacks
-    Solutions --> DLC
-    Solutions --> StateChannels
-    Solutions --> Taproot
+### BOB Layer 2 (src/layer2/bob/)
 
-    BOB --> Integration
-    Lightning --> Integration
-    RGB --> Integration
-    RSK --> Integration
-    Stacks --> Integration
-    DLC --> Integration
-    StateChannels --> Integration
-    Taproot --> Integration
+1. **Channel Implementation** - BOB channel implementation
+2. **State Management** - BOB state management
 
-    Integration --> Wallet
-    Integration --> Scripts
-    Integration --> UTXO
-    Integration --> TxBroadcast
-```
+### DLC (src/layer2/dlc/)
 
-## Implementation-Specific Components
+1. **Oracle Implementation** - DLC oracle implementation
+2. **Contract Management** - DLC contract management
 
-### Bitcoin Protocol Adapters
+## Web5 Architecture (src/web5/)
 
-- **Taproot Integration** (BIP-341)
-- **Schnorr Signatures** (BIP-340)
-- **PSBT Support** (BIP-174)
-- **DLC Oracle Implementation**
-- **Lightning Network Integration**
+### Decentralized Web Node (DWN)
 
-### Security Validation
+1. **Implementation** - DWN implementation
+2. **Protocol Support** - Web5 protocol support
+3. **Data Management** - Decentralized data management
 
-- **Bitcoin-specific Security Checks**
-- **Cryptographic Algorithm Validation**
-- **Protocol Compliance Verification**
-- **AI System Security (AIS-3)**
+### Decentralized Identity (DID)
 
-## Tokenomics System Flow
+1. **DID Implementation** - DID implementation
+2. **Verifiable Credentials** - Verifiable credentials
+3. **Authentication** - Decentralized authentication
 
-```mermaid
-graph TB
-    subgraph Issuance[Bitcoin-Style Issuance]
-        Genesis[Genesis Block]
-        BlockReward[Block Reward: 5,000 AGT]
-        Halving[Halving: 210,000 blocks]
-        TotalSupply[Total Supply: 21B AGT]
-    end
+## AI & Machine Learning Architecture (src/ml/)
 
-    subgraph Distribution[Token Distribution]
-        DEXAlloc[DEX: 30%]
-        TeamAlloc[Team: 15%]
-        DAOAlloc[DAO: 55%]
-    end
+### Agents
 
-    subgraph TeamDist[Team Distribution]
-        TopPerformer[Top: 40%]
-        MidPerformers[Middle: 5-40%]
-        LowPerformer[Low: 5%]
-    end
+1. **Agent Implementation** - AI agent implementation
+2. **Model Management** - Machine learning model management
+3. **Inference Engine** - Real-time inference engine
 
-    %% Connections
-    Genesis --> BlockReward
-    BlockReward --> Halving
-    Halving --> TotalSupply
+## Security Implementation (src/security/)
 
-    BlockReward --> Distribution
-    Distribution --> DEXAlloc
-    Distribution --> TeamAlloc
-    Distribution --> DAOAlloc
+### Cryptographic Security
 
-    TeamAlloc --> TeamDist
-    TeamDist --> TopPerformer
-    TeamDist --> MidPerformers
-    TeamDist --> LowPerformer
-```
+1. **Cryptographic Operations** - Secure cryptographic operations
+2. **HSM Integration** - Hardware security module integration
+3. **Key Management** - Secure key management
 
-## Data Flow
+### Protocol Security
 
-1. **Incoming Transactions**
-   - P2P Network → Validation Layer → Mempool → Block Template
+1. **Protocol Validation** - Bitcoin protocol validation
+2. **Vulnerability Detection** - Vulnerability detection
+3. **Compliance Checking** - Compliance checking
 
-2. **Block Processing**
-   - P2P Network → Block Validation → UTXO Updates → Chain State
+## Version Information
 
-3. **Security Analysis**
-   - Code Repository → CodeQL Analysis → Vulnerability Reports
+- Current Version: 3.1.0
+- Last Updated: 2025-04-28
+- Bitcoin Development Framework: v2.5
 
-4. **Compliance Validation**
-   - Implementation → BIP Validators → Compliance Reports
-
-## Integration Points
-
-1. **Bitcoin Core Compatibility**
-   - Compatible with Bitcoin Core RPC interface
-   - Follows Bitcoin P2P protocol standards
-   - Implements standard Bitcoin script validation
-
-2. **Security Tool Integration**
-   - CI/CD pipeline integration for CodeQL
-   - Automated reporting of security issues
-   - Integration with development workflow
-
-3. **Monitoring and Metrics**
-   - Prometheus integration for metrics
-   - Alert system for security events
-   - Performance monitoring
-
-## AI System Labeling
-
-All components adhere to the Bitcoin Development Framework v2.5 AI labeling system:
-
-1. **[AIR-3]** - AI Readiness Level 3
-   - Production-ready implementation
-   - Stable API interfaces
-   - Comprehensive documentation
-
-2. **[AIS-3]** - AI Security Level 3
-   - Comprehensive security measures
-   - Regular security audits
-   - Vulnerability reporting system
-
-3. **[BPC-3]** - Bitcoin Protocol Compliance Level 3
-   - Full compliance with Bitcoin protocol
-   - Implementation of required BIPs
-   - Rigorous testing against Bitcoin Core
-
-4. **[AIT-3]** - AI Testing Level 3
-   - Exhaustive testing methodology
-   - High test coverage
-   - Regression testing suite
-
-5. **[RES-3]** - Resilience Level 3
-   - Robust fault tolerance
-   - Error recovery mechanisms
-   - Graceful degradation
-
-## Cross-References
-
-For detailed information about specific components, please see the following documentation:
-
-- [DAO System Documentation](DAO_INDEX.md)
-- [Tokenomics System](TOKENOMICS_SYSTEM.md)
-- [DAO System Map](DAO_SYSTEM_MAP.md)
-- [Implementation Milestones](IMPLEMENTATION_MILESTONES.md)
-- [Bitcoin Documentation](/bitcoin/index.html)
-- [Web5 Documentation](/web5/index.html)
+*This documentation follows the [AI Labeling Standards](docs/standards/AI_LABELING.md) based on the Bitcoin Development Framework v2.5.*
 
 ## Implementation Status
 
 Current implementation status:
+
 - ✅ Core architecture and interfaces
 - ✅ Bitcoin-style issuance model with 21 billion token supply
 - 🔄 Distribution allocation mechanisms (In Progress)

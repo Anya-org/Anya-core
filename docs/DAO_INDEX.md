@@ -10,7 +10,7 @@ This index serves as the central entry point to all Anya DAO documentation.
 
 | Document | Description |
 |----------|-------------|
-| [DAO Overview](DAO_OVERVIEW.md) | Introduction and high-level overview of the Anya DAO |
+| [DAO Overview](src/dao/README.md) | Introduction and high-level overview of the Anya DAO |
 | [Governance Token](GOVERNANCE_TOKEN.md) | Details on the AGT token, economics, and distribution |
 | [Governance Framework](GOVERNANCE_FRAMEWORK.md) | Proposal types, voting process, and mechanism |
 | [Treasury Management](TREASURY_MANAGEMENT.md) | Treasury composition, operations, and guards |
@@ -47,16 +47,16 @@ This index serves as the central entry point to all Anya DAO documentation.
 
 - [AIS-3] Asset Issuance Standard v3
 - [BPC-3] Bitcoin Protocol Compliance v3
-- [DAO-3] Decentralized Autonomous Organization Standard v4
+- [DAO-3] Decentralized Autonomous Organization Standard v3
 
-*Last updated: 2025-02-24*
+*Last updated: 2025-04-28*
 
 ## Core Documentation
 
 | Document | Description | Last Updated |
 |----------|-------------|--------------|
-| [DAO README](../dao/README.md) | Overview of the DAO module, setup, and usage | 2025-03-02 |
-| [Tokenomics System](TOKENOMICS_SYSTEM.md) | Token economics architecture and Bitcoin-style issuance model | 2025-03-02 |
+| [DAO README](../src/dao/README.md) | Overview of the DAO module, setup, and usage | 2025-04-28 |
+| [Tokenomics System](TOKENOMICS_SYSTEM.md) | Token economics architecture and Bitcoin-style issuance model | 2025-04-28 |
 
 ## Technical Components
 
@@ -64,20 +64,20 @@ This index serves as the central entry point to all Anya DAO documentation.
 
 | Contract | Purpose | Path |
 |----------|---------|------|
-| DAO Trait | Interface definition for DAO functionality | `dao/traits/dao-trait.clar` |
-| DAO Core | Enhanced implementation of the DAO trait | `dao/core/dao-core.clar` |
+| DAO Trait | Interface definition for DAO functionality | `src/dao/traits/dao-trait.clar` |
+| DAO Core | Enhanced implementation of the DAO trait | `src/dao/core/dao-core.clar` |
 | Main DAO | Governance contract that integrates with DAO Core | `src/contracts/dao.clar` |
 | Governance Token | SIP-010 compliant AGT implementation | `src/contracts/governance_token.clar` |
 | Bitcoin Issuance | Bitcoin-style token issuance with special distribution | `src/contracts/bitcoin-issuance.clar` |
 | DEX Adapter | Decentralized exchange integration | `src/contracts/dex-adapter.clar` |
-| DEX Integration Trait | Interface for DEX interaction | `dao/traits/dex-integration-trait.clar` |
-| Token Economics | Advanced token economics implementation | `dao/extensions/token-economics.clar` |
+| DEX Integration Trait | Interface for DEX interaction | `src/dao/traits/dex-integration-trait.clar` |
+| Token Economics | Advanced token economics implementation | `src/dao/extensions/token-economics.clar` |
 
 ### Test Scripts
 
 | Script | Purpose | Path |
 |--------|---------|------|
-| DAO Core Test | Comprehensive test suite for DAO Core | `dao/tests/dao-core-test.clar` |
+| DAO Core Test | Comprehensive test suite for DAO Core | `tests/dao/dao-core-test.clar` |
 
 ### Utility Scripts
 
@@ -93,7 +93,8 @@ The Anya DAO system follows a hierarchical architecture:
 
 ```
 ┌─────────────────┐     implements     ┌─────────────────┐
-│   dao-trait.clar │◄─────────────────┤  dao-core.clar  │
+│src/dao/traits/  │◄─────────────────┤  src/dao/core/   │
+│dao-trait.clar   │                   │  dao-core.clar  │
 └────────┬────────┘                   └────────▲────────┘
          │                                     │
          │                                     │
@@ -101,15 +102,17 @@ The Anya DAO system follows a hierarchical architecture:
          │                                     │
          ▼                                     │
 ┌─────────────────┐     interacts     ┌─────────────────┐
-│    dao.clar     │◄─────────────────►│ governance_token│
+│src/contracts/   │◄─────────────────►│src/contracts/   │
+│dao.clar         │                   │governance_token │
 └─────────────────┘                   └─────────────────┘
          │                                     ▲
          │                                     │
          │ controls                            │ mints
          ▼                                     │
 ┌─────────────────┐     provides      ┌─────────────────┐
-│   dex-adapter   │◄─────────────────┤bitcoin-issuance │
-└─────────────────┘     liquidity     └─────────────────┘
+│src/contracts/   │◄─────────────────┤src/contracts/   │
+│dex-adapter      │     liquidity     │bitcoin-issuance │
+└─────────────────┘                   └─────────────────┘
 ```
 
 ## Tokenomics Integration
