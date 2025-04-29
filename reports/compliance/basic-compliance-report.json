@@ -1,0 +1,148 @@
+{
+  "overallStatus": "FAIL",
+  "bipCompliance": {
+    "BIP-342": {
+      "Name": "Tapscript",
+      "Required": true,
+      "Found": true
+    },
+    "BIP-341": {
+      "Name": "Taproot",
+      "Required": true,
+      "Found": true
+    },
+    "BIP-174": {
+      "Name": "PSBT",
+      "Required": true,
+      "Found": true
+    },
+    "BIP-370": {
+      "Name": "PSBT v2",
+      "Required": false,
+      "Found": false
+    }
+  },
+  "contracts": {
+    "dex-integration-trait.clar": {
+      "path": "C:\\Users\\bmokoka\\Projects\\anya-core\\dao\\traits\\dex-integration-trait.clar",
+      "size": 1282,
+      "bips": {
+        "BIP-341": false,
+        "BIP-370": false,
+        "BIP-174": false,
+        "BIP-342": false
+      }
+    },
+    "token-economics-minimal.clar": {
+      "path": "C:\\Users\\bmokoka\\Projects\\anya-core\\dao\\extensions\\token-economics-minimal.clar",
+      "size": 899,
+      "bips": {
+        "BIP-341": false,
+        "BIP-370": false,
+        "BIP-174": false,
+        "BIP-342": false
+      }
+    },
+    "token-economics.clar": {
+      "path": "C:\\Users\\bmokoka\\Projects\\anya-core\\src\\contracts\\token-economics.clar",
+      "size": 7134,
+      "bips": {
+        "BIP-341": false,
+        "BIP-370": false,
+        "BIP-174": false,
+        "BIP-342": false
+      }
+    },
+    "dao.clar": {
+      "path": "C:\\Users\\bmokoka\\Projects\\anya-core\\src\\contracts\\dao.clar",
+      "size": 6839,
+      "bips": {
+        "BIP-341": true,
+        "BIP-370": false,
+        "BIP-174": true,
+        "BIP-342": false
+      }
+    },
+    "dao-trait.clar": {
+      "path": "C:\\Users\\bmokoka\\Projects\\anya-core\\dao\\traits\\dao-trait.clar",
+      "size": 3014,
+      "bips": {
+        "BIP-341": false,
+        "BIP-370": false,
+        "BIP-174": false,
+        "BIP-342": false
+      }
+    },
+    "bitcoin-issuance.clar": {
+      "path": "C:\\Users\\bmokoka\\Projects\\anya-core\\src\\contracts\\bitcoin-issuance.clar",
+      "size": 12611,
+      "bips": {
+        "BIP-341": false,
+        "BIP-370": false,
+        "BIP-174": false,
+        "BIP-342": false
+      }
+    },
+    "dao-core.clar": {
+      "path": "C:\\Users\\bmokoka\\Projects\\anya-core\\src\\contracts\\dao-core.clar",
+      "size": 3935,
+      "bips": {
+        "BIP-341": true,
+        "BIP-370": false,
+        "BIP-174": true,
+        "BIP-342": true
+      }
+    },
+    "dao-core-test.clar": {
+      "path": "C:\\Users\\bmokoka\\Projects\\anya-core\\dao\\tests\\dao-core-test.clar",
+      "size": 6691,
+      "bips": {
+        "BIP-341": false,
+        "BIP-370": false,
+        "BIP-174": false,
+        "BIP-342": false
+      }
+    },
+    "governance_token.clar": {
+      "path": "C:\\Users\\bmokoka\\Projects\\anya-core\\src\\contracts\\governance_token.clar",
+      "size": 9469,
+      "bips": {
+        "BIP-341": false,
+        "BIP-370": false,
+        "BIP-174": false,
+        "BIP-342": false
+      }
+    },
+    "dex-adapter.clar": {
+      "path": "C:\\Users\\bmokoka\\Projects\\anya-core\\src\\contracts\\dex-adapter.clar",
+      "size": 16244,
+      "bips": {
+        "BIP-341": false,
+        "BIP-370": false,
+        "BIP-174": false,
+        "BIP-342": false
+      }
+    },
+    "security-guards.clar": {
+      "path": "C:\\Users\\bmokoka\\Projects\\anya-core\\src\\contracts\\security-guards.clar",
+      "size": 1643,
+      "bips": {
+        "BIP-341": false,
+        "BIP-370": false,
+        "BIP-174": false,
+        "BIP-342": false
+      }
+    },
+    "bip-compliance.clar": {
+      "path": "C:\\Users\\bmokoka\\Projects\\anya-core\\src\\contracts\\bip-compliance.clar",
+      "size": 642,
+      "bips": {
+        "BIP-341": true,
+        "BIP-370": false,
+        "BIP-174": true,
+        "BIP-342": true
+      }
+    }
+  },
+  "timestamp": "2025-04-28 21:19:44"
+}
