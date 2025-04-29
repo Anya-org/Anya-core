@@ -1,59 +1,36 @@
 //! Bitcoin Core Implementation
-//! Consensus-critical code only
+//! Following hexagonal architecture principles and Bitcoin Development Framework v2.5
 
-use bitcoin::{
-    Block, 
-    BlockHeader,
-    Transaction,
-    Network,
-    BlockHash,
-    Error as BitcoinError,
-    consensus::encode::deserialize,
-    util::hash::Hash,
-};
 use std::{sync::Arc, path::PathBuf};
-use log::{info, warn, error};
 
-// Core Bitcoin modules only
-pub mod consensus {
-    pub mod validation;   // Block/tx validation
-    pub mod rules;       // Consensus rules
-    pub mod params;      // Network parameters
-}
-
-pub mod mempool {
-    pub mod pool;        // Transaction mempool
-    pub mod policy;      // Mempool policies
-    pub mod fees;        // Fee estimation
-}
-
-pub mod net {
-    pub mod p2p;        // P2P networking
-    pub mod messages;   // Network messages
-    pub mod peers;      // Peer management
-}
-
-pub mod script {
-    pub mod interpreter; // Script verification
-    pub mod standard;    // Standard scripts
-}
-
-/// AIM-004: Layer 2 Integration Modules
-/// Layer 2 protocols for Bitcoin implemented with hexagonal architecture
+// Re-export core modules
+pub mod core;
 pub mod layer2;
+pub mod ports;
+pub mod adapters;
+pub mod protocol;
+pub mod riscv;
+pub mod security;
+pub mod testing;
+pub mod prelude;
 
+/// Configuration for Bitcoin node
 #[derive(Debug, Clone)]
 pub struct Config {
-    network: Network,
-    datadir: PathBuf,
-    max_peers: u32,      // Default: 125
-    min_peers: u32,      // Default: 8
+    /// Bitcoin network (mainnet, testnet, etc.)
+    pub network: bitcoin::Network,
+    /// Data directory for Bitcoin data
+    pub datadir: PathBuf,
+    /// Maximum number of peers
+    pub max_peers: u32,      // Default: 125
+    /// Minimum number of peers
+    pub min_peers: u32,      // Default: 8
 }
 
 impl Default for Config {
     fn default() -> Self {
         Self {
-            network: Network::Bitcoin,
+            network: bitcoin::Network::Bitcoin,
             datadir: PathBuf::from("~/.bitcoin"),
             max_peers: 125,
             min_peers: 8,
@@ -61,41 +38,48 @@ impl Default for Config {
     }
 }
 
+/// Main Bitcoin node implementation
 pub struct BitcoinNode {
+    /// Node configuration
     config: Config,
-    consensus: consensus::validation::Validator,
-    mempool: mempool::pool::Mempool,
-    network: net::p2p::P2P,
+    /// Consensus validator
+    consensus: Arc<dyn core::consensus::Validator>,
+    /// Mempool for transaction management
+    mempool: Arc<dyn core::mempool::Mempool>,
+    /// P2P network implementation
+    network: Arc<dyn core::network::P2P>,
     /// Layer 2 protocol registry
     layer2_registry: Option<Arc<layer2::framework::Layer2Registry>>,
 }
 
 impl BitcoinNode {
-    pub fn new(config: Config) -> Result<Self, BitcoinError> {
+    /// Create a new Bitcoin node with the given configuration
+    pub fn new(config: Config) -> Result<Self, bitcoin::Error> {
+        // These would normally be instantiated with concrete implementations
+        let consensus = Arc::new(core::consensus::NoopValidator {});
+        let mempool = Arc::new(core::mempool::NoopMempool {});
+        let network = Arc::new(core::network::NoopP2P {});
+        
         Ok(Self {
-            consensus: consensus::validation::Validator::new(&config)?,
-            mempool: mempool::pool::Mempool::new(&config)?,
-            network: net::p2p::P2P::new(&config)?,
             config,
+            consensus,
+            mempool,
+            network,
             layer2_registry: None,
         })
     }
 
-    pub fn start(&mut self) -> Result<(), BitcoinError> {
-        info!("Starting Bitcoin node");
-        self.consensus.start()?;
-        self.mempool.start()?;
-        self.network.start()?;
-        
+    /// Start the Bitcoin node
+    pub fn start(&mut self) -> Result<(), bitcoin::Error> {
         // Initialize Layer 2 factory and registry
-        let factory = Arc::new(layer2::framework::Layer2Factory::new());
+        let factory = Arc::new(layer2::framework::factory::Layer2Factory::new());
         let registry = Arc::new(layer2::framework::Layer2Registry::new(factory));
         self.layer2_registry = Some(registry);
         
         Ok(())
     }
     
-    /// Get Layer 2 protocol registry
+    /// Get the Layer 2 protocol registry
     pub fn layer2_registry(&self) -> Option<Arc<layer2::framework::Layer2Registry>> {
         self.layer2_registry.clone()
     }
