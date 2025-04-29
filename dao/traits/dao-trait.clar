@@ -53,5 +53,36 @@
             actor: principal,
             data: (string-utf8 256;)
         };) uint;););)
-;)
+
+        ;; New Financial Intelligence Function
+        (register-ai-agent (principal (string-ascii 20))
+            (let 
+                ((model-type "predictive-analytics")
+                 (verification-status true))
+                ;; Register AI agent with specialized metrics permissions
+                (register-financial-agent principal model-type)
+            )
+        )
+    )
+)
+
+(define-trait cross-chain-integration-trait
+    (
+        ;; Support all Layer 2 types
+        (verify-external-chain-state ((string-ascii 20) (buff 64)) (response bool uint))
+        (execute-cross-chain-swap (uint principal (string-ascii 20)) (response { tx-id: (buff 64) } uint))
+        
+        ;; Add BitVM specific functions
+        (verify-bitvm-proof ((buff 128)) (response bool uint))
+        
+        ;; Add Taproot Asset support
+        (transfer-taproot-asset ((string-ascii 64) principal uint) (response { success: bool } uint))
+        
+        ;; Add Lightning Network support
+        (open-lightning-channel (principal uint) (response { channel-id: (string-ascii 64) } uint))
+        
+        ;; Add RGB support
+        (issue-rgb-asset ((string-ascii 32) uint uint) (response { asset-id: (string-ascii 64) } uint))
+    )
+)
 
