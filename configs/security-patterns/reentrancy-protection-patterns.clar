@@ -3,8 +3,7 @@
 ;; Auto-updated from .\scripts\security-patterns.json
 
 (define-constant reentrancy-protection-patterns
-  (list
-    
+  (list;);)
 
-  ))
+
 
