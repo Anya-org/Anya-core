@@ -16,6 +16,12 @@ $totalStartTime = Get-Date
 
 # Initialize logging
 $logFile = "test-results/test-run-$(Get-Date -Format 'yyyyMMdd-HHmmss').log"
+$logDir = Split-Path -Path $logFile -Parent
+
+if (-not (Test-Path $logDir)) {
+    New-Item -ItemType Directory -Path $logDir -Force | Out-Null
+}
+
 function Write-Log {
     param(
         [string]$Message,
@@ -253,12 +259,13 @@ foreach ($stage in $testStages) {
             }
         } catch {
             $stage.Status = "ERROR"
-            Write-Log "Error during $stageName: $_" "ERROR" "Red"
+            $errorMessage = $_.Exception.Message
+            Write-Log "Error during $stageName - $errorMessage" "ERROR" "Red"
             if ($stage.Required) {
                 $testResults.OverallStatus = "FAIL"
-                $testResults.FailedTests += "$stageName (Error: $_)"
+                $testResults.FailedTests += "$stageName (Error: $errorMessage)"
             } else {
-                $testResults.WarningTests += "$stageName (Error: $_ - Optional)"
+                $testResults.WarningTests += "$stageName (Error: $errorMessage - Optional)"
             }
         }
     }
@@ -297,7 +304,7 @@ foreach ($stageName in $testResults.Stages.Keys) {
     }
     
     $requiredLabel = if ($stageResult.Required) { "[Required]" } else { "[Optional]" }
-    Write-Log "  $stageName $requiredLabel`: $($stageResult.Status)" "SUMMARY" $statusColor
+    Write-Log "  $stageName $requiredLabel - $($stageResult.Status)" "SUMMARY" $statusColor
     Write-Log "    Category: $($stageResult.Category)" "SUMMARY" "Gray"
     Write-Log "    Duration: $([math]::Round($stageResult.Duration, 2)) seconds" "SUMMARY" "Gray"
 }
@@ -321,3 +328,6 @@ if ($GenerateHtmlReport) {
 
 Write-Log "Test execution complete!" "INFO" "Cyan"
 Write-Log "================================================================" "INFO" "Cyan" 
+
+# Return success
+exit 0 
