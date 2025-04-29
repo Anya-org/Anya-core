@@ -19,6 +19,7 @@ Welcome to the Anya Core documentation. This is the authoritative root index for
 ### DAO & Tokenomics [DAO-3]
 
 - [DAO Architecture](src/dao/README.md) - Detailed DAO architecture
+- [Bitcoin-Compatible DAO](dao/core/dao-bitcoin-compatible.clar) - Full Bitcoin Layer 2 compatible implementation
 - [Bitcoin-Style Tokenomics](docs/TOKENOMICS_SYSTEM.md) - 21B token supply with halving
 - [Implementation Status](docs/IMPLEMENTATION_MILESTONES.md) - Current progress
 - [Component Reference](docs/DAO_INDEX.md) - Index of DAO components
@@ -87,8 +88,8 @@ Welcome to the Anya Core documentation. This is the authoritative root index for
 
 ## Current Version
 
-- Version: 3.1.0
-- Released: 2025-04-28
+- Version: 3.1.1
+- Released: 2025-04-29
 - Framework: Bitcoin Development Framework v2.5
 
 ## Support
@@ -120,5 +121,5 @@ The repository follows a structured organization:
 - [Discussions](https://github.com/anya-org/anya-core/discussions)
 
 ---
-*Last updated: 2025-04-28 11:34 UTC+2*
+*Last updated: 2025-04-29 14:30 UTC+2*
 *All components comply with [AI Labeling Standards](docs/standards/AI_LABELING.md)*
