@@ -9,4 +9,8 @@
 )]
 #![allow(clippy::module_name_repetitions)]
 //! Bitcoin Development Framework Core 2.5
-// ... rest of lib.rs ... 
+//!
+//! This crate provides the core functionality for the Anya project.
+
+// Re-export modules
+// Add actual modules as they are implemented 

@@ -3,16 +3,26 @@ members = [
   ".",
   "core",
   "mobile-sdk",
-  "dependencies"
+  "dependencies",
+  "anya-bitcoin"
 ]
 resolver = "2"
 
 [workspace.dependencies]
-bitcoin = "0.30.0"
-secp256k1 = "0.24.0"
+bitcoin = { version = "0.32.1", features = ["serde", "base64", "rand-std", "std"] }
+secp256k1 = { version = "0.28.1", features = ["global-context", "std", "rand-std"] }
 serde = { version = "1.0", features = ["derive"] }
 libp2p = "0.48.0"
 tokio = { version = "1.28.0", features = ["full"] }
+async-trait = "0.1.64"
+thiserror = "1.0.40"
+tracing = "0.1.37"
+tracing-subscriber = "0.3.16"
+hex = "0.4.3"
+log = "0.4.17"
+futures = "0.3.27"
+anyhow = "1.0.70"
+web5 = { git = "https://github.com/decentralized-identity/web5-rs.git", rev = "1c0ee2e", default-features = false }
 
 # Remove duplicate mobile entries
 # [AIS-3] Security: Enforce single source of truth

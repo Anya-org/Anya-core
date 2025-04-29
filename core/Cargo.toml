@@ -2,13 +2,20 @@
 name = "anya-core"
 version = "0.1.0-rc.1"
 edition = "2021"
+description = "Core libraries for Anya Bitcoin Framework"
+authors = ["bo_thebig <botshelomokokoka@gmail.com>"]
+license = "MIT"
 
 [dependencies]
-bitcoin.workspace = true
-secp256k1.workspace = true
-serde.workspace = true
+bitcoin = { workspace = true }
+secp256k1 = { workspace = true }
+serde = { workspace = true }
 libp2p = { workspace = true }
 tokio = { workspace = true }
+futures = { workspace = true }
+thiserror = { workspace = true }
+async-trait = { workspace = true }
+anyhow = { workspace = true }
 mobile-sdk = { path = "../mobile-sdk" }
 
 # Cryptographic primitives
@@ -23,8 +30,8 @@ hmac = "0.12.1"
 # Security auditing
 cargo-audit = { version = "0.18.3", optional = true }
 
-# Update Web5 dependency to decentralized-identity/web5-rs at branch main without custom features
-web5 = { git = "https://github.com/decentralized-identity/web5-rs.git", branch = "main" }
+# Use a specific version tag to avoid Git issues
+web5 = { git = "https://github.com/decentralized-identity/web5-rs.git", tag = "v4.0.0" }
 
 # Add SGX implementation
 sgx_urts = { version = "1.1.1", optional = true }
@@ -33,12 +40,22 @@ sgx_urts = { version = "1.1.1", optional = true }
 yubihsm = { version = "0.41.0", optional = true }
 
 [dev-dependencies]
+tokio-test = "0.4.2"
+mockall = "0.11.3"
+tempfile = "3.5.0"
+test-log = "0.2.11"
 
 [features]
-default = ["audit"]
+default = []
+mobile = ["bitcoin/serde", "bitcoin/rand-std", "secp256k1/global-context", "secp256k1/rand-std"]
+chaos = ["std"]
+sgx = ["std"]
+std = []
+auditing = ["std"]
+hardware = ["std"]
+hsm = ["yubihsm"]
 audit = ["cargo-audit"]
-hardware = ["hsm", "sgx_urts"]
-hsm = ["yubihsm", "secp256k1/hsm"]
-chaos = ["tokio/full"]
-sgx = ["sgx_urts"]
-mobile = ["bitcoin/use-serde", "secp256k1/global-context"] 
+
+[[bin]]
+name = "anya_audit"
+path = "src/bin/anya_audit.rs" 
