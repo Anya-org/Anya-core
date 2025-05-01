@@ -908,4 +908,4 @@ impl MempoolBatchVerifier {
     pub fn stats(&self) -> &VerificationStats {
         &self.verification_stats
     }
-} 
+}

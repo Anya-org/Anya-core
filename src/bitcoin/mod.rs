@@ -1,15 +1,19 @@
-use std::error::Error;
+//! Bitcoin module for Anya Core
+//!
+//! [SECURITY SENSITIVE] This module contains the core Bitcoin functionality
+//! and must maintain 100% alignment with Bitcoin Core principles:
+//!
+//! * Decentralization
+//! * Security
+//! * Immutability
+//! * Privacy
+
+// Copyright 2024 Anya Core Contributors
 // Migrated from OPSource to anya-core
 // This file was automatically migrated as part of the Rust-only implementation
 // Original file: C:\Users\bmokoka\Downloads\OPSource\src\bitcoin\mod.rs
-//! Bitcoin module for Anya Core
-//! 
-//! [SECURITY SENSITIVE] This module contains the core Bitcoin functionality
-//! and must maintain 100% alignment with Bitcoin Core principles:
-//! - Decentralization
-//! - Security
-//! - Immutability
-//! - Privacy
+
+use std::error::Error;
 
 // Re-export submodules
 pub mod validation;
