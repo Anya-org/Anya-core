@@ -35,7 +35,7 @@ The Anya Core system follows a hexagonal architecture pattern, separating core b
 
 ## Repository Structure
 
-The repository is organized according to the following structure:
+Following our reorganization, the repository is now structured more efficiently:
 
 ```
 /anya-core
@@ -43,21 +43,34 @@ The repository is organized according to the following structure:
 │   ├── adapters/            # Hexagonal architecture adapters
 │   ├── api/                 # API implementations
 │   ├── bitcoin/             # Bitcoin protocol implementation
+│   │   ├── adapters/        # Bitcoin-specific adapters
+│   │   ├── core/            # Core Bitcoin functionality
+│   │   │   ├── consensus/   # Consensus rules
+│   │   │   ├── mempool/     # Mempool management
+│   │   │   ├── network/     # Network protocols
+│   │   │   └── script/      # Script execution
+│   │   ├── layer2/          # Layer 2 implementations
+│   │   │   ├── bob/         # Bitcoin Optimistic Blockchain
+│   │   │   ├── dlc/         # Discreet Log Contracts
+│   │   │   ├── lightning/   # Lightning Network
+│   │   │   ├── rgb/         # RGB Protocol
+│   │   │   └── rsk/         # RSK Sidechain
+│   │   ├── protocol/        # Bitcoin protocol definitions
+│   │   ├── riscv/           # RISC-V implementations
+│   │   ├── security/        # Bitcoin-specific security
+│   │   └── testing/         # Bitcoin-specific tests
 │   ├── core/                # Core functionality
 │   ├── crypto/              # Cryptographic implementations
 │   ├── dao/                 # DAO implementation
-│   ├── layer2/              # Layer 2 solutions
-│   │   ├── bob/             # BOB Layer 2
-│   │   ├── dlc/             # Discreet Log Contracts
-│   │   ├── lightning/       # Lightning Network
-│   │   ├── rgb/             # RGB Protocol
-│   │   └── rsk/             # RSK Integration
-│   ├── lightning/           # Lightning Network implementation
 │   ├── ml/                  # Machine learning components
 │   ├── security/            # Security framework
 │   │   └── crypto/          # Cryptographic security
 │   └── web5/                # Web5 implementation
 ├── docs/                    # Documentation
+│   ├── dao/                 # DAO documentation
+│   │   └── BITCOIN_INTEGRATION.md  # Bitcoin-compatible DAO docs
+│   ├── bitcoin/             # Bitcoin documentation
+│   └── web5/                # Web5 documentation
 ├── tests/                   # Tests
 └── scripts/                 # Utility scripts
 ```
@@ -150,6 +163,61 @@ graph TB
     Events --> LNode
     Security --> Core
     Security --> LNode
+```
+
+## Enhanced System Architecture Graph
+
+```mermaid
+graph TB
+    subgraph Core["Core System"]
+        Bitcoin["Bitcoin Core"]
+        CoreLogic["Core Logic"]
+        Security["Security Framework"]
+        Web5["Web5 Implementation"]
+    end
+    
+    subgraph Layers["Layer Architecture"]
+        Layer1["Bitcoin Layer 1"]
+        Layer2["Layer 2 Solutions"]
+        subgraph L2Solutions["Layer 2 Implementations"]
+            Lightning["Lightning Network"]
+            RGB["RGB Protocol"]
+            RSK["RSK Sidechain"]
+            BOB["Bitcoin Optimistic Blockchain"]
+            DLC["Discreet Log Contracts"]
+        end
+    end
+    
+    subgraph Components["Key Components"]
+        BitcoinProtocol["Bitcoin Protocol"]
+        RISCV["RISC-V Implementation"]
+        Crypto["Cryptographic Operations"]
+        Testing["Testing Framework"]
+    end
+    
+    subgraph DAOSystem["DAO System"]
+        DAOCore["Bitcoin-Compatible DAO"]
+        TaprootVoting["Taproot-Verified Voting"]
+        BitVM["BitVM Integration"]
+        CrossChain["Cross-Chain Operations"]
+    end
+    
+    Bitcoin --> Layer1
+    Layer1 --> Layer2
+    Layer2 --> L2Solutions
+    
+    Bitcoin --> BitcoinProtocol
+    BitcoinProtocol --> RISCV
+    
+    Security --> Crypto
+    Security --> Testing
+    
+    DAOCore --> TaprootVoting
+    DAOCore --> BitVM
+    DAOCore --> CrossChain
+    CrossChain --> L2Solutions
+    
+    Web5 --> DAOCore
 ```
 
 ## DAO System Architecture
@@ -258,30 +326,30 @@ graph TB
 
 ## Layer 2 Solutions Architecture
 
-### Lightning Network (src/lightning/)
+### Lightning Network (src/bitcoin/layer2/lightning/)
 
 1. **Node Implementation** - Lightning Network node
 2. **Channel Management** - Lightning Network channels
 3. **Payment Processing** - Lightning Network payments
 4. **BOLT Compliance** - BOLT standard compliance
 
-### RGB Protocol (src/layer2/rgb/)
+### RGB Protocol (src/bitcoin/layer2/rgb/)
 
 1. **Schema Implementation** - RGB schema implementation
 2. **Asset Management** - RGB asset management
 3. **Validation** - RGB validation
 
-### RSK Integration (src/layer2/rsk/)
+### RSK Integration (src/bitcoin/layer2/rsk/)
 
 1. **Bridge Implementation** - RSK bridge implementation
 2. **Smart Contract Interface** - RSK smart contract interface
 
-### BOB Layer 2 (src/layer2/bob/)
+### BOB Layer 2 (src/bitcoin/layer2/bob/)
 
 1. **Channel Implementation** - BOB channel implementation
 2. **State Management** - BOB state management
 
-### DLC (src/layer2/dlc/)
+### DLC (src/bitcoin/layer2/dlc/)
 
 1. **Oracle Implementation** - DLC oracle implementation
 2. **Contract Management** - DLC contract management
@@ -322,52 +390,9 @@ graph TB
 2. **Vulnerability Detection** - Vulnerability detection
 3. **Compliance Checking** - Compliance checking
 
-## Modified Components After Cleanup
+## Mobile Integration
 
-The system has been optimized with the following changes:
-
-1. **DAO Implementation**
-   - Deprecated the basic DAO implementation
-   - Implemented Bitcoin-compatible DAO with full Layer 2 support
-   - Added Taproot-verified voting mechanism
-   - Integrated with BitVM for enhanced verification
-   - Added cross-chain capabilities for all Bitcoin Layer 2 technologies
-
-2. **System Structure**
-   - Removed redundant backup directories
-   - Cleaned up build artifacts
-   - Optimized directory structure
-   - Removed deprecated code elements
-
-3. **Layer 2 Integration**
-   - Enhanced integration with all Bitcoin Layer 2 protocols
-   - Added BOB (Bitcoin Optimistic Blockchain) support
-   - Integrated with RGB, RSK, and other Layer 2 solutions
-   - Added DLC (Discreet Log Contracts) support
-
-## Version Information
-
-- Current Version: 3.1.0
-- Last Updated: 2025-04-29
-- Bitcoin Development Framework: v2.5
-
-*This documentation follows the [AI Labeling Standards](docs/standards/AI_LABELING.md) based on the Bitcoin Development Framework v2.5.*
-
-## Implementation Status
-
-Current implementation status:
-
-- ✅ Core architecture and interfaces
-- ✅ Bitcoin-style issuance model with 21 billion token supply
-- ✅ Bitcoin-compatible DAO implementation
-- ✅ Full Layer 2 integration support
-- 🔄 Distribution allocation mechanisms (In Progress)
-- ⏳ DEX integration (Pending)
-
-## Last Updated
-
-*Last updated: 2025-04-29 14:30 UTC+2*
-
+```
 +----------------------------+
 | Mobile Interface           |
 | (React Native)             |
@@ -382,9 +407,9 @@ Current implementation status:
 | - Secure SPV Proofs        |
 | - BIP-341 Compliance       |
 +----------------------------+
+```
 
-*Last updated: 2025-02-24 18:05 UTC+2*
-
+```
             +----------------------------+
             | React Native TurboModules   |
             | - Taproot Wallet (BIP-341)  |
@@ -397,3 +422,54 @@ Current implementation status:
             | - Hardware Key Storage       |
             | - BIP-341 Compliance         |
             +------------------------------+ 
+```
+
+## Modified Components After Reorganization
+
+The system has been optimized with the following changes:
+
+1. **DAO Implementation**
+   - Deprecated the basic DAO implementation
+   - Implemented Bitcoin-compatible DAO with full Layer 2 support
+   - Added Taproot-verified voting mechanism
+   - Integrated with BitVM for enhanced verification
+   - Added cross-chain capabilities for all Bitcoin Layer 2 technologies
+   - Added comprehensive documentation in docs/dao/BITCOIN_INTEGRATION.md
+
+2. **System Structure**
+   - Reorganized Bitcoin components into proper directories
+   - Optimized source code organization following hexagonal architecture
+   - Created clear separation between core, adapters, and protocols
+   - Improved maintainability through proper module organization
+   - Enhanced documentation reflecting new structure
+
+3. **Layer 2 Integration**
+   - Consolidated all Layer 2 implementations under bitcoin/layer2
+   - Added BOB (Bitcoin Optimistic Blockchain) support
+   - Unified integration patterns for RGB, RSK, and other Layer 2 solutions
+   - Enhanced DLC (Discreet Log Contracts) support
+   - Improved cross-chain operation capabilities
+
+## Version Information
+
+- Current Version: 3.1.1
+- Last Updated: 2025-04-29
+- Bitcoin Development Framework: v2.5
+
+*This documentation follows the [AI Labeling Standards](docs/standards/AI_LABELING.md) based on the Bitcoin Development Framework v2.5.*
+
+## Implementation Status
+
+Current implementation status:
+
+- ✅ Core architecture and interfaces
+- ✅ Bitcoin-style issuance model with 21 billion token supply
+- ✅ Bitcoin-compatible DAO implementation
+- ✅ Full Layer 2 integration support
+- ✅ Bitcoin component reorganization
+- 🔄 Distribution allocation mechanisms (In Progress)
+- ⏳ DEX integration (Pending)
+
+## Last Updated
+
+*Last updated: 2025-04-29 15:45 UTC+2*

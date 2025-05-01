@@ -23,6 +23,69 @@ log = "0.4.17"
 futures = "0.3.27"
 anyhow = "1.0.70"
 web5 = { git = "https://github.com/decentralized-identity/web5-rs.git", rev = "1c0ee2e", default-features = false }
+clap = { version = "4.4.6", features = ["derive"] }
+chrono = { version = "0.4.31", features = ["serde"] }
+serde_json = "1.0.107"
+trust-dns-resolver = "0.23.0"
+base64 = "0.21.4"
+sha2 = "0.10.7"
+uuid = { version = "1.4.1", features = ["v4", "serde"] }
 
 # Remove duplicate mobile entries
 # [AIS-3] Security: Enforce single source of truth
+
+[package]
+name = "anya-core"
+version = "0.9.0-alpha.7"
+edition = "2021"
+description = "Anya Bitcoin System"
+license = "MIT OR Apache-2.0"
+homepage = "https://example.com/anya"
+repository = "https://github.com/anya/core"
+rust-version = "1.70.0"
+default-run = "anya"
+
+[lib]
+name = "anya_core"
+path = "src/lib.rs"
+
+[[bin]]
+name = "anya"
+path = "src/bin/anya.rs"
+
+[[bin]]
+name = "anya_installer"
+path = "src/bin/anya_installer.rs"
+
+[[bin]]
+name = "bip_health"
+path = "src/bin/bip_health.rs"
+
+[features]
+default = ["bitcoin", "dao", "web5", "enterprise"]
+bitcoin = []
+dao = []
+web5 = []
+enterprise = []
+experimental = ["bitcoin", "dao", "web5", "enterprise"]
+
+[dependencies]
+bitcoin = { workspace = true }
+secp256k1 = { workspace = true }
+serde = { workspace = true }
+tokio = { workspace = true }
+async-trait = { workspace = true }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+hex = { workspace = true }
+log = { workspace = true }
+futures = { workspace = true }
+anyhow = { workspace = true }
+clap = { workspace = true }
+chrono = { workspace = true }
+serde_json = { workspace = true }
+trust-dns-resolver = { workspace = true }
+base64 = { workspace = true }
+sha2 = { workspace = true }
+uuid = { workspace = true }

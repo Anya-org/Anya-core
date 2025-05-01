@@ -5,11 +5,13 @@
 [Introduction](README.md)
 
 ## Getting Started
+
 * [Quick Start](getting-started/quick-start.md)
 * [Installation](getting-started/installation.md)
 * [Architecture Overview](architecture/overview.md)
 
 ## Core Platform
+
 * [Web5 Integration](web5/README.md)
   * [DWN Storage](web5/dwn/storage.md)
   * [Identity Management](web5/identity/management.md)
@@ -74,6 +76,7 @@
     * [Social Features](nostr/guides/social-features.md)
 
 ## Developer Guide
+
 * [Setup & Configuration](development/setup.md)
 * [Architecture](architecture/README.md)
   * [System Design](architecture/design.md)
@@ -103,6 +106,7 @@
   * [Scripts & Tools](automation/tools.md)
 
 ## Contributing
+
 * [Getting Started](contributing/getting-started.md)
 * [Development Process](contributing/process.md)
 * [Code Standards](contributing/standards.md)
@@ -112,6 +116,7 @@
 * [Code Review](contributing/code-review.md)
 
 ## Operations
+
 * [Deployment](operations/deployment.md)
   * [Production Setup](operations/deployment/production.md)
   * [Configuration](operations/deployment/config.md)
@@ -130,6 +135,7 @@
   * [Testing](operations/backup/testing.md)
 
 ## Support
+
 * [FAQ](support/faq.md)
 * [Troubleshooting](support/troubleshooting.md)
   * [Common Issues](support/troubleshooting/common-issues.md)
@@ -140,6 +146,7 @@
   * [Events](support/community/events.md)
 
 ## Reference
+
 * [Glossary](reference/glossary.md)
 * [Best Practices](reference/best-practices.md)
   * [Development](reference/best-practices/development.md)

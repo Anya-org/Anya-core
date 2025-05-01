@@ -1,0 +1,105 @@
+{
+  "missing_count": 1,
+  "total_supported": 8,
+  "compliant_count": 5,
+  "healthy": true,
+  "timestamp": "2025-04-29T14:30:28.4614442+02:00",
+  "bips": {
+    "BIP-322": {
+      "implementation": "Partial implementation in messaging/",
+      "test_coverage": 50,
+      "required": false,
+      "description": "Generic signed message format for Bitcoin",
+      "is_beta": true,
+      "bip": "BIP-322",
+      "audit_status": "Not Started",
+      "name": "Generic Signed Message Format",
+      "status": "Partial"
+    },
+    "BIP-174": {
+      "implementation": "Full implementation in core/transaction",
+      "test_coverage": 98,
+      "required": true,
+      "description": "Partially Signed Bitcoin Transactions",
+      "is_beta": false,
+      "bip": "BIP-174",
+      "audit_status": "Verified",
+      "name": "PSBT",
+      "status": "Compliant"
+    },
+    "BIP-370": {
+      "implementation": "Full implementation in core/transaction",
+      "test_coverage": 85,
+      "required": false,
+      "description": "PSBT Version 2 with Tap enhancements",
+      "is_beta": false,
+      "bip": "BIP-370",
+      "audit_status": "Verified",
+      "name": "PSBT Version 2",
+      "status": "Compliant"
+    },
+    "BIP-353": {
+      "examples": [
+        "examples/bip353_examples.rs",
+        "examples/bip353_bitvm_integration.rs"
+      ],
+      "implementation": "Full implementation in bip/bip353.rs",
+      "test_coverage": 80,
+      "required": false,
+      "description": "DNS-based Bitcoin Payment Instructions using bitcoin@domain.tld identifiers",
+      "is_beta": true,
+      "bip": "BIP-353",
+      "audit_status": "In Progress",
+      "name": "DNS Payment Instructions",
+      "documentation": "docs/bitcoin/BIP353.md",
+      "tests": "tests/bip/test_bip353.rs",
+      "status": "Partial"
+    },
+    "BIP-342": {
+      "implementation": "Native implementation in core/script",
+      "test_coverage": 90,
+      "required": true,
+      "description": "Validation of Taproot Scripts",
+      "is_beta": false,
+      "bip": "BIP-342",
+      "audit_status": "Verified",
+      "name": "Tapscript",
+      "status": "Compliant"
+    },
+    "BIP-329": {
+      "implementation": "Basic implementation in wallet/labels.rs",
+      "test_coverage": 65,
+      "required": false,
+      "description": "Wallet label export/import format",
+      "is_beta": true,
+      "bip": "BIP-329",
+      "audit_status": "Pending",
+      "name": "Wallet Labels",
+      "status": "Missing"
+    },
+    "BIP-340": {
+      "implementation": "Uses rust-secp256k1 library",
+      "test_coverage": 90,
+      "required": true,
+      "description": "Schnorr Signatures for secp256k1",
+      "is_beta": false,
+      "bip": "BIP-340",
+      "audit_status": "Verified",
+      "name": "Schnorr Signatures",
+      "status": "Compliant"
+    },
+    "BIP-341": {
+      "implementation": "Native implementation in core/script",
+      "test_coverage": 95,
+      "required": true,
+      "description": "Taproot: SegWit version 1 spending rules",
+      "is_beta": false,
+      "bip": "BIP-341",
+      "audit_status": "Verified",
+      "name": "Taproot",
+      "status": "Compliant"
+    }
+  },
+  "partial_count": 2,
+  "beta_count": 3
+}

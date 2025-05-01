@@ -11,7 +11,7 @@ All contributors are expected to adhere to our Code of Conduct. Please read it b
 ## Getting Started
 
 1. Fork the repository
-2. Clone your fork: `git clone https://github.com/yourusername/anya-core.git`
+2. Clone your fork: `git clone https://github.com/anya-org/anya-core.git`
 3. Create a new branch: `git checkout -b feature/your-feature-name`
 4. Set up your development environment following the [Development Setup](./dev_setup.md) guide
 
