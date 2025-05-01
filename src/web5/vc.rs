@@ -72,7 +72,7 @@ pub struct CredentialManager {
 
 impl CredentialManager {
     /// Create a new credential manager
-    pub fn new(did_manager: DIDManager) -> Self  -> Result<(), Box<dyn Error>> {
+    pub fn new(did_manager: DIDManager) -> Self {
         Self {
             did_manager,
             credentials: HashMap::new(),
@@ -181,13 +181,12 @@ impl CredentialManager {
 }
 
 /// Generate a UUID
-fn generate_uuid() -> String  -> Result<(), Box<dyn Error>> {
+fn generate_uuid() -> String {
     use std::time::{SystemTime, UNIX_EPOCH};
     
     let now = SystemTime::now()
         .duration_since(UNIX_EPOCH)
-        ?
-        .as_secs();
+        .unwrap();
     
     format!("{:x}-{:x}-{:x}-{:x}-{:x}", 
         now & 0xFFFF, 

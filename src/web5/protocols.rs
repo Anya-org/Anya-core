@@ -26,7 +26,7 @@ pub trait ProtocolHandler: Send + Sync {
 /// 
 /// Describes a protocol's capabilities and structure.
 #[derive(Clone, Serialize, Deserialize)]
-pub struct ProtocolDefinition  -> Result<(), Box<dyn Error>> {
+pub struct ProtocolDefinition {
     /// Protocol ID (URI)
     pub protocol: String,
     /// Protocol version
