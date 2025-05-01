@@ -81,7 +81,7 @@ pub struct AssetTransfer {
 }
 
 /// Generate a unique asset ID based on asset properties
-pub fn generate_asset_id(name: &str, supply: u64, precision: u8, metadata: &str) -> [u8; 32]  -> Result<(), Box<dyn Error>> {
+pub fn generate_asset_id(name: &str, supply: u64, precision: u8, metadata: &str) -> [u8; 32] {
     let mut hasher = Sha256::new();
     hasher.update(name.as_bytes());
     hasher.update(&supply.to_be_bytes());
@@ -102,7 +102,7 @@ pub fn create_asset(
     supply: u64,
     precision: u8,
     metadata: &str,
-) -> BitcoinResult<TaprootAsset>  -> Result<(), Box<dyn Error>> {
+) -> BitcoinResult<TaprootAsset> {
     // Validate inputs
     if name.is_empty() {
         return Err(BitcoinError::TaprootError("Asset name cannot be empty".to_string()));
@@ -139,7 +139,7 @@ pub fn create_asset(
 /// Issue a Taproot asset
 /// 
 /// Creates a transaction that issues the asset to the specified address.
-pub fn issue_asset(asset: &TaprootAsset, issuer_secret_key: &[u8]) -> BitcoinResult<String>  -> Result<(), Box<dyn Error>> {
+pub fn issue_asset(asset: &TaprootAsset, issuer_secret_key: &[u8]) -> BitcoinResult<String> {
     let secp = Secp256k1::new();
     let secret_key = SecretKey::from_slice(issuer_secret_key)?;
     let keypair = Keypair::from_secret_key(&secp, &secret_key);
@@ -165,7 +165,7 @@ pub fn issue_asset(asset: &TaprootAsset, issuer_secret_key: &[u8]) -> BitcoinRes
 /// Verify a Taproot asset
 /// 
 /// Verifies that the asset was properly issued and that all transfers are valid.
-pub fn verify_asset(asset: &TaprootAsset) -> BitcoinResult<bool>  -> Result<(), Box<dyn Error>> {
+pub fn verify_asset(asset: &TaprootAsset) -> BitcoinResult<bool> {
     // Check if the asset has been issued
     let issuance_tx = match &asset.issuance_tx {
         Some(tx) => tx,
@@ -192,7 +192,7 @@ pub fn verify_asset(asset: &TaprootAsset) -> BitcoinResult<bool>  -> Result<(), 
 /// Create React Native code for asset management
 /// 
 /// Generates React Native code for managing a Taproot asset.
-pub fn create_react_native_asset(asset: &TaprootAsset) -> BitcoinResult<String>  -> Result<(), Box<dyn Error>> {
+pub fn create_react_native_asset(asset: &TaprootAsset) -> BitcoinResult<String> {
     // Create a JSON object with the asset parameters
     let asset_json = serde_json::json!({
         "name": asset.name,
@@ -226,7 +226,7 @@ pub fn create_taproot_transaction(
     inputs: Vec<TxIn>,
     outputs: Vec<TxOut>,
     taproot_script: &Script,
-) -> BitcoinResult<Transaction>  -> Result<(), Box<dyn Error>> {
+) -> BitcoinResult<Transaction> {
     // Create a new secp256k1 context
     let secp = Secp256k1::new();
     
@@ -270,7 +270,7 @@ pub fn sign_taproot_transaction(
     txout: &TxOut,
     secret_key: &SecretKey,
     _spend_info: &TaprootSpendInfo,
-) -> BitcoinResult<()>  -> Result<(), Box<dyn Error>> {
+) -> BitcoinResult<()> {
     // Create secp256k1 context
     let secp = Secp256k1::new();
     
@@ -339,7 +339,7 @@ pub fn sign_taproot_transaction(
 pub fn verify_taproot_output(
     output: &TxOut,
     _spend_info: &TaprootSpendInfo,
-) -> bool  -> Result<(), Box<dyn Error>> {
+) -> bool {
     // Check if the output is a Taproot output
     output.script_pubkey.is_p2tr()
 }
@@ -347,7 +347,7 @@ pub fn verify_taproot_output(
 /// Transfer a Taproot asset
 /// 
 /// Creates a transaction that transfers the asset from one address to another.
-pub fn transfer_asset(transfer: &AssetTransfer) -> BitcoinResult<String>  -> Result<(), Box<dyn Error>> {
+pub fn transfer_asset(transfer: &AssetTransfer) -> BitcoinResult<String> {
     let secp = Secp256k1::new();
     
     // Convert recipient's public key from bytes to XOnlyPublicKey
@@ -374,7 +374,7 @@ pub fn transfer_asset(transfer: &AssetTransfer) -> BitcoinResult<String>  -> Res
 /// Sign a transaction
 /// 
 /// Signs all inputs in a transaction.
-pub fn sign_transaction(tx: &mut Transaction, secret_key: &[u8], prevouts: &[TxOut]) -> BitcoinResult<()>  -> Result<(), Box<dyn Error>> {
+pub fn sign_transaction(tx: &mut Transaction, secret_key: &[u8], prevouts: &[TxOut]) -> BitcoinResult<()> {
     let secp = Secp256k1::new();
     let secret_key = SecretKey::from_slice(secret_key)?;
     let keypair = Keypair::from_secret_key(&secp, &secret_key);
@@ -414,20 +414,20 @@ pub fn sign_transaction(tx: &mut Transaction, secret_key: &[u8], prevouts: &[TxO
 }
 
 /// Convert a string to a Bitcoin address
-pub fn string_to_address(address_str: &str) -> BitcoinResult<Address<NetworkChecked>>  -> Result<(), Box<dyn Error>> {
+pub fn string_to_address(address_str: &str) -> BitcoinResult<Address<NetworkChecked>> {
     Address::from_str(address_str)
         .map(|addr| addr.assume_checked())
         .map_err(|_| BitcoinError::InvalidAddress(address_str.to_string()))
 }
 
 /// Convert a string to a Bitcoin address (alias for string_to_address)
-pub fn from_str(address_str: &str) -> BitcoinResult<Address<NetworkChecked>>  -> Result<(), Box<dyn Error>> {
+pub fn from_str(address_str: &str) -> BitcoinResult<Address<NetworkChecked>> {
     Address::from_str(address_str)
         .map(|addr| addr.assume_checked())
         .map_err(|_| BitcoinError::InvalidAddress(address_str.to_string()))
 }
 
-pub fn create_asset_script(asset: &TaprootAsset) -> ScriptBuf  -> Result<(), Box<dyn Error>> {
+pub fn create_asset_script(asset: &TaprootAsset) -> ScriptBuf {
     let mut builder = Builder::new()
         .push_opcode(opcodes::all::OP_RETURN);
 
@@ -449,7 +449,7 @@ pub fn create_asset_script(asset: &TaprootAsset) -> ScriptBuf  -> Result<(), Box
     builder.into_script()
 }
 
-pub fn create_transfer_script(transfer: &AssetTransfer) -> ScriptBuf  -> Result<(), Box<dyn Error>> {
+pub fn create_transfer_script(transfer: &AssetTransfer) -> ScriptBuf {
     let mut builder = Builder::new()
         .push_opcode(opcodes::all::OP_RETURN);
 
@@ -469,7 +469,7 @@ pub fn create_transfer_script(transfer: &AssetTransfer) -> ScriptBuf  -> Result<
 }
 
 impl TaprootAsset {
-    pub fn issue(&mut self) -> BitcoinResult<String>  -> Result<(), Box<dyn Error>> {
+    pub fn issue(&mut self) -> BitcoinResult<String> {
         if self.issued {
             return Err(BitcoinError::AssetAlreadyIssued);
         }
@@ -495,7 +495,7 @@ impl TaprootAsset {
         Ok(taproot_script.to_string())
     }
 
-    pub fn transfer(&mut self, transfer: AssetTransfer) -> BitcoinResult<String>  -> Result<(), Box<dyn Error>> {
+    pub fn transfer(&mut self, transfer: AssetTransfer) -> BitcoinResult<String> {
         let secp = Secp256k1::new();
         
         // Convert recipient's public key
@@ -519,7 +519,7 @@ impl TaprootAsset {
         Ok(taproot_script.to_string())
     }
 
-    pub fn sign_transaction(&self, tx: &mut Transaction, input_index: usize, secret_key: &[u8]) -> BitcoinResult<()>  -> Result<(), Box<dyn Error>> {
+    pub fn sign_transaction(&self, tx: &mut Transaction, input_index: usize, secret_key: &[u8]) -> BitcoinResult<()> {
         let secp = Secp256k1::new();
         let mut sighash_cache = SighashCache::new(&mut *tx);
         let secret_key = SecretKey::from_slice(secret_key)?;
@@ -549,7 +549,7 @@ impl TaprootAsset {
         Ok(())
     }
 
-    fn get_previous_output(&self, _input_index: usize) -> BitcoinResult<TxOut>  -> Result<(), Box<dyn Error>> {
+    fn get_previous_output(&self, _input_index: usize) -> BitcoinResult<TxOut> {
         // Placeholder implementation
         Ok(TxOut {
             value: Amount::from_sat(0),
@@ -558,12 +558,63 @@ impl TaprootAsset {
     }
 }
 
+/// TaprootValidator for BIP-341/342 compliance checks
+pub struct TaprootValidator;
+
+impl TaprootValidator {
+    /// Create a new Taproot validator
+    pub fn new() -> Self {
+        Self
+    }
+    
+    /// Check if an output is a Taproot output
+    pub fn is_taproot_output(&self, output: &TxOut) -> bool {
+        // Check for Taproot pattern (P2TR)
+        output.script_pubkey.is_p2tr()
+    }
+    
+    /// Count Taproot outputs in a transaction
+    pub fn count_taproot_outputs(&self, tx: &Transaction) -> usize {
+        tx.output.iter()
+            .filter(|output| self.is_taproot_output(output))
+            .count()
+    }
+    
+    /// Verify Taproot commitments in a transaction (BIP-341)
+    pub fn verify_taproot_commitment(&self, tx: &Transaction) -> BitcoinResult<()> {
+        // Ensure at least one output uses Taproot
+        let taproot_count = self.count_taproot_outputs(tx);
+        if taproot_count == 0 {
+            return Err(BitcoinError::TaprootError("No Taproot outputs found".to_string()));
+        }
+        
+        // In a real implementation, this would check specific Taproot requirements
+        // like proper key tweaking and merkelized script trees
+        
+        Ok(())
+    }
+    
+    /// Verify Tapscript execution (BIP-342)
+    pub fn verify_tapscript(&self, script: &Script) -> BitcoinResult<()> {
+        // This is a simplified implementation
+        // In reality, this would verify the script against BIP-342 rules
+        
+        if script.is_empty() {
+            return Err(BitcoinError::TaprootError("Empty Tapscript".to_string()));
+        }
+        
+        // In a real implementation, check for opcodes disabled in Tapscript
+        
+        Ok(())
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     
     #[test]
-    fn test_create_asset()  -> Result<(), Box<dyn Error>> {
+    fn test_create_asset() {
         let asset = create_asset("TestCoin", 1000000, 8, "{\"description\":\"Test asset\"}")
             ?;
             
@@ -576,7 +627,7 @@ mod tests {
     }
     
     #[test]
-    fn test_create_react_native_asset()  -> Result<(), Box<dyn Error>> {
+    fn test_create_react_native_asset() {
         let asset = create_asset("TestCoin", 1000000, 8, "{\"description\":\"Test asset\"}")
             ?;
             

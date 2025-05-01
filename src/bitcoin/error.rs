@@ -1,173 +1,135 @@
 use std::error::Error;
-// Migrated from OPSource to anya-core
-// This file was automatically migrated as part of the Rust-only implementation
-// Original file: C:\Users\bmokoka\Downloads\OPSource\src\bitcoin\error.rs
-// Bitcoin Error Handling Module
-// Implements comprehensive error types and handling for Bitcoin operations
-//
-// [AIR-3][AIS-2][AIT-2][AIM-1][AIP-1][BPC-2][RES-2]
-// This module provides structured error types with comprehensive coverage
-// for all Bitcoin-related operations with good resilience characteristics.
-
+use std::fmt;
 use thiserror::Error;
-use bitcoin::secp256k1;
-use bitcoin::{
-    taproot::TaprootBuilderError,
-    sighash::TaprootError,
-    sighash::P2wpkhError,
-    taproot::TaprootBuilder,
-    taproot::SigFromSliceError,
-};
-use hex::FromHexError;
-use bitcoin::key::FromSliceError;
 
-/// Bitcoin operation errors
-#[derive(Error, Debug)]
+/// Bitcoin-related errors
+#[derive(Debug, Error)]
 pub enum BitcoinError {
-    #[error("Failed to sign transaction")]
-    SigningError,
-
-    #[error("Failed to create Taproot output: {0}")]
-    TaprootError(String),
-
-    #[error("Failed to convert signature")]
-    SignatureConversionError,
-
-    #[error("Invalid sighash")]
-    InvalidSighash,
-
-    #[error("Invalid public key")]
-    InvalidPublicKey,
-
-    #[error("Invalid private key")]
-    InvalidPrivateKey,
-
-    #[error("Invalid script")]
-    InvalidScript,
-
-    #[error("Invalid address: {0}")]
-    InvalidAddress(String),
-
-    #[error("Insufficient funds")]
-    InsufficientFunds,
-
-    #[error("Transaction not found")]
-    TransactionNotFound,
-
-    #[error("Block not found")]
-    BlockNotFound,
-
-    #[error("Network error: {0}")]
-    NetworkError(String),
-
+    /// Wallet errors
     #[error("Wallet error: {0}")]
     Wallet(String),
-
-    #[error("Lightning error: {0}")]
-    Lightning(String),
-
-    #[error("DLC error: {0}")]
-    DLC(String),
-
-    #[error("Secp256k1 error: {0}")]
-    Secp256k1Error(String),
-
-    #[error("Other error: {0}")]
-    Other(String),
-
-    #[error("Asset already issued")]
-    AssetAlreadyIssued,
-
-    #[error("Taproot builder error: {0}")]
-    TaprootBuilderError(TaprootBuilderError),
-
-    #[error("Invalid secret key")]
-    InvalidSecretKey,
-
-    #[error("Invalid witness")]
-    InvalidWitness,
-
-    #[error("Hex decoding error")]
-    HexDecodingError,
-
-    #[error("Key conversion error")]
-    KeyConversionError,
-
-    #[error("IO error: {0}")]
-    IOError(String),
-
+    
+    /// Transaction errors
+    #[error("Transaction error: {0}")]
+    Transaction(String),
+    
+    /// Network errors
+    #[error("Network error: {0}")]
+    Network(String),
+    
+    /// Transaction not found
+    #[error("Transaction not found")]
+    TransactionNotFound,
+    
+    /// Block not found
+    #[error("Block not found")]
+    BlockNotFound,
+    
+    /// Invalid transaction
     #[error("Invalid transaction: {0}")]
     InvalidTransaction(String),
-
+    
+    /// Invalid script
+    #[error("Invalid script: {0}")]
+    InvalidScript(String),
+    
+    /// Invalid signature
     #[error("Invalid signature: {0}")]
     InvalidSignature(String),
-
-    #[error("Invalid oracle signature")]
-    InvalidOracleSignature,
-
+    
+    /// Invalid sighash
+    #[error("Invalid sighash")]
+    InvalidSighash,
+    
+    /// Signature conversion error
+    #[error("Signature conversion error")]
+    SignatureConversionError,
+    
+    /// Invalid secret key
+    #[error("Invalid secret key")]
+    InvalidSecretKey,
+    
+    /// Taproot error
+    #[error("Taproot error: {0}")]
+    TaprootError(String),
+    
+    /// Key error
     #[error("Key error: {0}")]
     KeyError(String),
-
-    #[error("P2WPKH error: {0}")]
-    P2wpkhError(String),
-
-    #[error("Invalid contract: {0}")]
-    InvalidContract(String),
+    
+    /// Protocol error
+    #[error("Protocol error: {0}")]
+    Protocol(String),
+    
+    /// SPV error
+    #[error("SPV error: {0}")]
+    SPV(String),
+    
+    /// Compliance error
+    #[error("BPC-{0} requires: {1}")]
+    ComplianceError(u8, String),
+    
+    /// Other errors
+    #[error("{0}")]
+    Other(String),
 }
 
-impl From<TaprootBuilderError> for BitcoinError {
-    fn from(err: TaprootBuilderError) -> Self  -> Result<(), Box<dyn Error>> {
-        BitcoinError::TaprootBuilderError(err)
+/// Result type for Bitcoin operations
+pub type BitcoinResult<T> = Result<T, BitcoinError>;
+
+impl BitcoinError {
+    /// Create a new wallet error
+    pub fn wallet(msg: &str) -> Self {
+        BitcoinError::Wallet(msg.to_string())
+    }
+    
+    /// Create a new transaction error
+    pub fn transaction(msg: &str) -> Self {
+        BitcoinError::Transaction(msg.to_string())
+    }
+    
+    /// Create a new network error
+    pub fn network(msg: &str) -> Self {
+        BitcoinError::Network(msg.to_string())
+    }
+    
+    /// Create a new protocol error
+    pub fn protocol(msg: &str) -> Self {
+        BitcoinError::Protocol(msg.to_string())
+    }
+    
+    /// Create a new SPV error
+    pub fn spv(msg: &str) -> Self {
+        BitcoinError::SPV(msg.to_string())
+    }
+    
+    /// Create a new compliance error
+    pub fn compliance(level: u8, msg: &str) -> Self {
+        BitcoinError::ComplianceError(level, msg.to_string())
     }
 }
 
-impl From<TaprootError> for BitcoinError {
-    fn from(err: TaprootError) -> Self  -> Result<(), Box<dyn Error>> {
-        BitcoinError::TaprootError(err.to_string())
-    }
-}
-
-impl From<TaprootBuilder> for BitcoinError {
-    fn from(_: TaprootBuilder) -> Self  -> Result<(), Box<dyn Error>> {
-        BitcoinError::TaprootError("Taproot builder error".to_string())
-    }
-}
-
-impl From<SigFromSliceError> for BitcoinError {
-    fn from(_: SigFromSliceError) -> Self  -> Result<(), Box<dyn Error>> {
-        BitcoinError::SignatureConversionError
-    }
-}
-
-impl From<FromHexError> for BitcoinError {
-    fn from(_: FromHexError) -> Self  -> Result<(), Box<dyn Error>> {
-        BitcoinError::HexDecodingError
-    }
-}
-
-impl From<FromSliceError> for BitcoinError {
-    fn from(_: FromSliceError) -> Self  -> Result<(), Box<dyn Error>> {
-        BitcoinError::KeyConversionError
-    }
-}
-
-impl From<secp256k1::Error> for BitcoinError {
-    fn from(error: secp256k1::Error) -> Self  -> Result<(), Box<dyn Error>> {
-        BitcoinError::Secp256k1Error(error.to_string())
-    }
-}
-
-impl From<&str> for BitcoinError {
-    fn from(error: &str) -> Self  -> Result<(), Box<dyn Error>> {
+impl From<std::io::Error> for BitcoinError {
+    fn from(error: std::io::Error) -> Self {
         BitcoinError::Other(error.to_string())
     }
 }
 
-impl From<P2wpkhError> for BitcoinError {
-    fn from(err: P2wpkhError) -> Self  -> Result<(), Box<dyn Error>> {
-        BitcoinError::P2wpkhError(err.to_string())
+impl From<bitcoin::secp256k1::Error> for BitcoinError {
+    fn from(error: bitcoin::secp256k1::Error) -> Self {
+        BitcoinError::Other(error.to_string())
     }
 }
 
-/// Result type for Bitcoin operations
-pub type BitcoinResult<T> = Result<T, BitcoinError>; 
+impl From<bitcoin::consensus::encode::Error> for BitcoinError {
+    fn from(error: bitcoin::consensus::encode::Error) -> Self {
+        BitcoinError::Other(error.to_string())
+    }
+}
+
+/// Convert errors from bitcoin_hashes
+impl From<bitcoin::hashes::Error> for BitcoinError {
+    fn from(error: bitcoin::hashes::Error) -> Self {
+        BitcoinError::Other(error.to_string())
+    }
+}
