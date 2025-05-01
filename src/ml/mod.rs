@@ -120,23 +120,23 @@ impl MLSystem {
     }
 
     /// Register a model with the ML system
-    pub fn register_model<M: MLModel + 'static>(&mut self, name: &str, model: M) -> AnyaResult<()>  -> Result<(), Box<dyn Error>> {
+    pub fn register_model<M: MLModel + 'static>(&mut self, name: &str, model: M) -> AnyaResult<()> {
         self.models.insert(name.to_string(), Arc::new(Mutex::new(model)));
         Ok(())
     }
 
     /// Get a model by name
-    pub fn get_model(&self, name: &str) -> Option<Arc<Mutex<dyn MLModel>>>  -> Result<(), Box<dyn Error>> {
+    pub fn get_model(&self, name: &str) -> Option<Arc<Mutex<dyn MLModel>>> {
         self.models.get(name).cloned()
     }
 
     /// List all registered models
-    pub fn list_models(&self) -> Vec<String>  -> Result<(), Box<dyn Error>> {
+    pub fn list_models(&self) -> Vec<String> {
         self.models.keys().cloned().collect()
     }
 
     /// Get health metrics for all models
-    pub fn get_health_metrics(&self) -> HashMap<String, HashMap<String, f64>>  -> Result<(), Box<dyn Error>> {
+    pub fn get_health_metrics(&self) -> HashMap<String, HashMap<String, f64>> {
         let mut metrics = HashMap::new();
         
         // Add service metrics
@@ -225,7 +225,7 @@ impl FederatedLearningManager {
     }
     
     /// List all nodes in the federation
-    pub fn list_nodes(&self) -> &[FederatedNode]  -> Result<(), Box<dyn Error>> {
+    pub fn list_nodes(&self) -> &[FederatedNode] {
         &self.nodes
     }
 }
@@ -274,4 +274,5 @@ mod tests {
         assert_eq!(is_ready_for_stage(0.95, SystemStage::Production), true);
     }
 }
+
 
