@@ -281,7 +281,7 @@ pub fn verify_tx_inclusion(
         .map_err(|e| SpvError::InvalidMerkleProof(format!("Invalid merkle path hex: {}", e)))?;
     
     // Create and verify the proof
-    let proof = SpvProof::from_raw(&tx_id, None, &block_header, &merkle_proof, tx_index as usize)?;
+    let proof = SpvProof::from_raw(&tx_id, None, BlockHeader::from_slice(&block_header)?, PartialMerkleTree::from_txids(&[Txid::from_slice(&tx_id)?], &[Txid::from_slice(&tx_id)?]), tx_index as usize)?;
     proof.verify()
 }
 

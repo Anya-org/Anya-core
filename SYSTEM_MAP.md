@@ -44,11 +44,19 @@ Following our reorganization, the repository is now structured more efficiently:
 │   ├── api/                 # API implementations
 │   ├── bitcoin/             # Bitcoin protocol implementation
 │   │   ├── adapters/        # Bitcoin-specific adapters
+│   │   │   ├── protocols/   # Protocol adapters
+│   │   │   ├── rpc/         # RPC adapters
+│   │   │   └── storage/     # Storage adapters
 │   │   ├── core/            # Core Bitcoin functionality
 │   │   │   ├── consensus/   # Consensus rules
 │   │   │   ├── mempool/     # Mempool management
 │   │   │   ├── network/     # Network protocols
 │   │   │   └── script/      # Script execution
+│   │   ├── error/           # Error handling
+│   │   ├── interface/       # Interface definitions
+│   │   │   ├── block.rs     # Block interface
+│   │   │   ├── transaction.rs # Transaction interface
+│   │   │   └── network.rs   # Network interface
 │   │   ├── layer2/          # Layer 2 implementations
 │   │   │   ├── bob/         # Bitcoin Optimistic Blockchain
 │   │   │   ├── dlc/         # Discreet Log Contracts
@@ -56,6 +64,8 @@ Following our reorganization, the repository is now structured more efficiently:
 │   │   │   ├── rgb/         # RGB Protocol
 │   │   │   └── rsk/         # RSK Sidechain
 │   │   ├── protocol/        # Bitcoin protocol definitions
+│   │   ├── bip341.rs        # BIP-341 (Taproot) implementation
+│   │   ├── spv.rs           # SPV verification
 │   │   ├── riscv/           # RISC-V implementations
 │   │   ├── security/        # Bitcoin-specific security
 │   │   └── testing/         # Bitcoin-specific tests
@@ -85,6 +95,12 @@ Following our reorganization, the repository is now structured more efficiently:
   - Manages UTXO state
   - Implements BIP standards
 
+- **Hexagonal Architecture**
+  - Interface layer defining ports (interfaces) - `interface/` directory
+  - Adapter layer connecting to external dependencies - `adapters/` directory 
+  - Core domain logic in the center - `core/` directory
+  - Comprehensive error handling - `error.rs` module
+
 - **BIP Compliance**
   - Validates implementation against Bitcoin Improvement Proposals
   - Checks for BIP-340, BIP-341, BIP-342, BIP-174, BIP-370 compliance
@@ -93,6 +109,25 @@ Following our reorganization, the repository is now structured more efficiently:
 - **Security Validation**
   - Basic security validation for Bitcoin components
   - Initial security checks for core functionality
+
+### Bitcoin Protocol Modules
+
+- **SPV Implementation (src/bitcoin/spv.rs)**
+  - Simplified Payment Verification
+  - Merkle proof validation
+  - Transaction inclusion verification
+  
+- **Taproot Implementation (src/bitcoin/bip341.rs)**
+  - BIP-341 Taproot implementation
+  - Merkle tree construction
+  - Taproot script path spending
+  - Key path spending
+  
+- **Interface Layer (src/bitcoin/interface/)**
+  - Block interfaces - `block.rs`
+  - Transaction interfaces - `transaction.rs`
+  - Network interfaces - `network.rs`
+  - Clean abstraction of Bitcoin Core types
 
 ### Security Analysis Framework (src/security/)
 

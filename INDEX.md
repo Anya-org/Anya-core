@@ -41,6 +41,11 @@ Welcome to the Anya Core documentation. This index will help you navigate the va
 ### Bitcoin & Lightning
 
 - [Bitcoin Integration](src/bitcoin/README.md) - Bitcoin protocol features
+  - [Bitcoin Error Handling](src/bitcoin/error.rs) - Comprehensive error types
+  - [Bitcoin Interface Layer](src/bitcoin/interface/) - Clean API abstractions
+  - [Simplified Payment Verification](src/bitcoin/spv.rs) - SPV implementation
+  - [Taproot/BIP-341](src/bitcoin/bip341.rs) - Taproot implementation
+  - [Bitcoin Adapters](src/bitcoin/adapters/) - Hexagonal architecture adapters
 - [Lightning Integration](src/lightning/README.md) - Lightning Network features
 
 ### DAO & Tokenomics
@@ -72,6 +77,24 @@ Welcome to the Anya Core documentation. This index will help you navigate the va
 - [AI Labeling Standards](docs/standards/AI_LABELING.md) - Component labeling standards
 
 ## Key Features at a Glance
+
+### Bitcoin Module Architecture (Hexagonal Pattern)
+
+- **Interface Layer**: Clean ports/interfaces for external services
+  - Block interfaces (`interface/block.rs`)
+  - Transaction interfaces (`interface/transaction.rs`)
+  - Network interfaces (`interface/network.rs`)
+- **Adapter Layer**: Adapters to external dependencies
+  - Protocol adapters (`adapters/protocols/`)
+  - RPC adapters (`adapters/rpc/`)
+  - Storage adapters (`adapters/storage/`)
+- **Core Domain Logic**: Bitcoin-specific business logic
+  - Consensus rules (`core/consensus/`)
+  - Mempool management (`core/mempool/`)
+  - Transaction validation (`core/transaction/`)
+- **Error Handling**: Comprehensive error types and propagation
+  - Bitcoin-specific errors (`error.rs`)
+  - Custom error types for all subsystems
 
 ### DAO & Tokenomics System
 

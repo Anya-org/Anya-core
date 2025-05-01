@@ -103,20 +103,20 @@ impl From<bitcoin::secp256k1::Error> for BitcoinError {
     }
 }
 
-impl From<bitcoin::hex::Error> for BitcoinError {
-    fn from(error: bitcoin::hex::Error) -> Self {
+impl From<hex::Error> for BitcoinError {
+    fn from(error: hex::Error) -> Self {
         BitcoinError::Other(format!("Hex error: {}", error))
     }
 }
 
-impl From<bitcoin::hashes::Error> for BitcoinError {
-    fn from(error: bitcoin::hashes::Error) -> Self {
+impl From<bitcoin_hashes::Error> for BitcoinError {
+    fn from(error: bitcoin_hashes::Error) -> Self {
         BitcoinError::Other(format!("Hash error: {}", error))
     }
 }
 
-impl From<bitcoin::taproot::Error> for BitcoinError {
-    fn from(error: bitcoin::taproot::Error) -> Self {
+impl From<bitcoin::psbt::Error> for BitcoinError {
+    fn from(error: bitcoin::psbt::Error) -> Self {
         BitcoinError::TaprootError(error.to_string())
     }
 }
@@ -127,8 +127,8 @@ impl From<bitcoin::key::Error> for BitcoinError {
     }
 }
 
-impl From<bitcoin::sighash::Error> for BitcoinError {
-    fn from(error: bitcoin::sighash::Error) -> Self {
+impl From<bitcoin::ecdsa::Error> for BitcoinError {
+    fn from(error: bitcoin::ecdsa::Error) -> Self {
         BitcoinError::Other(format!("Sighash error: {}", error))
     }
 }

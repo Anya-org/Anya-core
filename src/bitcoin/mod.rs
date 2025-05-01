@@ -15,6 +15,9 @@
 
 use std::error::Error;
 
+// Make the error module public to fix module errors
+pub mod error;
+
 // Re-export submodules - removing duplicates and keeping directory versions
 pub mod validation;
 pub mod protocol;
@@ -34,25 +37,24 @@ pub mod layer2;
 use bitcoin::{
     Address, Amount, Network, OutPoint, PublicKey, Script, ScriptBuf, Transaction, TxIn, TxOut,
     Witness, secp256k1::{Secp256k1, SecretKey, Keypair, XOnlyPublicKey},
-    taproot::{TaprootBuilder, TapTweakHash},
-    hashes::{Hash, sha256},
-    key::PrivateKey,
 };
-// Use TxMerkleNode from bitcoin instead of bitcoin::transaction
+
+// Import types from bitcoin - use bitcoin crate directly, not submodules
 use bitcoin::TxMerkleNode;
-// Use PartialMerkleTree from bitcoin::merkle
-use bitcoin::merkle::PartialMerkleTree;
 use bitcoin::transaction::Version;
 use bitcoin::absolute::LockTime;
 use bitcoin::psbt::Psbt;
 use bitcoin::bip32::{DerivationPath, ExtendedPrivKey, ExtendedPubKey};
 use bitcoin::ecdsa::{self, Signature};
+
+// For compatibility with newer libraries, also import the bitcoin_hashes crate
+use bitcoin_hashes::{Hash, sha256};
+
 // Fix the error module import
 use crate::bitcoin::error::{BitcoinError, BitcoinResult};
 use tracing::{info, warn, error};
 use std::str::FromStr;
 use rand::RngCore;
-use bitcoin::sighash::SighashCache;
 use std::collections::HashMap;
 use serde_json;
 
@@ -237,35 +239,9 @@ impl BitcoinManager {
 }
 
 /// Verify a Bitcoin payment using SPV (Simplified Payment Verification)
-pub fn verify_bitcoin_payment(tx_hash: &[u8], block_header: &interface::BlockHeader, merkle_proof: &[u8]) -> bool {
-    // Parse the merkle proof
-    let partial_merkle_tree = match PartialMerkleTree::consensus_decode(merkle_proof) {
-        Ok(tree) => tree,
-        Err(_) => return false,
-    };
-    
-    // Verify the merkle proof
-    let mut matched_txids: Vec<TxMerkleNode> = Vec::new();
-    let mut indices: Vec<u32> = Vec::new();
-    
-    if !partial_merkle_tree.extract_matches(&mut matched_txids, &mut indices) {
-        return false;
-    }
-    
-    // Check if the transaction hash is in the matched hashes
-    let tx_merkle_node = match TxMerkleNode::from_slice(tx_hash) {
-        Ok(hash) => hash,
-        Err(_) => return false,
-    };
-    
-    // Validate the merkle root against block header
-    let merkle_root = partial_merkle_tree.merkle_root();
-    if merkle_root.to_string() != block_header.merkle_root {
-        return false;
-    }
-    
-    // Check if our tx is included in the matched transactions
-    matched_txids.contains(&tx_merkle_node)
+pub fn verify_bitcoin_payment(tx_hash: &[u8], block_header: &interface::block::BlockHeader, merkle_proof: &[u8]) -> bool {
+    // This method is now implemented in the spv module
+    spv::verify_merkle_proof(tx_hash, block_header, merkle_proof)
 }
 
 /// Create a Taproot transaction with a script
