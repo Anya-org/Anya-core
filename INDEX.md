@@ -43,9 +43,20 @@ Welcome to the Anya Core documentation. This index will help you navigate the va
 - [Bitcoin Integration](src/bitcoin/README.md) - Bitcoin protocol features
   - [Bitcoin Error Handling](src/bitcoin/error.rs) - Comprehensive error types
   - [Bitcoin Interface Layer](src/bitcoin/interface/) - Clean API abstractions
-  - [Simplified Payment Verification](src/bitcoin/spv.rs) - SPV implementation
+    - [Block Interfaces](src/bitcoin/interface/block.rs) - Block structure and information
+    - [Transaction Interfaces](src/bitcoin/interface/transaction.rs) - Transaction structure and information
+    - [Network Interfaces](src/bitcoin/interface/network.rs) - Network status and operations
+  - [Protocol Implementation](src/bitcoin/protocol/) - Bitcoin protocol implementation
+    - [Protocol Validation](src/bitcoin/protocol/validation.rs) - Transaction and protocol validation
+    - [Script Execution](src/bitcoin/protocol/script.rs) - Bitcoin script execution
+    - [Address Utilities](src/bitcoin/protocol/address.rs) - Address generation and validation
+  - [Simplified Payment Verification](src/bitcoin/spv.rs) - SPV implementation with constant-time operations
   - [Taproot/BIP-341](src/bitcoin/bip341.rs) - Taproot implementation
   - [Bitcoin Adapters](src/bitcoin/adapters/) - Hexagonal architecture adapters
+- [BIP Implementations](core/src/bip/) - Core BIP implementations
+  - [BIP-341 (Taproot)](core/src/bip/bip341.rs) - Taproot verification and utilities
+  - [BIP-342 (Tapscript)](core/src/bip/bip342.rs) - Tapscript verification
+  - [BIP Registry](core/src/bip/mod.rs) - BIP implementation registry and status tracking
 - [Lightning Integration](src/lightning/README.md) - Lightning Network features
 
 ### DAO & Tokenomics
@@ -92,9 +103,12 @@ Welcome to the Anya Core documentation. This index will help you navigate the va
   - Consensus rules (`core/consensus/`)
   - Mempool management (`core/mempool/`)
   - Transaction validation (`core/transaction/`)
+  - Protocol implementation (`protocol/`)
+  - BIP implementations (`core/bip/`)
 - **Error Handling**: Comprehensive error types and propagation
   - Bitcoin-specific errors (`error.rs`)
   - Custom error types for all subsystems
+  - Constant-time operations for security-sensitive code
 
 ### DAO & Tokenomics System
 
@@ -140,8 +154,8 @@ Welcome to the Anya Core documentation. This index will help you navigate the va
 
 ## Release Information
 
-- **Current Version**: 3.1.0
-- **Last Updated**: 2025-04-28 14:30 UTC+2
+- **Current Version**: 3.1.2
+- **Last Updated**: May 1, 2025
 - **Compatibility**:
   - Stacks v2.4
   - Web5 Protocol v1.0
@@ -159,6 +173,9 @@ Welcome to the Anya Core documentation. This index will help you navigate the va
 
 - [Bitcoin Implementation](src/bitcoin/) - Bitcoin protocol implementation
 - [BIP Compliance Matrix](docs/BIP_COMPLIANCE.md) - Full BIP-341/342 implementation status
+  - [BIP-341 (Taproot)](core/src/bip/bip341.rs) - Complete Taproot implementation
+  - [BIP-342 (Tapscript)](core/src/bip/bip342.rs) - Complete Tapscript implementation
+  - [BIP Registry](core/src/bip/mod.rs) - Implementation status tracking
 - [DLC Implementation](src/layer2/dlc/) - Discrete Log Contracts
 
 ## Security Analysis Components
@@ -198,8 +215,8 @@ For full details on the AI labeling system, see [docs/standards/AI_LABELING.md](
 
 ## Version Information
 
-- Current Version: 3.1.0
-- Last Updated: April 28, 2025
+- Current Version: 3.1.2
+- Last Updated: May 1, 2025
 - Bitcoin Development Framework: v2.5
 
 ## Directory Structure
