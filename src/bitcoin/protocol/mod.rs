@@ -8,7 +8,8 @@ use anyhow::{Result, Context};
 use bitcoin::consensus::{Decodable, Encodable};
 use std::io::{self, Read, Write};
 use thiserror::Error;
-use bitcoin::{Transaction, Block, BlockHeader};
+use bitcoin::{Transaction, Block};
+use bitcoin::block::Header as BlockHeader;
 
 /// Bitcoin transaction validation
 pub mod validation;

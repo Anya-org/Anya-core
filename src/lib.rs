@@ -260,9 +260,15 @@ pub mod utils {
 
     /// Log a message
     pub fn log(msg: &str) {
-        println!("[{}] {}", chrono::Utc::now(), msg);
+        let now = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap_or_default();
+        println!("[{}] {}", now.as_secs(), msg);
     }
 }
+
+/// Library version
+pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 pub fn version() -> &'static str {
     env!("CARGO_PKG_VERSION")

@@ -1,6 +1,10 @@
-use std::error::Error;
-use std::fmt;
+// Bitcoin Error Module
+// [AIR-3][AIS-3][BPC-3]
+//
+// Defines error types for Bitcoin module operations
+
 use thiserror::Error;
+use std::fmt;
 
 /// Bitcoin-related errors
 #[derive(Debug, Error)]
@@ -49,6 +53,10 @@ pub enum BitcoinError {
     #[error("Invalid secret key")]
     InvalidSecretKey,
     
+    /// Invalid private key
+    #[error("Invalid private key")]
+    InvalidPrivateKey,
+    
     /// Taproot error
     #[error("Taproot error: {0}")]
     TaprootError(String),
@@ -63,11 +71,23 @@ pub enum BitcoinError {
     
     /// SPV error
     #[error("SPV error: {0}")]
-    SPV(String),
+    SPVError(String),
     
     /// Compliance error
     #[error("BPC-{0} requires: {1}")]
     ComplianceError(u8, String),
+    
+    /// Signing error
+    #[error("Signing error")]
+    SigningError,
+    
+    /// Invalid address
+    #[error("Invalid address: {0}")]
+    InvalidAddress(String),
+    
+    /// Asset already issued
+    #[error("Asset already issued")]
+    AssetAlreadyIssued,
     
     /// Other errors
     #[error("{0}")]
@@ -77,59 +97,86 @@ pub enum BitcoinError {
 /// Result type for Bitcoin operations
 pub type BitcoinResult<T> = Result<T, BitcoinError>;
 
-impl BitcoinError {
-    /// Create a new wallet error
-    pub fn wallet(msg: &str) -> Self {
-        BitcoinError::Wallet(msg.to_string())
+impl From<bitcoin::secp256k1::Error> for BitcoinError {
+    fn from(error: bitcoin::secp256k1::Error) -> Self {
+        BitcoinError::KeyError(error.to_string())
     }
-    
-    /// Create a new transaction error
-    pub fn transaction(msg: &str) -> Self {
-        BitcoinError::Transaction(msg.to_string())
+}
+
+impl From<bitcoin::hex::Error> for BitcoinError {
+    fn from(error: bitcoin::hex::Error) -> Self {
+        BitcoinError::Other(format!("Hex error: {}", error))
     }
-    
-    /// Create a new network error
-    pub fn network(msg: &str) -> Self {
-        BitcoinError::Network(msg.to_string())
+}
+
+impl From<bitcoin::hashes::Error> for BitcoinError {
+    fn from(error: bitcoin::hashes::Error) -> Self {
+        BitcoinError::Other(format!("Hash error: {}", error))
     }
-    
-    /// Create a new protocol error
-    pub fn protocol(msg: &str) -> Self {
-        BitcoinError::Protocol(msg.to_string())
+}
+
+impl From<bitcoin::taproot::Error> for BitcoinError {
+    fn from(error: bitcoin::taproot::Error) -> Self {
+        BitcoinError::TaprootError(error.to_string())
     }
-    
-    /// Create a new SPV error
-    pub fn spv(msg: &str) -> Self {
-        BitcoinError::SPV(msg.to_string())
+}
+
+impl From<bitcoin::key::Error> for BitcoinError {
+    fn from(error: bitcoin::key::Error) -> Self {
+        BitcoinError::KeyError(error.to_string())
     }
-    
-    /// Create a new compliance error
-    pub fn compliance(level: u8, msg: &str) -> Self {
-        BitcoinError::ComplianceError(level, msg.to_string())
+}
+
+impl From<bitcoin::sighash::Error> for BitcoinError {
+    fn from(error: bitcoin::sighash::Error) -> Self {
+        BitcoinError::Other(format!("Sighash error: {}", error))
     }
 }
 
 impl From<std::io::Error> for BitcoinError {
     fn from(error: std::io::Error) -> Self {
+        BitcoinError::Other(format!("IO error: {}", error))
+    }
+}
+
+impl From<anyhow::Error> for BitcoinError {
+    fn from(error: anyhow::Error) -> Self {
         BitcoinError::Other(error.to_string())
     }
 }
 
-impl From<bitcoin::secp256k1::Error> for BitcoinError {
-    fn from(error: bitcoin::secp256k1::Error) -> Self {
-        BitcoinError::Other(error.to_string())
+impl From<serde_json::Error> for BitcoinError {
+    fn from(error: serde_json::Error) -> Self {
+        BitcoinError::Other(format!("JSON error: {}", error))
     }
 }
 
-impl From<bitcoin::consensus::encode::Error> for BitcoinError {
-    fn from(error: bitcoin::consensus::encode::Error) -> Self {
-        BitcoinError::Other(error.to_string())
+impl From<bitcoin::address::Error> for BitcoinError {
+    fn from(error: bitcoin::address::Error) -> Self {
+        BitcoinError::InvalidAddress(error.to_string())
     }
 }
 
-/// Convert errors from bitcoin_hashes
-impl From<bitcoin::hashes::Error> for BitcoinError {
-    fn from(error: bitcoin::hashes::Error) -> Self {
-        BitcoinError::Other(error.to_string())
+// Additional helper methods
+impl BitcoinError {
+    /// Create a wallet error with a message
+    pub fn wallet<S: ToString>(msg: S) -> Self {
+        BitcoinError::Wallet(msg.to_string())
+    }
+    
+    /// Create a transaction error with a message
+    pub fn transaction<S: ToString>(msg: S) -> Self {
+        BitcoinError::Transaction(msg.to_string())
+    }
+    
+    /// Create a network error with a message
+    pub fn network<S: ToString>(msg: S) -> Self {
+        BitcoinError::Network(msg.to_string())
+    }
+    
+    /// Create a protocol error with a message
+    pub fn protocol<S: ToString>(msg: S) -> Self {
+        BitcoinError::Protocol(msg.to_string())
     }
 }
+

@@ -26,7 +26,7 @@ use bitcoin::{
     sighash::P2wpkhError,
 };
 use sha2::{Sha256, Digest};
-use crate::bitcoin::error::{BitcoinError, BitcoinResult};
+use super::error::{BitcoinError, BitcoinResult};
 use std::collections::HashMap;
 use std::str::FromStr;
 use rand::{thread_rng, RngCore};
