@@ -221,8 +221,8 @@ pub fn verify_merkle_proof(
     let partial_merkle_tree = match PartialMerkleTree::consensus_decode(Cursor::new(proof)) {
         Ok(tree) => tree,
         Err(_) => return Err(SpvError::InvalidMerkleProof("Failed to deserialize merkle proof".to_string())),
-    };
-    
+        };
+        
     // Extract matched transactions and indices
     let mut matched_txids = Vec::new();
     let mut indices = Vec::new();

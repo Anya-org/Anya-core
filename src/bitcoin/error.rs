@@ -24,15 +24,15 @@ pub enum BitcoinError {
     /// Transaction not found
     #[error("Transaction not found")]
     TransactionNotFound,
-    
+
     /// Block not found
     #[error("Block not found")]
     BlockNotFound,
-    
+
     /// Invalid transaction
     #[error("Invalid transaction: {0}")]
     InvalidTransaction(String),
-    
+
     /// Invalid script
     #[error("Invalid script: {0}")]
     InvalidScript(String),
@@ -40,7 +40,7 @@ pub enum BitcoinError {
     /// Invalid signature
     #[error("Invalid signature: {0}")]
     InvalidSignature(String),
-    
+
     /// Invalid sighash
     #[error("Invalid sighash")]
     InvalidSighash,
@@ -64,7 +64,7 @@ pub enum BitcoinError {
     /// Key error
     #[error("Key error: {0}")]
     KeyError(String),
-    
+
     /// Protocol error
     #[error("Protocol error: {0}")]
     Protocol(String),
