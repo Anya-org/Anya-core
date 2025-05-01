@@ -144,7 +144,7 @@ pub struct Service {
 
 impl DIDManager {
     /// Create a new DID manager with the specified method
-    pub fn new(method: &str) -> Self  -> Result<(), Box<dyn Error>> {
+    pub fn new(method: &str) -> Self {
         Self {
             dids: Arc::new(Mutex::new(HashMap::new())),
             default_did: None,
@@ -153,7 +153,7 @@ impl DIDManager {
     }
     
     /// Create a new DID with the configured method
-    pub fn create_did(&self) -> Web5Result<DID>  -> Result<(), Box<dyn Error>> {
+    pub fn create_did(&self) -> Web5Result<DID> {
         // Generate a random ID for the DID
         let id = format!("did:{}:{}", self.method, generate_random_id());
         
@@ -184,7 +184,7 @@ impl DIDManager {
     }
     
     /// Resolve a DID to its document
-    pub fn resolve_did(&self, did: &str) -> Web5Result<DIDDocument>  -> Result<(), Box<dyn Error>> {
+    pub fn resolve_did(&self, did: &str) -> Web5Result<DIDDocument> {
         // First, check if we have the DID locally
         let dids = self.dids.lock()?;
         if let Some(did_obj) = dids.get(did) {
@@ -196,7 +196,7 @@ impl DIDManager {
     }
     
     /// Set the default DID
-    pub fn set_default_did(&mut self, did: &str) -> Web5Result<()>  -> Result<(), Box<dyn Error>> {
+    pub fn set_default_did(&mut self, did: &str) -> Web5Result<()> {
         // Check if the DID exists
         let dids = self.dids.lock()?;
         if !dids.contains_key(did) {
@@ -210,12 +210,12 @@ impl DIDManager {
     }
     
     /// Get the default DID
-    pub fn get_default_did(&self) -> Web5Result<Option<String>>  -> Result<(), Box<dyn Error>> {
+    pub fn get_default_did(&self) -> Web5Result<Option<String>> {
         Ok(self.default_did.clone())
     }
     
     /// Sign data with a DID's private key
-    pub fn sign(&self, did: &str, data: &[u8]) -> Web5Result<Vec<u8>>  -> Result<(), Box<dyn Error>> {
+    pub fn sign(&self, did: &str, data: &[u8]) -> Web5Result<Vec<u8>> {
         // This is a simplified implementation
         // In a real implementation, this would use the DID's private key
         
@@ -232,17 +232,17 @@ impl DIDManager {
     }
     
     /// Get a list of all DIDs
-    pub fn dids(&self) -> Vec<String>  -> Result<(), Box<dyn Error>> {
-        let dids = self.dids.lock()?;
+    pub fn dids(&self) -> Vec<String> {
+        let dids = self.dids.lock().unwrap_or_default();
         dids.keys().cloned().collect()
     }
 }
 
 /// Generate a random ID for a DID
-fn generate_random_id() -> String  -> Result<(), Box<dyn Error>> {
+pub fn generate_random_id() -> String {
     let now = SystemTime::now()
         .duration_since(UNIX_EPOCH)
-        ?
+        .unwrap()
         .as_secs();
     
     format!("{:x}", now)
@@ -276,3 +276,4 @@ mod tests {
         assert_eq!(manager.get_default_did()??, did.id);
     }
 } 
+

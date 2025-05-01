@@ -3,8 +3,7 @@
 ;; Auto-updated from .\scripts\security-patterns.json
 
 (define-constant arithmetic-protection-patterns
-  (list
-    
+  (list;);)
 
-  ))
+
 

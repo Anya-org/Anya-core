@@ -1,0 +1,154 @@
+name: Bitcoin Protocol Validation
+
+on:
+  push:
+    branches: [ main, new-develop ]
+    paths:
+      - 'src/bitcoin/**'
+      - 'src/layer2/**'
+      - 'src/security/**'
+      - 'core/**'
+  pull_request:
+    branches: [ main, new-develop ]
+    paths:
+      - 'src/bitcoin/**'
+      - 'src/layer2/**'
+      - 'src/security/**'
+      - 'core/**'
+  workflow_dispatch:
+
+jobs:
+  bip-validation:
+    name: BIP Standards Compliance
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        
+      - name: Set up Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+          components: rustfmt, clippy
+          
+      - name: Set up Bitcoin Validation Tools
+        run: |
+          echo "Setting up Bitcoin validation tools..."
+          VALIDATION_DIR=".bitcoin-validation"
+          mkdir -p $VALIDATION_DIR
+          
+          # Clone BIPs repository for reference
+          git clone --depth 1 https://github.com/bitcoin/bips.git $VALIDATION_DIR/bips
+          
+          # Set up validation environment
+          cargo install bitcoincore-rpc
+      
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          
+      - name: Run BIP Validator
+        run: |
+          echo "Running BIP validation..."
+          cargo run --bin anya_validator -- validate-bips
+          
+      - name: Validate BIP-340 Schnorr Implementation
+        run: |
+          echo "Validating BIP-340 (Schnorr) implementation..."
+          cargo test --features schnorr_validation -- bip340
+          
+      - name: Validate BIP-341 Taproot Implementation
+        run: |
+          echo "Validating BIP-341 (Taproot) implementation..."
+          cargo test --features taproot_validation -- bip341
+          
+      - name: Validate BIP-342 Tapscript Implementation
+        run: |
+          echo "Validating BIP-342 (Tapscript) implementation..."
+          cargo test --features tapscript_validation -- bip342
+          
+      - name: Validate BIP-174 PSBT Implementation
+        run: |
+          echo "Validating BIP-174 (PSBT) implementation..."
+          cargo test --features psbt_validation -- bip174
+          
+      - name: Generate Compliance Report
+        run: |
+          echo "Generating compliance report..."
+          cargo run --bin anya_validator -- generate-report
+          
+      - name: Upload Compliance Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: bip-compliance-report
+          path: reports/compliance/bip-compliance-report.json
+          
+      - name: Check Compliance Status
+        run: |
+          echo "Checking BIP compliance status..."
+          cargo run --bin anya_validator -- check-compliance --strict
+          # Exit with error if compliance check fails
+          if [ $? -ne 0 ]; then
+            echo "::error::BIP compliance check failed."
+            exit 1
+          fi
+
+  protocol-testing:
+    name: Bitcoin Protocol Testing
+    runs-on: ubuntu-latest
+    needs: bip-validation
+    
+    services:
+      bitcoind:
+        image: ruimarinho/bitcoin-core:latest
+        ports:
+          - 18444:18444
+        options: >-
+          --entrypoint bitcoind
+          --user 1000:1000
+          -v ${{ github.workspace }}/bitcoin.conf:/bitcoin/.bitcoin/bitcoin.conf
+          -- -regtest -rpcuser=test -rpcpassword=test -rpcallowip=0.0.0.0/0 -server
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        
+      - name: Set up Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+          
+      - name: Create Bitcoin Configuration
+        run: |
+          mkdir -p ${{ github.workspace }}/bitcoin-data
+          cat > ${{ github.workspace }}/bitcoin.conf << EOF
+          regtest=1
+          server=1
+          rpcuser=test
+          rpcpassword=test
+          rpcallowip=0.0.0.0/0
+          txindex=1
+          EOF
+          
+      - name: Run Bitcoin Protocol Tests
+        run: |
+          echo "Running Bitcoin protocol tests..."
+          cargo test --features bitcoin_protocol_tests -- --ignored bitcoin_protocol
+          
+      - name: Run Layer 2 Protocol Tests
+        run: |
+          echo "Running Layer 2 protocol tests..."
+          cargo test --features layer2_protocol_tests -- --ignored layer2_protocol
+          
+      - name: Run Security Validation Tests
+        run: |
+          echo "Running security validation tests..."
+          cargo test --features security_validation -- security 

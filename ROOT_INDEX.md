@@ -5,54 +5,62 @@ Welcome to the Anya Core documentation. This is the authoritative root index for
 ## Quick Navigation [AIR-3]
 
 ### Core Documentation
+
 - [Getting Started](docs/getting-started/README.md) - Quick setup guide
-- [Installation](docs/installation/README.md) - Installation instructions
-- [System Architecture](docs/SYSTEM_MAP.md) - Complete system architecture
-- [Security Framework](docs/SECURITY.md) - AIS-3 compliance details
+- [Installation](INSTALLATION.md) - Installation instructions
+- [System Architecture](SYSTEM_MAP.md) - Complete system architecture
+- [Security Framework](SECURITY.md) - AIS-3 compliance details
 
 ### Bitcoin Protocol Integration [BPC-3]
-- [BIP-341/342 Implementation](docs/BIP-341-342.md) - Taproot/Tapscript
-- [PSBT Guide](docs/PSBT-GUIDE.md) - BIP-174/370 compliance
-- [Layer 2 Solutions](docs/bitcoin/LAYER2_SUPPORT.md) - L2 integration details
+
+- [BIP Implementation](docs/bitcoin/README.md) - Taproot/Tapscript
+- [Layer 2 Solutions](src/layer2/README.md) - L2 integration details
 
 ### DAO & Tokenomics [DAO-3]
-- [DAO Architecture](docs/DAO_SYSTEM_MAP.md) - Detailed DAO architecture
+
+- [DAO Architecture](src/dao/README.md) - Detailed DAO architecture
+- [Bitcoin-Compatible DAO](dao/core/dao-bitcoin-compatible.clar) - Full Bitcoin Layer 2 compatible implementation
 - [Bitcoin-Style Tokenomics](docs/TOKENOMICS_SYSTEM.md) - 21B token supply with halving
 - [Implementation Status](docs/IMPLEMENTATION_MILESTONES.md) - Current progress
 - [Component Reference](docs/DAO_INDEX.md) - Index of DAO components
 
 ### Web5 & Identity [W5C-3][DID-3]
-- [Web5 Integration](docs/web5/README.md) - Web5 implementation details
+
+- [Web5 Integration](src/web5/README.md) - Web5 implementation details
 - [DID System](docs/identity/README.md) - Decentralized identity implementation
-- [SILENT_LEAF Integration](docs/web5/taproot.md) - BIP-341 compliance
 
 ### AI & Machine Learning [AIR-3][AIS-3]
+
 - [ML System Architecture](docs/ML_SYSTEM_ARCHITECTURE.md) - ML system design
-- [AI Component Reference](docs/ml/README.md) - AI component details
+- [AI Component Reference](src/ml/README.md) - AI component details
 - [Model Management](docs/ml/models.md) - Model versioning and deployment
 
 ## System Status
 
 ### Core Protocol Status [BPC-3]
+
 - Bitcoin Core: v25.0
 - Taproot: Fully enabled (BIP-341/342)
 - PSBT: v2 support (BIP-174/370)
 - HSM: v2.5 integration
 
 ### Layer 2 Integration Status [BPC-3]
-- Lightning Network: Enabled
-- RGB Protocol: Q3 2025
-- RSK Integration: Q3 2025
-- BOB Layer 2: Active
-- State Channels: Enabled
+
+- Lightning Network: Enabled (src/lightning)
+- RGB Protocol: Q3 2025 (src/layer2/rgb)
+- RSK Integration: Q3 2025 (src/layer2/rsk)
+- BOB Layer 2: Active (src/layer2/bob)
+- State Channels: Enabled (src/layer2/state_channels)
 
 ### Security Compliance [AIS-3]
+
 - SILENT_LEAF Implementation: ✅
 - Taproot Script Validation: ✅
 - Schnorr Signature Support: ✅
 - HSM Integration: ✅
 
 ### Web5 Components [W5C-3]
+
 - DWN Implementation: ✅
 - DID Support: ✅
 - Verifiable Credentials: ✅
@@ -61,36 +69,57 @@ Welcome to the Anya Core documentation. This is the authoritative root index for
 ## Development Resources
 
 ### API & SDK
-- [API Documentation](docs/API.md) - Complete API reference
+
+- [API Documentation](docs/api/README.md) - Complete API reference
 - [Mobile SDK](docs/mobile/SDK.md) - React Native integration
-- [Web5 SDK](docs/web5/SDK.md) - Web5 development kit
+- [Web5 SDK](src/web5/README.md) - Web5 development kit
 
 ### Testing & Validation
-- [Test Framework](docs/TESTING.md) - Testing procedures
-- [Security Tests](docs/security/TESTS.md) - Security validation
-- [Performance Tests](docs/PERFORMANCE_TESTS.md) - Benchmarking
+
+- [Test Framework](TESTING.md) - Testing procedures
+- [Security Tests](src/security/README.md) - Security validation
+- [Performance Tests](src/testing/performance/README.md) - Benchmarking
 
 ### Compliance & Standards
+
 - [AI Labeling](docs/standards/AI_LABELING.md) - Component labeling
 - [Security Standards](docs/standards/SECURITY.md) - Security requirements
 - [BIP Compliance](docs/standards/BIP_COMPLIANCE.md) - Bitcoin protocol standards
 
 ## Current Version
-- Version: 3.1.0
-- Released: 2025-04-28
+
+- Version: 3.1.1
+- Released: 2025-04-29
 - Framework: Bitcoin Development Framework v2.5
 
 ## Support
+
 - Time Zone: UTC+2 (Johannesburg)
 - Hours: 09:00-17:00 SAST
-- Enterprise Support: enterprise@anya.org
-- Security: security@anya.org
+- Enterprise Support: <enterprise@anya.org>
+- Security: <security@anya.org>
+
+## Repository Structure
+
+The repository follows a structured organization:
+
+- `/src` - Main source code
+  - `/bitcoin` - Bitcoin protocol implementation
+  - `/layer2` - Layer 2 solutions (Lightning, RGB, RSK, etc.)
+  - `/web5` - Web5 implementation
+  - `/dao` - DAO system
+  - `/security` - Security framework
+  - `/ml` - Machine learning components
+- `/docs` - Documentation files
+- `/tests` - Test files
+- `/scripts` - Utility scripts
 
 ## Repository Links
-- [GitHub Repository](https://github.com/anya/anya-core)
-- [Issue Tracker](https://github.com/anya/anya-core/issues)
-- [Discussions](https://github.com/anya/anya-core/discussions)
+
+- [GitHub Repository](https://github.com/anya-org/anya-core)
+- [Issue Tracker](https://github.com/anya-org/anya-core/issues)
+- [Discussions](https://github.com/anya-org/anya-core/discussions)
 
 ---
-*Last updated: 2025-04-28 11:34 UTC+2*
+*Last updated: 2025-04-29 14:30 UTC+2*
 *All components comply with [AI Labeling Standards](docs/standards/AI_LABELING.md)*

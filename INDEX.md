@@ -5,30 +5,28 @@ Welcome to the Anya Core documentation. This index will help you navigate the va
 ## Quick Start
 
 - [Getting Started](docs/getting-started/README.md) - Quick setup guide
-- [Installation](docs/installation/README.md) - Installation instructions
+- [Installation](INSTALLATION.md) - Installation instructions
 - [README](README.md) - Main project readme with overview and features
 
 ## Core Documentation
 
 - [Documentation Index](docs/INDEX.md) - Main documentation index
-- [System Architecture](docs/SYSTEM_MAP.md) - Complete system architecture
-- [DAO System](docs/DAO_SYSTEM_GUIDE.md) - Comprehensive DAO documentation
+- [System Architecture](SYSTEM_MAP.md) - Complete system architecture
+- [DAO System](src/dao/README.md) - Comprehensive DAO documentation
 - [Tokenomics System](docs/TOKENOMICS_SYSTEM.md) - Bitcoin-style tokenomics
 - [Implementation Milestones](docs/IMPLEMENTATION_MILESTONES.md) - Current progress tracking
-- [Testing Strategy](docs/TESTING_STRATEGY.md) - Sectional testing methodology
+- [Testing Strategy](TESTING.md) - Sectional testing methodology
 - [README.md](./README.md) - Main project documentation
 - [SECURITY_CODEQL.md](./SECURITY_CODEQL.md) - Security analysis framework documentation
 - [ROADMAP.md](./ROADMAP.md) - Project development roadmap
 - [CHANGELOG.md](./CHANGELOG.md) - Version history and changes
 - [TODO.md](./TODO.md) - Current development tasks
 - [SYSTEM_MAP.md](./SYSTEM_MAP.md) - System architecture overview
-- [docs/standards/AI_LABELING.md](./docs/standards/AI_LABELING.md) - AI labeling system documentation
+- [AI Labeling System](./docs/standards/AI_LABELING.md) - AI labeling system documentation
 
 ## Installation & Deployment
 
-- [Installation Guide](docs/installation/README.md) - Complete installation instructions
-- [Installer Architecture](docs/installation/ARCHITECTURE.md) - Installation system design
-- [Configuration Guide](docs/installation/CONFIGURATION.md) - Configuration options
+- [Installation Guide](INSTALLATION.md) - Complete installation instructions
 - [Advanced Deployment](docs/installation/ADVANCED_DEPLOYMENT.md) - Advanced deployment scenarios
 
 ## Architecture Documentation
@@ -42,39 +40,36 @@ Welcome to the Anya Core documentation. This index will help you navigate the va
 
 ### Bitcoin & Lightning
 
-- [Bitcoin Integration](docs/bitcoin/README.md) - Bitcoin protocol features
-- [Lightning Integration](docs/lightning/README.md) - Lightning Network features
+- [Bitcoin Integration](src/bitcoin/README.md) - Bitcoin protocol features
+- [Lightning Integration](src/lightning/README.md) - Lightning Network features
 
 ### DAO & Tokenomics
 
-- [DAO Architecture](docs/DAO_SYSTEM_MAP.md) - Detailed architecture of the DAO
+- [DAO Architecture](src/dao/README.md) - Detailed architecture of the DAO
 - [Bitcoin-Style Tokenomics](docs/TOKENOMICS_SYSTEM.md) - 21B token supply with halving
 - [DAO Implementation Status](docs/IMPLEMENTATION_MILESTONES.md) - Current progress
 - [DAO Component Reference](docs/DAO_INDEX.md) - Index of all DAO components
 
 ### Web5 & Decentralized Identity
 
-- [Web5 Integration](docs/web5/README.md) - Web5 implementation details
+- [Web5 Integration](src/web5/README.md) - Web5 implementation details
 - [DID System](docs/identity/README.md) - Decentralized identity implementation
 
 ### AI & Machine Learning
 
 - [ML System Architecture](docs/ML_SYSTEM_ARCHITECTURE.md) - ML system design with Agent Checker
-- [AI Component Reference](docs/ml/README.md) - AI component details
+- [AI Component Reference](src/ml/README.md) - AI component details
 
 ### Installation System
 
-- [Installer Core](docs/installation/CORE.md) - Core installation system
-- [Virtual Environment](docs/installation/VENV.md) - Virtual environment management
-- [Component Installation](docs/installation/COMPONENTS.md) - Component installation procedures
-- [Deployment Types](docs/installation/DEPLOYMENT_TYPES.md) - Deployment configurations
+- [Installer Core](install/README.md) - Core installation system
 
 ## Development Resources
 
-- [API Documentation](docs/API.md) - API reference
+- [API Documentation](docs/api/README.md) - API reference
 - [Contributing Guide](CONTRIBUTING.md) - How to contribute
 - [Checkpoint System](docs/CHECKPOINT_SYSTEM.md) - Development checkpoints
-- [](docs/standards/AI_LABELING.md) - Component labeling standards
+- [AI Labeling Standards](docs/standards/AI_LABELING.md) - Component labeling standards
 
 ## Key Features at a Glance
 
@@ -116,14 +111,14 @@ Welcome to the Anya Core documentation. This index will help you navigate the va
 
 ## Security & Compliance
 
-- [Security Guidelines](docs/SECURITY.md) - Security best practices
+- [Security Guidelines](SECURITY.md) - Security best practices
 - [Compliance Framework](docs/COMPLIANCE.md) - Compliance information
 - [Privacy Measures](docs/PRIVACY.md) - Privacy protection measures
 
 ## Release Information
 
 - **Current Version**: 3.1.0
-- **Last Updated**: 2025-03-23 14:30 UTC+2
+- **Last Updated**: 2025-04-28 14:30 UTC+2
 - **Compatibility**:
   - Stacks v2.4
   - Web5 Protocol v1.0
@@ -135,42 +130,36 @@ Welcome to the Anya Core documentation. This index will help you navigate the va
 - [Issue Tracker](https://github.com/anya/anya-core/issues)
 - [GitHub Discussions](https://github.com/anya/anya-core/discussions)
 
-*This documentation follows the [](docs/standards/AI_LABELING.md) standards based on the Bitcoin Development Framework v2.5. All components are labeled with appropriate Core and Extended category labels.*
+*This documentation follows the [AI Labeling Standards](docs/standards/AI_LABELING.md) based on the Bitcoin Development Framework v2.5. All components are labeled with appropriate Core and Extended category labels.*
 
 ## Bitcoin Protocol Implementation
 
-- [scripts/bitcoin/mcp-server.js](./scripts/bitcoin/mcp-server.js) - MCP server implementation
-- [scripts/bitcoin/validate-bip-compliance.js](./scripts/bitcoin/validate-bip-compliance.js) - BIP compliance validation
-- [scripts/bitcoin/validate-security.js](./scripts/bitcoin/validate-security.js) - Bitcoin security validation
+- [Bitcoin Implementation](src/bitcoin/) - Bitcoin protocol implementation
 - [BIP Compliance Matrix](docs/BIP_COMPLIANCE.md) - Full BIP-341/342 implementation status
-- [PSBT v2 Support](docs/PSBT_V2.md) - Partially Signed Bitcoin Transactions
-- [DLC Implementation](docs/DLC_IMPLEMENTATION.md) - Discrete Log Contracts
+- [DLC Implementation](src/layer2/dlc/) - Discrete Log Contracts
 
 ## Security Analysis Components
 
-- [scripts/security/run-codeql-analysis.ps1](./scripts/security/run-codeql-analysis.ps1) - CodeQL analysis script
-- [scripts/security/crypto-validation.js](./scripts/security/crypto-validation.js) - Cryptographic validation
-- [scripts/security/analyze-mcp-server.js](./scripts/security/analyze-mcp-server.js) - MCP server analysis
-- [scripts/security/setup-permissions.sh](./scripts/security/setup-permissions.sh) - Security permissions setup
+- [Security Framework](src/security/) - Security framework implementation
+- [Crypto Implementation](src/security/crypto/) - Cryptographic implementation
 
 ## Development Scripts
 
-- [scripts/README.md](./scripts/README.md) - Overview of available scripts
-- [scripts/build.ps1](./scripts/build.ps1) - Build script for the project
-- [scripts/dev-setup.ps1](./scripts/dev-setup.ps1) - Development environment setup
+- [Scripts Overview](scripts/README.md) - Overview of available scripts
+- [Build Scripts](scripts/build.ps1) - Build script for the project
 
 ## Testing Framework
 
-- [scripts/run-all-tests.sh](./scripts/run-all-tests.sh) - Run all test suites
-- [scripts/run-integration-tests.ps1](./scripts/run-integration-tests.ps1) - Integration tests
-- [scripts/run-module-tests.ps1](./scripts/run-module-tests.ps1) - Module-specific tests
+- [Test Framework](tests/) - Test framework
+- [Integration Tests](tests/integration/) - Integration tests
+- [Module Tests](tests/modules/) - Module-specific tests
 
 ## Compliance and Governance
 
-- [GOVERNANCE.md](./GOVERNANCE.md) - Project governance structure
-- [CONTRIBUTING.md](./CONTRIBUTING.md) - Contribution guidelines
-- [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md) - Community code of conduct
-- [LICENSE.md](./LICENSE.md) - License information
+- [Governance](GOVERNANCE.md) - Project governance structure
+- [Contributing](CONTRIBUTING.md) - Contribution guidelines
+- [Code of Conduct](CODE_OF_CONDUCT.md) - Community code of conduct
+- [License](LICENSE.md) - License information
 
 ## Bitcoin Development Framework Compliance
 
@@ -186,9 +175,38 @@ For full details on the AI labeling system, see [docs/standards/AI_LABELING.md](
 
 ## Version Information
 
-- Current Version: 0.9.5
-- Last Updated: March 16, 2025
+- Current Version: 3.1.0
+- Last Updated: April 28, 2025
 - Bitcoin Development Framework: v2.5
+
+## Directory Structure
+
+The repository is organized into the following main directories:
+
+- `/src` - Main source code
+  - `/adapters` - Hexagonal architecture adapters
+  - `/ai` - AI components
+  - `/api` - API implementations
+  - `/audit` - Audit tools
+  - `/bin` - Binary executables
+  - `/bip` - BIP implementations
+  - `/bitcoin` - Bitcoin protocol implementation
+  - `/compliance` - Compliance tools
+  - `/components` - Reusable components
+  - `/config` - Configuration files
+  - `/contracts` - Smart contracts
+  - `/core` - Core functionality
+  - `/crypto` - Cryptographic implementations
+  - `/dao` - DAO implementation
+  - `/dashboard` - Dashboard UI
+  - `/layer2` - Layer 2 solutions
+  - `/lightning` - Lightning Network implementation
+  - `/ml` - Machine learning components
+  - `/security` - Security framework
+  - `/web5` - Web5 implementation
+- `/docs` - Documentation
+- `/tests` - Tests
+- `/scripts` - Utility scripts
 
 ## React Native Components
 
@@ -200,4 +218,4 @@ For full details on the AI labeling system, see [docs/standards/AI_LABELING.md](
 - [Mobile Security Guide](docs/mobile/SECURITY.md) - Secure mobile implementation
 - [Taproot Mobile Demo](docs/mobile/TAPROOT_DEMO.md) - Mobile Taproot examples
 
-*Last updated: 2025-02-24 18:05 UTC+2*
+*Last updated: 2025-04-28 18:05 UTC+2*

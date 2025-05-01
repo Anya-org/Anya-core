@@ -73,6 +73,15 @@ Code must be organized according to the following structure:
 - Must implement 2-of-2 MuSig for execution
 - Must be labeled with at least AIR-3, AIS-3, AIP-3, AIT-3, BPC-3
 
+#### DAO Components
+
+- Must use the Bitcoin-compatible DAO implementation
+- Must integrate with all Bitcoin Layer 2 solutions
+- Must support Taproot verification for secure voting
+- Must include BitVM compatibility for enhanced verification
+- Must support cross-chain operations for interoperability
+- Must be labeled with at least AIR-3, AIS-3, BPC-3, DAO-3
+
 #### Web5 Components
 
 - Must properly implement DID specifications
@@ -483,4 +492,6 @@ pub async fn execute_network_operation(params: NetworkParams) -> Result<NetworkR
 
 ## Last Updated
 
-2025-02-24 
+2025-04-29 14:30 UTC+2
+
+*Authored by: Decentralized Systems Architect* 

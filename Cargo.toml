@@ -2,17 +2,152 @@
 members = [
   ".",
   "core",
-  "mobile-sdk",
-  "dependencies"
+  "anya-bitcoin",
+  "anya-extensions",
+  "anya-enterprise"
 ]
 resolver = "2"
 
+[workspace.package]
+version = "0.9.0-alpha.7"
+edition = "2021"
+authors = ["Anya Bitcoin Core Team <dev@example.com>"]
+license = "MIT OR Apache-2.0"
+
 [workspace.dependencies]
-bitcoin = "0.30.0"
-secp256k1 = "0.24.0"
+# Bitcoin Core aligned dependencies
+# We use valid features for bitcoin 0.32.1 - Taproot is included in the core functionality
+bitcoin = { version = "0.32.1", features = ["serde", "base64", "rand-std", "std"] }
+bitcoin-wallet = { version = "1.1.0" }
+bitcoin_hashes = "0.12.0"
+secp256k1 = { version = "0.28.1", features = ["global-context", "std", "rand-std", "hashes"] }
+bitcoin_hd = { version = "0.10.2" }
+lightning = { version = "0.0.118", features = ["no-std"] }
+bitcoincore-rpc = { version = "0.16.0" }
+
+# Web5 dependencies
+web5 = { git = "https://github.com/decentralized-identity/web5-rs.git", tag = "v4.0.0", default-features = false }
+
+# Serialization and utilities
 serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0.107"
+hex = "0.4.3"
+base64 = "0.21.4"
+uuid = { version = "1.4.1", features = ["v4", "serde"] }
+
+# Cryptography
+sha2 = "0.10.7"
+rand = "0.8.5"
+digest = "0.10.7"
+zeroize = { version = "1.6.0", features = ["zeroize_derive"] }
+
+# Async runtime and networking
 libp2p = "0.48.0"
 tokio = { version = "1.28.0", features = ["full"] }
+async-trait = "0.1.64"
+futures = "0.3.27"
+trust-dns-resolver = "0.23.0"
+
+# Logging and error handling
+thiserror = "1.0.40"
+tracing = "0.1.37"
+tracing-subscriber = "0.3.16"
+log = "0.4.17"
+anyhow = "1.0.70"
+
+# CLI and time
+clap = { version = "4.4.6", features = ["derive"] }
+chrono = { version = "0.4.31", features = ["serde"] }
+tch = "0.13.0"
 
 # Remove duplicate mobile entries
 # [AIS-3] Security: Enforce single source of truth
+
+[package]
+name = "anya-core"
+version = "0.9.0-alpha.7"
+edition = "2021"
+description = "Anya Bitcoin System"
+license = "MIT OR Apache-2.0"
+homepage = "https://example.com/anya"
+repository = "https://github.com/anya/core"
+rust-version = "1.70.0"
+default-run = "anya"
+
+[lib]
+name = "anya_core"
+path = "src/lib.rs"
+
+[[bin]]
+name = "anya"
+path = "src/bin/anya.rs"
+
+[[bin]]
+name = "anya_installer"
+path = "src/bin/anya_installer.rs"
+
+[[bin]]
+name = "bip_health"
+path = "src/bin/bip_health.rs"
+
+[features]
+default = ["bitcoin", "dao", "web5", "enterprise"]
+# Core Bitcoin principles
+bitcoin = []
+dao = []
+web5 = []
+enterprise = []
+
+# Optional components
+p2p = ["libp2p", "trust-dns-resolver"] # Requires Protocol Buffers compiler
+machine-learning = ["tch"] # Requires LibTorch/PyTorch
+
+# Feature combinations
+networking = ["p2p"] # For backward compatibility
+full = ["bitcoin", "dao", "web5", "enterprise"]
+experimental = ["bitcoin", "dao", "web5", "enterprise", "machine-learning", "p2p"]
+
+[dependencies]
+# Core Bitcoin dependencies
+bitcoin = { workspace = true }
+bitcoin-wallet = { workspace = true }
+bitcoin_hashes = { workspace = true }
+secp256k1 = { workspace = true }
+bitcoin_hd = { workspace = true }
+lightning = { workspace = true }
+# Machine learning dependency is made optional to align with Bitcoin Core's
+# principle of minimal dependencies and decentralization
+tch = { version = "0.13.0", optional = true }
+
+# Web5/DID/Self-sovereign identity
+web5 = { workspace = true }
+
+# Serialization and data handling
+serde = { workspace = true }
+serde_json = { workspace = true }
+hex = { workspace = true }
+base64 = { workspace = true }
+uuid = { workspace = true }
+
+# Cryptography and security
+sha2 = { workspace = true }
+rand = { workspace = true }
+digest = { workspace = true }
+zeroize = { workspace = true }
+
+# Networking and async
+libp2p = { workspace = true, optional = true }
+tokio = { workspace = true }
+async-trait = { workspace = true }
+futures = { workspace = true }
+trust-dns-resolver = { workspace = true, optional = true }
+
+# Error handling and logging
+thiserror = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+log = { workspace = true }
+anyhow = { workspace = true }
+
+# CLI tools
+clap = { workspace = true }

@@ -1,10 +1,10 @@
 [package]
 name = "anya-extensions"
-version.workspace = true
-edition.workspace = true
-authors.workspace = true
-license.workspace = true
-description = "Extensions for Anya Core"
+version = { workspace = true }
+edition = { workspace = true }
+authors = { workspace = true }
+license = { workspace = true }
+description = "Extensions for Anya Core Bitcoin Capabilities"
 
 [lib]
 name = "anya_extensions"
@@ -24,12 +24,11 @@ bitcoin = { workspace = true, features = ["rand"] }
 web5 = { workspace = true }
 
 # Internal Dependencies
-anya-core = { path = "..", version = "0.2.0" }
+anya-core = { path = ".." }
 
 # Correct workspace inheritance
-secp256k1.workspace = true
-bitcoin.workspace = true
-bitcoincore-rpc.workspace = true
+secp256k1 = { workspace = true }
+bitcoincore-rpc = { workspace = true, optional = true }
 
 [features]
 default = ["standard"]

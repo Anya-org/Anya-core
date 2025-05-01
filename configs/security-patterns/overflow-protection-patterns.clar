@@ -3,8 +3,7 @@
 ;; Auto-updated from .\scripts\security-patterns.json
 
 (define-constant overflow-protection-patterns
-  (list
-    
+  (list;);)
 
-  ))
+
 

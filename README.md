@@ -871,3 +871,28 @@ sequenceDiagram
     HSM->>+Mobile: Signed PSBT
     Mobile->>+Network: Broadcast
 ```
+
+## Run-All Script
+
+A new `run-all.ps1` script has been added to simplify the process of running all necessary operations:
+
+1. Cleaning the build artifacts
+2. Verifying all components
+3. Running basic tests
+4. Running comprehensive tests (in quick mode)
+
+### Usage
+
+To run all operations:
+
+```powershell
+.\run-all.ps1
+```
+
+The script will:
+- Log all operations to the logs directory
+- Generate a comprehensive summary report
+- Handle failures gracefully
+- Provide timing information for each stage
+
+Author: Bo The Big (botshelomokokoka@gmail.com)

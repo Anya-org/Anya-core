@@ -9,6 +9,7 @@
     process-psbt
     execute-tapscript
     tr\(
-    psbt-version
-  ))
+    psbt-version;);)
+
+
 

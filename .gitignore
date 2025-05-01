@@ -56,3 +56,9 @@ Thumbs.db
 # Allow core Bitcoin files
 !lib/src/core/bitcoin/
 !test/core/bitcoin/
+
+# Backup and temporary files
+*_backup_*/
+reorganized_backup_*/
+*.bak
+*.bak/
