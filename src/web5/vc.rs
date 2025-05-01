@@ -86,7 +86,7 @@ impl CredentialManager {
         subject_did: &str,
         credential_type: &str,
         claims: HashMap<String, serde_json::Value>,
-    ) -> Web5Result<VerifiableCredential>  -> Result<(), Box<dyn Error>> {
+    ) -> Web5Result<VerifiableCredential> {
         // Create credential ID
         let id = format!("urn:uuid:{}", generate_uuid());
         
@@ -124,7 +124,7 @@ impl CredentialManager {
     }
     
     /// Verify a credential
-    pub fn verify_credential(&self, credential: &VerifiableCredential) -> Web5Result<bool>  -> Result<(), Box<dyn Error>> {
+    pub fn verify_credential(&self, credential: &VerifiableCredential) -> Web5Result<bool> {
         // Check if proof exists
         let proof = match &credential.proof {
             Some(p) => p,
@@ -137,25 +137,25 @@ impl CredentialManager {
     }
     
     /// Store a credential
-    pub fn store_credential(&mut self, credential: VerifiableCredential) -> Web5Result<()>  -> Result<(), Box<dyn Error>> {
+    pub fn store_credential(&mut self, credential: VerifiableCredential) -> Web5Result<()> {
         self.credentials.insert(credential.id.clone(), credential);
         Ok(())
     }
     
     /// Get a credential by ID
-    pub fn get_credential(&self, id: &str) -> Web5Result<VerifiableCredential>  -> Result<(), Box<dyn Error>> {
+    pub fn get_credential(&self, id: &str) -> Web5Result<VerifiableCredential> {
         self.credentials.get(id).cloned().ok_or_else(|| {
             Web5Error::Credential(format!("Credential not found: {}", id))
         })
     }
     
     /// List all credentials
-    pub fn list_credentials(&self) -> Vec<&VerifiableCredential>  -> Result<(), Box<dyn Error>> {
+    pub fn list_credentials(&self) -> Vec<&VerifiableCredential> {
         self.credentials.values().collect()
     }
     
     /// Create a proof for a credential
-    fn create_proof(&self, credential: &VerifiableCredential, issuer_did: &str) -> Web5Result<CredentialProof>  -> Result<(), Box<dyn Error>> {
+    fn create_proof(&self, credential: &VerifiableCredential, issuer_did: &str) -> Web5Result<CredentialProof> {
         // In a real implementation, this would sign the credential
         // For this example, we create a placeholder proof
         
@@ -197,7 +197,7 @@ fn generate_uuid() -> String {
 }
 
 /// Get current date in ISO 8601 format
-fn current_iso_date() -> String  -> Result<(), Box<dyn Error>> {
+fn current_iso_date() -> String {
     use std::time::{SystemTime, UNIX_EPOCH};
     
     let now = SystemTime::now()
@@ -241,3 +241,4 @@ mod tests {
         assert!(credential.proof.is_some());
     }
 } 
+
