@@ -2,7 +2,6 @@
 members = [
   ".",
   "core",
-  "dependencies",
   "anya-bitcoin",
   "anya-extensions",
   "anya-enterprise"
@@ -20,8 +19,8 @@ license = "MIT OR Apache-2.0"
 # We use valid features for bitcoin 0.32.1 - Taproot is included in the core functionality
 bitcoin = { version = "0.32.1", features = ["serde", "base64", "rand-std", "std"] }
 bitcoin-wallet = { version = "1.1.0" }
-bitcoin-hashes = "0.12.0"
-secp256k1 = { version = "0.28.1", features = ["global-context", "std", "rand-std", "bitcoin-hashes"] }
+bitcoin_hashes = "0.12.0"
+secp256k1 = { version = "0.28.1", features = ["global-context", "std", "rand-std", "hashes"] }
 bitcoin_hd = { version = "0.10.2" }
 lightning = { version = "0.0.118", features = ["no-std"] }
 bitcoincore-rpc = { version = "0.16.0" }
@@ -93,21 +92,32 @@ path = "src/bin/bip_health.rs"
 
 [features]
 default = ["bitcoin", "dao", "web5", "enterprise"]
+# Core Bitcoin principles
 bitcoin = []
 dao = []
 web5 = []
 enterprise = []
-experimental = ["bitcoin", "dao", "web5", "enterprise"]
+
+# Optional components
+p2p = ["libp2p", "trust-dns-resolver"] # Requires Protocol Buffers compiler
+machine-learning = ["tch"] # Requires LibTorch/PyTorch
+
+# Feature combinations
+networking = ["p2p"] # For backward compatibility
+full = ["bitcoin", "dao", "web5", "enterprise"]
+experimental = ["bitcoin", "dao", "web5", "enterprise", "machine-learning", "p2p"]
 
 [dependencies]
 # Core Bitcoin dependencies
 bitcoin = { workspace = true }
 bitcoin-wallet = { workspace = true }
-bitcoin-hashes = { workspace = true }
+bitcoin_hashes = { workspace = true }
 secp256k1 = { workspace = true }
 bitcoin_hd = { workspace = true }
 lightning = { workspace = true }
-tch = { workspace = true }
+# Machine learning dependency is made optional to align with Bitcoin Core's
+# principle of minimal dependencies and decentralization
+tch = { version = "0.13.0", optional = true }
 
 # Web5/DID/Self-sovereign identity
 web5 = { workspace = true }
@@ -126,11 +136,11 @@ digest = { workspace = true }
 zeroize = { workspace = true }
 
 # Networking and async
-libp2p = { workspace = true }
+libp2p = { workspace = true, optional = true }
 tokio = { workspace = true }
 async-trait = { workspace = true }
 futures = { workspace = true }
-trust-dns-resolver = { workspace = true }
+trust-dns-resolver = { workspace = true, optional = true }
 
 # Error handling and logging
 thiserror = { workspace = true }

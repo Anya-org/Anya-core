@@ -10,7 +10,7 @@ license = "MIT"
 # Bitcoin Core aligned dependencies
 bitcoin = { workspace = true }
 bitcoin-wallet = { workspace = true, optional = true }
-bitcoin-hashes = { workspace = true }
+bitcoin_hashes = { workspace = true }
 secp256k1 = { workspace = true }
 bitcoin_hd = { workspace = true, optional = true }
 lightning = { workspace = true, optional = true }

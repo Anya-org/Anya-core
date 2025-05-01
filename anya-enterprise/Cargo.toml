@@ -10,11 +10,11 @@ description = "Enterprise features for Anya Core Bitcoin Implementation"
 anya-core = { path = ".." }
 secp256k1 = { workspace = true }
 bitcoin = { workspace = true }
-bitcoin-hashes = { workspace = true }
+bitcoin_hashes = { workspace = true }
 
 # Audit Trail Compliance (BDF §5.3)
 opentelemetry = { version = "0.21.0", features = ["metrics"], optional = true }
 
 [features]
 default = ["advanced-security"]
-advanced-security = ["secp256k1/zkp", "opentelemetry"]
+advanced-security = ["opentelemetry"]
