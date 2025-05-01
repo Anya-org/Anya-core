@@ -64,17 +64,17 @@ impl Web5Manager {
     }
     
     /// Access the DID manager component
-    pub fn did_manager(&self) -> &identity::DIDManager  -> Result<(), Box<dyn Error>> {
+    pub fn did_manager(&self) -> &identity::DIDManager {
         &self.did_manager
     }
     
     /// Access the protocol manager component
-    pub fn protocol_manager(&self) -> &protocols::ProtocolManager  -> Result<(), Box<dyn Error>> {
+    pub fn protocol_manager(&self) -> &protocols::ProtocolManager {
         &self.protocol_manager
     }
     
     /// Initialize the Web5 subsystem with default protocols
-    pub fn initialize(&mut self) -> Web5Result<()>  -> Result<(), Box<dyn Error>> {
+    pub fn initialize(&mut self) -> Web5Result<()> {
         // Register standard protocols
         let profile_handler = protocols::ProfileProtocolHandler::new();
         self.protocol_manager.register_protocol(Box::new(profile_handler))?;
@@ -89,7 +89,7 @@ impl Web5Manager {
     }
     
     /// Get the system status
-    pub fn status(&self) -> Web5Result<Web5Status>  -> Result<(), Box<dyn Error>> {
+    pub fn status(&self) -> Web5Result<Web5Status> {
         let did_count = self.did_manager.dids().len();
         let protocol_count = self.protocol_manager.get_all_protocols().len();
         
@@ -102,7 +102,7 @@ impl Web5Manager {
     }
 
     /// Get metrics for the Web5 system
-    pub fn get_metrics(&self) -> HashMap<String, serde_json::Value>  -> Result<(), Box<dyn Error>> {
+    pub fn get_metrics(&self) -> HashMap<String, serde_json::Value> {
         let mut metrics = HashMap::new();
         
         // Add basic metrics
@@ -152,4 +152,5 @@ mod tests {
         assert!(!status.dwn_connected);
     }
 }
+
 
