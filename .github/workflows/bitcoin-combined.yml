@@ -126,4 +126,40 @@ jobs:
       - name: Run Integration Tests
         run: |
           echo "Running Bitcoin integration tests..."
-          cargo test --features "bitcoin_protocol_tests layer2_protocol_tests security_validation" -- --ignored 
+          cargo test --features "bitcoin_protocol_tests layer2_protocol_tests security_validation hardware_acceleration" -- --ignored 
+          
+  hardware-acceleration:
+    name: Hardware Acceleration Tests
+    runs-on: ubuntu-latest
+    needs: bip-validation
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        
+      - name: Set up Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+          
+      - name: Install Hardware Acceleration Dependencies
+        run: |
+          echo "Installing hardware acceleration dependencies..."
+          sudo apt-get update
+          sudo apt-get install -y ocl-icd-opencl-dev
+          
+      - name: Run Hardware Acceleration Tests
+        run: |
+          echo "Running hardware acceleration tests..."
+          cargo test --features "hardware_acceleration" --package anya-bitcoin -- hardware_tests
+          
+      - name: Test Taproot with Hardware Acceleration
+        run: |
+          echo "Testing Taproot with hardware acceleration..."
+          cargo test --features "taproot_validation hardware_acceleration" --package anya-bitcoin -- taproot_hardware_tests
+          
+      - name: Verify Performance Improvements
+        run: |
+          echo "Verifying performance improvements..."
+          cargo bench --features "hardware_acceleration taproot_validation" -- taproot_hardware_bench
