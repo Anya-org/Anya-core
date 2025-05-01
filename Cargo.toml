@@ -2,34 +2,64 @@
 members = [
   ".",
   "core",
-  "mobile-sdk",
   "dependencies",
-  "anya-bitcoin"
+  "anya-bitcoin",
+  "anya-extensions",
+  "anya-enterprise"
 ]
 resolver = "2"
 
+[workspace.package]
+version = "0.9.0-alpha.7"
+edition = "2021"
+authors = ["Anya Bitcoin Core Team <dev@example.com>"]
+license = "MIT OR Apache-2.0"
+
 [workspace.dependencies]
+# Bitcoin Core aligned dependencies
+# We use valid features for bitcoin 0.32.1 - Taproot is included in the core functionality
 bitcoin = { version = "0.32.1", features = ["serde", "base64", "rand-std", "std"] }
-secp256k1 = { version = "0.28.1", features = ["global-context", "std", "rand-std"] }
+bitcoin-wallet = { version = "1.1.0" }
+bitcoin-hashes = "0.12.0"
+secp256k1 = { version = "0.28.1", features = ["global-context", "std", "rand-std", "bitcoin-hashes"] }
+bitcoin_hd = { version = "0.10.2" }
+lightning = { version = "0.0.118", features = ["no-std"] }
+bitcoincore-rpc = { version = "0.16.0" }
+
+# Web5 dependencies
+web5 = { git = "https://github.com/decentralized-identity/web5-rs.git", tag = "v4.0.0", default-features = false }
+
+# Serialization and utilities
 serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0.107"
+hex = "0.4.3"
+base64 = "0.21.4"
+uuid = { version = "1.4.1", features = ["v4", "serde"] }
+
+# Cryptography
+sha2 = "0.10.7"
+rand = "0.8.5"
+digest = "0.10.7"
+zeroize = { version = "1.6.0", features = ["zeroize_derive"] }
+
+# Async runtime and networking
 libp2p = "0.48.0"
 tokio = { version = "1.28.0", features = ["full"] }
 async-trait = "0.1.64"
+futures = "0.3.27"
+trust-dns-resolver = "0.23.0"
+
+# Logging and error handling
 thiserror = "1.0.40"
 tracing = "0.1.37"
 tracing-subscriber = "0.3.16"
-hex = "0.4.3"
 log = "0.4.17"
-futures = "0.3.27"
 anyhow = "1.0.70"
-web5 = { git = "https://github.com/decentralized-identity/web5-rs.git", rev = "1c0ee2e", default-features = false }
+
+# CLI and time
 clap = { version = "4.4.6", features = ["derive"] }
 chrono = { version = "0.4.31", features = ["serde"] }
-serde_json = "1.0.107"
-trust-dns-resolver = "0.23.0"
-base64 = "0.21.4"
-sha2 = "0.10.7"
-uuid = { version = "1.4.1", features = ["v4", "serde"] }
+tch = "0.13.0"
 
 # Remove duplicate mobile entries
 # [AIS-3] Security: Enforce single source of truth
@@ -70,22 +100,44 @@ enterprise = []
 experimental = ["bitcoin", "dao", "web5", "enterprise"]
 
 [dependencies]
+# Core Bitcoin dependencies
 bitcoin = { workspace = true }
+bitcoin-wallet = { workspace = true }
+bitcoin-hashes = { workspace = true }
 secp256k1 = { workspace = true }
+bitcoin_hd = { workspace = true }
+lightning = { workspace = true }
+tch = { workspace = true }
+
+# Web5/DID/Self-sovereign identity
+web5 = { workspace = true }
+
+# Serialization and data handling
 serde = { workspace = true }
+serde_json = { workspace = true }
+hex = { workspace = true }
+base64 = { workspace = true }
+uuid = { workspace = true }
+
+# Cryptography and security
+sha2 = { workspace = true }
+rand = { workspace = true }
+digest = { workspace = true }
+zeroize = { workspace = true }
+
+# Networking and async
+libp2p = { workspace = true }
 tokio = { workspace = true }
 async-trait = { workspace = true }
+futures = { workspace = true }
+trust-dns-resolver = { workspace = true }
+
+# Error handling and logging
 thiserror = { workspace = true }
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
-hex = { workspace = true }
 log = { workspace = true }
-futures = { workspace = true }
 anyhow = { workspace = true }
+
+# CLI tools
 clap = { workspace = true }
-chrono = { workspace = true }
-serde_json = { workspace = true }
-trust-dns-resolver = { workspace = true }
-base64 = { workspace = true }
-sha2 = { workspace = true }
-uuid = { workspace = true }

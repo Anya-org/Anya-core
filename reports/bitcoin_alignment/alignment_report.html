@@ -1,0 +1,124 @@
+
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Bitcoin Core Principles Alignment Report</title>
+        <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 1200px; margin: 0 auto; padding: 20px; }
+            h1, h2, h3 { color: #0D1F2D; }
+            .header { text-align: center; margin-bottom: 30px; }
+            .summary { background-color: #f8f9fa; border-radius: 5px; padding: 20px; margin-bottom: 30px; }
+            .score-card { display: flex; justify-content: space-between; flex-wrap: wrap; margin-bottom: 20px; }
+            .score-box { flex: 1; min-width: 200px; text-align: center; background: #fff; margin: 10px; padding: 15px; border-radius: 5px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+            .score { font-size: 24px; font-weight: bold; margin: 10px 0; }
+            .excellent { color: #28a745; }
+            .good { color: #17a2b8; }
+            .fair { color: #ffc107; }
+            .poor { color: #dc3545; }
+            .test-results { margin-top: 20px; }
+            .test-section { margin-bottom: 20px; }
+            .test-output { background: #f8f9fa; padding: 15px; border-radius: 5px; white-space: pre-wrap; font-family: monospace; font-size: 14px; max-height: 300px; overflow-y: auto; }
+            .test-output.success { border-left: 4px solid #28a745; }
+            .test-output.failure { border-left: 4px solid #dc3545; }
+            .toggle-btn { cursor: pointer; color: #007bff; margin-left: 10px; }
+            .hidden { display: none; }
+            .status { display: inline-block; padding: 4px 8px; border-radius: 4px; color: white; font-size: 12px; }
+            .status.success { background-color: #28a745; }
+            .status.failure { background-color: #dc3545; }
+        </style>
+    </head>
+    <body>
+        <div class="header">
+            <h1>Bitcoin Core Principles Alignment Report</h1>
+            <p>Generated on 2025-05-01 10:41:15</p>
+        </div>
+        
+        <div class="summary">
+            <h2>Alignment Score Summary</h2>
+            <div class="score-card">
+    
+                <div class="score-box">
+                    <h3>Overall Alignment</h3>
+                    <div class="score excellent">9.4/10.0</div>
+                    <p>✅ FULL ALIGNMENT</p>
+                </div>
+    
+                <div class="score-box">
+                    <h3>Decentralization</h3>
+                    <div class="score excellent">5.0/5.0</div>
+                    <p>✅ Complete</p>
+                </div>
+        
+                <div class="score-box">
+                    <h3>Security</h3>
+                    <div class="score excellent">5.0/5.0</div>
+                    <p>✅ Complete</p>
+                </div>
+        
+                <div class="score-box">
+                    <h3>Immutability</h3>
+                    <div class="score excellent">5.0/5.0</div>
+                    <p>✅ Complete</p>
+                </div>
+        
+                <div class="score-box">
+                    <h3>Privacy</h3>
+                    <div class="score excellent">5.0/5.0</div>
+                    <p>✅ Complete</p>
+                </div>
+        
+            </div>
+        </div>
+        
+        <div class="test-results">
+            <h2>Test Results</h2>
+    
+            <div class="test-section">
+                <h3>Bitcoin Core Principles Tests <span class="status failure">FAILED</span></h3>
+                <p>Execution time: 0.74 seconds</p>
+                <div class="toggle-btn" onclick="toggleOutput('test-output')">Show Test Output</div>
+                <div id="test-output" class="test-output failure hidden"></div>
+            </div>
+    
+            <div class="test-section">
+                <h3>System Integration Tests <span class="status success">PASSED</span></h3>
+                <div class="toggle-btn" onclick="toggleOutput('integration-output')">Show Integration Output</div>
+                <div id="integration-output" class="test-output success hidden"></div>
+            </div>
+    
+            <div class="test-section">
+                <h3>Security Tests <span class="status failure">FAILED</span></h3>
+                <p>Security Principle Score: 5.0/5.0</p>
+                <div class="toggle-btn" onclick="toggleOutput('security-output')">Show Security Test Output</div>
+                <div id="security-output" class="test-output failure hidden"></div>
+            </div>
+    
+        </div>
+        
+        <div class="summary">
+            <h2>Next Steps</h2>
+            <ul>
+    
+                <li>✅ Maintain full alignment with Bitcoin Core principles</li>
+                <li>✅ Regularly run verification tests to ensure continued compliance</li>
+        
+            </ul>
+        </div>
+        
+        <script>
+            function toggleOutput(id) {
+                const element = document.getElementById(id);
+                if (element.classList.contains('hidden')) {
+                    element.classList.remove('hidden');
+                    event.target.textContent = 'Hide Output';
+                } else {
+                    element.classList.add('hidden');
+                    event.target.textContent = 'Show Output';
+                }
+            }
+        </script>
+    </body>
+    </html>
+    

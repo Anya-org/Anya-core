@@ -2,23 +2,28 @@ use std::error::Error;
 // Migrated from OPSource to anya-core
 // This file was automatically migrated as part of the Rust-only implementation
 // Original file: C:\Users\bmokoka\Downloads\OPSource\src\bitcoin\mod.rs
-// Bitcoin Core Module
-// Implements Bitcoin Protocol functionality following BIP standards
-//
-// [AIR-3][AIS-3][AIT-3][AIM-3][AIP-3][BPC-3][PFM-3][RES-3][SCL-2]
-// This is the main Bitcoin integration module with full protocol compliance
-// and comprehensive security, privacy, and performance optimizations.
+//! Bitcoin module for Anya Core
+//! 
+//! [SECURITY SENSITIVE] This module contains the core Bitcoin functionality
+//! and must maintain 100% alignment with Bitcoin Core principles:
+//! - Decentralization
+//! - Security
+//! - Immutability
+//! - Privacy
 
 // Re-export submodules
-pub mod error;
-pub mod interface;
+pub mod validation;
+pub mod protocol;
+pub mod taproot;
+pub mod dlc;
 pub mod wallet;
+pub mod interface;
+pub mod adapters;
 pub mod cross_chain;
 pub mod sidechains;
-pub mod lightning;
-pub mod dlc;
-pub mod taproot;
 pub mod rust;
+pub mod consensus;  // Consensus verification and security enhancements
+pub mod lightning;
 pub mod layer2;
 
 // Import necessary dependencies

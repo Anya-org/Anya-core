@@ -1,8 +1,9 @@
 //! Universal Adaptive Hardware Optimization Framework for anya-core [AIR-3][AIS-3][BPC-3][PFM-3][RES-3]
 //!
-//! This module provides a framework for detecting hardware capabilities
-//! and optimizing cryptographic operations based on the available hardware.
-//! It supports various architectures including RISC-V, ARM, x86_64 (Intel/AMD),
+//! This module provides an adaptive framework for hardware-specific optimizations
+//! that maintains Bitcoin protocol compliance while improving performance on
+//! various hardware platforms, with optimizations specifically targeting Intel i3-7020U
+//! as the minimum hardware specification. including RISC-V, ARM, x86_64 (Intel/AMD),
 //! and provides fallback implementations for unsupported hardware.
 //!
 //! # Design Principles
@@ -20,6 +21,12 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use chrono::{DateTime, Utc};
 
+use self::intel::IntelOptimizer;
+use self::gpu::GPUOptimizer;
+use self::amd::AMDOptimizer;
+use self::arm::ARMOptimizer;
+use self::work_scheduling::{DualCoreWorkScheduler, WorkItem, WorkStatus, WorkSchedulerMetrics};
+
 // Re-export main modules for external use
 pub mod detection;
 pub mod hal;
@@ -32,6 +39,7 @@ pub mod gpu;
 pub mod npu;
 pub mod integration;
 pub mod benchmark;
+pub mod work_scheduling;
 
 use crate::metrics::MetricsProvider;
 use crate::security::SecurityVerification;

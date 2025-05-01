@@ -1,5 +1,5 @@
 [package]
-name = "anya-core"
+name = "anya-core-lib"
 version = "0.1.0-rc.1"
 edition = "2021"
 description = "Core libraries for Anya Bitcoin Framework"
@@ -7,8 +7,15 @@ authors = ["bo_thebig <botshelomokokoka@gmail.com>"]
 license = "MIT"
 
 [dependencies]
+# Bitcoin Core aligned dependencies
 bitcoin = { workspace = true }
+bitcoin-wallet = { workspace = true, optional = true }
+bitcoin-hashes = { workspace = true }
 secp256k1 = { workspace = true }
+bitcoin_hd = { workspace = true, optional = true }
+lightning = { workspace = true, optional = true }
+
+# Core runtime dependencies
 serde = { workspace = true }
 libp2p = { workspace = true }
 tokio = { workspace = true }
@@ -16,7 +23,6 @@ futures = { workspace = true }
 thiserror = { workspace = true }
 async-trait = { workspace = true }
 anyhow = { workspace = true }
-mobile-sdk = { path = "../mobile-sdk" }
 
 # Cryptographic primitives
 k256 = { version = "0.13.3", features = [
