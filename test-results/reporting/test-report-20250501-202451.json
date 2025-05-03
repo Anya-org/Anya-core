@@ -1,0 +1,36 @@
+{
+  "results": {
+    "failed": 4,
+    "total_tests": 42,
+    "skipped": 0,
+    "passed": 38
+  },
+  "timestamp": "2025-05-01 20:24:51",
+  "components": {
+    "dao": {
+      "failed": 1,
+      "total": 7,
+      "passed": 6
+    },
+    "bitcoin": {
+      "failed": 1,
+      "total": 12,
+      "passed": 11
+    },
+    "layer2": {
+      "failed": 1,
+      "total": 8,
+      "passed": 7
+    },
+    "core": {
+      "failed": 1,
+      "total": 15,
+      "passed": 14
+    }
+  },
+  "compliance": {
+    "secp256k1": true,
+    "bip341": true,
+    "bip174": true
+  }
+}

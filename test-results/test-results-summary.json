@@ -1,0 +1,105 @@
+{
+  "Stages": {
+    "Security Analysis": {
+      "Status": "SKIPPED",
+      "Description": "Scans for security vulnerabilities and best practices",
+      "Category": "Security",
+      "Required": false,
+      "Duration": 0.031269
+    },
+    "Module Tests": {
+      "Status": "PASS",
+      "Description": "Runs unit tests for individual modules and contracts",
+      "Category": "Testing",
+      "Required": true,
+      "Duration": 1.0063754
+    },
+    "Environment Setup": {
+      "Status": "PASS",
+      "Description": "Prepares the test environment, directories, and dependencies",
+      "Category": "Setup",
+      "Required": true,
+      "Duration": 0.4101525
+    },
+    "Basic Contract Verification": {
+      "Status": "PASS",
+      "Description": "Performs syntax and basic validation of all Clarity contracts",
+      "Category": "Verification",
+      "Required": true,
+      "Duration": 1.5100481
+    },
+    "Report Generation": {
+      "Status": "PASS",
+      "Description": "Generates comprehensive test reports and visualizations",
+      "Category": "Reporting",
+      "Required": true,
+      "Duration": 0.101852
+    },
+    "System Tests": {
+      "Status": "ERROR",
+      "Description": "Executes full system workflows and end-to-end scenarios",
+      "Category": "Testing",
+      "Required": true,
+      "Duration": 0.2061221
+    },
+    "Integration Tests": {
+      "Status": "PASS",
+      "Description": "Tests interactions between related modules",
+      "Category": "Testing",
+      "Required": true,
+      "Duration": 0.3409655
+    },
+    "Performance Benchmarks": {
+      "Status": "PASS",
+      "Description": "Measures performance characteristics of contracts and workflows",
+      "Category": "Performance",
+      "Required": false,
+      "Duration": 1.4569462
+    },
+    "Compliance Checks": {
+      "Status": "FAIL",
+      "Description": "Validates compliance with Bitcoin Improvement Proposals (BIPs)",
+      "Category": "Compliance",
+      "Required": true,
+      "Duration": 1.0459828
+    }
+  },
+  "FailedTests": [
+    "System Tests (Error: The regular expression pattern [^a-zA-Z0-9\\_] is not valid.)",
+    "Compliance Checks (Exit Code: 1)"
+  ],
+  "WarningTests": [
+    "Security Analysis (Script not found - Optional)"
+  ],
+  "EndTime": "2025-05-01 20:24:51",
+  "StartTime": "2025-05-01 20:24:44",
+  "SystemCoverage": 0.0,
+  "Metrics": {
+    "PerformanceScore": 0.0,
+    "TotalContractsVerified": 0,
+    "SecurityScore": 0.0,
+    "AverageCoverage": 0.0,
+    "TotalSystemScenariosTested": 0,
+    "ComplianceScore": 0.0,
+    "TotalIntegrationsTested": 0,
+    "TotalModulesTested": 0
+  },
+  "Configuration": {
+    "QuickMode": {
+      "IsPresent": false
+    },
+    "MaxThreads": 4,
+    "SkipSlowTests": {
+      "IsPresent": false
+    },
+    "TestResultsFormat": "JSON",
+    "ParallelExecution": true,
+    "FocusModule": "",
+    "GenerateHtmlReport": {
+      "IsPresent": false
+    }
+  },
+  "TotalDuration": 7.4803487,
+  "OverallStatus": "FAIL",
+  "ModuleCoverage": {}
+}
