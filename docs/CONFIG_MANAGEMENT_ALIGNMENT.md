@@ -6,7 +6,7 @@
 
 ## Implementation Status
 
-We have successfully implemented the **AIR-012: Unified Configuration Management System** with the following components:
+We have successfully implemented the **[AIR-3]: Unified Configuration Management System** with the following components:
 
 1. **Core Configuration Manager (100% Complete)**
    - Thread-safe implementation with RwLock protection

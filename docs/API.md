@@ -1,3 +1,14 @@
+# API Documentation
+
+> **This document has been deprecated. Please refer to the canonical documentation.**
+> 
+> For the latest API specifications and documentation, please visit:
+> 
+> - [AI Labeling System](./standards/AI_LABELING.md) - Standardized labeling system used throughout Anya Core
+> - [API Reference](./api/README.md) - Comprehensive API reference
+
+[AIR-3][AIS-3][BPC-3]
+
 <!-- markdownlint-disable MD013 line-length -->
 
 > **⚠️ DEPRECATION NOTICE ⚠️**

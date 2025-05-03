@@ -6,7 +6,7 @@
 
 ## Overview
 
-The Configuration Management system (AIR-012) provides a centralized approach to managing all system configurations, supporting multiple configuration sources, validation, and both automated and user input options.
+The Configuration Management system [AIR-3] provides a centralized approach to managing all system configurations, supporting multiple configuration sources, validation, and both automated and user input options.
 
 ## Architecture
 

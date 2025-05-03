@@ -105,10 +105,16 @@
 *Last updated: 2024-12-07*
 
 ## Cryptographic Implementation [AIS-3][BPC-3]
+
 Aligned with Bitcoin Development Framework v2.5 Chapter 7
 
 ### Mandatory Requirements
+
 - 256-bit keys for all operations
 - SHA-256 for integrity checks
 - Constant-time comparisons
 - BIP-341/342 compliant Taproot scripts
+
+## Related Security Documentation
+
+For detailed information about our CodeQL security analysis framework, tooling, and technical security implementation, please refer to [SECURITY_CODEQL.md](./SECURITY_CODEQL.md).

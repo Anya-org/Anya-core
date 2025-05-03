@@ -10,7 +10,7 @@ Anya Core's Performance Architecture provides comprehensive monitoring, optimiza
 
 ## System Components
 
-### 1. Performance Optimization (AIR-008) ✅
+### 1. Performance Optimization [AIR-3] ✅
 
 The Performance Optimization component provides resource management and optimization with configurable targets and auto-save capabilities.
 
@@ -23,7 +23,7 @@ The Performance Optimization component provides resource management and optimiza
 
 **Implementation:**
 - Location: `src/core/performance_optimization.rs`
-- AI Label: AIR-008
+- AI Label: [AIR-3]
 - Status: ✅ Complete
 - Auto-Save: Enabled (every 20th change)
 
@@ -173,7 +173,7 @@ fn save_state_to_memory(&self) {
 ## Implementation Details
 
 ### Core Performance Components
-- `PerformanceOptimizer` - Resource optimization manager (AIR-008)
+- `PerformanceOptimizer` - Resource optimization manager [AIR-3]
 - `MetricsCollector` - System metrics collection
 - `ResourceManager` - Resource allocation and management
 - `OptimizationEngine` - Optimization algorithms and execution

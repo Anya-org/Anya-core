@@ -1,124 +1,57 @@
 # Anya Core - Bitcoin Development Framework v2.5
 
-A comprehensive Bitcoin development framework implementing the hexagonal architecture pattern and maintaining strict protocol adherence with Bitcoin's core tenets of decentralization, immutability, and censorship resistance.
+This is a summary of the Bitcoin Development Framework implementation in Anya Core. For the complete implementation details, please refer to the authoritative source document: [BITCOIN_FRAMEWORK_IMPLEMENTATION.md](./BITCOIN_FRAMEWORK_IMPLEMENTATION.md)
 
-## Features
+## Overview
 
-- **Full BIP Compliance**: Supports BIP-341 (Taproot), BIP-342 (Tapscript), and BIP-174 (PSBT)
-- **Hexagonal Architecture**: Cleanly separated core logic, adapters, and ports
-- **Layer 2 Solutions**: Lightning Network, RGB, RSK, and DLC implementations
-- **Monitoring**: Prometheus metrics for real-time observability
-- **Security Validation**: Comprehensive transaction validation with Taproot support
+This framework implements Bitcoin development using the hexagonal architecture pattern, maintaining strict protocol adherence with Bitcoin's core tenets.
 
-## Architecture
+## Key Features
+
+- **Full BIP Compliance**: BIP-341/342 (Taproot), BIP-174 (PSBT), BIP-340 (Schnorr)
+- **Hexagonal Architecture**: Core logic, adapters, and ports cleanly separated
+- **Layer 2 Solutions**: Lightning Network, RGB, RSK, and DLC support
+- **Monitoring**: Prometheus metrics integration
+- **Security**: Comprehensive transaction validation
+
+## Simplified Architecture
 
 ```
                       +----------------+
                       |  Bitcoin Core  |
                       +-------+--------+
                               |
-                      +-------v--------+
-                      |  Adapter Layer |
-                      +-------+--------+
-                              |
 +----------------+    +-------v--------+    +----------------+
 |   External     |    |   Application  |    |   Monitoring   |
 |   Interfaces   <----+   Core Logic   +---->   & Metrics    |
-| (APIs, Wallets)|    +-------+--------+    | (Prometheus)   |
-+----------------+            |             +----------------+
-                      +-------v--------+
-                      |   Protocol     |
-                      |   Adapters     |
-                      +-------+--------+
-                              |
-                      +-------v--------+
-                      |  Blockchain    |
-                      |  Network       |
-                      +----------------+
++----------------+    +----------------+    +----------------+
 ```
 
-## Getting Started
+## Quick Start
 
 ### Prerequisites
 
-- Rust toolchain (1.56 or later)
+- Rust toolchain (1.56+)
 - Node.js 14+ (for web interfaces)
-- Docker (optional, for containerized deployment)
 
-### Installation
+### Build
 
-1. Clone the repository
-```bash
-git clone https://github.com/yourusername/anya-core.git
-cd anya-core
-```
-
-2. Build the project
 ```bash
 cargo build --release
-```
-
-3. Run tests
-```bash
 cargo test --all-features
-```
-
-## Development Workflow
-
-- Commit messages must reference BIP standards: `feat(taproot): implement key path spending @BIP-341`
-- All Taproot changes must pass compliance tests
-- Use the hexagonal architecture pattern for all new components
-
-## Verification
-
-Verify Bitcoin Development Framework compliance:
-
-```bash
-./scripts/verify-framework.sh
-```
-
-## Security Validation
-
-All transactions must pass comprehensive validation checks:
-
-```rust
-use anya_core::security::validate_transaction;
-
-fn process_transaction(tx_bytes: &[u8]) {
-    match validate_transaction(tx_bytes) {
-        Ok(_) => println!("Transaction valid"),
-        Err(e) => println!("Transaction invalid: {:?}", e),
-    }
-}
-```
-
-## Metrics
-
-Start the metrics server to expose Prometheus metrics:
-
-```rust
-use anya_core::monitoring::start_monitoring;
-
-fn main() {
-    // Start metrics server on port 3000
-    start_monitoring().expect("Failed to start monitoring");
-    
-    // Your application code
-}
 ```
 
 ## Compliance Checklist
 
-- [x] BIP 341/342 (Taproot)
-- [x] BIP 174 (PSBT)
-- [x] Miniscript Support
-- [x] Testnet Validation
+- [x] BIP-341/342 (Taproot)
+- [x] BIP-174 (PSBT)
+- [x] BIP-340 (Schnorr)
+- [x] Hexagonal Architecture
 
 ## Author
 
 - **Author**: bo_thebig
-- **Email**: botshelomokokoka@gmail.com
+- **Email**: <botshelomokokoka@gmail.com>
+- **Last Updated**: 2025-05-01
 
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details. 
+For complete implementation details, development guidelines, and architecture specifications, please see [BITCOIN_FRAMEWORK_IMPLEMENTATION.md](./BITCOIN_FRAMEWORK_IMPLEMENTATION.md). 

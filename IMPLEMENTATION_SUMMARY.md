@@ -44,10 +44,10 @@ Next steps:
 - Implement more extensive compliance verification
 - Add automated vulnerability scanning and mitigation
 
-#### 3. Performance Optimization (AIR-008)
+#### 3. Performance Optimization [AIR-3]
 
 **Implementation Status**: ✅ Complete  
-**AI Label**: AIR-008  
+**AI Label**: [AIR-3]  
 **Location**: `src/core/performance_optimization.rs`
 
 The Performance Optimization system provides resource management and optimization with configurable targets and auto-save capabilities. Key features include:
@@ -63,10 +63,10 @@ Next steps:
 - Implement AI-driven resource allocation
 - Add predictive scaling capabilities
 
-### Core System Integration (AIR-008)
+### Core System Integration [AIR-3]
 
 **Implementation Status**: ✅ Complete  
-**AI Label**: AIR-008  
+**AI Label**: [AIR-3]  
 **Location**: `src/core/mod.rs`
 
 The Core System module integrates all P1 components into a unified system with consistent auto-save functionality. Key features include:

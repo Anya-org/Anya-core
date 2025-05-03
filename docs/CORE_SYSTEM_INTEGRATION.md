@@ -10,7 +10,7 @@ Anya Core's System Integration provides a unified framework for all components t
 
 ## System Components
 
-### 1. Core System Integration (AIR-008) ✅
+### 1. Core System Integration [AIR-3] ✅
 
 The Core System Integration component provides a unified interface for all P1 components with consistent auto-save functionality.
 
@@ -23,7 +23,7 @@ The Core System Integration component provides a unified interface for all P1 co
 
 **Implementation:**
 - Location: `src/core/mod.rs`
-- AI Label: AIR-008
+- AI Label: [AIR-3]
 - Status: ✅ Complete
 - Auto-Save: Enabled (every 20th input/change)
 
@@ -70,7 +70,7 @@ The Core System integrates the following components:
 - Configuration status tracking
 - Automated security hardening
 
-#### 2.3 Performance Optimization (AIR-008)
+#### 2.3 Performance Optimization [AIR-3]
 - Resource type management
 - Performance metrics tracking
 - Target-based optimization
@@ -160,10 +160,10 @@ impl CoreSystem {
 ## Implementation Details
 
 ### Core System Components
-- `CoreSystem` - Main system integration manager (AIR-008)
+- `CoreSystem` - Main system integration manager [AIR-3]
 - `AgentChecker` - System verification component (AIP-002)
 - `SystemHardening` - Security configuration manager (AIE-001)
-- `PerformanceOptimizer` - Resource optimization manager (AIR-008)
+- `PerformanceOptimizer` - Resource optimization manager [AIR-3]
 
 ### Technology Stack
 - Rust for system components

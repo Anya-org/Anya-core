@@ -34,9 +34,9 @@ This document tracks the implementation progress of the Anya Core platform. It o
   - Automated security hardening
   - Auto-save functionality
 
-#### 3. Performance Optimization (AIR-008) ✅
+#### 3. Performance Optimization [AIR-3] ✅
 
-- **AI Label**: AIR-008
+- **AI Label**: [AIR-3]
 - **Status**: ✅ Complete
 - **Location**: `src/core/performance_optimization.rs`
 - **Features**:
@@ -46,9 +46,9 @@ This document tracks the implementation progress of the Anya Core platform. It o
   - Resource-specific configuration
   - Auto-save functionality
 
-#### 4. Core System Integration (AIR-008) ✅
+#### 4. Core System Integration [AIR-3] ✅
 
-- **AI Label**: AIR-008
+- **AI Label**: [AIR-3]
 - **Status**: ✅ Complete
 - **Location**: `src/core/mod.rs`
 - **Features**:
@@ -72,8 +72,8 @@ The following architecture documentation has been completed for these components
 
 - ✅ ML*/Agent Checker System (AIP-002)
 - ✅ System Hardening (AIE-001)
-- ✅ Performance Optimization (AIR-008)
-- ✅ Core System Integration (AIR-008)
+- ✅ Performance Optimization [AIR-3]
+- ✅ Core System Integration [AIR-3]
 - ✅ BOB Layer 2 Integration (Complete)
 - ✅ Layer 2 Manager Implementation (Complete)
 - 🔄 High Availability Implementation (In Progress)

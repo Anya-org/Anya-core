@@ -75,7 +75,7 @@ The Inference Engine executes ML models and provides prediction capabilities to 
 - Hardware acceleration (GPU/NPU)
 - Model optimization
 
-### 4. Performance Monitoring (AIR-008) ✅
+### 4. Performance Monitoring [AIR-3] ✅
 
 The Performance Monitoring component tracks ML model and system performance metrics.
 
@@ -87,7 +87,7 @@ The Performance Monitoring component tracks ML model and system performance metr
 
 **Implementation:**
 - Location: `src/core/performance_optimization.rs`
-- AI Label: AIR-008
+- AI Label: [AIR-3]
 - Status: ✅ Complete
 - Auto-Save: Enabled (every 20th change)
 
@@ -171,7 +171,7 @@ fn save_state_to_memory(&self) {
 - `MLModel` - Model interface
 - `MLService` - Service layer
 - `AgentChecker` - System verification component (AIP-002)
-- `PerformanceOptimizer` - Performance monitoring and optimization (AIR-008)
+- `PerformanceOptimizer` - Performance monitoring and optimization [AIR-3]
 
 ### Technology Stack
 - TensorFlow / PyTorch for model training and inference

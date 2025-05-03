@@ -1,12 +1,13 @@
-<!-- markdownlint-disable MD013 line-length -->
+# AI Labeling System
 
-> **⚠️ DEPRECATION NOTICE ⚠️**
+> **This document has been deprecated. Please refer to the canonical documentation.**
 > 
-> This document is deprecated and will be removed in future versions.
-> Please use the canonical AI labeling documentation at [docs/standards/AI_LABELING.md](docs/standards/AI_LABELING.md).
-> The canonical document standardizes all AI labeling formats and requirements.
+> For the standardized AI labeling system documentation, please visit:
+> 
+> - [AI Labeling System](./standards/AI_LABELING.md) - The authoritative source for all AI labeling standards
 
-<!-- Original content below this line -->
+[AIR-3][AIS-3][BPC-3]
+
 <!-- markdownlint-disable MD013 line-length -->
 
 # AI-Driven Labeling System

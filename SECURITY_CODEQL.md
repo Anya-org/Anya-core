@@ -138,3 +138,9 @@ Maintenance Schedule:
 - Monthly review of CodeQL queries
 - Quarterly update of security standards
 - Annual full security audit
+
+---
+
+## Related Security Documentation
+
+For our general security policy, vulnerability reporting process, and bug bounty program information, please refer to [SECURITY.md](./SECURITY.md).
