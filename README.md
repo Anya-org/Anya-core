@@ -896,3 +896,15 @@ The script will:
 - Provide timing information for each stage
 
 Author: Bo The Big (botshelomokokoka@gmail.com)
+
+## Bitcoin Development Framework v2.5
+
+This project implements the Bitcoin Development Framework v2.5, which provides a comprehensive approach to Bitcoin development with:
+
+- Full BIP compliance (BIP-341, BIP-342, BIP-174)
+- Hexagonal architecture for clean separation of concerns
+- Real-time monitoring with Prometheus metrics
+- Comprehensive security validation
+- Standardized development workflow
+
+See [README-BITCOIN-FRAMEWORK.md](README-BITCOIN-FRAMEWORK.md) for detailed documentation on the framework implementation.

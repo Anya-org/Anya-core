@@ -192,3 +192,43 @@ pub mod metrics {
 }
 
 // Additional ports according to BDF v2.5 
+
+// Ports module - Hexagonal Architecture Implementation
+// Part of Bitcoin Development Framework v2.5
+
+// Submodules
+pub mod p2p;
+pub mod wallet;
+pub mod contracts;
+
+// Common traits for ports
+pub trait Port {
+    fn name(&self) -> &'static str;
+    fn version(&self) -> &'static str;
+    fn is_connected(&self) -> bool;
+}
+
+// Port management
+pub struct PortManager {
+    ports: Vec<Box<dyn Port>>,
+}
+
+impl PortManager {
+    pub fn new() -> Self {
+        PortManager {
+            ports: Vec::new(),
+        }
+    }
+    
+    pub fn register_port(&mut self, port: Box<dyn Port>) {
+        self.ports.push(port);
+    }
+    
+    pub fn get_ports(&self) -> &[Box<dyn Port>] {
+        &self.ports
+    }
+    
+    pub fn get_port_by_name(&self, name: &str) -> Option<&Box<dyn Port>> {
+        self.ports.iter().find(|p| p.name() == name)
+    }
+} 
