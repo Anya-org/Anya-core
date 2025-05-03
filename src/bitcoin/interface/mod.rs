@@ -15,6 +15,16 @@ use bitcoin::{Address, Transaction, Block, Network};
 use crate::bitcoin::error::{BitcoinError, BitcoinResult};
 use crate::config::Config;
 
+// Export our sub-modules
+pub mod block;
+pub mod transaction;
+pub mod network;
+
+// Re-export types for convenience
+pub use block::{BlockHeader, BlockInfo};
+pub use transaction::TransactionInfo;
+pub use network::NetworkStatus;
+
 /// Bitcoin implementation type selection enum
 /// 
 /// This enum allows for runtime selection between different Bitcoin
@@ -213,7 +223,7 @@ pub trait BitcoinInterface: Send + Sync {
 pub fn create_bitcoin_interface(
     implementation_type: BitcoinImplementationType,
     config: &Config,
-) -> Arc<dyn BitcoinInterface>  -> Result<(), Box<dyn Error>> {
+) -> Arc<dyn BitcoinInterface> {
     match implementation_type {
         BitcoinImplementationType::Rust => {
             let implementation = crate::bitcoin::rust::RustBitcoinImplementation::new(config);
@@ -230,7 +240,7 @@ pub fn create_bitcoin_interface(
 /// 
 /// This function returns the appropriate Bitcoin interface implementation
 /// based on the current configuration settings.
-pub fn get_current_bitcoin_interface(config: &Config) -> Arc<dyn BitcoinInterface>  -> Result<(), Box<dyn Error>> {
+pub fn get_current_bitcoin_interface(config: &Config) -> Arc<dyn BitcoinInterface> {
     // Always use Rust implementation
     create_bitcoin_interface(BitcoinImplementationType::Rust, config)
 }
@@ -244,7 +254,7 @@ pub struct BitcoinInterfaceConfig {
 }
 
 impl Default for BitcoinInterfaceConfig {
-    fn default() -> Self  -> Result<(), Box<dyn Error>> {
+    fn default() -> Self {
         Self {
             implementation_type: BitcoinImplementationType::Rust,
             network: Network::Bitcoin,
@@ -260,12 +270,13 @@ mod tests {
     use super::*;
     
     #[test]
-    fn test_interface_creation()  -> Result<(), Box<dyn Error>> {
+    fn test_interface_creation() -> Result<(), Box<dyn Error>> {
         let config = Config::default();
         
         // Test Rust implementation
         let rust_impl = get_current_bitcoin_interface(&config);
         assert_eq!(rust_impl.implementation_type(), BitcoinImplementationType::Rust);
+        Ok(())
     }
 } 
 

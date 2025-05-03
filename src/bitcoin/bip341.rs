@@ -10,6 +10,13 @@ use thiserror::Error;
 use std::collections::HashMap;
 use crate::bitcoin::bip340::{XOnlyPublicKey, SchnorrSignature, Bip340Schnorr};
 use crate::security::constant_time;
+use bitcoin::{
+    secp256k1::{Secp256k1, SecretKey},
+    taproot::{TaprootBuilder, TaprootSpendInfo},
+    ScriptBuf, Address, Amount,
+};
+use crate::bitcoin::error::{BitcoinError, BitcoinResult};
+use rand;
 
 /// Tag for the taproot branch hash
 const TAPROOT_LEAF_TAG: &[u8] = b"TapLeaf";
@@ -486,4 +493,229 @@ mod tests {
         // Verify that the Merkle root is stored
         assert_eq!(output.merkle_root, merkle_root);
     }
+}
+
+/// Taproot Merkle Tree used for script commitments
+#[derive(Debug, Clone)]
+pub struct TaprootMerkleTree {
+    /// Leaves of the tree (scripts)
+    pub leaves: Vec<TaprootLeaf>,
+    /// Tree depth
+    pub depth: usize,
+    /// Cached root hash
+    pub root_hash: Option<[u8; 32]>,
+}
+
+/// Taproot Leaf Specification
+#[derive(Debug, Clone)]
+pub struct TaprootLeaf {
+    /// Script for this leaf
+    pub script: ScriptBuf,
+    /// Leaf version
+    pub version: u8,
+    /// Position in the tree
+    pub position: usize,
+}
+
+/// Taproot spending types
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum TaprootSpend {
+    /// Key path spend (uses internal key)
+    KeyPath,
+    /// Script path spend (uses script with a specific leaf position)
+    ScriptPath { leaf_position: usize, script_hash: [u8; 32] },
+}
+
+/// Taproot output information
+#[derive(Debug, Clone)]
+pub struct TaprootOutput {
+    /// Internal key
+    pub internal_key: XOnlyPublicKey,
+    /// Output key (tweaked key)
+    pub output_key: XOnlyPublicKey,
+    /// Merkle root of the script tree
+    pub merkle_root: Option<[u8; 32]>,
+    /// Scripts in the tree
+    pub scripts: HashMap<usize, (Script, u8)>,
+    /// Output amount
+    pub value: Amount,
+}
+
+/// BIP-341 Taproot implementation
+#[derive(Debug)]
+pub struct Bip341Taproot {
+    /// Secp256k1 context
+    pub secp: Secp256k1<bitcoin::secp256k1::All>,
+    /// Internal key used for spending
+    pub internal_key: XOnlyPublicKey,
+    /// Script tree
+    pub script_tree: Option<TaprootMerkleTree>,
+    /// Taproot spend info
+    pub spend_info: Option<TaprootSpendInfo>,
+}
+
+impl Bip341Taproot {
+    /// Create a new Taproot builder with an internal key
+    pub fn new(internal_key: XOnlyPublicKey) -> Self {
+        Self {
+            secp: Secp256k1::new(),
+            internal_key,
+            script_tree: None,
+            spend_info: None,
+        }
+    }
+    
+    /// Create a new Taproot builder with a random internal key
+    pub fn random() -> BitcoinResult<Self> {
+        let secp = Secp256k1::new();
+        let (secret_key, _) = secp.generate_keypair(&mut rand::thread_rng());
+        let (internal_key, _) = secret_key.x_only_public_key(&secp);
+        Ok(Self {
+            secp,
+            internal_key,
+            script_tree: None,
+            spend_info: None,
+        })
+    }
+    
+    /// Add a script to the Taproot tree
+    pub fn add_script(&mut self, script: ScriptBuf, position: usize) -> BitcoinResult<&mut Self> {
+        // Initialize script tree if needed
+        if self.script_tree.is_none() {
+            self.script_tree = Some(TaprootMerkleTree {
+                leaves: Vec::new(),
+                depth: 0,
+                root_hash: None,
+            });
+        }
+        
+        // Add the script leaf
+        if let Some(tree) = &mut self.script_tree {
+            tree.leaves.push(TaprootLeaf {
+                script,
+                version: 0xc0, // Tapscript leaf version
+                position,
+            });
+            
+            // Reset any cached data
+            tree.root_hash = None;
+            self.spend_info = None;
+        }
+        
+        Ok(self)
+    }
+    
+    /// Build the Taproot output
+    pub fn build(&mut self) -> BitcoinResult<TaprootOutput> {
+        // Create a Taproot builder
+        let mut builder = TaprootBuilder::new();
+        
+        // Add scripts if we have any
+        if let Some(tree) = &self.script_tree {
+            for leaf in &tree.leaves {
+                builder = builder.add_leaf(leaf.position as u8, leaf.script.clone())?;
+            }
+        }
+        
+        // Finalize the Taproot output
+        let spend_info = builder.finalize(&self.secp, self.internal_key)?;
+        self.spend_info = Some(spend_info.clone());
+        
+        // Create output
+        let output = TaprootOutput {
+            internal_key: self.internal_key,
+            output_key: spend_info.output_key(),
+            merkle_root: Some(spend_info.merkle_root().as_ref().try_into()?),
+            scripts: HashMap::new(),
+            value: Amount::from_sat(0),
+        };
+        
+        Ok(output)
+    }
+    
+    /// Create a Taproot script spend
+    pub fn create_script_spend(
+        &self,
+        tx: &mut Transaction,
+        input_index: usize,
+        script_index: usize,
+    ) -> BitcoinResult<()> {
+        // Ensure we have spend info
+        let spend_info = self.spend_info.as_ref()
+            .ok_or_else(|| BitcoinError::TaprootError("Taproot not finalized".to_string()))?;
+        
+        // Find the right script
+        let tree = self.script_tree.as_ref()
+            .ok_or_else(|| BitcoinError::TaprootError("No script tree".to_string()))?;
+        
+        let leaf = tree.leaves.iter()
+            .find(|leaf| leaf.position == script_index)
+            .ok_or_else(|| BitcoinError::TaprootError(format!("Script at position {} not found", script_index)))?;
+        
+        // Create control block info needed for spending
+        let control_block = spend_info.control_block(&(leaf.script.clone(), leaf.version))
+            .ok_or_else(|| BitcoinError::TaprootError("Failed to create control block".to_string()))?;
+        
+        // In a real implementation, we would construct the witness for script path spending
+        // This is a placeholder for now
+        
+        Ok(())
+    }
+    
+    /// Create a P2TR address from this Taproot data
+    pub fn get_address(&self, network: bitcoin::Network) -> BitcoinResult<Address> {
+        // Build if not already built
+        if self.spend_info.is_none() {
+            let mut builder = TaprootBuilder::new();
+            
+            // Add scripts if we have any
+            if let Some(tree) = &self.script_tree {
+                for leaf in &tree.leaves {
+                    builder = builder.add_leaf(leaf.position as u8, leaf.script.clone())?;
+                }
+            }
+            
+            // Finalize the Taproot output
+            self.spend_info = Some(builder.finalize(&self.secp, self.internal_key)?);
+        }
+        
+        // Get output key from spend info
+        let output_key = self.spend_info.as_ref().unwrap().output_key();
+        
+        // Create P2TR address
+        let address = Address::p2tr(&self.secp, output_key, None, network);
+        Ok(address)
+    }
+}
+
+/// Helper function to create a Taproot output
+pub fn create_taproot_output(
+    internal_key: XOnlyPublicKey,
+    scripts: Vec<(ScriptBuf, usize)>,
+    value: u64,
+) -> BitcoinResult<TxOut> {
+    let mut taproot = Bip341Taproot::new(internal_key);
+    
+    // Add scripts to the tree
+    for (script, position) in scripts {
+        taproot.add_script(script, position)?;
+    }
+    
+    // Build the Taproot output
+    let taproot_output = taproot.build()?;
+    
+    // Create the P2TR script pubkey
+    let script_pubkey = ScriptBuf::new_p2tr(
+        &taproot.secp,
+        taproot_output.output_key,
+        None,
+    );
+    
+    // Create the transaction output
+    let tx_out = TxOut {
+        value: Amount::from_sat(value),
+        script_pubkey,
+    };
+    
+    Ok(tx_out)
 } 

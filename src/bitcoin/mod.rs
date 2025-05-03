@@ -15,7 +15,10 @@
 
 use std::error::Error;
 
-// Re-export submodules
+// Make the error module public to fix module errors
+pub mod error;
+
+// Re-export submodules - removing duplicates and keeping directory versions
 pub mod validation;
 pub mod protocol;
 pub mod taproot;
@@ -34,26 +37,33 @@ pub mod layer2;
 use bitcoin::{
     Address, Amount, Network, OutPoint, PublicKey, Script, ScriptBuf, Transaction, TxIn, TxOut,
     Witness, secp256k1::{Secp256k1, SecretKey, Keypair, XOnlyPublicKey},
-    taproot::{TaprootBuilder, TapTweakHash},
-    hashes::{Hash, sha256},
-    key::PrivateKey,
-    merkle::PartialMerkleTree,
-    transaction::{Version, TxMerkleNode}, 
 };
+
+// Import types from bitcoin - use bitcoin crate directly, not submodules
+use bitcoin::TxMerkleNode;
+use bitcoin::transaction::Version;
 use bitcoin::absolute::LockTime;
 use bitcoin::psbt::Psbt;
 use bitcoin::bip32::{DerivationPath, ExtendedPrivKey, ExtendedPubKey};
 use bitcoin::ecdsa::{self, Signature};
+
+// For compatibility with newer libraries, also import the bitcoin_hashes crate
+use bitcoin_hashes::{Hash, sha256};
+
+// Fix the error module import
 use crate::bitcoin::error::{BitcoinError, BitcoinResult};
 use tracing::{info, warn, error};
 use std::str::FromStr;
 use rand::RngCore;
-use bitcoin::sighash::SighashCache;
 use std::collections::HashMap;
 use serde_json;
 
 // Re-export the Layer2Protocol trait
 pub use layer2::Layer2Protocol;
+
+// Re-export our protocol types
+pub use protocol::{BitcoinProtocol, BPCLevel};
+pub use taproot::TaprootValidator;
 
 // Constants for Bitcoin network configuration
 pub const MAINNET_MAGIC: u32 = 0xD9B4BEF9;
@@ -229,35 +239,9 @@ impl BitcoinManager {
 }
 
 /// Verify a Bitcoin payment using SPV (Simplified Payment Verification)
-pub fn verify_bitcoin_payment(tx_hash: &[u8], block_header: &interface::BlockHeader, merkle_proof: &[u8]) -> bool {
-    // Parse the merkle proof
-    let partial_merkle_tree = match PartialMerkleTree::consensus_decode(merkle_proof) {
-        Ok(tree) => tree,
-        Err(_) => return false,
-    };
-    
-    // Verify the merkle proof
-    let mut matched_txids: Vec<TxMerkleNode> = Vec::new();
-    let mut indices: Vec<u32> = Vec::new();
-    
-    if !partial_merkle_tree.extract_matches(&mut matched_txids, &mut indices) {
-        return false;
-    }
-    
-    // Check if the transaction hash is in the matched hashes
-    let tx_merkle_node = match TxMerkleNode::from_slice(tx_hash) {
-        Ok(hash) => hash,
-        Err(_) => return false,
-    };
-    
-    // Validate the merkle root against block header
-    let merkle_root = partial_merkle_tree.merkle_root();
-    if merkle_root.to_string() != block_header.merkle_root {
-        return false;
-    }
-    
-    // Check if our tx is included in the matched transactions
-    matched_txids.contains(&tx_merkle_node)
+pub fn verify_bitcoin_payment(tx_hash: &[u8], block_header: &interface::block::BlockHeader, merkle_proof: &[u8]) -> bool {
+    // This method is now implemented in the spv module
+    spv::verify_merkle_proof(tx_hash, block_header, merkle_proof)
 }
 
 /// Create a Taproot transaction with a script
@@ -396,277 +380,22 @@ pub fn get_liquid_magic(network: &str) -> u32 {
     }
 }
 
-// Hexagonal architecture adapters for Bitcoin network
-pub mod adapters {
-    use super::*;
-    use bitcoin::{Network, Address, ScriptBuf, Transaction, PublicKey};
-    use crate::bitcoin::wallet::bip32::ExtendedKey;
-    use bitcoin::secp256k1::{Secp256k1, SecretKey};
-    
-    /// P2P network adapter for Bitcoin
-    pub struct BitcoinP2PAdapter {
-        // Network connection details
-        network: Network,
-        peers: Vec<String>,
-        connected: bool,
-    }
-    
-    impl BitcoinP2PAdapter {
-        /// Create a new P2P adapter
-        pub fn new(network: Network) -> Self {
-            Self {
-                network,
-                peers: Vec::new(),
-                connected: false,
-            }
-        }
-        
-        /// Connect to the Bitcoin network
-        pub fn connect(&mut self) -> Result<(), &'static str> {
-            // Placeholder: In a real implementation, this would establish P2P connections
-            self.connected = true;
-            Ok(())
-        }
-        
-        /// Broadcast a transaction to the network
-        pub fn broadcast_transaction(&self, tx: &Transaction) -> Result<String, &'static str> {
-            if !self.connected {
-                return Err("Not connected to the network");
-            }
-            
-            // Placeholder: In a real implementation, this would broadcast via P2P
-            Ok(tx.compute_txid().to_string())
-        }
-    }
-    
-    /// Wallet adapter for Bitcoin (BIP32/44/49/84/86)
-    pub struct BitcoinWalletAdapter {
-        // Wallet details
-        network: Network,
-        seed: Option<[u8; 32]>,
-        master_key: Option<ExtendedKey>,
-    }
-    
-    impl BitcoinWalletAdapter {
-        /// Create a new wallet adapter
-        pub fn new(network: Network) -> Self {
-            Self {
-                network,
-                seed: None,
-                master_key: None,
-            }
-        }
-        
-        /// Initialize wallet with seed
-        pub fn initialize_with_seed(&mut self, seed: [u8; 32]) -> Result<(), &'static str> {
-            self.seed = Some(seed);
-            
-            // Derive master key from seed
-            let result = crate::bitcoin::wallet::bip32::derive_master_key(&seed, self.network)
-                .map_err(|_| "Failed to derive master key");
-                
-            if let Ok(master_key) = result {
-                self.master_key = Some(master_key);
-                Ok(())
-            } else {
-                Err("Failed to initialize wallet")
-            }
-        }
-        
-        /// Derive address from path
-        pub fn derive_address(&self, path: &str) -> Result<bitcoin::Address, &'static str> {
-            // Check if master key is available
-            let master_key = match &self.master_key {
-                Some(key) => key,
-                None => return Err("Master key not initialized"),
-            };
-            
-            // Parse derivation path
-            let derivation_path = DerivationPath::from_str(path)
-                .map_err(|_| "Invalid derivation path")?;
-            
-            // Derive child key
-            let child_key_result = crate::bitcoin::wallet::bip32::derive_child_key(
-                master_key, 
-                &derivation_path
-            ).map_err(|_| "Failed to derive child key");
-            
-            let child_key = match child_key_result {
-                Ok(key) => key,
-                Err(e) => return Err(e),
-            };
-            
-            // Create address (Taproot/P2TR for enhanced privacy)
-            let secp = Secp256k1::new();
-            let public_key = bitcoin::key::PublicKey::from_private_key(
-                &secp, 
-                &PrivateKey::new(child_key.xpriv.private_key, self.network)
-            );
-            
-            // Convert PublicKey to XOnlyPublicKey
-            let x_only_pubkey = XOnlyPublicKey::from_slice(&public_key.inner.serialize()[1..33])
-                .map_err(|e| "Failed to create XOnlyPublicKey")?;
-            
-            let address = Address::p2tr(
-                &secp,
-                x_only_pubkey, 
-                None,
-                self.network
-            );
-            
-            Ok(address)
-        }
-    }
-    
-    /// Miniscript adapter for Bitcoin smart contracts
-    pub struct MiniscriptAdapter {
-        // Miniscript compiler and interpreter
-        network: Network,
-    }
-    
-    impl MiniscriptAdapter {
-        /// Create a new Miniscript adapter
-        pub fn new(network: Network) -> Self {
-            Self {
-                network,
-            }
-        }
-        
-        /// Compile policy to script
-        pub fn compile_policy(&self, _policy: &str) -> Result<ScriptBuf, &'static str> {
-            // Placeholder: In a real implementation, this would compile miniscript policy
-            Err("Miniscript compilation not implemented")
-        }
-        
-        /// Execute script against transaction
-        pub fn execute_script(&self, _script: &Script, _tx: &Transaction, _input_index: usize) -> Result<bool, &'static str> {
-            // Placeholder: In a real implementation, this would execute script
-            Err("Script execution not implemented")
-        }
-    }
-    
-    /// Lightning Network adapter
-    pub struct LightningAdapter {
-        // Lightning Network node details
-        network: Network,
-        node_id: Option<PublicKey>,
-    }
-    
-    impl LightningAdapter {
-        /// Create a new Lightning adapter
-        pub fn new(network: Network) -> Self {
-            Self {
-                network,
-                node_id: None,
-            }
-        }
-        
-        /// Initialize Lightning node
-        pub fn initialize(&mut self, secret_key: &SecretKey) -> Result<(), &'static str> {
-            let secp = Secp256k1::new();
-            let keypair = Keypair::from_secret_key(&secp, secret_key);
-            self.node_id = Some(PublicKey::new(keypair.public_key()));
-            Ok(())
-        }
-        
-        /// Create a Lightning invoice
-        pub fn create_invoice(&self, _amount_msat: u64, _description: &str) -> Result<String, &'static str> {
-            // Placeholder: In a real implementation, this would create BOLT11 invoice
-            Err("Invoice creation not implemented")
-        }
-    }
-    
-    /// Taproot Assets adapter
-    pub struct TaprootAssetsAdapter {
-        // Taproot Assets details
-        network: Network,
-    }
-    
-    impl TaprootAssetsAdapter {
-        /// Create a new Taproot Assets adapter
-        pub fn new(network: Network) -> Self {
-            Self {
-                network,
-            }
-        }
-        
-        /// Issue a new asset
-        pub fn issue_asset(&self, _name: &str, _supply: u64, _precision: u8) -> Result<Transaction, &'static str> {
-            // Placeholder: In a real implementation, this would issue a new asset
-            Err("Asset issuance not implemented")
-        }
-        
-        /// Transfer asset to recipient
-        pub fn transfer_asset(&self, _asset_id: &str, _recipient: &bitcoin::Address, _amount: u64) -> Result<Transaction, &'static str> {
-            // Placeholder: In a real implementation, this would transfer an asset
-            Err("Asset transfer not implemented")
-        }
-    }
-    
-    /// DLC Oracle adapter
-    pub struct DLCOracleAdapter {
-        // DLC Oracle details
-        network: Network,
-        oracle_key: Option<SecretKey>,
-    }
-    
-    impl DLCOracleAdapter {
-        /// Create a new DLC Oracle adapter
-        pub fn new(network: Network) -> Self {
-            Self {
-                network,
-                oracle_key: None,
-            }
-        }
-        
-        /// Initialize Oracle with a signing key
-        pub fn initialize(&mut self, secret_key: SecretKey) -> Result<(), &'static str> {
-            self.oracle_key = Some(secret_key);
-            Ok(())
-        }
-        
-        /// Sign an outcome as the oracle
-        pub fn sign_outcome(&self, outcome: &str) -> Result<ecdsa::Signature, &'static str> {
-            let oracle_key = match &self.oracle_key {
-                Some(key) => key,
-                None => return Err("Oracle not initialized"),
-            };
-            
-            let secp = Secp256k1::new();
-            
-            // Hash the outcome
-            let outcome_hash = sha256::Hash::hash(outcome.as_bytes());
-            let message = bitcoin::secp256k1::Message::from_digest_slice(&outcome_hash[..])
-                .map_err(|_| "Invalid message hash")?;
-            
-            // Sign the outcome hash
-            let sig = secp.sign_ecdsa(&message, oracle_key);
-            
-            // Convert to bitcoin::ecdsa::Signature
-            let der_sig = sig.serialize_der();
-            ecdsa::Signature::from_slice(&der_sig)
-                .map_err(|_| "Failed to convert signature")
-        }
-    }
-}
-
-pub mod protocol;
-pub mod taproot;
-pub mod validation;
-
-pub use protocol::{BitcoinProtocol, BPCLevel, BitcoinError};
-pub use taproot::TaprootValidator;
-
-// Export BIP-341 (Taproot) module
+// Export the BIP-341 (Taproot) module
 pub mod bip341;
-
-// Re-export Taproot types
-pub use bip341::{TaprootMerkleTree, TaprootLeaf, TaprootSpend, TaprootOutput, Bip341Taproot};
 
 // Export SPV (Simplified Payment Verification) module
 pub mod spv;
 
+// Re-export Taproot types
+pub use bip341::{TaprootMerkleTree, TaprootLeaf, TaprootSpend, TaprootOutput, Bip341Taproot};
+
 // Re-export SPV types
-pub use spv::{SpvProof, SpvError, verify_bitcoin_payment, verify_tx_inclusion, verify_merkle_proof};
+pub use spv::{SpvProof, SpvError, verify_tx_inclusion, verify_merkle_proof};
+
+// Export key types and functions
+pub use bitcoin::{
+    Address, Amount, Block, BlockHash, Transaction, TxIn, TxOut,
+    Network, OutPoint, Script, ScriptBuf, Txid,
+};
 
 

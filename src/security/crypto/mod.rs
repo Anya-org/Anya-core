@@ -25,6 +25,21 @@ pub mod signature;
 // Module for key derivation functions (PBKDF2, Argon2, scrypt)
 pub mod kdf;
 
+// Crypto module - Schnorr signature support
+// Bitcoin Development Framework v2.5
+
+pub mod schnorr;
+pub mod sha256;
+
+// Re-export commonly used types
+pub use schnorr::verify_signature;
+pub use schnorr::sign_message;
+pub use sha256::hash;
+
+// Constants
+pub const SCHNORR_SIGNATURE_SIZE: usize = 64;
+pub const TAPROOT_PUBLIC_KEY_SIZE: usize = 32;
+
 /// Helper function to generate a secure cryptographic key of specified length
 pub fn generate_key(length_bytes: usize) -> Vec<u8>  -> Result<(), Box<dyn Error>> {
     random_bytes(length_bytes)

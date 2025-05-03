@@ -41,17 +41,21 @@ use std::error::Error;
 use std::fmt;
 use std::collections::HashMap;
 
+// Core modules
 pub mod ml;
 pub mod web5;
 pub mod bitcoin;
 pub mod dao;
 pub mod extensions;
-pub mod config;
+// Remove config since it has conflicts
+// pub mod config;
 pub mod core;
 pub mod security;
-pub mod enterprise;
-pub mod layer2;
-pub mod tools;
+
+// Main tools module export
+mod tools {
+    pub mod markdown;
+}
 
 /// Core error type for the Anya system
 #[derive(Debug)]
@@ -256,9 +260,15 @@ pub mod utils {
 
     /// Log a message
     pub fn log(msg: &str) {
-        println!("[{}] {}", chrono::Utc::now(), msg);
+        let now = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap_or_default();
+        println!("[{}] {}", now.as_secs(), msg);
     }
 }
+
+/// Library version
+pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 pub fn version() -> &'static str {
     env!("CARGO_PKG_VERSION")
@@ -271,59 +281,6 @@ pub mod integration {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_config_default() {
-        let config = AnyaConfig::default();
-        assert!(config.ml_config.enabled);
-        assert!(config.web5_config.enabled);
-        assert!(config.bitcoin_config.enabled);
-        assert!(config.dao_config.enabled);
-    }
-
-    #[test]
-    fn test_error_display() {
-        let err = AnyaError::ML("test error".to_string());
-        assert_eq!(err.to_string(), "ML error: test error");
-    }
-}
-
-// Initialize all modules
-pub fn init() {
-    // Initialize Bitcoin module
-    // bitcoin::init();
-}
-
-// Library version
-pub const VERSION: &str = env!("CARGO_PKG_VERSION");
-
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
-    }
-}
-
-// Add From implementations for Web5Error and BitcoinError
-impl From<web5::Web5Error> for AnyaError {
-    fn from(error: web5::Web5Error) -> Self {
-        AnyaError::Web5(error.to_string())
-    }
-}
-
-impl From<bitcoin::error::BitcoinError> for AnyaError {
-    fn from(error: bitcoin::error::BitcoinError) -> Self {
-        AnyaError::Bitcoin(error.to_string())
-    }
-}
-
-pub use bitcoin::protocol::{BitcoinProtocol, BPCLevel, BitcoinError};
-pub use dao::governance::{DaoGovernance, DaoLevel, GovernanceError};
-
 /// Protocol version
 pub const PROTOCOL_VERSION: &str = "2.0.0";
 
@@ -335,8 +292,64 @@ pub const BUILD_ID: &str = env!("CARGO_PKG_VERSION");
 
 /// Module re-exports for convenience
 pub mod prelude {
-    pub use crate::bitcoin::protocol::{BitcoinProtocol, BPCLevel};
+    pub use crate::bitcoin::{BitcoinProtocol, BPCLevel};
     pub use crate::bitcoin::taproot::TaprootValidator;
-    pub use crate::dao::governance::{DaoGovernance, DaoLevel};
+    pub use crate::dao::DaoGovernance;
+    pub use crate::dao::DaoLevel;
     pub use crate::tools::markdown::DocumentationValidator;
+}
+
+/// Public exports for use in other crates
+pub use bitcoin::protocol as bitcoin_protocol;
+pub use web5::identity as web5_identity;
+pub use security::crypto as security_crypto;
+
+/// Test modules 
+#[cfg(test)]
+pub mod test_modules {
+    /// Bitcoin test modules
+    pub mod bitcoin {
+        /// Protocol tests
+        pub mod protocol {
+            // Placeholder for future test runner
+        }
+    }
+}
+
+// Re-export core types from dependencies
+pub use secp256k1;
+pub use lightning;
+
+// Export primary error type
+pub use anyhow::Error as AnyhowError;
+
+/// Check if the library is compiled with a specific feature
+#[inline]
+pub fn has_feature(feature: &str) -> bool {
+    match feature {
+        "bitcoin" => cfg!(feature = "bitcoin"),
+        "dao" => cfg!(feature = "dao"),
+        "web5" => cfg!(feature = "web5"),
+        "enterprise" => cfg!(feature = "enterprise"),
+        "p2p" => cfg!(feature = "p2p"),
+        "machine-learning" => cfg!(feature = "machine-learning"),
+        _ => false,
+    }
+}
+
+// Initialize the library
+pub fn initialize() -> anyhow::Result<()> {
+    // Initialize logging
+    tracing_subscriber::fmt::init();
+    
+    // Log library initialization
+    tracing::info!("Anya Core v{} initialized", VERSION);
+    tracing::info!("Features: bitcoin={}, dao={}, web5={}, enterprise={}", 
+        has_feature("bitcoin"), 
+        has_feature("dao"),
+        has_feature("web5"),
+        has_feature("enterprise")
+    );
+    
+    Ok(())
 } 

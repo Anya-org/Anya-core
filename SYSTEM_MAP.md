@@ -44,11 +44,19 @@ Following our reorganization, the repository is now structured more efficiently:
 │   ├── api/                 # API implementations
 │   ├── bitcoin/             # Bitcoin protocol implementation
 │   │   ├── adapters/        # Bitcoin-specific adapters
+│   │   │   ├── protocols/   # Protocol adapters
+│   │   │   ├── rpc/         # RPC adapters
+│   │   │   └── storage/     # Storage adapters
 │   │   ├── core/            # Core Bitcoin functionality
 │   │   │   ├── consensus/   # Consensus rules
 │   │   │   ├── mempool/     # Mempool management
 │   │   │   ├── network/     # Network protocols
 │   │   │   └── script/      # Script execution
+│   │   ├── error/           # Error handling
+│   │   ├── interface/       # Interface definitions
+│   │   │   ├── block.rs     # Block interface
+│   │   │   ├── transaction.rs # Transaction interface
+│   │   │   └── network.rs   # Network interface
 │   │   ├── layer2/          # Layer 2 implementations
 │   │   │   ├── bob/         # Bitcoin Optimistic Blockchain
 │   │   │   ├── dlc/         # Discreet Log Contracts
@@ -56,10 +64,19 @@ Following our reorganization, the repository is now structured more efficiently:
 │   │   │   ├── rgb/         # RGB Protocol
 │   │   │   └── rsk/         # RSK Sidechain
 │   │   ├── protocol/        # Bitcoin protocol definitions
+│   │   │   ├── validation.rs # Protocol validation
+│   │   │   ├── script.rs    # Script execution logic
+│   │   │   └── address.rs   # Address utilities
+│   │   ├── bip341.rs        # BIP-341 (Taproot) implementation
+│   │   ├── spv.rs           # SPV verification
 │   │   ├── riscv/           # RISC-V implementations
 │   │   ├── security/        # Bitcoin-specific security
 │   │   └── testing/         # Bitcoin-specific tests
 │   ├── core/                # Core functionality
+│   │   └── bip/             # BIP implementations
+│   │       ├── bip341.rs    # Taproot (BIP-341) implementation
+│   │       ├── bip342.rs    # Tapscript (BIP-342) implementation
+│   │       └── mod.rs       # BIP registry and common utilities
 │   ├── crypto/              # Cryptographic implementations
 │   ├── dao/                 # DAO implementation
 │   ├── ml/                  # Machine learning components
@@ -85,14 +102,44 @@ Following our reorganization, the repository is now structured more efficiently:
   - Manages UTXO state
   - Implements BIP standards
 
+- **Hexagonal Architecture**
+  - Interface layer defining ports (interfaces) - `interface/` directory with clean block, transaction, and network interfaces
+  - Adapter layer connecting to external dependencies - `adapters/` directory 
+  - Core domain logic in the center - `core/` directory
+  - Comprehensive error handling - `error.rs` module
+
 - **BIP Compliance**
   - Validates implementation against Bitcoin Improvement Proposals
+  - Core BIP implementations in `core/bip/` directory
+  - Full BIP-341 (Taproot) implementation
+  - Full BIP-342 (Tapscript) implementation
   - Checks for BIP-340, BIP-341, BIP-342, BIP-174, BIP-370 compliance
-  - Reports compliance status
+  - Central BIP registry tracking implementation status
 
 - **Security Validation**
   - Basic security validation for Bitcoin components
   - Initial security checks for core functionality
+  - Constant-time operations for SPV verification
+
+### Bitcoin Protocol Modules
+
+- **SPV Implementation (src/bitcoin/spv.rs)**
+  - Simplified Payment Verification
+  - Merkle proof validation with constant-time operations
+  - Transaction inclusion verification
+  - Comprehensive error handling
+  
+- **Taproot Implementation (src/bitcoin/bip341.rs and core/src/bip/bip341.rs)**
+  - BIP-341 Taproot implementation
+  - Merkle tree construction
+  - Taproot script path spending
+  - Key path spending
+  
+- **Interface Layer (src/bitcoin/interface/)**
+  - Block interfaces - `block.rs`
+  - Transaction interfaces - `transaction.rs`
+  - Network interfaces - `network.rs`
+  - Clean abstraction of Bitcoin Core types
 
 ### Security Analysis Framework (src/security/)
 
@@ -452,8 +499,8 @@ The system has been optimized with the following changes:
 
 ## Version Information
 
-- Current Version: 3.1.1
-- Last Updated: 2025-04-29
+- Current Version: 3.1.2
+- Last Updated: 2025-05-01
 - Bitcoin Development Framework: v2.5
 
 *This documentation follows the [AI Labeling Standards](docs/standards/AI_LABELING.md) based on the Bitcoin Development Framework v2.5.*
@@ -466,10 +513,11 @@ Current implementation status:
 - ✅ Bitcoin-style issuance model with 21 billion token supply
 - ✅ Bitcoin-compatible DAO implementation
 - ✅ Full Layer 2 integration support
-- ✅ Bitcoin component reorganization
+- ✅ Bitcoin component reorganization with hexagonal architecture
+- ✅ BIP-341 and BIP-342 implementation
 - 🔄 Distribution allocation mechanisms (In Progress)
 - ⏳ DEX integration (Pending)
 
 ## Last Updated
 
-*Last updated: 2025-04-29 15:45 UTC+2*
+*Last updated: 2025-05-01 16:30 UTC+2*
