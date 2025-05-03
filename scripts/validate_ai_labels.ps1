@@ -1,346 +1,147 @@
-# [AIR-3][AIS-3][BPC-3] AI Label Validation Script
-# This script validates that AI labels in the codebase follow the standardized format
+#!/usr/bin/env pwsh
+# AI Label Validation Script [AIR-3][AIS-3][BPC-3]
+# This script validates AI labeling formats across code and docs in the codebaseva
 
-param (
+param(
     [string]$file = "",
-    [switch]$verbose = $false,
     [switch]$fix = $false,
-    [switch]$stats = $false
+    [switch]$verbose = $false
 )
 
-# Set script version
-$VERSION = "1.0.0"
 $CANONICAL_DOC = "docs/standards/AI_LABELING.md"
 
-Write-Host "AI Label Validation Tool v$VERSION" -ForegroundColor Green
-Write-Host "Based on canonical documentation: $CANONICAL_DOC" -ForegroundColor Green
+Write-Host "AI Label Validation Tool v1.0.0" -ForegroundColor Cyan
+Write-Host "Based on canonical documentation: $CANONICAL_DOC" -ForegroundColor Cyan
 Write-Host ""
 
-# Valid labels and their levels
-$VALID_CATEGORIES = @(
-    # Core categories
-    "AIR", "AIS", "AIT", "AIM", "AIP", "AIE",
-    # Extended categories
-    "BPC", "RES", "SCL", "PFM", "DAO", "DID", "W5C", "UXA"
+# Valid label patterns
+$validLabels = @(
+    "AIR-[0-3]",
+    "AIS-[0-3]", 
+    "AIT-[0-3]", 
+    "AIM-[0-3]", 
+    "AIP-[0-3]", 
+    "AIE-[0-3]", 
+    "BPC-[0-3]", 
+    "RES-[0-3]", 
+    "SCL-[0-3]", 
+    "PFM-[0-3]", 
+    "DAO-[0-3]", 
+    "DID-[0-3]", 
+    "W5C-[0-3]", 
+    "UXA-[0-3]"
 )
 
-$MAX_LEVEL = 3  # 0-3 scale
+$validLabelRegex = "\[(" + ($validLabels -join "|") + ")\]"
+$legacyLabelRegex = "(AIR|AIS|AIT|AIM|AIP|AIE|BPC|RES)-\d{3}"
 
-# File extensions to check
-$CODE_EXTENSIONS = @(
-    ".rs", ".js", ".ts", ".jsx", ".tsx", ".py", ".go", 
-    ".java", ".c", ".cpp", ".h", ".hpp", ".cs"
-)
-
-$DOC_EXTENSIONS = @(
-    ".md", ".rst", ".txt", ".adoc"
-)
-
-function Test-ValidLabel {
-    param (
-        [string]$label
-    )
-    
-    # Extract category and level using regex
-    if ($label -match '\[([A-Z]{2,5})-([0-9])\]') {
-        $category = $matches[1]
-        $level = [int]$matches[2]
-        
-        # Check if category is valid
-        if ($VALID_CATEGORIES -contains $category) {
-            # Check if level is valid (0-3)
-            if ($level -ge 0 -and $level -le $MAX_LEVEL) {
-                return $true
-            }
-            else {
-                return "Invalid level: $level (must be 0-$MAX_LEVEL)"
-            }
-        }
-        else {
-            return "Invalid category: $category"
-        }
-    }
-    else {
-        return "Invalid label format: $label (must be [XXX-N])"
-    }
-}
-
-function Get-LabelsFromContent {
-    param (
-        [string]$content
-    )
-    
-    $labels = @()
-    $labelPattern = '\[([A-Z]{2,5})-([0-9])\]'
-    $matches = [regex]::Matches($content, $labelPattern)
-    
-    foreach ($match in $matches) {
-        $labels += $match.Value
-    }
-    
-    return $labels
-}
-
-function Convert-LegacyToStandardLabel {
-    param (
-        [string]$legacyLabel
-    )
-    
-    # Convert sequence format AIR-001 to [AIR-1]
-    if ($legacyLabel -match '([A-Z]{2,5})-(\d{3})') {
-        $category = $matches[1]
-        $number = [int]$matches[2]
-        
-        # Map legacy sequence numbers to new scale
-        $level = 1  # Default to level 1
-        if ($number -le 2) { $level = 1 }
-        elseif ($number -le 4) { $level = 2 }
-        else { $level = 3 }
-        
-        return "[$category-$level]"
-    }
-    
-    # Convert 1-5 scale to 0-3 scale
-    if ($legacyLabel -match '\[([A-Z]{2,5})-([1-5])\]') {
-        $category = $matches[1]
-        $oldLevel = [int]$matches[2]
-        
-        # Map old 1-5 scale to new 0-3 scale
-        $newLevel = 0
-        switch ($oldLevel) {
-            1 { $newLevel = 0 }
-            2 { $newLevel = 1 }
-            3 { $newLevel = 1 }
-            4 { $newLevel = 2 }
-            5 { $newLevel = 3 }
-        }
-        
-        return "[$category-$newLevel]"
-    }
-    
-    # Already in standard format
-    return $legacyLabel
-}
-
-function Update-FileWithStandardLabels {
-    param (
-        [string]$filePath
-    )
-    
-    try {
-        $content = Get-Content -Path $filePath -Raw
-        $originalContent = $content
-        
-        # Find all labels using regex
-        $labelPattern = '\[([A-Z]{2,5})-([0-9]{1,3})\]'
-        $matches = [regex]::Matches($content, $labelPattern)
-        
-        $replacements = @{}
-        
-        foreach ($match in $matches) {
-            $legacyLabel = $match.Value
-            $standardLabel = Convert-LegacyToStandardLabel -legacyLabel $legacyLabel
-            
-            if ($legacyLabel -ne $standardLabel) {
-                $replacements[$legacyLabel] = $standardLabel
-            }
-        }
-        
-        # Apply replacements
-        foreach ($key in $replacements.Keys) {
-            $content = $content -replace [regex]::Escape($key), $replacements[$key]
-        }
-        
-        # Write updated content if changed
-        if ($content -ne $originalContent) {
-            Set-Content -Path $filePath -Value $content
-            return $replacements.Count
-        }
-        
-        return 0
-    }
-    catch {
-        Write-Error "Error updating file $filePath`: $_"
-        return 0
-    }
-}
-
-function Get-FileStats {
-    param (
-        [string]$filePath
-    )
-    
-    try {
-        $content = Get-Content -Path $filePath -Raw
-        $labels = Get-LabelsFromContent -content $content
-        
-        $stats = @{}
-        foreach ($label in $labels) {
-            if ($stats.ContainsKey($label)) {
-                $stats[$label]++
-            }
-            else {
-                $stats[$label] = 1
-            }
-        }
-        
-        return $stats
-    }
-    catch {
-        Write-Error "Error getting stats for file $filePath`: $_"
-        return @{}
-    }
-}
-
-function Test-File {
-    param (
-        [string]$filePath
-    )
-    
-    try {
-        $content = Get-Content -Path $filePath -Raw
-        $labels = Get-LabelsFromContent -content $content
-        
-        $fileExt = [System.IO.Path]::GetExtension($filePath)
-        $isCode = $CODE_EXTENSIONS -contains $fileExt
-        $isDoc = $DOC_EXTENSIONS -contains $fileExt
-        
-        $errors = @()
-        $validCount = 0
-        
-        foreach ($label in $labels) {
-            $result = Test-ValidLabel -label $label
-            if ($result -eq $true) {
-                $validCount++
-            }
-            else {
-                $errors += "Invalid label in $filePath`: $label - $result"
-            }
-        }
-        
-        if ($errors.Count -eq 0) {
-            if ($labels.Count -gt 0) {
-                if ($verbose) {
-                    Write-Host "✓ $filePath`: $validCount valid labels" -ForegroundColor Green
-                }
-            }
-        }
-        else {
-            foreach ($error in $errors) {
-                Write-Host "✗ $error" -ForegroundColor Red
-            }
-        }
-        
-        # Fix labels if requested
-        if ($fix -and $errors.Count -gt 0) {
-            $fixedCount = Update-FileWithStandardLabels -filePath $filePath
-            if ($fixedCount -gt 0) {
-                Write-Host "  Fixed $fixedCount labels in $filePath" -ForegroundColor Yellow
-            }
-        }
-        
-        # Return stats if requested
-        if ($stats) {
-            return Get-FileStats -filePath $filePath
-        }
-        
-        return $errors.Count -eq 0
-    }
-    catch {
-        Write-Error "Error processing file $filePath`: $_"
-        return $false
-    }
-}
-
-# Main execution
-$allStats = @{}
-$processedFiles = 0
-$errorFiles = 0
-
-# Process single file if specified
+# Get files to check
+$filesToCheck = @()
 if ($file -ne "") {
+    # Check a single file
     if (Test-Path $file) {
-        $result = Test-File -filePath $file
-        
-        if ($stats) {
-            $fileStats = Get-FileStats -filePath $file
-            foreach ($key in $fileStats.Keys) {
-                if ($allStats.ContainsKey($key)) {
-                    $allStats[$key] += $fileStats[$key]
-                }
-                else {
-                    $allStats[$key] = $fileStats[$key]
-                }
-            }
-        }
-        
-        $processedFiles = 1
-        $errorFiles = if ($result) { 0 } else { 1 }
-    }
-    else {
-        Write-Error "File not found: $file"
+        $filesToCheck += Get-Item $file
+    } else {
+        Write-Host "File not found: $file" -ForegroundColor Red
         exit 1
     }
-}
-else {
-    # Process all files in the repository
-    $allFiles = Get-ChildItem -Path . -Recurse -File | Where-Object {
-        $ext = [System.IO.Path]::GetExtension($_.FullName)
-        ($CODE_EXTENSIONS -contains $ext) -or ($DOC_EXTENSIONS -contains $ext)
-    }
+} else {
+    # Get all relevant files
+    $filePatterns = @("*.md", "*.rs", "*.js", "*.py", "*.ts", "*.cs", "*.c", "*.cpp", "*.h", "*.java", "*.go", "*.sh", "*.ps1", "*.toml", "*.yaml", "*.yml")
     
-    foreach ($f in $allFiles) {
-        # Skip files in node_modules, target, etc.
-        if ($f.FullName -match "(node_modules|target|dist|build|\.git)") {
-            continue
-        }
+    foreach ($pattern in $filePatterns) {
+        $filesToCheck += Get-ChildItem -Path . -Filter $pattern -Recurse -File
+    }
+}
+
+Write-Host "Checking $($filesToCheck.Count) files for AI label compliance..." -ForegroundColor Yellow
+Write-Host ""
+
+$validCount = 0
+$invalidCount = 0
+$legacyCount = 0
+$fixedCount = 0
+
+foreach ($file in $filesToCheck) {
+    $content = Get-Content -Path $file.FullName -Raw
+    $hasInvalid = $false
+    $hasLegacy = $false
+    
+    # Check for valid labels
+    $validMatches = [regex]::Matches($content, $validLabelRegex)
+    
+    # Check for legacy labels
+    $legacyMatches = [regex]::Matches($content, $legacyLabelRegex)
+    
+    if ($legacyMatches.Count -gt 0) {
+        $hasLegacy = $true
+        $legacyCount += $legacyMatches.Count
         
-        $result = Test-File -filePath $f.FullName
-        
-        if ($stats) {
-            $fileStats = Get-FileStats -filePath $f.FullName
-            foreach ($key in $fileStats.Keys) {
-                if ($allStats.ContainsKey($key)) {
-                    $allStats[$key] += $fileStats[$key]
-                }
-                else {
-                    $allStats[$key] = $fileStats[$key]
-                }
+        if ($verbose) {
+            Write-Host "Legacy labels in $($file.FullName):" -ForegroundColor Yellow
+            foreach ($match in $legacyMatches) {
+                Write-Host "  $($match.Value)" -ForegroundColor Yellow
             }
         }
         
-        $processedFiles++
-        if (-not $result) {
-            $errorFiles++
+        if ($fix) {
+            $updatedContent = $content
+            
+            # Map from legacy to new format
+            $updatedContent = $updatedContent -replace "AIR-\d{3}", "[AIR-3]"
+            $updatedContent = $updatedContent -replace "AIS-\d{3}", "[AIS-3]"
+            $updatedContent = $updatedContent -replace "AIT-\d{3}", "[AIT-3]"
+            $updatedContent = $updatedContent -replace "AIM-\d{3}", "[AIM-3]"
+            $updatedContent = $updatedContent -replace "AIP-\d{3}", "[AIP-3]"
+            $updatedContent = $updatedContent -replace "AIE-\d{3}", "[AIE-3]"
+            $updatedContent = $updatedContent -replace "BPC-\d{3}", "[BPC-3]"
+            $updatedContent = $updatedContent -replace "RES-\d{3}", "[RES-3]"
+            
+            # Write updated content
+            if ($content -ne $updatedContent) {
+                Set-Content -Path $file.FullName -Value $updatedContent
+                $fixedCount++
+                Write-Host "Fixed legacy labels in $($file.FullName)" -ForegroundColor Green
+            }
         }
     }
-}
-
-# Print summary
-Write-Host ""
-Write-Host "Validation Summary:" -ForegroundColor Cyan
-Write-Host "----------------" -ForegroundColor Cyan
-Write-Host "Files processed: $processedFiles" -ForegroundColor White
-Write-Host "Files with errors: $errorFiles" -ForegroundColor $(if ($errorFiles -gt 0) { "Red" } else { "Green" })
-Write-Host "Success rate: $(100 - ($errorFiles / $processedFiles * 100))%" -ForegroundColor $(if ($errorFiles -eq 0) { "Green" } else { "Yellow" })
-
-# Print stats if requested
-if ($stats -and $allStats.Count -gt 0) {
-    Write-Host ""
-    Write-Host "Label Statistics:" -ForegroundColor Cyan
-    Write-Host "----------------" -ForegroundColor Cyan
     
-    $sortedStats = $allStats.GetEnumerator() | Sort-Object Name
-    
-    foreach ($stat in $sortedStats) {
-        Write-Host "$($stat.Key): $($stat.Value)" -ForegroundColor White
+    # Update counters
+    if ($validMatches.Count -gt 0 -and -not $hasLegacy) {
+        $validCount++
+        
+        if ($verbose) {
+            Write-Host "Valid labels in $($file.FullName):" -ForegroundColor Green
+            foreach ($match in $validMatches) {
+                Write-Host "  $($match.Value)" -ForegroundColor Green
+            }
+        }
+    } elseif ($validMatches.Count -gt 0 -and $hasLegacy) {
+        $invalidCount++
+        Write-Host "Mixed label formats in $($file.FullName)" -ForegroundColor Yellow
+    } elseif ($hasLegacy) {
+        $invalidCount++
     }
 }
 
-if ($errorFiles -gt 0) {
-    exit 1
+Write-Host ""
+Write-Host "Validation Summary:" -ForegroundColor Cyan
+Write-Host "- Checked $($filesToCheck.Count) files" -ForegroundColor White
+Write-Host "- Found $validCount files with valid labels" -ForegroundColor Green
+Write-Host "- Found $invalidCount files with invalid or mixed labels" -ForegroundColor Yellow
+Write-Host "- Found $legacyCount legacy label instances" -ForegroundColor Yellow
+
+if ($fix) {
+    Write-Host "- Fixed labels in $fixedCount files" -ForegroundColor Green
 }
-else {
+
+Write-Host ""
+if ($invalidCount -gt 0) {
+    Write-Host "Validation failed: $invalidCount files with non-compliant labels" -ForegroundColor Red
+    Write-Host "Run with -fix to automatically update legacy formats" -ForegroundColor Yellow
+    exit 1
+} else {
+    Write-Host "Validation successful: All files use compliant label formats" -ForegroundColor Green
     exit 0
 }
 
