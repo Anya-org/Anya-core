@@ -22,12 +22,16 @@ This document summarizes the implementation of the Bitcoin Development Framework
 
 3. **Hexagonal Architecture**
    - Ports
-     - P2P Communication
-     - Wallet (PSBT Support - BIP-174)
-     - Smart Contracts (Miniscript Support)
+     - P2P Communication Port (node_communication)
+     - Wallet Port with PSBT Support (BIP-174)
+     - Smart Contract Port with Miniscript Support
+     - Metrics Port for system monitoring
    - Adapters
      - Protocol adapters for Layer 2 solutions
      - Monitoring adapters
+     - P2P implementation
+     - Wallet implementation
+     - Contract implementation
    - Core logic separated from external interfaces
 
 ### Implementation Details
@@ -48,22 +52,61 @@ This document summarizes the implementation of the Bitcoin Development Framework
    - PSBT creation, signing, and finalization (BIP-174)
    - Transaction management
    - Status tracking
+   - Taproot-enabled PSBT for BIP-341/342
 
 4. **Contract Implementation**
    - Miniscript support
    - Taproot script tree creation
    - Multiple contract types (P2PKH, P2SH, P2WSH, P2TR)
+   - Script analysis and execution
 
 5. **Development Workflow**
    - Commit validation with BIP reference requirements
    - Taproot compliance checking
    - Verification script for framework compliance
 
+6. **Documentation Structure**
+   - Updated SYSTEM_MAP.md with hexagonal architecture details
+   - Updated ROOT_INDEX.md with framework references
+   - Dedicated HEXAGONAL.md for architecture documentation
+   - Implementation summary documentation
+
+## Port Structure
+
+The hexagonal architecture implementation includes:
+
+```
+src/ports/
+├── mod.rs                  # Core port definitions
+├── node_communication/     # P2P network communication
+├── wallet_interface/       # Wallet operations with PSBT
+├── smart_contract/         # Smart contract operations
+├── metrics/                # System monitoring
+├── p2p/                    # P2P implementation
+├── wallet/                 # Wallet implementation
+└── contracts/              # Contract implementation
+```
+
+## Security Module Structure
+
+```
+src/security/
+├── mod.rs                  # Security framework entry point
+├── crypto/                 # Cryptographic operations
+│   ├── schnorr.rs          # BIP-340 Schnorr signatures
+│   └── sha256.rs           # SHA-256 hashing functions
+├── validation/             # Transaction validation
+│   ├── taproot.rs          # BIP-341 Taproot validation
+│   └── transaction.rs      # Transaction validation
+└── hsm/                    # Hardware security module
+```
+
 ## Compliance Status
 
 - ✅ BIP-341 (Taproot) implementation
 - ✅ BIP-342 (Tapscript) implementation
 - ✅ BIP-174 (PSBT) implementation
+- ✅ BIP-340 (Schnorr) implementation
 - ✅ Hexagonal architecture implementation
 - ✅ Prometheus metrics integration
 - ✅ Commit validation with BIP references
@@ -85,3 +128,4 @@ This document summarizes the implementation of the Bitcoin Development Framework
 
 - **Author**: bo_thebig
 - **Email**: botshelomokokoka@gmail.com 
+- **Last Updated**: 2025-05-01 

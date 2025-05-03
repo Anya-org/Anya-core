@@ -1,4 +1,9 @@
+// Ports Module - Bitcoin Development Framework v2.5
+// Hexagonal Architecture Implementation with strict BIP compliance
+// [AIR-3][AIS-3][BPC-3][AIT-3][RES-3]
+
 use std::error::Error;
+
 /// Define all required ports according to BDF v2.5 Hexagonal Architecture
 pub mod node_communication {
     use crate::bitcoin::protocol::BitcoinError;
@@ -45,10 +50,12 @@ pub mod node_communication {
     }
 }
 
+/// Wallet interface port with BIP-174 (PSBT) support
 pub mod wallet_interface {
     use crate::bitcoin::error::Error;
     use async_trait::async_trait;
     
+    /// Wallet port for transaction operations
     #[async_trait]
     pub trait WalletPort {
         /// Create a new PSBT according to BIP-174
@@ -96,10 +103,12 @@ pub mod wallet_interface {
     }
 }
 
+/// Smart contract port with Miniscript support
 pub mod smart_contract {
     use crate::bitcoin::error::Error;
     use async_trait::async_trait;
     
+    /// Smart contract port for script operations
     #[async_trait]
     pub trait SmartContractPort {
         /// Compile Miniscript to Bitcoin Script
@@ -147,10 +156,12 @@ pub mod smart_contract {
     }
 }
 
+/// Metrics port for system monitoring
 pub mod metrics {
     use crate::bitcoin::error::Error;
     use async_trait::async_trait;
     
+    /// Metrics port for performance monitoring
     #[async_trait]
     pub trait MetricsPort {
         /// Get TPS (transactions per second) metric
@@ -191,43 +202,47 @@ pub mod metrics {
     }
 }
 
-// Additional ports according to BDF v2.5 
-
-// Ports module - Hexagonal Architecture Implementation
-// Part of Bitcoin Development Framework v2.5
-
-// Submodules
+// Concrete implementations
 pub mod p2p;
 pub mod wallet;
 pub mod contracts;
 
-// Common traits for ports
+/// Common traits for all ports
 pub trait Port {
+    /// Get the port name
     fn name(&self) -> &'static str;
+    
+    /// Get the port version
     fn version(&self) -> &'static str;
+    
+    /// Check if the port is connected
     fn is_connected(&self) -> bool;
 }
 
-// Port management
+/// Port management for hexagonal architecture
 pub struct PortManager {
     ports: Vec<Box<dyn Port>>,
 }
 
 impl PortManager {
+    /// Create a new port manager
     pub fn new() -> Self {
         PortManager {
             ports: Vec::new(),
         }
     }
     
+    /// Register a new port
     pub fn register_port(&mut self, port: Box<dyn Port>) {
         self.ports.push(port);
     }
     
+    /// Get all registered ports
     pub fn get_ports(&self) -> &[Box<dyn Port>] {
         &self.ports
     }
     
+    /// Get a port by name
     pub fn get_port_by_name(&self, name: &str) -> Option<&Box<dyn Port>> {
         self.ports.iter().find(|p| p.name() == name)
     }

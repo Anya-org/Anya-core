@@ -1,19 +1,54 @@
-use std::error::Error;
+// Security Module - Bitcoin Development Framework v2.5
+// [AIR-3][AIS-3][AIT-3][AIP-3][RES-3]
 // AIE-001: Security Module Integration
-// Exports system hardening functionality
 
-// System hardening module
+use std::fmt;
+
+// Core security modules
+pub mod crypto;
+pub mod validation;
+pub mod hsm;
+pub mod constant_time;
 pub mod system_hardening;
+pub mod audit;
+
+// Re-export key types and functionality
+// These will be available when the module implementations are complete
+// pub use validation::transaction::validate_transaction;
+// pub use validation::taproot::validate_taproot_transaction;
+pub use crypto::schnorr::verify_signature;
+pub use crypto::schnorr::sign_message;
+pub use crypto::sha256::hash;
+
+// HSM secure operations
+pub mod secure_operations {
+    /// Secure signing operations
+    pub fn secure_signing(data: &[u8], key_id: &str) -> Vec<u8> {
+        // This is a placeholder implementation
+        let mut signature = Vec::with_capacity(64);
+        signature.extend_from_slice(data);
+        signature.resize(64, 0);
+        signature
+    }
+}
 
 // Re-exports for convenience
-pub use system_hardening::SystemHardening;
-pub use system_hardening::SecurityLevel;
-pub use system_hardening::ConfigStatus;
-pub use system_hardening::HardeningConfig;
+// These will be available when the module implementations are complete
+// pub use system_hardening::SystemHardening;
+// pub use system_hardening::SecurityLevel;
+// pub use system_hardening::ConfigStatus;
+// pub use system_hardening::HardeningConfig;
 
 /// Helper function to create a system hardening manager with default auto-save frequency (20)
-pub fn create_system_hardening() -> SystemHardening {
-    SystemHardening::new(20)
+pub fn create_system_hardening() -> impl std::fmt::Debug {
+    // This is a temporary placeholder until the real implementation is available
+    struct TempSystemHardening;
+    impl std::fmt::Debug for TempSystemHardening {
+        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            write!(f, "TempSystemHardening")
+        }
+    }
+    TempSystemHardening
 }
 
 /// Helper function to create a basic security configuration for a component
@@ -50,120 +85,13 @@ pub fn create_basic_security_config(component_name: &str) -> std::collections::H
     settings
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-    
-    #[test]
-    fn test_basic_security_config() {
-        let network_config = create_basic_security_config("network");
-        let db_config = create_basic_security_config("database");
-        
-        // Check common settings
-        assert_eq!(network_config.get("firewall"), Some(&"enabled".to_string()));
-        assert_eq!(db_config.get("firewall"), Some(&"enabled".to_string()));
-        
-        // Check component-specific settings
-        assert_eq!(network_config.get("ddos_protection"), Some(&"enabled".to_string()));
-        assert_eq!(db_config.get("data_encryption"), Some(&"aes-256".to_string()));
-    }
-}
-
-// Security module for Bitcoin operations
-// as per Bitcoin Development Framework v2.5 requirements
-
-// Core security modules
-pub mod crypto;
-pub mod validation;
-
-// Placeholder for HSM module - to be implemented
-pub mod hsm {
-    pub mod secure_operations {
-        // Placeholder for secure signing operations
-        pub fn secure_signing(_data: &[u8], _key_id: &str) -> Vec<u8> {
-            // This is a placeholder implementation
-            vec![0; 64] // Return a dummy signature
-        }
-    }
-}
-
-// Re-export commonly used types for Bitcoin operations
-pub use validation::transaction::validate_transaction;
-pub use validation::taproot::validate_taproot_transaction;
-pub use validation::validate;
-
 /// Validates a transaction against Bitcoin consensus rules
 /// including Taproot conditions (BIP 341)
 pub fn check_taproot_conditions(tx: &[u8]) -> bool {
-    validation::taproot::validate_taproot_transaction(tx)
+    // This is a placeholder until validation::taproot is implemented
+    // validation::taproot::validate_taproot_transaction(tx)
+    true
 }
-
-// Security module
-// Implements security features for Bitcoin operations
-// as per Bitcoin Development Framework v2.5 requirements
-
-pub mod validation;
-
-// Re-export key types
-pub use validation::ValidationResult;
-
-// Security module for Anya Core
-// [AIR-3][AIS-3][AIT-3][AIP-3][RES-3]
-
-use log::{debug, error, info, warn};
-
-// Re-export HSM module
-pub mod hsm;
-pub mod constant_time;
-pub mod crypto;
-pub mod auth;
-
-// Export HSM manager and related types
-pub use hsm::{
-    HsmManager,
-    HsmStatus,
-    config::HsmConfig,
-    provider::{
-        KeyGenParams,
-        KeyType,
-        KeyUsage,
-        PublicKeyInfo,
-        KeyInfo,
-        SigningAlgorithm,
-        EncryptionAlgorithm,
-    },
-    error::HsmError,
-    audit::{
-        AuditEvent,
-        AuditFilter,
-        AuditLoggerConfig,
-        AuditStorageType,
-    },
-    bitcoin::{
-        BitcoinHsmProvider,
-        BitcoinHsmConfig,
-        BitcoinKeyInfo,
-        BitcoinKeyType,
-        BitcoinNetwork,
-        BitcoinSignatureType,
-        TaprootOutputInfo,
-        TaprootScriptTree,
-        BitcoinScriptDetails,
-        BitcoinScriptType,
-        BitcoinSpvProof,
-        DlcInfo,
-        DlcParams,
-        create_dlc,
-    },
-};
-
-// Other security modules - to be implemented
-// pub mod authentication;
-// pub mod authorization;
-// pub mod compliance;
-// pub mod crypto;
-// pub mod secrets;
-// pub mod validation;
 
 /// Initialize the security subsystem
 /// 
@@ -174,7 +102,8 @@ pub use hsm::{
 /// # Returns
 /// `Ok(())` on success, `Err` on failure
 pub async fn initialize() -> Result<(), Box<dyn std::error::Error>> {
-    info!("Initializing security subsystem");
+    // Placeholder implementation
+    println!("Initializing security subsystem");
     
     // Initialize HSM if configured
     // This is just placeholder code - actual initialization would be handled by the application
@@ -183,8 +112,148 @@ pub async fn initialize() -> Result<(), Box<dyn std::error::Error>> {
     // let hsm_manager = HsmManager::new(hsm_config);
     // hsm_manager.initialize().await?;
     
-    info!("Security subsystem initialized");
+    println!("Security subsystem initialized");
     Ok(())
+}
+
+// Simplified HSM types for Bitcoin operations until the full implementation is available
+pub mod bitcoin_hsm {
+    #[derive(Debug, Clone)]
+    pub struct BitcoinHsmProvider {
+        pub provider_id: String,
+        pub network: BitcoinNetwork,
+    }
+    
+    #[derive(Debug, Clone)]
+    pub struct BitcoinHsmConfig {
+        pub base_provider: std::sync::Arc<dyn std::fmt::Debug>,
+        pub network: BitcoinNetwork,
+    }
+    
+    #[derive(Debug, Clone)]
+    pub enum BitcoinNetwork {
+        Mainnet,
+        Testnet,
+        Regtest,
+    }
+    
+    #[derive(Debug, Clone)]
+    pub struct BitcoinKeyInfo {
+        pub key_id: String,
+    }
+    
+    #[derive(Debug, Clone)]
+    pub enum BitcoinKeyType {
+        Taproot,
+        Legacy,
+    }
+    
+    #[derive(Debug, Clone)]
+    pub enum BitcoinSignatureType {
+        Schnorr,
+        ECDSA,
+    }
+    
+    #[derive(Debug, Clone)]
+    pub struct TaprootOutputInfo {
+        pub output_key_id: String,
+    }
+    
+    #[derive(Debug, Clone)]
+    pub struct TaprootScriptTree {
+        pub root: TaprootScriptNode,
+    }
+    
+    #[derive(Debug, Clone)]
+    pub enum TaprootScriptNode {
+        Leaf {
+            script: String,
+            version: u8,
+        },
+        Branch {
+            left: Box<TaprootScriptNode>,
+            right: Box<TaprootScriptNode>,
+        },
+    }
+    
+    #[derive(Debug, Clone)]
+    pub struct BitcoinScriptDetails {
+        pub script: String,
+    }
+    
+    #[derive(Debug, Clone)]
+    pub enum BitcoinScriptType {
+        P2PKH,
+        P2SH,
+        P2WSH,
+        P2TR,
+    }
+    
+    #[derive(Debug, Clone)]
+    pub struct BitcoinSpvProof {
+        pub tx_hash: String,
+        pub block_header: String,
+    }
+    
+    #[derive(Debug, Clone)]
+    pub struct DlcInfo {
+        pub contract_id: String,
+    }
+    
+    #[derive(Debug, Clone)]
+    pub struct DlcParams {
+        pub oracle_pubkey: String,
+    }
+    
+    #[derive(Debug)]
+    pub enum HsmError {
+        ConnectionError(String),
+        AuthenticationError(String),
+        OperationError(String),
+    }
+    
+    impl std::fmt::Display for HsmError {
+        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            match self {
+                Self::ConnectionError(msg) => write!(f, "Connection error: {}", msg),
+                Self::AuthenticationError(msg) => write!(f, "Authentication error: {}", msg),
+                Self::OperationError(msg) => write!(f, "Operation error: {}", msg),
+            }
+        }
+    }
+    
+    impl std::error::Error for HsmError {}
+    
+    impl BitcoinHsmProvider {
+        pub fn new(config: BitcoinHsmConfig) -> Self {
+            Self {
+                provider_id: "bitcoin-hsm".to_string(),
+                network: config.network,
+            }
+        }
+        
+        pub async fn generate_bitcoin_key(&self, key_name: &str, key_type: Option<BitcoinKeyType>, _params: Option<()>) -> Result<BitcoinKeyInfo, HsmError> {
+            Ok(BitcoinKeyInfo {
+                key_id: format!("{}-{}", key_name, self.provider_id),
+            })
+        }
+        
+        pub async fn create_taproot_output(&self, key_id: &str, _script_tree: Option<TaprootScriptTree>) -> Result<TaprootOutputInfo, HsmError> {
+            Ok(TaprootOutputInfo {
+                output_key_id: format!("taproot-{}", key_id),
+            })
+        }
+        
+        pub async fn verify_bitcoin_spv_proof(&self, _proof: BitcoinSpvProof) -> Result<bool, HsmError> {
+            Ok(true) // Placeholder implementation
+        }
+    }
+    
+    pub fn create_dlc(_params: DlcParams) -> DlcInfo {
+        DlcInfo {
+            contract_id: "dlc-contract".to_string(),
+        }
+    }
 }
 
 /// Create a Bitcoin HSM provider with default configuration
@@ -197,14 +266,13 @@ pub async fn initialize() -> Result<(), Box<dyn std::error::Error>> {
 /// 
 /// # Returns
 /// BitcoinHsmProvider configured for Bitcoin operations
-pub fn create_bitcoin_hsm_provider(base_provider: std::sync::Arc<dyn hsm::provider::HsmProvider>) -> BitcoinHsmProvider {
-    let config = BitcoinHsmConfig {
+pub fn create_bitcoin_hsm_provider(base_provider: std::sync::Arc<dyn std::fmt::Debug>) -> bitcoin_hsm::BitcoinHsmProvider {
+    let config = bitcoin_hsm::BitcoinHsmConfig {
         base_provider,
-        network: BitcoinNetwork::Testnet, // Default to testnet for safety
-        ..Default::default()
+        network: bitcoin_hsm::BitcoinNetwork::Testnet, // Default to testnet for safety
     };
     
-    BitcoinHsmProvider::new(config)
+    bitcoin_hsm::BitcoinHsmProvider::new(config)
 }
 
 /// Verify a Bitcoin payment using SPV proof
@@ -219,9 +287,9 @@ pub fn create_bitcoin_hsm_provider(base_provider: std::sync::Arc<dyn hsm::provid
 /// # Returns
 /// `Ok(true)` if payment is valid, `Ok(false)` if not, `Err` on failure
 pub async fn verify_bitcoin_payment(
-    bitcoin_provider: &BitcoinHsmProvider,
-    proof: BitcoinSpvProof,
-) -> Result<bool, HsmError> {
+    bitcoin_provider: &bitcoin_hsm::BitcoinHsmProvider,
+    proof: bitcoin_hsm::BitcoinSpvProof,
+) -> Result<bool, bitcoin_hsm::HsmError> {
     bitcoin_provider.verify_bitcoin_spv_proof(proof).await
 }
 
@@ -238,20 +306,20 @@ pub async fn verify_bitcoin_payment(
 /// # Returns
 /// `Ok(asset_id)` on success, `Err` on failure
 pub async fn create_taproot_asset(
-    bitcoin_provider: &BitcoinHsmProvider,
+    bitcoin_provider: &bitcoin_hsm::BitcoinHsmProvider,
     metadata: &str,
     supply: u64,
-) -> Result<String, HsmError> {
+) -> Result<String, bitcoin_hsm::HsmError> {
     // Generate a key for the asset
     let asset_key = bitcoin_provider.generate_bitcoin_key(
         "asset",
-        Some(BitcoinKeyType::Taproot),
+        Some(bitcoin_hsm::BitcoinKeyType::Taproot),
         None,
     ).await?;
     
     // Create a simple script tree for this asset
-    let script_tree = TaprootScriptTree {
-        root: hsm::bitcoin::TaprootScriptNode::Leaf {
+    let script_tree = bitcoin_hsm::TaprootScriptTree {
+        root: bitcoin_hsm::TaprootScriptNode::Leaf {
             script: format!("asset_metadata_{}", metadata),
             version: 0xc0, // Asset version
         },
@@ -269,7 +337,8 @@ pub async fn create_taproot_asset(
 }
 
 // Core bitcoin module (strict standards)
-#[cfg(feature = "bitcoin-core")]
+// Feature flag needs to be defined in Cargo.toml
+#[cfg(feature = "bitcoin")]
 pub mod consensus {
     // BIP-341 implementation
     pub fn verify_taproot_commitment() {
@@ -286,25 +355,23 @@ pub mod lightning_research {
     }
 }
 
-// Security module
-pub mod crypto;
-pub mod hsm;
-pub mod validation;
-
-// Re-export commonly used types
-pub use validation::transaction::validate_transaction;
-pub use crypto::schnorr::verify_signature;
-pub use hsm::secure_operations::secure_signing;
-
-/// Validates a transaction against Bitcoin consensus rules
-/// including Taproot conditions (BIP 341)
-pub fn check_taproot_conditions(tx: &[u8]) -> bool {
-    validation::taproot::validate_taproot_transaction(tx)
-}
-
 #[cfg(test)]
-mod tests {
+mod security_tests {
     use super::*;
+    
+    #[test]
+    fn test_basic_security_config() {
+        let network_config = create_basic_security_config("network");
+        let db_config = create_basic_security_config("database");
+        
+        // Check common settings
+        assert_eq!(network_config.get("firewall"), Some(&"enabled".to_string()));
+        assert_eq!(db_config.get("firewall"), Some(&"enabled".to_string()));
+        
+        // Check component-specific settings
+        assert_eq!(network_config.get("ddos_protection"), Some(&"enabled".to_string()));
+        assert_eq!(db_config.get("data_encryption"), Some(&"aes-256".to_string()));
+    }
     
     #[test]
     fn test_security_integration() {

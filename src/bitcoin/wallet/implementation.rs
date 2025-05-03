@@ -1,9 +1,9 @@
-use std::error::Error;
 //! Bitcoin wallet implementation details
 //!
 //! This module contains the implementation details for the Bitcoin wallet.
 //! [AIR-1][AIS-1][AIM-1][AIP-1][RES-1]
 
+use std::error::Error;
 use std::collections::HashMap;
 use std::path::Path;
 use std::str::FromStr;

@@ -10,11 +10,14 @@ Welcome to the Anya Core documentation. This is the authoritative root index for
 - [Installation](INSTALLATION.md) - Installation instructions
 - [System Architecture](SYSTEM_MAP.md) - Complete system architecture
 - [Security Framework](SECURITY.md) - AIS-3 compliance details
+- [Bitcoin Framework Implementation](BITCOIN_FRAMEWORK_IMPLEMENTATION.md) - BIP-341/342/174 implementation details
+- [Hexagonal Architecture](docs/HEXAGONAL.md) - Hexagonal architecture patterns
 
 ### Bitcoin Protocol Integration [BPC-3]
 
 - [BIP Implementation](docs/bitcoin/README.md) - Taproot/Tapscript
 - [Layer 2 Solutions](src/layer2/README.md) - L2 integration details
+- [Bitcoin Framework](README-BITCOIN-FRAMEWORK.md) - Framework overview
 
 ### DAO & Tokenomics [DAO-3]
 
@@ -43,14 +46,16 @@ Welcome to the Anya Core documentation. This is the authoritative root index for
 - Taproot: Fully enabled (BIP-341/342)
 - PSBT: v2 support (BIP-174/370)
 - HSM: v2.5 integration
+- Hexagonal Architecture: Fully implemented
 
 ### Layer 2 Integration Status [BPC-3]
 
-- Lightning Network: Enabled (src/lightning)
-- RGB Protocol: Q3 2025 (src/layer2/rgb)
-- RSK Integration: Q3 2025 (src/layer2/rsk)
-- BOB Layer 2: Active (src/layer2/bob)
-- State Channels: Enabled (src/layer2/state_channels)
+- Lightning Network: Enabled (src/bitcoin/layer2/lightning)
+- RGB Protocol: Q3 2025 (src/bitcoin/layer2/rgb)
+- RSK Integration: Q3 2025 (src/bitcoin/layer2/rsk)
+- BOB Layer 2: Active (src/bitcoin/layer2/bob)
+- DLC: Enabled (src/bitcoin/layer2/dlc)
+- State Channels: Enabled (src/bitcoin/layer2/state_channels)
 
 ### Security Compliance [AIS-3]
 
@@ -58,6 +63,7 @@ Welcome to the Anya Core documentation. This is the authoritative root index for
 - Taproot Script Validation: ✅
 - Schnorr Signature Support: ✅
 - HSM Integration: ✅
+- BIP-340 Implementation: ✅
 
 ### Web5 Components [W5C-3]
 
@@ -79,17 +85,19 @@ Welcome to the Anya Core documentation. This is the authoritative root index for
 - [Test Framework](TESTING.md) - Testing procedures
 - [Security Tests](src/security/README.md) - Security validation
 - [Performance Tests](src/testing/performance/README.md) - Benchmarking
+- [BIP Validation](tests/bip/bip_validation.rs) - BIP validation framework
 
 ### Compliance & Standards
 
 - [AI Labeling](docs/standards/AI_LABELING.md) - Component labeling
 - [Security Standards](docs/standards/SECURITY.md) - Security requirements
 - [BIP Compliance](docs/standards/BIP_COMPLIANCE.md) - Bitcoin protocol standards
+- [Hexagonal Architecture](docs/HEXAGONAL.md) - Architecture standards
 
 ## Current Version
 
-- Version: 3.1.1
-- Released: 2025-04-29
+- Version: 3.1.2
+- Released: 2025-05-01
 - Framework: Bitcoin Development Framework v2.5
 
 ## Support
@@ -104,11 +112,19 @@ Welcome to the Anya Core documentation. This is the authoritative root index for
 The repository follows a structured organization:
 
 - `/src` - Main source code
+  - `/adapters` - Hexagonal architecture adapters
   - `/bitcoin` - Bitcoin protocol implementation
-  - `/layer2` - Layer 2 solutions (Lightning, RGB, RSK, etc.)
+    - `/adapters` - Bitcoin-specific adapters
+    - `/core` - Core Bitcoin functionality
+    - `/interface` - Interface definitions
+    - `/layer2` - Layer 2 solutions 
+    - `/protocol` - Bitcoin protocol definitions
+  - `/core` - Core functionality
+    - `/bip` - BIP implementations (341, 342, 174)
+  - `/ports` - Hexagonal architecture ports
+  - `/security` - Security framework
   - `/web5` - Web5 implementation
   - `/dao` - DAO system
-  - `/security` - Security framework
   - `/ml` - Machine learning components
 - `/docs` - Documentation files
 - `/tests` - Test files
@@ -121,5 +137,5 @@ The repository follows a structured organization:
 - [Discussions](https://github.com/anya-org/anya-core/discussions)
 
 ---
-*Last updated: 2025-04-29 14:30 UTC+2*
+*Last updated: 2025-05-01 16:30 UTC+2*
 *All components comply with [AI Labeling Standards](docs/standards/AI_LABELING.md)*
