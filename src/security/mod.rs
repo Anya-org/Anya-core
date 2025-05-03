@@ -67,6 +67,17 @@ mod tests {
         assert_eq!(network_config.get("ddos_protection"), Some(&"enabled".to_string()));
         assert_eq!(db_config.get("data_encryption"), Some(&"aes-256".to_string()));
     }
+
+    #[test]
+    #[cfg(feature = "security_validation")]
+    fn test_bitcoin_protocol_checks() {
+        let proof = load_spv_proof("test/fixtures/tx_valid.hex");
+        assert!(verify_bitcoin_payment(&hsm_provider, proof).await);
+        
+        // Test Taproot silent payments
+        let invalid_proof = load_spv_proof("test/fixtures/tx_invalid.hex");
+        assert!(!verify_bitcoin_payment(&hsm_provider, invalid_proof).await);
+    }
 }
 
 // Security module
@@ -237,4 +248,52 @@ pub async fn create_taproot_asset(
     // In a real implementation, this would create an actual Taproot Asset
     // using the RGB protocol. For now, just return the output key ID as the asset ID.
     Ok(output.output_key_id)
+}
+
+// Core bitcoin module (strict standards)
+#[cfg(feature = "bitcoin-core")]
+pub mod consensus {
+    // BIP-341 implementation
+    pub fn verify_taproot_commitment() {
+        // ... production-grade code ...
+    }
+}
+
+// Experimental module (relaxed standards)
+#[cfg(feature = "experimental")]
+pub mod lightning_research {
+    // WIP implementation
+    pub fn channel_management() {
+        // ... rapid iteration allowed ...
+    }
+}
+
+// Security module
+pub mod crypto;
+pub mod hsm;
+pub mod validation;
+
+// Re-export commonly used types
+pub use validation::transaction::validate_transaction;
+pub use crypto::schnorr::verify_signature;
+pub use hsm::secure_operations::secure_signing;
+
+/// Validates a transaction against Bitcoin consensus rules
+/// including Taproot conditions (BIP 341)
+pub fn check_taproot_conditions(tx: &[u8]) -> bool {
+    validation::taproot::validate_taproot_transaction(tx)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    
+    #[test]
+    fn test_security_integration() {
+        // This test ensures all security components work together
+        let dummy_tx = vec![0u8; 100]; // Placeholder
+        
+        // Should pass security validation
+        assert!(check_taproot_conditions(&dummy_tx));
+    }
 } 

@@ -61,6 +61,18 @@ validate_commit_message() {
         log_info "Types: feat, fix, docs, style, refactor, test, chore"
         exit 1
     fi
+    
+    # Bitcoin-specific validation
+    if ! echo "$message" | grep -qE '@BIP-[0-9]+'; then
+        log_error "Commit message must reference BIP standards (@BIP-XXX)"
+        exit 1
+    fi
+
+    # Add Taproot compliance check
+    if [[ "$message" == *"taproot"* ]] && ! cargo test --test taproot_compliance; then
+        log_error "Taproot changes require compliance tests to pass"
+        exit 1
+    fi
 }
 
 check_branch() {
@@ -81,7 +93,9 @@ commit_changes() {
     
     # Check if there are changes to commit
     if ! git diff --quiet || ! git diff --cached --quiet; then
-        git add .github/workflows/update-roadmap.yml scripts/update-roadmap.js package.json .github/ISSUE_TEMPLATE/roadmap_item.md
+        git add -N '*.rs' 'anya-bitcoin/**'  # Prevent hidden changes
+        git diff --cached --name-only | xargs cargo fmt --check
+        git diff --cached --name-only | grep .rs | xargs cargo clippy --features bip-check
         validate_commit_message "$message"
         
         # Check if GPG signing is enabled
@@ -92,6 +106,9 @@ commit_changes() {
         else
             git commit -m "$message"
         fi
+        
+        # Add Bitcoin core validation
+        git diff --cached --name-only | grep .rs | xargs cargo test --features bitcoin-core-check
     else
         log_warn "No changes to commit"
         exit 0

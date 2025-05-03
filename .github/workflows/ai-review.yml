@@ -47,8 +47,48 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            console.log('Running performance checks on PR code...');
-            // Performance check logic would go here
+            const { execSync } = require('child_process');
+            
+            // Bitcoin-specific validation
+            console.log('Running Bitcoin protocol checks...');
+            try {
+                execSync('cargo test --test bitcoin_consensus -- --test-threads=1', {
+                  env: {
+                    ...process.env,
+                    RUST_TEST_THREADS: '1',
+                    BTC_TEST_TIMEOUT: '300',
+                    MEMORY_LIMIT: '4G'
+                  },
+                  stdio: 'inherit',
+                  maxBuffer: 1024 * 1024 * 100  # 100MB output buffer
+                });
+                const mempoolSize = execSync('curl -s http://localhost:3000/metrics | grep mempool_size').toString();
+                const taprootAdoption = execSync('curl -s http://localhost:3000/metrics | grep taproot_usage').toString();
+                
+                core.setOutput('mempool_size', mempoolSize.match(/mempool_size (\d+)/)[1]);
+                core.setOutput('taproot_adoption', taprootAdoption.match(/taproot_usage (\d+\.\d+)/)[1]);
+                
+            } catch (error) {
+                core.setFailed(`Bitcoin validation failed: ${error.message}`);
+            }
+
+      - name: Bitcoin Protocol Validation
+        run: |
+          cargo test --test bip_validation \
+            --features "bitcoin-consensus taproot" \
+            -- --test-threads=1 \
+            --ignored
+
+      - name: Security Audit Trail
+        run: |
+          git log --since="24 hours" --grep='SECURITY' | \
+          awk '/^commit/ {print "Security Update:", $0}'
+          
+      - name: Prometheus Metrics Check
+        run: |
+          curl -s http://localhost:3000/metrics | \
+          grep -E 'bip_compliance{type="(341|342|174)"} 1' || \
+          (echo "BIP compliance metrics missing" && exit 1)
 
   label:
     needs: review
