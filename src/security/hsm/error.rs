@@ -57,93 +57,105 @@ pub enum HsmError {
     #[error("Decryption error: {0}")]
     DecryptionError(String),
     
-    /// Communication error
-    #[error("Communication error: {0}")]
-    CommunicationError(String),
+    /// Provider error
+    #[error("Provider error: {0}")]
+    ProviderError(String),
     
-    /// Timeout error
-    #[error("Timeout error: {0}")]
-    TimeoutError(String),
+    /// Permission denied
+    #[error("Permission denied: {0}")]
+    PermissionDenied(String),
     
-    /// Authentication error
-    #[error("Authentication error: {0}")]
-    AuthenticationError(String),
+    /// Unsupported operation
+    #[error("Unsupported operation: {0}")]
+    UnsupportedOperation(String),
     
-    /// Authorization error
-    #[error("Authorization error: {0}")]
-    AuthorizationError(String),
-    
-    /// HSM device error
-    #[error("HSM device error: {0}")]
-    DeviceError(String),
+    /// Unsupported key type
+    #[error("Unsupported key type")]
+    UnsupportedKeyType,
     
     /// Serialization error
     #[error("Serialization error: {0}")]
     SerializationError(String),
     
-    /// Deserialization error
-    #[error("Deserialization error: {0}")]
-    DeserializationError(String),
-    
     /// IO error
     #[error("IO error: {0}")]
-    IoError(#[from] io::Error),
+    IoError(#[from] std::io::Error),
     
-    /// Audit error
-    #[error("Audit error: {0}")]
-    AuditError(String),
+    /// Authentication error
+    #[error("Authentication error: {0}")]
+    AuthenticationError(String),
     
-    /// Audit storage error
-    #[error("Audit storage error: {0}")]
-    AuditStorageError(String),
+    /// Device locked
+    #[error("Device locked: {0}")]
+    DeviceLocked(String),
     
-    /// Audit logging error
-    #[error("Audit logging error: {0}")]
-    AuditLoggingError(String),
+    /// Device disconnected
+    #[error("Device disconnected: {0}")]
+    DeviceDisconnected(String),
     
-    /// Network error
+    /// Hardware failure
+    #[error("Hardware failure: {0}")]
+    HardwareFailure(String),
+    
+    /// Network error (for testnet operations)
     #[error("Network error: {0}")]
     NetworkError(String),
+    
+    /// Transaction error (for testnet transactions)
+    #[error("Transaction error: {0}")]
+    TransactionError(String),
+    
+    /// PIN locked (for hardware devices)
+    #[error("PIN locked: {0}")]
+    PinLocked(String),
+    
+    /// Timeout error
+    #[error("Timeout error: {0}")]
+    TimeoutError(String),
+    
+    /// Bitcoin-specific error
+    #[error("Bitcoin error: {0}")]
+    BitcoinError(String),
+
+    /// Device communication error (for hardware devices)
+    #[error("Device communication error: {0}")]
+    DeviceCommunicationError(String),
+    
+    /// Firmware error (for hardware devices)
+    #[error("Firmware error: {0}")]
+    FirmwareError(String),
+    
+    /// Signature verification failed
+    #[error("Signature verification failed")]
+    SignatureVerificationFailed,
+    
+    /// Transaction rejected by user (on hardware device)
+    #[error("Transaction rejected by user")]
+    TransactionRejected,
+    
+    /// Device needs firmware update
+    #[error("Device needs firmware update: {0}")]
+    FirmwareUpdateRequired(String),
+    
+    /// Session expired
+    #[error("Session expired")]
+    SessionExpired,
+    
+    /// Invalid address (for Bitcoin operations)
+    #[error("Invalid address: {0}")]
+    InvalidAddress(String),
+    
+    /// Invalid PSBT (for Bitcoin operations)
+    #[error("Invalid PSBT: {0}")]
+    InvalidPsbt(String),
+    
+    /// HSM overflow (too many keys or operations)
+    #[error("HSM overflow: {0}")]
+    HsmOverflow(String),
     
     /// Internal error
     #[error("Internal error: {0}")]
     InternalError(String),
-    
-    /// Invalid state
-    #[error("Invalid state: {0}")]
-    InvalidState(String),
-    
-    /// Invalid operation
-    #[error("Invalid operation: {0}")]
-    InvalidOperation(String),
-    
-    /// Not implemented
-    #[error("Not implemented: {0}")]
-    NotImplemented(String),
-    
-    /// Unsupported feature
-    #[error("Unsupported feature: {0}")]
-    UnsupportedFeature(String),
-    
-    /// Rate limit exceeded
-    #[error("Rate limit exceeded: {0}")]
-    RateLimitExceeded(String),
-    
-    /// Resource busy
-    #[error("Resource busy: {0}")]
-    ResourceBusy(String),
-    
-    /// Resource unavailable
-    #[error("Resource unavailable: {0}")]
-    ResourceUnavailable(String),
-    
-    /// Operation cancelled
-    #[error("Operation cancelled: {0}")]
-    OperationCancelled(String),
-    
-    /// HSM audit event error
-    #[error("HSM audit event error: {0}")]
-    HsmAuditEventError(String),
 }
 
 /// HSM audit event type

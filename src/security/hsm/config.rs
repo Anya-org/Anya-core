@@ -2,6 +2,7 @@ use std::error::Error;
 use serde::{Serialize, Deserialize};
 use std::path::PathBuf;
 use std::time::Duration;
+use chrono::{DateTime, Utc};
 
 use crate::security::hsm::provider::HsmProviderType;
 use crate::security::hsm::audit::AuditLoggerConfig;
@@ -13,24 +14,40 @@ pub struct HsmConfig {
     /// General HSM settings
     pub general: GeneralConfig,
     
-    /// Type of HSM provider to use
+    /// Provider type
     pub provider_type: HsmProviderType,
     
-    /// Configuration for SoftHSM provider
+    /// Audit logging enabled
     #[serde(default)]
-    pub softhsm: SoftHsmConfig,
+    pub audit_enabled: bool,
     
-    /// Configuration for CloudHSM provider
+    /// SoftHSM configuration
     #[serde(default)]
-    pub cloudhsm: CloudHsmConfig,
+    pub software: SoftHsmConfig,
     
-    /// Configuration for TPM provider
+    /// Cloud HSM configuration
+    #[serde(default)]
+    pub cloud: CloudHsmConfig,
+    
+    /// TPM configuration
     #[serde(default)]
     pub tpm: TpmConfig,
     
-    /// Configuration for PKCS#11 provider
+    /// PKCS#11 configuration
     #[serde(default)]
     pub pkcs11: Pkcs11Config,
+    
+    /// Simulator configuration
+    #[serde(default)]
+    pub simulator: SimulatorConfig,
+    
+    /// Hardware HSM configuration
+    #[serde(default)]
+    pub hardware: HardwareConfig,
+    
+    /// Bitcoin HSM configuration
+    #[serde(default)]
+    pub bitcoin: BitcoinConfig,
     
     /// Configuration for audit logging
     #[serde(default)]
@@ -42,14 +59,18 @@ pub struct HsmConfig {
 }
 
 impl Default for HsmConfig {
-    fn default() -> Self  -> Result<(), Box<dyn Error>> {
+    fn default() -> Self {
         Self {
             general: GeneralConfig::default(),
-            provider_type: HsmProviderType::SoftHsm,
-            softhsm: SoftHsmConfig::default(),
-            cloudhsm: CloudHsmConfig::default(),
+            provider_type: HsmProviderType::SoftwareKeyStore,
+            audit_enabled: true,
+            software: SoftHsmConfig::default(),
+            cloud: CloudHsmConfig::default(),
             tpm: TpmConfig::default(),
             pkcs11: Pkcs11Config::default(),
+            simulator: SimulatorConfig::default(),
+            hardware: HardwareConfig::default(),
+            bitcoin: BitcoinConfig::default(),
             audit: AuditLoggerConfig::default(),
             key_management: KeyManagementConfig::default(),
         }
@@ -65,8 +86,9 @@ impl HsmConfig {
                 log_level: LogLevel::Debug,
                 operation_timeout: Duration::from_secs(10),
             },
-            provider_type: HsmProviderType::SoftHsm,
-            softhsm: SoftHsmConfig::default(),
+            provider_type: HsmProviderType::SoftwareKeyStore,
+            audit_enabled: true,
+            software: SoftHsmConfig::default(),
             audit: AuditLoggerConfig {
                 enabled: true,
                 storage_type: crate::security::hsm::audit::AuditStorageType::File,
@@ -146,95 +168,94 @@ pub enum LogLevel {
     Error,
 }
 
-/// Configuration for SoftHSM provider
+/// Configuration for Software HSM provider
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SoftHsmConfig {
-    /// Path to the token directory
+    /// Directory for tokens
     pub token_dir: String,
     
-    /// Slot ID to use
-    pub slot_id: u64,
+    /// Maximum sessions
+    pub max_sessions: usize,
     
-    /// User PIN
-    pub user_pin: Option<String>,
+    /// Encryption key
+    pub encryption_key: Option<String>,
     
-    /// SO PIN (Security Officer)
-    pub so_pin: Option<String>,
+    /// Lock timeout in seconds
+    pub lock_timeout_seconds: u64,
     
-    /// Label for the token
-    pub token_label: String,
+    /// Always use testnet for Bitcoin operations
+    pub use_testnet: bool,
 }
 
 impl Default for SoftHsmConfig {
-    fn default() -> Self  -> Result<(), Box<dyn Error>> {
+    fn default() -> Self {
         Self {
-            token_dir: "./hsm/tokens".to_string(),
-            slot_id: 0,
-            user_pin: Some("1234".to_string()), // Default PIN for development
-            so_pin: Some("5678".to_string()),   // Default SO PIN for development
-            token_label: "anya-hsm-token".to_string(),
+            token_dir: ".tokens".to_string(),
+            max_sessions: 10,
+            encryption_key: None,
+            lock_timeout_seconds: 300,
+            use_testnet: true, // Always use testnet by default
         }
     }
 }
 
-/// Configuration for CloudHSM provider
+/// Configuration for Cloud HSM provider
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CloudHsmConfig {
-    /// Cluster ID for AWS CloudHSM
-    pub cluster_id: Option<String>,
+    /// Cloud provider
+    pub provider: CloudProvider,
     
-    /// Endpoint for the HSM cluster
-    pub endpoint: Option<String>,
+    /// Region
+    pub region: String,
     
-    /// User credentials
-    pub username: Option<String>,
+    /// Access key
+    pub access_key: Option<String>,
     
-    /// Password
-    pub password: Option<String>,
+    /// Secret key
+    pub secret_key: Option<String>,
     
-    /// Certificate file path
-    pub certificate_file: Option<String>,
-    
-    /// Region for AWS CloudHSM
-    pub region: Option<String>,
+    /// Key ID prefix
+    pub key_id_prefix: Option<String>,
 }
 
 impl Default for CloudHsmConfig {
-    fn default() -> Self  -> Result<(), Box<dyn Error>> {
+    fn default() -> Self {
         Self {
-            cluster_id: None,
-            endpoint: None,
-            username: None,
-            password: None,
-            certificate_file: None,
-            region: Some("us-west-2".to_string()),
+            provider: CloudProvider::Aws,
+            region: "us-east-1".to_string(),
+            access_key: None,
+            secret_key: None,
+            key_id_prefix: None,
         }
     }
+}
+
+/// Cloud providers
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub enum CloudProvider {
+    /// AWS
+    Aws,
+    /// GCP
+    Gcp,
+    /// Azure
+    Azure,
 }
 
 /// Configuration for TPM provider
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TpmConfig {
-    /// Device path for the TPM
+    /// Device path
     pub device_path: String,
     
     /// Owner password
     pub owner_password: Option<String>,
-    
-    /// Storage root key password
-    pub srk_password: Option<String>,
-    
-    /// Use TCG software stack
-    pub use_tss: bool,
 }
 
 impl Default for TpmConfig {
-    fn default() -> Self  -> Result<(), Box<dyn Error>> {
+    fn default() -> Self {
         Self {
             device_path: "/dev/tpm0".to_string(),
             owner_password: None,
-            srk_password: None,
-            use_tss: true,
         }
     }
 }
@@ -262,7 +283,7 @@ pub struct Pkcs11Config {
 }
 
 impl Default for Pkcs11Config {
-    fn default() -> Self  -> Result<(), Box<dyn Error>> {
+    fn default() -> Self {
         Self {
             library_path: "/usr/lib/libpkcs11.so".to_string(),
             slot_id: None,
@@ -270,6 +291,170 @@ impl Default for Pkcs11Config {
             user_pin: None,
             max_sessions: 10,
             rw_session: true,
+        }
+    }
+}
+
+/// Configuration for Simulator HSM provider
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SimulatorConfig {
+    /// Path for storing simulator data
+    pub storage_path: String,
+    
+    /// Simulate latency
+    pub simulate_latency: bool,
+    
+    /// Latency in milliseconds
+    pub latency_ms: u64,
+    
+    /// Simulate failures
+    pub simulate_failures: bool,
+    
+    /// Failure rate (0.0 - 1.0)
+    pub failure_rate: f64,
+    
+    /// PIN timeout in seconds
+    pub pin_timeout_seconds: u64,
+    
+    /// Max PIN attempts
+    pub max_pin_attempts: u8,
+    
+    /// Always use testnet for Bitcoin operations
+    #[serde(default = "default_true")]
+    pub use_testnet: bool,
+}
+
+fn default_true() -> bool {
+    true
+}
+
+impl Default for SimulatorConfig {
+    fn default() -> Self {
+        Self {
+            storage_path: ".simulator".to_string(),
+            simulate_latency: false,
+            latency_ms: 100,
+            simulate_failures: false,
+            failure_rate: 0.05,
+            pin_timeout_seconds: 300,
+            max_pin_attempts: 3,
+            use_testnet: true, // Always use testnet by default
+        }
+    }
+}
+
+/// Hardware device types
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub enum HardwareDeviceType {
+    /// YubiHSM
+    YubiHsm,
+    /// Ledger
+    Ledger,
+    /// Trezor
+    TrezorModel,
+    /// Custom
+    Custom,
+}
+
+/// Configuration for Hardware HSM provider
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct HardwareConfig {
+    /// Hardware device type
+    pub device_type: HardwareDeviceType,
+    
+    /// Device connection string (e.g., IP, USB path)
+    pub connection_string: String,
+    
+    /// Authentication key ID
+    pub auth_key_id: Option<String>,
+    
+    /// Password
+    pub password: Option<String>,
+    
+    /// Timeout in seconds
+    pub timeout_seconds: u64,
+    
+    /// Always use testnet for Bitcoin operations
+    #[serde(default = "default_true")]
+    pub use_testnet: bool,
+}
+
+impl Default for HardwareConfig {
+    fn default() -> Self {
+        Self {
+            device_type: HardwareDeviceType::YubiHsm,
+            connection_string: "127.0.0.1:12345".to_string(),
+            auth_key_id: None,
+            password: None,
+            timeout_seconds: 30,
+            use_testnet: true, // Always use testnet by default
+        }
+    }
+}
+
+/// Bitcoin network type
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub enum BitcoinNetworkType {
+    /// Mainnet (never use in development)
+    Mainnet,
+    /// Testnet (for testing)
+    Testnet,
+    /// Regtest (local testing)
+    Regtest,
+    /// Signet (testing network)
+    Signet,
+}
+
+impl Default for BitcoinNetworkType {
+    fn default() -> Self {
+        Self::Testnet // Always default to testnet
+    }
+}
+
+/// Configuration for Bitcoin HSM provider
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct BitcoinConfig {
+    /// Bitcoin network type
+    #[serde(default)]
+    pub network: BitcoinNetworkType,
+    
+    /// Bitcoin RPC URL
+    pub rpc_url: Option<String>,
+    
+    /// Bitcoin RPC username
+    pub rpc_username: Option<String>,
+    
+    /// Bitcoin RPC password
+    pub rpc_password: Option<String>,
+    
+    /// Derivation path template
+    pub derivation_path_template: String,
+    
+    /// Use segwit addresses
+    pub use_segwit: bool,
+    
+    /// Use taproot addresses
+    pub use_taproot: bool,
+    
+    /// Confirm transactions on device
+    pub confirm_transactions: bool,
+    
+    /// Fee rate in sats/vB
+    pub default_fee_rate: u64,
+}
+
+impl Default for BitcoinConfig {
+    fn default() -> Self {
+        Self {
+            network: BitcoinNetworkType::Testnet,
+            rpc_url: Some("http://127.0.0.1:18332".to_string()), // Default testnet port
+            rpc_username: None,
+            rpc_password: None,
+            derivation_path_template: "m/84'/1'/0'/0/{index}".to_string(), // Testnet bip84 path
+            use_segwit: true,
+            use_taproot: true,
+            confirm_transactions: true,
+            default_fee_rate: 5, // sats/vB
         }
     }
 }

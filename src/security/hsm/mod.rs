@@ -3,12 +3,21 @@ pub mod provider;
 pub mod audit;
 pub mod config;
 pub mod operations;
+pub mod error;
 
-// The provider implementations were moved to a different location
-// or are planned for future implementation
+// Export the provider implementations
 pub mod providers {
-    // Empty module for now - provider implementations will be added later
+    pub mod software;
+    pub mod simulator;
+    pub mod hardware;
+    
+    pub use software::SoftwareHsmProvider;
+    pub use simulator::SimulatorHsmProvider;
+    pub use hardware::HardwareHsmProvider;
 }
+
+#[cfg(test)]
+pub mod tests;
 
 use std::sync::Arc;
 use tokio::sync::RwLock;
@@ -880,10 +889,11 @@ impl HsmBridge {
 pub enum HsmType {
     YubiHsm,
     Ledger,
+    Trezor,
     Simulator,
 }
 
-// Placeholder for provider implementations that will be added later
-// pub use providers::{SoftwareHsmProvider, SimulatorHsmProvider, HardwareHsmProvider};
+// Re-export the provider implementations for convenient access
+pub use providers::{SoftwareHsmProvider, SimulatorHsmProvider, HardwareHsmProvider};
 
 // ... existing code ... 
