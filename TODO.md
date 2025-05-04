@@ -52,11 +52,12 @@
 
 ### 5. Security Implementation (Priority: HIGH)
 
-- [-] HSM Integration (90% Complete)
+- [x] HSM Integration (100% Complete)
   - [x] Key management
   - [x] Secure storage
   - [x] Access policies
-  - [-] Audit logging (75% complete)
+  - [x] Audit logging (100% complete)
+  - [x] Bitcoin HSM provider
 
 - [-] Compliance Setup (80% Complete)
   - [x] Audit systems
@@ -459,11 +460,11 @@ Priority areas for development:
   - [x] Environment detection
   - [x] Component validation
 
-- [-] Linux Installation (85% Complete)
+- [x] Linux Installation (100% Complete)
   - [x] Bash script implementation
   - [x] Package management
-  - [-] Systemd service configuration (70% complete)
-  - [-] Environment detection (85% complete)
+  - [x] Systemd service configuration (100% complete)
+  - [x] Environment detection (100% complete)
 
 - [-] macOS Installation (75% Complete)
   - [-] Shell script implementation (85% complete)
@@ -521,7 +522,7 @@ Priority areas for development:
   - [-] Configuration mapping (50% complete)
   - [-] Persistent storage (45% complete)
 
-*Last updated: 2025-03-12*
+*Last updated: 2025-05-04*
 
 # Anya Core Development TODO
 
@@ -664,10 +665,24 @@ Security priority aligns with BIP standards for protocol implementation, with sp
 
 ## Last Updated
 
-March 16, 2025
+May 4, 2025
 
 ## Q2 2025 Priorities
 
 - [ ] Mobile HSM Integration
 - [ ] PSBTv2 Performance Optimization
 - [ ] Taproot Assets v0.2.5 Upgrade
+
+### 4. Deployment Setup (Priority: MEDIUM)
+
+- [x] Linux Installation (100% Complete)
+  - [x] Installation script
+  - [x] Service configuration
+  - [x] Uninstall procedure
+  - [x] Auto-installation script
+
+- [-] Container-based Deployment (55% Complete)
+  - [-] Docker container setup (65% complete)
+  - [-] Container orchestration (60% complete)
+  - [-] Configuration mapping (50% complete)
+  - [-] Persistent storage (45% complete)

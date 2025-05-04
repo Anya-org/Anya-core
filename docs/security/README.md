@@ -9,24 +9,33 @@ This document outlines the security architecture, practices, and guidelines for 
 ## Security Architecture
 
 ### Authentication
+
 - JWT-based authentication
 - Multi-factor authentication support
 - Session management
 - API key authentication for services
 
 ### Authorization
+
 - Role-based access control (RBAC)
 - Permission management
 - Resource-level access control
 - Scope-based authorization
 
 ### Data Protection
+
 - End-to-end encryption
 - At-rest encryption
 - Data masking
 - Secure key management
+- **Hardware Security Module (HSM) integration**
+  - **Multiple provider types (Software, Hardware, Simulator, Bitcoin)**
+  - **Bitcoin-specific key derivation and operations**
+  - **Comprehensive audit logging of all HSM operations**
+  - **Support for multiple key types (RSA, EC, AES, Ed25519)**
 
 ### Network Security
+
 - TLS 1.3 enforcement
 - Certificate management
 - Network segmentation
@@ -35,12 +44,14 @@ This document outlines the security architecture, practices, and guidelines for 
 ## Security Practices
 
 ### Password Management
+
 - Argon2id for password hashing
 - Password complexity requirements
 - Password rotation policies
 - Secure password reset flow
 
 ### API Security
+
 - Rate limiting
 - Input validation
 - Output encoding
@@ -48,12 +59,15 @@ This document outlines the security architecture, practices, and guidelines for 
 - API versioning
 
 ### Audit & Logging
+
 - Security event logging
 - Audit trails
 - Log retention policies
 - Log encryption
+- **HSM operation logging and verification**
 
 ### Secure Development
+
 - Secure coding guidelines
 - Code review requirements
 - Dependency management
@@ -62,6 +76,7 @@ This document outlines the security architecture, practices, and guidelines for 
 ## Security Controls
 
 ### Access Controls
+
 ```yaml
 minimum_password_length: 12
 password_complexity:
@@ -74,6 +89,7 @@ session_timeout: 3600  # 1 hour
 ```
 
 ### Rate Limiting
+
 ```yaml
 api_rate_limits:
   authenticated:
@@ -85,6 +101,7 @@ api_rate_limits:
 ```
 
 ### Security Headers
+
 ```yaml
 security_headers:
   X-Frame-Options: DENY
@@ -94,9 +111,31 @@ security_headers:
   Strict-Transport-Security: "max-age=31536000; includeSubDomains"
 ```
 
+### Hardware Security Module Configuration
+
+```yaml
+hsm:
+  providers:
+    - type: bitcoin
+      network: testnet
+      derivation_path: "m/84'/1'/0'/0/{index}"
+      use_taproot: true
+    - type: hardware
+      device_type: YubiHsm
+      connection_string: "127.0.0.1:12345"
+    - type: software
+      token_dir: ".tokens"
+      max_sessions: 10
+  audit:
+    enabled: true
+    storage_type: file
+    retention_days: 90
+```
+
 ## Incident Response
 
 ### Security Incident Handling
+
 1. Detection & Analysis
 2. Containment
 3. Eradication
@@ -104,19 +143,22 @@ security_headers:
 5. Post-Incident Analysis
 
 ### Emergency Contacts
-- Security Team: security@anya.io
-- Emergency Response: emergency@anya.io
-- Compliance Team: compliance@anya.io
+
+- Security Team: <security@anya.io>
+- Emergency Response: <emergency@anya.io>
+- Compliance Team: <compliance@anya.io>
 
 ## Compliance
 
 ### Standards
+
 - SOC 2 Type II
 - ISO 27001
 - GDPR
 - CCPA
 
 ### Security Assessments
+
 - Regular penetration testing
 - Vulnerability scanning
 - Security audits
@@ -125,32 +167,39 @@ security_headers:
 ## Security Tools
 
 ### Monitoring
+
 - Real-time security monitoring
 - Intrusion detection
 - Anomaly detection
 - Security analytics
 
 ### Prevention
+
 - Web application firewall
 - Anti-malware
 - File integrity monitoring
 - Container security
+- **Hardware Security Modules (HSMs)**
 
 ## Best Practices
 
 ### Development
+
 - Use secure dependencies
 - Regular security updates
 - Code signing
 - Secure build process
 
 ### Deployment
+
 - Infrastructure as Code
 - Immutable infrastructure
 - Secure configuration
 - Secrets management
+- **HSM integration for critical operations**
 
 ### Operations
+
 - Change management
 - Access reviews
 - Security training
@@ -159,15 +208,19 @@ security_headers:
 ## Security Roadmap
 
 ### Current Quarter
+
 - Implement MFA for all users
 - Enhanced audit logging
 - Security automation
 - Vulnerability management
+- **Complete HSM integration with multiple provider types**
 
 ### Next Quarter
+
 - Zero trust architecture
 - Enhanced encryption
 - Security orchestration
 - Advanced threat protection
+- **Extend HSM support for post-quantum algorithms**
 
-*Last updated: 2024-12-07*
+*Last updated: 2025-05-04*
