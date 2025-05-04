@@ -896,3 +896,94 @@ The script will:
 - Provide timing information for each stage
 
 Author: Bo The Big (botshelomokokoka@gmail.com)
+
+## Hardware Security Module (HSM) Integration
+
+Anya Core now includes comprehensive Hardware Security Module (HSM) integration with multiple provider types:
+
+- **Software HSM**: Secure key management for development and testing
+- **Simulator HSM**: Testing HSM functionality without hardware
+- **Hardware HSM**: Integration with physical HSM devices (YubiHSM, Ledger, etc.)
+- **Bitcoin HSM**: Specialized Bitcoin key management with hardware wallets
+
+### Key Features
+
+- **Multiple Key Types**: RSA, EC (secp256k1, P-256/384/521), Ed25519, AES
+- **Secure Operations**: Signing, verification, encryption, decryption
+- **Comprehensive Audit**: Full audit logging for all HSM operations
+- **Bitcoin Integration**: Support for Bitcoin-specific key derivation and operations
+- **Taproot Ready**: Full support for Taproot transactions and signatures
+
+### Usage Example
+
+```rust
+// Initialize HSM Manager
+let config = HsmConfig {
+    provider_type: HsmProviderType::BitcoinHsm,
+    bitcoin: BitcoinConfig {
+        network: BitcoinNetworkType::Testnet,
+        use_taproot: true,
+        ..Default::default()
+    },
+    ..Default::default()
+};
+
+let hsm_manager = HsmManager::new(config).await?;
+hsm_manager.initialize().await?;
+
+// Generate key
+let key_info = hsm_manager.generate_key_pair(
+    KeyType::Ec { curve: EcCurve::Secp256k1 },
+    "payment-key"
+).await?;
+
+// Sign data
+let message = "transaction data".as_bytes();
+let signature = hsm_manager.sign_data(
+    "payment-key",
+    message,
+    SignatureAlgorithm::EcdsaSha256
+).await?;
+```
+
+This implementation follows the Bitcoin Development Framework v2.5 requirements for HSM integration, with full compliance with the Hexagonal Architecture principles.
+
+## Installation
+
+### Linux Installation
+
+For automated installation on Linux systems, we provide comprehensive installation scripts:
+
+```bash
+# Quick automatic installation with system-optimization (NEW)
+sudo ./scripts/install/install-anya.sh
+
+# Installation with custom options
+sudo ./scripts/install/install-anya.sh --network=mainnet --type=full
+
+# Standard installation (recommended)
+sudo ./scripts/install/auto_install.sh
+
+# Advanced options
+sudo ./scripts/install/auto_install.sh --network=testnet --type=full --hardening=strict --auto-run
+
+# Manual installation steps
+sudo ./scripts/install/linux_install.sh    # Install dependencies and build
+sudo ./scripts/install/systemd_config.sh   # Configure systemd service
+
+# Uninstallation
+sudo ./scripts/install/uninstall.sh
+```
+
+The new system-optimized installation automatically:
+1. Analyzes your system capabilities (CPU, memory, disk, hardware security modules)
+2. Configures build parameters based on available resources
+3. Sets appropriate resource limits in systemd service
+4. Optimizes HSM configuration based on detected hardware
+5. Tunes performance parameters for your specific system
+
+For more installation options, run:
+
+```bash
+sudo ./scripts/install/install-anya.sh --help
+```
