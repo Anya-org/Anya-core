@@ -144,6 +144,66 @@ pub enum HsmError {
     /// HSM audit event error
     #[error("HSM audit event error: {0}")]
     HsmAuditEventError(String),
+    
+    /// Hardware failure
+    #[error("Hardware failure: {0}")]
+    HardwareFailure(String),
+    
+    /// Connection failure
+    #[error("Connection failure: {0}")]
+    ConnectionFailure(String),
+    
+    /// Unsupported hardware
+    #[error("Unsupported hardware: {0}")]
+    UnsupportedHardware(String),
+    
+    /// Hardware requires reset
+    #[error("Hardware requires reset: {0}")]
+    HardwareReset(String),
+    
+    /// Permission denied
+    #[error("Permission denied: {0}")]
+    PermissionDenied(String),
+    
+    /// PIN locked
+    #[error("PIN locked: {0}")]
+    PinLocked(String),
+    
+    /// Device locked
+    #[error("Device locked: {0}")]
+    DeviceLocked(String),
+    
+    /// Token not found
+    #[error("Token not found: {0}")]
+    TokenNotFound(String),
+    
+    /// Slot not found
+    #[error("Slot not found: {0}")]
+    SlotNotFound(String),
+    
+    /// Firmware error
+    #[error("Firmware error: {0}")]
+    FirmwareError(String),
+    
+    /// Invalid data
+    #[error("Invalid data: {0}")]
+    InvalidData(String),
+    
+    /// Unsupported key type
+    #[error("Unsupported key type")]
+    UnsupportedKeyType,
+    
+    /// Unsupported operation
+    #[error("Unsupported operation: {0}")]
+    UnsupportedOperation(String),
+    
+    /// HSM provider error
+    #[error("Provider error: {0}")]
+    ProviderError(String),
+    
+    /// Bitcoin specific error
+    #[error("Bitcoin error: {0}")]
+    BitcoinError(String),
 }
 
 /// HSM audit event type

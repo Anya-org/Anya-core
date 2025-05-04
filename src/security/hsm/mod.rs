@@ -7,6 +7,10 @@ pub mod providers {
     pub mod software;
     pub mod simulator;
     pub mod hardware;
+    
+    pub use software::SoftwareHsmProvider;
+    pub use simulator::SimulatorHsmProvider;
+    pub use hardware::HardwareHsmProvider;
 }
 
 use std::sync::Arc;

@@ -16,13 +16,19 @@ use crate::security::hsm::error::HsmError;
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum HsmProviderType {
     /// Software HSM (for development and testing)
-    SoftHsm,
+    SoftwareKeyStore,
     /// Cloud HSM (AWS, GCP, Azure)
     CloudHsm,
     /// Trusted Platform Module
     Tpm,
     /// PKCS#11 compliant HSM
     Pkcs11,
+    /// Simulator HSM
+    Simulator,
+    /// Hardware HSM (YubiHSM, Ledger, etc.)
+    Hardware,
+    /// Bitcoin HSM
+    Bitcoin,
     /// Custom HSM implementation
     Custom,
 }
@@ -385,12 +391,12 @@ pub trait HsmProvider: Send + Sync {
 /// Creates an HSM provider based on the configuration
 pub async fn create_hsm_provider(config: &HsmConfig) -> Result<Arc<dyn HsmProvider>, HsmError> {
     match config.provider_type {
-        HsmProviderType::SoftHsm => {
-            let provider = SoftHsmProvider::new(&config.softhsm)?;
+        HsmProviderType::SoftwareKeyStore => {
+            let provider = SoftHsmProvider::new(&config.software)?;
             Ok(Arc::new(provider))
         },
         HsmProviderType::CloudHsm => {
-            let provider = CloudHsmProvider::new(&config.cloudhsm)?;
+            let provider = CloudHsmProvider::new(&config.cloud)?;
             Ok(Arc::new(provider))
         },
         HsmProviderType::Tpm => {
@@ -400,6 +406,21 @@ pub async fn create_hsm_provider(config: &HsmConfig) -> Result<Arc<dyn HsmProvid
         HsmProviderType::Pkcs11 => {
             let provider = Pkcs11Provider::new(&config.pkcs11)?;
             Ok(Arc::new(provider))
+        },
+        HsmProviderType::Simulator => {
+            // Import the type from the module
+            use crate::security::hsm::providers::SimulatorHsmProvider;
+            let provider = SimulatorHsmProvider::new(&config.simulator)?;
+            Ok(Arc::new(provider))
+        },
+        HsmProviderType::Hardware => {
+            // Import the type from the module
+            use crate::security::hsm::providers::HardwareHsmProvider;
+            let provider = HardwareHsmProvider::new(&config.hardware)?;
+            Ok(Arc::new(provider))
+        },
+        HsmProviderType::Bitcoin => {
+            Err(HsmError::ProviderError("Bitcoin provider not implemented".to_string()))
         },
         HsmProviderType::Custom => {
             Err(HsmError::ProviderError("Custom provider not implemented".to_string()))
