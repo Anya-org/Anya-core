@@ -1,28 +1,56 @@
-[workspace]
-members = [
-  ".",
-  "core",
-  "mobile-sdk",
-  "dependencies",
-  "anya-bitcoin"
-]
-resolver = "2"
+[package]
+name = "anya-core"
+version = "0.2.0"
+edition = "2021"
+description = "Enterprise-grade Bitcoin Infrastructure Platform"
+authors = ["botshelomokoka@gmail.com"]
+license = "MIT"
+repository = "https://github.com/anya-org/anya-core"
 
-[workspace.dependencies]
-bitcoin = { version = "0.32.1", features = ["serde", "base64", "rand-std", "std"] }
-secp256k1 = { version = "0.28.1", features = ["global-context", "std", "rand-std"] }
-serde = { version = "1.0", features = ["derive"] }
-libp2p = "0.48.0"
-tokio = { version = "1.28.0", features = ["full"] }
-async-trait = "0.1.64"
-thiserror = "1.0.40"
-tracing = "0.1.37"
-tracing-subscriber = "0.3.16"
-hex = "0.4.3"
-log = "0.4.17"
-futures = "0.3.27"
-anyhow = "1.0.70"
-web5 = { git = "https://github.com/decentralized-identity/web5-rs.git", rev = "1c0ee2e", default-features = false }
+[dependencies]
+# API dependencies
+axum = "0.7.4"
+tower = "0.4.13"
+tower-http = { version = "0.5.0", features = ["cors", "trace"] }
+hyper = { version = "1.1.0", features = ["full"] }
+tokio = { version = "1.36.0", features = ["full"] }
 
-# Remove duplicate mobile entries
-# [AIS-3] Security: Enforce single source of truth
+# Bitcoin dependencies
+bitcoin = { version = "0.32.0", features = ["std", "serde", "rand", "bitcoinconsensus"] }
+secp256k1 = { version = "0.28.1", features = ["std", "serde", "rand"] }
+bdk = "0.28.2"
+miniscript = "11.0.0"
+
+# Web5/DID dependencies 
+did_resolver = "0.5.0"
+jsonwebtoken = "8.3.0"
+multibase = "0.9.1"
+multihash = "0.18.1"
+
+# Serialization/Deserialization
+serde = { version = "1.0.193", features = ["derive"] }
+serde_json = "1.0.108"
+
+# Error handling
+anyhow = "1.0.78"
+thiserror = "1.0.56"
+
+# Logging
+tracing = "0.1.40"
+tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
+
+# Utilities
+async-trait = "0.1.77"
+uuid = { version = "1.6.1", features = ["v4", "serde"] }
+chrono = { version = "0.4.31", features = ["serde"] }
+futures = "0.3.30"
+getrandom = "0.2.12"
+
+[dev-dependencies]
+mockall = "0.12.1"
+tokio-test = "0.4.3"
+tower-test = "0.4.0"
+
+[features]
+default = ["std"]
+std = []
