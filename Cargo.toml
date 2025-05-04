@@ -151,3 +151,21 @@ anyhow = { workspace = true }
 
 # CLI tools
 clap = { workspace = true }
+
+# Time handling
+chrono = { version = "0.4", features = ["serde"] }
+humantime_serde = "1.1"
+
+# Bitcoin dependencies
+bitcoin = { version = "0.30", features = ["rand", "serde"] }
+secp256k1 = { version = "0.27", features = ["rand", "recovery"] }
+miniscript = { version = "10.0", features = ["compiler"] }
+
+# Cryptography
+argon2 = { version = "0.5", features = ["std"] }
+chacha20poly1305 = "0.10"
+aes-gcm = "0.10"
+rand = "0.8"
+
+# Bitcoin Script 
+bitcoin-opcodes = { version = "0.3", package = "bitcoin_opcodes" }
