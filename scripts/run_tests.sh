@@ -97,18 +97,18 @@ echo "Running code coverage..."
 # Run code coverage if the COVERAGE environment variable is set
 if [ "$COVERAGE" = "true" ]; then
 	echo "Running code coverage..."
+	cargo tarpaulin --out Html
+else
+	echo "Skipping code coverage..."
+fi
+
 # Run benchmarks if the RUN_BENCHMARKS environment variable is set
 if [ "$RUN_BENCHMARKS" = "true" ]; then
 	echo "Running benchmarks..."
 	cargo bench
 else
 	echo "Skipping benchmarks..."
-fiping code coverage..."
 fi
-
-# Run benchmarks
-echo "Running benchmarks..."
-cargo bench
 
 # New module tests
 echo "Running identity tests..."
@@ -116,7 +116,6 @@ cargo test --test identity_tests
 echo "Running data storage tests..."
 cargo test --test data_storage_tests
 echo "Running interoperability tests..."
-echo "All tests completed successfully at $(date)!"
 echo "Running privacy tests..."
 cargo test --test privacy_tests
 

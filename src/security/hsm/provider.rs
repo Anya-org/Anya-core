@@ -385,21 +385,32 @@ pub trait HsmProvider: Send + Sync {
 /// Creates an HSM provider based on the configuration
 pub async fn create_hsm_provider(config: &HsmConfig) -> Result<Arc<dyn HsmProvider>, HsmError> {
     match config.provider_type {
-        HsmProviderType::SoftHsm => {
-            let provider = SoftHsmProvider::new(&config.softhsm)?;
-            Ok(Arc::new(provider))
+        HsmProviderType::SoftwareKeyStore => {
+            // Temporarily return error as implementation is not available
+            Err(HsmError::ProviderError("SoftwareKeyStore provider not implemented".to_string()))
         },
         HsmProviderType::CloudHsm => {
-            let provider = CloudHsmProvider::new(&config.cloudhsm)?;
-            Ok(Arc::new(provider))
+            // Temporarily return error as implementation is not available
+            Err(HsmError::ProviderError("CloudHsm provider not implemented".to_string()))
         },
         HsmProviderType::Tpm => {
-            let provider = TpmProvider::new(&config.tpm)?;
-            Ok(Arc::new(provider))
+            // Temporarily return error as implementation is not available
+            Err(HsmError::ProviderError("Tpm provider not implemented".to_string()))
         },
         HsmProviderType::Pkcs11 => {
-            let provider = Pkcs11Provider::new(&config.pkcs11)?;
-            Ok(Arc::new(provider))
+            // Temporarily return error as implementation is not available
+            Err(HsmError::ProviderError("Pkcs11 provider not implemented".to_string()))
+        },
+        HsmProviderType::Simulator => {
+            // Temporarily return error as implementation is not available
+            Err(HsmError::ProviderError("Simulator provider not implemented".to_string()))
+        },
+        HsmProviderType::Hardware => {
+            // Temporarily return error as implementation is not available
+            Err(HsmError::ProviderError("Hardware provider not implemented".to_string()))
+        },
+        HsmProviderType::Bitcoin => {
+            Err(HsmError::ProviderError("Bitcoin provider not implemented".to_string()))
         },
         HsmProviderType::Custom => {
             Err(HsmError::ProviderError("Custom provider not implemented".to_string()))

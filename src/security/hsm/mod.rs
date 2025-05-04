@@ -4,6 +4,12 @@ pub mod audit;
 pub mod config;
 pub mod operations;
 
+// The provider implementations were moved to a different location
+// or are planned for future implementation
+pub mod providers {
+    // Empty module for now - provider implementations will be added later
+}
+
 use std::sync::Arc;
 use tokio::sync::RwLock;
 use tracing::{info, error, debug, warn};
@@ -868,4 +874,16 @@ impl HsmBridge {
         self.provider.sign_psbt(psbt).await?;
         Ok(())
     }
-} 
+}
+
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+pub enum HsmType {
+    YubiHsm,
+    Ledger,
+    Simulator,
+}
+
+// Placeholder for provider implementations that will be added later
+// pub use providers::{SoftwareHsmProvider, SimulatorHsmProvider, HardwareHsmProvider};
+
+// ... existing code ... 
