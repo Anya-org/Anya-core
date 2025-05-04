@@ -116,7 +116,7 @@ pub enum HsmError {
     /// Bitcoin-specific error
     #[error("Bitcoin error: {0}")]
     BitcoinError(String),
-
+    
     /// Device communication error (for hardware devices)
     #[error("Device communication error: {0}")]
     DeviceCommunicationError(String),

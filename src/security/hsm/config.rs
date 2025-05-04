@@ -1,11 +1,11 @@
+use chrono::{DateTime, Utc};
+use serde::{Deserialize, Serialize};
 use std::error::Error;
-use serde::{Serialize, Deserialize};
 use std::path::PathBuf;
 use std::time::Duration;
-use chrono::{DateTime, Utc};
 
-use crate::security::hsm::provider::HsmProviderType;
 use crate::security::hsm::audit::AuditLoggerConfig;
+use crate::security::hsm::provider::HsmProviderType;
 
 /// Configuration for Hardware Security Module (HSM)
 /// [AIR-3][AIS-3][AIT-3][AIP-3][RES-3]
@@ -13,46 +13,46 @@ use crate::security::hsm::audit::AuditLoggerConfig;
 pub struct HsmConfig {
     /// General HSM settings
     pub general: GeneralConfig,
-    
+
     /// Provider type
     pub provider_type: HsmProviderType,
-    
+
     /// Audit logging enabled
     #[serde(default)]
     pub audit_enabled: bool,
-    
+
     /// SoftHSM configuration
     #[serde(default)]
     pub software: SoftHsmConfig,
-    
+
     /// Cloud HSM configuration
     #[serde(default)]
     pub cloud: CloudHsmConfig,
-    
+
     /// TPM configuration
     #[serde(default)]
     pub tpm: TpmConfig,
-    
+
     /// PKCS#11 configuration
     #[serde(default)]
     pub pkcs11: Pkcs11Config,
-    
+
     /// Simulator configuration
     #[serde(default)]
     pub simulator: SimulatorConfig,
-    
+
     /// Hardware HSM configuration
     #[serde(default)]
     pub hardware: HardwareConfig,
-    
+
     /// Bitcoin HSM configuration
     #[serde(default)]
     pub bitcoin: BitcoinConfig,
-    
+
     /// Configuration for audit logging
     #[serde(default)]
     pub audit: AuditLoggerConfig,
-    
+
     /// Key management settings
     #[serde(default)]
     pub key_management: KeyManagementConfig,
@@ -79,7 +79,7 @@ impl Default for HsmConfig {
 
 impl HsmConfig {
     /// Creates a new configuration for development environment
-    pub fn development() -> Self  -> Result<(), Box<dyn Error>> {
+    pub fn development() -> Self {
         Self {
             general: GeneralConfig {
                 enabled: true,
@@ -100,9 +100,9 @@ impl HsmConfig {
             ..Default::default()
         }
     }
-    
+
     /// Creates a new configuration for production environment
-    pub fn production() -> Self  -> Result<(), Box<dyn Error>> {
+    pub fn production() -> Self {
         Self {
             general: GeneralConfig {
                 enabled: true,
@@ -119,8 +119,10 @@ impl HsmConfig {
             audit: AuditLoggerConfig {
                 enabled: true,
                 storage_type: crate::security::hsm::audit::AuditStorageType::Database,
-                db_connection: Some("postgresql://user:password@localhost:5432/auditdb".to_string()),
-                retention_days: 365, // Keep logs for a year
+                db_connection: Some(
+                    "postgresql://user:password@localhost:5432/auditdb".to_string(),
+                ),
+                retention_days: 365,  // Keep logs for a year
                 log_sensitive: false, // No sensitive logging in prod
                 ..Default::default()
             },
@@ -139,17 +141,17 @@ impl HsmConfig {
 pub struct GeneralConfig {
     /// Whether HSM is enabled
     pub enabled: bool,
-    
+
     /// Log level
     pub log_level: LogLevel,
-    
+
     /// Timeout for HSM operations
     #[serde(with = "humantime_serde")]
     pub operation_timeout: Duration,
 }
 
 impl Default for GeneralConfig {
-    fn default() -> Self  -> Result<(), Box<dyn Error>> {
+    fn default() -> Self {
         Self {
             enabled: true,
             log_level: LogLevel::Info,
@@ -173,16 +175,16 @@ pub enum LogLevel {
 pub struct SoftHsmConfig {
     /// Directory for tokens
     pub token_dir: String,
-    
+
     /// Maximum sessions
     pub max_sessions: usize,
-    
+
     /// Encryption key
     pub encryption_key: Option<String>,
-    
+
     /// Lock timeout in seconds
     pub lock_timeout_seconds: u64,
-    
+
     /// Always use testnet for Bitcoin operations
     pub use_testnet: bool,
 }
@@ -204,16 +206,16 @@ impl Default for SoftHsmConfig {
 pub struct CloudHsmConfig {
     /// Cloud provider
     pub provider: CloudProvider,
-    
+
     /// Region
     pub region: String,
-    
+
     /// Access key
     pub access_key: Option<String>,
-    
+
     /// Secret key
     pub secret_key: Option<String>,
-    
+
     /// Key ID prefix
     pub key_id_prefix: Option<String>,
 }
@@ -246,7 +248,7 @@ pub enum CloudProvider {
 pub struct TpmConfig {
     /// Device path
     pub device_path: String,
-    
+
     /// Owner password
     pub owner_password: Option<String>,
 }
@@ -265,19 +267,19 @@ impl Default for TpmConfig {
 pub struct Pkcs11Config {
     /// Path to the PKCS#11 library
     pub library_path: String,
-    
+
     /// Slot ID to use
     pub slot_id: Option<u64>,
-    
+
     /// Token label
     pub token_label: Option<String>,
-    
+
     /// User PIN
     pub user_pin: Option<String>,
-    
+
     /// Maximum sessions
     pub max_sessions: usize,
-    
+
     /// Read-write sessions
     pub rw_session: bool,
 }
@@ -300,25 +302,25 @@ impl Default for Pkcs11Config {
 pub struct SimulatorConfig {
     /// Path for storing simulator data
     pub storage_path: String,
-    
+
     /// Simulate latency
     pub simulate_latency: bool,
-    
+
     /// Latency in milliseconds
     pub latency_ms: u64,
-    
+
     /// Simulate failures
     pub simulate_failures: bool,
-    
+
     /// Failure rate (0.0 - 1.0)
     pub failure_rate: f64,
-    
+
     /// PIN timeout in seconds
     pub pin_timeout_seconds: u64,
-    
+
     /// Max PIN attempts
     pub max_pin_attempts: u8,
-    
+
     /// Always use testnet for Bitcoin operations
     #[serde(default = "default_true")]
     pub use_testnet: bool,
@@ -361,19 +363,19 @@ pub enum HardwareDeviceType {
 pub struct HardwareConfig {
     /// Hardware device type
     pub device_type: HardwareDeviceType,
-    
+
     /// Device connection string (e.g., IP, USB path)
     pub connection_string: String,
-    
+
     /// Authentication key ID
     pub auth_key_id: Option<String>,
-    
+
     /// Password
     pub password: Option<String>,
-    
+
     /// Timeout in seconds
     pub timeout_seconds: u64,
-    
+
     /// Always use testnet for Bitcoin operations
     #[serde(default = "default_true")]
     pub use_testnet: bool,
@@ -417,28 +419,28 @@ pub struct BitcoinConfig {
     /// Bitcoin network type
     #[serde(default)]
     pub network: BitcoinNetworkType,
-    
+
     /// Bitcoin RPC URL
     pub rpc_url: Option<String>,
-    
+
     /// Bitcoin RPC username
     pub rpc_username: Option<String>,
-    
+
     /// Bitcoin RPC password
     pub rpc_password: Option<String>,
-    
+
     /// Derivation path template
     pub derivation_path_template: String,
-    
+
     /// Use segwit addresses
     pub use_segwit: bool,
-    
+
     /// Use taproot addresses
     pub use_taproot: bool,
-    
+
     /// Confirm transactions on device
     pub confirm_transactions: bool,
-    
+
     /// Fee rate in sats/vB
     pub default_fee_rate: u64,
 }
@@ -464,27 +466,27 @@ impl Default for BitcoinConfig {
 pub struct KeyManagementConfig {
     /// Whether to automatically rotate keys
     pub auto_rotation: bool,
-    
+
     /// Interval for key rotation
     #[serde(with = "humantime_serde")]
     pub rotation_interval: Duration,
-    
+
     /// Key naming pattern
     pub key_naming_pattern: String,
-    
+
     /// Whether to keep old key versions
     pub keep_old_versions: bool,
-    
+
     /// Maximum number of key versions to keep
     pub max_versions: usize,
-    
+
     /// Default key types
     #[serde(default)]
     pub default_key_types: DefaultKeyTypes,
 }
 
 impl Default for KeyManagementConfig {
-    fn default() -> Self  -> Result<(), Box<dyn Error>> {
+    fn default() -> Self {
         Self {
             auto_rotation: false,
             rotation_interval: Duration::from_secs(7776000), // 90 days
@@ -501,19 +503,19 @@ impl Default for KeyManagementConfig {
 pub struct DefaultKeyTypes {
     /// Default key type for signing
     pub signing: String,
-    
+
     /// Default key type for encryption
     pub encryption: String,
-    
+
     /// Default key type for key wrapping
     pub key_wrapping: String,
-    
+
     /// Default key type for authentication
     pub authentication: String,
 }
 
 impl Default for DefaultKeyTypes {
-    fn default() -> Self  -> Result<(), Box<dyn Error>> {
+    fn default() -> Self {
         Self {
             signing: "ec/p256".to_string(),
             encryption: "rsa/2048".to_string(),
@@ -521,4 +523,4 @@ impl Default for DefaultKeyTypes {
             authentication: "ec/p256".to_string(),
         }
     }
-} 
+}
