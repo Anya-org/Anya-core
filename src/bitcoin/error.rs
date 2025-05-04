@@ -9,20 +9,17 @@ use std::error::Error;
 // This module provides structured error types with comprehensive coverage
 // for all Bitcoin-related operations with good resilience characteristics.
 
-use thiserror::Error;
+use bitcoin::key::FromSliceError;
 use bitcoin::secp256k1;
 use bitcoin::{
-    taproot::TaprootBuilderError,
-    sighash::TaprootError,
-    sighash::P2wpkhError,
-    taproot::TaprootBuilder,
-    taproot::SigFromSliceError,
+    sighash::P2wpkhError, sighash::TaprootError, taproot::SigFromSliceError,
+    taproot::TaprootBuilder, taproot::TaprootBuilderError,
 };
 use hex::FromHexError;
-use bitcoin::key::FromSliceError;
+use thiserror::Error;
 
 /// Bitcoin operation errors
-#[derive(Error, Debug)]
+#[derive(Debug, Error)]
 pub enum BitcoinError {
     #[error("Failed to sign transaction")]
     SigningError,
@@ -113,61 +110,82 @@ pub enum BitcoinError {
 
     #[error("Invalid contract: {0}")]
     InvalidContract(String),
+
+    #[error("Wallet not found: {0}")]
+    WalletNotFound(String),
+
+    #[error("Invalid wallet: {0}")]
+    InvalidWallet(String),
+
+    #[error("Transaction error: {0}")]
+    TransactionError(String),
+
+    #[error("Storage error: {0}")]
+    StorageError(String),
+
+    #[error("Serialization error: {0}")]
+    SerializationError(String),
+
+    #[error("Authentication error: {0}")]
+    AuthenticationError(String),
+
+    #[error("Internal error: {0}")]
+    InternalError(String),
 }
 
 impl From<TaprootBuilderError> for BitcoinError {
-    fn from(err: TaprootBuilderError) -> Self  -> Result<(), Box<dyn Error>> {
+    fn from(err: TaprootBuilderError) -> Self {
         BitcoinError::TaprootBuilderError(err)
     }
 }
 
 impl From<TaprootError> for BitcoinError {
-    fn from(err: TaprootError) -> Self  -> Result<(), Box<dyn Error>> {
+    fn from(err: TaprootError) -> Self {
         BitcoinError::TaprootError(err.to_string())
     }
 }
 
 impl From<TaprootBuilder> for BitcoinError {
-    fn from(_: TaprootBuilder) -> Self  -> Result<(), Box<dyn Error>> {
+    fn from(_: TaprootBuilder) -> Self {
         BitcoinError::TaprootError("Taproot builder error".to_string())
     }
 }
 
 impl From<SigFromSliceError> for BitcoinError {
-    fn from(_: SigFromSliceError) -> Self  -> Result<(), Box<dyn Error>> {
+    fn from(_: SigFromSliceError) -> Self {
         BitcoinError::SignatureConversionError
     }
 }
 
 impl From<FromHexError> for BitcoinError {
-    fn from(_: FromHexError) -> Self  -> Result<(), Box<dyn Error>> {
+    fn from(_: FromHexError) -> Self {
         BitcoinError::HexDecodingError
     }
 }
 
 impl From<FromSliceError> for BitcoinError {
-    fn from(_: FromSliceError) -> Self  -> Result<(), Box<dyn Error>> {
+    fn from(_: FromSliceError) -> Self {
         BitcoinError::KeyConversionError
     }
 }
 
 impl From<secp256k1::Error> for BitcoinError {
-    fn from(error: secp256k1::Error) -> Self  -> Result<(), Box<dyn Error>> {
+    fn from(error: secp256k1::Error) -> Self {
         BitcoinError::Secp256k1Error(error.to_string())
     }
 }
 
 impl From<&str> for BitcoinError {
-    fn from(error: &str) -> Self  -> Result<(), Box<dyn Error>> {
+    fn from(error: &str) -> Self {
         BitcoinError::Other(error.to_string())
     }
 }
 
 impl From<P2wpkhError> for BitcoinError {
-    fn from(err: P2wpkhError) -> Self  -> Result<(), Box<dyn Error>> {
+    fn from(err: P2wpkhError) -> Self {
         BitcoinError::P2wpkhError(err.to_string())
     }
 }
 
 /// Result type for Bitcoin operations
-pub type BitcoinResult<T> = Result<T, BitcoinError>; 
+pub type BitcoinResult<T> = Result<T, BitcoinError>;
