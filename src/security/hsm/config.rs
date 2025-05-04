@@ -18,11 +18,11 @@ pub struct HsmConfig {
     
     /// Configuration for SoftHSM provider
     #[serde(default)]
-    pub softhsm: SoftHsmConfig,
+    pub software: SoftHsmConfig,
     
     /// Configuration for CloudHSM provider
     #[serde(default)]
-    pub cloudhsm: CloudHsmConfig,
+    pub cloud: CloudHsmConfig,
     
     /// Configuration for TPM provider
     #[serde(default)]
@@ -31,6 +31,18 @@ pub struct HsmConfig {
     /// Configuration for PKCS#11 provider
     #[serde(default)]
     pub pkcs11: Pkcs11Config,
+    
+    /// Configuration for Simulator provider
+    #[serde(default)]
+    pub simulator: SimulatorConfig,
+    
+    /// Configuration for Hardware HSM provider
+    #[serde(default)]
+    pub hardware: HardwareConfig,
+    
+    /// Configuration for Bitcoin HSM provider
+    #[serde(default)]
+    pub bitcoin: BitcoinConfig,
     
     /// Configuration for audit logging
     #[serde(default)]
@@ -42,14 +54,17 @@ pub struct HsmConfig {
 }
 
 impl Default for HsmConfig {
-    fn default() -> Self  -> Result<(), Box<dyn Error>> {
+    fn default() -> Self {
         Self {
             general: GeneralConfig::default(),
-            provider_type: HsmProviderType::SoftHsm,
-            softhsm: SoftHsmConfig::default(),
-            cloudhsm: CloudHsmConfig::default(),
+            provider_type: HsmProviderType::SoftwareKeyStore,
+            software: SoftHsmConfig::default(),
+            cloud: CloudHsmConfig::default(),
             tpm: TpmConfig::default(),
             pkcs11: Pkcs11Config::default(),
+            simulator: SimulatorConfig::default(),
+            hardware: HardwareConfig::default(),
+            bitcoin: BitcoinConfig::default(),
             audit: AuditLoggerConfig::default(),
             key_management: KeyManagementConfig::default(),
         }
@@ -58,7 +73,7 @@ impl Default for HsmConfig {
 
 impl HsmConfig {
     /// Creates a new configuration for development environment
-    pub fn development() -> Self  -> Result<(), Box<dyn Error>> {
+    pub fn development() -> Self {
         Self {
             general: GeneralConfig {
                 enabled: true,
@@ -80,7 +95,7 @@ impl HsmConfig {
     }
     
     /// Creates a new configuration for production environment
-    pub fn production() -> Self  -> Result<(), Box<dyn Error>> {
+    pub fn production() -> Self {
         Self {
             general: GeneralConfig {
                 enabled: true,
@@ -127,7 +142,7 @@ pub struct GeneralConfig {
 }
 
 impl Default for GeneralConfig {
-    fn default() -> Self  -> Result<(), Box<dyn Error>> {
+    fn default() -> Self {
         Self {
             enabled: true,
             log_level: LogLevel::Info,
@@ -166,7 +181,7 @@ pub struct SoftHsmConfig {
 }
 
 impl Default for SoftHsmConfig {
-    fn default() -> Self  -> Result<(), Box<dyn Error>> {
+    fn default() -> Self {
         Self {
             token_dir: "./hsm/tokens".to_string(),
             slot_id: 0,
@@ -200,7 +215,7 @@ pub struct CloudHsmConfig {
 }
 
 impl Default for CloudHsmConfig {
-    fn default() -> Self  -> Result<(), Box<dyn Error>> {
+    fn default() -> Self {
         Self {
             cluster_id: None,
             endpoint: None,
@@ -229,7 +244,7 @@ pub struct TpmConfig {
 }
 
 impl Default for TpmConfig {
-    fn default() -> Self  -> Result<(), Box<dyn Error>> {
+    fn default() -> Self {
         Self {
             device_path: "/dev/tpm0".to_string(),
             owner_password: None,
@@ -262,7 +277,7 @@ pub struct Pkcs11Config {
 }
 
 impl Default for Pkcs11Config {
-    fn default() -> Self  -> Result<(), Box<dyn Error>> {
+    fn default() -> Self {
         Self {
             library_path: "/usr/lib/libpkcs11.so".to_string(),
             slot_id: None,
@@ -299,7 +314,7 @@ pub struct KeyManagementConfig {
 }
 
 impl Default for KeyManagementConfig {
-    fn default() -> Self  -> Result<(), Box<dyn Error>> {
+    fn default() -> Self {
         Self {
             auto_rotation: false,
             rotation_interval: Duration::from_secs(7776000), // 90 days
@@ -328,7 +343,7 @@ pub struct DefaultKeyTypes {
 }
 
 impl Default for DefaultKeyTypes {
-    fn default() -> Self  -> Result<(), Box<dyn Error>> {
+    fn default() -> Self {
         Self {
             signing: "ec/p256".to_string(),
             encryption: "rsa/2048".to_string(),

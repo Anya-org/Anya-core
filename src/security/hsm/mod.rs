@@ -3,6 +3,11 @@ pub mod provider;
 pub mod audit;
 pub mod config;
 pub mod operations;
+pub mod providers {
+    pub mod software;
+    pub mod simulator;
+    pub mod hardware;
+}
 
 use std::sync::Arc;
 use tokio::sync::RwLock;
@@ -19,6 +24,15 @@ use self::config::HsmConfig;
 use self::provider::{HsmProvider, HsmProviderType};
 use self::audit::AuditLogger;
 use self::operations::{HsmOperation, OperationResult, OperationRequest};
+
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+pub enum HsmType {
+    YubiHsm,
+    Ledger,
+    Simulator,
+}
+
+pub use providers::{SoftwareHsmProvider, SimulatorHsmProvider, HardwareHsmProvider};
 
 /// HSM Manager that provides a unified interface to hardware security modules
 /// [AIR-3][AIS-3][AIT-3][AIP-3][RES-3]
