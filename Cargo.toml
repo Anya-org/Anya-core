@@ -70,7 +70,7 @@ edition = "2021"
 description = "Anya Bitcoin System"
 license = "MIT OR Apache-2.0"
 homepage = "https://example.com/anya"
-repository = "https://github.com/anya/core"
+repository = "https://github.com/anya-org/anya-core.git"
 rust-version = "1.70.0"
 default-run = "anya"
 
@@ -154,7 +154,7 @@ clap = { workspace = true }
 
 # Time handling
 chrono = { version = "0.4", features = ["serde"] }
-humantime_serde = "1.1"
+humantime-serde = "1.1"
 
 # Cryptography
 argon2 = { version = "0.5", features = ["std"] }
@@ -162,4 +162,4 @@ chacha20poly1305 = "0.10"
 aes-gcm = "0.10"
 
 # Bitcoin Script 
-bitcoin-opcodes = { version = "0.3", package = "bitcoin_opcodes" }
+bitcoin-opcodes = { version = "0.1.0", package = "bitcoin_opcodes" }
