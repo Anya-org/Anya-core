@@ -22,7 +22,7 @@ bdk = "0.28.2"
 miniscript = "11.0.0"
 
 # Web5/DID dependencies 
-did_resolver = "0.5.0"
+web5 = { git = "https://github.com/TBD54566975/web5-rs" }
 jsonwebtoken = "8.3.0"
 multibase = "0.9.1"
 multihash = "0.18.1"
@@ -45,6 +45,13 @@ uuid = { version = "1.6.1", features = ["v4", "serde"] }
 chrono = { version = "0.4.31", features = ["serde"] }
 futures = "0.3.30"
 getrandom = "0.2.12"
+humantime-serde = "1.1.1"
+rand = "0.8.5"
+argon2 = "0.5.0"
+base64 = "0.21"
+sha2 = "0.10"
+hex = "0.4"
+log = "0.4"
 
 [dev-dependencies]
 mockall = "0.12.1"
@@ -54,3 +61,4 @@ tower-test = "0.4.0"
 [features]
 default = ["std"]
 std = []
+bitcoin_integration = []

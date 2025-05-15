@@ -4,11 +4,15 @@ use std::error::Error;
 //! This module provides decentralized autonomous organization functionality,
 //! including governance, voting, and proposal management.
 
-use crate::AnyaResult;
-use crate::AnyaError;
-use std::collections::HashMap;
-use chrono::{DateTime, Utc};
-use serde_json;
+// DAO Module for Anya Core
+// Implements governance and voting mechanisms
+
+pub mod voting;
+pub mod legal;
+pub mod governance;
+
+// Re-export main components
+pub use governance::{DaoGovernance, DaoConfig, Proposal, ProposalStatus};
 
 pub mod types;
 pub use types::{Proposal, ProposalMetrics, RiskMetrics};
@@ -196,15 +200,11 @@ impl DAOManager {
             .count();
         
         metrics.insert("active_proposals".to_string(), serde_json::json!(active_proposals));
-        metrics.insert("passed_proposals".to_string(), serde_json::json!(passed_proposals));
-        metrics.insert("executed_proposals".to_string(), serde_json::json!(executed_proposals));
+        metrics.insert("passed_proposals".to_string(), serde_json!(passed_proposals));
+        metrics.insert("executed_proposals".to_string(), serde_json!(executed_proposals));
         
         metrics
     }
 }
-
-pub mod governance;
-pub mod legal;
-pub mod voting;
 
 pub use governance::{DaoGovernance, DaoLevel, GovernanceError}; 

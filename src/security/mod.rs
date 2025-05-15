@@ -82,6 +82,8 @@ pub use validation::ValidationResult;
 // [AIR-3][AIS-3][AIT-3][AIP-3][RES-3]
 
 use log::{debug, error, info, warn};
+use crate::security::hsm::provider::PublicKeyInfo;
+use crate::security::hsm::audit::AuditFilter;
 
 // Re-export HSM module
 pub mod hsm;
@@ -98,7 +100,6 @@ pub use hsm::{
         KeyGenParams,
         KeyType,
         KeyUsage,
-        PublicKeyInfo,
         KeyInfo,
         SigningAlgorithm,
         EncryptionAlgorithm,
@@ -106,7 +107,6 @@ pub use hsm::{
     error::HsmError,
     audit::{
         AuditEvent,
-        AuditFilter,
         AuditLoggerConfig,
         AuditStorageType,
     },

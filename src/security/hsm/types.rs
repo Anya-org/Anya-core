@@ -1,6 +1,8 @@
 use bitcoin::{Address, Network, Script, ScriptBuf, Transaction, XOnlyPublicKey, Txid, Psbt};
-use bitcoin::bip32::ExtendedPrivKey;
+use bitcoin::bip32::Xpriv; // Updated from ExtendedPrivKey
 use bitcoin::taproot::{TaprootBuilder, Signature as TaprootSignature};
+use bitcoin::hashes::*;
+use secp256k1::ecdsa::Signature;
 use chrono::{DateTime, Utc};
 use serde::{Serialize, Deserialize};
 use sha2::Sha256;

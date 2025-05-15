@@ -411,27 +411,17 @@ impl HsmProvider for SoftHsmProvider {
         Ok(())
     }
     
-    async fn generate_key(&self, key_type: KeyType) -> Result<KeyPair, HsmError> {
+    async fn generate_key(&self, params: KeyGenParams) -> Result<KeyPair, HsmError> {
         // Implementation needed
         Err(HsmError::NotImplemented)
     }
     
-    async fn sign(&self, key_id: &str, data: &[u8]) -> Result<Vec<u8>, HsmError> {
+    async fn sign(&self, key_id: &str, algorithm: SigningAlgorithm, data: &[u8]) -> Result<Vec<u8>, HsmError> {
         // Implementation needed
         Err(HsmError::NotImplemented)
     }
     
-    async fn verify(&self, key_id: &str, data: &[u8], signature: &[u8]) -> Result<bool, HsmError> {
-        // Implementation needed
-        Err(HsmError::NotImplemented)
-    }
-    
-    async fn encrypt(&self, key_id: &str, data: &[u8]) -> Result<Vec<u8>, HsmError> {
-        // Implementation needed
-        Err(HsmError::NotImplemented)
-    }
-    
-    async fn decrypt(&self, key_id: &str, encrypted_data: &[u8]) -> Result<Vec<u8>, HsmError> {
+    async fn verify(&self, key_id: &str, algorithm: SigningAlgorithm, data: &[u8], signature: &[u8]) -> Result<bool, HsmError> {
         // Implementation needed
         Err(HsmError::NotImplemented)
     }
@@ -669,27 +659,17 @@ impl HsmProvider for CloudHsmProvider {
         Err(HsmError::NotImplemented)
     }
     
-    async fn generate_key(&self, key_type: KeyType) -> Result<KeyPair, HsmError> {
+    async fn generate_key(&self, params: KeyGenParams) -> Result<KeyPair, HsmError> {
         // Implementation needed
         Err(HsmError::NotImplemented)
     }
     
-    async fn sign(&self, key_id: &str, data: &[u8]) -> Result<Vec<u8>, HsmError> {
+    async fn sign(&self, key_id: &str, algorithm: SigningAlgorithm, data: &[u8]) -> Result<Vec<u8>, HsmError> {
         // Implementation needed
         Err(HsmError::NotImplemented)
     }
     
-    async fn verify(&self, key_id: &str, data: &[u8], signature: &[u8]) -> Result<bool, HsmError> {
-        // Implementation needed
-        Err(HsmError::NotImplemented)
-    }
-    
-    async fn encrypt(&self, key_id: &str, data: &[u8]) -> Result<Vec<u8>, HsmError> {
-        // Implementation needed
-        Err(HsmError::NotImplemented)
-    }
-    
-    async fn decrypt(&self, key_id: &str, encrypted_data: &[u8]) -> Result<Vec<u8>, HsmError> {
+    async fn verify(&self, key_id: &str, algorithm: SigningAlgorithm, data: &[u8], signature: &[u8]) -> Result<bool, HsmError> {
         // Implementation needed
         Err(HsmError::NotImplemented)
     }
@@ -746,27 +726,17 @@ impl HsmProvider for TpmProvider {
         Err(HsmError::NotImplemented)
     }
     
-    async fn generate_key(&self, key_type: KeyType) -> Result<KeyPair, HsmError> {
+    async fn generate_key(&self, params: KeyGenParams) -> Result<KeyPair, HsmError> {
         // Implementation needed
         Err(HsmError::NotImplemented)
     }
     
-    async fn sign(&self, key_id: &str, data: &[u8]) -> Result<Vec<u8>, HsmError> {
+    async fn sign(&self, key_id: &str, algorithm: SigningAlgorithm, data: &[u8]) -> Result<Vec<u8>, HsmError> {
         // Implementation needed
         Err(HsmError::NotImplemented)
     }
     
-    async fn verify(&self, key_id: &str, data: &[u8], signature: &[u8]) -> Result<bool, HsmError> {
-        // Implementation needed
-        Err(HsmError::NotImplemented)
-    }
-    
-    async fn encrypt(&self, key_id: &str, data: &[u8]) -> Result<Vec<u8>, HsmError> {
-        // Implementation needed
-        Err(HsmError::NotImplemented)
-    }
-    
-    async fn decrypt(&self, key_id: &str, encrypted_data: &[u8]) -> Result<Vec<u8>, HsmError> {
+    async fn verify(&self, key_id: &str, algorithm: SigningAlgorithm, data: &[u8], signature: &[u8]) -> Result<bool, HsmError> {
         // Implementation needed
         Err(HsmError::NotImplemented)
     }
@@ -823,27 +793,17 @@ impl HsmProvider for Pkcs11Provider {
         Err(HsmError::NotImplemented)
     }
     
-    async fn generate_key(&self, key_type: KeyType) -> Result<KeyPair, HsmError> {
+    async fn generate_key(&self, params: KeyGenParams) -> Result<KeyPair, HsmError> {
         // Implementation needed
         Err(HsmError::NotImplemented)
     }
     
-    async fn sign(&self, key_id: &str, data: &[u8]) -> Result<Vec<u8>, HsmError> {
+    async fn sign(&self, key_id: &str, algorithm: SigningAlgorithm, data: &[u8]) -> Result<Vec<u8>, HsmError> {
         // Implementation needed
         Err(HsmError::NotImplemented)
     }
     
-    async fn verify(&self, key_id: &str, data: &[u8], signature: &[u8]) -> Result<bool, HsmError> {
-        // Implementation needed
-        Err(HsmError::NotImplemented)
-    }
-    
-    async fn encrypt(&self, key_id: &str, data: &[u8]) -> Result<Vec<u8>, HsmError> {
-        // Implementation needed
-        Err(HsmError::NotImplemented)
-    }
-    
-    async fn decrypt(&self, key_id: &str, encrypted_data: &[u8]) -> Result<Vec<u8>, HsmError> {
+    async fn verify(&self, key_id: &str, algorithm: SigningAlgorithm, data: &[u8], signature: &[u8]) -> Result<bool, HsmError> {
         // Implementation needed
         Err(HsmError::NotImplemented)
     }
@@ -878,6 +838,3 @@ impl HsmProvider for Pkcs11Provider {
         Err(HsmError::NotImplemented)
     }
 }
-
-// Use the original definitions of these types from earlier in the file
-// The duplicates have been removed to resolve compilation errors

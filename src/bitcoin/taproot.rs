@@ -90,3 +90,13 @@ impl TaprootValidator {
         Ok(())
     }
 } 
+
+//! Taproot validation implementation
+
+pub struct TaprootValidator;
+
+impl TaprootValidator {
+    pub fn new() -> Self {
+        Self
+    }
+}

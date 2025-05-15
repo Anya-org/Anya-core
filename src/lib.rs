@@ -40,6 +40,9 @@
 use std::error::Error;
 use std::fmt;
 use std::collections::HashMap;
+use std::sync::{Arc, Mutex};
+
+use crate::core::PrometheusMetrics;
 
 pub mod ml;
 pub mod web5;
@@ -52,6 +55,7 @@ pub mod security;
 pub mod enterprise;
 pub mod layer2;
 pub mod tools;
+pub mod tokenomics;
 
 /// Core error type for the Anya system
 #[derive(Debug)]
@@ -133,9 +137,13 @@ impl AnyaCore {
             None
         };
 
+        // Initialize metrics system
+        let metrics = Arc::new(Mutex::new(core::PrometheusMetrics::new()));
+        
         let web5_manager = if config.web5_config.enabled {
             Some(web5::Web5Manager::new(config.web5_config)
-                .with_metrics(metrics.clone())
+                // No metrics adapter in Web5Manager yet, so comment this out
+                // .with_metrics(metrics.clone())
                 .with_bip_compliance(vec![174, 341, 342])
                 .build()?)
         } else {
@@ -321,9 +329,6 @@ impl From<bitcoin::error::BitcoinError> for AnyaError {
     }
 }
 
-pub use bitcoin::protocol::{BitcoinProtocol, BPCLevel, BitcoinError};
-pub use dao::governance::{DaoGovernance, DaoLevel, GovernanceError};
-
 /// Protocol version
 pub const PROTOCOL_VERSION: &str = "2.0.0";
 
@@ -335,8 +340,7 @@ pub const BUILD_ID: &str = env!("CARGO_PKG_VERSION");
 
 /// Module re-exports for convenience
 pub mod prelude {
-    pub use crate::bitcoin::protocol::{BitcoinProtocol, BPCLevel};
-    pub use crate::bitcoin::taproot::TaprootValidator;
     pub use crate::dao::governance::{DaoGovernance, DaoLevel};
     pub use crate::tools::markdown::DocumentationValidator;
+    pub use crate::security::hsm::TaprootValidator;
 } 

@@ -1,3 +1,15 @@
+//! Bitcoin protocol implementation
+
+pub mod bitcoin_protocol {
+    pub struct BitcoinProtocol;
+
+    impl BitcoinProtocol {
+        pub fn new() -> Self {
+            Self
+        }
+    }
+}
+
 use std::error::Error;
 use bitcoin::{Transaction, Block, BlockHeader};
 use thiserror::Error;
@@ -30,11 +42,11 @@ pub enum BitcoinError {
 
 /// BPC-3 compliant Bitcoin protocol validator
 #[derive(Default)]
-pub struct BitcoinProtocol {
+pub struct BitcoinProtocolValidator {
     level: BPCLevel,
 }
 
-impl BitcoinProtocol {
+impl BitcoinProtocolValidator {
     /// Create a new protocol validator with specified compliance level
     pub fn new(level: BPCLevel) -> Self {
         Self { level }

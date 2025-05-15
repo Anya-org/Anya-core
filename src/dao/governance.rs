@@ -58,6 +58,54 @@ pub struct CrossChainImpact {
     risk_level: u8,
 }
 
+/// Bridge for cross-chain operations
+pub trait CrossChainBridge: Send + Sync {
+    fn estimate_impact(&self, impact: &CrossChainImpact) -> Result<()>;
+    fn execute_impact(&self, impact: &CrossChainImpact) -> Result<()>;
+}
+
+/// Security audit interface
+pub struct SecurityAudit {
+    last_audit_time: DateTime<Utc>,
+    passed: bool,
+}
+
+impl SecurityAudit {
+    pub fn new() -> Self {
+        Self {
+            last_audit_time: Utc::now(),
+            passed: true,
+        }
+    }
+
+    pub fn check(&self) -> Result<bool> {
+        Ok(self.passed)
+    }
+}
+
+/// Result of proposal execution
+pub struct ProposalExecution {
+    pub proposal_id: u64,
+    pub executed_at: DateTime<Utc>,
+    pub success: bool,
+    pub message: String,
+}
+
+/// Default implementation of CrossChainBridge
+pub struct DefaultCrossChainBridge {}
+
+impl CrossChainBridge for DefaultCrossChainBridge {
+    fn estimate_impact(&self, _impact: &CrossChainImpact) -> Result<()> {
+        // Simple implementation - just succeed for now
+        Ok(())
+    }
+    
+    fn execute_impact(&self, _impact: &CrossChainImpact) -> Result<()> {
+        // Simple implementation - just succeed for now
+        Ok(())
+    }
+}
+
 pub struct Voter {
     address: String,
     stake: u64,
@@ -66,6 +114,17 @@ pub struct Voter {
 }
 
 impl DaoGovernance {
+    /// Initialize DAO governance from config
+    pub async fn initialize(config: DaoConfig) -> Result<Arc<Self>> {
+        // Create default dependencies
+        let security_audit = Arc::new(SecurityAudit::new());
+        
+        // Create a default cross-chain bridge
+        let cross_chain_bridge = Arc::new(DefaultCrossChainBridge {});
+        
+        Ok(Arc::new(Self::new(config, cross_chain_bridge, security_audit)))
+    }
+    
     pub fn new(
         config: DaoConfig,
         cross_chain_bridge: Arc<dyn CrossChainBridge>,

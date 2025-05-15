@@ -1,14 +1,21 @@
 use std::error::Error;
+use std::sync::{Arc, Mutex};
+
+// Import DaoGovernance for core initialization
+use crate::dao::governance::DaoGovernance;
+
 // AIR-008: Core Module Integration
 // Integrates all Priority 1 implementations with auto-save functionality
 
-// Performance optimization module
+// Modules
 pub mod performance_optimization;
+pub mod metrics;
 
 // Re-exports
 pub use performance_optimization::PerformanceOptimizer;
 pub use performance_optimization::ResourceType;
 pub use performance_optimization::OptimizationStatus;
+pub use metrics::PrometheusMetrics;
 
 // ML agent checker module is in src/ml/agent_checker.rs
 // Re-export from ml module
@@ -170,6 +177,12 @@ pub struct AnyaCore {
 impl AnyaCore {
     // Core initialization with dependency injection
     pub async fn new(config: Config) -> Result<Self> {
+        // Import necessary adapter types
+        use crate::bitcoin::adapters::BitcoinAdapter;
+        use crate::web5::adapters::Web5Adapter;
+        use crate::ml::agent::MLAgentSystem;
+        use crate::tokenomics::engine::TokenomicsEngine;
+        
         let bitcoin = BitcoinAdapter::new(config.bitcoin).await?;
         let web5 = Web5Adapter::build(config.web5).await?;
         let agents = MLAgentSystem::init(config.ml).await?;
@@ -188,14 +201,18 @@ impl AnyaCore {
 
 // [AIR-3][BPC-3] Hexagonal RPC ports
 pub mod rpc_ports {
+    use std::sync::{Arc, Mutex};
+    use serde_json::Value as JsonValue;
+    use crate::core::metrics::PrometheusMetrics;
+
     pub trait BitcoinRpc {
-        async fn call_method(&self, method: &str, params: JsonValue) -> Result<JsonValue>;
-        async fn validate_response(&self, response: JsonValue) -> Result<()>;
+        async fn call_method(&self, method: &str, params: JsonValue) -> Result<JsonValue, Box<dyn std::error::Error>>;
+        async fn validate_response(&self, response: JsonValue) -> Result<(), Box<dyn std::error::Error>>;
     }
 
     pub trait LightningRpc {
-        async fn create_invoice(&self, amount_msat: u64, description: &str) -> Result<String>;
-        async fn verify_payment(&self, payment_hash: &str) -> Result<bool>;
+        async fn create_invoice(&self, amount_msat: u64, description: &str) -> Result<String, Box<dyn std::error::Error>>;
+        async fn verify_payment(&self, payment_hash: &str) -> Result<bool, Box<dyn std::error::Error>>;
     }
 
     // BDF v2.5 compliant adapter
