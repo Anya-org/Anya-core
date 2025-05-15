@@ -259,6 +259,8 @@ pub enum HsmOperation {
     ExportPublicKey,
     /// List keys
     ListKeys,
+    /// Get status
+    GetStatus,
     /// Delete key
     DeleteKey,
     /// Custom operation

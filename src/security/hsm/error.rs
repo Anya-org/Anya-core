@@ -165,6 +165,14 @@ pub enum HsmError {
     /// Operation not supported
     #[error("Operation not supported: {0}")]
     OperationNotSupported(String),
+
+    /// Audit storage error
+    #[error("Audit storage error: {0}")]
+    AuditStorageError(String),
+
+    /// HSM audit event error
+    #[error("HSM audit event error: {0}")]
+    HsmAuditEventError(String),
 }
 
 // This From implementation is not needed as Rust automatically implements From<T> for T

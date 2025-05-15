@@ -14,20 +14,28 @@ pub struct ValidationResult {
 
 impl ValidationResult {
     /// Create a new validation result
-    pub fn new(is_valid: bool, message: String) -> Self  -> Result<(), Box<dyn Error>> {
+    pub fn new(is_valid: bool, message: String) -> Self {
         Self {
             is_valid,
             message,
         }
     }
     
-    /// Create a valid result
-    pub fn valid(message: String) -> Self  -> Result<(), Box<dyn Error>> {
-        Self::new(true, message)
+    /// Create a valid validation result
+    pub fn valid(message: String) -> Self {
+        Self {
+            is_valid: true,
+            message,
+        }
     }
     
-    /// Create an invalid result
-    pub fn invalid(message: String) -> Self  -> Result<(), Box<dyn Error>> {
-        Self::new(false, message)
+    /// Create an invalid validation result
+    pub fn invalid(message: String) -> Self {
+        Self {
+            is_valid: false,
+            message,
+        }
     }
+    
+    // Methods already defined above
 } 

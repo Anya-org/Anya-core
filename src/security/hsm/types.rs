@@ -488,60 +488,71 @@ pub struct KeyGenParams {
     pub label: String,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct CoreWrapper<T: Serialize + DeserializeOwned> {
+#[derive(Debug, Clone)]
+pub struct CoreWrapper<T> {
     // Add fields as needed
+    pub data: Option<T>
 }
 
-impl HsmKeyPath {
-    /// Create a new key path from components and hardened flags
-    pub fn new(components: Vec<u32>, _hardened: Vec<bool>) -> Self {
-        assert_eq!(components.len(), _hardened.len());
-        Self { components, hardened: _hardened }
+// Implement Serialize and Deserialize manually to avoid generic type parameter issues
+impl<T> Serialize for CoreWrapper<T> 
+where 
+    T: Serialize
+{
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        let mut map = serializer.serialize_struct("CoreWrapper", 1)?;
+        if let Some(data) = &self.data {
+            map.serialize_field("data", data)?;
+        }
+        map.end()
     }
-    
-    /// Parse a key path string like "m/44'/0'/0'/0/0"
-    pub fn from_string(_s: &str) -> Result<Self, Box<dyn Error>> {
-        if !_s.starts_with("m/") {
-            return Err(format!("Invalid key path: {}", _s).into());
+}
+
+impl<'de, T> Deserialize<'de> for CoreWrapper<T>
+where
+    T: Deserialize<'de>
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        struct CoreWrapperVisitor<T> {
+            phantom: std::marker::PhantomData<T>,
         }
         
-        let _s = &_s[2..]; // Skip the "m/"
-        let mut components = Vec::new();
-        let mut _hardened = Vec::new();
-        
-        for part in _s.split('/') {
-            if part.is_empty() {
-                continue;
+        impl<'de, T> serde::de::Visitor<'de> for CoreWrapperVisitor<T>
+        where
+            T: Deserialize<'de>,
+        {
+            type Value = CoreWrapper<T>;
+            
+            fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
+                formatter.write_str("a CoreWrapper")
             }
             
-            let is_hardened = part.ends_with('\'') || part.ends_with('h');
-            let num_str = if is_hardened {
-                &part[..part.len() - 1]
-            } else {
-                part
-            };
-            
-            let num = num_str.parse::<u32>()?;
-            components.push(num);
-            _hardened.push(is_hardened);
-        }
-        
-        Ok(Self::new(components, _hardened))
-    }
-    
-    /// Format the key path as a string
-    pub fn to_string(&self) -> String {
-        let mut result = String::from("m");
-        
-        for i in 0..self.components.len() {
-            result.push('/');
-            result.push_str(&self.components[i].to_string());
-            if self.hardened[i] {
-                result.push('\'');
+            fn visit_map<V>(self, mut map: V) -> Result<CoreWrapper<T>, V::Error>
+            where
+                V: serde::de::MapAccess<'de>,
+            {
+                let mut data = None;
+                
+                while let Some(key) = map.next_key::<String>()? {
+                    if key == "data" {
+                        data = Some(map.next_value()?); 
+                    } else {
+                        let _ = map.next_value::<serde::de::IgnoredAny>()?;
+                    }
+                }
+                
+                Ok(CoreWrapper { data })
             }
         }
         
-        result
+        deserializer.deserialize_map(CoreWrapperVisitor {
+            phantom: std::marker::PhantomData,
+        })
     }
 }

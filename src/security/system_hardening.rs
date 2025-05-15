@@ -78,25 +78,30 @@ impl SystemHardening {
     }
     
     /// Record an input and check if auto-save is needed
-    fn record_input_and_check_save(&self) {
+    fn record_input_and_check_save(&self) -> Result<(), String> {
         let mut counter = self.input_counter.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         *counter += 1;
         
         // Auto-save every Nth input (e.g., every 20th input)
         if *counter % self.auto_save_frequency == 0 {
-            self.save_state_to_memory();
-            println!("Auto-saved security configuration after {} changes", *counter);
+            match self.save_state_to_memory() {
+                Ok(_) => println!("Auto-saved security configuration after {} changes", *counter),
+                Err(e) => eprintln!("Failed to auto-save security configuration: {}", e),
+            }
         }
+        
+        Ok(())
     }
     
     /// Save the current state to memory (no file writing)
-    fn save_state_to_memory(&self) {
+    fn save_state_to_memory(&self) -> Result<(), String> {
         // In a real implementation, this would create a backup of security configurations
         // For this implementation, we're just keeping everything in memory
         let configs = self.configs.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         println!("In-memory security configuration snapshot created: {} components", configs.len());
         
         // Here you would normally serialize the state and store it
+        Ok(())
     }
     
     /// Apply security hardening configuration for a component

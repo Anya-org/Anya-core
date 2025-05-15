@@ -27,12 +27,12 @@ pub struct LightningConfig {
 }
 
 impl Default for LightningConfig {
-    fn default() -> Result<Self, Box<dyn Error>> {
-        Ok(Self {
+    fn default() -> Self {
+        Self {
             rpc_url: None,
             network: None,
             max_fee_rate: None,
-        })
+        }
     }
 }
 
@@ -56,7 +56,7 @@ impl LightningClient {
         if let Some(protocol) = &self.protocol {
             protocol.initialize().await
         } else {
-            Err(AnyaError::Generic("Lightning protocol not initialized".to_string()))
+            Err(Box::new(std::io::Error::new(std::io::ErrorKind::Other, "Lightning protocol not initialized")))
         }
     }
 }

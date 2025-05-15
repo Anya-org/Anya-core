@@ -22,6 +22,11 @@ pub struct DaoGovernance {
     config: DaoConfig,
     cross_chain_bridge: Arc<dyn CrossChainBridge>,
     security_audit: Arc<SecurityAudit>,
+    // Added fields to match what's used in verify_dao3_compliance
+    quadratic_voting_enabled: bool,
+    delegated_authority: DelegationConfig,
+    cross_chain_governance: Option<CrossChainGovernanceConfig>,
+    legal_wrappers: LegalWrappers,
 }
 
 pub struct DaoConfig {
@@ -44,12 +49,37 @@ pub struct Proposal {
     cross_chain_impact: Option<CrossChainImpact>,
 }
 
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub enum ProposalStatus {
     Pending,
     Active,
     Passed,
     Rejected,
     Executed,
+}
+
+pub struct DelegationConfig {
+    active: bool,
+    max_delegates: u32,
+    delegation_threshold: u64,
+}
+
+pub struct CrossChainGovernanceConfig {
+    enabled: bool,
+    supported_chains: Vec<String>,
+    bridge_contract: String,
+}
+
+pub struct LegalWrappers {
+    is_dao_recognized: bool,
+    jurisdiction: String,
+    legal_entity_type: String,
+}
+
+impl LegalWrappers {
+    pub fn is_implemented(&self) -> bool {
+        !self.jurisdiction.is_empty() && !self.legal_entity_type.is_empty() && self.is_dao_recognized
+    }
 }
 
 pub struct CrossChainImpact {

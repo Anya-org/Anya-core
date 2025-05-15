@@ -866,23 +866,4 @@ impl From<argon2::Error> for Argon2Error {
     }
 }
 
-impl SecurityManager {
-    pub fn gpu_resistant_derive(&self, mnemonic: &str) -> Result<Xpriv, Box<dyn Error>> {
-        use argon2::{Algorithm, Argon2, Params, Version};
-        use bitcoin::Network;
-        
-        let salt = "ANYA_CORE_SALT_V2";
-        
-        let params = Params::new(15000, 2, 1, Some(32))
-            .map_err(|e| -> Box<dyn std::error::Error> { Box::new(Argon2Error::Error(e.to_string())) })?;
-            
-        let argon2 = Argon2::new(Algorithm::Argon2id, Version::V0x13, params);
-        
-        let mut output_key = [0u8; 32]; // 32-byte key for BIP32
-        argon2.hash_password_into(mnemonic.as_bytes(), salt.as_bytes(), &mut output_key)
-            .map_err(|e| -> Box<dyn std::error::Error> { Box::new(Argon2Error::Error(e.to_string())) })?;
-            
-        Xpriv::new_master(Network::Bitcoin, &output_key)
-            .map_err(|e| -> Box<dyn std::error::Error> { Box::new(e) })
-    }
 }
