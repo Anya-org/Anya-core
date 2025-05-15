@@ -13,22 +13,22 @@ pub struct HybridAnalyticsEngine {
 
 impl HybridAnalyticsEngine {
     /// Create a new hybrid analytics engine
-    pub fn new(config: &BobConfig) -> Self  -> Result<(), Box<dyn Error>> {
-        Self {
+    pub fn new(config: &BobConfig) -> Result<Self, Box<dyn Error>> {
+        Ok(Self {
             config: config.clone(),
-        }
+        })
     }
     
     /// Collect metrics from the BOB network
-    pub fn collect_metrics(&self) -> Metrics  -> Result<(), Box<dyn Error>> {
+    pub fn collect_metrics(&self) -> Result<Metrics, Box<dyn Error>> {
         // In a real implementation, this would collect metrics from the BOB network
         // For now, we'll just return dummy metrics
-        Metrics {
+        Ok(Metrics {
             transactions_per_second: 10.0,
             block_time: 15.0,
             active_validators: 5,
             network_usage: HashMap::new(),
-        }
+        })
     }
 }
 

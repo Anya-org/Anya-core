@@ -9,23 +9,21 @@ use std::error::Error;
 // This module provides Bitcoin layer 2 functionality with strong security
 // and privacy protections for advanced BOB operations.
 
-//! # BOB Layer 2 Integration
-//!
-//! This module provides integration with the BOB (Bitcoin Optimistic Blockchain) Layer 2 solution.
-//! BOB is a hybrid L2 that combines the security of Bitcoin with the versatility of Ethereum's EVM.
-//!
-//! ## Features
-//!
-//! - Bitcoin relay monitoring and interaction
-//! - EVM-compatible smart contract support
-//! - Cross-layer transaction handling
-//! - BitVM integration for optimistic rollups
-//! - Hybrid analytics for cross-layer operations
+// BOB Layer 2 Integration
+//
+// This module provides integration with the BOB (Bitcoin Optimistic Blockchain) Layer 2 solution.
+// BOB is a hybrid L2 that combines the security of Bitcoin with the versatility of Ethereum's EVM.
+//
+// Features
+//
+// - Bitcoin relay monitoring and interaction
+// - EVM-compatible smart contract support
+// - Cross-layer transaction handling
+// - BitVM integration for optimistic rollups
+// - Hybrid analytics for cross-layer operations
 
 use std::sync::{Arc, Mutex};
-use std::time::Duration;
 use std::collections::HashMap;
-use chrono::{DateTime, Utc};
 use thiserror::Error;
 
 // Internal imports

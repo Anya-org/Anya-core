@@ -372,7 +372,7 @@ pub struct HsmAuditEvent {
 }
 
 /// HSM key path for hardware modules
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct HsmKeyPath {
     /// Path components
     pub components: Vec<u32>,
@@ -440,7 +440,7 @@ impl fmt::Display for HsmKeyPath {
 }
 
 /// Merkle proof for blockchain validation
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MerkleProof {
     /// Hash path
     pub path: Vec<[u8; 32]>,
@@ -449,7 +449,7 @@ pub struct MerkleProof {
 }
 
 /// Repudiation proof for mobile SDKs
-#[derive(Debug)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RepudiationProof {
     /// Partial signature
     pub partial_sig: Signature,
@@ -458,7 +458,7 @@ pub struct RepudiationProof {
 }
 
 /// User type for security operations
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum HsmType {
     /// YubiHSM hardware device
     YubiHsm,
@@ -490,4 +490,62 @@ pub struct KeyGenParams {
     pub key_usage: Vec<KeyUsage>,
     /// Label for the key
     pub label: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CoreWrapper<T: Serialize + DeserializeOwned> {
+    // Add fields as needed
+}
+
+impl HsmKeyPath {
+    /// Create a new key path from components and hardened flags
+    pub fn new(components: Vec<u32>, _hardened: Vec<bool>) -> Self {
+        assert_eq!(components.len(), _hardened.len());
+        Self { components, hardened: _hardened }
+    }
+    
+    /// Parse a key path string like "m/44'/0'/0'/0/0"
+    pub fn from_string(_s: &str) -> Result<Self, Box<dyn Error>> {
+        if !_s.starts_with("m/") {
+            return Err(format!("Invalid key path: {}", _s).into());
+        }
+        
+        let _s = &_s[2..]; // Skip the "m/"
+        let mut components = Vec::new();
+        let mut _hardened = Vec::new();
+        
+        for part in _s.split('/') {
+            if part.is_empty() {
+                continue;
+            }
+            
+            let is_hardened = part.ends_with('\'') || part.ends_with('h');
+            let num_str = if is_hardened {
+                &part[..part.len() - 1]
+            } else {
+                part
+            };
+            
+            let num = num_str.parse::<u32>()?;
+            components.push(num);
+            _hardened.push(is_hardened);
+        }
+        
+        Ok(Self::new(components, _hardened))
+    }
+    
+    /// Format the key path as a string
+    pub fn to_string(&self) -> String {
+        let mut result = String::from("m");
+        
+        for i in 0..self.components.len() {
+            result.push('/');
+            result.push_str(&self.components[i].to_string());
+            if self.hardened[i] {
+                result.push('\'');
+            }
+        }
+        
+        result
+    }
 }

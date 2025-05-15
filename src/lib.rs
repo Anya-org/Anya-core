@@ -42,11 +42,8 @@ use std::fmt;
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 
-use crate::core::PrometheusMetrics;
-
 pub mod ml;
 pub mod web5;
-pub mod bitcoin;
 pub mod dao;
 pub mod extensions;
 pub mod config;
@@ -137,13 +134,8 @@ impl AnyaCore {
             None
         };
 
-        // Initialize metrics system
-        let metrics = Arc::new(Mutex::new(core::PrometheusMetrics::new()));
-        
         let web5_manager = if config.web5_config.enabled {
             Some(web5::Web5Manager::new(config.web5_config)
-                // No metrics adapter in Web5Manager yet, so comment this out
-                // .with_metrics(metrics.clone())
                 .with_bip_compliance(vec![174, 341, 342])
                 .build()?)
         } else {
@@ -343,6 +335,5 @@ pub mod prelude {
 } 
 
 pub mod bitcoin {
-    pub mod protocol;
     pub mod taproot;
 }

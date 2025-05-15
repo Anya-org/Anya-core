@@ -47,16 +47,14 @@ use std::collections::{HashMap, HashSet};
 use std::sync::{Arc, Mutex, RwLock};
 use tokio::spawn;
 use tracing::{debug, error, info};
+use bitcoin::blockdata::block::BlockHeader;
+use log::debug;
 
 // Import HSM provider types
 use self::config::HsmConfig;
 use self::audit::AuditLogger;
 use self::operations::{HsmOperation, OperationRequest, OperationResult};
 use self::provider::{HsmProvider, HsmProviderType, HsmProviderStatus};
-
-// Types are already imported via pub use types::*; at the top level
-// No need for specific imports here that would cause shadowing
-
 
 /// HSM Manager that provides a unified interface to hardware security modules
 /// [AIR-3][AIS-3][AIT-3][AIP-3][RES-3]
@@ -741,16 +739,16 @@ impl SecurityManager {
         let salt = "ANYA_CORE_SALT_V2";
         
         let params = Params::new(15000, 2, 1, Some(32))
-            .map_err(|e| Box::new(e) as Box<dyn Error>)?;
+            .map_err(|e| -> Box<dyn std::error::Error> { Box::new(e) })?;
             
         let argon2 = Argon2::new(Algorithm::Argon2id, Version::V0x13, params);
         
         let mut output_key = [0u8; 32]; // 32-byte key for BIP32
         argon2.hash_password_into(mnemonic.as_bytes(), salt.as_bytes(), &mut output_key)
-            .map_err(|e| Box::new(e) as Box<dyn Error>)?;
+            .map_err(|e| -> Box<dyn std::error::Error> { Box::new(Argon2Error::Error(e.to_string())) })?;
             
         Xpriv::new_master(Network::Bitcoin, &output_key)
-            .map_err(|e| Box::new(e) as Box<dyn Error>)
+            .map_err(|e| -> Box<dyn std::error::Error> { Box::new(e) })
     }
 }
 
@@ -831,4 +829,42 @@ pub enum HsmType {
     Simulator,
 }
 
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct CoreWrapper<T: serde::Serialize + serde::de::DeserializeOwned> {
+    inner: T,
+}
+
 // ... existing code ...
+
+#[derive(Debug, thiserror::Error)]
+pub enum Argon2Error {
+    #[error("Argon2 error: {0}")]
+    Error(String),
+}
+
+impl From<argon2::Error> for Argon2Error {
+    fn from(e: argon2::Error) -> Self {
+        Argon2Error::Error(e.to_string())
+    }
+}
+
+impl SecurityManager {
+    pub fn gpu_resistant_derive(&self, mnemonic: &str) -> Result<Xpriv, Box<dyn Error>> {
+        use argon2::{Algorithm, Argon2, Params, Version};
+        use bitcoin::Network;
+        
+        let salt = "ANYA_CORE_SALT_V2";
+        
+        let params = Params::new(15000, 2, 1, Some(32))
+            .map_err(|e| -> Box<dyn std::error::Error> { Box::new(e) })?;
+            
+        let argon2 = Argon2::new(Algorithm::Argon2id, Version::V0x13, params);
+        
+        let mut output_key = [0u8; 32]; // 32-byte key for BIP32
+        argon2.hash_password_into(mnemonic.as_bytes(), salt.as_bytes(), &mut output_key)
+            .map_err(|e| -> Box<dyn std::error::Error> { Box::new(Argon2Error::Error(e.to_string())) })?;
+            
+        Xpriv::new_master(Network::Bitcoin, &output_key)
+            .map_err(|e| -> Box<dyn std::error::Error> { Box::new(e) })
+    }
+}

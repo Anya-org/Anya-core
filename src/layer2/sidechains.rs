@@ -15,42 +15,42 @@ pub struct SidechainsProtocol {
 
 impl SidechainsProtocol {
     /// Create a new sidechains protocol
-    pub fn new() -> Self  -> Result<(), Box<dyn Error>> {
-        Self {
+    pub fn new() -> Result<Self, Box<dyn Error>> {
+        Ok(Self {
             initialized: false,
             connected: false,
-        }
+        })
     }
 }
 
 #[async_trait]
 impl Layer2Protocol for SidechainsProtocol {
-    async fn initialize(&self) -> AnyaResult<()>  -> Result<(), Box<dyn Error>> {
+    async fn initialize(&self) -> Result<(), Box<dyn Error>> {
         // In a real implementation, this would initialize the sidechains protocol
         Ok(())
     }
     
-    async fn connect(&self) -> AnyaResult<()>  -> Result<(), Box<dyn Error>> {
+    async fn connect(&self) -> Result<(), Box<dyn Error>> {
         // In a real implementation, this would connect to the sidechains network
         Ok(())
     }
     
-    async fn disconnect(&self) -> AnyaResult<()>  -> Result<(), Box<dyn Error>> {
+    async fn disconnect(&self) -> Result<(), Box<dyn Error>> {
         // In a real implementation, this would disconnect from the sidechains network
         Ok(())
     }
     
-    async fn submit_transaction(&self, _tx: &[u8]) -> AnyaResult<String>  -> Result<(), Box<dyn Error>> {
+    async fn submit_transaction(&self, _tx: &[u8]) -> Result<String, Box<dyn Error>> {
         // In a real implementation, this would submit a transaction to the sidechains network
         Ok("tx_id".to_string())
     }
     
-    async fn get_transaction_status(&self, _tx_id: &str) -> AnyaResult<TransactionStatus>  -> Result<(), Box<dyn Error>> {
+    async fn get_transaction_status(&self, _tx_id: &str) -> Result<TransactionStatus, Box<dyn Error>> {
         // In a real implementation, this would get the transaction status from the sidechains network
         Ok(TransactionStatus::Confirmed)
     }
     
-    async fn get_state(&self) -> AnyaResult<ProtocolState>  -> Result<(), Box<dyn Error>> {
+    async fn get_state(&self) -> Result<ProtocolState, Box<dyn Error>> {
         // In a real implementation, this would get the state of the sidechains protocol
         Ok(ProtocolState {
             initialized: self.initialized,
@@ -61,17 +61,17 @@ impl Layer2Protocol for SidechainsProtocol {
         })
     }
     
-    async fn sync_state(&self) -> AnyaResult<()>  -> Result<(), Box<dyn Error>> {
+    async fn sync_state(&self) -> Result<(), Box<dyn Error>> {
         // In a real implementation, this would synchronize the state with the sidechains network
         Ok(())
     }
     
-    async fn issue_asset(&self, _params: AssetParams) -> AnyaResult<String>  -> Result<(), Box<dyn Error>> {
+    async fn issue_asset(&self, _params: AssetParams) -> Result<String, Box<dyn Error>> {
         // In a real implementation, this would issue a new asset on the sidechains network
         Ok("asset_id".to_string())
     }
     
-    async fn transfer_asset(&self, _transfer: AssetTransfer) -> AnyaResult<TransferResult>  -> Result<(), Box<dyn Error>> {
+    async fn transfer_asset(&self, _transfer: AssetTransfer) -> Result<TransferResult, Box<dyn Error>> {
         // In a real implementation, this would transfer an asset on the sidechains network
         Ok(TransferResult {
             tx_id: "tx_id".to_string(),
@@ -81,12 +81,12 @@ impl Layer2Protocol for SidechainsProtocol {
         })
     }
     
-    async fn verify_proof(&self, _proof: &Proof) -> AnyaResult<VerificationResult>  -> Result<(), Box<dyn Error>> {
+    async fn verify_proof(&self, _proof: &Proof) -> Result<VerificationResult, Box<dyn Error>> {
         // In a real implementation, this would verify a proof on the sidechains network
         Ok(VerificationResult::Valid)
     }
     
-    async fn validate_state(&self, _state: &ProtocolState) -> AnyaResult<ValidationResult>  -> Result<(), Box<dyn Error>> {
+    async fn validate_state(&self, _state: &ProtocolState) -> Result<ValidationResult, Box<dyn Error>> {
         // In a real implementation, this would validate the state of the sidechains protocol
         Ok(ValidationResult::Valid)
     }
