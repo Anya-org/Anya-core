@@ -27,6 +27,11 @@ pub use providers::{
 pub mod tests;
 
 use chrono::Utc;
+use bitcoin::taproot::{TaprootBuilder, Signature as TaprootSignature};
+use bitcoin_opcodes::{self, OpCode};
+use secp256k1::ecdsa::Signature;
+use sha2::Sha256;
+use base64::{Engine as _, engine::general_purpose::STANDARD as BASE64};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -296,14 +301,14 @@ impl HsmManager {
         // Call the execute method with SignData operation
         let params = SignParams {
             key_name: key_name.to_string(),
-            data: base64::encode(data),
+            data: BASE64.encode(data),
             algorithm,
         };
 
         let result = self.execute(HsmOperation::SignData, params).await?;
 
         // Convert result to signature bytes
-        let signature = base64::decode(result.data.as_str().ok_or_else(|| {
+        let signature = BASE64.decode(result.data.as_str().ok_or_else(|| {
             HsmError::DeserializationError("Expected string for signature".to_string())
         })?)
         .map_err(|e| HsmError::DeserializationError(e.to_string()))?;
@@ -327,8 +332,8 @@ impl HsmManager {
         // Call the execute method with VerifySignature operation
         let params = VerifyParams {
             key_name: key_name.to_string(),
-            data: base64::encode(data),
-            signature: base64::encode(signature),
+            data: BASE64.encode(data),
+            signature: BASE64.encode(signature),
             algorithm,
         };
 
@@ -357,14 +362,14 @@ impl HsmManager {
         // Call the execute method with EncryptData operation
         let params = EncryptParams {
             key_name: key_name.to_string(),
-            data: base64::encode(data),
+            data: BASE64.encode(data),
             algorithm,
         };
 
         let result = self.execute(HsmOperation::EncryptData, params).await?;
 
         // Convert result to encrypted bytes
-        let encrypted = base64::decode(result.data.as_str().ok_or_else(|| {
+        let encrypted = BASE64.decode(result.data.as_str().ok_or_else(|| {
             HsmError::DeserializationError("Expected string for encrypted data".to_string())
         })?)
         .map_err(|e| HsmError::DeserializationError(e.to_string()))?;
@@ -387,14 +392,14 @@ impl HsmManager {
         // Call the execute method with DecryptData operation
         let params = DecryptParams {
             key_name: key_name.to_string(),
-            data: base64::encode(data),
+            data: BASE64.encode(data),
             algorithm,
         };
 
         let result = self.execute(HsmOperation::DecryptData, params).await?;
 
         // Convert result to decrypted bytes
-        let decrypted = base64::decode(result.data.as_str().ok_or_else(|| {
+        let decrypted = BASE64.decode(result.data.as_str().ok_or_else(|| {
             HsmError::DeserializationError("Expected string for decrypted data".to_string())
         })?)
         .map_err(|e| HsmError::DeserializationError(e.to_string()))?;
