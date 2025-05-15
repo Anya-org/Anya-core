@@ -288,10 +288,10 @@ pub trait Layer2Protocol {
     async fn disconnect(&self) -> AnyaResult<()>;
     
     /// Submit transaction to the Layer 2 network
-    async fn submit_transaction(&self, tx: &[u8]) -> AnyaResult<String>;
+    async fn submit_transaction(&self, _tx: tx: &[u8][u8]) -> AnyaResult<String>;
     
     /// Get transaction status from the Layer 2 network
-    async fn get_transaction_status(&self, tx_id: &str) -> AnyaResult<TransactionStatus>;
+    async fn get_transaction_status(&self, _tx_id: tx_id: &strstr) -> AnyaResult<TransactionStatus>;
     
     /// Get the current state of the protocol
     async fn get_state(&self) -> AnyaResult<ProtocolState>;
@@ -300,16 +300,16 @@ pub trait Layer2Protocol {
     async fn sync_state(&self) -> AnyaResult<()>;
     
     /// Issue a new asset on the Layer 2 network
-    async fn issue_asset(&self, params: AssetParams) -> AnyaResult<String>;
+    async fn issue_asset(&self, _params: AssetParams) -> AnyaResult<String>;
     
     /// Transfer an asset on the Layer 2 network
-    async fn transfer_asset(&self, transfer: AssetTransfer) -> AnyaResult<TransferResult>;
+    async fn transfer_asset(&self, _transfer: AssetTransfer) -> AnyaResult<TransferResult>;
     
     /// Verify a proof on the Layer 2 network
-    async fn verify_proof(&self, proof: &Proof) -> AnyaResult<VerificationResult>;
+    async fn verify_proof(&self, _proof: proof: &ProofProof) -> AnyaResult<VerificationResult>;
     
     /// Validate the state of the protocol
-    async fn validate_state(&self, state: &ProtocolState) -> AnyaResult<ValidationResult>;
+    async fn validate_state(&self, _state: state: &ProtocolStateProtocolState) -> AnyaResult<ValidationResult>;
 }
 
 /// Transaction status for Layer 2 protocols

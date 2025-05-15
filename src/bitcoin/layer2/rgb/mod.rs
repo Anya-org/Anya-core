@@ -93,7 +93,7 @@ pub trait RGBManager {
     fn create_invoice(&self, asset_id: &str, amount: u64) -> AnyaResult<String>;
     
     /// Transfers an asset
-    fn transfer_asset(&self, transfer: AssetTransfer) -> AnyaResult<String>;
+    fn transfer_asset(&self, _transfer: AssetTransfer) -> AnyaResult<String>;
     
     /// Gets the status of a transfer
     fn get_transfer_status(&self, transfer_id: &str) -> AnyaResult<TransferStatus>;
@@ -261,7 +261,7 @@ impl RGBManager for DefaultRGBManager {
         unimplemented!("Invoice creation not yet implemented")
     }
     
-    fn transfer_asset(&self, transfer: AssetTransfer) -> AnyaResult<String>  -> Result<(), Box<dyn Error>> {
+    fn transfer_asset(&self, _transfer: AssetTransfer) -> AnyaResult<String>  -> Result<(), Box<dyn Error>> {
         // Implementation goes here
         unimplemented!("Asset transfer not yet implemented")
     }

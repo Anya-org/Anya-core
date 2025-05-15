@@ -71,13 +71,13 @@ impl AgentChecker {
     pub fn process_input(&self, input: &str) -> Result<(), String> {
         // Add input to buffer
         {
-            let mut buffer = self.input_buffer.lock()?;
+            let mut buffer = self.input_buffer.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
             buffer.push(input.to_string());
         }
 
         // Increment counter and check for auto-save
         {
-            let mut counter = self.input_counter.lock()?;
+            let mut counter = self.input_counter.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
             *counter += 1;
 
             // Auto-save every Nth input (e.g., every 20th input)
@@ -95,7 +95,7 @@ impl AgentChecker {
     fn save_state_to_memory(&self) {
         // In a real implementation, this would create a checkpoint of the current state
         // For now, we'll just update the last_save timestamp
-        let mut last_save = self.last_save.lock()?;
+        let mut last_save = self.last_save.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         *last_save = Instant::now();
         
         // This is where we'd normally serialize our state to a string or binary format
@@ -105,7 +105,7 @@ impl AgentChecker {
     /// Analyze input for agent checking
     fn analyze_input(&self, input: &str) -> Result<(), String> {
         // Simplified implementation for demo purposes
-        let mut health = self.health.lock()?;
+        let mut health = self.health.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         
         // Update overall system health based on input
         // This is a placeholder for actual ML-based analysis
@@ -134,25 +134,25 @@ impl AgentChecker {
 
     /// Get current system stage
     pub fn get_system_stage(&self) -> SystemStage {
-        let health = self.health.lock()?;
+        let health = self.health.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         health.stage
     }
     
     /// Get system health metrics
     pub fn get_system_health(&self) -> SystemHealth {
-        let health = self.health.lock()?;
+        let health = self.health.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         health.clone()
     }
     
     /// Check component readiness
     pub fn check_component_status(&self, component_name: &str) -> Option<ComponentStatus> {
-        let health = self.health.lock()?;
+        let health = self.health.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         health.components.get(component_name).cloned()
     }
     
     /// Update component status
     pub fn update_component_status(&self, component_name: &str, status: f64, metrics: HashMap<String, f64>, issues: Vec<String>) {
-        let mut health = self.health.lock()?;
+        let mut health = self.health.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         
         let component = ComponentStatus {
             name: component_name.to_string(),
@@ -175,7 +175,7 @@ impl AgentChecker {
     
     /// Validate system readiness against thresholds
     pub fn validate_system_readiness(&self) -> (bool, SystemStage, Vec<String>) {
-        let health = self.health.lock()?;
+        let health = self.health.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         let stage = health.stage;
         
         let mut issues = Vec::new();
@@ -197,9 +197,9 @@ impl AgentChecker {
     
     /// Get input buffer stats
     pub fn get_input_stats(&self) -> (usize, usize, Duration) {
-        let buffer = self.input_buffer.lock()?;
-        let counter = self.input_counter.lock()?;
-        let last_save = self.last_save.lock()?;
+        let buffer = self.input_buffer.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
+        let counter = self.input_counter.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
+        let last_save = self.last_save.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         
         (buffer.len(), *counter, last_save.elapsed())
     }

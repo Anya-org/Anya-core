@@ -65,7 +65,7 @@ pub trait KeyManager {
     fn derive_key(&self, path: &str) -> AnyaResult<SecretKey>;
     fn get_public_key(&self, path: &str) -> AnyaResult<bitcoin::secp256k1::PublicKey>;
     fn sign_message(&self, message: &[u8], path: &str) -> AnyaResult<Vec<u8>>;
-    fn verify_message(&self, message: &[u8], signature: &[u8], path: &str) -> AnyaResult<bool>;
+    fn verify_message(&self, message: &[u8], _signature: signature: &[u8][u8], path: &str) -> AnyaResult<bool>;
 }
 
 pub trait AddressManager {
@@ -169,7 +169,7 @@ impl Wallet {
             bip32::generate_seed(password.unwrap_or(""))?
         };
         
-        let mut seed_guard = self.seed.lock()?;
+        let mut seed_guard = self.seed.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         *seed_guard = Some(seed);
         
         // Generate initial addresses
@@ -179,7 +179,7 @@ impl Wallet {
     }
     
     fn init_addresses(&self) -> AnyaResult<()> {
-        let mut addresses = self.addresses.lock()?;
+        let mut addresses = self.addresses.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         
         // Generate 20 addresses of each type
         for address_type in [
@@ -228,7 +228,7 @@ impl Wallet {
 
 impl KeyManager for Wallet {
     fn derive_key(&self, path: &str) -> AnyaResult<SecretKey> {
-        let seed_guard = self.seed.lock()?;
+        let seed_guard = self.seed.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         let seed = seed_guard.as_ref()
             .ok_or_else(|| BitcoinError::Wallet("Wallet not initialized".to_string()))?;
         
@@ -253,7 +253,7 @@ impl KeyManager for Wallet {
         Ok(signature.serialize_der().to_vec())
     }
     
-    fn verify_message(&self, message: &[u8], signature: &[u8], path: &str) -> AnyaResult<bool> {
+    fn verify_message(&self, message: &[u8], _signature: signature: &[u8][u8], path: &str) -> AnyaResult<bool> {
         let public_key = self.get_public_key(path)?;
         
         // Hash the message with SHA256
@@ -269,7 +269,7 @@ impl KeyManager for Wallet {
 
 impl AddressManager for Wallet {
     fn get_new_address(&self, address_type: AddressType) -> AnyaResult<Address> {
-        let mut addresses = self.addresses.lock()?;
+        let mut addresses = self.addresses.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         
         let type_addresses = addresses.entry(address_type)
             .or_insert_with(Vec::new);
@@ -307,7 +307,7 @@ impl AddressManager for Wallet {
     }
     
     fn get_address(&self, index: u32, address_type: AddressType) -> AnyaResult<Address> {
-        let addresses = self.addresses.lock()?;
+        let addresses = self.addresses.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         
         if let Some(type_addresses) = addresses.get(&address_type) {
             if let Some(address) = type_addresses.get(index as usize) {
@@ -345,7 +345,7 @@ impl AddressManager for Wallet {
     }
     
     fn is_address_mine(&self, address: &str) -> AnyaResult<bool> {
-        let addresses = self.addresses.lock()?;
+        let addresses = self.addresses.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         
         for type_addresses in addresses.values() {
             for addr in type_addresses {
@@ -359,7 +359,7 @@ impl AddressManager for Wallet {
     }
     
     fn get_all_addresses(&self) -> AnyaResult<Vec<Address>> {
-        let addresses = self.addresses.lock()?;
+        let addresses = self.addresses.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         
         let mut result = Vec::new();
         for type_addresses in addresses.values() {
@@ -436,7 +436,7 @@ impl BalanceManager for Wallet {
     }
     
     fn get_asset_balance(&self, asset_id: &str) -> AnyaResult<u64> {
-        let assets = self.assets.lock()?;
+        let assets = self.assets.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         
         if let Some(asset) = assets.get(asset_id) {
             Ok(asset.balance)
@@ -446,7 +446,7 @@ impl BalanceManager for Wallet {
     }
     
     fn get_all_asset_balances(&self) -> AnyaResult<HashMap<String, u64>> {
-        let assets = self.assets.lock()?;
+        let assets = self.assets.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         
         let mut balances = HashMap::new();
         for (id, asset) in assets.iter() {
@@ -498,7 +498,7 @@ impl UnifiedWallet for Wallet {
     }
     
     fn add_asset(&self, asset_id: &str, name: &str, asset_type: &str) -> AnyaResult<()> {
-        let mut assets = self.assets.lock()?;
+        let mut assets = self.assets.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         
         if assets.contains_key(asset_id) {
             return Err(BitcoinError::Wallet(format!("Asset already exists: {}", asset_id)).into());
@@ -519,7 +519,7 @@ impl UnifiedWallet for Wallet {
     }
     
     fn remove_asset(&self, asset_id: &str) -> AnyaResult<()> {
-        let mut assets = self.assets.lock()?;
+        let mut assets = self.assets.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         
         if assets.remove(asset_id).is_none() {
             return Err(BitcoinError::Wallet(format!("Asset not found: {}", asset_id)).into());
@@ -529,7 +529,7 @@ impl UnifiedWallet for Wallet {
     }
     
     fn get_assets(&self) -> AnyaResult<Vec<Asset>> {
-        let assets = self.assets.lock()?;
+        let assets = self.assets.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         Ok(assets.values().cloned().collect())
     }
     

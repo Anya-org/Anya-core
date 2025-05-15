@@ -22,7 +22,7 @@ pub struct DWNConfig {
 }
 
 impl Default for DWNConfig {
-    fn default() -> Self  -> Result<(), Box<dyn Error>> {
+    fn default() -> Self {
         Self {
             endpoint: None,
             use_local_storage: true,
@@ -82,7 +82,7 @@ impl DWNClient {
     }
     
     /// Send a message to a DID through the DWN
-    pub fn send_message(&self, to: &str, protocol: &str, message_type: &str, data: &[u8]) -> Web5Result<String>  -> Result<(), Box<dyn Error>> {
+    pub fn send_message(&self, to: &str, protocol: &str, message_type: &str, _data: data: &[u8][u8]) -> Web5Result<String>  -> Result<(), Box<dyn Error>> {
         // Check if identity is set
         let from = self.identity.as_ref().ok_or_else(|| {
             Web5Error::Identity("Identity not set for DWN client".to_string())
@@ -114,7 +114,7 @@ impl DWNClient {
         
         // Store locally if configured
         if self.config.use_local_storage {
-            let mut storage = self.local_storage.lock()?;
+            let mut storage = self.local_storage.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
             let message_for_storage = message.clone();
             storage.insert(id.clone(), message_for_storage);
         }
@@ -136,7 +136,7 @@ impl DWNClient {
             Web5Error::Identity("Identity not set for DWN client".to_string())
         })?;
         
-        let storage = self.local_storage.lock()?;
+        let storage = self.local_storage.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         
         // Filter messages by recipient and optionally by protocol
         let messages: Vec<DWNMessage> = storage.values()

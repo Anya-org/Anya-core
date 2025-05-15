@@ -226,7 +226,7 @@ impl HsmManager {
             .await?;
 
         // Initialize the provider
-        self.provider.initialize().await?;
+        self.provider.initialize().await.map_err(|e| crate::security::hsm::error::HsmError::from(e))?;
 
         // Update status
         {
@@ -384,7 +384,7 @@ impl HsmManager {
     pub async fn sign_data(
         &self,
         key_name: &str,
-        data: &[u8],
+        _data: data: &[u8][u8],
         algorithm: SignatureAlgorithm,
     ) -> Result<Vec<u8>, HsmError> {
         debug!(
@@ -414,8 +414,8 @@ impl HsmManager {
     pub async fn verify_signature(
         &self,
         key_name: &str,
-        data: &[u8],
-        signature: &[u8],
+        _data: data: &[u8][u8],
+        _signature: signature: &[u8][u8],
         algorithm: SignatureAlgorithm,
     ) -> Result<bool, HsmError> {
         // Check if HSM is enabled
@@ -450,7 +450,7 @@ impl HsmManager {
     pub async fn encrypt_data(
         &self,
         key_name: &str,
-        data: &[u8],
+        _data: data: &[u8][u8],
         algorithm: EncryptionAlgorithm,
     ) -> Result<Vec<u8>, HsmError> {
         // Check if HSM is enabled
@@ -485,7 +485,7 @@ impl HsmManager {
     pub async fn decrypt_data(
         &self,
         key_name: &str,
-        data: &[u8],
+        _data: data: &[u8][u8],
         algorithm: EncryptionAlgorithm,
     ) -> Result<Vec<u8>, HsmError> {
         // Check if HSM is enabled

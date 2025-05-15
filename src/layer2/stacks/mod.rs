@@ -51,13 +51,13 @@ impl Layer2Protocol for StacksProtocol {
         Ok(())
     }
 
-    async fn submit_transaction(&self, tx: &[u8]) -> AnyaResult<String>  -> Result<(), Box<dyn Error>> {
+    async fn submit_transaction(&self, _tx: tx: &[u8][u8]) -> AnyaResult<String>  -> Result<(), Box<dyn Error>> {
         info!("Submitting Stacks transaction...");
         // TODO: Implement actual transaction submission
         Ok("stacks_tx_123".to_string())
     }
 
-    async fn get_transaction_status(&self, tx_id: &str) -> AnyaResult<TransactionStatus>  -> Result<(), Box<dyn Error>> {
+    async fn get_transaction_status(&self, _tx_id: tx_id: &strstr) -> AnyaResult<TransactionStatus>  -> Result<(), Box<dyn Error>> {
         info!("Getting Stacks transaction status...");
         // TODO: Implement actual status check
         Ok(TransactionStatus::Confirmed)
@@ -75,25 +75,25 @@ impl Layer2Protocol for StacksProtocol {
         Ok(())
     }
 
-    async fn issue_asset(&self, params: AssetParams) -> AnyaResult<String>  -> Result<(), Box<dyn Error>> {
+    async fn issue_asset(&self, _params: AssetParams) -> AnyaResult<String>  -> Result<(), Box<dyn Error>> {
         info!("Issuing Stacks asset...");
         // TODO: Implement actual asset issuance
         Ok("stacks_asset_123".to_string())
     }
 
-    async fn transfer_asset(&self, transfer: AssetTransfer) -> AnyaResult<TransferResult>  -> Result<(), Box<dyn Error>> {
+    async fn transfer_asset(&self, _transfer: AssetTransfer) -> AnyaResult<TransferResult>  -> Result<(), Box<dyn Error>> {
         info!("Transferring Stacks asset...");
         // TODO: Implement actual asset transfer
         Ok(TransferResult::default())
     }
 
-    async fn verify_proof(&self, proof: &Proof) -> AnyaResult<VerificationResult>  -> Result<(), Box<dyn Error>> {
+    async fn verify_proof(&self, _proof: proof: &ProofProof) -> AnyaResult<VerificationResult>  -> Result<(), Box<dyn Error>> {
         info!("Verifying Stacks proof...");
         // TODO: Implement actual proof verification
         Ok(VerificationResult::default())
     }
 
-    async fn validate_state(&self, state: &ProtocolState) -> AnyaResult<ValidationResult>  -> Result<(), Box<dyn Error>> {
+    async fn validate_state(&self, _state: state: &ProtocolStateProtocolState) -> AnyaResult<ValidationResult>  -> Result<(), Box<dyn Error>> {
         info!("Validating Stacks state...");
         // TODO: Implement actual state validation
         Ok(ValidationResult::default())

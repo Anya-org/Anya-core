@@ -84,47 +84,47 @@ impl SecureRng {
 
 /// Generate random bytes
 pub fn random_bytes(len: usize) -> Vec<u8>  -> Result<(), Box<dyn Error>> {
-    SECURE_RNG.lock()?.random_bytes(len)
+    SECURE_RNG.lock().map_err(|e| format!("Mutex lock error: {}", e))?.random_bytes(len)
 }
 
 /// Generate a random u64
 pub fn random_u64() -> u64  -> Result<(), Box<dyn Error>> {
-    SECURE_RNG.lock()?.random_u64()
+    SECURE_RNG.lock().map_err(|e| format!("Mutex lock error: {}", e))?.random_u64()
 }
 
 /// Generate a random u32
 pub fn random_u32() -> u32  -> Result<(), Box<dyn Error>> {
-    SECURE_RNG.lock()?.random_u32()
+    SECURE_RNG.lock().map_err(|e| format!("Mutex lock error: {}", e))?.random_u32()
 }
 
 /// Generate a random usize
 pub fn random_usize() -> usize  -> Result<(), Box<dyn Error>> {
-    SECURE_RNG.lock()?.random_usize()
+    SECURE_RNG.lock().map_err(|e| format!("Mutex lock error: {}", e))?.random_usize()
 }
 
 /// Generate a random f64 between 0.0 and 1.0
 pub fn random_f64() -> f64  -> Result<(), Box<dyn Error>> {
-    SECURE_RNG.lock()?.random_f64()
+    SECURE_RNG.lock().map_err(|e| format!("Mutex lock error: {}", e))?.random_f64()
 }
 
 /// Generate a random integer in range [min, max)
 pub fn random_in_range(min: i64, max: i64) -> i64  -> Result<(), Box<dyn Error>> {
-    SECURE_RNG.lock()?.random_in_range(min, max)
+    SECURE_RNG.lock().map_err(|e| format!("Mutex lock error: {}", e))?.random_in_range(min, max)
 }
 
 /// Generate a random boolean
 pub fn random_bool() -> bool  -> Result<(), Box<dyn Error>> {
-    SECURE_RNG.lock()?.random_bool()
+    SECURE_RNG.lock().map_err(|e| format!("Mutex lock error: {}", e))?.random_bool()
 }
 
 /// Shuffle a slice
 pub fn shuffle<T>(slice: &mut [T])  -> Result<(), Box<dyn Error>> {
-    SECURE_RNG.lock()?.shuffle(slice)
+    SECURE_RNG.lock().map_err(|e| format!("Mutex lock error: {}", e))?.shuffle(slice)
 }
 
 /// Reseed the global RNG
 pub fn reseed()  -> Result<(), Box<dyn Error>> {
-    SECURE_RNG.lock()?.reseed()
+    SECURE_RNG.lock().map_err(|e| format!("Mutex lock error: {}", e))?.reseed()
 }
 
 #[cfg(test)]

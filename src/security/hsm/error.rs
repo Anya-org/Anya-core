@@ -1,9 +1,10 @@
-use std::error::Error;
 //! Error types for HSM security module
 //!
 //! This module provides comprehensive error types for HSM operations,
 //! audit logging, and security events.
 //! [AIR-3][AIS-3][AIM-3][AIP-3][RES-3]
+
+use std::error::Error;
 
 use std::fmt;
 use std::io;
@@ -164,6 +165,14 @@ pub enum HsmError {
     /// Operation not supported
     #[error("Operation not supported: {0}")]
     OperationNotSupported(String),
+}
+
+// Implement From<HsmError> for HsmError to handle module path conflicts
+impl From<crate::security::hsm::error::HsmError> for HsmError {
+    fn from(err: crate::security::hsm::error::HsmError) -> Self {
+        // Since they're the same type with different paths, we can just return the error directly
+        err
+    }
 }
 
 /// HSM audit event type

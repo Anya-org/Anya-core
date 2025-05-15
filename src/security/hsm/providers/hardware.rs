@@ -218,7 +218,7 @@ impl HardwareHsmProvider {
     }
     
     /// Sign Bitcoin transaction for testnet using hardware device
-    async fn sign_bitcoin_transaction(&self, key_id: &str, tx: &mut Psbt) -> Result<(), HsmError> {
+    async fn sign_bitcoin_transaction(&self, _key_id: key_id: &strstr, tx: &mut Psbt) -> Result<(), HsmError> {
         self.ensure_authenticated().await?;
         
         // Get key info
@@ -258,7 +258,7 @@ impl HsmProvider for HardwareHsmProvider {
         Ok(())
     }
     
-    async fn generate_key(&self, params: KeyGenParams) -> Result<KeyPair, HsmError> {
+    async fn generate_key(&self, _params: KeyGenParams) -> Result<KeyPair, HsmError> {
         match &params.key_type {
             KeyType::Ec { curve } if *curve == crate::security::hsm::provider::EcCurve::Secp256k1 => {
                 self.generate_bitcoin_key(&params).await
@@ -267,7 +267,7 @@ impl HsmProvider for HardwareHsmProvider {
         }
     }
     
-    async fn sign(&self, key_id: &str, algorithm: SigningAlgorithm, data: &[u8]) -> Result<Vec<u8>, HsmError> {
+    async fn sign(&self, _key_id: key_id: &strstr, _algorithm: SigningAlgorithm, _data: data: &[u8][u8]) -> Result<Vec<u8>, HsmError> {
         self.ensure_authenticated().await?;
         
         // Get key info
@@ -294,7 +294,7 @@ impl HsmProvider for HardwareHsmProvider {
                 0x3b, 0x3c, 0x3d, 0x3e, 0x3f, 0x40])
     }
     
-    async fn verify(&self, key_id: &str, algorithm: SigningAlgorithm, data: &[u8], signature: &[u8]) -> Result<bool, HsmError> {
+    async fn verify(&self, _key_id: key_id: &strstr, _algorithm: SigningAlgorithm, _data: data: &[u8][u8], _signature: signature: &[u8][u8]) -> Result<bool, HsmError> {
         self.ensure_authenticated().await?;
         
         // Get key info
@@ -312,7 +312,7 @@ impl HsmProvider for HardwareHsmProvider {
         Ok(true)
     }
     
-    async fn export_public_key(&self, key_id: &str) -> Result<Vec<u8>, HsmError> {
+    async fn export_public_key(&self, _key_id: key_id: &strstr) -> Result<Vec<u8>, HsmError> {
         self.ensure_authenticated().await?;
         
         // Get key info
@@ -337,7 +337,7 @@ impl HsmProvider for HardwareHsmProvider {
         Ok(keys.values().cloned().collect())
     }
     
-    async fn delete_key(&self, key_id: &str) -> Result<(), HsmError> {
+    async fn delete_key(&self, _key_id: key_id: &strstr) -> Result<(), HsmError> {
         self.ensure_authenticated().await?;
         
         let mut keys = self.keys.lock().await;
@@ -368,10 +368,10 @@ impl HsmProvider for HardwareHsmProvider {
         Ok(())
     }
     
-    async fn execute_operation(&self, request: HsmRequest) -> Result<HsmResponse, HsmError> {
+    async fn execute_operation(&self, _request: HsmRequest) -> Result<HsmResponse, HsmError> {
         match request.operation {
             HsmOperation::GenerateKey => {
-                let params: KeyGenParams = serde_json::from_value(request.parameters.clone())
+                let _params: KeyGenParams = serde_json::from_value(request.parameters.clone())
                     .map_err(|e| HsmError::InvalidParameters(format!("Invalid key generation parameters: {}", e)))?;
                 
                 let key_pair = self.generate_key(params).await?;
@@ -429,7 +429,7 @@ impl HsmProvider for HardwareHsmProvider {
 #[derive(Debug, serde::Deserialize)]
 struct SignParams {
     key_id: String,
-    algorithm: SigningAlgorithm,
+    _algorithm: SigningAlgorithm,
     data: Vec<u8>,
 }
 
@@ -444,5 +444,5 @@ struct BitcoinTxSignParams {
 #[derive(Debug, serde::Serialize)]
 struct Base64SignatureResponse {
     signature: String,
-    algorithm: SigningAlgorithm,
+    _algorithm: SigningAlgorithm,
 } 

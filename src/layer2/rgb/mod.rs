@@ -101,7 +101,7 @@ impl RgbClient {
     pub async fn create_non_fungible_asset(
         &self,
         name: &str,
-        data: &[u8],
+        _data: data: &[u8][u8],
     ) -> Result<AssetInfo, RgbError> {
         self.asset_manager.create_non_fungible_asset(name, data).await
     }
@@ -171,7 +171,7 @@ impl ContractManager {
     /// Validate a contract
     pub async fn validate_contract(&self, contract_id: &str) -> Result<ValidationResult, RgbError> {
         // Implementation would validate contract based on its ID
-        let contracts = self.contracts.lock()?;
+        let contracts = self.contracts.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         
         if let Some(_contract) = contracts.get(contract_id) {
             Ok(ValidationResult::Valid)
@@ -182,7 +182,7 @@ impl ContractManager {
     
     /// Get a contract's info
     pub async fn get_contract_info(&self, contract_id: &str) -> Result<ContractInfo, RgbError> {
-        let contracts = self.contracts.lock()?;
+        let contracts = self.contracts.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         
         if let Some(contract) = contracts.get(contract_id) {
             Ok(contract.clone())
@@ -227,7 +227,7 @@ impl AssetManager {
             metadata: HashMap::new(),
         };
         
-        let mut assets = self.assets.lock()?;
+        let mut assets = self.assets.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         assets.insert(asset_id, asset.clone());
         
         Ok(asset)
@@ -237,7 +237,7 @@ impl AssetManager {
     pub async fn create_non_fungible_asset(
         &self,
         name: &str,
-        data: &[u8],
+        _data: data: &[u8][u8],
     ) -> Result<AssetInfo, RgbError> {
         // Implementation would create a non-fungible asset
         let asset_id = format!("rgb:{}", uuid::Uuid::new_v4());
@@ -255,7 +255,7 @@ impl AssetManager {
             metadata,
         };
         
-        let mut assets = self.assets.lock()?;
+        let mut assets = self.assets.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         assets.insert(asset_id, asset.clone());
         
         Ok(asset)
@@ -263,7 +263,7 @@ impl AssetManager {
     
     /// Get asset information
     pub async fn get_asset_info(&self, asset_id: &str) -> Result<AssetInfo, RgbError> {
-        let assets = self.assets.lock()?;
+        let assets = self.assets.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         
         if let Some(asset) = assets.get(asset_id) {
             Ok(asset.clone())
@@ -274,13 +274,13 @@ impl AssetManager {
     
     /// Get all assets owned by this client
     pub async fn get_owned_assets(&self) -> Result<Vec<AssetInfo>, RgbError> {
-        let assets = self.assets.lock()?;
+        let assets = self.assets.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         Ok(assets.values().cloned().collect())
     }
     
     /// Burn an amount of a fungible asset
     pub async fn burn_asset(&self, asset_id: &str, amount: u64) -> Result<(), RgbError> {
-        let mut assets = self.assets.lock()?;
+        let mut assets = self.assets.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         
         if let Some(asset) = assets.get_mut(asset_id) {
             if asset.asset_type == AssetType::Fungible && amount <= asset.total_supply {
@@ -331,7 +331,7 @@ impl SchemaValidator {
     
     /// Validate a schema
     pub fn validate_schema(&self, schema_id: &str) -> Result<bool, RgbError> {
-        let schemas = self.schemas.lock()?;
+        let schemas = self.schemas.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         
         if schemas.contains_key(schema_id) {
             Ok(true)
@@ -342,7 +342,7 @@ impl SchemaValidator {
     
     /// Get schema information
     pub fn get_schema_info(&self, schema_id: &str) -> Result<SchemaInfo, RgbError> {
-        let schemas = self.schemas.lock()?;
+        let schemas = self.schemas.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         
         if let Some(schema) = schemas.get(schema_id) {
             Ok(schema.clone())
@@ -388,7 +388,7 @@ impl TransactionManager {
             confirmed_at: None,
         };
         
-        let mut transfers = self.transfers.lock()?;
+        let mut transfers = self.transfers.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         transfers.insert(transfer_id, transfer.clone());
         
         Ok(transfer)
@@ -396,7 +396,7 @@ impl TransactionManager {
     
     /// Get transfer information
     pub async fn get_transfer_info(&self, transfer_id: &str) -> Result<TransferInfo, RgbError> {
-        let transfers = self.transfers.lock()?;
+        let transfers = self.transfers.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         
         if let Some(transfer) = transfers.get(transfer_id) {
             Ok(transfer.clone())
@@ -407,7 +407,7 @@ impl TransactionManager {
     
     /// Get all transfers
     pub async fn get_all_transfers(&self) -> Result<Vec<TransferInfo>, RgbError> {
-        let transfers = self.transfers.lock()?;
+        let transfers = self.transfers.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         Ok(transfers.values().cloned().collect())
     }
 }

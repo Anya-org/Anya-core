@@ -43,7 +43,7 @@ impl Watchdog {
         
         tokio::spawn(async move {
             tokio::time::sleep(timeout_duration_clone + Duration::from_secs(1)).await;
-            let is_active = { *active_clone.lock()? };
+            let is_active = { *active_clone.lock().map_err(|e| format!("Mutex lock error: {}", e))? };
             
             if is_active {
                 error!(
@@ -59,7 +59,7 @@ impl Watchdog {
     
     /// Stop the watchdog timer
     pub fn stop(&self)  -> Result<(), Box<dyn Error>> {
-        let mut active = self.active.lock()?;
+        let mut active = self.active.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         *active = false;
         
         info!(
@@ -82,7 +82,7 @@ impl Watchdog {
 
 impl Drop for Watchdog {
     fn drop(&mut self)  -> Result<(), Box<dyn Error>> {
-        let is_active = { *self.active.lock()? };
+        let is_active = { *self.active.lock().map_err(|e| format!("Mutex lock error: {}", e))? };
         
         if is_active {
             warn!(
@@ -141,10 +141,10 @@ impl ProgressTracker {
         let progress = progress.max(0.0).min(1.0);
         
         {
-            let mut progress_lock = self.progress.lock()?;
+            let mut progress_lock = self.progress.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
             *progress_lock = progress;
             
-            let mut last_update_lock = self.last_update.lock()?;
+            let mut last_update_lock = self.last_update.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
             *last_update_lock = Instant::now();
         }
         
@@ -166,7 +166,7 @@ impl ProgressTracker {
     
     /// Get the current progress
     pub fn get_progress(&self) -> f64  -> Result<(), Box<dyn Error>> {
-        *self.progress.lock()?
+        *self.progress.lock().map_err(|e| format!("Mutex lock error: {}", e))?
     }
     
     /// Check if the operation has timed out
@@ -180,7 +180,7 @@ impl ProgressTracker {
     
     /// Mark the operation as complete
     pub fn complete(&self)  -> Result<(), Box<dyn Error>> {
-        let mut progress_lock = self.progress.lock()?;
+        let mut progress_lock = self.progress.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         *progress_lock = 1.0;
         
         if self.verbose {

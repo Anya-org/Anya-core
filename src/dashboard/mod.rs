@@ -94,7 +94,7 @@ impl Dashboard {
             let spinner_chars = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
             let mut spinner_idx = 0;
             
-            while state.lock()?.is_running {
+            while state.lock().map_err(|e| format!("Mutex lock error: {}", e))?.is_running {
                 // Clear the screen
                 execute!(
                     stdout(),
@@ -103,7 +103,7 @@ impl Dashboard {
                 )?;
                 
                 // Get the current state
-                let dash_state = state.lock()?.clone();
+                let dash_state = state.lock().map_err(|e| format!("Mutex lock error: {}", e))?.clone();
                 
                 // Print the title
                 let title = format!(" {} ", config.title);

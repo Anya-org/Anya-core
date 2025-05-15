@@ -50,11 +50,11 @@ impl Layer2Protocol for MockLayer2Protocol {
         Ok(())
     }
 
-    async fn submit_transaction(&self, _tx: &[u8]) -> AnyaResult<String>  -> Result<(), Box<dyn Error>> {
+    async fn submit_transaction(&self, __tx: tx: &[u8][u8]) -> AnyaResult<String>  -> Result<(), Box<dyn Error>> {
         Ok("mock_tx_id".to_string())
     }
 
-    async fn get_transaction_status(&self, _tx_id: &str) -> AnyaResult<TransactionStatus>  -> Result<(), Box<dyn Error>> {
+    async fn get_transaction_status(&self, __tx_id: tx_id: &strstr) -> AnyaResult<TransactionStatus>  -> Result<(), Box<dyn Error>> {
         Ok(TransactionStatus::Confirmed)
     }
 
@@ -70,11 +70,11 @@ impl Layer2Protocol for MockLayer2Protocol {
         Ok(())
     }
 
-    async fn issue_asset(&self, _params: AssetParams) -> AnyaResult<String>  -> Result<(), Box<dyn Error>> {
+    async fn issue_asset(&self, __params: AssetParams) -> AnyaResult<String>  -> Result<(), Box<dyn Error>> {
         Ok("mock_asset_id".to_string())
     }
 
-    async fn transfer_asset(&self, _transfer: AssetTransfer) -> AnyaResult<TransferResult>  -> Result<(), Box<dyn Error>> {
+    async fn transfer_asset(&self, __transfer: AssetTransfer) -> AnyaResult<TransferResult>  -> Result<(), Box<dyn Error>> {
         Ok(TransferResult {
             tx_id: "mock_tx_id".to_string(),
             status: TransactionStatus::Confirmed,
@@ -82,14 +82,14 @@ impl Layer2Protocol for MockLayer2Protocol {
         })
     }
 
-    async fn verify_proof(&self, _proof: &Proof) -> AnyaResult<VerificationResult>  -> Result<(), Box<dyn Error>> {
+    async fn verify_proof(&self, __proof: proof: &ProofProof) -> AnyaResult<VerificationResult>  -> Result<(), Box<dyn Error>> {
         Ok(VerificationResult {
             valid: true,
             error: None,
         })
     }
 
-    async fn validate_state(&self, _state: &ProtocolState) -> AnyaResult<ValidationResult>  -> Result<(), Box<dyn Error>> {
+    async fn validate_state(&self, __state: state: &ProtocolStateProtocolState) -> AnyaResult<ValidationResult>  -> Result<(), Box<dyn Error>> {
         Ok(ValidationResult {
             valid: true,
             error: None,

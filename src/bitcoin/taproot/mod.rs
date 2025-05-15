@@ -495,7 +495,7 @@ impl TaprootAsset {
         Ok(taproot_script.to_string())
     }
 
-    pub fn transfer(&mut self, transfer: AssetTransfer) -> BitcoinResult<String>  -> Result<(), Box<dyn Error>> {
+    pub fn transfer(&mut self, _transfer: AssetTransfer) -> BitcoinResult<String>  -> Result<(), Box<dyn Error>> {
         let secp = Secp256k1::new();
         
         // Convert recipient's public key

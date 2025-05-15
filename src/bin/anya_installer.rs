@@ -749,7 +749,7 @@ impl DashboardServer {
     pub async fn start(&self) -> Result<()> {
         let routes = warp::path!("dashboard" / "status")
             .map(|| {
-                let installer = self.installer.lock()?;
+                let installer = self.installer.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
                 warp::reply::json(&installer.generate_dashboard_report()?)
             });
         

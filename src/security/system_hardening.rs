@@ -58,7 +58,7 @@ impl SystemHardening {
                               level: SecurityLevel, 
                               settings: HashMap<String, String>,
                               auto_save: bool) -> Result<(), String> {
-        let mut configs = self.configs.lock()?;
+        let mut configs = self.configs.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         
         let config = HardeningConfig {
             name: name.to_string(),
@@ -79,7 +79,7 @@ impl SystemHardening {
     
     /// Record an input and check if auto-save is needed
     fn record_input_and_check_save(&self) {
-        let mut counter = self.input_counter.lock()?;
+        let mut counter = self.input_counter.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         *counter += 1;
         
         // Auto-save every Nth input (e.g., every 20th input)
@@ -93,7 +93,7 @@ impl SystemHardening {
     fn save_state_to_memory(&self) {
         // In a real implementation, this would create a backup of security configurations
         // For this implementation, we're just keeping everything in memory
-        let configs = self.configs.lock()?;
+        let configs = self.configs.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         println!("In-memory security configuration snapshot created: {} components", configs.len());
         
         // Here you would normally serialize the state and store it
@@ -101,7 +101,7 @@ impl SystemHardening {
     
     /// Apply security hardening configuration for a component
     pub fn apply_hardening(&self, component_name: &str) -> Result<ConfigStatus, String> {
-        let mut configs = self.configs.lock()?;
+        let mut configs = self.configs.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         
         let config = match configs.get_mut(component_name) {
             Some(config) => config,
@@ -124,7 +124,7 @@ impl SystemHardening {
     
     /// Set a specific security setting
     pub fn set_security_setting(&self, component_name: &str, key: &str, value: &str) -> Result<(), String> {
-        let mut configs = self.configs.lock()?;
+        let mut configs = self.configs.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         
         let config = match configs.get_mut(component_name) {
             Some(config) => config,
@@ -144,27 +144,27 @@ impl SystemHardening {
     
     /// Get the configuration for a component
     pub fn get_component_config(&self, component_name: &str) -> Option<HardeningConfig> {
-        let configs = self.configs.lock()?;
+        let configs = self.configs.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         configs.get(component_name).cloned()
     }
     
     /// Get all component configurations
     pub fn get_all_configs(&self) -> Vec<HardeningConfig> {
-        let configs = self.configs.lock()?;
+        let configs = self.configs.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         configs.values().cloned().collect()
     }
     
     /// Get number of changes and configs
     pub fn get_stats(&self) -> (usize, usize) {
-        let counter = self.input_counter.lock()?;
-        let configs = self.configs.lock()?;
+        let counter = self.input_counter.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
+        let configs = self.configs.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         
         (*counter, configs.len())
     }
     
     /// Apply all pending configurations
     pub fn apply_all_pending(&self) -> Vec<(String, Result<ConfigStatus, String>)> {
-        let configs = self.configs.lock()?;
+        let configs = self.configs.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         let pending_components: Vec<String> = configs
             .iter()
             .filter(|(_, config)| config.status == ConfigStatus::Pending)

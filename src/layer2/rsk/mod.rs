@@ -211,7 +211,7 @@ impl NodeConnector {
             size: 1000,
         };
         
-        let mut last_block = self.last_block.lock()?;
+        let mut last_block = self.last_block.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         *last_block = Some(block.clone());
         
         Ok(block)
@@ -260,7 +260,7 @@ impl BridgeInterface {
             rsk_tx_hash: None,
         };
         
-        let mut peg_ins = self.peg_ins.lock()?;
+        let mut peg_ins = self.peg_ins.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         peg_ins.insert(peg_in_id, peg_in.clone());
         
         Ok(peg_in)
@@ -284,7 +284,7 @@ impl BridgeInterface {
             rsk_tx_hash: None,
         };
         
-        let mut peg_outs = self.peg_outs.lock()?;
+        let mut peg_outs = self.peg_outs.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         peg_outs.insert(peg_out_id, peg_out.clone());
         
         Ok(peg_out)
@@ -292,7 +292,7 @@ impl BridgeInterface {
     
     /// Get peg-in information
     pub async fn get_peg_in_info(&self, peg_in_id: &str) -> Result<PegInInfo, RskError> {
-        let peg_ins = self.peg_ins.lock()?;
+        let peg_ins = self.peg_ins.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         
         if let Some(peg_in) = peg_ins.get(peg_in_id) {
             Ok(peg_in.clone())
@@ -303,7 +303,7 @@ impl BridgeInterface {
     
     /// Get peg-out information
     pub async fn get_peg_out_info(&self, peg_out_id: &str) -> Result<PegOutInfo, RskError> {
-        let peg_outs = self.peg_outs.lock()?;
+        let peg_outs = self.peg_outs.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         
         if let Some(peg_out) = peg_outs.get(peg_out_id) {
             Ok(peg_out.clone())
@@ -354,7 +354,7 @@ impl SmartContractCaller {
             timestamp: chrono::Utc::now(),
         };
         
-        let mut contract_calls = self.contract_calls.lock()?;
+        let mut contract_calls = self.contract_calls.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         contract_calls.insert(call_id, result.clone());
         
         Ok(result)
@@ -378,7 +378,7 @@ impl SmartContractCaller {
             deploy_tx_hash: format!("0x{}", uuid::Uuid::new_v4()),
         };
         
-        let mut deployed_contracts = self.deployed_contracts.lock()?;
+        let mut deployed_contracts = self.deployed_contracts.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         deployed_contracts.insert(contract_address.clone(), contract_info);
         
         let result = ContractDeployResult {
@@ -394,7 +394,7 @@ impl SmartContractCaller {
     
     /// Get contract information
     pub fn get_contract_info(&self, contract_address: &str) -> Result<ContractInfo, RskError> {
-        let deployed_contracts = self.deployed_contracts.lock()?;
+        let deployed_contracts = self.deployed_contracts.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         
         if let Some(contract) = deployed_contracts.get(contract_address) {
             Ok(contract.clone())
@@ -443,7 +443,7 @@ impl TransactionManager {
             timestamp: chrono::Utc::now(),
         };
         
-        let mut transactions = self.transactions.lock()?;
+        let mut transactions = self.transactions.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         transactions.insert(tx_hash.clone(), transaction.clone());
         
         Ok(transaction)
@@ -451,7 +451,7 @@ impl TransactionManager {
     
     /// Get transaction information
     pub async fn get_transaction(&self, tx_hash: &str) -> Result<TransactionInfo, RskError> {
-        let transactions = self.transactions.lock()?;
+        let transactions = self.transactions.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         
         if let Some(transaction) = transactions.get(tx_hash) {
             Ok(transaction.clone())

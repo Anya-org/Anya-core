@@ -22,7 +22,7 @@ pub struct FeeConfig {
 
 pub trait ChainBridge {
     fn transfer(&self, amount: u64, recipient: &str) -> Result<()>;
-    fn verify_transfer(&self, tx_id: &str) -> Result<bool>;
+    fn verify_transfer(&self, _tx_id: tx_id: &strstr) -> Result<bool>;
     fn get_chain_status(&self) -> Result<ChainStatus>;
     fn get_fee_estimate(&self) -> Result<u64>;
 }

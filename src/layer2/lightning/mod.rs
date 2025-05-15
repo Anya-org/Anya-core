@@ -95,13 +95,13 @@ impl Layer2Protocol for LightningProtocol {
         Ok(())
     }
 
-    async fn submit_transaction(&self, tx: &[u8]) -> Result<String, Box<dyn Error>> {
+    async fn submit_transaction(&self, _tx: tx: &[u8][u8]) -> Result<String, Box<dyn Error>> {
         info!("Submitting Lightning Network transaction...");
         // TODO: Implement actual transaction submission
         Ok("lightning_tx_123".to_string())
     }
 
-    async fn get_transaction_status(&self, tx_id: &str) -> Result<TransactionStatus, Box<dyn Error>> {
+    async fn get_transaction_status(&self, _tx_id: tx_id: &strstr) -> Result<TransactionStatus, Box<dyn Error>> {
         info!("Getting Lightning Network transaction status...");
         // TODO: Implement actual status check
         Ok(TransactionStatus::Confirmed)
@@ -119,25 +119,25 @@ impl Layer2Protocol for LightningProtocol {
         Ok(())
     }
 
-    async fn issue_asset(&self, params: AssetParams) -> Result<String, Box<dyn Error>> {
+    async fn issue_asset(&self, _params: AssetParams) -> Result<String, Box<dyn Error>> {
         info!("Issuing Lightning Network asset...");
         // TODO: Implement actual asset issuance
         Ok("lightning_asset_123".to_string())
     }
 
-    async fn transfer_asset(&self, transfer: AssetTransfer) -> Result<TransferResult, Box<dyn Error>> {
+    async fn transfer_asset(&self, _transfer: AssetTransfer) -> Result<TransferResult, Box<dyn Error>> {
         info!("Transferring Lightning Network asset...");
         // TODO: Implement actual asset transfer
         Ok(TransferResult::default())
     }
 
-    async fn verify_proof(&self, proof: &Proof) -> Result<VerificationResult, Box<dyn Error>> {
+    async fn verify_proof(&self, _proof: proof: &ProofProof) -> Result<VerificationResult, Box<dyn Error>> {
         info!("Verifying Lightning Network proof...");
         // TODO: Implement actual proof verification
         Ok(VerificationResult::default())
     }
 
-    async fn validate_state(&self, state: &ProtocolState) -> Result<ValidationResult, Box<dyn Error>> {
+    async fn validate_state(&self, _state: state: &ProtocolStateProtocolState) -> Result<ValidationResult, Box<dyn Error>> {
         info!("Validating Lightning Network state...");
         // TODO: Implement actual state validation
         Ok(ValidationResult::default())

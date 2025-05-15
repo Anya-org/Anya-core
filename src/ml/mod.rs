@@ -1,9 +1,9 @@
-use std::error::Error;
 //! Machine Learning module
 //!
 //! This module provides machine learning capabilities for the Anya system,
 //! including model management, training, prediction, and federated learning.
 
+use std::error::Error;
 use crate::AnyaError;
 use crate::AnyaResult;
 use std::collections::HashMap;

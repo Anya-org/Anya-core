@@ -176,7 +176,7 @@ impl DIDManager {
         
         // Store the DID
         {
-            let mut dids = self.dids.lock()?;
+            let mut dids = self.dids.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
             dids.insert(id.clone(), did.clone());
         }
         
@@ -186,7 +186,7 @@ impl DIDManager {
     /// Resolve a DID to its document
     pub fn resolve_did(&self, did: &str) -> Web5Result<DIDDocument>  -> Result<(), Box<dyn Error>> {
         // First, check if we have the DID locally
-        let dids = self.dids.lock()?;
+        let dids = self.dids.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         if let Some(did_obj) = dids.get(did) {
             return Ok(did_obj.document.clone());
         }
@@ -198,7 +198,7 @@ impl DIDManager {
     /// Set the default DID
     pub fn set_default_did(&mut self, did: &str) -> Web5Result<()>  -> Result<(), Box<dyn Error>> {
         // Check if the DID exists
-        let dids = self.dids.lock()?;
+        let dids = self.dids.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         if !dids.contains_key(did) {
             return Err(Web5Error::Identity(format!("DID not found: {}", did)));
         }
@@ -215,12 +215,12 @@ impl DIDManager {
     }
     
     /// Sign data with a DID's private key
-    pub fn sign(&self, did: &str, data: &[u8]) -> Web5Result<Vec<u8>>  -> Result<(), Box<dyn Error>> {
+    pub fn sign(&self, did: &str, _data: data: &[u8][u8]) -> Web5Result<Vec<u8>>  -> Result<(), Box<dyn Error>> {
         // This is a simplified implementation
         // In a real implementation, this would use the DID's private key
         
         // Get the DID
-        let dids = self.dids.lock()?;
+        let dids = self.dids.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         let did_obj = dids.get(did).ok_or_else(|| {
             Web5Error::Identity(format!("DID not found: {}", did))
         })?;
@@ -233,7 +233,7 @@ impl DIDManager {
     
     /// Get a list of all DIDs
     pub fn dids(&self) -> Vec<String>  -> Result<(), Box<dyn Error>> {
-        let dids = self.dids.lock()?;
+        let dids = self.dids.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         dids.keys().cloned().collect()
     }
 }

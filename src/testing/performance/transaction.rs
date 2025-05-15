@@ -183,7 +183,7 @@ impl TransactionThroughputTest {
                     match test.generate_transaction() {
                         Ok(tx) => {
                             let _ = test.validator.validate_taproot_transaction(&tx);
-                            let mut counter = counter.lock()?;
+                            let mut counter = counter.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
                             *counter += 1;
                             
                             if *counter % 100 == 0 {

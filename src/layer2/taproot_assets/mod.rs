@@ -55,13 +55,13 @@ impl Layer2Protocol for TaprootAssetsProtocol {
         Ok(())
     }
 
-    async fn submit_transaction(&self, tx: &[u8]) -> AnyaResult<String> {
+    async fn submit_transaction(&self, _tx: tx: &[u8][u8]) -> AnyaResult<String> {
         info!("Submitting Taproot Assets transaction...");
         // TODO: Implement actual transaction submission
         Ok("taproot_tx_123".to_string())
     }
 
-    async fn get_transaction_status(&self, tx_id: &str) -> AnyaResult<TransactionStatus> {
+    async fn get_transaction_status(&self, _tx_id: tx_id: &strstr) -> AnyaResult<TransactionStatus> {
         info!("Getting Taproot Assets transaction status...");
         // TODO: Implement actual status check
         Ok(TransactionStatus::Confirmed)
@@ -79,25 +79,25 @@ impl Layer2Protocol for TaprootAssetsProtocol {
         Ok(())
     }
 
-    async fn issue_asset(&self, params: AssetParams) -> AnyaResult<String> {
+    async fn issue_asset(&self, _params: AssetParams) -> AnyaResult<String> {
         info!("Issuing Taproot Assets asset...");
         // TODO: Implement actual asset issuance
         Ok("taproot_asset_123".to_string())
     }
 
-    async fn transfer_asset(&self, transfer: AssetTransfer) -> AnyaResult<TransferResult> {
+    async fn transfer_asset(&self, _transfer: AssetTransfer) -> AnyaResult<TransferResult> {
         info!("Transferring Taproot Assets asset...");
         // TODO: Implement actual asset transfer
         Ok(TransferResult::default())
     }
 
-    async fn verify_proof(&self, proof: &Proof) -> AnyaResult<VerificationResult> {
+    async fn verify_proof(&self, _proof: proof: &ProofProof) -> AnyaResult<VerificationResult> {
         info!("Verifying Taproot Assets proof...");
         // TODO: Implement actual proof verification
         Ok(VerificationResult::default())
     }
 
-    async fn validate_state(&self, state: &ProtocolState) -> AnyaResult<ValidationResult> {
+    async fn validate_state(&self, _state: state: &ProtocolStateProtocolState) -> AnyaResult<ValidationResult> {
         info!("Validating Taproot Assets state...");
         // TODO: Implement actual state validation
         Ok(ValidationResult::default())

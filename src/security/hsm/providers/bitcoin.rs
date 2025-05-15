@@ -171,9 +171,9 @@ impl BitcoinHsmProvider {
     /// Sign data with a Bitcoin key
     async fn sign_bitcoin(
         &self,
-        key_id: &str,
-        data: &[u8],
-        algorithm: SigningAlgorithm,
+        _key_id: key_id: &strstr,
+        _data: data: &[u8][u8],
+        _algorithm: SigningAlgorithm,
     ) -> Result<Vec<u8>, HsmError> {
         // Get key info
         let keys = self.keys.lock().await;
@@ -214,10 +214,10 @@ impl BitcoinHsmProvider {
     /// Verify a signature with a Bitcoin key
     async fn verify_bitcoin(
         &self,
-        key_id: &str,
-        data: &[u8],
-        signature: &[u8],
-        algorithm: SigningAlgorithm,
+        _key_id: key_id: &strstr,
+        _data: data: &[u8][u8],
+        _signature: signature: &[u8][u8],
+        _algorithm: SigningAlgorithm,
     ) -> Result<bool, HsmError> {
         // Get key info
         let keys = self.keys.lock().await;
@@ -294,7 +294,7 @@ impl HsmProvider for BitcoinHsmProvider {
         Ok(())
     }
 
-    async fn generate_key(&self, params: KeyGenParams) -> Result<KeyPair, HsmError> {
+    async fn generate_key(&self, _params: KeyGenParams) -> Result<KeyPair, HsmError> {
         debug!("Generating key with params: {:?}", params);
 
         // Check provider status
@@ -321,9 +321,9 @@ impl HsmProvider for BitcoinHsmProvider {
 
     async fn sign(
         &self,
-        key_id: &str,
-        algorithm: SigningAlgorithm,
-        data: &[u8],
+        _key_id: key_id: &strstr,
+        _algorithm: SigningAlgorithm,
+        _data: data: &[u8][u8],
     ) -> Result<Vec<u8>, HsmError> {
         debug!(
             "Signing data with key {}, algorithm {:?}",
@@ -345,10 +345,10 @@ impl HsmProvider for BitcoinHsmProvider {
 
     async fn verify(
         &self,
-        key_id: &str,
-        algorithm: SigningAlgorithm,
-        data: &[u8],
-        signature: &[u8],
+        _key_id: key_id: &strstr,
+        _algorithm: SigningAlgorithm,
+        _data: data: &[u8][u8],
+        _signature: signature: &[u8][u8],
     ) -> Result<bool, HsmError> {
         debug!(
             "Verifying signature with key {}, algorithm {:?}",
@@ -369,7 +369,7 @@ impl HsmProvider for BitcoinHsmProvider {
             .await
     }
 
-    async fn export_public_key(&self, key_id: &str) -> Result<Vec<u8>, HsmError> {
+    async fn export_public_key(&self, _key_id: key_id: &strstr) -> Result<Vec<u8>, HsmError> {
         debug!("Exporting public key {}", key_id);
 
         // Check provider status
@@ -420,7 +420,7 @@ impl HsmProvider for BitcoinHsmProvider {
         Ok(keys_list)
     }
 
-    async fn delete_key(&self, key_id: &str) -> Result<(), HsmError> {
+    async fn delete_key(&self, _key_id: key_id: &strstr) -> Result<(), HsmError> {
         debug!("Deleting key {}", key_id);
 
         // Check provider status
@@ -466,12 +466,12 @@ impl HsmProvider for BitcoinHsmProvider {
         Ok(())
     }
 
-    async fn execute_operation(&self, request: HsmRequest) -> Result<HsmResponse, HsmError> {
+    async fn execute_operation(&self, _request: HsmRequest) -> Result<HsmResponse, HsmError> {
         debug!("Executing operation: {:?}", request.operation);
 
         match request.operation {
             HsmOperation::GenerateKey => {
-                let params: KeyGenParams = serde_json::from_value(request.parameters.clone())
+                let _params: KeyGenParams = serde_json::from_value(request.parameters.clone())
                     .map_err(|e| {
                         HsmError::InvalidParameters(format!("Invalid parameters: {}", e))
                     })?;
@@ -582,7 +582,7 @@ struct SignParams {
     pub data: String,
 
     /// Signing algorithm
-    pub algorithm: SigningAlgorithm,
+    pub _algorithm: SigningAlgorithm,
 }
 
 /// Parameters for verifying
@@ -598,7 +598,7 @@ struct VerifyParams {
     pub signature: String,
 
     /// Signing algorithm
-    pub algorithm: SigningAlgorithm,
+    pub _algorithm: SigningAlgorithm,
 }
 
 /// Parameters for getting a key

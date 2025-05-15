@@ -68,7 +68,7 @@ impl SoftwareHsmProvider {
     }
 
     /// Sign a Bitcoin transaction for testnet
-    async fn sign_bitcoin_transaction(&self, key_id: &str, tx: &mut Psbt) -> Result<(), HsmError> {
+    async fn sign_bitcoin_transaction(&self, _key_id: key_id: &strstr, tx: &mut Psbt) -> Result<(), HsmError> {
         let key_data = self.key_data.lock().await;
         let secret_data = key_data
             .get(key_id)
@@ -102,7 +102,7 @@ impl HsmProvider for SoftwareHsmProvider {
         Ok(())
     }
 
-    async fn generate_key(&self, params: KeyGenParams) -> Result<KeyPair, HsmError> {
+    async fn generate_key(&self, _params: KeyGenParams) -> Result<KeyPair, HsmError> {
         let key_id = params.id.unwrap_or_else(|| self.generate_key_id());
 
         // Generate key pair based on key type with real testnet support
@@ -143,9 +143,9 @@ impl HsmProvider for SoftwareHsmProvider {
 
     async fn sign(
         &self,
-        key_id: &str,
-        algorithm: SigningAlgorithm,
-        data: &[u8],
+        _key_id: key_id: &strstr,
+        _algorithm: SigningAlgorithm,
+        _data: data: &[u8][u8],
     ) -> Result<Vec<u8>, HsmError> {
         // Check if key exists and has signing capability
         let keys = self.keys.lock().await;
@@ -192,10 +192,10 @@ impl HsmProvider for SoftwareHsmProvider {
 
     async fn verify(
         &self,
-        key_id: &str,
-        algorithm: SigningAlgorithm,
-        data: &[u8],
-        signature: &[u8],
+        _key_id: key_id: &strstr,
+        _algorithm: SigningAlgorithm,
+        _data: data: &[u8][u8],
+        _signature: signature: &[u8][u8],
     ) -> Result<bool, HsmError> {
         // Check if key exists and has verify capability
         let keys = self.keys.lock().await;
@@ -258,7 +258,7 @@ impl HsmProvider for SoftwareHsmProvider {
         }
     }
 
-    async fn export_public_key(&self, key_id: &str) -> Result<Vec<u8>, HsmError> {
+    async fn export_public_key(&self, _key_id: key_id: &strstr) -> Result<Vec<u8>, HsmError> {
         // Check if key exists
         let keys = self.keys.lock().await;
         let key_info = keys
@@ -290,7 +290,7 @@ impl HsmProvider for SoftwareHsmProvider {
         Ok(keys.values().cloned().collect())
     }
 
-    async fn delete_key(&self, key_id: &str) -> Result<(), HsmError> {
+    async fn delete_key(&self, _key_id: key_id: &strstr) -> Result<(), HsmError> {
         let mut keys = self.keys.lock().await;
         let mut key_data = self.key_data.lock().await;
 
@@ -310,10 +310,10 @@ impl HsmProvider for SoftwareHsmProvider {
         Ok(())
     }
 
-    async fn execute_operation(&self, request: HsmRequest) -> Result<HsmResponse, HsmError> {
+    async fn execute_operation(&self, _request: HsmRequest) -> Result<HsmResponse, HsmError> {
         match request.operation {
             HsmOperation::GenerateKey => {
-                let params: KeyGenParams = serde_json::from_value(request.parameters.clone())
+                let _params: KeyGenParams = serde_json::from_value(request.parameters.clone())
                     .map_err(|e| {
                         HsmError::InvalidParameters(format!(
                             "Invalid key generation parameters: {}",
@@ -381,7 +381,7 @@ impl HsmProvider for SoftwareHsmProvider {
 #[derive(Debug, serde::Deserialize)]
 struct SignParams {
     key_id: String,
-    algorithm: SigningAlgorithm,
+    _algorithm: SigningAlgorithm,
     data: Vec<u8>,
 }
 
@@ -396,5 +396,5 @@ struct BitcoinTxSignParams {
 #[derive(Debug, serde::Serialize)]
 struct Base64SignatureResponse {
     signature: String,
-    algorithm: SigningAlgorithm,
+    _algorithm: SigningAlgorithm,
 }

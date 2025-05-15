@@ -2,6 +2,20 @@
 use std::sync::{Arc, Mutex, RwLock};
 use std::collections::HashMap;
 use std::error::Error;
+use std::fmt;
+
+/// Wrapper for Argon2 errors to implement std::error::Error
+#[derive(Debug)]
+struct Argon2ErrorWrapper(String);
+
+impl fmt::Display for Argon2ErrorWrapper {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "Argon2 error: {}", self.0)
+    }
+}
+
+impl Error for Argon2ErrorWrapper {}
+
 use bitcoin::{Txid, XOnlyPublicKey};
 use secp256k1::ecdsa::Signature;
 use crate::AnyaResult;
@@ -93,13 +107,13 @@ impl SecurityManager {
         
         // High memory and iterations parameters to make GPU attacks expensive
         let params = Params::new(15000, 2, 1, Some(32))
-            .map_err(|e| Box::new(e) as Box<dyn Error>)?;
+            .map_err(|e| Box::new(Argon2ErrorWrapper(e.to_string())) as Box<dyn Error>)?;
             
         let argon2 = Argon2::new(Algorithm::Argon2id, Version::V0x13, params);
         
         let mut output_key = [0u8; 32]; // 32-byte key for BIP32
         argon2.hash_password_into(mnemonic.as_bytes(), salt.as_bytes(), &mut output_key)
-            .map_err(|e| Box::new(e) as Box<dyn Error>)?;
+            .map_err(|e| Box::new(Argon2ErrorWrapper(e.to_string())) as Box<dyn Error>)?;
             
         bitcoin::bip32::Xpriv::new_master(Network::Bitcoin, &output_key)
             .map_err(|e| Box::new(e) as Box<dyn Error>)

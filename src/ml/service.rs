@@ -142,7 +142,7 @@ impl MLService {
         self.model_version = model_version.to_string();
         
         // Would typically load a pre-trained model here
-        *self.model.lock()? = RandomForestClassifier::default()
+        *self.model.lock().map_err(|e| format!("Mutex lock error: {}", e))? = RandomForestClassifier::default()
             .with_n_trees(100)
             .with_max_depth(10)
             .with_min_samples_leaf(5);
@@ -256,7 +256,7 @@ impl MLService {
 
     /// Train the model with new data
     pub async fn train(&mut self, features: Array2<f64>, labels: Array1<f64>) -> AnyaResult<()>  -> Result<(), Box<dyn Error>> {
-        let mut model = self.model.lock()?;
+        let mut model = self.model.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         
         // Call the fit method which returns a bool
         let fit_success = model.fit(&features, &labels);
