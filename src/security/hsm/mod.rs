@@ -29,6 +29,11 @@ pub use providers::{
 pub mod tests;
 
 use chrono::Utc;
+use bitcoin::taproot::{TaprootBuilder, Signature as TaprootSignature};
+use bitcoin_opcodes::{self, OpCode};
+use secp256k1::ecdsa::Signature;
+use sha2::Sha256;
+use base64::{Engine as _, engine::general_purpose::STANDARD as BASE64};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::pin::Pin;
