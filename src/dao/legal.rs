@@ -1,6 +1,6 @@
-use std::error::Error;
-//! Legal wrapper integration for DAO-4 [AIS-3][BPC-3][DAO-3]
+/// Legal wrapper integration for DAO-4 [AIS-3][BPC-3][DAO-3]
 
+use std::error::Error;
 use serde::{Serialize, Deserialize};
 use thiserror::Error;
 use chrono::{DateTime, Utc};

@@ -20,7 +20,7 @@ pub struct Metrics {
 
 impl Metrics {
     /// Create new metrics
-    pub fn new() -> Self  -> Result<(), Box<dyn Error>> {
+    pub fn new() -> Self {
         Self {
             transactions_per_second: 0.0,
             block_time: 0.0,

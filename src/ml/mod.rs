@@ -29,7 +29,7 @@ pub struct MLConfig {
 }
 
 impl Default for MLConfig {
-    fn default() -> Self  -> Result<(), Box<dyn Error>> {
+    fn default() -> Self {
         Self {
             enabled: true,
             model_path: Some("./data/models".to_string()),
@@ -49,7 +49,7 @@ pub struct MLSystem {
 
 impl MLSystem {
     /// Create a new MLSystem with the given configuration
-    pub fn new(config: MLConfig) -> AnyaResult<Self>  -> Result<(), Box<dyn Error>> {
+    pub fn new(config: MLConfig) -> AnyaResult<Self> {
         if !config.enabled {
             return Ok(Self {
                 config,
@@ -130,7 +130,7 @@ pub trait MLModel: Send + Sync {
 
 /// ML model input
 #[derive(Debug, Clone)]
-pub struct MLInput  -> Result<(), Box<dyn Error>> {
+pub struct MLInput {
     /// Features for the model
     pub features: Vec<f64>,
     /// Label for supervised learning

@@ -169,14 +169,24 @@ impl SystemHardening {
     
     /// Apply all pending configurations
     pub fn apply_all_pending(&self) -> Vec<(String, Result<ConfigStatus, String>)> {
-        let configs = self.configs.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
-        let pending_components: Vec<String> = configs
-            .iter()
-            .filter(|(_, config)| config.status == ConfigStatus::Pending)
-            .map(|(name, _)| name.clone())
-            .collect();
-        
-        drop(configs); // Release the lock
+        let pending_components = match self.configs.lock() {
+            Ok(configs) => {
+                let components: Vec<String> = configs
+                    .iter()
+                    .filter(|(_, config)| config.status == ConfigStatus::Pending)
+                    .map(|(name, _)| name.clone())
+                    .collect();
+                drop(configs); // Release the lock
+                components
+            },
+            Err(e) => {
+                // Return an empty vec with the error if we can't get the lock
+                let error_msg = format!("Mutex lock error: {}", e);
+                let mut results = Vec::new();
+                results.push(("general".to_string(), Err(error_msg)));
+                return results;
+            }
+        };
         
         // Apply each pending config
         let mut results = Vec::new();

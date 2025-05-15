@@ -1,6 +1,6 @@
-use std::error::Error;
-//! Quadratic Voting Implementation [AIS-3][BPC-3][DAO-3]
+/// Quadratic Voting Implementation [AIS-3][BPC-3][DAO-3]
 
+use std::error::Error;
 use std::collections::HashMap;
 use serde::{Serialize, Deserialize};
 use thiserror::Error;

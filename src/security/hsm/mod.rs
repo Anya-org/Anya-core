@@ -865,5 +865,3 @@ impl From<argon2::Error> for Argon2Error {
         Argon2Error::Error(e.to_string())
     }
 }
-
-}

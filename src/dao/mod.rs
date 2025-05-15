@@ -1,9 +1,10 @@
-use std::error::Error;
-use std::collections::HashMap;
 //! DAO module
 //! 
 //! This module provides decentralized autonomous organization functionality,
 //! including governance, voting, and proposal management.
+
+use std::error::Error;
+use std::collections::HashMap;
 
 // DAO Module for Anya Core
 // Implements governance and voting mechanisms
