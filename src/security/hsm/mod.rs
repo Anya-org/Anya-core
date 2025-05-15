@@ -1,24 +1,26 @@
 use std::error::Error;
+use crate::adapters::{YubiConnector, LedgerConnector};
+
 pub mod audit;
 pub mod config;
 pub mod error;
 pub mod operations;
 pub mod provider;
+pub mod providers;
+pub mod types;
 
-// Export the provider implementations
-pub mod providers {
-    pub mod bitcoin;
-    pub mod hardware;
-    pub mod simulator;
-    pub mod software;
+// Re-export types for easier access
+pub use types::*;
 
-    pub use bitcoin::BitcoinHsmProvider;
-    pub use hardware::HardwareHsmProvider;
-    pub use simulator::SimulatorHsmProvider;
-    pub use software::SoftwareHsmProvider;
-}
+// Import provider implementations
+use self::providers::bitcoin::BitcoinHsmProvider;
+use self::providers::cloud::CloudHsmProvider;
+use self::providers::hardware::HardwareHsmProvider;
+use self::providers::pkcs11::Pkcs11HsmProvider;
+use self::providers::simulator::SimulatorHsmProvider;
+use self::providers::software::SoftwareHsmProvider;
+use self::providers::tpm::TpmHsmProvider;
 
-// Re-export the provider implementations for convenient access
 pub use providers::{
     BitcoinHsmProvider, HardwareHsmProvider, SimulatorHsmProvider, SoftwareHsmProvider,
 };
@@ -29,13 +31,31 @@ pub mod tests;
 use chrono::Utc;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use std::sync::Arc;
-use std::sync::Mutex;
+use std::pin::Pin;
+use std::sync::{Arc, Mutex};
 use std::time::Duration;
+use std::error::Error;
+
+use async_trait::async_trait;
+use bitcoin::{Network, Script, ScriptBuf, XOnlyPublicKey, Txid, Psbt};
+use bitcoin::taproot::{TaprootBuilder, Signature as TaprootSignature};
+use bitcoin::bip32::ExtendedPrivKey;
+use bitcoin::key::Secp256k1;
+use bitcoin_opcodes::{self, OpCode, all as opcodes};
+use chrono::{DateTime, Utc};
+use secp256k1::ecdsa::Signature;
+use base64::{Engine as _, engine::general_purpose::STANDARD as BASE64};
+use sha2::Sha256;
 use tokio::sync::RwLock;
 use tokio::time::timeout;
 use tracing::{debug, error, info, warn};
 use uuid::Uuid;
+
+// Import HSM provider types
+use self::config::HsmConfig;
+use self::provider::{HsmOperation, HsmProvider, HsmProviderType, HsmProviderStatus, HsmRequest, HsmResponse};
+use self::audit::AuditLogger;
+use self::types::*;
 
 use self::audit::AuditLogger;
 use self::config::HsmConfig;
@@ -46,19 +66,100 @@ use self::provider::{HsmProvider, HsmProviderType};
 /// [AIR-3][AIS-3][AIT-3][AIP-3][RES-3]
 pub struct HsmManager {
     /// Configuration for the HSM
-    pub config: HsmConfig,
+    config: HsmConfig,
 
     /// Active HSM provider
-    pub provider: Box<dyn HsmProvider>,
+    provider: Box<dyn HsmProvider>,
+
+    /// HSM statistics
+    stats: HsmStats,
+
+    /// Whether HSM is enabled
+    enabled: bool,
 
     /// Audit logger for HSM operations
-    pub audit_logger: Arc<AuditLogger>,
+    audit_logger: Arc<AuditLogger>,
 
     /// Current status
-    pub status: Arc<RwLock<HsmStatus>>,
+    status: Arc<RwLock<HsmStatus>>,
 
     /// Operation tracker
-    pub operation_tracker: Arc<Mutex<HashMap<String, (DateTime<Utc>, String)>>>,
+    operation_tracker: Arc<Mutex<HashMap<String, (DateTime<Utc>, String)>>>,
+}
+
+/// HSM Statistics
+#[derive(Debug, Default, Clone)]
+pub struct HsmStats {
+    /// Number of successful operations
+    pub successful_operations: u64,
+    /// Number of failed operations
+    pub failed_operations: u64,
+    /// Last operation time
+    pub last_operation_time: Option<DateTime<Utc>>,
+    /// Total operation time (milliseconds)
+    pub total_operation_time_ms: u64,
+}
+
+/// HSM status
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub enum HsmStatus {
+    /// HSM is initializing
+    Initializing,
+
+    /// HSM is ready
+    Ready,
+
+    /// HSM is in error state
+    Error(String),
+
+    /// HSM is disconnected
+    Disconnected,
+
+    /// HSM is shutting down
+    ShuttingDown,
+    
+    /// HSM is disabled (waiting for user to enable)
+    Disabled,
+}
+
+/// HSM errors
+#[derive(Debug, thiserror::Error)]
+pub enum HsmError {
+    #[error("HSM provider error: {0}")]
+    ProviderError(String),
+
+    #[error("HSM not ready: {0}")]
+    NotReady(String),
+
+    #[error("HSM operation error: {0}")]
+    OperationError(String),
+
+    #[error("Key not found: {0}")]
+    KeyNotFound(String),
+
+    #[error("Serialization error: {0}")]
+    SerializationError(String),
+
+    #[error("Deserialization error: {0}")]
+    DeserializationError(String),
+
+    #[error("Configuration error: {0}")]
+    ConfigError(String),
+
+    #[error("Authentication error: {0}")]
+    AuthError(String),
+
+    #[error("Network error: {0}")]
+    NetworkError(String),
+
+    #[error("Audit logging error: {0}")]
+    AuditError(String),
+    
+    #[error("HSM is disabled: {0}")]
+    Disabled(String),
+
+    #[error("I/O error: {0}")]
+    IoError(#[from] std::io::Error),
 }
 
 impl HsmManager {
@@ -84,13 +185,17 @@ impl HsmManager {
             }
         };
 
-        // Create audit logger
+        let stats = HsmStats::default();
+
+        // HSM is disabled by default, requiring explicit user activation after testing
         let audit_logger = Arc::new(AuditLogger::new(&config.audit).await?);
 
         // Create the HSM manager
         let manager = Self {
             config,
             provider,
+            stats,
+            enabled: false,
             audit_logger,
             operation_tracker: Arc::new(Mutex::new(HashMap::new())),
             status: Arc::new(RwLock::new(HsmStatus::Initializing)),
@@ -296,14 +401,14 @@ impl HsmManager {
         // Call the execute method with SignData operation
         let params = SignParams {
             key_name: key_name.to_string(),
-            data: base64::encode(data),
+            data: BASE64.encode(data),
             algorithm,
         };
 
         let result = self.execute(HsmOperation::SignData, params).await?;
 
         // Convert result to signature bytes
-        let signature = base64::decode(result.data.as_str().ok_or_else(|| {
+        let signature = BASE64.decode(result.data.as_str().ok_or_else(|| {
             HsmError::DeserializationError("Expected string for signature".to_string())
         })?)
         .map_err(|e| HsmError::DeserializationError(e.to_string()))?;
@@ -319,6 +424,11 @@ impl HsmManager {
         signature: &[u8],
         algorithm: SignatureAlgorithm,
     ) -> Result<bool, HsmError> {
+        // Check if HSM is enabled
+        if !self.enabled {
+            return Err(HsmError::Disabled("HSM is not enabled".to_string()));
+        }
+
         debug!(
             "Verifying signature with key: {}, algorithm: {:?}",
             key_name, algorithm
@@ -327,8 +437,8 @@ impl HsmManager {
         // Call the execute method with VerifySignature operation
         let params = VerifyParams {
             key_name: key_name.to_string(),
-            data: base64::encode(data),
-            signature: base64::encode(signature),
+            data: BASE64.encode(data),
+            signature: BASE64.encode(signature),
             algorithm,
         };
 
@@ -349,6 +459,11 @@ impl HsmManager {
         data: &[u8],
         algorithm: EncryptionAlgorithm,
     ) -> Result<Vec<u8>, HsmError> {
+        // Check if HSM is enabled
+        if !self.enabled {
+            return Err(HsmError::Disabled("HSM is not enabled".to_string()));
+        }
+
         debug!(
             "Encrypting data with key: {}, algorithm: {:?}",
             key_name, algorithm
@@ -357,14 +472,14 @@ impl HsmManager {
         // Call the execute method with EncryptData operation
         let params = EncryptParams {
             key_name: key_name.to_string(),
-            data: base64::encode(data),
+            data: BASE64.encode(data),
             algorithm,
         };
 
         let result = self.execute(HsmOperation::EncryptData, params).await?;
 
         // Convert result to encrypted bytes
-        let encrypted = base64::decode(result.data.as_str().ok_or_else(|| {
+        let encrypted = BASE64.decode(result.data.as_str().ok_or_else(|| {
             HsmError::DeserializationError("Expected string for encrypted data".to_string())
         })?)
         .map_err(|e| HsmError::DeserializationError(e.to_string()))?;
@@ -379,6 +494,11 @@ impl HsmManager {
         data: &[u8],
         algorithm: EncryptionAlgorithm,
     ) -> Result<Vec<u8>, HsmError> {
+        // Check if HSM is enabled
+        if !self.enabled {
+            return Err(HsmError::Disabled("HSM is not enabled".to_string()));
+        }
+
         debug!(
             "Decrypting data with key: {}, algorithm: {:?}",
             key_name, algorithm
@@ -387,14 +507,14 @@ impl HsmManager {
         // Call the execute method with DecryptData operation
         let params = DecryptParams {
             key_name: key_name.to_string(),
-            data: base64::encode(data),
+            data: BASE64.encode(data),
             algorithm,
         };
 
         let result = self.execute(HsmOperation::DecryptData, params).await?;
 
         // Convert result to decrypted bytes
-        let decrypted = base64::decode(result.data.as_str().ok_or_else(|| {
+        let decrypted = BASE64.decode(result.data.as_str().ok_or_else(|| {
             HsmError::DeserializationError("Expected string for decrypted data".to_string())
         })?)
         .map_err(|e| HsmError::DeserializationError(e.to_string()))?;
@@ -410,6 +530,11 @@ impl HsmManager {
 
     /// Gets information about a key stored in the HSM
     pub async fn get_key_info(&self, key_name: &str) -> Result<KeyInfo, HsmError> {
+        // Check if HSM is enabled
+        if !self.enabled {
+            return Err(HsmError::Disabled("HSM is not enabled".to_string()));
+        }
+
         debug!("Getting key info for: {}", key_name);
 
         // Call the execute method with GetKeyInfo operation
@@ -428,6 +553,11 @@ impl HsmManager {
 
     /// Lists all keys stored in the HSM
     pub async fn list_keys(&self) -> Result<Vec<KeyInfo>, HsmError> {
+        // Check if HSM is enabled
+        if !self.enabled {
+            return Err(HsmError::Disabled("HSM is not enabled".to_string()));
+        }
+
         debug!("Listing all keys");
 
         // Call the execute method with ListKeys operation
@@ -442,6 +572,11 @@ impl HsmManager {
 
     /// Deletes a key from the HSM
     pub async fn delete_key(&self, key_name: &str) -> Result<(), HsmError> {
+        // Check if HSM is enabled
+        if !self.enabled {
+            return Err(HsmError::Disabled("HSM is not enabled".to_string()));
+        }
+
         info!("Deleting key: {}", key_name);
 
         // Call the execute method with DeleteKey operation
@@ -461,6 +596,11 @@ impl HsmManager {
         end_time: Option<chrono::DateTime<chrono::Utc>>,
         limit: Option<usize>,
     ) -> Result<Vec<HsmAuditEvent>, HsmError> {
+        // Check if HSM is enabled
+        if !self.enabled {
+            return Err(HsmError::Disabled("HSM is not enabled".to_string()));
+        }
+
         debug!("Getting audit log");
 
         // Delegate to the audit logger
@@ -474,6 +614,11 @@ impl HsmManager {
 
     /// Rotates a key in the HSM
     pub async fn rotate_key(&self, key_name: &str) -> Result<KeyInfo, HsmError> {
+        // Check if HSM is enabled
+        if !self.enabled {
+            return Err(HsmError::Disabled("HSM is not enabled".to_string()));
+        }
+
         info!("Rotating key: {}", key_name);
 
         // Call the execute method with RotateKey operation
@@ -489,349 +634,36 @@ impl HsmManager {
 
         Ok(key_info)
     }
-}
 
-/// Type of key
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
-pub enum KeyType {
-    /// RSA key pair
-    Rsa(RsaKeySize),
-
-    /// Elliptic curve key pair
-    Ec(EcCurve),
-
-    /// AES symmetric key
-    Aes(AesKeySize),
-
-    /// Ed25519 key pair
-    Ed25519,
-}
-
-/// RSA key size
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
-pub enum RsaKeySize {
-    /// 2048 bits
-    Bits2048,
-
-    /// 3072 bits
-    Bits3072,
-
-    /// 4096 bits
-    Bits4096,
-}
-
-/// Elliptic curve type
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
-pub enum EcCurve {
-    /// P-256 curve (secp256r1)
-    P256,
-
-    /// P-384 curve (secp384r1)
-    P384,
-
-    /// P-521 curve (secp521r1)
-    P521,
-
-    /// Secp256k1 curve (used in Bitcoin)
-    Secp256k1,
-}
-
-/// AES key size
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
-pub enum AesKeySize {
-    /// 128 bits
-    Bits128,
-
-    /// 192 bits
-    Bits192,
-
-    /// 256 bits
-    Bits256,
-}
-
-/// Information about a key stored in the HSM
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct KeyInfo {
-    /// Name of the key
-    pub name: String,
-
-    /// Type of the key
-    pub key_type: KeyType,
-
-    /// Identifier for the key in the HSM
-    pub hsm_id: String,
-
-    /// Creation time
-    pub created_at: chrono::DateTime<chrono::Utc>,
-
-    /// Last used time
-    pub last_used: Option<chrono::DateTime<chrono::Utc>>,
-
-    /// Public key (for asymmetric keys)
-    pub public_key: Option<String>,
-
-    /// Key version
-    pub version: u32,
-
-    /// Whether the key can be exported
-    pub exportable: bool,
-}
-
-/// Parameters for generating a key
-#[derive(Debug, Serialize, Deserialize)]
-struct GenerateKeyParams {
-    /// Type of key to generate
-    pub key_type: KeyType,
-
-    /// Name to give the key
-    pub key_name: String,
-
-    /// Whether to store the key in the HSM
-    pub store_in_hsm: bool,
-}
-
-/// Parameters for signing data
-#[derive(Debug, Serialize, Deserialize)]
-struct SignParams {
-    /// Name of the key to use
-    pub key_name: String,
-
-    /// Data to sign (base64 encoded)
-    pub data: String,
-
-    /// Signature algorithm to use
-    pub algorithm: SignatureAlgorithm,
-}
-
-/// Parameters for verifying a signature
-#[derive(Debug, Serialize, Deserialize)]
-struct VerifyParams {
-    /// Name of the key to use
-    pub key_name: String,
-
-    /// Data that was signed (base64 encoded)
-    pub data: String,
-
-    /// Signature to verify (base64 encoded)
-    pub signature: String,
-
-    /// Signature algorithm used
-    pub algorithm: SignatureAlgorithm,
-}
-
-/// Parameters for encrypting data
-#[derive(Debug, Serialize, Deserialize)]
-struct EncryptParams {
-    /// Name of the key to use
-    pub key_name: String,
-
-    /// Data to encrypt (base64 encoded)
-    pub data: String,
-
-    /// Encryption algorithm to use
-    pub algorithm: EncryptionAlgorithm,
-}
-
-/// Parameters for decrypting data
-#[derive(Debug, Serialize, Deserialize)]
-struct DecryptParams {
-    /// Name of the key to use
-    pub key_name: String,
-
-    /// Data to decrypt (base64 encoded)
-    pub data: String,
-
-    /// Encryption algorithm used
-    pub algorithm: EncryptionAlgorithm,
-}
-
-/// Parameters for getting key info
-#[derive(Debug, Serialize, Deserialize)]
-struct GetKeyParams {
-    /// Name of the key
-    pub key_name: String,
-}
-
-/// Parameters for deleting a key
-#[derive(Debug, Serialize, Deserialize)]
-struct DeleteKeyParams {
-    /// Name of the key to delete
-    pub key_name: String,
-}
-
-/// Parameters for rotating a key
-#[derive(Debug, Serialize, Deserialize)]
-struct RotateKeyParams {
-    /// Name of the key to rotate
-    pub key_name: String,
-}
-
-/// Signature algorithm
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
-pub enum SignatureAlgorithm {
-    /// RSA with PKCS#1 v1.5 padding and SHA-256
-    RsaPkcs1v15Sha256,
-
-    /// RSA with PKCS#1 v1.5 padding and SHA-384
-    RsaPkcs1v15Sha384,
-
-    /// RSA with PKCS#1 v1.5 padding and SHA-512
-    RsaPkcs1v15Sha512,
-
-    /// RSA with PSS padding and SHA-256
-    RsaPssSha256,
-
-    /// RSA with PSS padding and SHA-384
-    RsaPssSha384,
-
-    /// RSA with PSS padding and SHA-512
-    RsaPssSha512,
-
-    /// ECDSA with SHA-256
-    EcdsaSha256,
-
-    /// ECDSA with SHA-384
-    EcdsaSha384,
-
-    /// ECDSA with SHA-512
-    EcdsaSha512,
-
-    /// Ed25519
-    Ed25519,
-}
-
-/// Encryption algorithm
-#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
-pub enum EncryptionAlgorithm {
-    /// RSA PKCS#1 v1.5
-    RsaPkcs1,
-    /// RSA OAEP with SHA-256
-    RsaOaepSha256,
-    /// AES-CBC with 256-bit key
-    AesCbc256,
-    /// AES-GCM with 256-bit key
-    AesGcm256,
-    /// AES-CTR with 256-bit key
-    AesCtr256,
-    /// ChaCha20-Poly1305
-    ChaCha20Poly1305,
-}
-
-/// HSM status
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-pub enum HsmStatus {
-    /// HSM is initializing
-    Initializing,
-
-    /// HSM is ready
-    Ready,
-
-    /// HSM is in error state
-    Error(String),
-
-    /// HSM is disconnected
-    Disconnected,
-
-    /// HSM is shutting down
-    ShuttingDown,
-}
-
-/// HSM audit event
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct HsmAuditEvent {
-    /// Type of event
-    pub event_type: String,
-
-    /// HSM provider
-    pub provider: String,
-
-    /// Status of the event
-    pub status: String,
-
-    /// Additional details
-    pub details: Option<String>,
-
-    /// Operation ID (if applicable)
-    pub operation_id: Option<String>,
-}
-
-/// HSM errors
-#[derive(Debug, thiserror::Error)]
-pub enum HsmError {
-    #[error("HSM provider error: {0}")]
-    ProviderError(String),
-
-    #[error("HSM not ready: {0}")]
-    NotReady(String),
-
-    #[error("HSM operation error: {0}")]
-    OperationError(String),
-
-    #[error("Key not found: {0}")]
-    KeyNotFound(String),
-
-    #[error("Serialization error: {0}")]
-    SerializationError(String),
-
-    #[error("Deserialization error: {0}")]
-    DeserializationError(String),
-
-    #[error("Configuration error: {0}")]
-    ConfigError(String),
-
-    #[error("Authentication error: {0}")]
-    AuthError(String),
-
-    #[error("Network error: {0}")]
-    NetworkError(String),
-
-    #[error("Audit logging error: {0}")]
-    AuditError(String),
-
-    #[error("I/O error: {0}")]
-    IoError(#[from] std::io::Error),
-}
-
-impl Drop for HsmManager {
-    fn drop(&mut self) {
-        // This is a best-effort attempt to clean up. Since we can't use async in Drop,
-        // we just log a warning if we haven't closed properly.
-        let status = futures::executor::block_on(self.status.read());
-        if *status != HsmStatus::ShuttingDown && *status != HsmStatus::Initializing {
-            warn!("HsmManager dropped without calling close(). Resources may not be cleaned up properly.");
+    /// Enable the HSM module
+    pub async fn enable(&mut self) -> Result<(), HsmError> {
+        // Check if the HSM provider is available and working
+        let status = self.provider.get_status().await?;
+        
+        match status {
+            HsmProviderStatus::Ready => {
+                self.enabled = true;
+                *self.status.write().await = HsmStatus::Ready;
+                self.log_audit_event("HSM enabled by user", "ENABLE_HSM").await;
+                Ok(())
+            },
+            _ => {
+                Err(HsmError::NotReady(format!("Cannot enable HSM, provider status: {:?}", status)))
+            }
         }
     }
-}
-
-// Ensure the HsmProvider trait has an execute_operation method
-pub trait HsmProvider: Send + Sync {
-    // ... existing methods ...
-
-    async fn execute_operation(&self, request: HsmRequest) -> Result<HsmResponse, HsmError>;
-
-    // ... existing methods ...
-}
-
-// HSM Integration Core
-#[derive(Debug, Clone)]
-pub struct HsmClient {
-    connector: Arc<dyn HsmConnector>,
-    network: Network,
-}
-
-#[async_trait]
-pub trait HsmConnector: Send + Sync {
-    async fn sign_taproot(&self, msg: &[u8], path: &HsmKeyPath) -> Result<Signature>;
-    async fn derive_key(&self, path: &HsmKeyPath) -> Result<XOnlyPublicKey>;
-    async fn get_pubkey(&self, path: &HsmKeyPath) -> Result<XOnlyPublicKey>;
-}
-
-impl SecurityManager {
-    pub async fn new_hsm_client(&self, hsm_type: HsmType) -> Result<HsmClient> {
-        match hsm_type {
-            HsmType::YubiHsm => YubiConnector::new().await,
-            HsmType::Ledger => LedgerConnector::new().await,
-        }
+    
+    /// Disable the HSM module
+    pub async fn disable(&mut self) -> Result<(), HsmError> {
+        self.enabled = false;
+        *self.status.write().await = HsmStatus::Disabled;
+        self.log_audit_event("HSM disabled by user", "DISABLE_HSM").await;
+        Ok(())
+    }
+    
+    /// Check if HSM is enabled
+    pub fn is_enabled(&self) -> bool {
+        self.enabled
     }
 }
 
@@ -846,19 +678,26 @@ pub struct AtomicSwap {
 
 impl NetworkManager {
     pub async fn initiate_swap(&self, amount: u64, counterparty: &str) -> Result<AtomicSwap> {
-        let preimage = rand::thread_rng().gen::<[u8; 32]>();
-        let hash = Sha256::hash(&preimage);
+        use rand::Rng;
+        use sha2::{Sha256, Digest};
+        use bitcoin::Script;
+        use bitcoin::opcodes;
+        use bitcoin::blockdata::script::Builder;
+
+        let mut rng = rand::thread_rng();
+        let preimage = rng.gen::<[u8; 32]>();
+        let hash = Sha256::digest(&preimage);
 
         let script = Builder::new()
-            .push_opcode(opcodes::OP_IF)
+            .push_opcode(opcodes::all::OP_IF)
             .push_slice(&hash)
-            .push_opcode(opcodes::OP_ELSE)
+            .push_opcode(opcodes::all::OP_ELSE)
             .push_int(self.network.get_block_height()? + 144)
-            .push_opcode(opcodes::OP_CHECKSEQUENCEVERIFY)
-            .push_opcode(opcodes::OP_DROP)
-            .push_slice(&counterparty)
-            .push_opcode(opcodes::OP_ENDIF)
-            .push_opcode(opcodes::OP_CHECKSIG)
+            .push_opcode(opcodes::all::OP_CHECKSEQUENCEVERIFY)
+            .push_opcode(opcodes::all::OP_DROP)
+            .push_slice(&counterparty.as_bytes())
+            .push_opcode(opcodes::all::OP_ENDIF)
+            .push_opcode(opcodes::all::OP_CHECKSIG)
             .into_script();
 
         Ok(AtomicSwap {
@@ -898,16 +737,24 @@ impl SecurityManager {
 
 // GPU-Resistant Key Derivation
 impl SecurityManager {
-    pub fn gpu_resistant_derive(&self, mnemonic: &str) -> Result<ExtendedPrivKey> {
+    pub fn gpu_resistant_derive(&self, mnemonic: &str) -> Result<ExtendedPrivKey, Box<dyn Error>> {
+        use argon2::{Algorithm, Argon2, Params, Version};
+        use bitcoin::util::bip32::ExtendedPrivKey;
+        use bitcoin::Network;
+        
         let salt = "ANYA_CORE_SALT_V2";
-        let mut kdf = Argon2::new(
-            argon2::Algorithm::Argon2id,
-            argon2::Version::V0x13,
-            argon2::Params::new(15000, 2, 1, Some(32))?,
-        );
-
-        let seed = kdf.hash_password(mnemonic.as_bytes(), salt.as_bytes())?;
-        ExtendedPrivKey::new_master(Network::Bitcoin, &seed.hash)
+        
+        let params = Params::new(15000, 2, 1, Some(32))
+            .map_err(|e| Box::new(e) as Box<dyn Error>)?;
+            
+        let argon2 = Argon2::new(Algorithm::Argon2id, Version::V0x13, params);
+        
+        let mut output_key = [0u8; 32]; // 32-byte key for BIP32
+        argon2.hash_password_into(mnemonic.as_bytes(), salt.as_bytes(), &mut output_key)
+            .map_err(|e| Box::new(e) as Box<dyn Error>)?;
+            
+        ExtendedPrivKey::new_master(Network::Bitcoin, &output_key)
+            .map_err(|e| Box::new(e) as Box<dyn Error>)
     }
 }
 
