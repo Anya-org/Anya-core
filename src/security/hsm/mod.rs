@@ -739,7 +739,7 @@ impl SecurityManager {
         let salt = "ANYA_CORE_SALT_V2";
         
         let params = Params::new(15000, 2, 1, Some(32))
-            .map_err(|e| -> Box<dyn std::error::Error> { Box::new(e) })?;
+            .map_err(|e| -> Box<dyn std::error::Error> { Box::new(Argon2Error::Error(e.to_string())) })?;
             
         let argon2 = Argon2::new(Algorithm::Argon2id, Version::V0x13, params);
         
@@ -874,7 +874,7 @@ impl SecurityManager {
         let salt = "ANYA_CORE_SALT_V2";
         
         let params = Params::new(15000, 2, 1, Some(32))
-            .map_err(|e| -> Box<dyn std::error::Error> { Box::new(e) })?;
+            .map_err(|e| -> Box<dyn std::error::Error> { Box::new(Argon2Error::Error(e.to_string())) })?;
             
         let argon2 = Argon2::new(Algorithm::Argon2id, Version::V0x13, params);
         

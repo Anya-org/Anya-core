@@ -156,6 +156,14 @@ pub enum HsmError {
     /// Internal error
     #[error("Internal error: {0}")]
     InternalError(String),
+
+    /// Not implemented error
+    #[error("Not implemented")]
+    NotImplemented,
+    
+    /// Operation not supported
+    #[error("Operation not supported: {0}")]
+    OperationNotSupported(String),
 }
 
 /// HSM audit event type

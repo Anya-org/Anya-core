@@ -142,7 +142,7 @@ impl AnyaCore {
             None
         };
 
-        let bitcoin_manager = if config.bitcoin_config.enabled {
+        let bitcoin_manager = if config.bitcoin_config.general.enabled {
             Some(bitcoin::BitcoinManager::new(config.bitcoin_config)?)
         } else {
             None
