@@ -40,7 +40,7 @@
 use std::error::Error;
 use std::fmt;
 use std::collections::HashMap;
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
 
 pub mod ml;
 pub mod web5;
@@ -97,7 +97,7 @@ pub struct AnyaConfig {
     /// Web5 configuration
     pub web5_config: web5::Web5Config,
     /// Bitcoin network configuration
-    pub bitcoin_config: bitcoin::BitcoinConfig,
+    pub bitcoin_config: crate::security::hsm::config::HsmConfig,
     /// DAO configuration
     pub dao_config: dao::DAOConfig,
 }
@@ -107,7 +107,7 @@ impl Default for AnyaConfig {
         Self {
             ml_config: ml::MLConfig::default(),
             web5_config: web5::Web5Config::default(),
-            bitcoin_config: bitcoin::BitcoinConfig::default(),
+            bitcoin_config: crate::security::hsm::config::HsmConfig::default(),
             dao_config: dao::DAOConfig::default(),
         }
     }
@@ -120,7 +120,7 @@ pub struct AnyaCore {
     /// Web5 manager
     pub web5_manager: Option<web5::Web5Manager>,
     /// Bitcoin manager
-    pub bitcoin_manager: Option<bitcoin::BitcoinManager>,
+    pub bitcoin_manager: Option<crate::security::hsm::HsmManager>,
     /// DAO manager
     pub dao_manager: Option<dao::DAOManager>,
 }
@@ -312,8 +312,8 @@ impl From<web5::Web5Error> for AnyaError {
     }
 }
 
-impl From<bitcoin::error::BitcoinError> for AnyaError {
-    fn from(error: bitcoin::error::BitcoinError) -> Self {
+impl From<crate::security::hsm::HsmError> for AnyaError {
+    fn from(error: crate::security::hsm::HsmError) -> Self {
         AnyaError::Bitcoin(error.to_string())
     }
 }

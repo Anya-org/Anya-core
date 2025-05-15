@@ -1,4 +1,3 @@
-use std::error::Error;
 // AIE-001: Security Module Integration
 // Exports system hardening functionality
 
@@ -81,7 +80,7 @@ pub use validation::ValidationResult;
 // Security module for Anya Core
 // [AIR-3][AIS-3][AIT-3][AIP-3][RES-3]
 
-use log::{info, error, warn};
+use log::info;
 use crate::security::hsm::provider::PublicKeyInfo;
 use crate::security::hsm::audit::AuditFilter;
 

@@ -1,4 +1,4 @@
-use std::error::Error;
+
 // Migrated from OPSource to anya-core
 // This file was automatically migrated as part of the Rust-only implementation
 // Original file: C:\Users\bmokoka\Downloads\OPSource\src\layer2\bob\mod.rs
@@ -24,15 +24,15 @@ use std::error::Error;
 
 use std::sync::{Arc, Mutex};
 use std::collections::HashMap;
-use thiserror::Error;
+
 
 // Internal imports
 use crate::bitcoin::interface::BitcoinAddress;
 use crate::bitcoin::Transaction as BtcTransaction;
-use crate::core::performance::Metrics;
+
 use crate::security::validation::ValidationResult;
 use crate::layer2::bob::cross_layer::BtcTransaction as BobBtcTransaction;
-use crate::AnyaResult;
+
 
 /// Configuration for the BOB Layer 2 integration
 #[derive(Clone, Debug)]
@@ -392,6 +392,10 @@ impl Default for Metrics {
         }
     }
 }
+
+// Forward declarations for types to be implemented later
+pub struct BitcoinRelay {}
+pub struct StateManager {}
 
 pub struct BobIntegration {
     l2_client: BobClient,

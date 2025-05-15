@@ -1,7 +1,6 @@
 use std::error::Error;
 use crate::{
-    AnyaError,
-    AnyaResult,
+
     layer2::{
         Layer2Protocol,
         ProtocolState,
@@ -15,7 +14,7 @@ use crate::{
     },
 };
 use async_trait::async_trait;
-use tracing::{info, error, warn};
+use tracing::info;
 
 pub struct StateChannelsProtocol {
     initialized: bool,

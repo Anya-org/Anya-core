@@ -4,7 +4,7 @@ use std::error::Error;
 // as per Bitcoin Development Framework v2.5 requirements
 
 use crate::layer2::{Layer2Protocol, TransactionStatus, ProtocolState, AssetParams, AssetTransfer, TransferResult, Proof, VerificationResult, ValidationResult};
-use crate::AnyaResult;
+
 use async_trait::async_trait;
 
 /// Sidechains protocol for Layer 2

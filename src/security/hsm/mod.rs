@@ -32,7 +32,7 @@ pub use providers::{
 #[cfg(test)]
 pub mod tests;
 
-use bitcoin::{Network, Script, ScriptBuf, XOnlyPublicKey, Txid, Psbt};
+use bitcoin::{Txid, Psbt, Script, ScriptBuf, XOnlyPublicKey};
 use bitcoin::taproot::TaprootBuilder;
 use bitcoin::bip32::Xpriv;
 use bitcoin::key::Secp256k1;
@@ -43,12 +43,12 @@ use secp256k1::ecdsa::Signature;
 use sha2::Sha256;
 use base64::{Engine as _, engine::general_purpose::STANDARD as BASE64};
 use serde::{Deserialize, Serialize};
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 use std::sync::{Arc, Mutex, RwLock};
-use tokio::spawn;
+// No need for spawn import
 use tracing::{debug, error, info};
 use bitcoin::blockdata::block::BlockHeader;
-use log::debug;
+// No need for debug import
 
 // Import HSM provider types
 use self::config::HsmConfig;
@@ -674,7 +674,7 @@ impl NetworkManager {
     pub async fn initiate_swap(&self, amount: u64, counterparty: &str) -> Result<AtomicSwap> {
         use rand::Rng;
         use sha2::{Sha256, Digest};
-        use bitcoin::Script;
+        // Script already imported at the top level
         use bitcoin::opcodes;
         use bitcoin::blockdata::script::Builder;
 
@@ -829,9 +829,27 @@ pub enum HsmType {
     Simulator,
 }
 
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone)]
 pub struct CoreWrapper<T: serde::Serialize + serde::de::DeserializeOwned> {
     inner: T,
+}
+
+impl<T: serde::Serialize + serde::de::DeserializeOwned> serde::Serialize for CoreWrapper<T> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        self.inner.serialize(serializer)
+    }
+}
+
+impl<'de, T: serde::Serialize + serde::de::DeserializeOwned> serde::Deserialize<'de> for CoreWrapper<T> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        T::deserialize(deserializer).map(|inner| CoreWrapper { inner })
+    }
 }
 
 // ... existing code ...
