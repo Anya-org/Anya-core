@@ -65,7 +65,7 @@ pub trait KeyManager {
     fn derive_key(&self, path: &str) -> AnyaResult<SecretKey>;
     fn get_public_key(&self, path: &str) -> AnyaResult<bitcoin::secp256k1::PublicKey>;
     fn sign_message(&self, message: &[u8], path: &str) -> AnyaResult<Vec<u8>>;
-    fn verify_message(&self, message: &[u8], _signature: signature: &[u8][u8], path: &str) -> AnyaResult<bool>;
+    fn verify_message(&self, message: &[u8], _signature: &[u8], path: &str) -> AnyaResult<bool>;
 }
 
 pub trait AddressManager {
@@ -253,7 +253,7 @@ impl KeyManager for Wallet {
         Ok(signature.serialize_der().to_vec())
     }
     
-    fn verify_message(&self, message: &[u8], _signature: signature: &[u8][u8], path: &str) -> AnyaResult<bool> {
+    fn verify_message(&self, message: &[u8], _signature: &[u8], path: &str) -> AnyaResult<bool> {
         let public_key = self.get_public_key(path)?;
         
         // Hash the message with SHA256

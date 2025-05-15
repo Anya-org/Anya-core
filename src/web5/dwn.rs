@@ -82,7 +82,7 @@ impl DWNClient {
     }
     
     /// Send a message to a DID through the DWN
-    pub fn send_message(&self, to: &str, protocol: &str, message_type: &str, _data: data: &[u8][u8]) -> Web5Result<String>  -> Result<(), Box<dyn Error>> {
+    pub fn send_message(&self, to: &str, protocol: &str, message_type: &str, _data: &[u8]) -> Web5Result<String>  -> Result<(), Box<dyn Error>> {
         // Check if identity is set
         let from = self.identity.as_ref().ok_or_else(|| {
             Web5Error::Identity("Identity not set for DWN client".to_string())

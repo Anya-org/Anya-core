@@ -321,19 +321,19 @@ pub trait HsmProvider: Debug + Send + Sync {
     async fn generate_key(&self, _params: KeyGenParams) -> Result<(KeyPair, KeyInfo), HsmError>;
     
     /// Sign data
-    async fn sign(&self, _key_id: key_id: &strstr, _algorithm: SigningAlgorithm, _data: data: &[u8][u8]) -> Result<Vec<u8>, HsmError>;
+    async fn sign(&self, _key_id: &str, _algorithm: SigningAlgorithm, _data: &[u8]) -> Result<Vec<u8>, HsmError>;
     
     /// Verify signature
-    async fn verify(&self, _key_id: key_id: &strstr, _algorithm: SigningAlgorithm, _data: data: &[u8][u8], _signature: signature: &[u8][u8]) -> Result<bool, HsmError>;
+    async fn verify(&self, _key_id: &str, _algorithm: SigningAlgorithm, _data: &[u8], _signature: &[u8]) -> Result<bool, HsmError>;
     
     /// Export public key
-    async fn export_public_key(&self, _key_id: key_id: &strstr) -> Result<Vec<u8>, HsmError>;
+    async fn export_public_key(&self, _key_id: &str) -> Result<Vec<u8>, HsmError>;
     
     /// List keys
     async fn list_keys(&self) -> Result<Vec<KeyInfo>, HsmError>;
     
     /// Delete key
-    async fn delete_key(&self, _key_id: key_id: &strstr) -> Result<(), HsmError>;
+    async fn delete_key(&self, _key_id: &str) -> Result<(), HsmError>;
     
     /// Get provider status
     async fn get_status(&self) -> Result<HsmProviderStatus, HsmError>;
@@ -418,17 +418,17 @@ impl HsmProvider for SoftHsmProvider {
         Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
     
-    async fn sign(&self, _key_id: key_id: &strstr, _algorithm: SigningAlgorithm, _data: data: &[u8][u8]) -> Result<Vec<u8>, HsmError> {
+    async fn sign(&self, _key_id: &str, _algorithm: SigningAlgorithm, _data: &[u8]) -> Result<Vec<u8>, HsmError> {
         // Implementation needed
         Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
     
-    async fn verify(&self, _key_id: key_id: &strstr, _algorithm: SigningAlgorithm, _data: data: &[u8][u8], _signature: signature: &[u8][u8]) -> Result<bool, HsmError> {
+    async fn verify(&self, _key_id: &str, _algorithm: SigningAlgorithm, _data: &[u8], _signature: &[u8]) -> Result<bool, HsmError> {
         // Implementation needed
         Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
     
-    async fn export_public_key(&self, _key_id: key_id: &strstr) -> Result<Vec<u8>, HsmError> {
+    async fn export_public_key(&self, _key_id: &str) -> Result<Vec<u8>, HsmError> {
         // Implementation needed
         Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
@@ -438,7 +438,7 @@ impl HsmProvider for SoftHsmProvider {
         Ok(keys.values().cloned().collect())
     }
     
-    async fn delete_key(&self, _key_id: key_id: &strstr) -> Result<(), HsmError> {
+    async fn delete_key(&self, _key_id: &str) -> Result<(), HsmError> {
         let mut keys = self.keys.lock().await;
         let mut key_data = self.key_data.lock().await;
         
@@ -666,17 +666,17 @@ impl HsmProvider for CloudHsmProvider {
         Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
     
-    async fn sign(&self, _key_id: key_id: &strstr, _algorithm: SigningAlgorithm, _data: data: &[u8][u8]) -> Result<Vec<u8>, HsmError> {
+    async fn sign(&self, _key_id: &str, _algorithm: SigningAlgorithm, _data: &[u8]) -> Result<Vec<u8>, HsmError> {
         // Implementation needed
         Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
     
-    async fn verify(&self, _key_id: key_id: &strstr, _algorithm: SigningAlgorithm, _data: data: &[u8][u8], _signature: signature: &[u8][u8]) -> Result<bool, HsmError> {
+    async fn verify(&self, _key_id: &str, _algorithm: SigningAlgorithm, _data: &[u8], _signature: &[u8]) -> Result<bool, HsmError> {
         // Implementation needed
         Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
     
-    async fn export_public_key(&self, _key_id: key_id: &strstr) -> Result<Vec<u8>, HsmError> {
+    async fn export_public_key(&self, _key_id: &str) -> Result<Vec<u8>, HsmError> {
         // Implementation needed
         Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
@@ -686,7 +686,7 @@ impl HsmProvider for CloudHsmProvider {
         Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
     
-    async fn delete_key(&self, _key_id: key_id: &strstr) -> Result<(), HsmError> {
+    async fn delete_key(&self, _key_id: &str) -> Result<(), HsmError> {
         // Implementation needed
         Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
@@ -733,17 +733,17 @@ impl HsmProvider for TpmProvider {
         Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
     
-    async fn sign(&self, _key_id: key_id: &strstr, _algorithm: SigningAlgorithm, _data: data: &[u8][u8]) -> Result<Vec<u8>, HsmError> {
+    async fn sign(&self, _key_id: &str, _algorithm: SigningAlgorithm, _data: &[u8]) -> Result<Vec<u8>, HsmError> {
         // Implementation needed
         Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
     
-    async fn verify(&self, _key_id: key_id: &strstr, _algorithm: SigningAlgorithm, _data: data: &[u8][u8], _signature: signature: &[u8][u8]) -> Result<bool, HsmError> {
+    async fn verify(&self, _key_id: &str, _algorithm: SigningAlgorithm, _data: &[u8], _signature: &[u8]) -> Result<bool, HsmError> {
         // Implementation needed
         Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
     
-    async fn export_public_key(&self, _key_id: key_id: &strstr) -> Result<Vec<u8>, HsmError> {
+    async fn export_public_key(&self, _key_id: &str) -> Result<Vec<u8>, HsmError> {
         // Implementation needed
         Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
@@ -753,7 +753,7 @@ impl HsmProvider for TpmProvider {
         Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
     
-    async fn delete_key(&self, _key_id: key_id: &strstr) -> Result<(), HsmError> {
+    async fn delete_key(&self, _key_id: &str) -> Result<(), HsmError> {
         // Implementation needed
         Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
@@ -800,17 +800,17 @@ impl HsmProvider for Pkcs11Provider {
         Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
     
-    async fn sign(&self, _key_id: key_id: &strstr, _algorithm: SigningAlgorithm, _data: data: &[u8][u8]) -> Result<Vec<u8>, HsmError> {
+    async fn sign(&self, _key_id: &str, _algorithm: SigningAlgorithm, _data: &[u8]) -> Result<Vec<u8>, HsmError> {
         // Implementation needed
         Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
     
-    async fn verify(&self, _key_id: key_id: &strstr, _algorithm: SigningAlgorithm, _data: data: &[u8][u8], _signature: signature: &[u8][u8]) -> Result<bool, HsmError> {
+    async fn verify(&self, _key_id: &str, _algorithm: SigningAlgorithm, _data: &[u8], _signature: &[u8]) -> Result<bool, HsmError> {
         // Implementation needed
         Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
     
-    async fn export_public_key(&self, _key_id: key_id: &strstr) -> Result<Vec<u8>, HsmError> {
+    async fn export_public_key(&self, _key_id: &str) -> Result<Vec<u8>, HsmError> {
         // Implementation needed
         Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
@@ -820,7 +820,7 @@ impl HsmProvider for Pkcs11Provider {
         Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
     
-    async fn delete_key(&self, _key_id: key_id: &strstr) -> Result<(), HsmError> {
+    async fn delete_key(&self, _key_id: &str) -> Result<(), HsmError> {
         // Implementation needed
         Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }

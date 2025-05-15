@@ -412,7 +412,7 @@ impl TaprootWallet {
     /// Encode data in a Taproot commitment using OP_RETURN
     pub fn encode_taproot_data_commitment(
         &self,
-        _data: data: &[u8][u8],
+        _data: &[u8],
     ) -> Result<ScriptBuf, TaprootError> {
         if data.len() > 80 {
             return Err(TaprootError::InvalidParameter(
@@ -428,7 +428,7 @@ impl TaprootWallet {
     pub fn create_taproot_asset(
         &self,
         issuer_key: &SecretKey,
-        asset_meta_data: data: &[u8][u8],
+        asset_meta_data: &[u8],
         total_supply: u64,
         initial_outputs: Vec<(Address, u64)>,
         utxos: Vec<(Transaction, usize)>,
@@ -642,7 +642,7 @@ impl MuSig {
         &self,
         combined_pubkey: &XOnlyPublicKey,
         message: &[u8],
-        _signature: signature: &[u8][u8],
+        _signature: &[u8],
     ) -> Result<bool, TaprootError> {
         let msg = Message::from_slice(message)
             .map_err(|e| TaprootError::InvalidParameter(format!("Invalid message: {}", e)))?;

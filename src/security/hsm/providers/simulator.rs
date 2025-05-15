@@ -169,7 +169,7 @@ impl SimulatorHsmProvider {
     }
     
     /// Sign Bitcoin transaction for testnet
-    async fn sign_bitcoin_transaction(&self, _key_id: key_id: &strstr, tx: &mut Psbt) -> Result<(), HsmError> {
+    async fn sign_bitcoin_transaction(&self, _key_id: &str, tx: &mut Psbt) -> Result<(), HsmError> {
         self.simulate_conditions().await?;
         
         let key_data = self.key_data.lock().await;
@@ -267,7 +267,7 @@ impl HsmProvider for SimulatorHsmProvider {
         })
     }
     
-    async fn sign(&self, _key_id: key_id: &strstr, _algorithm: SigningAlgorithm, _data: data: &[u8][u8]) -> Result<Vec<u8>, HsmError> {
+    async fn sign(&self, _key_id: &str, _algorithm: SigningAlgorithm, _data: &[u8]) -> Result<Vec<u8>, HsmError> {
         self.simulate_conditions().await?;
         
         // Check if key exists and has signing capability
@@ -305,7 +305,7 @@ impl HsmProvider for SimulatorHsmProvider {
         }
     }
     
-    async fn verify(&self, _key_id: key_id: &strstr, _algorithm: SigningAlgorithm, _data: data: &[u8][u8], _signature: signature: &[u8][u8]) -> Result<bool, HsmError> {
+    async fn verify(&self, _key_id: &str, _algorithm: SigningAlgorithm, _data: &[u8], _signature: &[u8]) -> Result<bool, HsmError> {
         self.simulate_conditions().await?;
         
         // Check if key exists and has verify capability
@@ -352,7 +352,7 @@ impl HsmProvider for SimulatorHsmProvider {
         }
     }
     
-    async fn export_public_key(&self, _key_id: key_id: &strstr) -> Result<Vec<u8>, HsmError> {
+    async fn export_public_key(&self, _key_id: &str) -> Result<Vec<u8>, HsmError> {
         self.simulate_conditions().await?;
         
         // Check if key exists
@@ -382,7 +382,7 @@ impl HsmProvider for SimulatorHsmProvider {
         Ok(keys.values().cloned().collect())
     }
     
-    async fn delete_key(&self, _key_id: key_id: &strstr) -> Result<(), HsmError> {
+    async fn delete_key(&self, _key_id: &str) -> Result<(), HsmError> {
         self.simulate_conditions().await?;
         
         let mut keys = self.keys.lock().await;

@@ -70,7 +70,7 @@ impl AsRef<[u8]> for SchnorrSignature {
 impl TryFrom<&[u8]> for SchnorrSignature {
     type Error = Bip340Error;
     
-    fn try_from(_data: data: &[u8][u8]) -> Result<Self, Self::Error> {
+    fn try_from(_data: &[u8]) -> Result<Self, Self::Error> {
         if data.len() != 64 {
             return Err(Bip340Error::InvalidSignature(
                 format!("Invalid signature length: {}", data.len())
@@ -117,7 +117,7 @@ impl AsRef<[u8]> for XOnlyPublicKey {
 impl TryFrom<&[u8]> for XOnlyPublicKey {
     type Error = Bip340Error;
     
-    fn try_from(_data: data: &[u8][u8]) -> Result<Self, Self::Error> {
+    fn try_from(_data: &[u8]) -> Result<Self, Self::Error> {
         if data.len() != 32 {
             return Err(Bip340Error::InvalidPublicKey(
                 format!("Invalid public key length: {}", data.len())

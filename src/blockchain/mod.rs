@@ -359,7 +359,7 @@ pub trait NodePort {
     async fn get_raw_transaction(&self, txid: &str) -> Result<Vec<u8>, BlockchainError>;
     
     /// Broadcast a raw transaction
-    async fn broadcast_transaction(&self, tx__data: data: &[u8][u8]) -> Result<String, BlockchainError>;
+    async fn broadcast_transaction(&self, tx__data: &[u8]) -> Result<String, BlockchainError>;
     
     /// Get mempool status
     async fn get_mempool_status(&self) -> Result<MempoolStatus, BlockchainError>;

@@ -231,7 +231,7 @@ impl FederatedAgent {
         &self,
         participant_id: &str,
         model_hash: &str,
-        model__data: data: &[u8][u8],
+        model__data: &[u8],
         performance: HashMap<String, f64>
     ) -> Result<(), AgentError> {
         // Update participant state

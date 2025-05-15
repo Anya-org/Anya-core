@@ -687,7 +687,7 @@ impl NodePort for BitcoinAdapter {
             .map_err(|e| BlockchainError::SerializationError(format!("Failed to decode transaction hex: {}", e)))
     }
     
-    async fn broadcast_transaction(&self, tx__data: data: &[u8][u8]) -> Result<String, BlockchainError> {
+    async fn broadcast_transaction(&self, tx__data: &[u8]) -> Result<String, BlockchainError> {
         // Encode the transaction as hex
         let tx_hex = hex::encode(tx_data);
         

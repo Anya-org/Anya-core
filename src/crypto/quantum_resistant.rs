@@ -43,7 +43,7 @@ impl QuantumResistantCrypto {
         Ok(signature)
     }
 
-    pub fn verify(&self, message: &[u8], _signature: signature: &[u8][u8]) -> Result<bool> {
+    pub fn verify(&self, message: &[u8], _signature: &[u8]) -> Result<bool> {
         if signature.len() != self.key_size * 2 {
             return Ok(false);
         }

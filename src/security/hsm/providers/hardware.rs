@@ -218,7 +218,7 @@ impl HardwareHsmProvider {
     }
     
     /// Sign Bitcoin transaction for testnet using hardware device
-    async fn sign_bitcoin_transaction(&self, _key_id: key_id: &strstr, tx: &mut Psbt) -> Result<(), HsmError> {
+    async fn sign_bitcoin_transaction(&self, _key_id: &str, tx: &mut Psbt) -> Result<(), HsmError> {
         self.ensure_authenticated().await?;
         
         // Get key info
@@ -267,7 +267,7 @@ impl HsmProvider for HardwareHsmProvider {
         }
     }
     
-    async fn sign(&self, _key_id: key_id: &strstr, _algorithm: SigningAlgorithm, _data: data: &[u8][u8]) -> Result<Vec<u8>, HsmError> {
+    async fn sign(&self, _key_id: &str, _algorithm: SigningAlgorithm, _data: &[u8]) -> Result<Vec<u8>, HsmError> {
         self.ensure_authenticated().await?;
         
         // Get key info
@@ -294,7 +294,7 @@ impl HsmProvider for HardwareHsmProvider {
                 0x3b, 0x3c, 0x3d, 0x3e, 0x3f, 0x40])
     }
     
-    async fn verify(&self, _key_id: key_id: &strstr, _algorithm: SigningAlgorithm, _data: data: &[u8][u8], _signature: signature: &[u8][u8]) -> Result<bool, HsmError> {
+    async fn verify(&self, _key_id: &str, _algorithm: SigningAlgorithm, _data: &[u8], _signature: &[u8]) -> Result<bool, HsmError> {
         self.ensure_authenticated().await?;
         
         // Get key info
@@ -312,7 +312,7 @@ impl HsmProvider for HardwareHsmProvider {
         Ok(true)
     }
     
-    async fn export_public_key(&self, _key_id: key_id: &strstr) -> Result<Vec<u8>, HsmError> {
+    async fn export_public_key(&self, _key_id: &str) -> Result<Vec<u8>, HsmError> {
         self.ensure_authenticated().await?;
         
         // Get key info
@@ -337,7 +337,7 @@ impl HsmProvider for HardwareHsmProvider {
         Ok(keys.values().cloned().collect())
     }
     
-    async fn delete_key(&self, _key_id: key_id: &strstr) -> Result<(), HsmError> {
+    async fn delete_key(&self, _key_id: &str) -> Result<(), HsmError> {
         self.ensure_authenticated().await?;
         
         let mut keys = self.keys.lock().await;

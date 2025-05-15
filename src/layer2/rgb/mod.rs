@@ -101,7 +101,7 @@ impl RgbClient {
     pub async fn create_non_fungible_asset(
         &self,
         name: &str,
-        _data: data: &[u8][u8],
+        _data: &[u8],
     ) -> Result<AssetInfo, RgbError> {
         self.asset_manager.create_non_fungible_asset(name, data).await
     }
@@ -237,7 +237,7 @@ impl AssetManager {
     pub async fn create_non_fungible_asset(
         &self,
         name: &str,
-        _data: data: &[u8][u8],
+        _data: &[u8],
     ) -> Result<AssetInfo, RgbError> {
         // Implementation would create a non-fungible asset
         let asset_id = format!("rgb:{}", uuid::Uuid::new_v4());

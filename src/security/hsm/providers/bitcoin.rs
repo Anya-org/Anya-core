@@ -171,8 +171,8 @@ impl BitcoinHsmProvider {
     /// Sign data with a Bitcoin key
     async fn sign_bitcoin(
         &self,
-        _key_id: key_id: &strstr,
-        _data: data: &[u8][u8],
+        _key_id: &str,
+        _data: &[u8],
         _algorithm: SigningAlgorithm,
     ) -> Result<Vec<u8>, HsmError> {
         // Get key info
@@ -214,9 +214,9 @@ impl BitcoinHsmProvider {
     /// Verify a signature with a Bitcoin key
     async fn verify_bitcoin(
         &self,
-        _key_id: key_id: &strstr,
-        _data: data: &[u8][u8],
-        _signature: signature: &[u8][u8],
+        _key_id: &str,
+        _data: &[u8],
+        _signature: &[u8],
         _algorithm: SigningAlgorithm,
     ) -> Result<bool, HsmError> {
         // Get key info
@@ -321,9 +321,9 @@ impl HsmProvider for BitcoinHsmProvider {
 
     async fn sign(
         &self,
-        _key_id: key_id: &strstr,
+        _key_id: &str,
         _algorithm: SigningAlgorithm,
-        _data: data: &[u8][u8],
+        _data: &[u8],
     ) -> Result<Vec<u8>, HsmError> {
         debug!(
             "Signing data with key {}, algorithm {:?}",
@@ -345,10 +345,10 @@ impl HsmProvider for BitcoinHsmProvider {
 
     async fn verify(
         &self,
-        _key_id: key_id: &strstr,
+        _key_id: &str,
         _algorithm: SigningAlgorithm,
-        _data: data: &[u8][u8],
-        _signature: signature: &[u8][u8],
+        _data: &[u8],
+        _signature: &[u8],
     ) -> Result<bool, HsmError> {
         debug!(
             "Verifying signature with key {}, algorithm {:?}",
@@ -369,7 +369,7 @@ impl HsmProvider for BitcoinHsmProvider {
             .await
     }
 
-    async fn export_public_key(&self, _key_id: key_id: &strstr) -> Result<Vec<u8>, HsmError> {
+    async fn export_public_key(&self, _key_id: &str) -> Result<Vec<u8>, HsmError> {
         debug!("Exporting public key {}", key_id);
 
         // Check provider status
@@ -420,7 +420,7 @@ impl HsmProvider for BitcoinHsmProvider {
         Ok(keys_list)
     }
 
-    async fn delete_key(&self, _key_id: key_id: &strstr) -> Result<(), HsmError> {
+    async fn delete_key(&self, _key_id: &str) -> Result<(), HsmError> {
         debug!("Deleting key {}", key_id);
 
         // Check provider status

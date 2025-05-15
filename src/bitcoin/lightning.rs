@@ -765,7 +765,7 @@ fn current_time() -> u64 {
 
 // Add a method to create LightningTxid from slice
 impl LightningTxid {
-    pub fn from_slice(_data: data: &[u8][u8]) -> Result<Self, String> {
+    pub fn from_slice(_data: &[u8]) -> Result<Self, String> {
         if data.len() != 32 {
             return Err("Invalid txid length".to_string());
         }

@@ -68,7 +68,7 @@ impl SoftwareHsmProvider {
     }
 
     /// Sign a Bitcoin transaction for testnet
-    async fn sign_bitcoin_transaction(&self, _key_id: key_id: &strstr, tx: &mut Psbt) -> Result<(), HsmError> {
+    async fn sign_bitcoin_transaction(&self, _key_id: &str, tx: &mut Psbt) -> Result<(), HsmError> {
         let key_data = self.key_data.lock().await;
         let secret_data = key_data
             .get(key_id)
@@ -143,9 +143,9 @@ impl HsmProvider for SoftwareHsmProvider {
 
     async fn sign(
         &self,
-        _key_id: key_id: &strstr,
+        _key_id: &str,
         _algorithm: SigningAlgorithm,
-        _data: data: &[u8][u8],
+        _data: &[u8],
     ) -> Result<Vec<u8>, HsmError> {
         // Check if key exists and has signing capability
         let keys = self.keys.lock().await;
@@ -192,10 +192,10 @@ impl HsmProvider for SoftwareHsmProvider {
 
     async fn verify(
         &self,
-        _key_id: key_id: &strstr,
+        _key_id: &str,
         _algorithm: SigningAlgorithm,
-        _data: data: &[u8][u8],
-        _signature: signature: &[u8][u8],
+        _data: &[u8],
+        _signature: &[u8],
     ) -> Result<bool, HsmError> {
         // Check if key exists and has verify capability
         let keys = self.keys.lock().await;
@@ -258,7 +258,7 @@ impl HsmProvider for SoftwareHsmProvider {
         }
     }
 
-    async fn export_public_key(&self, _key_id: key_id: &strstr) -> Result<Vec<u8>, HsmError> {
+    async fn export_public_key(&self, _key_id: &str) -> Result<Vec<u8>, HsmError> {
         // Check if key exists
         let keys = self.keys.lock().await;
         let key_info = keys
@@ -290,7 +290,7 @@ impl HsmProvider for SoftwareHsmProvider {
         Ok(keys.values().cloned().collect())
     }
 
-    async fn delete_key(&self, _key_id: key_id: &strstr) -> Result<(), HsmError> {
+    async fn delete_key(&self, _key_id: &str) -> Result<(), HsmError> {
         let mut keys = self.keys.lock().await;
         let mut key_data = self.key_data.lock().await;
 

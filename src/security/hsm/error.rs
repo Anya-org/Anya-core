@@ -167,13 +167,7 @@ pub enum HsmError {
     OperationNotSupported(String),
 }
 
-// Implement From<HsmError> for HsmError to handle module path conflicts
-impl From<crate::security::hsm::error::HsmError> for HsmError {
-    fn from(err: crate::security::hsm::error::HsmError) -> Self {
-        // Since they're the same type with different paths, we can just return the error directly
-        err
-    }
-}
+// This From implementation is not needed as Rust automatically implements From<T> for T
 
 /// HSM audit event type
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]

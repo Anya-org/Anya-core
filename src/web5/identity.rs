@@ -215,7 +215,7 @@ impl DIDManager {
     }
     
     /// Sign data with a DID's private key
-    pub fn sign(&self, did: &str, _data: data: &[u8][u8]) -> Web5Result<Vec<u8>>  -> Result<(), Box<dyn Error>> {
+    pub fn sign(&self, did: &str, _data: &[u8]) -> Web5Result<Vec<u8>>  -> Result<(), Box<dyn Error>> {
         // This is a simplified implementation
         // In a real implementation, this would use the DID's private key
         

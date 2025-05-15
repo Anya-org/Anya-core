@@ -96,23 +96,23 @@ impl HsmProvider for NoopHsmProvider {
         Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
     
-    async fn sign(&self, __key_id: key_id: &strstr, __algorithm: SigningAlgorithm, __data: data: &[u8][u8]) -> Result<Vec<u8>, HsmError> {
+    async fn sign(&self, __key_id: &str, __algorithm: SigningAlgorithm, __data: &[u8]) -> Result<Vec<u8>, HsmError> {
         Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
     
-    async fn verify(&self, __key_id: key_id: &strstr, __algorithm: SigningAlgorithm, __data: data: &[u8][u8], __signature: signature: &[u8][u8]) -> Result<bool, HsmError> {
+    async fn verify(&self, __key_id: &str, __algorithm: SigningAlgorithm, __data: &[u8], __signature: &[u8]) -> Result<bool, HsmError> {
         Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
     
-    async fn encrypt(&self, __key_id: key_id: &strstr, _algorithm: EncryptionAlgorithm, __data: data: &[u8][u8], _iv: Option<&[u8]>) -> Result<Vec<u8>, HsmError> {
+    async fn encrypt(&self, __key_id: &str, _algorithm: EncryptionAlgorithm, __data: &[u8], _iv: Option<&[u8]>) -> Result<Vec<u8>, HsmError> {
         Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
     
-    async fn decrypt(&self, __key_id: key_id: &strstr, _algorithm: EncryptionAlgorithm, __data: data: &[u8][u8], _iv: Option<&[u8]>) -> Result<Vec<u8>, HsmError> {
+    async fn decrypt(&self, __key_id: &str, _algorithm: EncryptionAlgorithm, __data: &[u8], _iv: Option<&[u8]>) -> Result<Vec<u8>, HsmError> {
         Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
     
-    async fn get_key_info(&self, __key_id: key_id: &strstr) -> Result<KeyInfo, HsmError> {
+    async fn get_key_info(&self, __key_id: &str) -> Result<KeyInfo, HsmError> {
         Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
     
@@ -120,7 +120,7 @@ impl HsmProvider for NoopHsmProvider {
         Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
     
-    async fn delete_key(&self, __key_id: key_id: &strstr) -> Result<(), HsmError> {
+    async fn delete_key(&self, __key_id: &str) -> Result<(), HsmError> {
         Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
     
@@ -326,7 +326,7 @@ impl BitcoinHsmProvider {
     /// Sign a Bitcoin transaction
     pub async fn sign_bitcoin_transaction(
         &self,
-        _key_id: key_id: &strstr,
+        _key_id: &str,
         tx_hex: &str,
         signature_type: BitcoinSignatureType,
         sighash_type: u8,
@@ -378,7 +378,7 @@ impl BitcoinHsmProvider {
     /// Create a Taproot output
     pub async fn create_taproot_output(
         &self,
-        internal__key_id: key_id: &strstr,
+        internal__key_id: &str,
         script_tree: Option<TaprootScriptTree>,
     ) -> Result<TaprootOutputInfo, HsmError> {
         // Get internal key info
@@ -441,7 +441,7 @@ impl BitcoinHsmProvider {
     }
     
     /// Get Bitcoin key info
-    pub async fn get_bitcoin_key_info(&self, _key_id: key_id: &strstr) -> Result<BitcoinKeyInfo, HsmError> {
+    pub async fn get_bitcoin_key_info(&self, _key_id: &str) -> Result<BitcoinKeyInfo, HsmError> {
         // Get key info from base provider
         let public_key_info = match self.config.base_provider.get_key_info(key_id).await {
             Ok(key_info) => PublicKeyInfo {
@@ -509,7 +509,7 @@ impl BitcoinHsmProvider {
     /// Sign a message using a Bitcoin key (for message signing, not transactions)
     pub async fn sign_bitcoin_message(
         &self,
-        _key_id: key_id: &strstr,
+        _key_id: &str,
         message: &str,
         use_standard_format: bool,
     ) -> Result<String, HsmError> {
@@ -683,7 +683,7 @@ pub struct DlcCetInfo {
 /// Create a DLC (Discreet Log Contract)
 pub async fn create_dlc(
     hsm_provider: &BitcoinHsmProvider,
-    funding__key_id: key_id: &strstr,
+    funding__key_id: &str,
     dlc_params: DlcParams,
 ) -> Result<DlcInfo, HsmError> {
     // In a real implementation, this would create a DLC using the funding key
