@@ -3,7 +3,6 @@ pub mod wallet;
 pub mod manager;
 pub mod adapters;
 pub mod config;
-pub mod protocol;
 pub mod taproot;
 
 // Re-export Bitcoin types for convenience

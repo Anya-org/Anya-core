@@ -344,3 +344,8 @@ pub mod prelude {
     pub use crate::tools::markdown::DocumentationValidator;
     pub use crate::security::hsm::TaprootValidator;
 } 
+
+pub mod bitcoin {
+    pub mod protocol;
+    pub mod taproot;
+}

@@ -316,7 +316,7 @@ pub trait HsmProvider: Debug + Send + Sync {
     async fn initialize(&self) -> Result<(), HsmError>;
     
     /// Generate key
-    async fn generate_key(&self, params: KeyGenParams) -> Result<KeyPair, HsmError>;
+    async fn generate_key(&self, params: KeyGenParams) -> Result<(KeyPair, KeyInfo), HsmError>;
     
     /// Sign data
     async fn sign(&self, key_id: &str, algorithm: SigningAlgorithm, data: &[u8]) -> Result<Vec<u8>, HsmError>;
@@ -411,7 +411,7 @@ impl HsmProvider for SoftHsmProvider {
         Ok(())
     }
     
-    async fn generate_key(&self, params: KeyGenParams) -> Result<KeyPair, HsmError> {
+    async fn generate_key(&self, params: KeyGenParams) -> Result<(KeyPair, KeyInfo), HsmError> {
         // Implementation needed
         Err(HsmError::NotImplemented)
     }
@@ -659,7 +659,7 @@ impl HsmProvider for CloudHsmProvider {
         Err(HsmError::NotImplemented)
     }
     
-    async fn generate_key(&self, params: KeyGenParams) -> Result<KeyPair, HsmError> {
+    async fn generate_key(&self, params: KeyGenParams) -> Result<(KeyPair, KeyInfo), HsmError> {
         // Implementation needed
         Err(HsmError::NotImplemented)
     }
@@ -726,7 +726,7 @@ impl HsmProvider for TpmProvider {
         Err(HsmError::NotImplemented)
     }
     
-    async fn generate_key(&self, params: KeyGenParams) -> Result<KeyPair, HsmError> {
+    async fn generate_key(&self, params: KeyGenParams) -> Result<(KeyPair, KeyInfo), HsmError> {
         // Implementation needed
         Err(HsmError::NotImplemented)
     }
@@ -793,7 +793,7 @@ impl HsmProvider for Pkcs11Provider {
         Err(HsmError::NotImplemented)
     }
     
-    async fn generate_key(&self, params: KeyGenParams) -> Result<KeyPair, HsmError> {
+    async fn generate_key(&self, params: KeyGenParams) -> Result<(KeyPair, KeyInfo), HsmError> {
         // Implementation needed
         Err(HsmError::NotImplemented)
     }

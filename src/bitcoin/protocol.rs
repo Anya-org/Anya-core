@@ -11,7 +11,8 @@ pub mod bitcoin_protocol {
 }
 
 use std::error::Error;
-use bitcoin::{Transaction, Block, BlockHeader};
+use bitcoin::blockdata::block::BlockHeader;
+use bitcoin::Transaction;
 use thiserror::Error;
 
 /// Bitcoin Protocol Compliance Levels
