@@ -68,9 +68,11 @@ impl SecurityManager {
         
         // This would actually use the HSM to create a partial signature
         // For now, we'll create a placeholder signature
+        use bitcoin::hashes::Hash;
         let secp = secp256k1::Secp256k1::new();
         let secret_key = secp256k1::SecretKey::from_slice(&[42; 32])?;
-        let message = secp256k1::Message::from_slice(&txid.to_vec())?;
+        let txid_bytes = txid.as_byte_array();
+        let message = secp256k1::Message::from_digest_slice(txid_bytes)?;
         
         Ok(secp.sign_ecdsa(&message, &secret_key))
     }
@@ -86,13 +88,17 @@ impl SecurityManager {
         let secp = secp256k1::Secp256k1::new();
         let secret_key = secp256k1::SecretKey::from_slice(&[42; 32])?;
         let public_key = secp256k1::PublicKey::from_secret_key(&secp, &secret_key);
-        let key = XOnlyPublicKey::from(public_key);
+        let (xonly, _parity) = public_key.x_only_public_key();
+        
+        // Convert secp256k1::XOnlyPublicKey to bitcoin::XOnlyPublicKey
+        let xonly_serialized = xonly.serialize();
+        let bitcoin_xonly = XOnlyPublicKey::from_slice(&xonly_serialized)?;
         
         // Cache the key name
         let mut cache = self.key_cache.lock().unwrap();
-        cache.insert(key_name.to_string(), key.serialize().to_vec());
+        cache.insert(key_name.to_string(), xonly_serialized.to_vec());
         
-        Ok(key)
+        Ok(bitcoin_xonly)
     }
     
     // This function is implemented in the parent module (src/security/hsm/mod.rs)

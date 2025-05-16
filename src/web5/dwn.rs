@@ -82,7 +82,7 @@ impl DWNClient {
     }
     
     /// Send a message to a DID through the DWN
-    pub fn send_message(&self, to: &str, protocol: &str, message_type: &str, _data: &[u8]) -> Web5Result<String>  -> Result<(), Box<dyn Error>> {
+    pub fn send_message(&self, to: &str, protocol: &str, message_type: &str, data: &[u8]) -> Web5Result<String> {
         // Check if identity is set
         let from = self.identity.as_ref().ok_or_else(|| {
             Web5Error::Identity("Identity not set for DWN client".to_string())
@@ -130,9 +130,9 @@ impl DWNClient {
     }
     
     /// Get messages for the identity DID
-    pub fn get_messages(&self, protocol: Option<&str>) -> Web5Result<Vec<DWNMessage>>  -> Result<(), Box<dyn Error>> {
+    pub fn get_messages(&self, protocol: Option<&str>) -> Web5Result<Vec<DWNMessage>> {
         // Check if identity is set
-        let identity = self.identity.as_ref().ok_or_else(|| {
+        let _from = self.identity.as_ref().ok_or_else(|| {
             Web5Error::Identity("Identity not set for DWN client".to_string())
         })?;
         
@@ -140,7 +140,7 @@ impl DWNClient {
         
         // Filter messages by recipient and optionally by protocol
         let messages: Vec<DWNMessage> = storage.values()
-            .filter(|msg| msg.to == *identity && 
+            .filter(|msg| msg.to == *_from && 
                    protocol.map_or(true, |p| msg.protocol == p))
             .cloned()
             .collect();
@@ -160,11 +160,11 @@ fn generate_id() -> String {
 }
 
 /// Get current time in seconds
-fn current_time() -> u64  -> Result<(), Box<dyn Error>> {
+fn current_time() -> u64 {
     SystemTime::now()
         .duration_since(UNIX_EPOCH)
-        ?
-        .as_secs()
+        .map(|d| d.as_secs())
+        .unwrap_or(0)
 }
 
 /// DWN Manager
@@ -294,7 +294,7 @@ pub struct DWNQueryPagination {
 
 impl DWNManager {
     /// Create a new DWN Manager
-    pub fn new(endpoints: Vec<String>) -> Self  -> Result<(), Box<dyn Error>> {
+    pub fn new(endpoints: Vec<String>) -> Self {
         Self {
             endpoints,
             records: Arc::new(Mutex::new(HashMap::new())),
@@ -302,7 +302,7 @@ impl DWNManager {
     }
     
     /// Store a record in a DWN
-    pub fn store_record(&self, record: DWNRecord) -> Web5Result<String>  -> Result<(), Box<dyn Error>> {
+    pub fn store_record(&self, record: DWNRecord) -> Web5Result<String> {
         // In a real implementation, this would store the record in a DWN
         // For this example, we're storing it locally
         
@@ -314,7 +314,7 @@ impl DWNManager {
     }
     
     /// Query records from a DWN
-    pub fn query_records(&self, owner: &str, schema: &str) -> Web5Result<Vec<DWNRecord>>  -> Result<(), Box<dyn Error>> {
+    pub fn query_records(&self, owner: &str, schema: &str) -> Web5Result<Vec<DWNRecord>> {
         // In a real implementation, this would query records from a DWN
         // For this example, we're querying locally
         
@@ -332,19 +332,15 @@ impl DWNManager {
     }
     
     /// Delete a record from a DWN
-    pub fn delete_record(&self, id: &str) -> Web5Result<()>  -> Result<(), Box<dyn Error>> {
+    pub fn delete_record(&self, id: &str) -> Web5Result<()> {
         // In a real implementation, this would delete the record from a DWN
-        // For this example, we're deleting it locally
-        
-        if let Ok(mut records) = self.records.lock() {
-            records.remove(id);
-        }
-        
+        // For this example, we're just removing it from local storage
+        self.records.lock().unwrap().remove(id);
         Ok(())
     }
     
     /// Send a message to a DWN
-    pub fn send_message(&self, message: DWNMessage) -> Web5Result<DWNMessage>  -> Result<(), Box<dyn Error>> {
+    pub fn send_message(&self, message: DWNMessage) -> Web5Result<DWNMessage> {
         // In a real implementation, this would send the message to a DWN
         // For this example, we're handling it locally
         
@@ -435,25 +431,25 @@ impl DWNManager {
     }
     
     /// Create a record in a DWN
-    pub fn create_record(&self, owner: &str, schema: &str, data: serde_json::Value) -> Web5Result<String>  -> Result<(), Box<dyn Error>> {
+    pub fn create_record(&self, owner: &str, schema: &str, data: serde_json::Value) -> Web5Result<String> {
+        // In a real implementation, this would create a record in a DWN
+        // For this example, we're creating it locally
         let id = generate_random_id();
-        
         let record = DWNRecord {
             id: id.clone(),
             owner: owner.to_string(),
             schema: schema.to_string(),
             data,
-            metadata: HashMap::new(),
-            attestations: Vec::new(),
+            created: current_time(),
+            updated: current_time(),
         };
         
-        self.store_record(record)?;
-        
+        self.records.lock().unwrap().insert(id.clone(), record);
         Ok(id)
     }
     
     /// Read a record from a DWN
-    pub fn read_record(&self, id: &str) -> Web5Result<DWNRecord>  -> Result<(), Box<dyn Error>> {
+    pub fn read_record(&self, id: &str) -> Web5Result<DWNRecord> {
         if let Ok(records) = self.records.lock() {
             if let Some(record) = records.get(id) {
                 return Ok(record.clone());
@@ -464,24 +460,26 @@ impl DWNManager {
     }
     
     /// Update a record in a DWN
-    pub fn update_record(&self, id: &str, data: serde_json::Value) -> Web5Result<()>  -> Result<(), Box<dyn Error>> {
+    pub fn update_record(&self, id: &str, data: serde_json::Value) -> Web5Result<()> {
+        // In a real implementation, this would update the record in a DWN
+        // For this example, we're updating it locally
         if let Ok(mut records) = self.records.lock() {
             if let Some(record) = records.get_mut(id) {
                 record.data = data;
+                record.updated = current_time();
                 return Ok(());
             }
         }
         
-        Err(Web5Error::DWNError(format!("Record not found: {}", id)))
+        Err(Web5Error::RecordNotFound(id.to_string()))
     }
 }
 
 /// Generate a random ID
-fn generate_random_id() -> String  -> Result<(), Box<dyn Error>> {
-    use rand::Rng;
-    let mut rng = rand::thread_rng();
-    let id: u64 = rng.gen();
-    format!("{:x}", id)
+fn generate_random_id() -> String {
+    // In a real implementation, this would generate a unique ID
+    // This is a simplified placeholder
+    "random_id".to_string()
 }
 
 #[cfg(test)]

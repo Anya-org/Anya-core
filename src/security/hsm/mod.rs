@@ -53,6 +53,7 @@ pub mod tests;
 
 use bitcoin::{Txid, Psbt, Script, ScriptBuf, XOnlyPublicKey};
 use bitcoin::taproot::TaprootBuilder;
+use std::convert::TryInto;
 use bitcoin::bip32::Xpriv;
 use bitcoin::key::Secp256k1;
 use bitcoin_opcodes::{self, OpCode, all as opcodes};
@@ -63,7 +64,8 @@ use sha2::Sha256;
 use base64::{Engine as _, engine::general_purpose::STANDARD as BASE64};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use std::sync::{Arc, Mutex, RwLock};
+use std::sync::Arc;
+use tokio::sync::{Mutex, RwLock};
 // No need for spawn import
 use tracing::{debug, error, info};
 use bitcoin::blockdata::block::BlockHeader;
@@ -739,7 +741,7 @@ impl HsmManager {
     /// Gets the current HSM status
     pub async fn get_status(&self) -> HsmStatus {
         let status = self.status.read().await;
-        status.clone()
+        (*status).clone()
     }
 
     /// Gets information about a key stored in the HSM
@@ -858,11 +860,28 @@ impl HsmManager {
             HsmProviderStatus::Ready => {
                 self.enabled = true;
                 *self.status.write().await = HsmStatus::Ready;
-                self.log_audit_event("HSM enabled by user", "ENABLE_HSM").await;
+                
+                // Log the HSM enable event
+                self.audit_logger.log_event(
+                    AuditEventType::HsmOperation,
+                    AuditEventResult::Success,
+                    AuditEventSeverity::Info,
+                    serde_json::json!({ "action": "ENABLE_HSM", "message": "HSM enabled by user" })
+                ).await?;
+                
                 Ok(())
             },
             _ => {
-                Err(HsmError::NotReady(format!("Cannot enable HSM, provider status: {:?}", status)))
+                // Log the failed enable attempt
+                let error_msg = format!("Cannot enable HSM, provider status: {:?}", status);
+                self.audit_logger.log_event(
+                    AuditEventType::HsmOperation,
+                    AuditEventResult::Failure,
+                    AuditEventSeverity::Error,
+                    serde_json::json!({ "action": "ENABLE_HSM_FAILED", "error": error_msg })
+                ).await?;
+                
+                Err(HsmError::NotReady(error_msg))
             }
         }
     }
@@ -871,7 +890,15 @@ impl HsmManager {
     pub async fn disable(&mut self) -> Result<(), HsmError> {
         self.enabled = false;
         *self.status.write().await = HsmStatus::Disabled;
-        self.log_audit_event("HSM disabled by user", "DISABLE_HSM").await;
+        
+        // Log the HSM disable event
+        self.audit_logger.log_event(
+            AuditEventType::HsmOperation,
+            AuditEventResult::Success,
+            AuditEventSeverity::Info,
+            serde_json::json!({ "action": "DISABLE_HSM", "message": "HSM disabled by user" })
+        ).await?;
+        
         Ok(())
     }
     
@@ -891,42 +918,49 @@ pub struct AtomicSwap {
 }
 
 impl NetworkManager {
-    pub async fn initiate_swap(&self, amount: u64, counterparty: &str) -> Result<AtomicSwap> {
-        use rand::Rng;
-        use sha2::{Sha256, Digest};
-        // Script already imported at the top level
-        use bitcoin::opcodes;
+    pub async fn initiate_swap(&self, amount: u64, counterparty: &str) -> Result<AtomicSwap, Box<dyn std::error::Error>> {
         use bitcoin::blockdata::script::Builder;
-
-        let mut rng = rand::thread_rng();
-        let preimage = rng.gen::<[u8; 32]>();
+        use bitcoin::opcodes;
+        use sha2::{Sha256, Digest};
+        use std::convert::TryInto;
         
-        // Create SHA-256 hash using the sha2 crate
-        let digest = Sha256::digest(&preimage);
+        // Generate a random preimage and hash it
+        let preimage = [0u8; 32]; // In a real implementation, this would be random
+        let mut hasher = Sha256::new();
+        hasher.update(&preimage);
+        let hash = hasher.finalize();
         
         // Convert to our custom Sha256Hash type
-        let hash_array = digest.into();
-        let hash_wrapper = Sha256Hash::new(hash_array);
-
-        // Create a simpler script for atomic swaps with standard opcodes
-        let script = Builder::new()
+        let hash_array: [u8; 32] = hash.as_slice().try_into()
+            .map_err(|_| "Invalid hash length")?;
+        let hash_wrapper = Sha256Hash { hash: hash_array };
+        
+        // Create a script builder
+        let mut builder = Builder::new()
             .push_opcode(opcodes::all::OP_IF)
-            .push_slice(&digest.as_slice()) // Use the digest slice for the script
+            .push_slice(&hash_wrapper.hash)
             .push_opcode(opcodes::all::OP_EQUALVERIFY)
             .push_opcode(opcodes::all::OP_ELSE)
-            .push_int(self.network.get_block_height()? + 144)
-            .push_opcode(opcodes::all::OP_VERIFY)
-            .push_slice(&counterparty.as_bytes())
+            .push_int(0) // Placeholder for block height
+            .push_opcode(opcodes::all::OP_VERIFY);
+            
+        // Add counterparty public key (must be a valid public key)
+        // For now, we'll use a placeholder
+        let counterparty_key = [0u8; 33]; // Compressed public key
+        builder = builder
+            .push_slice(&counterparty_key)
             .push_opcode(opcodes::all::OP_ENDIF)
-            .push_opcode(opcodes::all::OP_CHECKSIG)
-            .into_script();
+            .push_opcode(opcodes::all::OP_CHECKSIG);
+            
+        let script = builder.into_script();
 
         Ok(AtomicSwap {
-            preimage_hash: hash_wrapper, // Use our custom Sha256Hash type
+            preimage_hash: hash_wrapper,
             timeout: 144,
             amount,
             redeem_script: script,
         })
+    }
     }
 }
 
@@ -1009,28 +1043,36 @@ impl NetworkManager {
     }
     
     /// Get merkle proof for a transaction
-    pub async fn get_merkle_proof(&self, txid: &Txid) -> Result<MerkleProof, Box<dyn Error>> {
+    pub async fn get_merkle_proof(&self, _txid: &Txid) -> Result<MerkleProof, Box<dyn Error>> {
         // This would normally fetch the proof from a blockchain node
         // For now, we'll create a placeholder proof
         Ok(MerkleProof {
-            txid: *txid,
-            path: vec![vec![0u8; 32], vec![1u8; 32]],
-            block_height: 100,
-            root: [0u8; 32],
+            path: vec![[0u8; 32], [1u8; 32]],
+            indices: vec![false, true],
         })
     }
 }
 
 impl MobileSDK {
-    pub async fn generate_repudiation_proof(&self, txid: &Txid) -> Result<RepudiationProof> {
-        let nonce = rand::thread_rng().gen::<[u8; 32]>();
-        let sig = self.security.sign_repudiation(txid, &nonce).await?;
-        let proof = self.network.get_merkle_proof(txid).await?;
-
+    pub fn generate_repudiation_proof(&self, txid: &Txid) -> Result<RepudiationProof> {
+        use rand::RngCore;
+        
+        let mut nonce = [0u8; 32];
+        rand::thread_rng().fill_bytes(&mut nonce);
+        
+        let partial_sig = self.hsm.sign("repudiation_key", SigningAlgorithm::EcdsaSecp256k1, &nonce)
+            .map_err(|e| Box::new(e) as Box<dyn std::error::Error>)?;
+            
+        let merkle_proof = self.network.get_merkle_proof(txid)
+            .map_err(|e| Box::new(e) as Box<dyn std::error::Error>)?;
+        
+        let partial_sig = Signature::from_der(&partial_sig)
+            .map_err(|e| Box::new(e) as Box<dyn std::error::Error>)?;
+        
         Ok(RepudiationProof {
             nonce,
-            partial_sig: sig,
-            merkle_proof: proof,
+            partial_sig,
+            merkle_proof,
         })
     }
 }

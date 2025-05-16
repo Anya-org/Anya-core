@@ -12,6 +12,7 @@ use std::fmt::Debug;
 use chrono::{DateTime, Utc};
 use std::str::FromStr;
 use base64::{Engine as _, engine::general_purpose::STANDARD as BASE64};
+use bitcoin::psbt::Psbt;
 
 use crate::security::hsm::config::{
     HsmConfig, SoftHsmConfig, CloudHsmConfig, TpmConfig, Pkcs11Config
@@ -326,7 +327,14 @@ pub trait HsmProvider: Debug + Send + Sync {
     async fn sign(&self, _key_id: &str, _algorithm: SigningAlgorithm, _data: &[u8]) -> Result<Vec<u8>, HsmError>;
     
     /// Verify signature
-    async fn verify(&self, _key_id: &str, _algorithm: SigningAlgorithm, _data: &[u8], _signature: &[u8]) -> Result<bool, HsmError>;
+    async fn verify(&self, _key_id: &str, _algorithm: SigningAlgorithm, _data: &[u8], _signature: &[u8]) -> Result<bool, HsmError> {
+        Err(HsmError::UnsupportedOperation("Verification not implemented".into()))
+    }
+    
+    /// Sign PSBT (Partially Signed Bitcoin Transaction)
+    async fn sign_psbt(&self, _psbt: &mut Psbt) -> Result<(), HsmError> {
+        Err(HsmError::UnsupportedOperation("PSBT signing not implemented".into()))
+    }
     
     /// Export public key
     async fn export_public_key(&self, _key_id: &str) -> Result<Vec<u8>, HsmError>;
@@ -355,13 +363,13 @@ pub trait HsmProvider: Debug + Send + Sync {
         
         // Generate a test key to verify key operations
         let test_params = KeyGenParams {
-            key_type: KeyType::Ec,
-            key_size: Some(256),
-            label: Some("health_check_test_key".to_string()),
             id: Some(format!("health_check_{}", Utc::now().timestamp())),
+            label: Some("health_check_test_key".to_string()),
+            key_type: KeyType::Ec { curve: EcCurve::Secp256k1 },
             extractable: true,
-            algorithm: Some(KeyAlgorithm::Ec),
-            usage: vec![KeyUsage::Sign, KeyUsage::Verify],
+            usages: vec![KeyUsage::Sign, KeyUsage::Verify],
+            expires_at: None,
+            attributes: HashMap::new(),
         };
         
         // Test key generation
@@ -454,6 +462,7 @@ pub async fn create_hsm_provider(config: &HsmConfig) -> Result<Arc<dyn HsmProvid
 /// SoftHSM provider
 ///
 /// This provider is used for development and testing purposes only.
+#[derive(Debug)]
 pub struct SoftHsmProvider {
     config: SoftHsmConfig,
     keys: Mutex<HashMap<String, KeyInfo>>,
@@ -706,6 +715,7 @@ impl HsmProvider for SoftHsmProvider {
 }
 
 /// CloudHSM provider
+#[derive(Debug)]
 pub struct CloudHsmProvider {
     config: CloudHsmConfig,
 }
@@ -773,6 +783,7 @@ impl HsmProvider for CloudHsmProvider {
 }
 
 /// TPM provider
+#[derive(Debug)]
 pub struct TpmProvider {
     config: TpmConfig,
 }
@@ -840,6 +851,7 @@ impl HsmProvider for TpmProvider {
 }
 
 /// PKCS#11 provider
+#[derive(Debug)]
 pub struct Pkcs11Provider {
     config: Pkcs11Config,
 }

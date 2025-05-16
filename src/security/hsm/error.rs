@@ -84,6 +84,10 @@ pub enum HsmError {
     #[error("IO error: {0}")]
     IoError(String),
     
+    /// Invalid key size
+    #[error("Invalid key size: {0}")]
+    InvalidKeySize(usize),
+    
     /// Authentication error
     #[error("Authentication error: {0}")]
     AuthenticationError(String),
@@ -99,6 +103,22 @@ pub enum HsmError {
     /// Hardware failure
     #[error("Hardware failure: {0}")]
     HardwareFailure(String),
+    
+    /// Deserialization error
+    #[error("Deserialization error: {0}")]
+    DeserializationError(String),
+    
+    /// HSM is disabled
+    #[error("HSM is disabled: {0}")]
+    Disabled(String),
+    
+    /// HSM is not ready
+    #[error("HSM is not ready: {0}")]
+    NotReady(String),
+    
+    /// Key rotation failed
+    #[error("Key rotation failed: {0}")]
+    RotateKey(String),
     
     /// Network error (for testnet operations)
     #[error("Network error: {0}")]

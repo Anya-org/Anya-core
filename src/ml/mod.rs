@@ -67,8 +67,7 @@ impl MLSystem {
             }
         }
 
-        let mut ml_service = MLService::new();
-        ml_service.initialize(10, "0.1.0")?;
+        let ml_service = MLService::new();
 
         Ok(Self {
             config,

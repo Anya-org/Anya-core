@@ -123,7 +123,7 @@ impl AuditLogger {
         storage.store_event(event).await?;
         
         // Perform cleanup if needed
-        if let Err(e) = storage.cleanup(self.config.retention_days, Some(self.config.max_events)).await {
+        if let Err(e) = storage.cleanup(self.config.retention_days, Some(self.config.max_events as usize)).await {
             warn!("Failed to cleanup audit logs: {}", e);
         }
         
@@ -149,13 +149,15 @@ impl AuditLogger {
         let mut event = AuditEvent::new(event_type, result, severity);
         
         // Add details to the event
-        let details_map: HashMap<String, String> = serde_json::from_value(details_value)
-            .unwrap_or_else(|_| {
+        let details_map: HashMap<String, String> = match serde_json::from_value(details_value.clone()) {
+            Ok(map) => map,
+            Err(_) => {
                 // If we can't convert to a HashMap, create a single detail entry
                 let mut map = HashMap::new();
                 map.insert("data".to_string(), serde_json::to_string(&details_value).unwrap_or_default());
                 map
-            });
+            }
+        };
             
         for (key, value) in details_map {
             event = event.with_detail(key, value);
@@ -200,8 +202,11 @@ impl AuditLogger {
             return Ok(0);
         }
         
-        let mut storage = self.storage.lock().await;
-        storage.cleanup(self.config.retention_days, Some(self.config.max_events)).await
+        let storage = self.storage.lock().await;
+        storage.cleanup(
+            self.config.retention_days, 
+            Some(self.config.max_events as usize)
+        ).await
     }
     
     /// Track an operation

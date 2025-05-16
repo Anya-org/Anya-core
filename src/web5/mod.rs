@@ -74,7 +74,7 @@ impl Web5Manager {
     }
     
     /// Initialize the Web5 subsystem with default protocols
-    pub fn initialize(&mut self) -> Web5Result<()>  -> Result<(), Box<dyn Error>> {
+    pub fn initialize(&mut self) -> Web5Result<()> {
         // Register standard protocols
         let profile_handler = protocols::ProfileProtocolHandler::new();
         self.protocol_manager.register_protocol(Box::new(profile_handler))?;
@@ -82,14 +82,14 @@ impl Web5Manager {
         // Create default identity if none exists
         if self.config.use_local_storage && self.did_manager.get_default_did()?.is_none() {
             let did = self.did_manager.create_did()?;
-            self.did_manager.set_default_did(&did.id)?;
+            self.did_manager.set_default_did(&did.id)?
         }
         
         Ok(())
     }
     
     /// Get the system status
-    pub fn status(&self) -> Web5Result<Web5Status>  -> Result<(), Box<dyn Error>> {
+    pub fn status(&self) -> Web5Result<Web5Status> {
         let did_count = self.did_manager.dids().len();
         let protocol_count = self.protocol_manager.get_all_protocols().len();
         
@@ -102,15 +102,13 @@ impl Web5Manager {
     }
 
     /// Get metrics for the Web5 system
-    pub fn get_metrics(&self) -> HashMap<String, serde_json::Value>  -> Result<(), Box<dyn Error>> {
+    pub fn get_metrics(&self) -> Web5Result<HashMap<String, String>> {
         let mut metrics = HashMap::new();
+        metrics.insert("dids".to_string(), self.did_manager.dids().len().to_string());
+        metrics.insert("protocols".to_string(), self.protocol_manager.get_all_protocols().len().to_string());
+        metrics.insert("dwn_connected".to_string(), self.config.dwn_url.is_some().to_string());
         
-        // Add basic metrics
-        metrics.insert("did_count".to_string(), serde_json::json!(self.did_manager.dids().len()));
-        metrics.insert("protocol_count".to_string(), serde_json::json!(self.protocol_manager.get_all_protocols().len()));
-        metrics.insert("dwn_connected".to_string(), serde_json::json!(self.config.dwn_url.is_some()));
-        
-        metrics
+        Ok(metrics)
     }
 }
 
