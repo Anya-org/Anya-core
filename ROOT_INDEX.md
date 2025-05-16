@@ -5,16 +5,18 @@ Welcome to the Anya Core documentation. This is the authoritative root index for
 ## Quick Navigation [AIR-3]
 
 ### Core Documentation
-
-- [Getting Started](docs/getting-started/README.md) - Quick setup guide
+- [Getting Started](README.md) - Project overview and setup
 - [Installation](INSTALLATION.md) - Installation instructions
 - [System Architecture](SYSTEM_MAP.md) - Complete system architecture
 - [Security Framework](SECURITY.md) - AIS-3 compliance details
+- [Changelog](CHANGELOG.md) - Release notes and changes
+- [Roadmap](ROADMAP.md) - Development roadmap and milestones
 
 ### Bitcoin Protocol Integration [BPC-3]
 
-- [BIP Implementation](docs/bitcoin/README.md) - Taproot/Tapscript
-- [Layer 2 Solutions](src/layer2/README.md) - L2 integration details
+- [Bitcoin Module](docs/bitcoin/README.md) - Core Bitcoin functionality
+- [Layer 2 Support](docs/layer2/README.md) - Layer 2 solutions
+- [Migration Guide](docs/bitcoin/migration.md) - Migration documentation
 
 ### DAO & Tokenomics [DAO-3]
 

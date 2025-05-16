@@ -2,6 +2,8 @@ use std::error::Error;
 use crate::adapters::{YubiConnector, LedgerConnector};
 use serde::{Serialize, Deserialize};
 use bitcoin::ScriptBuf;
+use crate::security::hsm::error::{AuditEventType, AuditEventResult, AuditEventSeverity, HsmError};
+use serde_json;
 
 // Define a simple Sha256 hash type wrapper
 // Use our own wrapper to avoid conflicts with sha2::Sha256
@@ -554,24 +556,25 @@ impl HsmManager {
                     )
                     .await?;
 
-                Ok(result)
             }
             Err(err) => {
                 // Log operation failure
                 self.audit_logger
                     .log_event(
-                        "hsm.operation",
-                        &HsmAuditEvent {
-                            event_type: "operation_error".to_string(),
-                            provider: format!("{:?}", self.config.provider_type),
-                            status: "failed".to_string(),
-                            details: Some(format!("Error: {:?}", err)),
-                            operation_id: Some(operation_id),
-                        },
+                        AuditEventType::HsmOperation,
+                        AuditEventResult::Failure,
+                        AuditEventSeverity::Error,
+                        serde_json::json!({
+                            "provider": format!("{:?}", self.config.provider_type),
+                            "error": format!("{:?}", err),
+                            "operation_id": operation_id,
+                            "action": "EXECUTE_OPERATION_FAILED"
+                        }),
                     )
                     .await?;
 
                 Err(err)
+            }
             }
         };
 
@@ -819,11 +822,14 @@ impl HsmManager {
 
         debug!("Getting audit log");
 
-        // Delegate to the audit logger
+        // Delegate to the audit logger and convert events
         let events = self
             .audit_logger
             .get_events(start_time, end_time, limit)
-            .await?;
+            .await?
+            .into_iter()
+            .map(|event| event.to_hsm_audit_event())
+            .collect();
 
         Ok(events)
     }
@@ -960,7 +966,6 @@ impl NetworkManager {
             amount,
             redeem_script: script,
         })
-    }
     }
 }
 

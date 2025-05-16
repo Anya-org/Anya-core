@@ -275,6 +275,9 @@ pub enum AuditEventType {
     /// HSM operation response
     OperationResponse,
     
+    /// HSM operation
+    HsmOperation,
+    
     /// Custom event
     Custom(String),
 }

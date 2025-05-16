@@ -1,6 +1,6 @@
 use std::error::Error;
-use crate::security::hsm::{HsmError, HsmAuditEvent};
-use serde::{Serialize, Deserialize};
+use crate::security::hsm::error::{HsmError, AuditEventType, AuditEventResult, AuditEventSeverity, HsmAuditEvent};
+use serde::{Serialize, Deserialize, Serializer, Deserializer};
 use std::sync::Arc;
 use tokio::sync::Mutex;
 use tracing::{debug, info, error, warn};
@@ -409,6 +409,37 @@ impl AuditEvent {
     pub fn with_client_ip(mut self, client_ip: impl Into<String>) -> Self {
         self.client_ip = Some(client_ip.into());
         self
+    }
+    
+    /// Convert to HsmAuditEvent
+    pub fn to_hsm_audit_event(&self) -> HsmAuditEvent {
+        let mut event = HsmAuditEvent::new(
+            self.event_type,
+            self.result,
+            self.severity
+        );
+        
+        if let Some(actor) = &self.actor {
+            event = event.with_user(actor.clone());
+        }
+        
+        if let Some(operation_id) = &self.operation_id {
+            event = event.with_operation_id(operation_id.clone());
+        }
+        
+        if let Some(key_id) = &self.key_id {
+            event = event.with_key_id(key_id.clone());
+        }
+        
+        if let Some(error) = &self.error {
+            event = event.with_error(error.clone());
+        }
+        
+        if !self.details.is_empty() {
+            event = event.with_metadata(serde_json::to_value(&self.details).unwrap_or_default());
+        }
+        
+        event
     }
 }
 

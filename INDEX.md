@@ -1,28 +1,10 @@
 # Anya Core Documentation
 
-Welcome to the Anya Core documentation. This index will help you navigate the various documentation files and resources available for the Anya Core platform.
+This file has been replaced by [ROOT_INDEX.md](ROOT_INDEX.md). Please update your bookmarks.
 
-## Quick Start
+Redirecting to [ROOT_INDEX.md](ROOT_INDEX.md)...
 
-- [Getting Started](docs/getting-started/README.md) - Quick setup guide
-- [Installation](INSTALLATION.md) - Installation instructions
-- [README](README.md) - Main project readme with overview and features
-
-## Core Documentation
-
-- [Documentation Index](docs/INDEX.md) - Main documentation index
-- [System Architecture](SYSTEM_MAP.md) - Complete system architecture
-- [DAO System](src/dao/README.md) - Comprehensive DAO documentation
-- [Tokenomics System](docs/TOKENOMICS_SYSTEM.md) - Bitcoin-style tokenomics
-- [Implementation Milestones](docs/IMPLEMENTATION_MILESTONES.md) - Current progress tracking
-- [Testing Strategy](TESTING.md) - Sectional testing methodology
-- [README.md](./README.md) - Main project documentation
-- [SECURITY_CODEQL.md](./SECURITY_CODEQL.md) - Security analysis framework documentation
-- [ROADMAP.md](./ROADMAP.md) - Project development roadmap
-- [CHANGELOG.md](./CHANGELOG.md) - Version history and changes
-- [TODO.md](./TODO.md) - Current development tasks
-- [SYSTEM_MAP.md](./SYSTEM_MAP.md) - System architecture overview
-- [AI Labeling System](./docs/standards/AI_LABELING.md) - AI labeling system documentation
+<meta http-equiv="refresh" content="0; url=ROOT_INDEX.md" />
 
 ## Installation & Deployment
 

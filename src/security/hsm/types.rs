@@ -102,6 +102,25 @@ pub enum HsmOperation {
     GetStatus,
     /// Custom operation
     Custom(String),
+    /// Get key information
+    GetKeyInfo,
+    /// Rotate a key
+    RotateKey,
+    
+    /// Generate a key pair (alias for GenerateKey)
+    GenerateKeyPair,
+    
+    /// Sign data
+    SignData,
+    
+    /// Verify a signature
+    VerifySignature,
+    
+    /// Encrypt data
+    EncryptData,
+    
+    /// Decrypt data
+    DecryptData,
 }
 
 /// HSM request parameters
