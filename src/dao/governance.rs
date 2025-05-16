@@ -166,6 +166,22 @@ impl DaoGovernance {
             config,
             cross_chain_bridge,
             security_audit,
+            quadratic_voting_enabled: true,
+            delegated_authority: DelegationConfig {
+                active: true,
+                max_delegates: 10,
+                delegation_threshold: 1000,
+            },
+            cross_chain_governance: Some(CrossChainGovernanceConfig {
+                enabled: true,
+                supported_chains: vec!["bitcoin".to_string()],
+                bridge_contract: "0x1234...".to_string(),
+            }),
+            legal_wrappers: LegalWrappers {
+                terms_of_service: true,
+                privacy_policy: true,
+                jurisdiction: "International".to_string(),
+            },
         }
     }
 

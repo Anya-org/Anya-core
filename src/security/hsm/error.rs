@@ -175,14 +175,6 @@ pub enum HsmError {
     /// Operation not supported
     #[error("Operation not supported: {0}")]
     OperationNotSupported(String),
-
-    /// Audit storage error
-    #[error("Audit storage error: {0}")]
-    AuditStorageError(String),
-
-    /// HSM audit event error
-    #[error("HSM audit event error: {0}")]
-    HsmAuditEventError(String),
 }
 
 // Implement From<std::io::Error> since we changed IoError to use String

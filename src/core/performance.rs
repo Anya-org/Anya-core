@@ -30,7 +30,8 @@ impl Metrics {
     }
     
     /// Add a network usage metric
-    pub fn add_network_usage(&mut self, key: &str, value: f64)  -> Result<(), Box<dyn Error>> {
+    pub fn add_network_usage(&mut self, key: &str, value: f64) -> Result<(), Box<dyn Error>> {
         self.network_usage.insert(key.to_string(), value);
+        Ok(())
     }
 } 

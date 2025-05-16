@@ -333,7 +333,7 @@ mod tests {
     use super::*;
     
     #[test]
-    fn test_resource_configuration_and_auto_save() {
+    fn test_resource_configuration_and_auto_save() -> Result<(), Box<dyn std::error::Error>> {
         let optimizer = PerformanceOptimizer::new(20); // Auto-save every 20th change
         
         // Configure 25 resources to trigger auto-save
@@ -356,10 +356,12 @@ mod tests {
         let (changes, resources, _) = optimizer.get_stats();
         assert_eq!(changes, 25);
         assert_eq!(resources, 25);
+        
+        Ok(())
     }
     
     #[test]
-    fn test_optimization_workflow() {
+    fn test_optimization_workflow() -> Result<(), Box<dyn std::error::Error>> {
         let optimizer = PerformanceOptimizer::new(10);
         
         // Configure a resource
@@ -389,12 +391,16 @@ mod tests {
         )?;
         
         // Optimize the resource
-        let result = optimizer.optimize_resource("database");
-        assert!(result.is_ok());
-        assert_eq!(result?, OptimizationStatus::Optimized);
+        let result = optimizer.optimize_resource("database")?;
+        assert_eq!(result, OptimizationStatus::Optimized);
         
         // Verify the status
-        let config = optimizer.get_resource_config("database")?;
-        assert_eq!(config.status, OptimizationStatus::Optimized);
+        if let Some(config) = optimizer.get_resource_config("database") {
+            assert_eq!(config.status, OptimizationStatus::Optimized);
+        } else {
+            return Err("Resource config not found".into());
+        }
+        
+        Ok(())
     }
 } 

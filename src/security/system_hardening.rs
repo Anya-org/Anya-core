@@ -227,7 +227,7 @@ mod tests {
     use super::*;
     
     #[test]
-    fn test_configuration_and_auto_save() {
+    fn test_configuration_and_auto_save() -> Result<(), Box<dyn std::error::Error>> {
         let hardening = SystemHardening::new(20); // Auto-save every 20th change
         
         // Create 25 configurations to trigger auto-save
@@ -248,10 +248,12 @@ mod tests {
         let (changes, configs) = hardening.get_stats();
         assert_eq!(changes, 25);
         assert_eq!(configs, 25);
+        
+        Ok(())
     }
     
     #[test]
-    fn test_apply_hardening() {
+    fn test_apply_hardening() -> Result<(), Box<dyn std::error::Error>> {
         let hardening = SystemHardening::new(10);
         
         // Create a configuration
@@ -260,12 +262,16 @@ mod tests {
         hardening.configure_component("network", SecurityLevel::Strict, settings, true)?;
         
         // Apply the hardening
-        let result = hardening.apply_hardening("network");
-        assert!(result.is_ok());
-        assert_eq!(result?, ConfigStatus::Applied);
+        let result = hardening.apply_hardening("network")?;
+        assert_eq!(result, ConfigStatus::Applied);
         
         // Verify the status
-        let config = hardening.get_component_config("network")?;
-        assert_eq!(config.status, ConfigStatus::Applied);
+        if let Some(config) = hardening.get_component_config("network") {
+            assert_eq!(config.status, ConfigStatus::Applied);
+        } else {
+            return Err("Component config not found".into());
+        }
+        
+        Ok(())
     }
 } 

@@ -75,7 +75,7 @@ pub struct ProtocolManager {
 
 impl ProtocolManager {
     /// Create a new protocol manager
-    pub fn new() -> Self  -> Result<(), Box<dyn Error>> {
+    pub fn new() -> Self {
         Self {
             protocols: HashMap::new(),
             handlers: HashMap::new(),
@@ -83,7 +83,7 @@ impl ProtocolManager {
     }
     
     /// Register a protocol handler
-    pub fn register_protocol(&mut self, handler: Box<dyn ProtocolHandler>) -> Web5Result<()>  -> Result<(), Box<dyn Error>> {
+    pub fn register_protocol(&mut self, handler: Box<dyn ProtocolHandler>) -> Web5Result<()> {
         let protocol_id = handler.protocol_id().to_string();
         let definition = handler.get_definition();
         
@@ -94,28 +94,28 @@ impl ProtocolManager {
     }
     
     /// Get a protocol definition by ID
-    pub fn get_protocol(&self, protocol_id: &str) -> Web5Result<&ProtocolDefinition>  -> Result<(), Box<dyn Error>> {
+    pub fn get_protocol(&self, protocol_id: &str) -> Web5Result<&ProtocolDefinition> {
         self.protocols.get(protocol_id).ok_or_else(|| {
             Web5Error::Protocol(format!("Protocol not found: {}", protocol_id))
         })
     }
     
     /// Handle a message for a specific protocol
-    pub fn handle_message(&self, protocol_id: &str, message: &[u8]) -> Web5Result<Vec<u8>>  -> Result<(), Box<dyn Error>> {
+    pub fn handle_message(&self, protocol_id: &str, message: &[u8]) -> Web5Result<Vec<u8>> {
         let handler = self.handlers.get(protocol_id).ok_or_else(|| {
-            Web5Error::Protocol(format!("Protocol handler not found: {}", protocol_id))
+            Web5Error::Protocol(format!("No handler found for protocol: {}", protocol_id))
         })?;
         
         handler.handle_message(message)
     }
     
     /// Check if a protocol is registered
-    pub fn has_protocol(&self, protocol_id: &str) -> bool  -> Result<(), Box<dyn Error>> {
+    pub fn has_protocol(&self, protocol_id: &str) -> bool {
         self.protocols.contains_key(protocol_id)
     }
     
     /// Get all registered protocol definitions
-    pub fn get_all_protocols(&self) -> Vec<&ProtocolDefinition>  -> Result<(), Box<dyn Error>> {
+    pub fn get_all_protocols(&self) -> Vec<&ProtocolDefinition> {
         self.protocols.values().collect()
     }
 }
@@ -127,22 +127,22 @@ pub struct ProfileProtocolHandler;
 
 impl ProfileProtocolHandler {
     /// Create a new profile protocol handler
-    pub fn new() -> Self  -> Result<(), Box<dyn Error>> {
+    pub fn new() -> Self {
         Self {}
     }
 }
 
 impl ProtocolHandler for ProfileProtocolHandler {
-    fn protocol_id(&self) -> &str  -> Result<(), Box<dyn Error>> {
+    fn protocol_id(&self) -> &str {
         "https://identity.foundation/schemas/profile"
     }
     
-    fn handle_message(&self, message: &[u8]) -> Web5Result<Vec<u8>>  -> Result<(), Box<dyn Error>> {
+    fn handle_message(&self, message: &[u8]) -> Web5Result<Vec<u8>> {
         // Simple echo implementation for demonstration
         Ok(message.to_vec())
     }
     
-    fn get_definition(&self) -> ProtocolDefinition  -> Result<(), Box<dyn Error>> {
+    fn get_definition(&self) -> ProtocolDefinition {
         let mut types = HashMap::new();
         types.insert(
             "profile".to_string(),
@@ -190,22 +190,22 @@ pub struct CredentialProtocolHandler;
 
 impl CredentialProtocolHandler {
     /// Create a new credentials protocol handler
-    pub fn new() -> Self  -> Result<(), Box<dyn Error>> {
+    pub fn new() -> Self {
         Self {}
     }
 }
 
 impl ProtocolHandler for CredentialProtocolHandler {
-    fn protocol_id(&self) -> &str  -> Result<(), Box<dyn Error>> {
+    fn protocol_id(&self) -> &str {
         "https://identity.foundation/schemas/credentials"
     }
     
-    fn handle_message(&self, message: &[u8]) -> Web5Result<Vec<u8>>  -> Result<(), Box<dyn Error>> {
+    fn handle_message(&self, message: &[u8]) -> Web5Result<Vec<u8>> {
         // Simple echo implementation for demonstration
         Ok(message.to_vec())
     }
     
-    fn get_definition(&self) -> ProtocolDefinition  -> Result<(), Box<dyn Error>> {
+    fn get_definition(&self) -> ProtocolDefinition {
         let mut types = HashMap::new();
         types.insert(
             "credential".to_string(),
@@ -251,9 +251,11 @@ impl ProtocolHandler for CredentialProtocolHandler {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::error::Error;
+    use crate::web5::Web5Error;
     
     #[test]
-    fn test_protocol_manager()  -> Result<(), Box<dyn Error>> {
+    fn test_protocol_manager() -> Result<(), Box<dyn Error>> {
         let mut manager = ProtocolManager::new();
         let profile_handler = ProfileProtocolHandler::new();
         

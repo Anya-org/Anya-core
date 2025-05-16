@@ -89,7 +89,7 @@ mod tests {
     use std::time::Duration;
     
     #[test]
-    fn test_core_system_integration() {
+    fn test_core_system_integration() -> Result<(), Box<dyn std::error::Error>> {
         // Create core system with auto-save every 20 inputs
         let core = CoreSystem::new(20);
         
@@ -101,7 +101,7 @@ mod tests {
                 format!("normal message {}", i)
             };
             
-            core.process_input(&input)?;
+            core.process_input(&input).map_err(|e| e.to_string())?;
         }
         
         // Set up a resource in the performance optimizer
@@ -110,7 +110,7 @@ mod tests {
         
         core.performance_optimizer().configure_resource(
             "database",
-            ResourceType::Database,
+            performance::ResourceType::Database,
             settings,
             0.8,
             500.0,
@@ -118,6 +118,7 @@ mod tests {
         )?;
         
         // Set up a component in the system hardening
+        use crate::security::system_hardening::SecurityLevel;
         let mut security_settings = HashMap::new();
         security_settings.insert("firewall".to_string(), "enabled".to_string());
         
@@ -135,6 +136,8 @@ mod tests {
         assert_eq!(agent_inputs, 25);
         assert_eq!(hardening_changes, 1);
         assert_eq!(performance_changes, 1);
+        
+        Ok(())
     }
 }
 
