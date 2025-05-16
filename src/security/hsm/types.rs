@@ -2,6 +2,7 @@ use bitcoin::hashes::*;
 use secp256k1::ecdsa::Signature;
 use chrono::{DateTime, Utc};
 use serde::{Serialize, Deserialize, de::DeserializeOwned};
+use serde::ser::{Serializer, SerializeStruct};
 
 use std::error::Error;
 use std::fmt;
@@ -519,40 +520,14 @@ where
     where
         D: serde::Deserializer<'de>,
     {
-        struct CoreWrapperVisitor<T> {
-            phantom: std::marker::PhantomData<T>,
+        #[derive(Deserialize)]
+        struct CoreWrapperHelper<T> {
+            data: Option<T>,
         }
-        
-        impl<'de, T> serde::de::Visitor<'de> for CoreWrapperVisitor<T>
-        where
-            T: Deserialize<'de>,
-        {
-            type Value = CoreWrapper<T>;
-            
-            fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
-                formatter.write_str("a CoreWrapper")
-            }
-            
-            fn visit_map<V>(self, mut map: V) -> Result<CoreWrapper<T>, V::Error>
-            where
-                V: serde::de::MapAccess<'de>,
-            {
-                let mut data = None;
-                
-                while let Some(key) = map.next_key::<String>()? {
-                    if key == "data" {
-                        data = Some(map.next_value()?); 
-                    } else {
-                        let _ = map.next_value::<serde::de::IgnoredAny>()?;
-                    }
-                }
-                
-                Ok(CoreWrapper { data })
-            }
-        }
-        
-        deserializer.deserialize_map(CoreWrapperVisitor {
-            phantom: std::marker::PhantomData,
+
+        let helper = CoreWrapperHelper::deserialize(deserializer)?;
+        Ok(CoreWrapper {
+            data: helper.data,
         })
     }
 }

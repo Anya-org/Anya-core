@@ -144,7 +144,7 @@ pub struct Service {
 
 impl DIDManager {
     /// Create a new DID manager with the specified method
-    pub fn new(method: &str) -> Self  -> Result<(), Box<dyn Error>> {
+    pub fn new(method: &str) -> Self {
         Self {
             dids: Arc::new(Mutex::new(HashMap::new())),
             default_did: None,
@@ -153,7 +153,7 @@ impl DIDManager {
     }
     
     /// Create a new DID with the configured method
-    pub fn create_did(&self) -> Web5Result<DID>  -> Result<(), Box<dyn Error>> {
+    pub fn create_did(&self) -> Web5Result<DID> {
         // Generate a random ID for the DID
         let id = format!("did:{}:{}", self.method, generate_random_id());
         
@@ -239,7 +239,7 @@ impl DIDManager {
 }
 
 /// Generate a random ID for a DID
-fn generate_random_id() -> String  -> Result<(), Box<dyn Error>> {
+fn generate_random_id() -> String {
     let now = SystemTime::now()
         .duration_since(UNIX_EPOCH)
         ?

@@ -1,5 +1,12 @@
 use std::error::Error;
 use crate::adapters::{YubiConnector, LedgerConnector};
+use serde::{Serialize, Deserialize};
+use bitcoin::ScriptBuf;
+
+// Define a simple Sha256 hash type wrapper
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Sha256([u8; 32]);
+
 
 pub mod audit;
 pub mod config;

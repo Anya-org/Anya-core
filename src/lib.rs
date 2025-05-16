@@ -69,6 +69,8 @@ pub enum AnyaError {
     System(String),
     /// Generic errors
     Generic(String),
+    /// Custom errors with message
+    Custom(String),
 }
 
 impl fmt::Display for AnyaError {
@@ -80,6 +82,7 @@ impl fmt::Display for AnyaError {
             AnyaError::DAO(msg) => write!(f, "DAO error: {}", msg),
             AnyaError::System(msg) => write!(f, "System error: {}", msg),
             AnyaError::Generic(msg) => write!(f, "Generic error: {}", msg),
+            AnyaError::Custom(msg) => write!(f, "Custom error: {}", msg),
         }
     }
 }
@@ -135,9 +138,10 @@ impl AnyaCore {
         };
 
         let web5_manager = if config.web5_config.enabled {
-            Some(web5::Web5Manager::new(config.web5_config)
-                .with_bip_compliance(vec![174, 341, 342])
-                .build()?)
+            match web5::Web5Manager::new(config.web5_config) {
+                Ok(manager) => Some(manager),
+                Err(e) => return Err(AnyaError::Web5(e.to_string()))
+            }
         } else {
             None
         };
@@ -149,7 +153,10 @@ impl AnyaCore {
         };
 
         let dao_manager = if config.dao_config.enabled {
-            Some(dao::DAOManager::new(config.dao_config)?)
+            match dao::DAOManager::new(config.dao_config) {
+                Ok(manager) => Some(manager),
+                Err(e) => return Err(AnyaError::Custom(format!("Failed to initialize DAO manager: {}", e)))
+            }
         } else {
             None
         };
@@ -187,7 +194,7 @@ impl AnyaCore {
 
         // Add component-specific status
         if let Some(ml_system) = &self.ml_system {
-            status.metrics.insert("ml".to_string(), ml_system.get_health_metrics());
+            status.metrics.insert("ml".to_string(), ml_system.get_model_health_metrics());
         }
 
         // Add status for each component

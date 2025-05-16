@@ -150,6 +150,14 @@ pub enum HsmError {
     #[error("Invalid PSBT: {0}")]
     InvalidPsbt(String),
     
+    /// Audit storage error
+    #[error("Audit storage error: {0}")]
+    AuditStorageError(String),
+    
+    /// HSM audit event error
+    #[error("HSM audit event error: {0}")]
+    HsmAuditEventError(String),
+    
     /// HSM overflow (too many keys or operations)
     #[error("HSM overflow: {0}")]
     HsmOverflow(String),
@@ -159,8 +167,8 @@ pub enum HsmError {
     InternalError(String),
 
     /// Not implemented error
-    #[error("Not implemented")]
-    NotImplemented,
+    #[error("Not implemented: {0}")]
+    NotImplemented(String),
     
     /// Operation not supported
     #[error("Operation not supported: {0}")]

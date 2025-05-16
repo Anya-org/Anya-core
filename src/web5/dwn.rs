@@ -68,7 +68,7 @@ pub struct DWNClient {
 
 impl DWNClient {
     /// Create a new DWN client with the specified configuration
-    pub fn new(config: DWNConfig) -> Self  -> Result<(), Box<dyn Error>> {
+    pub fn new(config: DWNConfig) -> Self {
         Self {
             config,
             local_storage: Arc::new(Mutex::new(HashMap::new())),
@@ -77,7 +77,7 @@ impl DWNClient {
     }
     
     /// Set the identity DID for the client
-    pub fn set_identity(&mut self, did: &str)  -> Result<(), Box<dyn Error>> {
+    pub fn set_identity(&mut self, did: &str) {
         self.identity = Some(did.to_string());
     }
     
@@ -150,7 +150,7 @@ impl DWNClient {
 }
 
 /// Generate a random ID
-fn generate_id() -> String  -> Result<(), Box<dyn Error>> {
+fn generate_id() -> String {
     let now = SystemTime::now()
         .duration_since(UNIX_EPOCH)
         ?

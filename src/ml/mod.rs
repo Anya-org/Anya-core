@@ -78,28 +78,39 @@ impl MLSystem {
     }
 
     /// Get the ML service
-    pub fn service(&self) -> &MLService  -> Result<(), Box<dyn Error>> {
+    pub fn service(&self) -> &MLService {
         &self.service
     }
 
     /// Register a model with the ML system
-    pub fn register_model<M: MLModel + 'static>(&mut self, name: &str, model: M) -> AnyaResult<()>  -> Result<(), Box<dyn Error>> {
+    pub fn register_model<M: MLModel + 'static>(&mut self, name: &str, model: M) -> AnyaResult<()> {
         self.models.insert(name.to_string(), Arc::new(Mutex::new(model)));
         Ok(())
     }
 
     /// Get a model by name
-    pub fn get_model(&self, name: &str) -> Option<Arc<Mutex<dyn MLModel>>>  -> Result<(), Box<dyn Error>> {
+    pub fn get_model(&self, name: &str) -> Option<Arc<Mutex<dyn MLModel>>> {
         self.models.get(name).cloned()
     }
 
+    /// Get health metrics for the ML system
+    pub fn get_health_metrics(&self) -> HashMap<String, f64> {
+        let mut metrics = HashMap::new();
+        metrics.insert("model_count".to_string(), self.models.len() as f64);
+        metrics.insert("enabled".to_string(), if self.config.enabled { 1.0 } else { 0.0 });
+        metrics.insert("federated_learning".to_string(), if self.config.federated_learning { 1.0 } else { 0.0 });
+        
+        // Add more detailed metrics here if needed
+        metrics
+    }
+
     /// List all registered models
-    pub fn list_models(&self) -> Vec<String>  -> Result<(), Box<dyn Error>> {
+    pub fn list_models(&self) -> Vec<String> {
         self.models.keys().cloned().collect()
     }
 
     /// Get health metrics for all models
-    pub fn get_health_metrics(&self) -> HashMap<String, HashMap<String, f64>>  -> Result<(), Box<dyn Error>> {
+    pub fn get_model_health_metrics(&self) -> HashMap<String, HashMap<String, f64>> {
         let mut metrics = HashMap::new();
         
         // Add service metrics
@@ -170,7 +181,7 @@ pub struct FederatedLearningManager {
 
 impl FederatedLearningManager {
     /// Create a new federated learning manager
-    pub fn new() -> Self  -> Result<(), Box<dyn Error>> {
+    pub fn new() -> Self {
         Self {
             nodes: Vec::new(),
             aggregation_method: "average".to_string(),
@@ -178,7 +189,7 @@ impl FederatedLearningManager {
     }
     
     /// Add a node to the federation
-    pub fn add_node(&mut self, node: FederatedNode)  -> Result<(), Box<dyn Error>> {
+    pub fn add_node(&mut self, node: FederatedNode) {
         self.nodes.push(node);
     }
     
@@ -211,12 +222,12 @@ pub const PROD_THRESHOLD: f64 = 0.90;
 pub const RELEASE_THRESHOLD: f64 = 0.99;
 
 /// Helper function to create an agent checker with default auto-save frequency (20)
-pub fn create_agent_checker() -> AgentChecker  -> Result<(), Box<dyn Error>> {
+pub fn create_agent_checker() -> AgentChecker {
     AgentChecker::new(20)
 }
 
 /// Helper function to determine if a system is ready for a given stage
-pub fn is_ready_for_stage(health: f64, stage: SystemStage) -> bool  -> Result<(), Box<dyn Error>> {
+pub fn is_ready_for_stage(health: f64, stage: SystemStage) -> bool {
     match stage {
         SystemStage::Development => health >= DEV_THRESHOLD,
         SystemStage::Production => health >= PROD_THRESHOLD,

@@ -29,7 +29,7 @@ pub struct Web5Config {
 }
 
 impl Default for Web5Config {
-    fn default() -> Self  -> Result<(), Box<dyn Error>> {
+    fn default() -> Self {
         Self {
             enabled: true,
             did_method: "ion".to_string(),
@@ -52,7 +52,7 @@ pub struct Web5Manager {
 
 impl Web5Manager {
     /// Create a new Web5 manager with the specified configuration
-    pub fn new(config: Web5Config) -> Web5Result<Self>  -> Result<(), Box<dyn Error>> {
+    pub fn new(config: Web5Config) -> Web5Result<Self> {
         let did_manager = identity::DIDManager::new(&config.did_method);
         let protocol_manager = protocols::ProtocolManager::new();
         
@@ -64,12 +64,12 @@ impl Web5Manager {
     }
     
     /// Access the DID manager component
-    pub fn did_manager(&self) -> &identity::DIDManager  -> Result<(), Box<dyn Error>> {
+    pub fn did_manager(&self) -> &identity::DIDManager {
         &self.did_manager
     }
     
     /// Access the protocol manager component
-    pub fn protocol_manager(&self) -> &protocols::ProtocolManager  -> Result<(), Box<dyn Error>> {
+    pub fn protocol_manager(&self) -> &protocols::ProtocolManager {
         &self.protocol_manager
     }
     
