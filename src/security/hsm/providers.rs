@@ -76,22 +76,22 @@ pub mod bitcoin {
             Ok(())
         }
         
-        fn generate_key(&self, params: KeyGenParams) -> Result<KeyPair, HsmError> {
+        fn generate_key(&self, _params: KeyGenParams) -> Result<KeyPair, HsmError> {
             // Implementation would go here
             Err(HsmError::NotImplemented("BitcoinHsmProvider::generate_key".to_string()))
         }
         
-        fn sign(&self, key_id: &str, data: &[u8]) -> Result<Vec<u8>, HsmError> {
+        fn sign(&self, _key_id: &str, _data: &[u8]) -> Result<Vec<u8>, HsmError> {
             // Implementation would go here
             Err(HsmError::NotImplemented("BitcoinHsmProvider::sign".to_string()))
         }
         
-        fn verify(&self, key_id: &str, data: &[u8], signature: &[u8]) -> Result<bool, HsmError> {
+        fn verify(&self, _key_id: &str, _data: &[u8], _signature: &[u8]) -> Result<bool, HsmError> {
             // Implementation would go here
             Err(HsmError::NotImplemented("BitcoinHsmProvider::verify".to_string()))
         }
         
-        fn export_public_key(&self, key_id: &str) -> Result<Vec<u8>, HsmError> {
+        fn export_public_key(&self, _key_id: &str) -> Result<Vec<u8>, HsmError> {
             // Implementation would go here
             Err(HsmError::NotImplemented("BitcoinHsmProvider::export_public_key".to_string()))
         }
@@ -101,7 +101,7 @@ pub mod bitcoin {
             Ok(vec![])
         }
         
-        fn delete_key(&self, key_id: &str) -> Result<(), HsmError> {
+        fn delete_key(&self, _key_id: &str) -> Result<(), HsmError> {
             // Implementation would go here
             Err(HsmError::NotImplemented("BitcoinHsmProvider::delete_key".to_string()))
         }
@@ -162,22 +162,22 @@ pub mod cloud {
             Ok(())
         }
         
-        fn generate_key(&self, params: KeyGenParams) -> Result<KeyPair, HsmError> {
+        fn generate_key(&self, _params: KeyGenParams) -> Result<KeyPair, HsmError> {
             // Implementation would go here
             Err(HsmError::NotImplemented("CloudHsmProvider::generate_key".to_string()))
         }
         
-        fn sign(&self, key_id: &str, data: &[u8]) -> Result<Vec<u8>, HsmError> {
+        fn sign(&self, _key_id: &str, _data: &[u8]) -> Result<Vec<u8>, HsmError> {
             // Implementation would go here
             Err(HsmError::NotImplemented("CloudHsmProvider::sign".to_string()))
         }
         
-        fn verify(&self, key_id: &str, data: &[u8], signature: &[u8]) -> Result<bool, HsmError> {
+        fn verify(&self, _key_id: &str, _data: &[u8], _signature: &[u8]) -> Result<bool, HsmError> {
             // Implementation would go here
             Err(HsmError::NotImplemented("CloudHsmProvider::verify".to_string()))
         }
         
-        fn export_public_key(&self, key_id: &str) -> Result<Vec<u8>, HsmError> {
+        fn export_public_key(&self, _key_id: &str) -> Result<Vec<u8>, HsmError> {
             // Implementation would go here
             Err(HsmError::NotImplemented("CloudHsmProvider::export_public_key".to_string()))
         }
@@ -187,7 +187,7 @@ pub mod cloud {
             Ok(vec![])
         }
         
-        fn delete_key(&self, key_id: &str) -> Result<(), HsmError> {
+        fn delete_key(&self, _key_id: &str) -> Result<(), HsmError> {
             // Implementation would go here
             Err(HsmError::NotImplemented("CloudHsmProvider::delete_key".to_string()))
         }

@@ -65,7 +65,7 @@ pub fn perform_key_generation(params: KeyGenParams) -> Result<KeyPair, HsmError>
 }
 
 /// Helper function to perform signing
-pub fn perform_signing(key_id: &str, data: &[u8]) -> Result<Vec<u8>, HsmError> {
+pub fn perform_signing(_key_id: &str, _data: &[u8]) -> Result<Vec<u8>, HsmError> {
     // This is a placeholder implementation
     // In a real HSM implementation, this would call into the HSM hardware or software
     Err(HsmError::NotImplemented("Signing not implemented yet".to_string()))

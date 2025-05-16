@@ -12,7 +12,9 @@ use thiserror::Error;
 use serde::{Serialize, Deserialize};
 
 /// Main HSM error type
-#[derive(Error, Debug)]
+#[derive(Error, Debug, Clone)]
+// Remove non_exhaustive attribute as it's causing pattern matching issues
+// Alternatively, we could add #[error(transparent)] to ensure all variants are covered
 pub enum HsmError {
     /// Invalid parameters provided
     #[error("Invalid parameters: {0}")]
@@ -80,7 +82,7 @@ pub enum HsmError {
     
     /// IO error
     #[error("IO error: {0}")]
-    IoError(#[from] std::io::Error),
+    IoError(String),
     
     /// Authentication error
     #[error("Authentication error: {0}")]
@@ -181,6 +183,13 @@ pub enum HsmError {
     /// HSM audit event error
     #[error("HSM audit event error: {0}")]
     HsmAuditEventError(String),
+}
+
+// Implement From<std::io::Error> since we changed IoError to use String
+impl From<std::io::Error> for HsmError {
+    fn from(error: std::io::Error) -> Self {
+        HsmError::IoError(error.to_string())
+    }
 }
 
 // This From implementation is not needed as Rust automatically implements From<T> for T

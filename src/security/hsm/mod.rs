@@ -4,8 +4,17 @@ use serde::{Serialize, Deserialize};
 use bitcoin::ScriptBuf;
 
 // Define a simple Sha256 hash type wrapper
+// Use our own wrapper to avoid conflicts with sha2::Sha256
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct Sha256([u8; 32]);
+pub struct Sha256Hash {
+    pub hash: [u8; 32]
+}
+
+impl Sha256Hash {
+    pub fn new(hash: [u8; 32]) -> Self {
+        Self { hash }
+    }
+}
 
 
 pub mod audit;
@@ -22,6 +31,9 @@ pub use types::*;
 
 // Re-export security manager for easier access
 pub use security::SecurityManager;
+
+// Re-export error types for easier access
+pub use error::*;
 
 // Import provider implementations
 use self::providers::bitcoin::BitcoinHsmProvider;
@@ -123,45 +135,8 @@ pub enum HsmStatus {
     Disabled,
 }
 
-/// HSM errors
-#[derive(Debug, thiserror::Error)]
-pub enum HsmError {
-    #[error("HSM provider error: {0}")]
-    ProviderError(String),
-
-    #[error("HSM not ready: {0}")]
-    NotReady(String),
-
-    #[error("HSM operation error: {0}")]
-    OperationError(String),
-
-    #[error("Key not found: {0}")]
-    KeyNotFound(String),
-
-    #[error("Serialization error: {0}")]
-    SerializationError(String),
-
-    #[error("Deserialization error: {0}")]
-    DeserializationError(String),
-
-    #[error("Configuration error: {0}")]
-    ConfigError(String),
-
-    #[error("Authentication error: {0}")]
-    AuthError(String),
-
-    #[error("Network error: {0}")]
-    NetworkError(String),
-
-    #[error("Audit logging error: {0}")]
-    AuditError(String),
-    
-    #[error("HSM is disabled: {0}")]
-    Disabled(String),
-
-    #[error("I/O error: {0}")]
-    IoError(#[from] std::io::Error),
-}
+// HSM errors are defined in the error.rs module
+// Re-exported here via 'pub use error::*;'
 
 impl HsmManager {
     /// Creates a new HSM Manager with the specified configuration
@@ -671,7 +646,7 @@ impl HsmManager {
 // Lightning Atomic Swaps
 #[derive(Debug, Serialize, Deserialize)]
 pub struct AtomicSwap {
-    preimage_hash: Sha256,
+    preimage_hash: Sha256Hash,
     timeout: u32,
     amount: u64,
     redeem_script: ScriptBuf,
@@ -687,12 +662,18 @@ impl NetworkManager {
 
         let mut rng = rand::thread_rng();
         let preimage = rng.gen::<[u8; 32]>();
-        let hash = Sha256::digest(&preimage);
+        
+        // Create SHA-256 hash using the sha2 crate
+        let digest = Sha256::digest(&preimage);
+        
+        // Convert to our custom Sha256Hash type
+        let hash_array = digest.into();
+        let hash_wrapper = Sha256Hash::new(hash_array);
 
         // Create a simpler script for atomic swaps with standard opcodes
         let script = Builder::new()
             .push_opcode(opcodes::all::OP_IF)
-            .push_slice(&hash)
+            .push_slice(&digest.as_slice()) // Use the digest slice for the script
             .push_opcode(opcodes::all::OP_EQUALVERIFY)
             .push_opcode(opcodes::all::OP_ELSE)
             .push_int(self.network.get_block_height()? + 144)
@@ -703,7 +684,7 @@ impl NetworkManager {
             .into_script();
 
         Ok(AtomicSwap {
-            preimage_hash: hash,
+            preimage_hash: hash_wrapper, // Use our custom Sha256Hash type
             timeout: 144,
             amount,
             redeem_script: script,

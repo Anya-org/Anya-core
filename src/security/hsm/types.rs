@@ -2,7 +2,7 @@ use bitcoin::hashes::*;
 use secp256k1::ecdsa::Signature;
 use chrono::{DateTime, Utc};
 use serde::{Serialize, Deserialize, de::DeserializeOwned};
-use serde::ser::{Serializer, SerializeStruct};
+use serde::ser::SerializeStruct; // Removed Serializer as it's not being used
 
 use std::error::Error;
 use std::fmt;

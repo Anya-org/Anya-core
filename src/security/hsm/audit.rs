@@ -7,7 +7,7 @@ use tracing::{debug, info, error, warn};
 use chrono::{DateTime, Utc};
 use std::path::PathBuf;
 use std::fs::{self, OpenOptions, File};
-use std::io::{Write, Read, Seek, SeekFrom};
+use std::io::{Write, /* Read, */ Seek, SeekFrom}; // Commented out Read as it's not being used
 use async_trait::async_trait;
 use std::collections::HashMap;
 use uuid::Uuid;

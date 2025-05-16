@@ -149,22 +149,45 @@ impl SystemHardening {
     
     /// Get the configuration for a component
     pub fn get_component_config(&self, component_name: &str) -> Option<HardeningConfig> {
-        let configs = self.configs.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
-        configs.get(component_name).cloned()
+        match self.configs.lock() {
+            Ok(configs) => configs.get(component_name).cloned(),
+            Err(e) => {
+                error!("Mutex lock error: {}", e);
+                None
+            }
+        }
     }
     
     /// Get all component configurations
     pub fn get_all_configs(&self) -> Vec<HardeningConfig> {
-        let configs = self.configs.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
-        configs.values().cloned().collect()
+        match self.configs.lock() {
+            Ok(configs) => configs.values().cloned().collect(),
+            Err(e) => {
+                error!("Mutex lock error: {}", e);
+                Vec::new()
+            }
+        }
     }
     
     /// Get number of changes and configs
     pub fn get_stats(&self) -> (usize, usize) {
-        let counter = self.input_counter.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
-        let configs = self.configs.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
+        let counter = match self.input_counter.lock() {
+            Ok(counter) => *counter,
+            Err(e) => {
+                error!("Mutex lock error: {}", e);
+                0
+            }
+        };
         
-        (*counter, configs.len())
+        let config_count = match self.configs.lock() {
+            Ok(configs) => configs.len(),
+            Err(e) => {
+                error!("Mutex lock error: {}", e);
+                0
+            }
+        };
+        
+        (counter, config_count)
     }
     
     /// Apply all pending configurations
