@@ -96,6 +96,9 @@ pub struct HsmManager {
     /// Current status
     status: Arc<RwLock<HsmStatus>>,
 
+    /// Health status and bi-yearly check information
+    health_status: Arc<RwLock<HsmHealthStatus>>,
+
     /// Operation tracker
     operation_tracker: Arc<Mutex<HashMap<String, (DateTime<Utc>, String)>>>,
 }
@@ -138,6 +141,33 @@ pub enum HsmStatus {
 // HSM errors are defined in the error.rs module
 // Re-exported here via 'pub use error::*;'
 
+// Add a struct to track last health check time
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct HsmHealthStatus {
+    /// Time of the last health check
+    pub last_check_time: Option<DateTime<Utc>>,
+    /// Status of the last health check
+    pub last_check_result: bool,
+    /// User has explicitly enabled HSM
+    pub user_enabled: bool,
+    /// Time of the last system upgrade
+    pub last_upgrade_time: Option<DateTime<Utc>>,
+    /// Reason if HSM is disabled
+    pub disabled_reason: Option<String>,
+}
+
+impl Default for HsmHealthStatus {
+    fn default() -> Self {
+        Self {
+            last_check_time: None,
+            last_check_result: false,
+            user_enabled: false,
+            last_upgrade_time: None,
+            disabled_reason: Some("HSM is disabled by default".to_string()),
+        }
+    }
+}
+
 impl HsmManager {
     /// Creates a new HSM Manager with the specified configuration
     pub async fn new(config: HsmConfig) -> Result<Self, HsmError> {
@@ -171,10 +201,11 @@ impl HsmManager {
             config,
             provider,
             stats,
-            enabled: false,
+            enabled: false,  // HSM is disabled by default
             audit_logger,
             operation_tracker: Arc::new(Mutex::new(HashMap::new())),
             status: Arc::new(RwLock::new(HsmStatus::Initializing)),
+            health_status: Arc::new(RwLock::new(HsmHealthStatus::default())),
         };
 
         Ok(manager)
@@ -234,6 +265,213 @@ impl HsmManager {
             "HSM Manager initialized successfully with provider: {:?}",
             self.config.provider_type
         );
+        Ok(())
+    }
+
+    /// Checks if the HSM is due for a health check after a system upgrade
+    pub async fn should_run_health_check(&self) -> bool {
+        let health_status = self.health_status.read().await;
+        
+        // If there was no last upgrade time recorded, don't trigger a check
+        if health_status.last_upgrade_time.is_none() {
+            return false;
+        }
+        
+        // If there was an upgrade but no check performed since then, return true
+        if let (Some(upgrade_time), Some(check_time)) = (health_status.last_upgrade_time, health_status.last_check_time) {
+            return upgrade_time > check_time;
+        }
+        
+        // If there is an upgrade time but no check time, definitely run a check
+        if health_status.last_upgrade_time.is_some() && health_status.last_check_time.is_none() {
+            return true;
+        }
+        
+        false
+    }
+    
+    /// Record a system upgrade occurred, which will trigger health check requirement
+    pub async fn record_system_upgrade(&self) -> Result<(), HsmError> {
+        let mut health_status = self.health_status.write().await;
+        health_status.last_upgrade_time = Some(Utc::now());
+        health_status.disabled_reason = Some("System upgrade requires health check validation".to_string());
+        
+        // Disable HSM until health check passes
+        // Note: We're not updating self.enabled here directly as it would require &mut self
+        // Instead, we'll check health_status.last_check_result in the is_enabled() method
+        
+        // Log event
+        self.audit_logger
+            .log_event(
+                "hsm.system_upgrade",
+                &HsmAuditEvent {
+                    event_type: "system_upgrade".to_string(),
+                    provider: format!("{:?}", self.config.provider_type),
+                    status: "recorded".to_string(),
+                    details: Some("HSM disabled until health check passes".to_string()),
+                    operation_id: None,
+                },
+            )
+            .await?;
+            
+        Ok(())
+    }
+    
+    /// Performs a comprehensive health check on the HSM
+    pub async fn run_health_check(&mut self) -> Result<bool, HsmError> {
+        // Update status during check
+        {
+            let mut status = self.status.write().await;
+            *status = HsmStatus::Maintenance;
+        }
+        
+        // Log starting health check
+        self.audit_logger
+            .log_event(
+                "hsm.health_check",
+                &HsmAuditEvent {
+                    event_type: "health_check".to_string(),
+                    provider: format!("{:?}", self.config.provider_type),
+                    status: "started".to_string(),
+                    details: None,
+                    operation_id: None,
+                },
+            )
+            .await?;
+            
+        // Perform the actual health check operations
+        let check_result = self.provider.perform_health_check().await;
+        
+        // Update health status
+        {
+            let mut health_status = self.health_status.write().await;
+            health_status.last_check_time = Some(Utc::now());
+            
+            match &check_result {
+                Ok(passed) => {
+                    health_status.last_check_result = *passed;
+                    
+                    if *passed {
+                        // Only clear the reason if the check passed
+                        if health_status.user_enabled {
+                            health_status.disabled_reason = None;
+                        } else {
+                            health_status.disabled_reason = Some("Waiting for user to enable HSM".to_string());
+                        }
+                    } else {
+                        health_status.disabled_reason = Some("Health check failed".to_string());
+                    }
+                },
+                Err(e) => {
+                    health_status.last_check_result = false;
+                    health_status.disabled_reason = Some(format!("Health check error: {}", e));
+                }
+            }
+        }
+        
+        // Update system status based on health check results
+        {
+            let mut status = self.status.write().await;
+            
+            // If check passed and user has enabled HSM, set to Ready; otherwise set to Disabled
+            if let Ok(true) = check_result {
+                let health_status = self.health_status.read().await;
+                if health_status.user_enabled {
+                    *status = HsmStatus::Ready;
+                    self.enabled = true;
+                } else {
+                    *status = HsmStatus::Disabled;
+                    self.enabled = false;
+                }
+            } else {
+                *status = HsmStatus::Disabled;
+                self.enabled = false;
+            }
+        }
+        
+        // Log completed health check
+        let result_str = match &check_result {
+            Ok(true) => "passed",
+            Ok(false) => "failed",
+            Err(_) => "error"
+        };
+        
+        self.audit_logger
+            .log_event(
+                "hsm.health_check",
+                &HsmAuditEvent {
+                    event_type: "health_check".to_string(),
+                    provider: format!("{:?}", self.config.provider_type),
+                    status: "completed".to_string(),
+                    details: Some(format!("Result: {}", result_str)),
+                    operation_id: None,
+                },
+            )
+            .await?;
+            
+        // Return the health check result
+        check_result
+    }
+    
+    /// Enables the HSM with user confirmation
+    pub async fn enable(&mut self) -> Result<(), HsmError> {
+        // First check if a health check is needed
+        if self.should_run_health_check().await {
+            let health_check_result = self.run_health_check().await?;
+            if !health_check_result {
+                return Err(HsmError::NotReady("HSM failed health check and cannot be enabled".to_string()));
+            }
+        }
+        
+        // Update status
+        {
+            let mut status = self.status.write().await;
+            *status = HsmStatus::Initializing;
+        }
+        
+        // Update health status to record user's intent
+        {
+            let mut health_status = self.health_status.write().await;
+            health_status.user_enabled = true;
+            health_status.disabled_reason = None; // Clear any previous reason
+        }
+
+        // Log event
+        self.audit_logger
+            .log_event(
+                "hsm.enable",
+                &HsmAuditEvent {
+                    event_type: "enable".to_string(),
+                    provider: format!("{:?}", self.config.provider_type),
+                    status: "started".to_string(),
+                    details: Some("User-initiated enablement".to_string()),
+                    operation_id: None,
+                },
+            )
+            .await?;
+
+        self.enabled = true;
+
+        // Update status
+        {
+            let mut status = self.status.write().await;
+            *status = HsmStatus::Ready;
+        }
+
+        // Log completed event
+        self.audit_logger
+            .log_event(
+                "hsm.enable",
+                &HsmAuditEvent {
+                    event_type: "enable".to_string(),
+                    provider: format!("{:?}", self.config.provider_type),
+                    status: "completed".to_string(),
+                    details: None,
+                    operation_id: None,
+                },
+            )
+            .await?;
+
         Ok(())
     }
 

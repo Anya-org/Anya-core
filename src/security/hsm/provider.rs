@@ -345,6 +345,69 @@ pub trait HsmProvider: Debug + Send + Sync {
     
     /// Execute operation
     async fn execute_operation(&self, _request: HsmRequest) -> Result<HsmResponse, HsmError>;
+    
+    /// Perform a comprehensive health check of the HSM
+    /// Returns true if all checks pass, false otherwise
+    async fn perform_health_check(&self) -> Result<bool, HsmError> {
+        // Default implementation performs basic status check and key operation tests
+        // Each provider should override this with more specific checks
+        let status = self.get_status().await?;
+        
+        // Generate a test key to verify key operations
+        let test_params = KeyGenParams {
+            key_type: KeyType::Ec,
+            key_size: Some(256),
+            label: Some("health_check_test_key".to_string()),
+            id: Some(format!("health_check_{}", Utc::now().timestamp())),
+            extractable: true,
+            algorithm: Some(KeyAlgorithm::Ec),
+            usage: vec![KeyUsage::Sign, KeyUsage::Verify],
+        };
+        
+        // Test key generation
+        let (key_pair, _) = match self.generate_key(test_params).await {
+            Ok(result) => result,
+            Err(e) => {
+                warn!("HSM health check failed: Key generation error: {}", e);
+                return Ok(false);
+            }
+        };
+        
+        // Test signing
+        let test_data = b"HSM health check test data";
+        let signature = match self.sign(&key_pair.id, SigningAlgorithm::EcdsaSha256, test_data).await {
+            Ok(sig) => sig,
+            Err(e) => {
+                warn!("HSM health check failed: Signing error: {}", e);
+                // Try to clean up test key before returning
+                let _ = self.delete_key(&key_pair.id).await;
+                return Ok(false);
+            }
+        };
+        
+        // Test verification
+        let verify_result = match self.verify(&key_pair.id, SigningAlgorithm::EcdsaSha256, test_data, &signature).await {
+            Ok(result) => result,
+            Err(e) => {
+                warn!("HSM health check failed: Verification error: {}", e);
+                // Try to clean up test key before returning
+                let _ = self.delete_key(&key_pair.id).await;
+                return Ok(false);
+            }
+        };
+        
+        // Clean up test key
+        match self.delete_key(&key_pair.id).await {
+            Ok(_) => {},
+            Err(e) => {
+                warn!("HSM health check warning: Could not delete test key: {}", e);
+                // Non-fatal error, don't fail the health check just for this
+            }
+        };
+        
+        // All checks should pass and verification should succeed
+        Ok(verify_result);
+    }
 }
 
 /// Creates an HSM provider based on the configuration
