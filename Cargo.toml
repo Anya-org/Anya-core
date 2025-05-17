@@ -1,11 +1,18 @@
 [package]
 name = "anya-core"
-version = "0.2.0"
+version = "0.3.0-rc.1"
 edition = "2021"
 description = "Enterprise-grade Bitcoin Infrastructure Platform"
 authors = ["botshelomokoka@gmail.com"]
 license = "MIT"
 repository = "https://github.com/anya-org/anya-core"
+
+[features]
+default = []
+# Feature flag for HSM functionality
+hsm = ["uuid", "chrono", "base64", "rand", "async-trait", "sha2", "hmac"]
+# Feature flag for complete system (including HSM)
+complete = ["hsm"]
 
 [dependencies]
 # API dependencies
@@ -39,19 +46,20 @@ thiserror = "1.0.56"
 tracing = "0.1.40"
 tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
 
-# Utilities
+# Utilities and common dependencies
 async-trait = "0.1.77"
+clap = { version = "4.4.7", features = ["derive"] }
+base64 = "0.21.4"
 uuid = { version = "1.6.1", features = ["v4", "serde"] }
 chrono = { version = "0.4.31", features = ["serde"] }
-futures = "0.3.30"
-getrandom = "0.2.12"
-humantime-serde = "1.1.1"
 rand = "0.8.5"
 argon2 = "0.5.0"
-base64 = "0.21"
-sha2 = { version = "0.10", default-features = false }
 hex = "0.4"
 log = "0.4"
+
+# Conditionally required dependencies (HSM feature)
+sha2 = { version = "0.10.7", optional = true }
+hmac = { version = "0.12.1", optional = true }
 
 [dev-dependencies]
 mockall = "0.12.1"

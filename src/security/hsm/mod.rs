@@ -1,9 +1,35 @@
+//! Hardware Security Module (HSM) Implementation
+//! 
+//! This module provides a unified interface for hardware security operations
+//! with a focus on open-source solutions that align with Bitcoin's philosophy.
+
 use std::error::Error;
-use crate::adapters::{YubiConnector, LedgerConnector};
+use std::sync::Arc;
+use async_trait::async_trait;
 use serde::{Serialize, Deserialize};
 use bitcoin::ScriptBuf;
-use crate::security::hsm::error::{AuditEventType, AuditEventResult, AuditEventSeverity, HsmError};
-use serde_json;
+use crate::security::hsm::error::{
+    AuditEventType, AuditEventResult, AuditEventSeverity, 
+    HsmError, HsmAuditEvent
+};
+use crate::security::hsm::audit::AuditLogger;
+use uuid::Uuid;
+
+// Re-export open-source HSM provider implementations
+pub mod providers {
+    pub mod software;
+    pub mod tpm;
+    pub mod pkcs11;
+    pub mod ledger;
+}
+
+// Re-export types for easier access
+pub use providers::{
+    software::SoftwareHsmProvider,
+    tpm::TpmHsmProvider,
+    pkcs11::Pkcs11HsmProvider,
+    ledger::LedgerHsmProvider,
+};
 
 // Define a simple Sha256 hash type wrapper
 // Use our own wrapper to avoid conflicts with sha2::Sha256
@@ -24,12 +50,13 @@ pub mod config;
 pub mod error;
 pub mod operations;
 pub mod provider;
-pub mod providers;
+pub mod providers_exports as providers;
 pub mod security;
 pub mod types;
 
 // Re-export types for easier access
 pub use types::*;
+pub use types::HsmOperation;
 
 // Re-export security manager for easier access
 pub use security::SecurityManager;
@@ -37,21 +64,35 @@ pub use security::SecurityManager;
 // Re-export error types for easier access
 pub use error::*;
 
-// Import provider implementations
-use self::providers::bitcoin::BitcoinHsmProvider;
-use self::providers::cloud::CloudHsmProvider;
-use self::providers::hardware::HardwareHsmProvider;
-use self::providers::pkcs11::Pkcs11HsmProvider;
-use self::providers::simulator::SimulatorHsmProvider;
-use self::providers::software::SoftwareHsmProvider;
-use self::providers::tpm::TpmHsmProvider;
+// Provider module declarations
+pub mod providers {
+    pub mod bitcoin;
+    pub mod hardware;
+    pub mod ledger;
+    pub mod pkcs11;
+    pub mod simulator;
+    pub mod software;
+    pub mod tpm;
+    
+    // Re-export provider implementations
+    pub use bitcoin::BitcoinHsmProvider;
+    pub use hardware::HardwareHsmProvider;
+    pub use pkcs11::Pkcs11HsmProvider;
+    pub use simulator::SimulatorHsmProvider;
+    pub use software::SoftwareHsmProvider;
+    pub use tpm::TpmHsmProvider;
+}
 
-pub use providers::{
-    BitcoinHsmProvider, HardwareHsmProvider, SimulatorHsmProvider, SoftwareHsmProvider,
-};
+// Re-export provider types for easier access
+pub use providers::BitcoinHsmProvider;
+pub use providers::HardwareHsmProvider;
+pub use providers::Pkcs11HsmProvider;
+pub use providers::SimulatorHsmProvider;
+pub use providers::SoftwareHsmProvider;
+pub use providers::TpmHsmProvider;
 
 #[cfg(test)]
-pub mod tests;
+pub mod tests_standalone as tests;
 
 use bitcoin::{Txid, Psbt, Script, ScriptBuf, XOnlyPublicKey};
 use bitcoin::taproot::TaprootBuilder;
@@ -185,11 +226,11 @@ impl HsmManager {
             HsmProviderType::Simulator => Box::new(SimulatorHsmProvider::new(&config.simulator)?),
             HsmProviderType::SoftwareKeyStore => {
                 Box::new(SoftwareHsmProvider::new(&config.software)?)
-            }
+            },
             HsmProviderType::CloudHsm => Box::new(CloudHsmProvider::new(&config.cloud).await?),
             HsmProviderType::HardwareHsm => {
                 Box::new(HardwareHsmProvider::new(&config.hardware).await?)
-            }
+            },
             HsmProviderType::BitcoinHsm => {
                 Box::new(BitcoinHsmProvider::new(&config.bitcoin).await?)
             }
@@ -233,11 +274,16 @@ impl HsmManager {
             .log_event(
                 "hsm.initialize",
                 &HsmAuditEvent {
-                    event_type: "initialize".to_string(),
-                    provider: format!("{:?}", self.config.provider_type),
-                    status: "started".to_string(),
-                    details: None,
-                    operation_id: None,
+                    event_type: AuditEventType::HsmInitialize,
+                    result: AuditEventResult::InProgress,
+                    severity: AuditEventSeverity::Info,
+                    timestamp: chrono::Utc::now(),
+                    id: Uuid::new_v4().to_string(),
+                    user_id: None,
+                    key_id: None,
+                    parameters: Some(serde_json::to_value(&self.config.provider_type).unwrap_or_default()),
+                    error: None,
+                    metadata: None,
                 },
             )
             .await?;
@@ -256,11 +302,16 @@ impl HsmManager {
             .log_event(
                 "hsm.initialize",
                 &HsmAuditEvent {
-                    event_type: "initialize".to_string(),
-                    provider: format!("{:?}", self.config.provider_type),
-                    status: "success".to_string(),
-                    details: None,
-                    operation_id: None,
+                    event_type: AuditEventType::HsmInitialize,
+                    result: AuditEventResult::Success,
+                    severity: AuditEventSeverity::Info,
+                    timestamp: chrono::Utc::now(),
+                    id: Uuid::new_v4().to_string(),
+                    user_id: None,
+                    key_id: None,
+                    parameters: Some(serde_json::to_value(&self.config.provider_type).unwrap_or_default()),
+                    error: None,
+                    metadata: None,
                 },
             )
             .await?;
@@ -491,17 +542,34 @@ impl HsmManager {
             "Executing HSM operation: {:?}, operation_id: {}",
             operation, operation_id
         );
+        
+        // Create the request object with serialized parameters
+        let request = HsmRequest {
+            id: operation_id.clone(),
+            operation: operation.clone(),
+            parameters: serde_json::to_value(&params)?,
+            user_id: None,
+            timestamp: chrono::Utc::now()
+        };
 
         // Log operation start
         self.audit_logger
             .log_event(
                 "hsm.operation",
                 &HsmAuditEvent {
-                    event_type: "operation_start".to_string(),
-                    provider: format!("{:?}", self.config.provider_type),
-                    status: "started".to_string(),
-                    details: Some(format!("Operation: {:?}", operation)),
-                    operation_id: Some(operation_id.clone()),
+                    event_type: AuditEventType::HsmOperation,
+                    result: AuditEventResult::InProgress,
+                    severity: AuditEventSeverity::Info,
+                    timestamp: chrono::Utc::now(),
+                    id: Uuid::new_v4().to_string(),
+                    user_id: None,
+                    key_id: None,
+                    parameters: Some(serde_json::to_value(&operation).unwrap_or_default()),
+                    error: None,
+                    metadata: Some(serde_json::json!({
+                        "operation_id": operation_id.clone(),
+                        "status": "started"
+                    })),
                 },
             )
             .await?;
@@ -518,11 +586,20 @@ impl HsmManager {
                     .log_event(
                         "hsm.operation",
                         &HsmAuditEvent {
-                            event_type: "operation_error".to_string(),
-                            provider: format!("{:?}", self.config.provider_type),
-                            status: "failed".to_string(),
-                            details: Some(format!("Error: {:?}", err)),
-                            operation_id: Some(operation_id),
+                            event_type: AuditEventType::HsmOperation,
+                            result: AuditEventResult::Failure,
+                            severity: AuditEventSeverity::Error,
+                            timestamp: chrono::Utc::now(),
+                            id: Uuid::new_v4().to_string(),
+                            user_id: None,
+                            key_id: None,
+                            parameters: None,
+                            error: Some(format!("{:?}", err)),
+                            metadata: Some(serde_json::json!({
+                                "operation_id": operation_id,
+                                "status": "failed",
+                                "provider": format!("{:?}", self.config.provider_type)
+                            })),
                         },
                     )
                     .await?;
@@ -530,55 +607,56 @@ impl HsmManager {
                 return Err(err);
             }
         }
-
-        // Create operation request
-        let request = OperationRequest {
-            operation,
-            params: serde_json::to_value(params)
-                .map_err(|e| HsmError::SerializationError(e.to_string()))?,
-            operation_id: operation_id.clone(),
-        };
+        
+        // Request object already created above
 
         // Execute operation
-        let result = match self.provider.execute_operation(request).await {
+        match self.provider.execute_operation(request).await {
             Ok(result) => {
                 // Log operation success
+                let event = HsmAuditEvent::success(AuditEventType::HsmOperation)
+                    .with_operation_id(operation_id)
+                    .with_metadata(&serde_json::json!({
+                        "provider": format!("{:?}", self.config.provider_type),
+                        "action": "EXECUTE_OPERATION_SUCCESS"
+                    }))?;
+                
                 self.audit_logger
                     .log_event(
-                        "hsm.operation",
-                        &HsmAuditEvent {
-                            event_type: "operation_complete".to_string(),
-                            provider: format!("{:?}", self.config.provider_type),
-                            status: "success".to_string(),
-                            details: None,
-                            operation_id: Some(operation_id),
-                        },
+                        AuditEventType::HsmOperation,
+                        AuditEventResult::Success,
+                        AuditEventSeverity::Info,
+                        event.to_hsm_audit_event(),
                     )
                     .await?;
-
+                
+                Ok(result)
             }
             Err(err) => {
                 // Log operation failure
+                let event = HsmAuditEvent::failure(
+                    AuditEventType::HsmOperation,
+                    format!("Operation failed: {}", err)
+                )
+                .with_operation_id(operation_id)
+                .with_metadata(&serde_json::json!({
+                    "provider": format!("{:?}", self.config.provider_type),
+                    "error": format!("{:?}", err),
+                    "action": "EXECUTE_OPERATION_FAILED"
+                }))?;
+                
                 self.audit_logger
                     .log_event(
                         AuditEventType::HsmOperation,
                         AuditEventResult::Failure,
                         AuditEventSeverity::Error,
-                        serde_json::json!({
-                            "provider": format!("{:?}", self.config.provider_type),
-                            "error": format!("{:?}", err),
-                            "operation_id": operation_id,
-                            "action": "EXECUTE_OPERATION_FAILED"
-                        }),
+                        event.to_hsm_audit_event(),
                     )
                     .await?;
-
+                    
                 Err(err)
             }
-            }
-        };
-
-        result
+        }
     }
 
     /// Generates a new key pair
@@ -609,7 +687,7 @@ impl HsmManager {
     pub async fn sign_data(
         &self,
         key_name: &str,
-        _data: &[u8],
+        data: &[u8],
         algorithm: SignatureAlgorithm,
     ) -> Result<Vec<u8>, HsmError> {
         debug!(
@@ -621,7 +699,7 @@ impl HsmManager {
         let params = SignParams {
             key_name: key_name.to_string(),
             data: BASE64.encode(data),
-            algorithm,
+            algorithm, // This will be converted as needed
         };
 
         let result = self.execute(HsmOperation::SignData, params).await?;
@@ -639,8 +717,8 @@ impl HsmManager {
     pub async fn verify_signature(
         &self,
         key_name: &str,
-        _data: &[u8],
-        _signature: &[u8],
+        data: &[u8],
+        signature: &[u8],
         algorithm: SignatureAlgorithm,
     ) -> Result<bool, HsmError> {
         // Check if HSM is enabled
@@ -675,7 +753,7 @@ impl HsmManager {
     pub async fn encrypt_data(
         &self,
         key_name: &str,
-        _data: &[u8],
+        data: &[u8],
         algorithm: EncryptionAlgorithm,
     ) -> Result<Vec<u8>, HsmError> {
         // Check if HSM is enabled
@@ -710,7 +788,7 @@ impl HsmManager {
     pub async fn decrypt_data(
         &self,
         key_name: &str,
-        _data: &[u8],
+        data: &[u8],
         algorithm: EncryptionAlgorithm,
     ) -> Result<Vec<u8>, HsmError> {
         // Check if HSM is enabled
@@ -1065,7 +1143,7 @@ impl MobileSDK {
         let mut nonce = [0u8; 32];
         rand::thread_rng().fill_bytes(&mut nonce);
         
-        let partial_sig = self.hsm.sign("repudiation_key", SigningAlgorithm::EcdsaSecp256k1, &nonce)
+        let partial_sig = self.hsm.sign("repudiation_key", SignatureAlgorithm::EcdsaSecp256k1Sha256, &nonce)
             .map_err(|e| Box::new(e) as Box<dyn std::error::Error>)?;
             
         let merkle_proof = self.network.get_merkle_proof(txid)

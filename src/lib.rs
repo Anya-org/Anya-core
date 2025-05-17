@@ -48,8 +48,13 @@ pub mod dao;
 pub mod extensions;
 pub mod config;
 pub mod core;
+
+// Security module, with HSM functionality controlled by feature flag
 pub mod security;
-pub mod enterprise;
+
+// Re-export HSM types for convenience when feature is enabled
+#[cfg(feature = "hsm")]
+pub use security::hsm;
 pub mod layer2;
 pub mod tools;
 pub mod tokenomics;

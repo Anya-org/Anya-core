@@ -22,10 +22,9 @@ use bitcoin::{
 
 use crate::security::hsm::config::BitcoinConfig;
 use crate::security::hsm::error::HsmError;
-use crate::security::hsm::provider::{
-    EcCurve, EncryptionAlgorithm, HsmOperation, HsmProvider, HsmProviderStatus, HsmRequest,
-    HsmResponse, KeyGenParams, KeyInfo, KeyPair, KeyType, KeyUsage, SigningAlgorithm,
-};
+use crate::security::hsm::provider::{HsmProvider, KeyGenParams, KeyInfo, KeyPair, EncryptionAlgorithm, KeyType, KeyUsage, SigningAlgorithm, EcCurve};
+use crate::security::hsm::types::{HsmRequest, HsmResponse, HsmOperation, HsmResponseStatus, HsmProviderStatus};
+use crate::security::hsm::audit::AuditLogger;
 
 /// Bitcoin HSM Provider
 #[derive(Debug)]
@@ -294,7 +293,7 @@ impl HsmProvider for BitcoinHsmProvider {
         Ok(())
     }
 
-    async fn generate_key(&self, _params: KeyGenParams) -> Result<KeyPair, HsmError> {
+    async fn generate_key(&self, params: KeyGenParams) -> Result<KeyPair, HsmError> {
         debug!("Generating key with params: {:?}", params);
 
         // Check provider status
@@ -321,9 +320,9 @@ impl HsmProvider for BitcoinHsmProvider {
 
     async fn sign(
         &self,
-        _key_id: &str,
-        _algorithm: SigningAlgorithm,
-        _data: &[u8],
+        key_id: &str,
+        algorithm: SigningAlgorithm,
+        data: &[u8],
     ) -> Result<Vec<u8>, HsmError> {
         debug!(
             "Signing data with key {}, algorithm {:?}",
@@ -345,10 +344,10 @@ impl HsmProvider for BitcoinHsmProvider {
 
     async fn verify(
         &self,
-        _key_id: &str,
-        _algorithm: SigningAlgorithm,
-        _data: &[u8],
-        _signature: &[u8],
+        key_id: &str,
+        algorithm: SigningAlgorithm,
+        data: &[u8],
+        signature: &[u8],
     ) -> Result<bool, HsmError> {
         debug!(
             "Verifying signature with key {}, algorithm {:?}",
@@ -369,7 +368,7 @@ impl HsmProvider for BitcoinHsmProvider {
             .await
     }
 
-    async fn export_public_key(&self, _key_id: &str) -> Result<Vec<u8>, HsmError> {
+    async fn export_public_key(&self, key_id: &str) -> Result<Vec<u8>, HsmError> {
         debug!("Exporting public key {}", key_id);
 
         // Check provider status
@@ -420,7 +419,7 @@ impl HsmProvider for BitcoinHsmProvider {
         Ok(keys_list)
     }
 
-    async fn delete_key(&self, _key_id: &str) -> Result<(), HsmError> {
+    async fn delete_key(&self, key_id: &str) -> Result<(), HsmError> {
         debug!("Deleting key {}", key_id);
 
         // Check provider status
@@ -466,7 +465,7 @@ impl HsmProvider for BitcoinHsmProvider {
         Ok(())
     }
 
-    async fn execute_operation(&self, _request: HsmRequest) -> Result<HsmResponse, HsmError> {
+    async fn execute_operation(&self, request: HsmRequest) -> Result<HsmResponse, HsmError> {
         debug!("Executing operation: {:?}", request.operation);
 
         match request.operation {

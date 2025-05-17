@@ -49,6 +49,17 @@ See the [Enterprise License](./enterprise/LICENSE) for details.
 - Comprehensive health monitoring
 - Thread-safe caching layer
 
+### Hardware Security Module (HSM) Support
+
+[AIS-3][RES-3][PFM-2]
+
+- Modular HSM provider architecture
+- Software-based HSM implementation for development
+- Hardware device support including TPM and PKCS#11
+- Bitcoin-specific HSM operations
+- Feature-flag enabled for flexible deployment
+- Comprehensive key management and cryptographic operations
+
 ### Installation System
 
 [AIR-3][AIS-3][AIT-3][PFM-2]
@@ -760,6 +771,7 @@ Special thanks to our contributors and the following projects:
 *2025-03-12*
 
 ## Validation
+
 Run the following to verify system compliance:
 
 ```shell
@@ -767,12 +779,15 @@ Run the following to verify system compliance:
 ```
 
 ## Standards Compliance
+
 This project adheres to:
+
 - Bitcoin Protocol Compliance Level 3 (BPC-3)
 - DAO Governance Standard Level 4 (DAO-4)
 - AI Security Standard Level 3 (AIS-3)
 
 ## Bitcoin Protocol Compliance
+
 ```mermaid
 graph TD
     A[Bitcoin Core] --> B{{BIP-341}}
@@ -785,6 +800,7 @@ graph TD
 ```
 
 ## Core Features
+
 ```rust
 // From src/security/hsm/mod.rs
 #[bip341]
@@ -801,6 +817,7 @@ fn verify_taproot(commitment: [u8; 32]) -> Result<()> {
 ```
 
 ## Dependency Matrix
+
 ```toml
 [workspace.dependencies]
 bitcoin = { version = "0.32.1", features = ["bip341"] }
@@ -817,6 +834,7 @@ last-audit = "2025-08-24"
 ```
 
 ## Security Implementation
+
 ```mermaid
 sequenceDiagram
     User->>+HSM: Sign Transaction
@@ -827,6 +845,7 @@ sequenceDiagram
 ```
 
 ## Mobile Integration
+
 ```toml
 [features]
 mobile = [
@@ -840,6 +859,7 @@ jsi = { version = "0.12", features = ["bip341"] }
 ```
 
 ## Audit Trail
+
 ```json
 {
   "2025-08": {
@@ -852,6 +872,7 @@ jsi = { version = "0.12", features = ["bip341"] }
 ```
 
 ## Compliance Checklist
+
 - [x] BIP-341 (Taproot)
 - [x] BIP-174 (PSBT v2)
 - [x] BIP-342 (Tapscript)
@@ -863,6 +884,7 @@ jsi = { version = "0.12", features = ["bip341"] }
 **Last Updated**: 2025-08-24 | [Full Roadmap](ROADMAP.md) | [Audit Reports](docs/SECURITY.md)
 
 ## CI/CD Pipeline
+
 ```mermaid
 sequenceDiagram
     User->>+HSM: Sign Transaction
@@ -890,12 +912,13 @@ To run all operations:
 ```
 
 The script will:
+
 - Log all operations to the logs directory
 - Generate a comprehensive summary report
 - Handle failures gracefully
 - Provide timing information for each stage
 
-Author: Bo The Big (botshelomokokoka@gmail.com)
+Author: Bo The Big (<botshelomokokoka@gmail.com>)
 
 ## Hardware Security Module (HSM) Integration
 
@@ -976,6 +999,7 @@ sudo ./scripts/install/uninstall.sh
 ```
 
 The new system-optimized installation automatically:
+
 1. Analyzes your system capabilities (CPU, memory, disk, hardware security modules)
 2. Configures build parameters based on available resources
 3. Sets appropriate resource limits in systemd service

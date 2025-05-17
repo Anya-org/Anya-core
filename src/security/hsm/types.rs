@@ -514,6 +514,42 @@ pub struct CoreWrapper<T> {
     pub data: Option<T>
 }
 
+// Add conversion from provider::SigningAlgorithm to types::SignatureAlgorithm
+impl From<crate::security::hsm::provider::SigningAlgorithm> for SignatureAlgorithm {
+    fn from(algorithm: crate::security::hsm::provider::SigningAlgorithm) -> Self {
+        use crate::security::hsm::provider::SigningAlgorithm as ProviderAlgorithm;
+        match algorithm {
+            ProviderAlgorithm::RsaPkcs1Sha256 => SignatureAlgorithm::RsaPkcs1v15Sha256,
+            ProviderAlgorithm::RsaPkcs1Sha384 => SignatureAlgorithm::RsaPkcs1v15Sha384,
+            ProviderAlgorithm::RsaPkcs1Sha512 => SignatureAlgorithm::RsaPkcs1v15Sha512,
+            ProviderAlgorithm::RsaPssSha256 => SignatureAlgorithm::RsaPssSha256,
+            ProviderAlgorithm::RsaPssSha384 => SignatureAlgorithm::RsaPssSha384,
+            ProviderAlgorithm::RsaPssSha512 => SignatureAlgorithm::RsaPssSha512,
+            ProviderAlgorithm::EcdsaSha256 => SignatureAlgorithm::EcdsaSecp256k1Sha256,
+            ProviderAlgorithm::Ed25519 => SignatureAlgorithm::Ed25519,
+            _ => SignatureAlgorithm::EcdsaSecp256k1Sha256, // Default for unsupported algorithms
+        }
+    }
+}
+
+// Add conversion from types::SignatureAlgorithm to provider::SigningAlgorithm
+impl From<SignatureAlgorithm> for crate::security::hsm::provider::SigningAlgorithm {
+    fn from(algorithm: SignatureAlgorithm) -> Self {
+        use crate::security::hsm::provider::SigningAlgorithm as ProviderAlgorithm;
+        match algorithm {
+            SignatureAlgorithm::RsaPkcs1v15Sha256 => ProviderAlgorithm::RsaPkcs1Sha256,
+            SignatureAlgorithm::RsaPkcs1v15Sha384 => ProviderAlgorithm::RsaPkcs1Sha384,
+            SignatureAlgorithm::RsaPkcs1v15Sha512 => ProviderAlgorithm::RsaPkcs1Sha512,
+            SignatureAlgorithm::RsaPssSha256 => ProviderAlgorithm::RsaPssSha256,
+            SignatureAlgorithm::RsaPssSha384 => ProviderAlgorithm::RsaPssSha384,
+            SignatureAlgorithm::RsaPssSha512 => ProviderAlgorithm::RsaPssSha512,
+            SignatureAlgorithm::EcdsaSecp256k1Sha256 => ProviderAlgorithm::EcdsaSha256,
+            SignatureAlgorithm::Ed25519 => ProviderAlgorithm::Ed25519,
+            _ => ProviderAlgorithm::EcdsaSha256, // Default for unsupported algorithms
+        }
+    }
+}
+
 // Implement Serialize and Deserialize manually to avoid generic type parameter issues
 impl<T> Serialize for CoreWrapper<T> 
 where 

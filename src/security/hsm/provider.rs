@@ -316,34 +316,34 @@ impl HsmResponse {
 
 /// HSM provider trait
 #[async_trait]
-pub trait HsmProvider: Debug + Send + Sync {
+pub trait HsmProvider: Send + Sync + Debug {
     /// Initialize provider
     async fn initialize(&self) -> Result<(), HsmError>;
     
     /// Generate key
-    async fn generate_key(&self, _params: KeyGenParams) -> Result<(KeyPair, KeyInfo), HsmError>;
+    async fn generate_key(&self, params: KeyGenParams) -> Result<(KeyPair, KeyInfo), HsmError>;
     
     /// Sign data
-    async fn sign(&self, _key_id: &str, _algorithm: SigningAlgorithm, _data: &[u8]) -> Result<Vec<u8>, HsmError>;
+    async fn sign(&self, key_id: &str, algorithm: SigningAlgorithm, data: &[u8]) -> Result<Vec<u8>, HsmError>;
     
     /// Verify signature
-    async fn verify(&self, _key_id: &str, _algorithm: SigningAlgorithm, _data: &[u8], _signature: &[u8]) -> Result<bool, HsmError> {
+    async fn verify(&self, key_id: &str, algorithm: SigningAlgorithm, data: &[u8], signature: &[u8]) -> Result<bool, HsmError> {
         Err(HsmError::UnsupportedOperation("Verification not implemented".into()))
     }
     
     /// Sign PSBT (Partially Signed Bitcoin Transaction)
-    async fn sign_psbt(&self, _psbt: &mut Psbt) -> Result<(), HsmError> {
+    async fn sign_psbt(&self, psbt: &mut Psbt) -> Result<(), HsmError> {
         Err(HsmError::UnsupportedOperation("PSBT signing not implemented".into()))
     }
     
     /// Export public key
-    async fn export_public_key(&self, _key_id: &str) -> Result<Vec<u8>, HsmError>;
+    async fn export_public_key(&self, key_id: &str) -> Result<Vec<u8>, HsmError>;
     
     /// List keys
     async fn list_keys(&self) -> Result<Vec<KeyInfo>, HsmError>;
     
     /// Delete key
-    async fn delete_key(&self, _key_id: &str) -> Result<(), HsmError>;
+    async fn delete_key(&self, key_id: &str) -> Result<(), HsmError>;
     
     /// Get provider status
     async fn get_status(&self) -> Result<HsmProviderStatus, HsmError>;
@@ -352,7 +352,7 @@ pub trait HsmProvider: Debug + Send + Sync {
     async fn close(&self) -> Result<(), HsmError>;
     
     /// Execute operation
-    async fn execute_operation(&self, _request: HsmRequest) -> Result<HsmResponse, HsmError>;
+    async fn execute_operation(&self, request: HsmRequest) -> Result<HsmResponse, HsmError>;
     
     /// Perform a comprehensive health check of the HSM
     /// Returns true if all checks pass, false otherwise

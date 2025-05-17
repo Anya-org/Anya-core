@@ -1,5 +1,6 @@
 use crate::security::hsm::error::HsmError;
 use crate::security::hsm::types::*;
+use crate::security::hsm::HsmStatus;
 
 /// HSM Provider trait
 /// 

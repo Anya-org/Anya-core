@@ -3,20 +3,16 @@ use std::sync::Arc;
 use std::time::Duration;
 use async_trait::async_trait;
 use tokio::sync::Mutex;
-use uuid::Uuid;
 use chrono::Utc;
-use secp256k1::{Secp256k1, SecretKey, PublicKey};
-use bitcoin::{Network, Address};
-use bitcoin::psbt::Psbt;
-use sha2::{Sha256, Digest};
+use serde_json::Value;
+use uuid::Uuid;
 
+// Types from the HSM module
 use crate::security::hsm::config::{HardwareConfig, HardwareDeviceType};
-use crate::security::hsm::provider::{
-    HsmProvider, HsmProviderStatus, KeyType, KeyInfo, KeyGenParams,
-    KeyPair, KeyUsage, SigningAlgorithm, EncryptionAlgorithm,
-    HsmRequest, HsmResponse, HsmOperation
-};
+use crate::security::hsm::provider::{HsmProvider, KeyGenParams, KeyInfo, KeyPair, EncryptionAlgorithm, KeyType, KeyUsage, SigningAlgorithm};
+use crate::security::hsm::types::{HsmRequest, HsmResponse, HsmOperation, HsmResponseStatus, HsmProviderStatus};
 use crate::security::hsm::error::HsmError;
+use crate::security::hsm::audit::AuditLogger;
 
 /// Hardware connection state
 #[derive(Debug, Clone, PartialEq)]
@@ -267,7 +263,7 @@ impl HsmProvider for HardwareHsmProvider {
         }
     }
     
-    async fn sign(&self, _key_id: &str, _algorithm: SigningAlgorithm, _data: &[u8]) -> Result<Vec<u8>, HsmError> {
+    async fn sign(&self, key_id: &str, algorithm: SigningAlgorithm, data: &[u8]) -> Result<Vec<u8>, HsmError> {
         self.ensure_authenticated().await?;
         
         // Get key info
@@ -294,7 +290,7 @@ impl HsmProvider for HardwareHsmProvider {
                 0x3b, 0x3c, 0x3d, 0x3e, 0x3f, 0x40])
     }
     
-    async fn verify(&self, _key_id: &str, _algorithm: SigningAlgorithm, _data: &[u8], _signature: &[u8]) -> Result<bool, HsmError> {
+    async fn verify(&self, key_id: &str, algorithm: SigningAlgorithm, data: &[u8], signature: &[u8]) -> Result<bool, HsmError> {
         self.ensure_authenticated().await?;
         
         // Get key info
@@ -312,7 +308,7 @@ impl HsmProvider for HardwareHsmProvider {
         Ok(true)
     }
     
-    async fn export_public_key(&self, _key_id: &str) -> Result<Vec<u8>, HsmError> {
+    async fn export_public_key(&self, key_id: &str) -> Result<Vec<u8>, HsmError> {
         self.ensure_authenticated().await?;
         
         // Get key info
@@ -368,10 +364,10 @@ impl HsmProvider for HardwareHsmProvider {
         Ok(())
     }
     
-    async fn execute_operation(&self, _request: HsmRequest) -> Result<HsmResponse, HsmError> {
+    async fn execute_operation(&self, request: HsmRequest) -> Result<HsmResponse, HsmError> {
         match request.operation {
             HsmOperation::GenerateKey => {
-                let _params: KeyGenParams = serde_json::from_value(request.parameters.clone())
+                let params: KeyGenParams = serde_json::from_value(request.parameters.clone())
                     .map_err(|e| HsmError::InvalidParameters(format!("Invalid key generation parameters: {}", e)))?;
                 
                 let key_pair = self.generate_key(params).await?;

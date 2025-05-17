@@ -1,14 +1,40 @@
-// AIE-001: Security Module Integration
-// Exports system hardening functionality
+//! Security Module
+//! 
+//! This module provides security functionality for the Anya Core platform,
+//! including system hardening, input validation, and hardware security module (HSM)
+//! support for cryptographic operations.
 
-// System hardening module
+// Basic security modules always available
 pub mod system_hardening;
+pub mod validation;
+pub mod constant_time;
+pub mod crypto;
+
+// Hardware Security Module (conditionally included)
+#[cfg(feature = "hsm")]
+pub mod hsm;
+
+// Include shim implementation when HSM feature is disabled
+#[cfg(not(feature = "hsm"))]
+pub mod hsm_shim;
 
 // Re-exports for convenience
 pub use system_hardening::SystemHardening;
 pub use system_hardening::SecurityLevel;
 pub use system_hardening::ConfigStatus;
 pub use system_hardening::HardeningConfig;
+
+// Conditionally re-export HSM types based on feature flag
+#[cfg(feature = "hsm")]
+pub use hsm::{HsmManager, HsmStatus};
+#[cfg(feature = "hsm")]
+pub use hsm::config::HsmConfig;
+#[cfg(feature = "hsm")]
+pub use hsm::provider::{HsmProvider, KeyGenParams, KeyType, SigningAlgorithm};
+
+// When HSM feature is disabled, use the shim implementation instead
+#[cfg(not(feature = "hsm"))]
+pub use hsm_shim::{HsmManager, HsmStatus, KeyType, SigningAlgorithm, HsmStubError};
 
 /// Helper function to create a system hardening manager with default auto-save frequency (20)
 pub fn create_system_hardening() -> SystemHardening {
@@ -18,7 +44,6 @@ pub fn create_system_hardening() -> SystemHardening {
 /// Helper function to create a basic security configuration for a component
 pub fn create_basic_security_config(component_name: &str) -> std::collections::HashMap<String, String> {
     let mut settings = std::collections::HashMap::new();
-    
     // Basic security settings
     settings.insert("firewall".to_string(), "enabled".to_string());
     settings.insert("encryption".to_string(), "enabled".to_string());
@@ -81,21 +106,24 @@ pub use validation::ValidationResult;
 // [AIR-3][AIS-3][AIT-3][AIP-3][RES-3]
 
 use log::info;
-use crate::security::hsm::provider::PublicKeyInfo;
-use crate::security::hsm::audit::AuditFilter;
-
-// Re-export HSM module
-pub mod hsm;
+// Other security modules
 pub mod constant_time;
 pub mod crypto;
-pub mod auth;
 
-// Export HSM manager and related types
+// Conditionally export HSM types when the feature is enabled
+#[cfg(feature = "hsm")]
 pub use hsm::{
     HsmManager,
     HsmStatus,
     config::HsmConfig,
     provider::{
+        HsmProvider,
+        KeyGenParams,
+        KeyType,
+        KeyInfo,
+        SigningAlgorithm
+    }
+};
         KeyGenParams,
         KeyType,
         KeyUsage,

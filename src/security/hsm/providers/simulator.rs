@@ -77,25 +77,28 @@ impl SimulatorHsmProvider {
         Uuid::new_v4().to_string()
     }
     
-    /// Simulate latency and random failures
+    /// Simulate hardware conditions like latency and random failures
     async fn simulate_conditions(&self) -> Result<(), HsmError> {
-        // Simulate session timeout
+        // Get mutable state lock
         let mut state = self.state.lock().await;
+        
+        // Check for session timeout
         if let Some(last_op) = state.last_operation {
-            let now = chrono::Utc::now();
+            let now = Utc::now();
             let elapsed = now.signed_duration_since(last_op);
+            
             if elapsed.to_std().unwrap_or_default() > state.session_timeout {
                 state.is_locked = true;
-                return Err(HsmError::AuthenticationError("Session timed out, please unlock the device".to_string()));
+                return Err(HsmError::AuthenticationError("Session timed out".to_string()));
             }
         }
         
-        // Update last operation timestamp
-        state.last_operation = Some(chrono::Utc::now());
+        // Update the last operation timestamp
+        state.last_operation = Some(Utc::now());
         
-        // Check if device is locked
+        // Check if the device is locked
         if state.is_locked {
-            return Err(HsmError::DeviceLocked("Device is locked, please unlock first".to_string()));
+            return Err(HsmError::DeviceLocked("Device is locked".to_string()));
         }
         
         // Simulate battery drain
@@ -105,7 +108,7 @@ impl SimulatorHsmProvider {
             return Err(HsmError::HardwareFailure("Battery depleted".to_string()));
         }
         
-        // Release lock before simulating latency
+        // Release the mutex lock before simulating latency
         drop(state);
         
         // Simulate latency if enabled
@@ -117,9 +120,8 @@ impl SimulatorHsmProvider {
         if self.config.simulate_failures {
             let mut rng = self.rng.lock().await;
             let failure_roll: f64 = rng.gen();
-            
             if failure_roll < self.config.failure_rate {
-                return Err(HsmError::HardwareFailure("Simulated random hardware failure".to_string()));
+                return Err(HsmError::HardwareFailure("Random hardware failure".to_string()));
             }
         }
         
@@ -416,10 +418,10 @@ impl HsmProvider for SimulatorHsmProvider {
         Ok(())
     }
     
-    async fn execute_operation(&self, _request: HsmRequest) -> Result<HsmResponse, HsmError> {
+    async fn execute_operation(&self, request: HsmRequest) -> Result<HsmResponse, HsmError> {
         match request.operation {
             HsmOperation::GenerateKey => {
-                let _params: KeyGenParams = serde_json::from_value(request.parameters.clone())
+                let params: KeyGenParams = serde_json::from_value(request.parameters.clone())
                     .map_err(|e| HsmError::InvalidParameters(format!("Invalid key generation parameters: {}", e)))?;
                 
                 let key_pair = self.generate_key(params).await?;
@@ -485,7 +487,7 @@ impl HsmProvider for SimulatorHsmProvider {
 #[derive(Debug, serde::Deserialize)]
 struct SignParams {
     key_id: String,
-    _algorithm: SigningAlgorithm,
+    algorithm: SigningAlgorithm,
     data: Vec<u8>,
 }
 
@@ -506,5 +508,5 @@ struct UnlockParams {
 #[derive(Debug, serde::Serialize)]
 struct Base64SignatureResponse {
     signature: String,
-    _algorithm: SigningAlgorithm,
+    algorithm: SigningAlgorithm,
 } 
