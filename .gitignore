@@ -62,3 +62,4 @@ Thumbs.db
 reorganized_backup_*/
 *.bak
 *.bak/
+scripts/target/
