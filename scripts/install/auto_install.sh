@@ -46,7 +46,7 @@ INSTALL_DEPS=true
 CONFIGURE_FIREWALL=true
 INSTALL_TYPE="standard"  # standard, minimal, full
 HARDENING_LEVEL="standard"  # basic, standard, strict
-AUTO_RUN=false
+AUTO_RUN=true  # Always run in automatic mode by default
 FEATURE_FLAGS=""  # Will be auto-configured based on hardware
 RUN_TESTS=false
 TEST_TYPE="basic"  # basic, comprehensive, full
@@ -389,21 +389,25 @@ check_existing_installation() {
 run_uninstall() {
     log INFO "Removing existing Anya Core installation..."
     
-    # Check if uninstall script exists and run it
-    if [ -f "${SCRIPT_DIR}/uninstall.sh" ] && [ -x "${SCRIPT_DIR}/uninstall.sh" ]; then
-        log INFO "Using uninstall script: ${SCRIPT_DIR}/uninstall.sh"
-        if [ "$AUTO_RUN" = true ]; then
-            "${SCRIPT_DIR}/uninstall.sh" --non-interactive
-        else
-            "${SCRIPT_DIR}/uninstall.sh"
-        fi
-    else
-        # Manual uninstall if no script is available
-        log INFO "No uninstall script found, performing manual uninstall"
+    # Check if uninstall script exists
+    UNINSTALL_SCRIPT="${SCRIPT_DIR}/uninstall.sh"
+    if [ -f "$UNINSTALL_SCRIPT" ]; then
+        log INFO "Using uninstall script: $UNINSTALL_SCRIPT"
         
-        # Stop and disable service
-        if systemctl list-unit-files | grep -q anya-core.service; then
-            log INFO "Stopping and disabling anya-core service"
+        # Make it executable
+        chmod +x "$UNINSTALL_SCRIPT"
+        
+        # Run the uninstall script with automatic confirmation if AUTO_RUN is true
+        if [ "$AUTO_RUN" = true ]; then
+            log INFO "Running uninstaller in automatic mode"
+            echo "y" | "$UNINSTALL_SCRIPT"
+        else
+            "$UNINSTALL_SCRIPT"
+        fi
+        
+        if [ $? -ne 0 ]; then
+            log ERROR "Uninstall script failed. Check logs for details."
+            exit 1
             systemctl stop anya-core.service 2>/dev/null || true
             systemctl disable anya-core.service 2>/dev/null || true
             rm -f /etc/systemd/system/anya-core.service 2>/dev/null || true
