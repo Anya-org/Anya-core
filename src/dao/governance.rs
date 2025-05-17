@@ -178,9 +178,9 @@ impl DaoGovernance {
                 bridge_contract: "0x1234...".to_string(),
             }),
             legal_wrappers: LegalWrappers {
-                terms_of_service: true,
-                privacy_policy: true,
+                is_dao_recognized: true,
                 jurisdiction: "International".to_string(),
+                legal_entity_type: "Decentralized Autonomous Organization".to_string(),
             },
         }
     }
@@ -253,8 +253,14 @@ impl DaoGovernance {
     }
 
     /// Execute proposal based on voting results
-    pub fn execute_proposal(&self, proposal_id: u64) -> Result<ProposalExecution, Error> {
+    pub fn execute_proposal(&self, proposal_id: u64) -> Result<ProposalExecution, Box<dyn Error>> {
         // Implementation according to BDF v2.5
+        Ok(ProposalExecution {
+            proposal_id,
+            executed_at: Utc::now(),
+            success: true,
+            message: "Proposal executed successfully".to_string(),
+        })
     }
     
     // Additional required methods

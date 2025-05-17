@@ -170,16 +170,16 @@ pub mod ports {
 
 // Hexagonal architecture implementation
 pub struct AnyaCore {
-    bitcoin_adapter: BitcoinAdapter,
-    web5_adapter: Web5Adapter,
-    ml_agent_system: MLAgentSystem,
-    dao_governance: DaoGovernance,
-    tokenomics: TokenomicsEngine,
+    bitcoin_adapter: Arc<BitcoinAdapter>,
+    web5_adapter: Arc<Web5Adapter>,
+    ml_agent_system: Arc<MLAgentSystem>,
+    dao_governance: Arc<DaoGovernance>,
+    tokenomics: Arc<TokenomicsEngine>,
 }
 
 impl AnyaCore {
     // Core initialization with dependency injection
-    pub async fn new(config: Config) -> Result<Self> {
+    pub async fn new(config: Config) -> Result<Self, Box<dyn std::error::Error>> {
         // Import necessary adapter types
         use crate::bitcoin::adapters::BitcoinAdapter;
         use crate::web5::adapters::Web5Adapter;
@@ -192,12 +192,18 @@ impl AnyaCore {
         let dao = DaoGovernance::initialize(config.dao).await?;
         let tokenomics = TokenomicsEngine::new(config.tokenomics)?;
         
+        // Wrap them in Arc since our struct fields expect Arc<T>
+        let bitcoin = Arc::new(bitcoin);
+        let web5 = Arc::new(web5);
+        let agents = Arc::new(agents);
+        
+        // Both dao and tokenomics are already Arc-wrapped from their respective initialize methods
         Ok(Self {
             bitcoin_adapter: bitcoin,
             web5_adapter: web5,
             ml_agent_system: agents,
-            dao_governance: dao,
-            tokenomics,
+            dao_governance: dao, // dao is already an Arc<DaoGovernance>
+            tokenomics: tokenomics, // tokenomics is already an Arc<TokenomicsEngine>
         })
     }
 }
@@ -207,21 +213,24 @@ pub mod rpc_ports {
     use std::sync::{Arc, Mutex};
     use serde_json::Value as JsonValue;
     use crate::core::metrics::PrometheusMetrics;
+    use async_trait::async_trait;
 
+    #[async_trait]
     pub trait BitcoinRpc {
-        async fn call_method(&self, method: &str, params: JsonValue) -> Result<JsonValue, Box<dyn std::error::Error>>;
-        async fn validate_response(&self, response: JsonValue) -> Result<(), Box<dyn std::error::Error>>;
+        async fn call_method(&self, method: &str, params: JsonValue) -> Result<JsonValue, Box<dyn std::error::Error + Send + Sync>>;
+        async fn validate_response(&self, response: JsonValue) -> Result<(), Box<dyn std::error::Error + Send + Sync>>;
     }
 
+    #[async_trait]
     pub trait LightningRpc {
-        async fn create_invoice(&self, amount_msat: u64, description: &str) -> Result<String, Box<dyn std::error::Error>>;
-        async fn verify_payment(&self, payment_hash: &str) -> Result<bool, Box<dyn std::error::Error>>;
+        async fn create_invoice(&self, amount_msat: u64, description: &str) -> Result<String, Box<dyn std::error::Error + Send + Sync>>;
+        async fn verify_payment(&self, payment_hash: &str) -> Result<bool, Box<dyn std::error::Error + Send + Sync>>;
     }
 
     // BDF v2.5 compliant adapter
     pub struct AnyaRpcAdapter {
-        bitcoin: Arc<dyn BitcoinRpc>,
-        lightning: Arc<dyn LightningRpc>,
+        bitcoin: Arc<dyn BitcoinRpc + Send + Sync>,
+        lightning: Arc<dyn LightningRpc + Send + Sync>,
         metrics: Arc<Mutex<PrometheusMetrics>>
     }
 } 

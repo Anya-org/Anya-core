@@ -176,6 +176,89 @@ clarity-repl = { git = "https://github.com/hirosystems/clarinet", tag = "v1.7.0"
 
 ## Quick Start
 
+### Installation
+
+Anya Core features an intelligent installation system that automatically detects hardware capabilities and configures the system optimally.
+
+#### Quick Install
+
+```bash
+# Standard installation with auto-detection
+sudo ./scripts/install.sh
+
+# Minimal installation for low-resource environments
+sudo ./scripts/install.sh --type=minimal
+
+# Full installation with all features
+sudo ./scripts/install.sh --type=full
+```
+
+#### Installation Options
+
+```bash
+# Display all installation options
+./scripts/install.sh --help
+
+# Install with specific configuration
+sudo ./scripts/install.sh --network=testnet --hardening=strict --run-tests
+
+# Install with explicit feature flags
+sudo ./scripts/install.sh --features=std,hsm,bitcoin_integration
+
+# Upgrade an existing installation
+sudo ./scripts/install.sh
+
+# Force clean installation
+sudo ./scripts/install.sh --force-clean
+```
+
+#### Manual Installation (Alternative)
+
+```bash
+# Clone the repository
+git clone https://github.com/anya/anya-enterprise.git
+
+# Install dependencies
+sudo apt-get update
+sudo apt-get install -y build-essential cmake pkg-config libssl-dev
+
+# Install Rust
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+source $HOME/.cargo/env
+
+# Build with specific features
+cargo build --release --features="std,hsm,bitcoin_integration"
+
+# Run tests
+cargo test --all-features
+```
+
+#### Verify Installation
+
+```bash
+# Check system health
+./scripts/install/utils/monitor_health.sh
+
+# Run diagnostics
+./scripts/test/debug_test.sh
+
+# Verify hardware detection
+./scripts/install/utils/script_cleanup.sh
+```
+
+#### Configuration
+
+The installation creates a default configuration in `config/anya.conf`. You can modify this or use environment variables:
+
+```bash
+# Environment variables
+export BITCOIN_RPC_URL=http://localhost:8332
+export BITCOIN_RPC_USER=bitcoinrpc
+export BITCOIN_RPC_PASSWORD=your_password
+export WEB5_DWN_URL=http://localhost:3000
+export NETWORK=testnet
+```
+
 ### 1. Clone and Setup
 
    ```bash

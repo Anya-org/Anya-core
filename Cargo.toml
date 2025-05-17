@@ -8,11 +8,13 @@ license = "MIT"
 repository = "https://github.com/anya-org/anya-core"
 
 [features]
-default = []
+default = ["std"]
 # Feature flag for HSM functionality
-hsm = ["uuid", "chrono", "base64", "rand", "async-trait", "sha2", "hmac"]
+hsm = ["dep:sha2", "dep:hmac"]
 # Feature flag for complete system (including HSM)
 complete = ["hsm"]
+std = []
+bitcoin_integration = []
 
 [dependencies]
 # API dependencies
@@ -66,7 +68,4 @@ mockall = "0.12.1"
 tokio-test = "0.4.3"
 tower-test = "0.4.0"
 
-[features]
-default = ["std"]
-std = []
-bitcoin_integration = []
+
