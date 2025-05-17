@@ -1,5 +1,4 @@
-git checkout -b release/0.3.0-rc1
-git push -u origin release/0.3.0-rc1# Release Candidate Preparation Guide
+# Release Candidate Preparation Guide
 
 This document outlines the steps needed to prepare the Anya Core codebase for the Release Candidate (RC) version.
 
