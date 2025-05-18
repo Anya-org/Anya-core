@@ -63,3 +63,8 @@ reorganized_backup_*/
 *.bak
 *.bak/
 scripts/target/
+
+# Specific backup directories
+scripts/install/utils/backup_*
+config/*.backup.*
+backups/
