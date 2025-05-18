@@ -7,11 +7,14 @@ set -euo pipefail
 # Directory setup
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
-LOGS_DIR="${PROJECT_ROOT}/logs"
+LOGS_DIR="${PROJECT_ROOT}/logs/installation"
+
+# Set timestamp for logging
+TIMESTAMP=$(date +"%Y%m%d-%H%M%S")
 mkdir -p "$LOGS_DIR"
 
 # Log file
-INSTALL_LOG="${LOGS_DIR}/install_$(date +%Y%m%d-%H%M%S).log"
+INSTALL_LOG="${LOGS_DIR}/install_${TIMESTAMP}.log"
 
 # Script version
 VERSION="1.0.0"
@@ -381,15 +384,17 @@ build_project() {
         else
             # For custom features, add them explicitly
             BUILD_CMD="$BUILD_CMD --no-default-features --features=$CLEAN_FLAGS"
-            log INFO "Using custom features for build: $CLEAN_FLAGS"
+            log INFO "Using custom features for build: $FEATURES"
         fi
     fi
     
-    # Add parallel jobs if set from system analysis
-    if [ -n "$PARALLEL_JOBS" ]; then
-        BUILD_CMD="$BUILD_CMD -j $PARALLEL_JOBS"
-        log INFO "Using $PARALLEL_JOBS parallel jobs for build"
-    fi
+    # Determine optimal number of parallel jobs based on CPU cores
+    CPU_CORES=$(nproc 2>/dev/null || echo 2)
+    PARALLEL_JOBS=${PARALLEL_JOBS:-$CPU_CORES}
+    
+    # Add parallel jobs to the build command
+    BUILD_CMD="$BUILD_CMD -j $PARALLEL_JOBS"
+    log INFO "Using $PARALLEL_JOBS parallel jobs for build (detected $CPU_CORES cores)"
     
     # Add any Rust flags from system analysis
     if [ -n "$RUST_FLAGS" ]; then
@@ -397,12 +402,50 @@ build_project() {
         log INFO "Using additional Rust flags: $RUST_FLAGS"
     fi
     
-    # Log and execute the build command
-    log INFO "Executing: $BUILD_CMD"
-    eval $BUILD_CMD || {
-        log ERROR "Build failed. Check the logs for details."
+    # Validate feature flags before building
+    log INFO "Validating feature flags: ${FEATURE_FLAGS:-$FEATURES}"
+    
+    # Add specific validation for known components based on project architecture
+    if [[ "${FEATURE_FLAGS:-$FEATURES}" == *"bitcoin_integration"* ]]; then
+        log INFO "Bitcoin integration feature enabled"
+        # Verify bitcoin directory exists
+        if [ ! -d "${PROJECT_ROOT}/src/bitcoin" ]; then
+            log WARN "Bitcoin integration feature enabled but src/bitcoin directory not found"
+        fi
+    fi
+    
+    # Check for HSM support
+    if [[ "${FEATURE_FLAGS:-$FEATURES}" == *"hsm"* ]]; then
+        log INFO "HSM feature enabled"
+        # Verify HSM directory exists
+        if [ ! -d "${PROJECT_ROOT}/src/security/hsm" ]; then
+            log WARN "HSM feature enabled but src/security/hsm directory not found"
+        fi
+    fi
+    
+    # Create a trap to capture and log any build failures
+    trap 'log ERROR "Build process interrupted or failed"; exit 1' ERR INT TERM
+    
+    # Run the build command with proper error handling
+    log INFO "Executing build: $BUILD_CMD"
+    set +e  # Don't exit immediately on error so we can capture output
+    BUILD_OUTPUT=$(eval "$BUILD_CMD" 2>&1)
+    BUILD_STATUS=$?
+    set -e  # Restore exit on error
+    
+    if [ $BUILD_STATUS -ne 0 ]; then
+        log ERROR "Build failed with status $BUILD_STATUS"
+        # Extract relevant error information
+        ERROR_SUMMARY=$(echo "$BUILD_OUTPUT" | grep -E 'error:|error\[|thread .* panicked' | head -10)
+        log ERROR "Build errors: \n$ERROR_SUMMARY"
+        log INFO "Saving full build output to ${LOGS_DIR}/build_error_${TIMESTAMP}.log"
+        mkdir -p "${LOGS_DIR}"
+        echo "$BUILD_OUTPUT" > "${LOGS_DIR}/build_error_${TIMESTAMP}.log"
         exit 1
-    }
+    fi
+    
+    # Reset trap
+    trap - ERR INT TERM
     
     # Verify binary exists
     if [ ! -f "${PROJECT_ROOT}/target/release/anya-core" ]; then
