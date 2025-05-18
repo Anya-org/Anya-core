@@ -1,8 +1,17 @@
-use std::error::Error;
 use std::path::{Path, PathBuf};
 use std::fs;
 use std::result::Result;
-use crate::bitcoin::BitcoinConfig;
+
+// Create our own BitcoinConfig since the import is not available
+#[derive(Debug, Clone, Default)]
+pub struct BitcoinConfig {
+    pub network: String,
+    pub rpc_url: String,
+    pub auth_method: String,
+    pub username: Option<String>,
+    pub password: Option<String>,
+    pub timeout_seconds: u64,
+}
 
 // BIP341 constant for silent leaf
 const BIP341_SILENT_LEAF: bool = true;

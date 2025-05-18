@@ -5,6 +5,10 @@
 
 use std::error::Error;
 use std::collections::HashMap;
+use chrono::Utc;
+use crate::AnyaError;
+use serde_json::json as serde_json;
+use rand::random;
 
 // DAO Module for Anya Core
 // Implements governance and voting mechanisms
@@ -14,8 +18,52 @@ pub mod legal;
 pub mod governance;
 
 // Re-export main components
-pub use governance::{DaoGovernance, DaoLevel, GovernanceError, ProposalStatus};
-pub use types::{Proposal, ProposalMetrics, RiskMetrics};
+pub use governance::{DaoGovernance, ProposalStatus};
+pub use self::governance::{DaoLevel, GovernanceError};
+
+// Define the types that were previously imported from a non-existent module
+#[derive(Debug, Clone)]
+pub struct Proposal {
+    pub id: String,
+    pub title: String,
+    pub description: String,
+    pub author: String,
+    pub status: ProposalStatus,
+    pub votes: i32,
+    pub votes_for: u64,
+    pub votes_against: u64,
+    pub amount: u64,
+    pub proposer: String,
+    pub created_at: chrono::DateTime<Utc>,
+    pub updated_at: chrono::DateTime<Utc>,
+    pub execution_time: Option<chrono::DateTime<Utc>>,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct ProposalMetrics {
+    // General metrics
+    pub proposal_count: usize,
+    pub passed_count: usize,
+    pub rejected_count: usize,
+    pub active_count: usize,
+    
+    // ML analysis metrics
+    pub sentiment_score: f64,
+    pub risk_assessment: RiskMetrics,
+    pub ml_predictions: std::collections::HashMap<String, f64>,
+    pub federated_consensus: std::collections::HashMap<String, f64>,
+    pub last_updated: chrono::DateTime<Utc>,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct RiskMetrics {
+    pub risk_score: f64,
+    pub compliance_level: String,
+    pub audit_status: bool,
+    pub risk_factors: Vec<(String, f64)>,
+    pub mitigation_suggestions: Vec<String>,
+    pub last_updated: chrono::DateTime<Utc>,
+}
 
 /// Configuration options for DAO functionality
 #[derive(Debug, Clone)]
@@ -75,17 +123,19 @@ impl DAOManager {
             )));
         }
 
-        let proposal_id = format!("proposal:{:x}", rand::random::<u64>());
+        let proposal_id = format!("proposal:{:x}", random::<u64>());
         
         let proposal = Proposal {
             id: proposal_id.clone(),
             title: title.to_string(),
             description: description.to_string(),
+            author: "unknown".to_string(),
             proposer: "unknown".to_string(), // Would be set from context in real implementation
             amount,
             votes_for: 0,
             votes_against: 0,
-            status: types::ProposalStatus::Active,
+            votes: 0,
+            status: ProposalStatus::Active,
             created_at: Utc::now(),
             updated_at: Utc::now(),
             execution_time: None,
@@ -101,7 +151,7 @@ impl DAOManager {
         let proposal = self.proposals.get_mut(proposal_id)
             .ok_or_else(|| AnyaError::DAO(format!("Proposal not found: {}", proposal_id)))?;
         
-        if proposal.status != types::ProposalStatus::Active {
+        if proposal.status != ProposalStatus::Active {
             return Err(AnyaError::DAO(format!(
                 "Proposal is not active: {:?}", proposal.status
             )));
@@ -135,7 +185,7 @@ impl DAOManager {
         let proposal = self.proposals.get_mut(proposal_id)
             .ok_or_else(|| AnyaError::DAO(format!("Proposal not found: {}", proposal_id)))?;
         
-        if proposal.status != types::ProposalStatus::Active {
+        if proposal.status != ProposalStatus::Active {
             return Err(AnyaError::DAO(format!(
                 "Proposal is not active: {:?}", proposal.status
             )));
@@ -149,7 +199,7 @@ impl DAOManager {
         }
         
         // In a real implementation, this would execute the proposal
-        proposal.status = types::ProposalStatus::Executed;
+        proposal.status = ProposalStatus::Executed;
         proposal.execution_time = Some(Utc::now());
         proposal.updated_at = Utc::now();
         
@@ -190,13 +240,13 @@ impl DAOManager {
         
         // Add proposal status counts
         let active_proposals = self.proposals.values()
-            .filter(|p| p.status == types::ProposalStatus::Active)
+            .filter(|p| p.status == ProposalStatus::Active)
             .count();
         let passed_proposals = self.proposals.values()
-            .filter(|p| p.status == types::ProposalStatus::Passed)
+            .filter(|p| p.status == ProposalStatus::Passed)
             .count();
         let executed_proposals = self.proposals.values()
-            .filter(|p| p.status == types::ProposalStatus::Executed)
+            .filter(|p| p.status == ProposalStatus::Executed)
             .count();
         
         metrics.insert("active_proposals".to_string(), serde_json::json!(active_proposals));

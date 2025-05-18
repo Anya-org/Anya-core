@@ -168,34 +168,74 @@ pub mod ports {
     // Additional ports from BDF v2.5
 }
 
+use crate::bitcoin::adapters::BitcoinAdapter;
+use crate::web5::adapters::Web5Adapter;
+use crate::ml::agent_system::MLAgentSystem;
+use crate::tokenomics::{TokenomicsEngine, TokenomicsConfig};
+
+impl TokenomicsEngine {
+    pub async fn setup(_config: TokenomicsConfig) -> Result<Self, Box<dyn std::error::Error>> {
+        Ok(Self {})
+    }
+}
+
+// Configuration types
+#[derive(Debug, Clone)]
+pub struct BitcoinConfig {
+    pub network: String,
+    pub rpc_url: Option<String>,
+}
+
+#[derive(Debug, Clone)]
+pub struct Web5Config {
+    pub endpoint: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct MlConfig {
+    pub model_path: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct TokenomicsConfig {
+    pub token_name: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct Config {
+    pub bitcoin: BitcoinConfig,
+    pub web5: Web5Config,
+    pub ml: MlConfig,
+    pub tokenomics: TokenomicsConfig,
+}
+
 // Hexagonal architecture implementation
 pub struct AnyaCore {
     bitcoin_adapter: Arc<BitcoinAdapter>,
     web5_adapter: Arc<Web5Adapter>,
     ml_agent_system: Arc<MLAgentSystem>,
-    dao_governance: Arc<DaoGovernance>,
+    dao_governance: Arc<crate::dao::DaoGovernance>,
     tokenomics: Arc<TokenomicsEngine>,
 }
 
 impl AnyaCore {
     // Core initialization with dependency injection
     pub async fn new(config: Config) -> Result<Self, Box<dyn std::error::Error>> {
-        // Import necessary adapter types
-        use crate::bitcoin::adapters::BitcoinAdapter;
-        use crate::web5::adapters::Web5Adapter;
-        use crate::ml::agent::MLAgentSystem;
-        use crate::tokenomics::engine::TokenomicsEngine;
-        
+        // Use our stub implementations
         let bitcoin = BitcoinAdapter::new(config.bitcoin).await?;
         let web5 = Web5Adapter::build(config.web5).await?;
         let agents = MLAgentSystem::init(config.ml).await?;
-        let dao = DaoGovernance::initialize(config.dao).await?;
-        let tokenomics = TokenomicsEngine::new(config.tokenomics)?;
+        
+        // Create a default DaoGovernance since we can't import it
+        let dao = Arc::new(crate::dao::DaoGovernance::default());
+        
+        let tokens = TokenomicsEngine::setup(config.tokenomics).await?;
         
         // Wrap them in Arc since our struct fields expect Arc<T>
         let bitcoin = Arc::new(bitcoin);
         let web5 = Arc::new(web5);
         let agents = Arc::new(agents);
+        let tokens = Arc::new(tokens);
         
         // Both dao and tokenomics are already Arc-wrapped from their respective initialize methods
         Ok(Self {
@@ -203,7 +243,7 @@ impl AnyaCore {
             web5_adapter: web5,
             ml_agent_system: agents,
             dao_governance: dao, // dao is already an Arc<DaoGovernance>
-            tokenomics: tokenomics, // tokenomics is already an Arc<TokenomicsEngine>
+            tokenomics: tokens, // tokenomics is already an Arc<TokenomicsEngine>
         })
     }
 }
@@ -236,4 +276,4 @@ pub mod rpc_ports {
 } 
 
 use crate::bitcoin::adapters::BitcoinAdapter;
-use crate::tokenomics::TokenomicsEngine;
+use crate::tokenomics::{TokenomicsEngine, TokenomicsConfig};

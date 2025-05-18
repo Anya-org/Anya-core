@@ -50,13 +50,13 @@ impl Layer2Protocol for StateChannelsProtocol {
         Ok(())
     }
 
-    async fn submit_transaction(&self, _tx: tx: &[u8][u8]) -> Result<String, Box<dyn Error>> {
+    async fn submit_transaction(&self, tx: &[u8]) -> Result<String, Box<dyn Error>> {
         info!("Submitting State Channels transaction...");
         // TODO: Implement actual transaction submission
         Ok("state_channels_tx_123".to_string())
     }
 
-    async fn get_transaction_status(&self, _tx_id: tx_id: &strstr) -> Result<TransactionStatus, Box<dyn Error>> {
+    async fn get_transaction_status(&self, tx_id: &str) -> Result<TransactionStatus, Box<dyn Error>> {
         info!("Getting State Channels transaction status...");
         // TODO: Implement actual status check
         Ok(TransactionStatus::Confirmed)

@@ -1,4 +1,5 @@
 use std::error::Error;
+use tracing::error;
 // AIE-001: System Hardening Implementation
 // Priority: HIGH - Security configurations with in-memory state
 

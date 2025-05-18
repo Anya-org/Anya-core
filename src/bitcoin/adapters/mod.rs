@@ -27,7 +27,7 @@ pub struct BitcoinAdapter {
 
 impl BitcoinAdapter {
     /// Create a new Bitcoin adapter
-    pub fn new(config: Arc<Config>) -> Self  -> Result<(), Box<dyn Error>> {
+    pub async fn new(config: Config) -> Result<Self, Box<dyn Error>> {
         // Create the Rust implementation
         let implementation = Arc::new(RustBitcoinImplementation::new(&config)) as Arc<dyn BitcoinInterface>;
         
@@ -38,25 +38,25 @@ impl BitcoinAdapter {
     }
     
     /// Get the Bitcoin implementation
-    pub fn get_implementation(&self) -> Arc<dyn BitcoinInterface>  -> Result<(), Box<dyn Error>> {
+    pub fn get_implementation(&self) -> Arc<dyn BitcoinInterface> {
         self.implementation.clone()
     }
 }
 
 impl BitcoinInterface for BitcoinAdapter {
-    fn get_transaction(&self, txid: &str) -> BitcoinResult<BitcoinTransaction>  -> Result<(), Box<dyn Error>> {
+    fn get_transaction(&self, txid: &str) -> BitcoinResult<BitcoinTransaction> {
         self.implementation.get_transaction(txid)
     }
     
-    fn get_block(&self, hash: &str) -> BitcoinResult<Vec<BitcoinTransaction>>  -> Result<(), Box<dyn Error>> {
+    fn get_block(&self, hash: &str) -> BitcoinResult<Vec<BitcoinTransaction>> {
         self.implementation.get_block(hash)
     }
     
-    fn get_block_height(&self) -> BitcoinResult<u32>  -> Result<(), Box<dyn Error>> {
+    fn get_block_height(&self) -> BitcoinResult<u32> {
         self.implementation.get_block_height()
     }
     
-    fn generate_address(&self, address_type: AddressType) -> BitcoinResult<BitcoinAddress>  -> Result<(), Box<dyn Error>> {
+    fn generate_address(&self, address_type: AddressType) -> BitcoinResult<BitcoinAddress> {
         self.implementation.generate_address(address_type)
     }
     
@@ -64,23 +64,23 @@ impl BitcoinInterface for BitcoinAdapter {
         &self,
         outputs: Vec<(String, u64)>,
         fee_rate: u64,
-    ) -> BitcoinResult<BitcoinTransaction>  -> Result<(), Box<dyn Error>> {
+    ) -> BitcoinResult<BitcoinTransaction> {
         self.implementation.create_transaction(outputs, fee_rate)
     }
     
-    fn broadcast_transaction(&self, transaction: &BitcoinTransaction) -> BitcoinResult<String>  -> Result<(), Box<dyn Error>> {
+    fn broadcast_transaction(&self, transaction: &BitcoinTransaction) -> BitcoinResult<String> {
         self.implementation.broadcast_transaction(transaction)
     }
     
-    fn get_balance(&self) -> BitcoinResult<u64>  -> Result<(), Box<dyn Error>> {
+    fn get_balance(&self) -> BitcoinResult<u64> {
         self.implementation.get_balance()
     }
     
-    fn estimate_fee(&self, target_blocks: u8) -> BitcoinResult<u64>  -> Result<(), Box<dyn Error>> {
+    fn estimate_fee(&self, target_blocks: u8) -> BitcoinResult<u64> {
         self.implementation.estimate_fee(target_blocks)
     }
     
-    fn implementation_type(&self) -> BitcoinImplementationType  -> Result<(), Box<dyn Error>> {
+    fn implementation_type(&self) -> BitcoinImplementationType {
         BitcoinImplementationType::Rust
     }
 }
@@ -90,9 +90,9 @@ mod tests {
     use super::*;
     
     #[test]
-    fn test_adapter_initialization()  -> Result<(), Box<dyn Error>> {
-        let config = Arc::new(Config::default());
-        let adapter = BitcoinAdapter::new(config);
+    async fn test_adapter_initialization() -> Result<(), Box<dyn Error>> {
+        let config = Config::default();
+        let adapter = BitcoinAdapter::new(config).await?;
         
         // Check that we can get the implementation
         let implementation = adapter.get_implementation();

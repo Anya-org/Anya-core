@@ -40,12 +40,12 @@ impl Layer2Protocol for SidechainsProtocol {
         Ok(())
     }
     
-    async fn submit_transaction(&self, __tx: tx: &[u8][u8]) -> Result<String, Box<dyn Error>> {
+    async fn submit_transaction(&self, tx: &[u8]) -> Result<String, Box<dyn Error>> {
         // In a real implementation, this would submit a transaction to the sidechains network
         Ok("tx_id".to_string())
     }
     
-    async fn get_transaction_status(&self, __tx_id: tx_id: &strstr) -> Result<TransactionStatus, Box<dyn Error>> {
+    async fn get_transaction_status(&self, tx_id: &str) -> Result<TransactionStatus, Box<dyn Error>> {
         // In a real implementation, this would get the transaction status from the sidechains network
         Ok(TransactionStatus::Confirmed)
     }
@@ -81,12 +81,12 @@ impl Layer2Protocol for SidechainsProtocol {
         })
     }
     
-    async fn verify_proof(&self, __proof: proof: &ProofProof) -> Result<VerificationResult, Box<dyn Error>> {
+    async fn verify_proof(&self, proof: &Proof) -> Result<VerificationResult, Box<dyn Error>> {
         // In a real implementation, this would verify a proof on the sidechains network
         Ok(VerificationResult::Valid)
     }
     
-    async fn validate_state(&self, __state: state: &ProtocolStateProtocolState) -> Result<ValidationResult, Box<dyn Error>> {
+    async fn validate_state(&self, state: &ProtocolState) -> Result<ValidationResult, Box<dyn Error>> {
         // In a real implementation, this would validate the state of the sidechains protocol
         Ok(ValidationResult::Valid)
     }

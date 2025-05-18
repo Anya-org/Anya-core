@@ -265,3 +265,41 @@ impl DaoGovernance {
     
     // Additional required methods
 }
+
+impl Default for DaoGovernance {
+    /// Creates a default instance of DaoGovernance with sensible defaults.
+    /// This is used primarily for testing and as a fallback when specific configuration is not provided.
+    fn default() -> Self {
+        let security_audit = Arc::new(SecurityAudit::new());
+        let cross_chain_bridge = Arc::new(DefaultCrossChainBridge {});
+        
+        Self {
+            proposals: HashMap::new(),
+            voters: HashMap::new(),
+            config: DaoConfig {
+                min_voting_period: 86400, // 1 day in seconds
+                max_voting_period: 604800, // 1 week in seconds
+                quorum_threshold: 100,
+                stake_minimum: 10,
+            },
+            cross_chain_bridge,
+            security_audit,
+            quadratic_voting_enabled: true,
+            delegated_authority: DelegationConfig {
+                active: true,
+                max_delegates: 5,
+                delegation_threshold: 500,
+            },
+            cross_chain_governance: Some(CrossChainGovernanceConfig {
+                enabled: true,
+                supported_chains: vec!["bitcoin".to_string()],
+                bridge_contract: "0xdefault".to_string(),
+            }),
+            legal_wrappers: LegalWrappers {
+                is_dao_recognized: true,
+                jurisdiction: "Default".to_string(),
+                legal_entity_type: "DAO".to_string(),
+            },
+        }
+    }
+}

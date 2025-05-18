@@ -8,10 +8,12 @@ pub mod identity;
 pub mod protocols;
 pub mod dwn;  // Decentralized Web Node
 pub mod vc;   // Verifiable Credentials
+pub mod adapter;
 
 // Re-export important types for easy access
 pub use identity::{Web5Error, Web5Result, DIDManager, DID, DIDDocument};
 pub use protocols::{ProtocolHandler, ProtocolManager, ProtocolDefinition};
+pub use adapter::Web5Adapter;
 
 use std::collections::HashMap;
 

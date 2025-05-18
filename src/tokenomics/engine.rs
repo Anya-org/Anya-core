@@ -29,7 +29,15 @@ pub struct TokenomicsEngine {
 }
 
 impl TokenomicsEngine {
+    /// Initialize a new TokenomicsEngine with the given configuration
     pub fn new(config: TokenomicsConfig) -> AnyaResult<Arc<Self>> {
+        Ok(Arc::new(Self { config }))
+    }
+    
+    /// Setup the tokenomics engine with configuration - async variant for core integration
+    pub async fn setup(config: TokenomicsConfig) -> AnyaResult<Arc<Self>> {
+        // In a real implementation, this would perform more complex initialization
+        // such as loading historical data, initializing pricing oracles, etc.
         Ok(Arc::new(Self { config }))
     }
     

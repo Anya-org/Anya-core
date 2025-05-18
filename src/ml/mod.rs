@@ -13,6 +13,10 @@ use std::path::Path;
 mod service;
 pub use service::MLService;
 
+// ML agent system module
+mod agent_system;
+pub use agent_system::MLAgentSystem;
+
 /// Configuration options for ML functionality
 #[derive(Debug, Clone)]
 pub struct MLConfig {

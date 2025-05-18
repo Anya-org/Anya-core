@@ -1,12 +1,10 @@
 use std::error::Error;
-// Layer 2 Integrations
-// Last Updated: 2025-03-06
-
-//! # Layer 2 Integrations
-//!
-//! This module provides integration with various Bitcoin Layer 2 solutions.
-//! It includes support for BOB (Bitcoin Optimistic Blockchain), Lightning Network,
-//! and other Layer 2 scaling solutions.
+/// Layer 2 protocols integration.
+/// Includes implementations for various layer 2 technologies on top of the base Bitcoin layer.
+///
+/// This module provides interfaces and concrete implementations for state channels, sidechains,
+/// the Lightning Network, and more. BOB (Bitcoin Optimistic Blockchain), Lightning Network,
+/// and other Layer 2 scaling solutions.
 
 pub mod bob;
 pub mod lightning;
@@ -288,10 +286,10 @@ pub trait Layer2Protocol {
     async fn disconnect(&self) -> AnyaResult<()>;
     
     /// Submit transaction to the Layer 2 network
-    async fn submit_transaction(&self, _tx: tx: &[u8][u8]) -> AnyaResult<String>;
+    async fn submit_transaction(&self, tx: &[u8]) -> AnyaResult<String>;
     
     /// Get transaction status from the Layer 2 network
-    async fn get_transaction_status(&self, _tx_id: tx_id: &strstr) -> AnyaResult<TransactionStatus>;
+    async fn get_transaction_status(&self, tx_id: &str) -> AnyaResult<TransactionStatus>;
     
     /// Get the current state of the protocol
     async fn get_state(&self) -> AnyaResult<ProtocolState>;

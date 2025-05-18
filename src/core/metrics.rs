@@ -1,6 +1,6 @@
 // Core metrics implementation using Prometheus
 use std::collections::HashMap;
-use crate::core::AnyaResult;
+use crate::AnyaResult;
 
 /// Simple prometheus metrics implementation
 pub struct PrometheusMetrics {
