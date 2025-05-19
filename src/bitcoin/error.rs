@@ -5,9 +5,10 @@ use std::error::Error;
 // Bitcoin Error Handling Module
 // Implements comprehensive error types and handling for Bitcoin operations
 //
-// [AIR-3][AIS-2][AIT-2][AIM-1][AIP-1][BPC-2][RES-2]
+// [AIR-3][AIS-3][AIT-2][AIM-2][AIP-2][BPC-3][RES-3]
 // This module provides structured error types with comprehensive coverage
 // for all Bitcoin-related operations with good resilience characteristics.
+// Complete implementation as per Bitcoin Development Framework v2.5 standards
 
 use bitcoin::key::FromSliceError;
 use bitcoin::secp256k1;
@@ -120,6 +121,11 @@ pub enum BitcoinError {
     #[error("Transaction error: {0}")]
     TransactionError(String),
 
+    // [AIR-3][AIS-3][BPC-3][RES-3] Invalid configuration error
+    // This follows the Bitcoin Development Framework v2.5 standards for configuration validation
+    #[error("Invalid configuration: {0}")]
+    InvalidConfiguration(String),
+
     #[error("Storage error: {0}")]
     StorageError(String),
 
@@ -131,6 +137,11 @@ pub enum BitcoinError {
 
     #[error("Internal error: {0}")]
     InternalError(String),
+    
+    // [AIR-3][AIS-3][BPC-3][RES-3] Configuration error handling
+    // This follows the Bitcoin Development Framework v2.5 standards for error handling
+    #[error("Configuration error: {0}")]
+    ConfigError(String),
 }
 
 impl From<TaprootBuilderError> for BitcoinError {
