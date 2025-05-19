@@ -4,25 +4,19 @@
 //! TPM 2.0 is an open standard for secure cryptographic operations with hardware
 //! protection for private keys.
 
-// Basic imports
+// [AIR-3][AIS-3][BPC-3][RES-3] Import necessary dependencies for TPM HSM provider
+// This follows the Bitcoin Development Framework v2.5 standards for secure HSM implementation
 use std::sync::Arc;
-use std::fmt;
-use std::path::PathBuf;
 
 // External crates
 use async_trait::async_trait;
-use tokio::sync::RwLock;
-use chrono::Utc;
-use serde_json::Value;
 use uuid::Uuid;
 
-// Types from the HSM module
+// [AIR-3][AIS-3][BPC-3][RES-3] Import HSM module types following BDF v2.5 standards
 use crate::security::hsm::config::TpmConfig;
-use crate::security::hsm::provider::{HsmProvider, KeyGenParams, KeyInfo, KeyPair, EncryptionAlgorithm, KeyType, KeyUsage, SigningAlgorithm};
-use crate::security::hsm::types::{HsmRequest, HsmResponse, HsmOperation, HsmResponseStatus};
+use crate::security::hsm::provider::{HsmProvider, KeyGenParams, KeyInfo, KeyPair, SigningAlgorithm};
+use crate::security::hsm::types::{HsmRequest, HsmResponse, HsmProviderStatus};
 use crate::security::hsm::error::HsmError;
-use crate::security::hsm::audit::AuditLogger;
-use crate::security::hsm::types::HsmProviderStatus;
 
 /// TPM HSM Provider for hardware-backed key security
 #[derive(Debug)]

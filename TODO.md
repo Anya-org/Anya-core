@@ -1,5 +1,9 @@
 # Anya Core Setup Requirements
 
+# [AIR-3][AIS-3][BPC-3][RES-3] Anya Core TODO List
+
+*Last Updated: May 19, 2025*
+
 ## Production Environment Setup
 
 ### 1. Core System (Phase 1 - Complete)
@@ -58,6 +62,31 @@
   - [x] Access policies
   - [x] Audit logging (100% complete)
   - [x] Bitcoin HSM provider
+
+### 6. Compilation Fixes (Completed: May 19, 2025)
+
+- [x] RGB Module Fixes
+  - [x] Fixed duplicate implementation of the `generate_asset_id` function
+  - [x] Ensured proper AI labeling according to BDF v2.5 standards
+  - [x] Validated Taproot-compatible asset ID generation
+
+- [x] Bitcoin Module Fixes
+  - [x] Removed duplicate `InvalidConfiguration` error variant
+  - [x] Fixed network configuration handling
+  - [x] Updated `block_hash` method usage in `verify_merkle_proof`
+  - [x] Added proper AI labeling for all components
+
+- [x] ML Module Fixes
+  - [x] Fixed `Device::cuda` and `Device::Cpu` usage
+  - [x] Implemented missing `predict_proposal_metrics` method
+  - [x] Fixed duplicate `Ok(())` statement
+  - [x] Added proper AI labeling for all components
+
+- [x] DLC Module Fixes
+  - [x] Added missing `OracleClient` struct and implementation
+  - [x] Fixed `create_contract` method signature
+  - [x] Updated `sign_contract` method error handling
+  - [x] Ensured proper AI labeling according to BDF v2.5 standards
 
 - [-] Compliance Setup (80% Complete)
   - [x] Audit systems

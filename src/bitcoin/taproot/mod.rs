@@ -7,34 +7,49 @@
 //! This module implements full Bitcoin Compliance with BIP-341/342 (Taproot)
 //! and provides comprehensive privacy features with non-interactive oracle patterns.
 
+// [AIR-3][AIS-3][BPC-3][RES-3] Import necessary dependencies for Taproot implementation
+// This follows the Bitcoin Development Framework v2.5 standards for Taproot (BIP-341/342)
 use std::error::Error;
+use std::fmt;
+use crate::AnyaError; // Import AnyaError for proper error handling
+use bitcoin::script::Instruction;
 
+// [AIR-3][AIS-3][BPC-3][RES-3] Import Bitcoin types for Taproot functionality
 use bitcoin::{
     secp256k1::{self, Secp256k1, SecretKey, Keypair, XOnlyPublicKey, Parity, Message},
     taproot::{self, TapLeafHash, TaprootBuilder, LeafVersion, TaprootSpendInfo, ControlBlock},
-    Address, Network, Script, ScriptBuf, Transaction, TxIn, TxOut, Witness,
-    transaction::{Version},
+    Address, Network, Script, Transaction, TxOut, Witness,
     Amount, OutPoint,
     hashes::sha256,
     key::{PublicKey, PrivateKey},
     sighash::{SighashCache, Prevouts},
-    address::NetworkChecked,
-    script::{PushBytes, PushBytesBuf},
-    script::Builder,
+    script::{Builder, PushBytesBuf},
     opcodes,
     TapSighashType,
-    sighash::P2wpkhError,
 };
-use sha2::{Sha256, Digest};
+// [AIR-3][AIS-3][BPC-3][RES-3] Use bitcoin's hashing functionality instead of sha2 directly
+use bitcoin::hashes::sha256::Hash as Sha256Hash;
+use bitcoin::hashes::Hash;
 use crate::bitcoin::error::{BitcoinError, BitcoinResult};
 use std::collections::HashMap;
+
+// [AIR-3][AIS-3][BPC-3][RES-3] Create a wrapper for TaprootBuilder to implement Display
+// This follows the Bitcoin Development Framework v2.5 standards for Taproot implementation
+pub struct TaprootBuilderWrapper<'a>(pub &'a TaprootBuilder);
+
+impl<'a> fmt::Display for TaprootBuilderWrapper<'a> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "TaprootBuilder with {} leaves using tr(KEY,{{SILENT_LEAF}}) pattern", self.0.num_leaves())
+    }
+}
 use std::str::FromStr;
 use rand::{thread_rng, RngCore};
 use std::convert::TryInto;
 use serde_json;
 use hex;
 use std::io::Write;
-use crate::bitcoin::LockTime;
+// [AIR-3][AIS-3][BPC-3][RES-3] Import LockTime from bitcoin absolute module
+use bitcoin::absolute::LockTime;
 
 /// Taproot Asset structure
 /// 
@@ -81,16 +96,20 @@ pub struct AssetTransfer {
 }
 
 /// Generate a unique asset ID based on asset properties
+/// [AIR-3][AIS-3][BPC-3][RES-3] Using Bitcoin's hashing functionality
 pub fn generate_asset_id(name: &str, supply: u64, precision: u8, metadata: &str) -> Result<[u8; 32], Box<dyn Error>> {
-    let mut hasher = Sha256::new();
-    hasher.update(name.as_bytes());
-    hasher.update(&supply.to_be_bytes());
-    hasher.update(&[precision]);
-    hasher.update(metadata.as_bytes());
+    // Create a data vector to hash
+    let mut data = Vec::new();
+    data.extend_from_slice(name.as_bytes());
+    data.extend_from_slice(&supply.to_be_bytes());
+    data.push(precision);
+    data.extend_from_slice(metadata.as_bytes());
     
-    let result = hasher.finalize();
+    // Use Bitcoin's hash functionality
+    // [AIR-3][AIS-3][BPC-3][RES-3] Using Bitcoin's hash functionality
+    let hash = bitcoin::hashes::sha256::Hash::hash(&data);
     let mut output = [0u8; 32];
-    output.copy_from_slice(&result[..]);
+    output.copy_from_slice(hash.as_ref());
     Ok(output)
 }
 
@@ -150,12 +169,14 @@ pub fn issue_asset(asset: &TaprootAsset, issuer_secret_key: &[u8]) -> Result<Str
 
     // Create Taproot tree
     // [BPC-3] Handle TaprootBuilder errors explicitly following tr(KEY,{SILENT_LEAF}) pattern
+    // [AIR-3][AIS-3][BPC-3][RES-3]
     let builder = TaprootBuilder::new().add_leaf(0, asset_script)
-        .map_err(|e| Box::new(AnyaError::BitcoinError(format!("Failed to add leaf to Taproot builder: {}", e))) as Box<dyn Error>)?;
+        .map_err(|e| Box::new(AnyaError::Bitcoin(format!("Failed to add leaf to Taproot builder: {}", e))) as Box<dyn Error>)?;
     
     // Finalize Taproot
+    // [AIR-3][AIS-3][BPC-3][RES-3]
     let spend_info = builder.finalize(&secp, internal_key)
-        .map_err(|e| Box::new(AnyaError::BitcoinError(format!("Failed to finalize Taproot: {}", e))) as Box<dyn Error>)?;
+        .map_err(|e| Box::new(AnyaError::Bitcoin(format!("Failed to finalize Taproot: {}", e))) as Box<dyn Error>)?;
 
     // Create output script
     let output_key = spend_info.output_key();
@@ -432,9 +453,10 @@ pub fn sign_transaction(tx: &mut Transaction, secret_key: &[u8], prevouts: &[TxO
 /// - See @AI labelling.md
 pub fn string_to_address(address_str: &str) -> Result<Address<NetworkChecked>, Box<dyn Error>> {
     // Accepts bc1p... and tb1p... Taproot addresses
-    Address::from_str(address_str)
-        .map(|addr| addr.assume_checked())
-        .map_err(|_| BitcoinError::InvalidAddress(address_str.to_string()))
+    // [AIR-3][AIS-3][BPC-3][RES-3] Use FromStr trait to parse address
+    let address = Address::from_str(address_str)
+        .map_err(|_| Box::new(BitcoinError::InvalidAddress(address_str.to_string())) as Box<dyn Error>)?;
+    Ok(address)
 }
 
 /// Convert a string to a Bitcoin address (alias for string_to_address)
@@ -444,9 +466,10 @@ pub fn string_to_address(address_str: &str) -> Result<Address<NetworkChecked>, B
 /// - BIP-350 (Bech32m)
 /// - See @AI labelling.md
 pub fn from_str(address_str: &str) -> Result<Address<NetworkChecked>, Box<dyn Error>> {
-    Address::from_str(address_str)
-        .map(|addr| addr.assume_checked())
-        .map_err(|_| BitcoinError::InvalidAddress(address_str.to_string()))
+    // [AIR-3][AIS-3][BPC-3][RES-3] Use FromStr trait to parse address
+    let address = Address::from_str(address_str)
+        .map_err(|_| Box::new(BitcoinError::InvalidAddress(address_str.to_string())) as Box<dyn Error>)?;
+    Ok(address)
 }
 
 /// Create an OP_RETURN asset script for Taproot asset issuance
@@ -508,8 +531,10 @@ pub fn create_transfer_script(transfer: &AssetTransfer) -> Result<ScriptBuf, Box
 
 impl TaprootAsset {
     pub fn issue(&mut self) -> Result<String, Box<dyn Error>> {
+        // [AIR-3][AIS-3][BPC-3][RES-3] Check if asset has already been issued
+        // This follows the Bitcoin Development Framework v2.5 standards for asset issuance validation
         if self.issued {
-            return Err(BitcoinError::AssetAlreadyIssued);
+            return Err(Box::new(BitcoinError::AssetAlreadyIssued));
         }
 
         let secp = Secp256k1::new();
@@ -551,8 +576,10 @@ impl TaprootAsset {
         // Build Taproot tree
         let builder = TaprootBuilder::new().add_leaf(0, transfer_script)?;
         
-        // Finalize with recipient's key
-        let spend_info = builder.finalize(&secp, recipient_pubkey)?;
+        // [AIR-3][AIS-3][BPC-3][RES-3] Finalize Taproot tree with recipient's key
+        // This follows the Bitcoin Development Framework v2.5 standards for Taproot script construction
+        let spend_info = builder.finalize(&secp, recipient_pubkey)
+            .map_err(|e| Box::new(BitcoinError::TaprootError(e.to_string())))?;
         
         // Create output script
         let output_key = spend_info.output_key();
@@ -646,7 +673,8 @@ pub fn create_non_interactive_oracle_script(oracle_pubkey: &[u8; 32], outcome_ha
     script_builder = script_builder.push_opcode(opcodes::all::OP_EQUALVERIFY);
     
     // Complete the script with final check
-    script_builder = script_builder.push_opcode(opcodes::all::OP_TRUE);
+    // [AIR-3][AIS-3][BPC-3][RES-3] Use bitcoin's opcodes directly with correct path
+    script_builder = script_builder.push_opcode(bitcoin::opcodes::OP_TRUE);
     
     Ok(script_builder.into_script())
 }
@@ -663,7 +691,7 @@ mod tests {
         let addr_str = "bc1p5cyxnuxmeuwuvkwfem96lxyepd3dkq6a6h7ec3w6d9knu2u3x4qz8v5j7c";
         let addr = string_to_address(addr_str).unwrap();
         // [BPC-3] Update to current bitcoin crate API
-        assert_eq!(addr.network, Network::Bitcoin);
+        assert_eq!(addr.network().unwrap(), Network::Bitcoin);
         assert!(matches!(addr.script_pubkey().witness_program(), Some((version, _)) if version.to_num() == 1));
     }
     

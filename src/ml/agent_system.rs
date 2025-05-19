@@ -55,8 +55,9 @@ impl MLAgentSystem {
     }
     
     /// Register a component with the agent checker
-    pub async fn register_component(&self, name: &str, status: crate::ml::ComponentStatus) -> AnyaResult<()> {
-        let mut agent_checker = self.agent_checker.clone();
+    // [AIR-3][AIS-3][BPC-3][RES-3]
+    pub async fn register_component(&self, _name: &str, _status: crate::ml::ComponentStatus) -> AnyaResult<()> {
+        let _agent_checker = self.agent_checker.clone();
         // The actual implementation would be more complex, but this is a simplified version
         Ok(())
     }

@@ -232,14 +232,48 @@ impl AnyaCore {
     // Core initialization with dependency injection
     pub async fn new(config: Config) -> Result<Self, Box<dyn std::error::Error>> {
         // Use our stub implementations
-        let bitcoin = Arc::new(crate::bitcoin::BitcoinAdapter::new(config.bitcoin).await?);
-        let web5 = Arc::new(Web5Adapter::build(config.web5).await?);
-        let agents = Arc::new(MLAgentSystem::init(config.ml).await?);
+        // [AIR-3][AIS-3][BPC-3][RES-3] Convert core::BitcoinConfig to bitcoin::config::BitcoinConfig with all required fields
+        let bitcoin_config = crate::bitcoin::config::BitcoinConfig {
+            enabled: true, // Assuming enabled by default since core config doesn't have this field
+            network: config.bitcoin.network.clone(),
+            rpc_url: config.bitcoin.rpc_url.clone(),
+            auth: None, // No auth in core config
+            min_confirmations: 6, // Default value
+            default_fee_rate: 1, // [AIR-3][AIS-3][BPC-3][RES-3] Default value for fee rate as u64
+            wallet_path: Some("/tmp/bitcoin-wallet".to_string()), // Default wallet path as Option<String>
+        };
+        
+        // Properly wrap BitcoinInterface trait object to comply with BDF v2.5 hexagonal architecture
+        let bitcoin_adapter = crate::bitcoin::BitcoinAdapter::new(bitcoin_config).await?;
+        let bitcoin: Arc<dyn crate::bitcoin::interface::BitcoinInterface + Send + Sync> = Arc::new(bitcoin_adapter);
+        
+        // Convert config.web5 to web5::Web5Config with all required fields
+        // [AIR-3][AIS-3][BPC-3][RES-3]
+        let web5_config = crate::web5::Web5Config {
+            enabled: true, // Default to enabled
+            did_method: "ion".to_string(), // Default DID method
+            dwn_url: Some(config.web5.endpoint.clone()), // Use endpoint as DWN URL
+            use_local_storage: true, // Default to using local storage
+        };
+        let web5 = Arc::new(Web5Adapter::build(web5_config).await?);
+        
+        // Convert config.ml to MLConfig with all required fields
+        // [AIR-3][AIS-3][BPC-3][RES-3]
+        let ml_config = crate::ml::MLConfig {
+            enabled: true, // Default to enabled
+            model_path: Some(config.ml.model_path.clone()), // model_path is Option<String> in MLConfig
+            use_gpu: true, // Default to using GPU
+            federated_learning: true, // Default to using federated learning
+            max_model_size: 100 * 1024 * 1024, // Default to 100MB
+        };
+        let agents = Arc::new(MLAgentSystem::init(ml_config).await?);
         
         // Create a default DaoGovernance since we can't import it
         let dao = Arc::new(crate::dao::DaoGovernance::default());
         
-        let tokens = Arc::new(TokenomicsEngine::setup(config.tokenomics).await?);
+        // [AIR-3][AIS-3][BPC-3][RES-3]
+        // TokenomicsEngine::setup already returns Arc<TokenomicsEngine>, so we don't need to wrap it again
+        let tokens = TokenomicsEngine::setup(config.tokenomics).await?;
         
         // Assign tokens directly to the AnyaCore struct
         Ok(Self {

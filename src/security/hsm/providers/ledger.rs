@@ -4,23 +4,19 @@
 //! Ledger devices are open hardware platforms that provide secure key storage and
 //! operations with a physical security boundary.
 
-// Basic imports
+// [AIR-3][AIS-3][BPC-3][RES-3] Import necessary dependencies for Ledger HSM provider
+// This follows the Bitcoin Development Framework v2.5 standards for secure HSM implementation
 use std::sync::Arc;
-use std::fmt;
 
 // External crates
 use async_trait::async_trait;
-use tokio::sync::RwLock;
-use chrono::Utc;
-use serde_json::Value;
 use uuid::Uuid;
 use bitcoin::Network;
 
-// Types from the HSM module
-use crate::security::hsm::provider::{HsmProvider, KeyGenParams, KeyInfo, KeyPair, EncryptionAlgorithm, KeyType, KeyUsage, SigningAlgorithm};
-use crate::security::hsm::types::{HsmRequest, HsmResponse, HsmOperation, HsmResponseStatus, HsmProviderStatus};
+// [AIR-3][AIS-3][BPC-3][RES-3] Import HSM module types following BDF v2.5 standards
+use crate::security::hsm::provider::{HsmProvider, KeyGenParams, KeyInfo, KeyPair, SigningAlgorithm};
+use crate::security::hsm::types::{HsmRequest, HsmResponse, HsmProviderStatus};
 use crate::security::hsm::error::HsmError;
-use crate::security::hsm::audit::AuditLogger;
 
 /// Configuration for Ledger devices
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]

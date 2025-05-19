@@ -5,18 +5,18 @@
 //! Bitcoin Development Framework v2.5 requirements, with support for
 //! non-interactive oracle patterns and transaction indistinguishability.
 
+// [AIR-3][AIS-3][BPC-3][RES-3] Import necessary dependencies for State Channels implementation
+// This follows the Bitcoin Development Framework v2.5 standards for transaction indistinguishability
 use std::error::Error;
-use std::sync::{Arc, Mutex};
 use std::collections::HashMap;
 use serde::{Serialize, Deserialize};
 
 use crate::layer2::{
-    Layer2Protocol, ProtocolState, TransactionStatus,
+    ProtocolState, TransactionStatus,
     AssetParams, AssetTransfer, TransferResult,
     Proof, VerificationResult, ValidationResult,
     Layer2Error
 };
-use crate::AnyaResult;
 
 /// Channel state
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]

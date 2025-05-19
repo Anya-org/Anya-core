@@ -13,7 +13,7 @@ use std::collections::HashMap;
 use uuid::Uuid;
 use std::path::Path;
 
-use crate::security::hsm::error::{AuditEventType, AuditEventResult, AuditEventSeverity};
+// [AIR-3][AIS-3][BPC-3][RES-3] No need to re-import these types as they're already imported above
 
 /// Audit logger configuration for HSM operations
 #[derive(Debug, Clone, Serialize, Deserialize)]

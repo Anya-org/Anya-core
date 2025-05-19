@@ -1,18 +1,15 @@
 use std::collections::HashMap;
-use std::sync::Arc;
-use std::time::Duration;
+// [AIR-3][AIS-3][BPC-3][RES-3] Import necessary dependencies for hardware HSM provider
+// This follows the Bitcoin Development Framework v2.5 standards for secure HSM implementation
 use async_trait::async_trait;
-use tokio::sync::Mutex;
-use chrono::Utc;
-use serde_json::Value;
 use uuid::Uuid;
 
 // Types from the HSM module
 use crate::security::hsm::config::{HardwareConfig, HardwareDeviceType};
-use crate::security::hsm::provider::{HsmProvider, KeyGenParams, KeyInfo, KeyPair, EncryptionAlgorithm, KeyType, KeyUsage, SigningAlgorithm};
-use crate::security::hsm::types::{HsmRequest, HsmResponse, HsmOperation, HsmResponseStatus, HsmProviderStatus};
+// [AIR-3][AIS-3][BPC-3][RES-3] Import HSM module types following BDF v2.5 standards
+use crate::security::hsm::provider::{HsmProvider, KeyGenParams, KeyInfo, KeyPair, SigningAlgorithm};
+use crate::security::hsm::types::{HsmRequest, HsmResponse, HsmOperation, HsmProviderStatus};
 use crate::security::hsm::error::HsmError;
-use crate::security::hsm::audit::AuditLogger;
 
 /// Hardware connection state
 #[derive(Debug, Clone, PartialEq)]
@@ -380,9 +377,12 @@ impl HsmProvider for HardwareHsmProvider {
                 let params: SignParams = serde_json::from_value(request.parameters.clone())
                     .map_err(|e| HsmError::InvalidParameters(format!("Invalid signing parameters: {}", e)))?;
                 
+                // [AIR-3][AIS-3][BPC-3][RES-3] Sign data using hardware HSM
                 let signature = self.sign(&params.key_id, params.algorithm, &params.data).await?;
+                // [AIR-3][AIS-3][BPC-3][RES-3] Use base64 Engine for encoding
+                // This follows the Bitcoin Development Framework v2.5 standards for secure data handling
                 let response_data = serde_json::to_value(Base64SignatureResponse {
-                    signature: base64::encode(&signature),
+                    signature: base64::engine::general_purpose::STANDARD.encode(&signature),
                     algorithm: params.algorithm,
                 })
                     .map_err(|e| HsmError::SerializationError(e.to_string()))?;

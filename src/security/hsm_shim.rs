@@ -9,9 +9,20 @@ use std::sync::Arc;
 use std::collections::HashMap;
 
 /// Stub error type for HSM operations when the feature is disabled
+/// [AIR-3][AIS-3][BPC-3][RES-3]
 #[derive(Debug)]
 pub struct HsmStubError {
     pub message: String,
+}
+
+impl HsmStubError {
+    /// Static method to create a feature disabled error
+    /// [AIR-3][AIS-3][BPC-3][RES-3]
+    pub fn feature_disabled() -> Self {
+        Self {
+            message: "This feature is disabled in the current configuration".to_string(),
+        }
+    }
 }
 
 impl fmt::Display for HsmStubError {
@@ -76,13 +87,80 @@ pub enum SigningAlgorithm {
 /// Stub trait for HsmProvider
 pub trait HsmProvider: Send + Sync {}
 
-/// Stub for BitcoinHsmProvider
+/// [AIR-3][AIS-3][BPC-3][RES-3] Stub for BitcoinHsmProvider
+/// This follows the Bitcoin Development Framework v2.5 standards
 #[derive(Debug, Clone, Default)]
 pub struct BitcoinHsmProvider;
 
 impl BitcoinHsmProvider {
     pub fn default() -> Self {
         BitcoinHsmProvider
+    }
+}
+
+/// [AIR-3][AIS-3][BPC-3][RES-3] Stub for SoftwareHsmProvider
+/// This follows the Bitcoin Development Framework v2.5 standards
+#[derive(Debug, Clone, Default)]
+pub struct SoftwareHsmProvider;
+
+impl SoftwareHsmProvider {
+    pub fn new(_config: &impl std::fmt::Debug) -> Result<Self, HsmStubError> {
+        Err(hsm_stub_error("SoftwareHsmProvider is disabled in this build"))
+    }
+}
+
+/// [AIR-3][AIS-3][BPC-3][RES-3] Stub for SimulatorHsmProvider
+/// This follows the Bitcoin Development Framework v2.5 standards
+#[derive(Debug, Clone, Default)]
+pub struct SimulatorHsmProvider;
+
+impl SimulatorHsmProvider {
+    pub fn new(_config: &impl std::fmt::Debug) -> Result<Self, HsmStubError> {
+        Err(hsm_stub_error("SimulatorHsmProvider is disabled in this build"))
+    }
+}
+
+/// [AIR-3][AIS-3][BPC-3][RES-3] Stub for HardwareHsmProvider
+/// This follows the Bitcoin Development Framework v2.5 standards
+#[derive(Debug, Clone, Default)]
+pub struct HardwareHsmProvider;
+
+impl HardwareHsmProvider {
+    pub fn new(_config: &impl std::fmt::Debug) -> Result<Self, HsmStubError> {
+        Err(hsm_stub_error("HardwareHsmProvider is disabled in this build"))
+    }
+}
+
+/// [AIR-3][AIS-3][BPC-3][RES-3] Stub for Pkcs11HsmProvider
+/// This follows the Bitcoin Development Framework v2.5 standards
+#[derive(Debug, Clone, Default)]
+pub struct Pkcs11HsmProvider;
+
+impl Pkcs11HsmProvider {
+    pub fn new(_config: &impl std::fmt::Debug) -> Result<Self, HsmStubError> {
+        Err(hsm_stub_error("Pkcs11HsmProvider is disabled in this build"))
+    }
+}
+
+/// [AIR-3][AIS-3][BPC-3][RES-3] Stub for TpmHsmProvider
+/// This follows the Bitcoin Development Framework v2.5 standards
+#[derive(Debug, Clone, Default)]
+pub struct TpmHsmProvider;
+
+impl TpmHsmProvider {
+    pub fn new(_config: &impl std::fmt::Debug) -> Result<Self, HsmStubError> {
+        Err(hsm_stub_error("TpmHsmProvider is disabled in this build"))
+    }
+}
+
+/// [AIR-3][AIS-3][BPC-3][RES-3] Stub for LedgerHsmProvider
+/// This follows the Bitcoin Development Framework v2.5 standards
+#[derive(Debug, Clone, Default)]
+pub struct LedgerHsmProvider;
+
+impl LedgerHsmProvider {
+    pub fn new(_config: &impl std::fmt::Debug) -> Result<Self, HsmStubError> {
+        Err(hsm_stub_error("LedgerHsmProvider is disabled in this build"))
     }
 }
 

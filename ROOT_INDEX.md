@@ -1,10 +1,26 @@
 # Anya Core Documentation [AIR-3][AIS-3][BPC-3]
 
+[AIR-3][AIS-3][BPC-3][RES-3]
+
+*Last Updated: May 19, 2025*
+
 Welcome to the Anya Core documentation. This is the authoritative root index for all Anya Core documentation, following Bitcoin Development Framework v2.5 standards.
+
+## Recent Updates (May 19, 2025) [AIR-3][AIS-3][BPC-3][RES-3]
+
+The following modules have been updated to fix compilation errors and ensure compliance with the Bitcoin Development Framework v2.5 standards:
+
+- **RGB Module**: Fixed duplicate implementation of the `generate_asset_id` function and ensured Taproot-compatible asset ID generation
+- **Bitcoin Module**: Resolved error handling issues and fixed network configuration handling
+- **ML Module**: Implemented missing `predict_proposal_metrics` method and fixed `Device` usage
+- **DLC Module**: Added missing `OracleClient` implementation and fixed method signatures
+
+All modules now include proper AI labeling according to the canonical AI Labeling System. For detailed information about these changes, see the [Changelog](CHANGELOG.md) and [Implementation Summary](docs/IMPLEMENTATION_SUMMARY.md).
 
 ## Quick Navigation [AIR-3]
 
 ### Core Documentation
+
 - [Getting Started](README.md) - Project overview and setup
 - [Installation](INSTALLATION.md) - Installation instructions
 - [System Architecture](SYSTEM_MAP.md) - Complete system architecture

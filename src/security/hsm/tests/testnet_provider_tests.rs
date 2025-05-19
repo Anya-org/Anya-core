@@ -14,9 +14,7 @@ mod tests {
         HsmProvider, HsmProviderType, KeyType, KeyUsage, EcCurve, KeyGenParams, SigningAlgorithm,
         create_hsm_provider
     };
-    use crate::security::hsm::providers::{
-        SoftwareHsmProvider, SimulatorHsmProvider, HardwareHsmProvider
-    };
+    use crate::hsm::{SoftwareHsmProvider, SimulatorHsmProvider, HardwareHsmProvider};
     
     #[tokio::test]
     async fn test_software_provider_bitcoin_testnet() {

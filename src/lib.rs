@@ -49,9 +49,10 @@ pub mod dao;
 pub mod extensions;
 
 // Re-export key types for crate-wide visibility
+// [AIR-3][BPC-3] Following Bitcoin Development Framework v2.5 standards
 pub use crate::dao::DaoLevel;
 pub use crate::bitcoin::interface::BitcoinInterface;
-pub use crate::bitcoin::interface::BitcoinAdapter;
+pub use crate::bitcoin::adapters::BitcoinAdapter;
 pub mod config;
 pub mod core;
 
@@ -68,6 +69,7 @@ pub mod tools;
 pub mod tokenomics;
 
 /// Core error type for the Anya system
+/// [AIR-3][AIS-3][BPC-3][RES-3]
 #[derive(Debug, PartialEq, Eq)]
 pub enum AnyaError {
     /// ML-related errors
@@ -84,6 +86,10 @@ pub enum AnyaError {
     Generic(String),
     /// Custom errors with message
     Custom(String),
+    /// Timeout errors
+    Timeout(String),
+    /// Low confidence AI output errors
+    LowConfidence(String),
 }
 
 impl fmt::Display for AnyaError {
@@ -96,6 +102,8 @@ impl fmt::Display for AnyaError {
             AnyaError::System(msg) => write!(f, "System error: {}", msg),
             AnyaError::Generic(msg) => write!(f, "Generic error: {}", msg),
             AnyaError::Custom(msg) => write!(f, "Custom error: {}", msg),
+            AnyaError::Timeout(msg) => write!(f, "Timeout error: {}", msg),
+            AnyaError::LowConfidence(msg) => write!(f, "Low confidence error: {}", msg),
         }
     }
 }
@@ -348,7 +356,7 @@ pub mod prelude {
     pub use crate::dao::governance::DaoGovernance;
     // pub use crate::dao::DaoLevel; // Now re-exported at crate root
     // pub use crate::bitcoin::interface::BitcoinInterface;
-pub use crate::bitcoin::interface::BitcoinAdapter; // Now re-exported at crate root
+    pub use crate::bitcoin::adapters::BitcoinAdapter; // Now re-exported at crate root
     // pub use crate::tools::markdown::DocumentationValidator;
     // pub use crate::security::hsm::TaprootValidator;
 } 

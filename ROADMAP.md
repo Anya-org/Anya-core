@@ -1,8 +1,10 @@
 # Anya Core Project Roadmap
 
+[AIR-3][AIS-3][BPC-3][RES-3]
+
 > Note: For Enterprise features and roadmap, please see [Enterprise Roadmap](./enterprise/ROADMAP.md)
 
-## Current Status (March 2025)
+## Current Status (May 19, 2025)
 
 We have completed the initial security analysis framework implementation, including:
 
@@ -14,6 +16,18 @@ We have completed the initial security analysis framework implementation, includ
    - Software, Hardware, Simulator, and Bitcoin-specific HSM providers
    - Key management and secure operations
    - Audit logging and compliance tracking
+
+**Recent Achievements (May 19, 2025):**
+
+6. **Fixed compilation issues across multiple modules**
+   - RGB Module: Fixed duplicate implementation of the `generate_asset_id` function
+   - Bitcoin Module: Resolved error handling and network configuration issues
+   - ML Module: Implemented missing functionality and fixed method usage
+   - DLC Module: Added missing components and fixed method signatures
+7. **Enhanced BDF v2.5 compliance**
+   - Updated all modules with proper AI labeling ([AIR-3][AIS-3][BPC-3][RES-3])
+   - Ensured Taproot-compatible implementations
+   - Verified proper error handling across all modules
 
 The current focus is on hardening security, ensuring BIP compliance, and preparing for the v1.0 release.
 

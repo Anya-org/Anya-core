@@ -4,7 +4,21 @@
 
 All notable changes to the Anya Core project will be documented in this file.
 
+*Last Updated: May 19, 2025*
+
 ## [Unreleased]
+
+## [2.5.1] - 2025-05-19
+
+### Fixed
+
+- [AIR-3][AIS-3][BPC-3][RES-3] RGB Module: Fixed duplicate implementation of the `generate_asset_id` function
+- [AIR-3][AIS-3][BPC-3][RES-3] Bitcoin Module: Removed duplicate `InvalidConfiguration` error variant in the `BitcoinError` enum
+- [AIR-3][AIS-3][BPC-3][RES-3] Bitcoin Module: Fixed network configuration handling and updated `block_hash` method usage
+- [AIR-3][AIS-3][BPC-3][RES-3] ML Module: Fixed `Device::cuda` and `Device::Cpu` usage to use the correct method calls
+- [AIR-3][AIS-3][BPC-3][RES-3] ML Module: Implemented the missing `predict_proposal_metrics` method in the MLService
+- [AIR-3][AIS-3][BPC-3][RES-3] DLC Module: Added the missing `OracleClient` struct and its implementation
+- [AIR-3][AIS-3][BPC-3][RES-3] DLC Module: Fixed the `create_contract` method signature and updated error handling
 
 ### Added
 

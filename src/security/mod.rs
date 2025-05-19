@@ -9,7 +9,6 @@ pub mod system_hardening;
 
 pub mod constant_time;
 
-
 // Hardware Security Module (conditionally included)
 #[cfg(feature = "hsm")]
 pub mod hsm;
@@ -97,35 +96,14 @@ mod tests {
 // Implements security features for Bitcoin operations
 // as per Bitcoin Development Framework v2.5 requirements
 
-
-
-// Re-export key types
-pub mod validation;
-pub use validation::ValidationResult;
-
-// Security module for Anya Core
-// [AIR-3][AIS-3][AIT-3][AIP-3][RES-3]
-
 use log::info;
-// Other security modules
-pub mod constant_time;
+// [AIR-3][AIS-3][BPC-3][RES-3] Constant time module already declared above
 
-
-// Conditionally export HSM types when the feature is enabled
+// [AIR-3][AIS-3][BPC-3][RES-3] Conditionally export HSM types when the feature is enabled
+// This follows the Bitcoin Development Framework v2.5 standards for HSM implementations
 #[cfg(feature = "hsm")]
 pub use hsm::{
-    HsmManager,
-    HsmStatus,
-    config::HsmConfig,
-    provider::{
-        HsmProvider,
-        KeyGenParams,
-        KeyType,
-        KeyInfo,
-        SigningAlgorithm,
-        KeyUsage,
-        EncryptionAlgorithm,
-    },
+    // Only export the types that are actually used in the codebase
     error::HsmError,
     audit::{
         AuditEvent,
@@ -230,12 +208,14 @@ pub async fn verify_bitcoin_payment(
 }
 
 #[cfg(not(feature = "hsm"))]
+// [AIR-3][AIS-3][BPC-3][RES-3]
 pub async fn verify_bitcoin_payment(
-    bitcoin_provider: &hsm_shim::BitcoinHsmProvider,
-    proof_data: Vec<u8>,
+    _bitcoin_provider: &hsm_shim::BitcoinHsmProvider,
+    _proof_data: Vec<u8>,
 ) -> Result<bool, hsm_shim::HsmStubError> {
     // Fallback stub for when HSM is not enabled
-    Err(hsm_shim::HsmStubError::FeatureDisabled)
+    // [AIR-3][AIS-3][BPC-3][RES-3]
+    Err(hsm_shim::HsmStubError::feature_disabled())
 }
 
 /// Create a Taproot asset
@@ -264,16 +244,20 @@ pub async fn create_taproot_asset(
         algorithm: None,
         exportable: false,
     };
+    
+    // [AIR-3][AIS-3][BPC-3][RES-3] Generate the key and return its ID
     let asset_key = bitcoin_provider.generate_key(key_params).await?;
     Ok(asset_key.key_id)
 }
 
 #[cfg(not(feature = "hsm"))]
+// [AIR-3][AIS-3][BPC-3][RES-3]
 pub async fn create_taproot_asset(
-    bitcoin_provider: &hsm_shim::BitcoinHsmProvider,
-    metadata: &str,
-    supply: u64,
+    _bitcoin_provider: &hsm_shim::BitcoinHsmProvider,
+    _metadata: &str,
+    _supply: u64,
 ) -> Result<String, hsm_shim::HsmStubError> {
     // Fallback stub for when HSM is not enabled
-    Err(hsm_shim::HsmStubError::FeatureDisabled)
+    // [AIR-3][AIS-3][BPC-3][RES-3]
+    Err(hsm_shim::HsmStubError::feature_disabled())
 }

@@ -29,9 +29,9 @@ hyper = { version = "1.1.0", features = ["full"] }
 tokio = { version = "1.36.0", features = ["full"] }
 
 # Bitcoin dependencies
-bitcoin = { version = "0.32.0", features = ["std", "serde", "rand", "bitcoinconsensus"] }
+bitcoin = { version = "0.32.0", features = ["std", "serde", "rand", "bitcoinconsensus"], optional = true }
 secp256k1 = { version = "0.28.1", features = ["std", "serde", "rand"] }
-bdk = "0.28.2"
+bdk = { version = "0.28.2", optional = true }
 miniscript = "11.0.0"
 
 # Web5/DID dependencies 
@@ -43,6 +43,9 @@ multihash = "0.18.1"
 # Serialization/Deserialization
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0.108"
+humantime-serde = "1.1.1"
+getrandom = "0.2.10"
+url = "2.4.1"
 
 # Error handling
 anyhow = "1.0.78"
@@ -64,8 +67,8 @@ hex = "0.4"
 log = "0.4"
 reqwest = { version = "0.11", features = ["json"] }
 
-# Conditionally required dependencies (HSM feature)
-sha2 = { version = "0.10.7", optional = true }
+# Conditionally required dependencies (HSM feature and general codebase)
+sha2 = { version = "0.10.8", optional = true }
 hmac = { version = "0.12.1", optional = true }
 
 [dev-dependencies]

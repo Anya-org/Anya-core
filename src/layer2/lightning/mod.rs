@@ -5,17 +5,17 @@
 //! Bitcoin Development Framework v2.5 requirements, including proper hexagonal
 //! architecture and non-interactive oracle patterns.
 
+// [AIR-3][AIS-3][BPC-3][RES-3] Import necessary dependencies for Lightning implementation
+// This follows the Bitcoin Development Framework v2.5 standards for Lightning Network
 use std::error::Error;
-use std::sync::{Arc, Mutex};
 use serde::{Serialize, Deserialize};
 
 use crate::layer2::{
-    Layer2Protocol, ProtocolState, TransactionStatus,
+    ProtocolState, TransactionStatus,
     AssetParams, AssetTransfer, TransferResult,
     Proof, VerificationResult, ValidationResult,
     Layer2Error
 };
-use crate::AnyaResult;
 
 /// Lightning Network configuration
 #[derive(Debug, Clone, Serialize, Deserialize)]

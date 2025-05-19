@@ -38,19 +38,20 @@ use std::{
 use zeroize::Zeroize;
 
 use async_trait::async_trait;
+// [AIR-3][AIS-3][BPC-3][RES-3] Import Bitcoin types for software HSM implementation
+// This follows the Bitcoin Development Framework v2.5 standards for secure HSM implementation
 use bitcoin::{
-    hashes::{sha256d, Hash as BitcoinHash, HashEngine, Hmac, HmacEngine, sha256},
+    hashes::{Hash as BitcoinHash},
     secp256k1::{
-        self, ecdsa, Keypair, Message, PublicKey, Secp256k1, SecretKey, Signing, Verification,
-        XOnlyPublicKey, schnorr,
+        Message, PublicKey, Secp256k1, SecretKey,
+        XOnlyPublicKey,
     },
-    Network, Psbt, XOnlyPublicKey, bip32::{DerivationPath, ExtendedPrivKey, ExtendedPubKey, Fingerprint},
+    Network, Psbt, bip32::{DerivationPath, Xpriv, Xpub, Fingerprint},
 };
-use rand::rngs::OsRng;
-use serde::{Deserialize, Serialize};
-use serde_json::Value;
-use thiserror::Error;
-use tracing::{debug, error, info, instrument, trace, warn};
+
+// [AIR-3][AIS-3][BPC-3][RES-3] Import secure random number generation
+use rand::{rngs::OsRng, Rng};
+use serde::Serialize;
 
 use crate::{
     security::hsm::{
@@ -67,7 +68,8 @@ use crate::security::hsm::types::{KeyType, KeyInfo, KeyPair, HsmOperation, HsmRe
 use crate::security::hsm::types::{HsmResponseStatus, HsmProviderStatus, SignatureAlgorithm, HsmKeyPath};
 use crate::security::hsm::error::{HsmError, HsmAuditEvent};
 use crate::security::hsm::audit::{AuditLogger, AuditEventType, AuditEventResult, AuditEventSeverity};
-use crate::security::hsm::provider::{HsmProvider, SigningAlgorithm, EncryptionAlgorithm};
+// [AIR-3][AIS-3][BPC-3][RES-3] Import encryption algorithm while avoiding duplicate SigningAlgorithm
+use crate::security::hsm::provider::{HsmProvider, EncryptionAlgorithm};
 
 use tokio::sync::Mutex;
 
@@ -174,9 +176,12 @@ impl SoftwareHsmProvider {
     }
 
     /// Generate a secure random key ID using the system's secure RNG
+    /// [AIR-3][AIS-3][BPC-3][RES-3] Generate a secure random key ID using the system's secure RNG
+    /// This follows the Bitcoin Development Framework v2.5 standards for secure key generation
     fn generate_key_id(&self) -> String {
         // Use system's secure RNG to generate a unique key ID
-        let id: [u8; 16] = rand::rngs::OsRng.gen();
+        let mut rng = OsRng;
+        let id: [u8; 16] = rng.gen();
         hex::encode(id)
     }
     

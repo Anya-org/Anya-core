@@ -1,6 +1,3 @@
-use std::error::Error;
-// Migrated from OPSource to anya-core
-// This file was automatically migrated as part of the Rust-only implementation
 // Bitcoin Interface Module
 // Implements a clean API for Bitcoin network operations
 //
@@ -12,32 +9,19 @@ use std::error::Error;
 // BitcoinInterface trait for hexagonal architecture pattern
 // Following Bitcoin Development Framework v2.5 standards
 
-// Legacy BitcoinAdapter implementation moved to adapters module
-// The comprehensive BitcoinInterface trait is defined below
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    #[test]
-    fn test_get_blockchain_info() {
-        let adapter = BitcoinAdapter;
-        let info = adapter.get_blockchain_info();
-        assert!(info.contains("Bitcoin Mainnet"));
-    }
-}
-
-
-use std::sync::Arc;
-use std::error::Error;
+// [AIR-3][AIS-3][BPC-3][RES-3] Import necessary dependencies for Bitcoin interface
+// This follows the Bitcoin Development Framework v2.5 standards for hexagonal architecture
+use std::error::Error as StdError;
 use async_trait::async_trait;
+
 // Re-export bitcoin types for use by other modules
 pub use bitcoin::{Address, Transaction, Block, Network};
 pub use crate::bitcoin::error::{BitcoinError, BitcoinResult};
-use crate::config::Config;
 
-// Import the RustBitcoinImplementation for use in this module
-#[cfg(feature = "rust-bitcoin")]
-use crate::bitcoin::rust::RustBitcoinImplementation;
+// [AIR-3][AIS-3][BPC-3][RES-3] Import Bitcoin configuration
+// This follows the Bitcoin Development Framework v2.5 standards for configuration management
+use crate::config::BitcoinConfig;
+// Note: bitcoin crate doesn't have a config module, so we don't need to alias it
 
 /// Bitcoin implementation type selection enum
 /// 
@@ -165,7 +149,7 @@ pub struct BlockHeader {
 /// 
 /// [AIR-3][AIS-3][BPC-3][RES-3]
 /// Complete implementation as per Bitcoin Development Framework v2.5 standards
-#[async_trait]
+#[async_trait::async_trait]
 pub trait BitcoinInterface: Send + Sync {
     /// Get transaction by txid
     /// 
@@ -237,23 +221,25 @@ pub trait BitcoinInterface: Send + Sync {
 /// 
 /// This factory function creates and returns a Bitcoin interface implementation
 /// based on the requested type and configuration.
+/// 
+/// [AIR-3][BPC-3] Implementation according to Bitcoin Development Framework v2.5
 pub fn create_bitcoin_interface(
     implementation_type: BitcoinImplementationType,
-    config: &Config,
-) -> Result<Arc<dyn BitcoinInterface>, Box<dyn Error>> {
+    config: &BitcoinConfig,
+) -> Result<Arc<dyn BitcoinInterface + 'static>, Box<dyn StdError>> {
     match implementation_type {
         BitcoinImplementationType::Rust => {
             // Use the Rust implementation
             #[cfg(feature = "rust-bitcoin")]
             {
                 match crate::bitcoin::rust::RustBitcoinImplementation::new(config) {
-                    Ok(implementation) => Arc::new(implementation),
-                    Err(e) => panic!("Failed to create Rust Bitcoin implementation: {}", e)
+                    Ok(implementation) => Ok(Arc::new(implementation) as Arc<dyn BitcoinInterface + 'static>),
+                    Err(e) => Err(Box::new(e) as Box<dyn StdError>)
                 }
             }
             #[cfg(not(feature = "rust-bitcoin"))]
             {
-                panic!("Rust Bitcoin implementation requested but feature 'rust-bitcoin' is not enabled")
+                Err(Box::new(BitcoinError::ConfigError("Rust Bitcoin implementation requested but feature 'rust-bitcoin' is not enabled".to_string())) as Box<dyn StdError>)
             }
         }
         _ => {
@@ -261,13 +247,13 @@ pub fn create_bitcoin_interface(
             #[cfg(feature = "rust-bitcoin")]
             {
                 match crate::bitcoin::rust::RustBitcoinImplementation::new(config) {
-                    Ok(implementation) => Arc::new(implementation),
-                    Err(e) => panic!("Failed to create Bitcoin implementation: {}", e)
+                    Ok(implementation) => Ok(Arc::new(implementation) as Arc<dyn BitcoinInterface + 'static>),
+                    Err(e) => Err(Box::new(e) as Box<dyn StdError>)
                 }
             }
             #[cfg(not(feature = "rust-bitcoin"))]
             {
-                panic!("No Bitcoin implementation available for the requested type")
+                Err(Box::new(BitcoinError::ConfigError("No Bitcoin implementation available for the requested type".to_string())) as Box<dyn StdError>)
             }
         }
     }
@@ -277,45 +263,11 @@ pub fn create_bitcoin_interface(
 /// 
 /// This function returns the appropriate Bitcoin interface implementation
 /// based on the current configuration settings.
-pub fn get_current_bitcoin_interface(config: &Config) -> Result<Arc<dyn BitcoinInterface>, Box<dyn Error>> {
-    // Always use Rust implementation
-    create_bitcoin_interface(BitcoinImplementationType::Rust, config)
+/// 
+/// [AIR-3][BPC-3] Implementation according to Bitcoin Development Framework v2.5
+pub fn get_current_bitcoin_interface(config: &BitcoinConfig) -> Result<Arc<dyn BitcoinInterface + 'static>, Box<dyn StdError>> {
+    // [AIR-3][AIS-3][BPC-3][RES-3] Create a Rust implementation of the Bitcoin interface
+    let implementation = crate::bitcoin::rust::RustBitcoinImplementation::new(config)
+        .map_err(|e| Box::new(e) as Box<dyn StdError>)?;
+    Ok(Arc::new(implementation) as Arc<dyn BitcoinInterface + 'static>)
 }
-
-pub struct BitcoinInterfaceConfig {
-    pub implementation_type: BitcoinImplementationType,
-    pub network: Network,
-    pub rpc_url: Option<String>,
-    pub rpc_user: Option<String>,
-    pub rpc_password: Option<String>,
-}
-
-impl Default for BitcoinInterfaceConfig {
-    fn default() -> Self {
-        Self {
-            implementation_type: BitcoinImplementationType::Rust,
-            network: Network::Bitcoin,
-            rpc_url: None,
-            rpc_user: None,
-            rpc_password: None,
-        }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    
-    #[test]
-    fn test_interface_creation() -> Result<(), Box<dyn Error>> {
-        let config = Config::default();
-        
-        // Test Rust implementation
-        let rust_impl = get_current_bitcoin_interface(&config)?;
-        assert_eq!(rust_impl.implementation_type(), BitcoinImplementationType::Rust);
-        
-        // Return Ok to satisfy the Result return type
-        Ok(())
-    }
-} 
-

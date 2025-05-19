@@ -1,5 +1,6 @@
 use std::collections::HashMap;
-use std::sync::Arc;
+// [AIR-3][AIS-3][BPC-3][RES-3] Import necessary dependencies for HSM simulator
+// This follows the Bitcoin Development Framework v2.5 standards for secure HSM implementation
 use std::time::Duration;
 use async_trait::async_trait;
 use tokio::sync::Mutex;
@@ -8,14 +9,15 @@ use uuid::Uuid;
 use rand::prelude::*;
 use chrono::Utc;
 use secp256k1::{Secp256k1, SecretKey, PublicKey};
-use bitcoin::{Network, Transaction, Address, Script, ScriptBuf};
+use bitcoin::{Network, Address};
 use bitcoin::psbt::Psbt;
 use sha2::{Sha256, Digest};
 
 use crate::security::hsm::config::SimulatorConfig;
+// [AIR-3][AIS-3][BPC-3][RES-3] Import HSM module types following BDF v2.5 standards
 use crate::security::hsm::provider::{
     HsmProvider, HsmProviderStatus, KeyType, KeyInfo, KeyGenParams,
-    KeyPair, KeyUsage, SigningAlgorithm, EncryptionAlgorithm,
+    KeyPair, KeyUsage, SigningAlgorithm,
     HsmRequest, HsmResponse, HsmOperation
 };
 use crate::security::hsm::error::HsmError;
@@ -434,9 +436,12 @@ impl HsmProvider for SimulatorHsmProvider {
                 let params: SignParams = serde_json::from_value(request.parameters.clone())
                     .map_err(|e| HsmError::InvalidParameters(format!("Invalid signing parameters: {}", e)))?;
                 
+                // [AIR-3][AIS-3][BPC-3][RES-3] Sign data using simulator HSM
                 let signature = self.sign(&params.key_id, params.algorithm, &params.data).await?;
+                // [AIR-3][AIS-3][BPC-3][RES-3] Use base64 Engine for encoding
+                // This follows the Bitcoin Development Framework v2.5 standards for secure data handling
                 let response_data = serde_json::to_value(Base64SignatureResponse {
-                    signature: base64::encode(&signature),
+                    signature: base64::engine::general_purpose::STANDARD.encode(&signature),
                     algorithm: params.algorithm,
                 })
                     .map_err(|e| HsmError::SerializationError(e.to_string()))?;

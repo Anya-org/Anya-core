@@ -3,25 +3,19 @@
 //! This module provides a unified interface for hardware security operations
 //! with a focus on open-source solutions that align with Bitcoin's philosophy.
 
-use std::error::Error;
+// [AIR-3][AIS-3][BPC-3][RES-3] Import necessary dependencies for HSM module
+// This follows the Bitcoin Development Framework v2.5 standards for secure HSM implementation
 use std::sync::Arc;
 use async_trait::async_trait;
 use serde::{Serialize, Deserialize};
 use bitcoin::ScriptBuf;
-use crate::security::hsm::error::{
-    AuditEventType, AuditEventResult, AuditEventSeverity, 
-    HsmError, HsmAuditEvent
-};
-use crate::security::hsm::audit::AuditLogger;
 use uuid::Uuid;
 
-// Re-export open-source HSM provider implementations
-pub mod providers {
-    pub mod software;
-    pub mod tpm;
-    pub mod pkcs11;
-    pub mod ledger;
-}
+// Import the AuditLogger directly without re-importing types that will be re-exported
+use crate::security::hsm::audit::AuditLogger;
+
+// [AIR-3][AIS-3][BPC-3][RES-3] Import HSM provider modules
+// This follows the Bitcoin Development Framework v2.5 standards for HSM providers
 
 // Re-export types for easier access
 pub use providers::{
@@ -64,60 +58,39 @@ pub use security::SecurityManager;
 // Re-export error types for easier access
 pub use error::*;
 
-// Provider module declarations
-pub mod providers {
-    pub mod bitcoin;
-    pub mod hardware;
-    pub mod ledger;
-    pub mod pkcs11;
-    pub mod simulator;
-    pub mod software;
-    pub mod tpm;
-    
-    // Re-export provider implementations
-    pub use bitcoin::BitcoinHsmProvider;
-    pub use hardware::HardwareHsmProvider;
-    pub use pkcs11::Pkcs11HsmProvider;
-    pub use simulator::SimulatorHsmProvider;
-    pub use software::SoftwareHsmProvider;
-    pub use tpm::TpmHsmProvider;
-}
+// [AIR-3][AIS-3][BPC-3][RES-3] HSM provider module declarations
+// This follows the Bitcoin Development Framework v2.5 standards for HSM providers
+pub mod providers;
 
-// Re-export provider types for easier access
-pub use providers::BitcoinHsmProvider;
-pub use providers::HardwareHsmProvider;
-pub use providers::Pkcs11HsmProvider;
-pub use providers::SimulatorHsmProvider;
-pub use providers::SoftwareHsmProvider;
-pub use providers::TpmHsmProvider;
+// Re-export provider implementations for easier access
+// Only export what's needed to avoid duplicate exports
+pub use providers::bitcoin::BitcoinHsmProvider;
 
 #[cfg(test)]
 pub mod tests;
 
-use bitcoin::{Txid, Psbt, Script, ScriptBuf, XOnlyPublicKey};
+// [AIR-3][AIS-3][BPC-3][RES-3] Import Bitcoin types for HSM functionality
+// This follows the Bitcoin Development Framework v2.5 standards for HSM implementations
+use bitcoin::{Txid, Psbt, Script, XOnlyPublicKey};
 use bitcoin::taproot::TaprootBuilder;
-use std::convert::TryInto;
 use bitcoin::bip32::Xpriv;
 use bitcoin::key::Secp256k1;
 use bitcoin_opcodes::{self, OpCode, all as opcodes};
-use chrono::DateTime;
-use chrono::Utc;
+use chrono::{DateTime, Utc};
 use secp256k1::ecdsa::Signature;
-use sha2::Sha256;
 use base64::{Engine as _, engine::general_purpose::STANDARD as BASE64};
-use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use std::sync::Arc;
 use tokio::sync::{Mutex, RwLock};
-// No need for spawn import
+use std::convert::TryInto;
 use tracing::{debug, error, info};
 use bitcoin::blockdata::block::BlockHeader;
 // No need for debug import
 
 // Import HSM provider types
+// [AIR-3][AIS-3][BPC-3][RES-3] Import necessary HSM components
+// This follows the Bitcoin Development Framework v2.5 standards for HSM implementations
 use self::config::HsmConfig;
-use self::audit::AuditLogger;
-use self::operations::{HsmOperation, OperationRequest, OperationResult};
+use self::operations::{OperationRequest, OperationResult};
 use self::provider::{HsmProvider, HsmProviderType, HsmProviderStatus};
 
 /// HSM Manager that provides a unified interface to hardware security modules
