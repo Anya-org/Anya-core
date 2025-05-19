@@ -8,13 +8,17 @@ license = "MIT"
 repository = "https://github.com/anya-org/anya-core"
 
 [features]
-default = ["std"]
+default = ["std", "rust-bitcoin"]
 # Feature flag for HSM functionality
 hsm = ["dep:sha2", "dep:hmac"]
 # Feature flag for complete system (including HSM)
 complete = ["hsm"]
 std = []
+# Bitcoin implementation features
 bitcoin_integration = []
+rust-bitcoin = ["bitcoin", "bdk"]
+# RSK integration for Bitcoin verification
+rsk = []
 
 [dependencies]
 # API dependencies
@@ -58,6 +62,7 @@ rand = "0.8.5"
 argon2 = "0.5.0"
 hex = "0.4"
 log = "0.4"
+reqwest = { version = "0.11", features = ["json"] }
 
 # Conditionally required dependencies (HSM feature)
 sha2 = { version = "0.10.7", optional = true }
