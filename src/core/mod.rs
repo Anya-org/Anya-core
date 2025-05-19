@@ -87,6 +87,7 @@ mod tests {
     use super::*;
     use std::collections::HashMap;
     use std::time::Duration;
+    use crate::core::ResourceType; // Fix: Import ResourceType from core
     
     #[test]
     fn test_core_system_integration() -> Result<(), Box<dyn std::error::Error>> {
@@ -110,7 +111,7 @@ mod tests {
         
         core.performance_optimizer().configure_resource(
             "database",
-            performance::ResourceType::Database,
+            ResourceType::Database,
             settings,
             0.8,
             500.0,
@@ -155,29 +156,44 @@ pub mod ports {
     // Define all required ports according to BDF v2.5
     pub mod node_communication {
         // P2P networking protocols
+        // [BDF v2.5] Ensure block propagation and mempool monitoring
     }
-    
+
     pub mod wallet_interface {
         // PSBT/BIP-174 compliant interfaces
+        // [BDF v2.5] Enforce BIP-174 structure and SegWit/Taproot witness checks
     }
-    
+
     pub mod smart_contract {
         // Miniscript execution interfaces
+        // [BDF v2.5] Miniscript support for smart contract execution
     }
-    
+
+    pub mod taproot_assets {
+        // [BDF v2.5] Taproot asset issuance and management (BIP-341/342)
+        // Stub: Integrate Taproot asset logic (see @AI labelling.md)
+    }
+
+    pub mod dlc_oracle {
+        // [BDF v2.5] DLC oracle interface (privacy-preserving, non-interactive)
+        // Stub: Implement Schnorr-based non-interactive oracle pattern
+    }
+
+    pub mod metrics_port {
+        // [BDF v2.5] Prometheus metrics export
+        // Stub: Expose TPS, block propagation, mempool depth, BIP support matrix
+    }
+
+    pub mod audit_trail {
+        // [BDF v2.5] Security audit hooks and event trail
+        // Stub: Log compliance events and protocol upgrades
+    }
     // Additional ports from BDF v2.5
 }
 
-use crate::bitcoin::adapters::BitcoinAdapter;
-use crate::web5::adapters::Web5Adapter;
+use crate::web5::Web5Adapter;
 use crate::ml::agent_system::MLAgentSystem;
-use crate::tokenomics::{TokenomicsEngine, TokenomicsConfig};
-
-impl TokenomicsEngine {
-    pub async fn setup(_config: TokenomicsConfig) -> Result<Self, Box<dyn std::error::Error>> {
-        Ok(Self {})
-    }
-}
+use crate::tokenomics::{TokenomicsEngine, engine::TokenomicsConfig};
 
 // Configuration types
 #[derive(Debug, Clone)]
@@ -196,12 +212,6 @@ pub struct MlConfig {
     pub model_path: String,
 }
 
-#[derive(Debug, Clone)]
-pub struct TokenomicsConfig {
-    pub token_name: String,
-}
-
-#[derive(Debug, Clone)]
 pub struct Config {
     pub bitcoin: BitcoinConfig,
     pub web5: Web5Config,
@@ -211,7 +221,7 @@ pub struct Config {
 
 // Hexagonal architecture implementation
 pub struct AnyaCore {
-    bitcoin_adapter: Arc<BitcoinAdapter>,
+    bitcoin_adapter: Arc<dyn crate::bitcoin::interface::BitcoinInterface>,
     web5_adapter: Arc<Web5Adapter>,
     ml_agent_system: Arc<MLAgentSystem>,
     dao_governance: Arc<crate::dao::DaoGovernance>,
@@ -222,28 +232,22 @@ impl AnyaCore {
     // Core initialization with dependency injection
     pub async fn new(config: Config) -> Result<Self, Box<dyn std::error::Error>> {
         // Use our stub implementations
-        let bitcoin = BitcoinAdapter::new(config.bitcoin).await?;
-        let web5 = Web5Adapter::build(config.web5).await?;
-        let agents = MLAgentSystem::init(config.ml).await?;
+        let bitcoin = Arc::new(crate::bitcoin::BitcoinAdapter::new(config.bitcoin).await?);
+        let web5 = Arc::new(Web5Adapter::build(config.web5).await?);
+        let agents = Arc::new(MLAgentSystem::init(config.ml).await?);
         
         // Create a default DaoGovernance since we can't import it
         let dao = Arc::new(crate::dao::DaoGovernance::default());
         
-        let tokens = TokenomicsEngine::setup(config.tokenomics).await?;
+        let tokens = Arc::new(TokenomicsEngine::setup(config.tokenomics).await?);
         
-        // Wrap them in Arc since our struct fields expect Arc<T>
-        let bitcoin = Arc::new(bitcoin);
-        let web5 = Arc::new(web5);
-        let agents = Arc::new(agents);
-        let tokens = Arc::new(tokens);
-        
-        // Both dao and tokenomics are already Arc-wrapped from their respective initialize methods
+        // Assign tokens directly to the AnyaCore struct
         Ok(Self {
             bitcoin_adapter: bitcoin,
             web5_adapter: web5,
             ml_agent_system: agents,
-            dao_governance: dao, // dao is already an Arc<DaoGovernance>
-            tokenomics: tokens, // tokenomics is already an Arc<TokenomicsEngine>
+            dao_governance: dao, 
+            tokenomics: tokens,
         })
     }
 }
@@ -274,6 +278,3 @@ pub mod rpc_ports {
         metrics: Arc<Mutex<PrometheusMetrics>>
     }
 } 
-
-use crate::bitcoin::adapters::BitcoinAdapter;
-use crate::tokenomics::{TokenomicsEngine, TokenomicsConfig};
