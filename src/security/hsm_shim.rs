@@ -72,3 +72,20 @@ pub enum SigningAlgorithm {
     RsaSha256,
     EcdsaP256,
 }
+
+/// Stub trait for HsmProvider
+pub trait HsmProvider: Send + Sync {}
+
+/// Stub for BitcoinHsmProvider
+#[derive(Debug, Clone, Default)]
+pub struct BitcoinHsmProvider;
+
+impl BitcoinHsmProvider {
+    pub fn default() -> Self {
+        BitcoinHsmProvider
+    }
+}
+
+/// Stub for HsmConfig
+#[derive(Debug, Clone, Default)]
+pub struct HsmConfig;

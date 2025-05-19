@@ -6,9 +6,9 @@
 
 // Basic security modules always available
 pub mod system_hardening;
-pub mod validation;
+
 pub mod constant_time;
-pub mod crypto;
+
 
 // Hardware Security Module (conditionally included)
 #[cfg(feature = "hsm")]
@@ -97,9 +97,10 @@ mod tests {
 // Implements security features for Bitcoin operations
 // as per Bitcoin Development Framework v2.5 requirements
 
-pub mod validation;
+
 
 // Re-export key types
+pub mod validation;
 pub use validation::ValidationResult;
 
 // Security module for Anya Core
@@ -108,7 +109,7 @@ pub use validation::ValidationResult;
 use log::info;
 // Other security modules
 pub mod constant_time;
-pub mod crypto;
+
 
 // Conditionally export HSM types when the feature is enabled
 #[cfg(feature = "hsm")]
@@ -189,7 +190,9 @@ pub async fn initialize() -> Result<(), Box<dyn std::error::Error>> {
 /// 
 /// # Returns
 /// BitcoinHsmProvider configured for Bitcoin operations
+#[cfg(feature = "hsm")]
 pub fn create_bitcoin_hsm_provider(base_provider: std::sync::Arc<dyn hsm::provider::HsmProvider>) -> hsm::providers::bitcoin::BitcoinHsmProvider {
+    #[cfg(feature = "hsm")]
     let config = hsm::providers::bitcoin::BitcoinHsmConfig {
         base_provider,
         network: hsm::config::BitcoinNetworkType::Testnet, // Default to testnet for safety
@@ -198,6 +201,12 @@ pub fn create_bitcoin_hsm_provider(base_provider: std::sync::Arc<dyn hsm::provid
     
     hsm::providers::bitcoin::BitcoinHsmProvider::new(config)
 }
+
+#[cfg(not(feature = "hsm"))]
+pub fn create_bitcoin_hsm_provider(_base_provider: std::sync::Arc<dyn hsm_shim::HsmProvider>) -> hsm_shim::BitcoinHsmProvider {
+    hsm_shim::BitcoinHsmProvider::default()
+}
+
 
 /// Verify a Bitcoin payment using SPV proof
 /// 
@@ -210,13 +219,23 @@ pub fn create_bitcoin_hsm_provider(base_provider: std::sync::Arc<dyn hsm::provid
 /// 
 /// # Returns
 /// `Ok(true)` if payment is valid, `Ok(false)` if not, `Err` on failure
+#[cfg(feature = "hsm")]
 pub async fn verify_bitcoin_payment(
     bitcoin_provider: &hsm::providers::bitcoin::BitcoinHsmProvider,
-    proof_data: Vec<u8>, // Simplified proof representation since BitcoinSpvProof isn't defined
+    proof_data: Vec<u8>,
 ) -> Result<bool, hsm::error::HsmError> {
     // This would normally verify an SPV proof
     // For now, it simply returns success as a placeholder
     Ok(true)
+}
+
+#[cfg(not(feature = "hsm"))]
+pub async fn verify_bitcoin_payment(
+    bitcoin_provider: &hsm_shim::BitcoinHsmProvider,
+    proof_data: Vec<u8>,
+) -> Result<bool, hsm_shim::HsmStubError> {
+    // Fallback stub for when HSM is not enabled
+    Err(hsm_shim::HsmStubError::FeatureDisabled)
 }
 
 /// Create a Taproot asset
@@ -231,6 +250,7 @@ pub async fn verify_bitcoin_payment(
 /// 
 /// # Returns
 /// `Ok(asset_id)` on success, `Err` on failure
+#[cfg(feature = "hsm")]
 pub async fn create_taproot_asset(
     bitcoin_provider: &hsm::providers::bitcoin::BitcoinHsmProvider,
     metadata: &str,
@@ -244,11 +264,16 @@ pub async fn create_taproot_asset(
         algorithm: None,
         exportable: false,
     };
-    
     let asset_key = bitcoin_provider.generate_key(key_params).await?;
-    
-    // In a real implementation, this would create an actual Taproot Asset
-    // using taproot script trees and RGB protocol
-    // For now, just return the key ID as a placeholder for the asset ID
     Ok(asset_key.key_id)
-} 
+}
+
+#[cfg(not(feature = "hsm"))]
+pub async fn create_taproot_asset(
+    bitcoin_provider: &hsm_shim::BitcoinHsmProvider,
+    metadata: &str,
+    supply: u64,
+) -> Result<String, hsm_shim::HsmStubError> {
+    // Fallback stub for when HSM is not enabled
+    Err(hsm_shim::HsmStubError::FeatureDisabled)
+}

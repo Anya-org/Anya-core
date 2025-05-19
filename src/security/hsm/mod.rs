@@ -50,7 +50,7 @@ pub mod config;
 pub mod error;
 pub mod operations;
 pub mod provider;
-pub mod providers_exports as providers;
+pub mod providers;
 pub mod security;
 pub mod types;
 
@@ -92,7 +92,7 @@ pub use providers::SoftwareHsmProvider;
 pub use providers::TpmHsmProvider;
 
 #[cfg(test)]
-pub mod tests_standalone as tests;
+pub mod tests;
 
 use bitcoin::{Txid, Psbt, Script, ScriptBuf, XOnlyPublicKey};
 use bitcoin::taproot::TaprootBuilder;
