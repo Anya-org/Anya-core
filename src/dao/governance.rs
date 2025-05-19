@@ -1,7 +1,7 @@
 use std::error::Error;
 /// DAO-3 Compliance Check
 impl DaoGovernance {
-    #[dao_label(DaoLabel::DAO3)]
+    // #[dao_label(DaoLabel::DAO3)]
     pub fn verify_dao3_compliance(&self) -> bool {
         self.quadratic_voting_enabled &&
         self.delegated_authority.active &&
@@ -264,6 +264,15 @@ impl DaoGovernance {
     }
     
     // Additional required methods
+}
+
+// [AIR-3][AIS-3][RES-3]
+// DAO Governance Levels
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum DaoLevel {
+    Basic,
+    Advanced,
+    Enterprise,
 }
 
 impl Default for DaoGovernance {

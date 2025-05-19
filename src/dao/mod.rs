@@ -16,10 +16,14 @@ use rand::random;
 pub mod voting;
 pub mod legal;
 pub mod governance;
+pub use governance::DaoLevel;
 
 // Re-export main components
+
+#[cfg(test)]
+mod tests;
+
 pub use governance::{DaoGovernance, ProposalStatus};
-pub use self::governance::{DaoLevel, GovernanceError};
 
 // Define the types that were previously imported from a non-existent module
 #[derive(Debug, Clone)]
@@ -117,10 +121,10 @@ impl DAOManager {
     /// Create a new proposal
     pub fn create_proposal(&mut self, title: &str, description: &str, amount: u64) -> Result<Proposal, Box<dyn Error>> {
         if amount < self.config.proposal_threshold {
-            return Err(AnyaError::DAO(format!(
+            return Err(Box::new(AnyaError::DAO(format!(
                 "Proposal amount ({}) is below the threshold ({})",
                 amount, self.config.proposal_threshold
-            )));
+            ))));
         }
 
         let proposal_id = format!("proposal:{:x}", random::<u64>());
@@ -149,12 +153,12 @@ impl DAOManager {
     /// Vote on a proposal
     pub fn vote(&mut self, proposal_id: &str, vote_for: bool, amount: u64) -> Result<(), Box<dyn Error>> {
         let proposal = self.proposals.get_mut(proposal_id)
-            .ok_or_else(|| AnyaError::DAO(format!("Proposal not found: {}", proposal_id)))?;
+            .ok_or_else(|| Box::new(AnyaError::DAO(format!("Proposal not found: {}", proposal_id))))?;
         
         if proposal.status != ProposalStatus::Active {
-            return Err(AnyaError::DAO(format!(
+            return Err(Box::new(AnyaError::DAO(format!(
                 "Proposal is not active: {:?}", proposal.status
-            )));
+            ))));
         }
         
         if vote_for {
@@ -170,9 +174,10 @@ impl DAOManager {
 
     /// Get a proposal by ID
     pub fn get_proposal(&self, proposal_id: &str) -> Result<Proposal, Box<dyn Error>> {
-        self.proposals.get(proposal_id)
+        Ok(self.proposals.get(proposal_id)
             .cloned()
-            .ok_or_else(|| AnyaError::DAO(format!("Proposal not found: {}", proposal_id)))
+            .ok_or_else(|| Box::new(AnyaError::DAO(format!("Proposal not found: {}", proposal_id))))?
+        )
     }
 
     /// List all proposals
@@ -183,19 +188,19 @@ impl DAOManager {
     /// Execute a proposal
     pub fn execute_proposal(&mut self, proposal_id: &str) -> Result<(), Box<dyn Error>> {
         let proposal = self.proposals.get_mut(proposal_id)
-            .ok_or_else(|| AnyaError::DAO(format!("Proposal not found: {}", proposal_id)))?;
+            .ok_or_else(|| Box::new(AnyaError::DAO(format!("Proposal not found: {}", proposal_id))))?;
         
         if proposal.status != ProposalStatus::Active {
-            return Err(AnyaError::DAO(format!(
+            return Err(Box::new(AnyaError::DAO(format!(
                 "Proposal is not active: {:?}", proposal.status
-            )));
+            ))));
         }
         
         if proposal.votes_for <= proposal.votes_against {
-            return Err(AnyaError::DAO(format!(
+            return Err(Box::new(AnyaError::DAO(format!(
                 "Proposal does not have enough votes: {} vs {}",
                 proposal.votes_for, proposal.votes_against
-            )));
+            ))));
         }
         
         // In a real implementation, this would execute the proposal

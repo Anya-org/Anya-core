@@ -34,7 +34,7 @@ impl ConfigManager {
         }
     }
 
-    pub fn generate(&self, config: &BitcoinConfig) -> Result<(), std::io::Error> {
+    pub fn generate(&self, _config: &BitcoinConfig) -> Result<(), std::io::Error> {
         let content = format!(
             "network=mainnet\n\
             taproot=1\n\
