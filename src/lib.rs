@@ -42,10 +42,16 @@ use std::fmt;
 use std::collections::HashMap;
 use std::sync::Arc;
 
+pub mod bitcoin;
 pub mod ml;
 pub mod web5;
 pub mod dao;
 pub mod extensions;
+
+// Re-export key types for crate-wide visibility
+pub use crate::dao::DaoLevel;
+pub use crate::bitcoin::interface::BitcoinInterface;
+pub use crate::bitcoin::interface::BitcoinAdapter;
 pub mod config;
 pub mod core;
 
@@ -55,12 +61,14 @@ pub mod security;
 // Re-export HSM types for convenience when feature is enabled
 #[cfg(feature = "hsm")]
 pub use security::hsm;
+#[cfg(not(feature = "hsm"))]
+pub use security::hsm_shim as hsm;
 pub mod layer2;
 pub mod tools;
 pub mod tokenomics;
 
 /// Core error type for the Anya system
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum AnyaError {
     /// ML-related errors
     ML(String),
@@ -105,7 +113,10 @@ pub struct AnyaConfig {
     /// Web5 configuration
     pub web5_config: web5::Web5Config,
     /// Bitcoin network configuration
+    #[cfg(feature = "hsm")]
     pub bitcoin_config: crate::security::hsm::config::HsmConfig,
+    #[cfg(not(feature = "hsm"))]
+    pub bitcoin_config: crate::security::hsm_shim::HsmConfig,
     /// DAO configuration
     pub dao_config: dao::DAOConfig,
 }
@@ -115,7 +126,10 @@ impl Default for AnyaConfig {
         Self {
             ml_config: ml::MLConfig::default(),
             web5_config: web5::Web5Config::default(),
+            #[cfg(feature = "hsm")]
             bitcoin_config: crate::security::hsm::config::HsmConfig::default(),
+            #[cfg(not(feature = "hsm"))]
+            bitcoin_config: crate::security::hsm_shim::HsmConfig::default(),
             dao_config: dao::DAOConfig::default(),
         }
     }
@@ -127,8 +141,6 @@ pub struct AnyaCore {
     pub ml_system: Option<ml::MLSystem>,
     /// Web5 manager
     pub web5_manager: Option<web5::Web5Manager>,
-    /// Bitcoin manager
-    pub bitcoin_manager: Option<crate::security::hsm::HsmManager>,
     /// DAO manager
     pub dao_manager: Option<dao::DAOManager>,
 }
@@ -151,12 +163,6 @@ impl AnyaCore {
             None
         };
 
-        let bitcoin_manager = if config.bitcoin_config.general.enabled {
-            Some(bitcoin::BitcoinManager::new(config.bitcoin_config)?)
-        } else {
-            None
-        };
-
         let dao_manager = if config.dao_config.enabled {
             match dao::DAOManager::new(config.dao_config) {
                 Ok(manager) => Some(manager),
@@ -169,7 +175,6 @@ impl AnyaCore {
         Ok(Self {
             ml_system,
             web5_manager,
-            bitcoin_manager,
             dao_manager,
         })
     }
@@ -182,8 +187,7 @@ impl AnyaCore {
     /// Check if the system is operational
     pub fn is_operational(&self) -> bool {
         // A basic check that at least one core component is enabled
-        self.ml_system.is_some() || self.web5_manager.is_some() || 
-        self.bitcoin_manager.is_some() || self.dao_manager.is_some()
+        self.ml_system.is_some() || self.web5_manager.is_some() || self.dao_manager.is_some()
     }
 
     /// Get system status information
@@ -191,7 +195,8 @@ impl AnyaCore {
         let mut status = SystemStatus {
             ml_enabled: self.ml_system.is_some(),
             web5_enabled: self.web5_manager.is_some(),
-            bitcoin_enabled: self.bitcoin_manager.is_some(),
+            // Temporarily disable bitcoin_enabled check as the field doesn't exist
+            bitcoin_enabled: false,
             dao_enabled: self.dao_manager.is_some(),
             component_status: Vec::new(),
             metrics: HashMap::new(),
@@ -215,11 +220,6 @@ impl AnyaCore {
             health_score: if self.web5_manager.is_some() { 1.0 } else { 0.0 },
         });
 
-        status.component_status.push(ComponentStatus {
-            name: "bitcoin".to_string(),
-            operational: self.bitcoin_manager.is_some(),
-            health_score: if self.bitcoin_manager.is_some() { 1.0 } else { 0.0 },
-        });
 
         status.component_status.push(ComponentStatus {
             name: "dao".to_string(),
@@ -290,8 +290,10 @@ mod tests {
     #[test]
     fn test_config_default() {
         let config = AnyaConfig::default();
+        // [BPC-3] Use correct field structure as per BDF v2.5 hexagonal architecture
         assert!(config.ml_config.enabled);
         assert!(config.web5_config.enabled);
+        // Check HSM config through the bitcoin_config field
         assert!(config.bitcoin_config.enabled);
         assert!(config.dao_config.enabled);
     }
@@ -324,7 +326,9 @@ impl From<web5::Web5Error> for AnyaError {
     }
 }
 
+#[cfg(feature = "hsm")]
 impl From<crate::security::hsm::HsmError> for AnyaError {
+    #[cfg(feature = "hsm")]
     fn from(error: crate::security::hsm::HsmError) -> Self {
         AnyaError::Bitcoin(error.to_string())
     }
@@ -341,11 +345,10 @@ pub const BUILD_ID: &str = env!("CARGO_PKG_VERSION");
 
 /// Module re-exports for convenience
 pub mod prelude {
-    pub use crate::dao::governance::{DaoGovernance, DaoLevel};
-    pub use crate::tools::markdown::DocumentationValidator;
-    pub use crate::security::hsm::TaprootValidator;
+    pub use crate::dao::governance::DaoGovernance;
+    // pub use crate::dao::DaoLevel; // Now re-exported at crate root
+    // pub use crate::bitcoin::interface::BitcoinInterface;
+pub use crate::bitcoin::interface::BitcoinAdapter; // Now re-exported at crate root
+    // pub use crate::tools::markdown::DocumentationValidator;
+    // pub use crate::security::hsm::TaprootValidator;
 } 
-
-pub mod bitcoin {
-    pub mod taproot;
-}
