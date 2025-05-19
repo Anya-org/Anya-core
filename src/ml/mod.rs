@@ -4,9 +4,12 @@
 //! including model management, training, prediction, and federated learning.
 
 use std::error::Error;
-use crate::AnyaError;
+// [AIR-3][AIS-3][BPC-3][RES-3] Import necessary dependencies for ML module
+// This follows the Bitcoin Development Framework v2.5 standards for ML operations
 use crate::AnyaResult;
+use crate::ml::service::{MLModel, MLService, Proposal, ProposalMetrics, RiskMetrics};
 use std::collections::HashMap;
+use std::error::Error;
 use std::sync::{Arc, Mutex};
 use std::path::Path;
 
