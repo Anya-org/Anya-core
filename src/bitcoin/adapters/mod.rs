@@ -8,18 +8,18 @@ use std::error::Error;
 // following the hexagonal architecture pattern.
 
 use std::sync::Arc;
+use std::error::Error;
+use async_trait::async_trait;
 use crate::bitcoin::interface::{
-    BitcoinInterface, BitcoinError, BitcoinResult, BitcoinTransaction,
-    BitcoinAddress, AddressType, TransactionInput, TransactionOutput,
-    BlockHeader, BitcoinImplementationType
+    BitcoinInterface, BitcoinError, BitcoinResult, Transaction,
+    Address, AddressType, Block, BlockHeader, BitcoinImplementationType
 };
-use crate::bitcoin::config::Config;
-use crate::bitcoin::rust::RustBitcoinImplementation;
+use crate::bitcoin::config::BitcoinConfig;
 
 /// Bitcoin adapter for Bitcoin implementation
 pub struct BitcoinAdapter {
     /// Configuration
-    config: Arc<Config>,
+    config: Arc<BitcoinConfig>,
     
     /// Rust implementation
     implementation: Arc<dyn BitcoinInterface>,
@@ -27,14 +27,16 @@ pub struct BitcoinAdapter {
 
 impl BitcoinAdapter {
     /// Create a new Bitcoin adapter
-    pub async fn new(config: Config) -> Result<Self, Box<dyn Error>> {
-        // Create the Rust implementation
-        let implementation = Arc::new(RustBitcoinImplementation::new(&config)) as Arc<dyn BitcoinInterface>;
+    /// [BPC-3] Complete real implementation as per BDF v2.5 standards
+    pub async fn new(config: BitcoinConfig) -> Result<Self, Box<dyn Error>> {
+        // Create a simple Rust implementation
+        // Use the rust module implementation to avoid conflicts
+        let implementation = Arc::new(crate::bitcoin::rust::RustBitcoinImplementation::new(&config)?) as Arc<dyn BitcoinInterface>;
         
-        Self {
-            config,
+        Ok(Self {
+            config: Arc::new(config),
             implementation,
-        }
+        })
     }
     
     /// Get the Bitcoin implementation
@@ -43,41 +45,56 @@ impl BitcoinAdapter {
     }
 }
 
+// [BPC-3] Implementation of BitcoinInterface following hexagonal architecture pattern
+// [AIR-3] Complete real implementation as per BDF v2.5 standards
+#[async_trait]
 impl BitcoinInterface for BitcoinAdapter {
-    fn get_transaction(&self, txid: &str) -> BitcoinResult<BitcoinTransaction> {
-        self.implementation.get_transaction(txid)
+    async fn get_transaction(&self, txid: &str) -> BitcoinResult<Transaction> {
+        self.implementation.get_transaction(txid).await
     }
     
-    fn get_block(&self, hash: &str) -> BitcoinResult<Vec<BitcoinTransaction>> {
-        self.implementation.get_block(hash)
+    async fn get_block(&self, hash: &str) -> BitcoinResult<Block> {
+        self.implementation.get_block(hash).await
     }
     
-    fn get_block_height(&self) -> BitcoinResult<u32> {
-        self.implementation.get_block_height()
+    async fn get_block_height(&self) -> BitcoinResult<u32> {
+        self.implementation.get_block_height().await
     }
     
-    fn generate_address(&self, address_type: AddressType) -> BitcoinResult<BitcoinAddress> {
-        self.implementation.generate_address(address_type)
+    async fn generate_address(&self, address_type: AddressType) -> BitcoinResult<Address> {
+        self.implementation.generate_address(address_type).await
     }
     
-    fn create_transaction(
+    async fn create_transaction(
         &self,
         outputs: Vec<(String, u64)>,
         fee_rate: u64,
-    ) -> BitcoinResult<BitcoinTransaction> {
-        self.implementation.create_transaction(outputs, fee_rate)
+    ) -> BitcoinResult<Transaction> {
+        self.implementation.create_transaction(outputs, fee_rate).await
     }
     
-    fn broadcast_transaction(&self, transaction: &BitcoinTransaction) -> BitcoinResult<String> {
-        self.implementation.broadcast_transaction(transaction)
+    async fn broadcast_transaction(&self, transaction: &Transaction) -> BitcoinResult<String> {
+        self.implementation.broadcast_transaction(transaction).await
     }
     
-    fn get_balance(&self) -> BitcoinResult<u64> {
-        self.implementation.get_balance()
+    async fn get_balance(&self, address: &Address) -> BitcoinResult<u64> {
+        self.implementation.get_balance(address).await
     }
     
-    fn estimate_fee(&self, target_blocks: u8) -> BitcoinResult<u64> {
-        self.implementation.estimate_fee(target_blocks)
+    async fn estimate_fee(&self, target_blocks: u8) -> BitcoinResult<u64> {
+        self.implementation.estimate_fee(target_blocks).await
+    }
+    
+    async fn get_block_header(&self, hash: &str) -> BitcoinResult<BlockHeader> {
+        self.implementation.get_block_header(hash).await
+    }
+    
+    async fn verify_merkle_proof(&self, tx_hash: &str, block_header: &BlockHeader) -> BitcoinResult<bool> {
+        self.implementation.verify_merkle_proof(tx_hash, block_header).await
+    }
+    
+    async fn send_transaction(&self, tx: &Transaction) -> BitcoinResult<String> {
+        self.implementation.send_transaction(tx).await
     }
     
     fn implementation_type(&self) -> BitcoinImplementationType {
@@ -89,9 +106,9 @@ impl BitcoinInterface for BitcoinAdapter {
 mod tests {
     use super::*;
     
-    #[test]
+    #[tokio::test]
     async fn test_adapter_initialization() -> Result<(), Box<dyn Error>> {
-        let config = Config::default();
+        let config = BitcoinConfig::default();
         let adapter = BitcoinAdapter::new(config).await?;
         
         // Check that we can get the implementation
@@ -100,6 +117,9 @@ mod tests {
         
         // Check the default implementation type
         assert_eq!(adapter.implementation_type(), BitcoinImplementationType::Rust);
+        
+        // [BPC-3] Return success result
+        Ok(())
     }
 } 
 

@@ -28,11 +28,16 @@ mod tests {
 
 
 use std::sync::Arc;
+use std::error::Error;
 use async_trait::async_trait;
 // Re-export bitcoin types for use by other modules
 pub use bitcoin::{Address, Transaction, Block, Network};
 pub use crate::bitcoin::error::{BitcoinError, BitcoinResult};
 use crate::config::Config;
+
+// Import the RustBitcoinImplementation for use in this module
+#[cfg(feature = "rust-bitcoin")]
+use crate::bitcoin::rust::RustBitcoinImplementation;
 
 /// Bitcoin implementation type selection enum
 /// 
@@ -238,14 +243,31 @@ pub fn create_bitcoin_interface(
 ) -> Result<Arc<dyn BitcoinInterface>, Box<dyn Error>> {
     match implementation_type {
         BitcoinImplementationType::Rust => {
-            let implementation = crate::bitcoin::rust::RustBitcoinImplementation::new(config);
-            Arc::new(implementation)
+            // Use the Rust implementation
+            #[cfg(feature = "rust-bitcoin")]
+            {
+                match crate::bitcoin::rust::RustBitcoinImplementation::new(config) {
+                    Ok(implementation) => Arc::new(implementation),
+                    Err(e) => panic!("Failed to create Rust Bitcoin implementation: {}", e)
+                }
+            }
+            #[cfg(not(feature = "rust-bitcoin"))]
+            {
+                panic!("Rust Bitcoin implementation requested but feature 'rust-bitcoin' is not enabled")
+            }
         }
         _ => {
             // Create a Rust implementation for all other cases
-            match crate::bitcoin::rust::RustBitcoinImplementation::new(config) {
-                Ok(implementation) => Arc::new(implementation),
-                Err(e) => panic!("Failed to create Bitcoin implementation: {}", e)
+            #[cfg(feature = "rust-bitcoin")]
+            {
+                match crate::bitcoin::rust::RustBitcoinImplementation::new(config) {
+                    Ok(implementation) => Arc::new(implementation),
+                    Err(e) => panic!("Failed to create Bitcoin implementation: {}", e)
+                }
+            }
+            #[cfg(not(feature = "rust-bitcoin"))]
+            {
+                panic!("No Bitcoin implementation available for the requested type")
             }
         }
     }
