@@ -92,7 +92,7 @@ impl Web5Manager {
     
     /// Get the system status
     pub fn status(&self) -> Web5Result<Web5Status> {
-        let did_count = self.did_manager.dids().len();
+        let did_count = self.did_manager.dids()?.len();
         let protocol_count = self.protocol_manager.get_all_protocols().len();
         
         Ok(Web5Status {
@@ -106,7 +106,7 @@ impl Web5Manager {
     /// Get metrics for the Web5 system
     pub fn get_metrics(&self) -> Web5Result<HashMap<String, String>> {
         let mut metrics = HashMap::new();
-        metrics.insert("dids".to_string(), self.did_manager.dids().len().to_string());
+        metrics.insert("dids".to_string(), self.did_manager.dids()?.len().to_string());
         metrics.insert("protocols".to_string(), self.protocol_manager.get_all_protocols().len().to_string());
         metrics.insert("dwn_connected".to_string(), self.config.dwn_url.is_some().to_string());
         
@@ -138,6 +138,7 @@ mod tests {
         
         assert!(manager.config.enabled);
         assert_eq!(manager.config.did_method, "ion");
+        Ok(())
     }
     
     #[test]
@@ -150,6 +151,6 @@ mod tests {
         assert_eq!(status.did_count, 0);
         assert_eq!(status.protocol_count, 0);
         assert!(!status.dwn_connected);
+        Ok(())
     }
 }
-

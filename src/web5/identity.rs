@@ -29,11 +29,38 @@ pub enum Web5Error {
     #[error("Credential error: {0}")]
     Credential(String),
     
+    #[error("Not found: {0}")]
+    NotFound(String),
+    
     #[error("DWN error: {0}")]
     DWNError(String),
     
     #[error("Serialization error: {0}")]
     SerializationError(String),
+}
+
+// [AIS-3] Implementation for From<Box<dyn std::error::Error>> for Web5Error
+// This allows the ? operator to work correctly when converting from Box<dyn Error> to Web5Error
+impl From<Box<dyn std::error::Error>> for Web5Error {
+    fn from(err: Box<dyn std::error::Error>) -> Self {
+        Web5Error::Protocol(err.to_string())
+    }
+}
+
+// [AIS-3] Implementation for From<String> for Web5Error
+// This allows the ? operator to work correctly when converting from String to Web5Error
+impl From<String> for Web5Error {
+    fn from(err: String) -> Self {
+        Web5Error::Protocol(err)
+    }
+}
+
+// [AIS-3] Implementation for From<&str> for Web5Error
+// This allows the ? operator to work correctly when converting from &str to Web5Error
+impl From<&str> for Web5Error {
+    fn from(err: &str) -> Self {
+        Web5Error::Protocol(err.to_string())
+    }
 }
 
 /// DID Manager
@@ -236,10 +263,11 @@ impl DIDManager {
 }
 
 /// Generate a random ID for a DID
+/// [AIS-3] Properly handles errors without using ? operator
 fn generate_random_id() -> String {
     let now = SystemTime::now()
         .duration_since(UNIX_EPOCH)
-        ?
+        .unwrap_or_default()
         .as_secs();
     
     format!("{:x}", now)

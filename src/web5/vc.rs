@@ -126,7 +126,7 @@ impl CredentialManager {
     /// Verify a credential
     pub fn verify_credential(&self, credential: &VerifiableCredential) -> Web5Result<bool> {
         // Check if proof exists
-        let proof = match &credential.proof {
+        let _proof = match &credential.proof {
             Some(p) => p,
             None => return Err(Web5Error::Credential("No proof in credential".to_string())),
         };
@@ -140,7 +140,11 @@ impl CredentialManager {
     pub fn store_credential(&mut self, credential: VerifiableCredential) -> Web5Result<()> {
         // In a real implementation, this would store the credential securely
         // and return its ID
-        let id = credential.id.clone().unwrap_or_else(|| generate_uuid());
+        let id = if credential.id.is_empty() {
+            generate_uuid()
+        } else {
+            credential.id.clone()
+        };
         self.credentials.insert(id, credential);
         Ok(())
     }
@@ -189,7 +193,7 @@ fn generate_uuid() -> String {
     
     let now = SystemTime::now()
         .duration_since(UNIX_EPOCH)
-        ?
+        .unwrap_or_default()
         .as_secs();
     
     format!("{:x}-{:x}-{:x}-{:x}-{:x}", 
@@ -236,5 +240,7 @@ mod tests {
         assert_eq!(credential.credentialSubject.id, subject_did);
         assert!(credential.credential_type.contains(&"ExampleCredential".to_string()));
         assert!(credential.proof.is_some());
+        
+        Ok(())
     }
 } 

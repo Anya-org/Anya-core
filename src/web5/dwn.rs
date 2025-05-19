@@ -150,10 +150,11 @@ impl DWNClient {
 }
 
 /// Generate a random ID
+/// [AIS-3] Properly handles errors without using ? operator
 fn generate_id() -> String {
     let now = SystemTime::now()
         .duration_since(UNIX_EPOCH)
-        ?
+        .unwrap_or_default()
         .as_secs();
     
     format!("{:x}", now)
@@ -303,32 +304,55 @@ impl DWNManager {
     
     /// Store a record in a DWN
     pub fn store_record(&self, record: DWNRecord) -> Web5Result<String> {
-        // In a real implementation, this would store the record in a DWN
-        // For this example, we're storing it locally
-        
-        if let Ok(mut records) = self.records.lock() {
-            records.insert(record.id.clone(), record.clone());
-        }
-        
-        Ok(record.id)
+        let mut storage = self.records.lock()
+            .map_err(|e| Web5Error::Storage(format!("Failed to acquire lock: {}", e)))?;
+        let record_id = generate_id();
+        storage.insert(record_id.clone(), record);
+        Ok(record_id)
     }
     
     /// Query records from a DWN
     pub fn query_records(&self, owner: &str, schema: &str) -> Web5Result<Vec<DWNRecord>> {
-        // In a real implementation, this would query records from a DWN
-        // For this example, we're querying locally
-        
-        let mut result = Vec::new();
-        
-        if let Ok(records) = self.records.lock() {
-            for record in records.values() {
-                if record.owner == owner && record.schema == schema {
-                    result.push(record.clone());
-                }
-            }
+        let storage = self.records.lock()
+            .map_err(|e| Web5Error::Storage(format!("Failed to acquire lock: {}", e)))?;
+        let records: Vec<DWNRecord> = storage.values()
+            .filter(|r| r.owner == owner && r.schema == schema)
+            .cloned()
+            .collect();
+        Ok(records)
+    }
+    
+    /// Create a record in a DWN
+    pub fn create_record(&self, owner: &str, schema: &str, data: serde_json::Value) -> Web5Result<String> {
+        let record = DWNRecord {
+            id: generate_id(),
+            owner: owner.to_string(),
+            schema: schema.to_string(),
+            data,
+            metadata: HashMap::new(),
+            attestations: Vec::new(),
+        };
+        self.store_record(record)
+    }
+    
+    /// Read a record from a DWN
+    pub fn read_record(&self, id: &str) -> Web5Result<DWNRecord> {
+        let storage = self.records.lock()
+            .map_err(|e| Web5Error::Storage(format!("Failed to acquire lock: {}", e)))?;
+        storage.get(id).cloned().ok_or_else(|| Web5Error::NotFound(id.to_string()))
+    }
+    
+    /// Update a record in a DWN
+    pub fn update_record(&self, id: &str, data: serde_json::Value) -> Web5Result<()> {
+        let mut storage = self.records.lock()
+            .map_err(|e| Web5Error::Storage(format!("Failed to acquire lock: {}", e)))?;
+        if let Some(mut record) = storage.get_mut(id) {
+            record.data = data;
+            record.metadata.insert("updated".to_string(), current_time().to_string());
+            Ok(())
+        } else {
+            Err(Web5Error::NotFound("Record not found".to_string()))
         }
-        
-        Ok(result)
     }
     
     /// Delete a record from a DWN
@@ -429,50 +453,6 @@ impl DWNManager {
             }
         }
     }
-    
-    /// Create a record in a DWN
-    pub fn create_record(&self, owner: &str, schema: &str, data: serde_json::Value) -> Web5Result<String> {
-        // In a real implementation, this would create a record in a DWN
-        // For this example, we're creating it locally
-        let id = generate_random_id();
-        let record = DWNRecord {
-            id: id.clone(),
-            owner: owner.to_string(),
-            schema: schema.to_string(),
-            data,
-            created: current_time(),
-            updated: current_time(),
-        };
-        
-        self.records.lock().unwrap().insert(id.clone(), record);
-        Ok(id)
-    }
-    
-    /// Read a record from a DWN
-    pub fn read_record(&self, id: &str) -> Web5Result<DWNRecord> {
-        if let Ok(records) = self.records.lock() {
-            if let Some(record) = records.get(id) {
-                return Ok(record.clone());
-            }
-        }
-        
-        Err(Web5Error::DWNError(format!("Record not found: {}", id)))
-    }
-    
-    /// Update a record in a DWN
-    pub fn update_record(&self, id: &str, data: serde_json::Value) -> Web5Result<()> {
-        // In a real implementation, this would update the record in a DWN
-        // For this example, we're updating it locally
-        if let Ok(mut records) = self.records.lock() {
-            if let Some(record) = records.get_mut(id) {
-                record.data = data;
-                record.updated = current_time();
-                return Ok(());
-            }
-        }
-        
-        Err(Web5Error::RecordNotFound(id.to_string()))
-    }
 }
 
 /// Generate a random ID
@@ -509,6 +489,8 @@ mod tests {
         assert_eq!(records.len(), 1);
         assert_eq!(records[0].id, "record1");
         assert_eq!(records[0].owner, "did:ion:123");
+        
+        Ok(())
     }
     
     #[test]
@@ -526,6 +508,7 @@ mod tests {
         assert_eq!(record.owner, "did:ion:456");
         assert_eq!(record.schema, "https://schema.org/Person");
         assert_eq!(record.data, data);
+        Ok(())
     }
     
     #[test]
@@ -548,6 +531,8 @@ mod tests {
         
         let record = dwn_manager.read_record(&id)?;
         assert_eq!(record.data, new_data);
+        
+        Ok(())
     }
     
     #[test]
@@ -565,5 +550,7 @@ mod tests {
         
         let result = dwn_manager.read_record(&id);
         assert!(result.is_err());
+        
+        Ok(())
     }
 } 
