@@ -1,4 +1,5 @@
 #!/bin/bash
+# [AIR-3][AIS-3][BPC-3][RES-3]
 
 # Define the root directory and files
 ROOT_DIR="/home/portiam/Downloads/OPSource/anya"
@@ -26,13 +27,21 @@ cat > "$TODO_FILE" << 'TODOEOF'
 - [ ] Add Dart SDK version verification
 - [ ] Document system requirements
 
-### 4. Known Issues
+### 4. Script Management System
+- [x] Created script_manager.sh utility
+- [x] Implemented unified test framework
+- [x] Developed unified installation framework
+- [x] Applied hexagonal architecture principles
+- [ ] Complete documentation for new frameworks
+- [ ] Final consolidation of remaining 26 scripts
+
+### 5. Known Issues
 1. Dependency Conflicts:
    - http ^1.2.0 vs dart_code_metrics requirements
    - web5 ^0.4.0 requiring specific http version
    - mockito version compatibility issues
 
-### 5. Next Actions
+### 6. Next Actions
 - [ ] Resolve remaining dependency conflicts
 - [ ] Complete system compatibility checks
 - [ ] Test file management scripts

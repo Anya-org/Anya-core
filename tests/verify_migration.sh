@@ -1,4 +1,5 @@
 #!/bin/bash
+# [AIR-3][AIS-3][BPC-3][RES-3]
 # Verify Migration Script
 # Tests the functionality of both Python and Rust implementations to confirm migration success
 

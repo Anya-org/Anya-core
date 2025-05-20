@@ -1,4 +1,5 @@
 #!/bin/bash
+# [AIR-3][AIS-3][BPC-3][RES-3]
 # Configure Git Signing
 # This script configures Git to use GPG for commit signing
 

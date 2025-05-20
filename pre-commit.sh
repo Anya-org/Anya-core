@@ -1,4 +1,5 @@
 #!/bin/bash
+# [AIR-3][AIS-3][BPC-3][RES-3]
 COMMIT_MSG=$(cat "$1")
 PATTERN='\[([A-Z]{3}-[0-9])\]\[([A-Z]{3})\]\[([A-Z]{3})\]'
 

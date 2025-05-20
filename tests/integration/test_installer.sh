@@ -1,4 +1,5 @@
 #!/bin/bash
+# [AIR-3][AIS-3][BPC-3][RES-3]
 # Anya Installer Integration Test
 # Tests the full installation process in a clean environment
 

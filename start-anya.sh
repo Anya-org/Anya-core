@@ -1,4 +1,5 @@
 #!/bin/bash
+# [AIR-3][AIS-3][BPC-3][RES-3]
 
 # Stop any running containers
 echo "Stopping any running Anya Core services..."
