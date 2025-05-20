@@ -10,13 +10,15 @@ use std::sync::Arc;
 
 // External crates
 use async_trait::async_trait;
+use bitcoin::{Network};
 use uuid::Uuid;
-use bitcoin::Network;
 
 // [AIR-3][AIS-3][BPC-3][RES-3] Import HSM module types following BDF v2.5 standards
 use crate::security::hsm::provider::{HsmProvider, KeyGenParams, KeyInfo, KeyPair, SigningAlgorithm};
 use crate::security::hsm::types::{HsmRequest, HsmResponse, HsmProviderStatus};
 use crate::security::hsm::error::HsmError;
+use std::collections::HashMap;
+use crate::security::hsm::audit::AuditLogger;
 
 /// Configuration for Ledger devices
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -39,12 +41,12 @@ pub struct LedgerHsmProvider {
     /// Keys (actually BIP32 paths) known to this provider
     keys: tokio::sync::Mutex<HashMap<String, KeyInfo>>,
     /// Audit logger
-    audit_logger: Arc<dyn AuditLogger + Send + Sync>,
+    audit_logger: Arc<AuditLogger>,
 }
 
 impl LedgerHsmProvider {
     /// Create a new Ledger HSM provider
-    pub fn new(config: &LedgerConfig, audit_logger: Arc<dyn AuditLogger + Send + Sync>) -> Result<Self, HsmError> {
+    pub fn new(config: &LedgerConfig, audit_logger: Arc<AuditLogger>) -> Result<Self, HsmError> {
         Ok(Self {
             config: config.clone(),
             keys: tokio::sync::Mutex::new(HashMap::new()),

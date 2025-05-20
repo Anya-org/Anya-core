@@ -12,4 +12,4 @@ pub mod tpm;
 
 // Re-export only the BitcoinHsmProvider to avoid duplicate exports
 // This is the primary provider used in the application
-pub use self::bitcoin::BitcoinHsmProvider;
+pub use self::bitcoin::BitcoinHsmProvider; // [AIR-3][AIS-3][BPC-3][RES-3] AI labeling for compliance

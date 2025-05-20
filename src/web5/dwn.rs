@@ -2,9 +2,7 @@
 // Provides storage and messaging capabilities for Web5
 // [AIR-012] Operational Reliability and [AIP-002] Modular Architecture
 
-// Import std::error::Error for use in trait bounds
-use std::error::Error;
-
+// Removed: use std::error::Error;
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use std::time::{SystemTime, UNIX_EPOCH};
@@ -176,8 +174,6 @@ fn current_time() -> u64 {
 /// Manages Decentralized Web Nodes (DWNs) for Web5.
 #[derive(Debug)]
 pub struct DWNManager {
-    /// DWN endpoints to connect to
-    endpoints: Vec<String>,
     /// Records stored in DWNs
     records: Arc<Mutex<HashMap<String, DWNRecord>>>,
 }
@@ -298,9 +294,8 @@ pub struct DWNQueryPagination {
 
 impl DWNManager {
     /// Create a new DWN Manager
-    pub fn new(endpoints: Vec<String>) -> Self {
+    pub fn new() -> Self {
         Self {
-            endpoints,
             records: Arc::new(Mutex::new(HashMap::new())),
         }
     }
@@ -460,13 +455,6 @@ impl DWNManager {
     }
 }
 
-/// Generate a random ID
-fn generate_random_id() -> String {
-    // In a real implementation, this would generate a unique ID
-    // This is a simplified placeholder
-    "random_id".to_string()
-}
-
 #[cfg(test)]
 mod tests {
     // [AIR-3][AIS-3][BPC-3][RES-3] Error trait is already imported in the parent module
@@ -475,7 +463,7 @@ mod tests {
     
     #[test]
     fn test_store_record()  -> Result<(), Box<dyn std::error::Error>> {
-        let dwn_manager = DWNManager::new(vec!["https://dwn.tbddev.org".to_string()]);
+        let dwn_manager = DWNManager::new();
         
         let record = DWNRecord {
             id: "record1".to_string(),
@@ -502,7 +490,7 @@ mod tests {
     
     #[test]
     fn test_create_and_read_record()  -> Result<(), Box<dyn std::error::Error>> {
-        let dwn_manager = DWNManager::new(vec!["https://dwn.tbddev.org".to_string()]);
+        let dwn_manager = DWNManager::new();
         
         let data = serde_json::json!({
             "name": "Bob",
@@ -520,7 +508,7 @@ mod tests {
     
     #[test]
     fn test_update_record()  -> Result<(), Box<dyn std::error::Error>> {
-        let dwn_manager = DWNManager::new(vec!["https://dwn.tbddev.org".to_string()]);
+        let dwn_manager = DWNManager::new();
         
         let data = serde_json::json!({
             "name": "Charlie",
@@ -544,7 +532,7 @@ mod tests {
     
     #[test]
     fn test_delete_record()  -> Result<(), Box<dyn std::error::Error>> {
-        let dwn_manager = DWNManager::new(vec!["https://dwn.tbddev.org".to_string()]);
+        let dwn_manager = DWNManager::new();
         
         let data = serde_json::json!({
             "name": "Dave",

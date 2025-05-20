@@ -23,31 +23,6 @@ pub trait MLModel {
     fn evaluate(&self, test_data: &[u8]) -> AnyaResult<f64>;
 }
 
-// Define our own types for now to avoid external dependencies
-pub struct Array1<T> {
-    data: Vec<T>,
-    shape: (usize,)
-}
-
-impl<T: Clone> Array1<T> {
-    pub fn new(data: Vec<T>) -> Self {
-        let shape = (data.len(),);
-        Self { data, shape }
-    }
-}
-
-pub struct Array2<T> {
-    data: Vec<T>,
-    shape: (usize, usize)
-}
-
-impl<T: Clone> Array2<T> {
-    pub fn new(data: Vec<T>, rows: usize, cols: usize) -> Self {
-        let shape = (rows, cols);
-        Self { data, shape }
-    }
-}
-
 pub struct Device {}
 
 impl Device {
@@ -110,12 +85,12 @@ impl<T> RandomForestClassifier<T> {
         self
     }
     
-    pub fn fit(&mut self, _: &Array2<T>, _: &Array1<T>) -> bool {
+    pub fn fit(&mut self, _: &Vec<f64>, _: &Vec<f64>) -> bool {
         // In a real implementation, this would train the model
         true
     }
     
-    pub fn predict(&self, _: &Array1<T>) -> Vec<f64> {
+    pub fn predict(&self, _: &Vec<f64>) -> Vec<f64> {
         vec![0.0]
     }
 }
@@ -248,16 +223,16 @@ impl MLService {
     }
 
     /// Extract features from a proposal for ML processing
-    fn extract_features(&self, _proposal: &Proposal) -> AnyaResult<Array1<f64>> {
+    fn extract_features(&self, _proposal: &Proposal) -> AnyaResult<Vec<f64>> {
         // [AIR-3][AIS-3][BPC-3][RES-3] In a real implementation, this would extract relevant features from the proposal
         // This follows the Bitcoin Development Framework v2.5 standards for ML feature extraction
-        // Create a zero-filled vector of the expected dimension using Array1::new instead of zeros
+        // Create a zero-filled vector of the expected dimension
         let zeros = vec![0.0; self.features_dim];
-        Ok(Array1::new(zeros))
+        Ok(zeros)
     }
 
     /// Predict outcomes based on features
-    fn predict(&self, features: &Array1<f64>) -> AnyaResult<HashMap<String, f64>> {
+    fn predict(&self, features: &Vec<f64>) -> AnyaResult<HashMap<String, f64>> {
         // In a real implementation, this would use the actual model for predictions
         let mut predictions = HashMap::new();
         
@@ -274,11 +249,11 @@ impl MLService {
     }
 
     /// Calculate confidence for the prediction
-    fn calculate_confidence(&self, features: &Array1<f64>) -> f64 {
+    fn calculate_confidence(&self, features: &Vec<f64>) -> f64 {
         // In a real implementation, this would be based on model certainty
         // This is a placeholder implementation
-        let feature_sum: f64 = features.data.iter().sum();
-        let confidence = (0.5 + (feature_sum / (features.data.len() as f64 * 10.0))).min(0.99);
+        let feature_sum: f64 = features.iter().sum();
+        let confidence = (0.5 + (feature_sum / (features.len() as f64 * 10.0))).min(0.99);
         
         confidence
     }
@@ -329,7 +304,7 @@ impl MLService {
 
     /// Train the model with new data
     // [AIR-3][AIS-3][BPC-3][RES-3]
-    pub async fn train(&mut self, features: Array2<f64>, labels: Array1<f64>) -> AnyaResult<()> {
+    pub async fn train(&mut self, features: Vec<f64>, labels: Vec<f64>) -> AnyaResult<()> {
         // Properly handle mutex lock error by converting to AnyaError::ML
         let mut model = match self.model.lock() {
             Ok(guard) => guard,

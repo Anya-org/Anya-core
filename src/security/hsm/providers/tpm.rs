@@ -7,16 +7,15 @@
 // [AIR-3][AIS-3][BPC-3][RES-3] Import necessary dependencies for TPM HSM provider
 // This follows the Bitcoin Development Framework v2.5 standards for secure HSM implementation
 use std::sync::Arc;
-
-// External crates
-use async_trait::async_trait;
+use tokio::sync::Mutex;
 use uuid::Uuid;
-
-// [AIR-3][AIS-3][BPC-3][RES-3] Import HSM module types following BDF v2.5 standards
+use async_trait::async_trait;
+use std::collections::HashMap;
 use crate::security::hsm::config::TpmConfig;
 use crate::security::hsm::provider::{HsmProvider, KeyGenParams, KeyInfo, KeyPair, SigningAlgorithm};
 use crate::security::hsm::types::{HsmRequest, HsmResponse, HsmProviderStatus};
 use crate::security::hsm::error::HsmError;
+use crate::security::hsm::audit::AuditLogger;
 
 /// TPM HSM Provider for hardware-backed key security
 #[derive(Debug)]
@@ -24,14 +23,14 @@ pub struct TpmHsmProvider {
     /// Provider configuration
     config: TpmConfig,
     /// Keys stored in the TPM
-    keys: tokio::sync::Mutex<HashMap<String, KeyInfo>>,
+    keys: Mutex<HashMap<String, KeyInfo>>,
     /// Audit logger
-    audit_logger: Arc<dyn AuditLogger + Send + Sync>,
+    audit_logger: Arc<AuditLogger>,
 }
 
 impl TpmHsmProvider {
     /// Create a new TPM HSM provider
-    pub fn new(config: &TpmConfig, audit_logger: Arc<dyn AuditLogger + Send + Sync>) -> Result<Self, HsmError> {
+    pub fn new(config: &TpmConfig, audit_logger: Arc<AuditLogger>) -> Result<Self, HsmError> {
         Ok(Self {
             config: config.clone(),
             keys: tokio::sync::Mutex::new(HashMap::new()),
@@ -101,7 +100,7 @@ impl HsmProvider for TpmHsmProvider {
         Ok(())
     }
     
-    async fn execute_operation(&self, request: HsmRequest) -> Result<HsmResponse, HsmError> {
+    async fn execute_operation(&self, request: crate::security::hsm::provider::HsmRequest) -> Result<crate::security::hsm::provider::HsmResponse, HsmError> {
         // Just return an unsupported operation error for now
         let request_id = request.id.clone();
         Err(HsmError::UnsupportedOperation(format!(

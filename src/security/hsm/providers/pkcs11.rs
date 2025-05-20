@@ -7,16 +7,17 @@
 // [AIR-3][AIS-3][BPC-3][RES-3] Import necessary dependencies for PKCS#11 HSM provider
 // This follows the Bitcoin Development Framework v2.5 standards for secure HSM implementation
 use std::sync::Arc;
-
-// External crates
 use async_trait::async_trait;
-use uuid::Uuid;
+use tokio::sync::Mutex;
+use std::collections::HashMap;
 
 // [AIR-3][AIS-3][BPC-3][RES-3] Import HSM module types following BDF v2.5 standards
 use crate::security::hsm::config::Pkcs11Config;
 use crate::security::hsm::provider::{HsmProvider, KeyGenParams, KeyInfo, KeyPair, SigningAlgorithm};
 use crate::security::hsm::types::{HsmRequest, HsmResponse, HsmProviderStatus};
 use crate::security::hsm::error::HsmError;
+use uuid::Uuid;
+use crate::security::hsm::audit::AuditLogger;
 
 /// PKCS#11 HSM Provider for hardware security devices
 #[derive(Debug)]
@@ -24,14 +25,14 @@ pub struct Pkcs11HsmProvider {
     /// Provider configuration
     config: Pkcs11Config,
     /// Keys stored in the HSM
-    keys: tokio::sync::Mutex<HashMap<String, KeyInfo>>,
+    keys: Mutex<HashMap<String, KeyInfo>>,
     /// Audit logger
-    audit_logger: Arc<dyn AuditLogger + Send + Sync>,
+    audit_logger: Arc<AuditLogger>,
 }
 
 impl Pkcs11HsmProvider {
     /// Create a new PKCS#11 HSM provider
-    pub fn new(config: &Pkcs11Config, audit_logger: Arc<dyn AuditLogger + Send + Sync>) -> Result<Self, HsmError> {
+    pub fn new(config: &Pkcs11Config, audit_logger: Arc<AuditLogger>) -> Result<Self, HsmError> {
         Ok(Self {
             config: config.clone(),
             keys: tokio::sync::Mutex::new(HashMap::new()),

@@ -1,8 +1,8 @@
 // Security Manager Implementation for Anya Core HSM
 use std::sync::{Arc, Mutex, RwLock};
 use std::collections::HashMap;
-use std::error::Error;
 use std::fmt;
+use std::error::Error;
 
 /// Wrapper for Argon2 errors to implement std::error::Error
 #[derive(Debug)]

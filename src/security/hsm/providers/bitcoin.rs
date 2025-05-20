@@ -16,15 +16,14 @@ use uuid::Uuid;
 use bitcoin::{
     hashes::{sha256, Hash},
     secp256k1::{Message, PublicKey as SepcPublicKey, Secp256k1, SecretKey, Signature},
-    util::bip32::{ChildNumber, DerivationPath, ExtendedPrivKey, ExtendedPubKey},
-    Address, Network, PrivateKey, PublicKey,
+    util::bip32::{ChildNumber, ExtendedPrivKey, ExtendedPubKey},
+    Network,
 };
 
 use crate::security::hsm::config::BitcoinConfig;
 use crate::security::hsm::error::HsmError;
-use crate::security::hsm::provider::{HsmProvider, KeyGenParams, KeyInfo, KeyPair, EncryptionAlgorithm, KeyType, KeyUsage, SigningAlgorithm, EcCurve};
-use crate::security::hsm::types::{HsmRequest, HsmResponse, HsmOperation, HsmResponseStatus, HsmProviderStatus};
-use crate::security::hsm::audit::AuditLogger;
+use crate::security::hsm::provider::{HsmProvider, KeyGenParams, KeyInfo, KeyPair, KeyType, SigningAlgorithm};
+use crate::security::hsm::types::{HsmRequest, HsmResponse, HsmOperation, HsmProviderStatus};
 
 /// Bitcoin HSM Provider
 #[derive(Debug)]

@@ -29,11 +29,8 @@ pub struct DaoGovernance {
     legal_wrappers: LegalWrappers,
 }
 
+#[derive(Debug)]
 pub struct DaoConfig {
-    min_voting_period: u64,
-    max_voting_period: u64,
-    quorum_threshold: u64,
-    stake_minimum: u64,
 }
 
 pub struct Proposal {
@@ -202,7 +199,7 @@ impl DaoGovernance {
 
     pub fn vote(&mut self, voter_id: &str, proposal_id: u64, vote: bool) -> Result<()> {
         if let Some(voter) = self.voters.get(voter_id) {
-            if voter.stake < self.config.stake_minimum {
+            if voter.stake < 10 {
                 return Err(anyhow::anyhow!("Insufficient stake"));
             }
 
@@ -230,7 +227,7 @@ impl DaoGovernance {
     fn update_proposal_status(&mut self, proposal_id: u64) -> Result<()> {
         if let Some(proposal) = self.proposals.get_mut(&proposal_id) {
             let total_votes = proposal.yes_votes + proposal.no_votes;
-            let quorum_reached = total_votes >= self.config.quorum_threshold;
+            let quorum_reached = total_votes >= 100;
             let voting_period_ended = Utc::now() > proposal.end_time;
 
             if quorum_reached && voting_period_ended {
@@ -285,12 +282,7 @@ impl Default for DaoGovernance {
         Self {
             proposals: HashMap::new(),
             voters: HashMap::new(),
-            config: DaoConfig {
-                min_voting_period: 86400, // 1 day in seconds
-                max_voting_period: 604800, // 1 week in seconds
-                quorum_threshold: 100,
-                stake_minimum: 10,
-            },
+            config: DaoConfig {},
             cross_chain_bridge,
             security_audit,
             quadratic_voting_enabled: true,

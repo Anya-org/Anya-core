@@ -171,7 +171,7 @@ pub async fn initialize() -> Result<(), Box<dyn std::error::Error>> {
 #[cfg(feature = "hsm")]
 pub fn create_bitcoin_hsm_provider(base_provider: std::sync::Arc<dyn hsm::provider::HsmProvider>) -> hsm::providers::bitcoin::BitcoinHsmProvider {
     #[cfg(feature = "hsm")]
-    let config = hsm::providers::bitcoin::BitcoinHsmConfig {
+    let config = hsm::config::BitcoinConfig {
         base_provider,
         network: hsm::config::BitcoinNetworkType::Testnet, // Default to testnet for safety
         ..Default::default()

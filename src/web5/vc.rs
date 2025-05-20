@@ -3,11 +3,10 @@
 // [AIR-012] Operational Reliability and [AIP-002] Modular Architecture
 
 // Import std::error::Error for use in trait bounds
-use std::error::Error;
-
 use std::collections::HashMap;
 use serde::{Serialize, Deserialize};
 use crate::web5::identity::{Web5Result, Web5Error, DIDManager};
+use std::fmt::{Display, Formatter, Result as FmtResult};
 
 /// Verifiable Credential
 /// 
@@ -210,6 +209,25 @@ fn generate_uuid() -> String {
 fn current_iso_date() -> String {
     use chrono::Utc;
     Utc::now().to_rfc3339()
+}
+
+#[derive(Debug)]
+pub enum VCError {
+    Credential(String),
+    Serialization(String),
+    Signing(String),
+}
+
+impl Display for VCError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+        write!(f, "{:?}", self)
+    }
+}
+
+impl std::error::Error for VCError {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        None
+    }
 }
 
 #[cfg(test)]

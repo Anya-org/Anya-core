@@ -8,13 +8,11 @@ use tokio::time::sleep;
 use uuid::Uuid;
 use rand::prelude::*;
 use chrono::Utc;
-use secp256k1::{Secp256k1, SecretKey, PublicKey};
-use bitcoin::{Network, Address};
-use bitcoin::psbt::Psbt;
+use bitcoin::secp256k1::{Secp256k1, SecretKey, PublicKey};
+use bitcoin::{Network, Address, Script, ScriptBuf, psbt::Psbt};
 use sha2::{Sha256, Digest};
 
 use crate::security::hsm::config::SimulatorConfig;
-// [AIR-3][AIS-3][BPC-3][RES-3] Import HSM module types following BDF v2.5 standards
 use crate::security::hsm::provider::{
     HsmProvider, HsmProviderStatus, KeyType, KeyInfo, KeyGenParams,
     KeyPair, KeyUsage, SigningAlgorithm,
@@ -31,7 +29,7 @@ pub struct SimulatorHsmProvider {
     key_data: Mutex<HashMap<String, Vec<u8>>>,
     rng: Mutex<ThreadRng>,
     network: Network,
-    secp: Secp256k1<secp256k1::All>,
+    secp: Secp256k1<bitcoin::secp256k1::All>,
     // Simulated hardware state
     state: Mutex<HardwareState>,
 }
@@ -173,7 +171,7 @@ impl SimulatorHsmProvider {
     }
     
     /// Sign Bitcoin transaction for testnet
-    async fn sign_bitcoin_transaction(&self, _key_id: &str, tx: &mut Psbt) -> Result<(), HsmError> {
+    async fn sign_bitcoin_transaction(&self, key_id: &str, tx: &mut Psbt) -> Result<(), HsmError> {
         self.simulate_conditions().await?;
         
         let key_data = self.key_data.lock().await;
@@ -232,7 +230,7 @@ impl HsmProvider for SimulatorHsmProvider {
         Ok(())
     }
     
-    async fn generate_key(&self, _params: KeyGenParams) -> Result<KeyPair, HsmError> {
+    async fn generate_key(&self, params: KeyGenParams) -> Result<KeyPair, HsmError> {
         self.simulate_conditions().await?;
         
         let key_id = params.id.unwrap_or_else(|| self.generate_key_id());
@@ -271,7 +269,7 @@ impl HsmProvider for SimulatorHsmProvider {
         })
     }
     
-    async fn sign(&self, _key_id: &str, _algorithm: SigningAlgorithm, _data: &[u8]) -> Result<Vec<u8>, HsmError> {
+    async fn sign(&self, key_id: &str, algorithm: SigningAlgorithm, data: &[u8]) -> Result<Vec<u8>, HsmError> {
         self.simulate_conditions().await?;
         
         // Check if key exists and has signing capability
@@ -299,7 +297,7 @@ impl HsmProvider for SimulatorHsmProvider {
                 let message_hash = hasher.finalize();
                 
                 // Sign the hash
-                let message = secp256k1::Message::from_slice(&message_hash)
+                let message = bitcoin::secp256k1::Message::from_slice(&message_hash)
                     .map_err(|e| HsmError::SigningError(format!("Invalid message hash: {}", e)))?;
                     
                 let signature = self.secp.sign_ecdsa(&message, &secret_key);
@@ -309,7 +307,7 @@ impl HsmProvider for SimulatorHsmProvider {
         }
     }
     
-    async fn verify(&self, _key_id: &str, _algorithm: SigningAlgorithm, _data: &[u8], _signature: &[u8]) -> Result<bool, HsmError> {
+    async fn verify(&self, key_id: &str, algorithm: SigningAlgorithm, data: &[u8], signature: &[u8]) -> Result<bool, HsmError> {
         self.simulate_conditions().await?;
         
         // Check if key exists and has verify capability
@@ -337,11 +335,11 @@ impl HsmProvider for SimulatorHsmProvider {
                             .map_err(|e| HsmError::VerificationError(format!("Invalid public key data: {}", e)))?;
                             
                         // Parse the signature
-                        let sig = secp256k1::ecdsa::Signature::from_der(signature)
+                        let sig = bitcoin::secp256k1::ecdsa::Signature::from_der(signature)
                             .map_err(|e| HsmError::VerificationError(format!("Invalid signature format: {}", e)))?;
                             
                         // Verify
-                        let message = secp256k1::Message::from_slice(&message_hash)
+                        let message = bitcoin::secp256k1::Message::from_slice(&message_hash)
                             .map_err(|e| HsmError::VerificationError(format!("Invalid message hash: {}", e)))?;
                             
                         match self.secp.verify_ecdsa(&message, &sig, &public_key) {
@@ -356,7 +354,7 @@ impl HsmProvider for SimulatorHsmProvider {
         }
     }
     
-    async fn export_public_key(&self, _key_id: &str) -> Result<Vec<u8>, HsmError> {
+    async fn export_public_key(&self, key_id: &str) -> Result<Vec<u8>, HsmError> {
         self.simulate_conditions().await?;
         
         // Check if key exists
@@ -386,7 +384,7 @@ impl HsmProvider for SimulatorHsmProvider {
         Ok(keys.values().cloned().collect())
     }
     
-    async fn delete_key(&self, _key_id: &str) -> Result<(), HsmError> {
+    async fn delete_key(&self, key_id: &str) -> Result<(), HsmError> {
         self.simulate_conditions().await?;
         
         let mut keys = self.keys.lock().await;

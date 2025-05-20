@@ -1,15 +1,16 @@
 use std::collections::HashMap;
-// [AIR-3][AIS-3][BPC-3][RES-3] Import necessary dependencies for hardware HSM provider
+
+
 // This follows the Bitcoin Development Framework v2.5 standards for secure HSM implementation
 use async_trait::async_trait;
 use uuid::Uuid;
 
 // Types from the HSM module
-use crate::security::hsm::config::{HardwareConfig, HardwareDeviceType};
-// [AIR-3][AIS-3][BPC-3][RES-3] Import HSM module types following BDF v2.5 standards
-use crate::security::hsm::provider::{HsmProvider, KeyGenParams, KeyInfo, KeyPair, SigningAlgorithm};
-use crate::security::hsm::types::{HsmRequest, HsmResponse, HsmOperation, HsmProviderStatus};
-use crate::security::hsm::error::HsmError;
+use tracing::debug;
+use bitcoin::Network;
+use crate::security::hsm::error::{HsmError, HsmProviderStatus, HsmResponse, HsmOperation};
+use crate::security::hsm::types::{HsmRequest, KeyGenParams};
+use crate::security::hsm::providers::{KeyInfo, KeyPair, KeyType, SigningAlgorithm};
 
 /// Hardware connection state
 #[derive(Debug, Clone, PartialEq)]
@@ -211,7 +212,7 @@ impl HardwareHsmProvider {
     }
     
     /// Sign Bitcoin transaction for testnet using hardware device
-    async fn sign_bitcoin_transaction(&self, _key_id: &str, tx: &mut Psbt) -> Result<(), HsmError> {
+    async fn sign_bitcoin_transaction(&self, key_id: &str, tx: &mut Psbt) -> Result<(), HsmError> {
         self.ensure_authenticated().await?;
         
         // Get key info
@@ -251,7 +252,7 @@ impl HsmProvider for HardwareHsmProvider {
         Ok(())
     }
     
-    async fn generate_key(&self, _params: KeyGenParams) -> Result<KeyPair, HsmError> {
+    async fn generate_key(&self, params: KeyGenParams) -> Result<KeyPair, HsmError> {
         match &params.key_type {
             KeyType::Ec { curve } if *curve == crate::security::hsm::provider::EcCurve::Secp256k1 => {
                 self.generate_bitcoin_key(&params).await
@@ -330,7 +331,7 @@ impl HsmProvider for HardwareHsmProvider {
         Ok(keys.values().cloned().collect())
     }
     
-    async fn delete_key(&self, _key_id: &str) -> Result<(), HsmError> {
+    async fn delete_key(&self, key_id: &str) -> Result<(), HsmError> {
         self.ensure_authenticated().await?;
         
         let mut keys = self.keys.lock().await;
