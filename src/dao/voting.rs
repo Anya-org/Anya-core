@@ -1,6 +1,6 @@
 /// Quadratic Voting Implementation [AIS-3][BPC-3][DAO-3]
 
-use std::error::Error;
+// [AIR-3][AIS-3][BPC-3][RES-3] Removed unused import: std::error::Error
 use std::collections::HashMap;
 use serde::{Serialize, Deserialize};
 use thiserror::Error;
