@@ -1,19 +1,15 @@
-use std::error::Error;
 use crate::security::hsm::error::{HsmError, AuditEventType, AuditEventResult, AuditEventSeverity, HsmAuditEvent};
 use serde::{Serialize, Deserialize, Serializer, Deserializer};
 use std::sync::Arc;
 use tokio::sync::Mutex;
-use tracing::{debug, info, error, warn};
+use tracing::{debug, warn};
 use chrono::{DateTime, Utc};
-use std::path::PathBuf;
-use std::fs::{self, OpenOptions, File};
-use std::io::{Write, /* Read, */ Seek, SeekFrom}; // Commented out Read as it's not being used
+use std::fs::{OpenOptions, File};
+use std::io::{Write, Seek, SeekFrom};
 use async_trait::async_trait;
 use std::collections::HashMap;
-use uuid::Uuid;
-use std::path::Path;
 
-// [AIR-3][AIS-3][BPC-3][RES-3] No need to re-import these types as they're already imported above
+// [AIR-3][AIS-3][BPC-3][RES-3] Imports cleaned up for BDF v2.5 compliance
 
 /// Audit logger configuration for HSM operations
 #[derive(Debug, Clone, Serialize, Deserialize)]

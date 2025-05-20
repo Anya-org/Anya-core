@@ -6,7 +6,13 @@
 // [AIR-3][AIS-3][BPC-3][RES-3] Import necessary dependencies for HSM module
 // This follows the Bitcoin Development Framework v2.5 standards for secure HSM implementation
 use std::sync::Arc;
-use async_trait::async_trait;
+use std::error::Error;
+use crate::security::hsm::types::{
+    MerkleProof, SignatureAlgorithm, KeyInfo, SignParams, VerifyParams, EncryptionAlgorithm, EncryptParams, DecryptParams, GetKeyParams, DeleteKeyParams, RotateKeyParams, HsmRequest, KeyType, GenerateKeyParams
+};
+use crate::security::hsm::providers::simulator::SimulatorHsmProvider;
+use crate::security::hsm::providers::cloud::CloudHsmProvider;
+use crate::security::hsm::providers::hardware::HardwareHsmProvider;
 use serde::{Serialize, Deserialize};
 use bitcoin::ScriptBuf;
 use uuid::Uuid;
@@ -49,7 +55,7 @@ pub mod security;
 pub mod types;
 
 // Re-export types for easier access
-pub use types::*;
+pub use types::{HsmAuditEvent, HsmProviderStatus};
 pub use types::HsmOperation;
 
 // Re-export security manager for easier access

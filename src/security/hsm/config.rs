@@ -1,7 +1,5 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use std::error::Error;
-use std::path::PathBuf;
 use std::time::Duration;
 
 use crate::security::hsm::audit::AuditLoggerConfig;

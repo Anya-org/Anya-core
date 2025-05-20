@@ -42,11 +42,11 @@ use async_trait::async_trait;
 // This follows the Bitcoin Development Framework v2.5 standards for secure HSM implementation
 use bitcoin::{
     hashes::{Hash as BitcoinHash},
-    secp256k1::{
+    bitcoin::secp256k1::{
         Message, PublicKey, Secp256k1, SecretKey,
         XOnlyPublicKey,
     },
-    Network, Psbt, bip32::{DerivationPath, Xpriv, Xpub, Fingerprint},
+    Network, Psbt,
 };
 
 // [AIR-3][AIS-3][BPC-3][RES-3] Import secure random number generation
@@ -56,20 +56,20 @@ use serde::Serialize;
 use crate::{
     security::hsm::{
         error::HsmError,
-        provider::{HsmProvider, KeyGenParams, SigningAlgorithm, HsmRequest, HsmResponse, HsmResponseStatus},
-        types::{KeyPair, KeyInfo, KeyType, KeyUsage, HsmProviderStatus, HsmKeyPath},
+        provider::{HsmProvider, KeyGenParams, SigningAlgorithm, HsmRequest, HsmResponse},
     },
     util::mem::SecureString,
 };
 
 // Import from parent modules
 use crate::security::hsm::config::SoftHsmConfig;
-use crate::security::hsm::types::{KeyType, KeyInfo, KeyPair, HsmOperation, HsmRequest, HsmResponse};
-use crate::security::hsm::types::{HsmResponseStatus, HsmProviderStatus, SignatureAlgorithm, HsmKeyPath};
-use crate::security::hsm::error::{HsmError, HsmAuditEvent};
-use crate::security::hsm::audit::{AuditLogger, AuditEventType, AuditEventResult, AuditEventSeverity};
-// [AIR-3][AIS-3][BPC-3][RES-3] Import encryption algorithm while avoiding duplicate SigningAlgorithm
-use crate::security::hsm::provider::{HsmProvider, EncryptionAlgorithm};
+use crate::security::hsm::audit::AuditLogger;
+use crate::security::hsm::types::{KeyType, HsmOperation, KeyUsage, EncryptionAlgorithm, EcCurve, HsmProviderStatus, SignatureAlgorithm};
+use crate::security::hsm::provider::{KeyPair, KeyInfo};
+use crate::security::hsm::{AuditEventType, AuditEventResult};
+use chrono::{DateTime, Utc};
+use bitcoin::key::Keypair;
+use sha2::{Sha256, Sha384};
 
 use tokio::sync::Mutex;
 
@@ -136,13 +136,13 @@ pub struct SoftwareHsmProvider {
     /// Configuration for the software HSM
     config: SoftHsmConfig,
     /// In-memory key storage with secure memory protection
-    keys: AsyncMutex<HashMap<String, SecureKey>>,
+    keys: Mutex<HashMap<String, SecureKey>>,
     /// Secp256k1 context for cryptographic operations
-    secp: Secp256k1<secp256k1::All>,
+    secp: Secp256k1<bitcoin::secp256k1::All>,
     /// Network this HSM is operating on (mainnet, testnet, etc.)
     network: Network,
     /// Audit logger for security events
-    audit_logger: Arc<dyn AuditLogger + Send + Sync>,
+    audit_logger: Arc<AuditLogger>,
 }
 
 impl SoftwareHsmProvider {
@@ -150,7 +150,7 @@ impl SoftwareHsmProvider {
     pub fn new(
         config: SoftHsmConfig,
         network: Network,
-        audit_logger: Arc<dyn AuditLogger + Send + Sync>,
+        audit_logger: Arc<AuditLogger>,
     ) -> Result<Self, HsmError> {
         // Initialize the secp256k1 context with all capabilities
         let secp = Secp256k1::new();
@@ -225,13 +225,12 @@ impl SoftwareHsmProvider {
         keys.insert(key_id, secure_key);
 
         // Log the key storage event
-        self.audit_logger.log(
-            AuditEventType::KeyStored,
-            &key_info.hsm_id,
-            Some(&key_id),
-            &format!("Stored new {} key", key_type),
+        self.audit_logger.log_event(
+            AuditEventType::KeyGeneration,
             AuditEventResult::Success,
-        )?;
+            AuditEventSeverity::Info,
+            &format!("Stored new {:?} key", key_type),
+        ).await?;
 
         Ok(key_info)
     }
@@ -246,7 +245,7 @@ impl SoftwareHsmProvider {
         let secret_bytes = secret_key.secret_bytes();
         
         // Generate the corresponding public key
-        let public_key = secp256k1::PublicKey::from_secret_key(&self.secp, &secret_key);
+        let public_key = bitcoin::secp256k1::PublicKey::from_secret_key(&self.secp, &secret_key);
         
         // Determine if this is a Taproot key based on parameters
         let is_taproot = match params.key_type {
@@ -271,13 +270,12 @@ impl SoftwareHsmProvider {
         zeroize::Zeroize::zeroize(&mut secret_bytes.0);
         
         // Log the key generation
-        self.audit_logger.log(
+        self.audit_logger.log_event(
             AuditEventType::KeyGenerated,
-            &self.config.hsm_id,
-            None,
-            &format!("Generated new {} Bitcoin key", if is_taproot { "Taproot" } else { "SegWit" }),
             AuditEventResult::Success,
-        )?;
+            AuditEventSeverity::Info,
+            &format!("Generated new {} Bitcoin key", if is_taproot { "Taproot" } else { "SegWit" }),
+        ).await?;
         
         Ok((secure_secret, public_key_bytes))
     }
@@ -296,13 +294,13 @@ impl SoftwareHsmProvider {
         // Get the secret key with zeroization on drop
         let secret_key = {
             let secret_bytes = hex::decode(&key.key_data.as_str())
-                .map_err(|e| HsmError::CryptoError(format!("Invalid key data: {}", e)))?;
+                .map_err(|e| HsmError::SigningError(format!("Invalid key data: {}", e)))?;
             SecretKey::from_slice(&secret_bytes)
-                .map_err(|e| HsmError::CryptoError(format!("Invalid secret key: {}", e)))?
+                .map_err(|e| HsmError::SigningError(format!("Invalid secret key: {}", e)))?
         };
         
         // Get the public key
-        let public_key = secp256k1::PublicKey::from_secret_key(&self.secp, &secret_key);
+        let public_key = bitcoin::secp256k1::PublicKey::from_secret_key(&self.secp, &secret_key);
         
         // Sign each input in the PSBT
         for (i, input) in psbt.inputs.iter_mut().enumerate() {
@@ -317,28 +315,27 @@ impl SoftwareHsmProvider {
                 (wit_utxo.script_pubkey.clone(), wit_utxo.value)
             } else if let Some(non_wit_utxo) = &input.non_witness_utxo {
                 // Legacy or P2SH-wrapped SegWit
-                let prevout = input.previous_output;
-                if prevout.vout as usize >= non_wit_utxo.output.len() {
-                    return Err(HsmError::CryptoError("Invalid previous output index".into()));
-                }
+                let prevout_index = psbt.unsigned_tx.input[i].previous_output.vout as usize;
+                let prevout = &input.non_witness_utxo.as_ref().unwrap().output[prevout_index];
                 (non_wit_utxo.output[prevout.vout as usize].script_pubkey.clone(), 
                  non_wit_utxo.output[prevout.vout as usize].value)
             } else {
-                return Err(HsmError::CryptoError("No UTXO provided for input".into()));
+                return Err(HsmError::SigningError("No UTXO provided for input".into()));
             };
             
             // Sign based on script type
             if script_code.is_p2pkh() {
                 // Legacy P2PKH
-                let sighash = psbt.unsigned_tx.signature_hash(
+                let mut sighash_cache = bitcoin::sighash::SighashCache::new(&psbt.unsigned_tx);
+                let sighash = sighash_cache.legacy_signature_hash(
                     i,
                     &script_code,
                     value,
                     bitcoin::sighash::EcdsaSighashType::All,
                 )?;
                 
-                let message = Message::from_slice(&sighash[..])
-                    .map_err(|e| HsmError::CryptoError(format!("Invalid message: {}", e)))?;
+                let message = Message::from_digest_slice(&sighash[..])
+                    .map_err(|e| HsmError::SigningError(format!("Invalid message: {}", e)))?;
                 
                 let signature = self.secp.sign_ecdsa(&message, &secret_key);
                 
@@ -350,7 +347,8 @@ impl SoftwareHsmProvider {
                 
             } else if script_code.is_v0_p2wpkh() {
                 // Native SegWit P2WPKH
-                let sighash = psbt.unsigned_tx.signature_hash(
+                let mut sighash_cache = bitcoin::sighash::SighashCache::new(&psbt.unsigned_tx);
+                let sighash = sighash_cache.segwitv0_signature_hash(
                     i,
                     &bitcoin::blockdata::script::Builder::new()
                         .push_slice(&bitcoin::PubkeyHash::hash(&public_key.serialize()))
@@ -359,8 +357,8 @@ impl SoftwareHsmProvider {
                     bitcoin::sighash::EcdsaSighashType::All,
                 )?;
                 
-                let message = Message::from_slice(&sighash[..])
-                    .map_err(|e| HsmError::CryptoError(format!("Invalid message: {}", e)))?;
+                let message = Message::from_digest_slice(&sighash[..])
+                    .map_err(|e| HsmError::SigningError(format!("Invalid message hash: {}", e)))?;
                 
                 let signature = self.secp.sign_ecdsa(&message, &secret_key);
                 
@@ -373,29 +371,19 @@ impl SoftwareHsmProvider {
                 
             } else if script_code.is_v1_p2tr() {
                 // Taproot (BIP 341/342)
-                let sighash = psbt.unsigned_tx.signature_hash_taproot(
+                // For Taproot, use the witness_utxo for each input to construct the prevouts
+                let prevouts: Vec<_> = psbt.inputs.iter()
+                    .filter_map(|i| i.witness_utxo.clone())
+                    .collect();
+                let mut sighash_cache = bitcoin::sighash::SighashCache::new(&psbt.unsigned_tx);
+                let sighash = sighash_cache.taproot_signature_hash(
                     i,
-                    &bitcoin::sighash::Prevouts::All(&psbt.inputs.iter()
-                        .map(|i| {
-                            i.witness_utxo.as_ref()
-                                .map(|o| (o.script_pubkey.clone(), o.value))
-                                .or_else(|| i.non_witness_utxo.as_ref()
-                                    .map(|tx| {
-                                        let out = &tx.output[input.previous_output.vout as usize];
-                                        (out.script_pubkey.clone(), out.value)
-                                    })
-                                )
-                                .expect("Could not get previous output for sighash")
-                        })
-                        .collect::<Vec<_>>()
-                    ),
-                    None,  // No taproot script path
-                    None,  // No tapleaf hash
-                    bitcoin::sighash::TapSighashType::Default,
+                    &prevouts,
+                    bitcoin::sighash::SighashType::All,
                 )?;
                 
-                let message = Message::from_slice(&sighash[..])
-                    .map_err(|e| HsmError::CryptoError(format!("Invalid message: {}", e)))?;
+                let message = Message::from_digest_slice(&sighash[..])
+                    .map_err(|e| HsmError::SigningError(format!("Invalid message hash: {}", e)))?;
                 
                 // Create a keypair for BIP340 signing
                 let keypair = Keypair::from_secret_key(&self.secp, &secret_key);
@@ -412,36 +400,23 @@ impl SoftwareHsmProvider {
                 ]));
                 
             } else {
-                return Err(HsmError::CryptoError("Unsupported script type".into()));
+                return Err(HsmError::SigningError("Unsupported script type".into()));
             }
         }
         
         // Log the signing operation
-        self.audit_logger.log(
-            AuditEventType::TransactionSigned,
-            &key.info.hsm_id,
-            Some(key_id),
-            &format!("Signed transaction with {} inputs", psbt.inputs.len()),
+        self.audit_logger.log_event(
+            AuditEventType::Sign,
             AuditEventResult::Success,
-        )?;
+            AuditEventSeverity::Info,
+            &format!("Signed transaction with {} inputs", psbt.inputs.len()),
+        ).await?;
         
         Ok(())
     }
-}
 
-#[async_trait]
-impl HsmProvider for SoftwareHsmProvider {
-    async fn initialize(&self) -> Result<(), HsmError> {
-        // For software HSM, initialization just ensures the token directory exists
-        std::fs::create_dir_all(&self.config.token_dir).map_err(|e| {
-            HsmError::InitializationError(format!("Failed to create token directory: {}", e))
-        })?;
-
-        tracing::info!("Initialized software HSM for Bitcoin testnet operations");
-        Ok(())
-    }
-
-    async fn generate_key(&self, params: KeyGenParams) -> Result<(crate::security::hsm::types::KeyPair, KeyInfo), HsmError> {
+    /// Generate a new key pair
+    async fn generate_key(&self, params: KeyGenParams) -> Result<(KeyPair, KeyInfo), HsmError> {
         use crate::security::hsm::provider::EcCurve;
         use crate::security::hsm::types::{KeyPair, KeyType};
         use chrono::Utc;
@@ -453,8 +428,7 @@ impl HsmProvider for SoftwareHsmProvider {
         let (secret, public_key) = match params.key_type {
             KeyType::Ec(EcCurve::Secp256k1) => {
                 // Generate a new secp256k1 key pair
-                let secp = Secp256k1::new();
-                let (secret_key, public_key) = secp.generate_keypair(&mut OsRng);
+                let (secret_key, public_key) = self.secp.generate_keypair(&mut OsRng);
                 
                 // Convert to secure storage format
                 let secret_bytes = secret_key.secret_bytes();
@@ -467,14 +441,14 @@ impl HsmProvider for SoftwareHsmProvider {
         
         // Create key info with all required fields
         let key_info = KeyInfo {
-            name: key_id.clone(),
+            id: key_id.clone(),
+            label: Some(key_id.clone()),
             key_type: params.key_type,
-            hsm_id: self.config.hsm_id.clone(),
+            extractable: false,
+            usages: vec![KeyUsage::Sign, KeyUsage::Verify],
             created_at: Utc::now(),
-            last_used: None,
-            public_key: Some(hex::encode(&public_key)),
-            version: 1,
-            exportable: false, // Default to non-exportable for security
+            expires_at: None,
+            attributes: HashMap::new(),
         };
         
         // Store the key securely
@@ -486,24 +460,12 @@ impl HsmProvider for SoftwareHsmProvider {
             *params.key_usage.first().unwrap_or(&KeyUsage::Sign),
         )?;
         
-        // The key is already stored via store_key, no need to store it again
-        // The keys are stored in the SecureKey struct within store_key
-        
-        // Log the key generation
-        self.audit_logger.log(
-            AuditEventType::KeyGenerated,
-            &self.config.hsm_id,
-            Some(&key_id),
-            &format!("Generated new key: {}", key_id),
-            AuditEventResult::Success,
-        )?;
-        
         // Create and return both the key pair and key info
         let key_pair = KeyPair {
             id: key_id.clone(),
             key_type: params.key_type,
             public_key: public_key.clone(),
-            private_key_handle: key_id,
+            private_key_handle: key_id.clone(),
         };
         
         Ok((key_pair, key_info))
@@ -512,7 +474,7 @@ impl HsmProvider for SoftwareHsmProvider {
     async fn sign(
         &self,
         key_id: &str,
-        _algorithm: SigningAlgorithm,  // Marked as unused for now
+        algorithm: SigningAlgorithm,  // Now used
         data: &[u8],
     ) -> Result<Vec<u8>, HsmError> {
         // Check if key exists and has signing capability
@@ -539,7 +501,7 @@ impl HsmProvider for SoftwareHsmProvider {
                 let message_hash = hasher.finalize();
 
                 // Sign the hash
-                let message = secp256k1::Message::from_slice(&message_hash)
+                let message = bitcoin::secp256k1::Message::from_digest_slice(&message_hash)
                     .map_err(|e| HsmError::SigningError(format!("Invalid message hash: {}", e)))?;
 
                 let signature = self.secp.sign_ecdsa(&message, &secret_key);
@@ -558,7 +520,7 @@ impl HsmProvider for SoftwareHsmProvider {
 
                 // Sign the hash (truncate to 32 bytes for secp256k1)
                 let truncated_hash = &message_hash[..32];
-                let message = secp256k1::Message::from_slice(truncated_hash)
+                let message = bitcoin::secp256k1::Message::from_digest_slice(truncated_hash)
                     .map_err(|e| HsmError::SigningError(format!("Invalid message hash: {}", e)))?;
 
                 let signature = self.secp.sign_ecdsa(&message, &secret_key);
@@ -603,7 +565,7 @@ impl HsmProvider for SoftwareHsmProvider {
                         })?;
 
                         // Parse the signature
-                        let sig = secp256k1::ecdsa::Signature::from_der(signature).map_err(|e| {
+                        let sig = bitcoin::secp256k1::ecdsa::Signature::from_der(signature).map_err(|e| {
                             HsmError::VerificationError(format!(
                                 "Invalid signature format: {}",
                                 e
@@ -611,7 +573,7 @@ impl HsmProvider for SoftwareHsmProvider {
                         })?;
 
                         // Verify the signature
-                        let message = Message::from_slice(&message_hash).map_err(|e| {
+                        let message = Message::from_digest_slice(&message_hash).map_err(|e| {
                             HsmError::VerificationError(format!("Invalid message hash: {}", e))
                         })?;
 
@@ -631,7 +593,7 @@ impl HsmProvider for SoftwareHsmProvider {
         }
     }
 
-    async fn export_public_key(&self, _key_id: &str) -> Result<Vec<u8>, HsmError> {
+    async fn export_public_key(&self, key_id: &str) -> Result<Vec<u8>, HsmError> {
         // Check if key exists
         let keys = self.keys.lock().await;
         let key_info = keys
