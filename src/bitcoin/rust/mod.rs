@@ -72,7 +72,9 @@ impl BitcoinInterface for RustBitcoinImplementation {
         Ok(transaction.compute_txid().to_string())
     }
 
-    async fn get_block_header(&self, hash: &str) -> BitcoinResult<BlockHeader> {
+    // [AIR-3][AIS-3][BPC-3][RES-3] Prefix unused parameter with underscore
+    // This follows the Bitcoin Development Framework v2.5 standards for clean code
+    async fn get_block_header(&self, _hash: &str) -> BitcoinResult<BlockHeader> {
         Err(BitcoinError::BlockNotFound)
     }
 
@@ -87,7 +89,9 @@ impl BitcoinInterface for RustBitcoinImplementation {
         Ok(true)
     }
 
-    async fn get_balance(&self, address: &Address) -> BitcoinResult<u64> {
+    // [AIR-3][AIS-3][BPC-3][RES-3] Prefix unused parameter with underscore
+    // This follows the Bitcoin Development Framework v2.5 standards for clean code
+    async fn get_balance(&self, _address: &Address) -> BitcoinResult<u64> {
         Ok(0)
     }
 

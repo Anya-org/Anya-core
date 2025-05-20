@@ -1,4 +1,4 @@
-use std::error::Error;
+// [AIR-3][AIS-3][BPC-3][RES-3] Removed unused import: std::error::Error
 // Migrated from OPSource to anya-core
 // This file was automatically migrated as part of the Rust-only implementation
 // Original file: C:\Users\bmokoka\Downloads\OPSource\src\bitcoin\error.rs

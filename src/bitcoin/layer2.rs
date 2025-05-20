@@ -1,5 +1,5 @@
-use std::error::Error;
-use bitcoin::{Transaction, Network};
+// [AIR-3][AIS-3][BPC-3][RES-3] Removed unused import: std::error::Error
+use bitcoin::{Transaction};
 use crate::bitcoin::error::BitcoinResult;
 
 /// Layer2Protocol trait defines the interface for Bitcoin Layer 2 protocols

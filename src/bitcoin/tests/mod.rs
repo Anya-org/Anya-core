@@ -2,13 +2,15 @@
 //!
 //! This module contains tests for the Bitcoin functionality.
 
+// [AIR-3][AIS-3][BPC-3][RES-3] Import only what's needed for tests
 use std::error::Error;
-use log::{info, warn, error};
-use bitcoin::{Network, Transaction};
-use bitcoin::consensus::encode::deserialize;
-use std::process::Command;
-use std::sync::Arc;
-use url;
+use log::{info, error};
+// Empty bitcoin import removed as it's not used
+// use bitcoin::{};
+
+
+
+
 
 /// Runs all Bitcoin protocol tests to verify BPC-3 compliance
 pub fn run_all() -> Result<(), Box<dyn Error>> {
