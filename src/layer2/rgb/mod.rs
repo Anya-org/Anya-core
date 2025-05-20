@@ -9,13 +9,14 @@ use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use uuid::Uuid;
 use chrono;
-use async_trait::async_trait;
-use bitcoin::hashes::{sha256, Hash, HashEngine};
-use bitcoin::hashes::hex; // Import hex module instead of direct ToHex
+// [AIR-3][AIS-3][BPC-3][RES-3] Removed unused import: async_trait::async_trait
+use bitcoin::hashes::{Hash, HashEngine};
 use bitcoin::secp256k1::Secp256k1;
 // [AIR-3][AIS-3][BPC-3][RES-3] Use bitcoin's hashing functionality
 // This follows the Bitcoin Development Framework v2.5 standards for cryptographic operations
 use bitcoin::hashes::sha256;
+// [AIR-3][AIS-3][BPC-3][RES-3] Import hex for encoding/decoding
+use hex;
 use serde::{Serialize, Deserialize};
 use thiserror::Error;
 
@@ -116,7 +117,8 @@ impl ContractManager {
         
         // [AIR-3][AIS-3][BPC-3][RES-3] Convert to hex string with RGB prefix
         // This follows the Bitcoin Development Framework v2.5 standards for asset ID generation
-        let hex_string = hex::encode(hash.as_ref());
+        // [AIR-3][AIS-3][BPC-3][RES-3] Specify type for hex::encode to resolve ambiguity
+        let hex_string = hex::encode::<&[u8]>(hash.as_ref());
         let asset_id = format!("rgb1{}", hex_string);
         
         Ok(asset_id)
@@ -265,7 +267,8 @@ pub fn generate_asset_id(issuer_address: &str, total_supply: u64, precision: u8,
     
     // [AIR-3][AIS-3][BPC-3][RES-3] Convert to hex string with RGB prefix
     // This follows the Bitcoin Development Framework v2.5 standards for asset ID generation
-    let hex_string = hex::encode(hash.as_ref());
+    // [AIR-3][AIS-3][BPC-3][RES-3] Specify type for hex::encode to resolve ambiguity
+    let hex_string = hex::encode::<&[u8]>(hash.as_ref());
     let asset_id = format!("rgb1{}", hex_string);
     
     Ok(asset_id)

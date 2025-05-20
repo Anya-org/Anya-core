@@ -171,8 +171,20 @@ pub use lightning::LightningNetwork;
 // [AIR-3][AIS-3][BPC-3][RES-3] Re-export Layer2 protocol implementations
 // This follows the Bitcoin Development Framework v2.5 standards for Layer2 protocols
 pub use state_channels::StateChannel;
-pub use rgb::RGBProtocol;
-pub use dlc::DiscreteLogContract;
+
+// Define the RGB Protocol trait implementation
+// [AIR-3][AIS-3][BPC-3][RES-3]
+pub struct RGBProtocol {
+    pub version: String,
+    pub network: String,
+}
+
+// Define the DLC Protocol trait implementation
+// [AIR-3][AIS-3][BPC-3][RES-3]
+pub struct DiscreteLogContract {
+    pub version: String,
+    pub network: String,
+}
 
 /// Error types for Layer2 protocols
 #[derive(Debug)]

@@ -13,7 +13,9 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use serde::{Deserialize, Serialize};
 use bitcoin::hashes::{Hash, HashEngine};
 use bitcoin::hashes::sha256;
-use bitcoin::secp256k1::{Secp256k1, SecretKey, PublicKey, Message};
+// [AIR-3][AIS-3][BPC-3][RES-3] Removed unused import: PublicKey
+// [AIR-3][AIS-3][BPC-3][RES-3] Removed unused PublicKey import
+use bitcoin::secp256k1::{Secp256k1, SecretKey, Message};
 use thiserror::Error;
 use uuid::Uuid;
 
@@ -116,7 +118,7 @@ impl ContractManager {
     /// [AIR-3][AIS-3][BPC-3][RES-3]
     pub async fn create_contract(
         &self,
-        settlement_address: &str,
+        _settlement_address: &str,
         collateral: u64,
         oracle_info: &OracleEvent,
         payout_curve: &PayoutCurve,
@@ -154,8 +156,10 @@ impl ContractManager {
     /// [AIR-3][AIS-3][BPC-3][RES-3]
     pub fn sign_contract(&self, contract: &DlcContract, private_key: &SecretKey) -> Result<DlcSignature, DlcError> {
         // Create a signature for the contract
+        // [AIR-3][AIS-3][BPC-3][RES-3] Use from_digest_slice instead of deprecated from_slice
+        // This follows the Bitcoin Development Framework v2.5 standards for cryptographic operations
         let contract_hash = self.hash_contract(contract)?;
-        let message = Message::from_slice(&contract_hash).map_err(|_| DlcError::ContractError("Invalid message format".to_string()))?;
+        let message = Message::from_digest_slice(&contract_hash).map_err(|_| DlcError::ContractError("Invalid message format".to_string()))?;
         
         let signature = self.secp.sign_ecdsa(&message, private_key);
         
@@ -412,7 +416,10 @@ impl Default for DlcConfig {
 /// [AIR-3][AIS-3][BPC-3][RES-3] Oracle Client for non-interactive oracle patterns
 /// This follows the Bitcoin Development Framework v2.5 standards for oracle interactions
 pub struct OracleClient {
-    oracle_pubkey: String,
+    /// Oracle public key in hex format
+    pub oracle_pubkey: String,
+    /// Map of event IDs to attestations
+    pub attestations: HashMap<String, NonInteractiveOracleAttestation>,
 }
 
 impl OracleClient {
@@ -421,6 +428,7 @@ impl OracleClient {
     pub fn new(oracle_pubkey: &str) -> Self {
         Self {
             oracle_pubkey: oracle_pubkey.to_string(),
+            attestations: HashMap::new(),
         }
     }
     
@@ -442,7 +450,7 @@ impl OracleClient {
     
     /// [AIR-3][AIS-3][BPC-3][RES-3] Verify an oracle attestation
     /// This follows the Bitcoin Development Framework v2.5 standards for oracle attestations
-    pub fn verify_attestation(&self, attestation: &OracleAttestation) -> DlcResult<bool> {
+    pub fn verify_attestation(&self, _attestation: &OracleAttestation) -> DlcResult<bool> {
         // In a real implementation, this would verify the signature using the oracle's public key
         // For now, we'll just return true
         Ok(true)
@@ -542,7 +550,7 @@ impl DlcManager {
             .ok_or_else(|| DlcError::ContractError("Payout not found for outcome".to_string()))?;
         
         // Create execution record
-        let execution = DlcExecution {
+        let _execution = DlcExecution {
             id: format!("exec_{}", uuid::Uuid::new_v4()),
             contract_id: contract.id.clone(),
             outcome: outcome.clone(),
@@ -563,12 +571,8 @@ impl DlcManager {
     }
 }
 
-/// Non-interactive Oracle Client implementation
+/// Oracle attestation for non-interactive verification
 /// [AIR-3][AIS-3][BPC-3][RES-3]
-pub struct OracleClient {
-    pubkey: bitcoin::secp256k1::PublicKey,
-    attestations: HashMap<String, NonInteractiveOracleAttestation>,
-}
 
 /// Oracle attestation for non-interactive verification
 /// [AIR-3][AIS-3][BPC-3][RES-3]
@@ -580,74 +584,8 @@ pub struct NonInteractiveOracleAttestation {
     pub r_point: bitcoin::secp256k1::PublicKey,
 }
 
+/// [AIR-3][AIS-3][BPC-3][RES-3] Additional methods for OracleClient
 impl OracleClient {
-    /// Create a new non-interactive oracle client
-    /// [AIR-3][AIS-3][BPC-3][RES-3]
-    /// [AIR-3][AIS-3][BPC-3][RES-3]
-    pub fn new(pubkey_hex: &str) -> Self {
-        // Remove any 0x prefix if present
-        let clean_hex = pubkey_hex.trim_start_matches("0x");
-        
-        // Default to a secp256k1 context for key generation
-        let secp = Secp256k1::new();
-        
-        // Create a dummy key if parsing fails (for development only)
-        // In production, this would return a Result instead
-        let pubkey = if !clean_hex.is_empty() {
-            // Try to decode the hex string to bytes
-            match hex::decode(clean_hex) {
-                Ok(bytes) => {
-                    // Try to parse the public key from bytes
-                    match bitcoin::secp256k1::PublicKey::from_slice(&bytes) {
-                        Ok(key) => key,
-                        Err(_) => {
-                            // Generate a dummy key for development
-                            // [AIR-3][AIS-3][BPC-3][RES-3] Non-interactive oracle pattern
-                            let dummy_secret = SecretKey::from_slice(&[0x42; 32]).unwrap();
-                            PublicKey::from_secret_key(&secp, &dummy_secret)
-                        }
-                    }
-                },
-                Err(_) => {
-                    // Generate a dummy key for development
-                    // [AIR-3][AIS-3][BPC-3][RES-3] Non-interactive oracle pattern
-                    let dummy_secret = SecretKey::from_slice(&[0x42; 32]).unwrap();
-                    PublicKey::from_secret_key(&secp, &dummy_secret)
-                }
-            }
-        } else {
-            // Generate a dummy key for development
-            // [AIR-3][AIS-3][BPC-3][RES-3] Non-interactive oracle pattern
-            let dummy_secret = SecretKey::from_slice(&[0x42; 32]).unwrap();
-            PublicKey::from_secret_key(&secp, &dummy_secret)
-        };
-        
-        Self {
-            pubkey,
-            attestations: HashMap::new(),
-        }
-    }
-    
-    /// Get event info using non-interactive pattern
-    /// [AIR-3][AIS-3][BPC-3][RES-3]
-    pub async fn get_event_info(&self, event_id: &str) -> DlcResult<OracleEvent> {
-        // In a non-interactive oracle pattern, we don't make HTTP requests
-        // Instead, we use locally stored attestations or pre-committed oracle data
-        
-        // Check if we have an attestation for this event
-        if let Some(attestation) = self.attestations.get(event_id) {
-            return Ok(OracleEvent {
-                id: attestation.event_id.clone(),
-                event_type: OracleEventType::PriceFeed, // Default type
-                outcome_domain: vec![attestation.outcome.clone()],
-                start_time: 0, // Not relevant for non-interactive pattern
-                end_time: 0,   // Not relevant for non-interactive pattern
-            });
-        }
-        
-        // [AIR-3][AIS-3][BPC-3][RES-3] Return error if attestation not found
-        Err(DlcError::OracleError(format!("Event {} not found", event_id)))
-    }
     
     /// Get attestation for an event
     /// [AIR-3][AIS-3][BPC-3][RES-3]
