@@ -11,6 +11,9 @@ use crate::security::hsm::provider::HsmProviderType;
 /// [AIR-3][AIS-3][AIT-3][AIP-3][RES-3]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct HsmConfig {
+    /// Whether HSM functionality is enabled
+    #[serde(default = "default_true")]
+    pub enabled: bool,
     /// General HSM settings
     pub general: GeneralConfig,
 
@@ -61,6 +64,7 @@ pub struct HsmConfig {
 impl Default for HsmConfig {
     fn default() -> Self {
         Self {
+            enabled: true,
             general: GeneralConfig::default(),
             provider_type: HsmProviderType::SoftwareKeyStore,
             audit_enabled: true,
@@ -81,6 +85,7 @@ impl HsmConfig {
     /// Creates a new configuration for development environment
     pub fn development() -> Self {
         Self {
+            enabled: true,
             general: GeneralConfig {
                 enabled: true,
                 log_level: LogLevel::Debug,
@@ -104,6 +109,7 @@ impl HsmConfig {
     /// Creates a new configuration for production environment
     pub fn production() -> Self {
         Self {
+            enabled: true,
             general: GeneralConfig {
                 enabled: true,
                 log_level: LogLevel::Info,

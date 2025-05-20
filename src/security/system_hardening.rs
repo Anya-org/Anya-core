@@ -1,4 +1,4 @@
-use std::error::Error;
+// [AIR-3][AIS-3][BPC-3][RES-3] Removed unused import: std::error::Error
 use tracing::error;
 // AIE-001: System Hardening Implementation
 // Priority: HIGH - Security configurations with in-memory state
@@ -73,7 +73,7 @@ impl SystemHardening {
         configs.insert(name.to_string(), config);
         
         // Update input counter and check for auto-save
-        self.record_input_and_check_save();
+let _ =         self.record_input_and_check_save();
         
         Ok(())
     }
@@ -123,7 +123,7 @@ impl SystemHardening {
         config.last_modified = Instant::now();
         
         // Record this input and potentially auto-save
-        self.record_input_and_check_save();
+let _ =         self.record_input_and_check_save();
         
         Ok(config.status.clone())
     }
@@ -143,7 +143,7 @@ impl SystemHardening {
         config.last_modified = Instant::now();
         
         // Auto-save if needed
-        self.record_input_and_check_save();
+let _ =         self.record_input_and_check_save();
         
         Ok(())
     }

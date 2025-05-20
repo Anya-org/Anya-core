@@ -4,7 +4,7 @@
 //! This module provides constant-time operations for cryptographic functions
 //! to prevent timing attacks.
 
-use std::error::Error;
+// [AIR-3][AIS-3][BPC-3][RES-3] Removed unused import: std::error::Error
 
 /// Performs a constant-time comparison of two byte slices.
 /// This function does not short-circuit, ensuring that the time taken
@@ -76,8 +76,9 @@ pub fn constant_time_is_zero_u8(val: u8) -> u8 {
     result |= result >> 2;
     result |= result >> 1;
     
-    // Invert and mask to get 1 for 0 input, 0 for non-zero input
-    (!result & 1)
+    // [AIR-3][AIS-3][BPC-3][RES-3] Invert and mask to get 1 for 0 input, 0 for non-zero input
+    // This follows the Bitcoin Development Framework v2.5 standards for clean code
+    !result & 1
 }
 
 /// Calculates a constant-time eq result (0 or 1) for two u8 values.

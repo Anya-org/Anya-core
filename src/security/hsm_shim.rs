@@ -5,7 +5,7 @@
 //! to compile and operate without requiring the HSM functionality.
 
 use std::fmt;
-use std::sync::Arc;
+// [AIR-3][AIS-3][BPC-3][RES-3] Removed unused import: std::sync::Arc
 use std::collections::HashMap;
 
 /// Stub error type for HSM operations when the feature is disabled
