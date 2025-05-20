@@ -1,6 +1,6 @@
 // Core metrics implementation using Prometheus
 use std::collections::HashMap;
-use crate::AnyaResult;
+// [AIR-3][AIS-3][BPC-3][RES-3] Removed unused import: crate::AnyaResult
 
 /// Simple prometheus metrics implementation
 pub struct PrometheusMetrics {

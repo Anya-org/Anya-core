@@ -6,10 +6,12 @@
 use std::error::Error;
 // [AIR-3][AIS-3][BPC-3][RES-3] Import necessary dependencies for ML module
 // This follows the Bitcoin Development Framework v2.5 standards for ML operations
-use crate::AnyaResult;
-use crate::ml::service::{MLModel, MLService, Proposal, ProposalMetrics, RiskMetrics};
+use crate::{AnyaResult, AnyaError};
+// Re-export these types to make them public
+pub use crate::dao::{Proposal, ProposalMetrics, RiskMetrics};
+// Import MLModel trait from service module
+pub use crate::ml::service::MLModel;
 use std::collections::HashMap;
-use std::error::Error;
 use std::sync::{Arc, Mutex};
 use std::path::Path;
 
@@ -133,17 +135,9 @@ impl MLSystem {
     }
 }
 
-/// Trait for ML models
-pub trait MLModel: Send + Sync {
-    /// Train the model with new data
-    fn train(&mut self, features: &[f64], labels: &[f64]) -> AnyaResult<()>;
-    
-    /// Make predictions with the model
-    fn predict(&self, features: &[f64]) -> AnyaResult<Vec<f64>>;
-    
-    /// Get health metrics for the model
-    fn get_health_metrics(&self) -> HashMap<String, f64>;
-}
+/// Trait for ML models (re-exported from service module)
+/// This is just a placeholder to avoid duplicate definitions
+pub trait MLModelPlaceholder {}
 
 /// ML model input
 #[derive(Debug, Clone)]
@@ -202,6 +196,7 @@ impl FederatedLearningManager {
     /// Remove a node from the federation
     pub fn remove_node(&mut self, node_id: &str)  -> Result<(), Box<dyn Error>> {
         self.nodes.retain(|n| n.id != node_id);
+        Ok(())
     }
     
     /// List all nodes in the federation

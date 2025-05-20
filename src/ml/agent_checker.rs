@@ -1,4 +1,4 @@
-use std::error::Error;
+// [AIR-3][AIS-3][BPC-3][RES-3] Removed unused import: std::error::Error
 // AIP-002: Agent Checker System Implementation
 // Priority: CRITICAL - ML-based system analyzer with in-memory auto-save
 

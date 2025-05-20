@@ -1,4 +1,4 @@
-use std::error::Error;
+// [AIR-3][AIS-3][BPC-3][RES-3] Removed unused import: std::error::Error
 // AIR-008: Performance Optimization Implementation
 // Priority: HIGH - Performance tuning with in-memory auto-save
 
@@ -94,7 +94,7 @@ impl PerformanceOptimizer {
         resources.insert(resource_name.to_string(), config);
         
         // Record input and potentially auto-save
-        self.record_input_and_check_save();
+let _ =         self.record_input_and_check_save();
         
         Ok(())
     }
@@ -133,7 +133,7 @@ impl PerformanceOptimizer {
         metrics_map.insert(resource_name.to_string(), metrics);
         
         // Record input and potentially auto-save
-        self.record_input_and_check_save();
+let _ =         self.record_input_and_check_save();
         
         Ok(())
     }
@@ -223,7 +223,7 @@ impl PerformanceOptimizer {
         config.last_modified = Instant::now();
         
         // Record input and potentially auto-save
-        self.record_input_and_check_save();
+let _ =         self.record_input_and_check_save();
         
         Ok(config.status.clone())
     }

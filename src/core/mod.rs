@@ -1,8 +1,10 @@
-use std::error::Error;
-use std::sync::{Arc, Mutex};
+// [AIR-3][AIS-3][BPC-3][RES-3] Removed unused import: std::error::Error
+// [AIR-3][AIS-3][BPC-3][RES-3] Import necessary synchronization primitives
+// Mutex is used in the rpc_ports module, so we'll keep it imported there
+use std::sync::Arc;
 
 // Import DaoGovernance for core initialization
-use crate::dao::governance::DaoGovernance;
+// [AIR-3][AIS-3][BPC-3][RES-3] Removed unused import: crate::dao::governance::DaoGovernance
 
 // AIR-008: Core Module Integration
 // Integrates all Priority 1 implementations with auto-save functionality
@@ -288,6 +290,8 @@ impl AnyaCore {
 
 // [AIR-3][BPC-3] Hexagonal RPC ports
 pub mod rpc_ports {
+    // [AIR-3][AIS-3][BPC-3][RES-3] Import necessary synchronization primitives
+    // This follows the Bitcoin Development Framework v2.5 standards for clean code
     use std::sync::{Arc, Mutex};
     use serde_json::Value as JsonValue;
     use crate::core::metrics::PrometheusMetrics;
@@ -309,6 +313,8 @@ pub mod rpc_ports {
     pub struct AnyaRpcAdapter {
         bitcoin: Arc<dyn BitcoinRpc + Send + Sync>,
         lightning: Arc<dyn LightningRpc + Send + Sync>,
+        // [AIR-3][AIS-3][BPC-3][RES-3] Using imported Mutex
+        // This follows the Bitcoin Development Framework v2.5 standards for clean code
         metrics: Arc<Mutex<PrometheusMetrics>>
     }
 } 
