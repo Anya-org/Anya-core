@@ -1,9 +1,12 @@
 # Anya Core Installation System
+# [AIR-3][AIS-3][BPC-3][RES-3]
+Date: 2025-05-20
 
-This directory contains the Anya Core installation system scripts. This system has been designed to provide a unified installation experience with automatic hardware detection, appropriate feature flag configuration, and support for both fresh installations and upgrades.
+This directory contains the Anya Core installation system scripts. This system has been designed to provide a unified installation experience with automatic hardware detection, appropriate feature flag configuration, and support for both fresh installations and upgrades. The system follows the Bitcoin Development Framework v2.5 standards and implements hexagonal architecture principles.
 
 ## System Components
 
+- **unified_install_framework.sh** - Comprehensive installation framework following BDF v2.5 standards
 - **install.sh** - Main entry point for the installation system (at project root level)
 - **auto_install.sh** - Automated installation with hardware detection and system analysis
 - **linux_install.sh** - Core installation script for Linux systems
@@ -46,23 +49,26 @@ The installation system automatically detects available hardware and configures 
 ## Example Usage
 
 ```bash
+# Using the unified installation framework
+sudo ./scripts/install/unified_install_framework.sh
+
 # Basic installation
 sudo ./scripts/install.sh
 
 # Minimal installation for low-resource environments
-sudo ./scripts/install.sh --type=minimal
+sudo ./scripts/install/unified_install_framework.sh --type=minimal
 
 # Full installation with strict security
-sudo ./scripts/install.sh --type=full --hardening=strict
+sudo ./scripts/install/unified_install_framework.sh --type=full --hardening=strict
 
 # Upgrade an existing installation
-sudo ./scripts/install.sh
+sudo ./scripts/install/unified_install_framework.sh
 
 # Force clean installation (removes existing installation)
-sudo ./scripts/install.sh --force-clean
+sudo ./scripts/install/unified_install_framework.sh --force-clean
 
 # Run tests after installation
-sudo ./scripts/install.sh --run-tests
+sudo ./scripts/install/unified_install_framework.sh --run-tests
 ```
 
 ## Utilities
@@ -100,14 +106,38 @@ Installation logs are stored in:
 ./logs/installation/
 ```
 
-## Architecture
+## Hexagonal Architecture
 
-The installation system follows a modular design:
+The installation system follows the hexagonal architecture principles as defined in the Bitcoin Development Framework v2.5:
 
-1. **Entry Point**: `install.sh` provides a clean, unified entry point
-2. **System Analysis**: `auto_install.sh` analyzes the system and configures appropriately
-3. **Core Installation**: `linux_install.sh` handles the core installation process
-4. **Service Configuration**: `systemd_config.sh` configures the system service
-5. **Utilities**: Common functions are centralized in `utils/install_common.sh`
+1. **Core Domain**:
+   - `unified_install_framework.sh` provides the comprehensive installation framework
+   - `linux_install.sh` handles the core installation process
 
-This design ensures consistent behavior across different environments and simplifies maintenance.
+2. **Ports**:
+   - Installation interface through command-line arguments
+   - System analysis interface for hardware detection
+   - Configuration interface for feature flags
+
+3. **Adapters**:
+   - Network adapters for different Bitcoin networks (mainnet, testnet, regtest)
+   - Hardware adapters for different security devices (TPM, HSM, hardware wallets)
+   - System adapters for different environments (physical, virtualized)
+
+4. **Utilities**:
+   - Common functions are centralized in `utils/install_common.sh`
+   - Script management utilities in `scripts/maintenance/script_manager.sh`
+
+This hexagonal architecture design ensures:
+- Clear separation of concerns
+- Consistent behavior across different environments
+- Simplified maintenance and extensibility
+- Compliance with Bitcoin Development Framework v2.5 standards
+
+## AI Labeling Compliance
+
+All installation scripts include proper AI labeling according to the Bitcoin Development Framework v2.5 standards:
+- [AIR-3] - AI Responsibility
+- [AIS-3] - AI Security
+- [BPC-3] - Bitcoin Protocol Compliance
+- [RES-3] - Resource Efficiency
