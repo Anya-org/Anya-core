@@ -1,7 +1,9 @@
-use std::error::Error;
-// Web5 Module for Anya Core
+// [AIR-3][AIS-3][BPC-3][RES-3] Web5 Module for Anya Core
 // Implements Web5 specification with focus on decentralized identity and protocols
 // [AIR-012] Operational Reliability and [AIP-002] Modular Architecture
+
+// Import std::error::Error for use in trait bounds
+use std::error::Error;
 
 // Re-export modules
 pub mod identity;
@@ -129,10 +131,12 @@ pub struct Web5Status {
 
 #[cfg(test)]
 mod tests {
+    // [AIR-3][AIS-3][BPC-3][RES-3] Import Error trait for test functions
+    use std::error::Error;
     use super::*;
     
     #[test]
-    fn test_web5_manager_creation()  -> Result<(), Box<dyn Error>> {
+    fn test_web5_manager_creation()  -> Result<(), Box<dyn std::error::Error>> {
         let config = Web5Config::default();
         let manager = Web5Manager::new(config)?;
         
@@ -142,7 +146,7 @@ mod tests {
     }
     
     #[test]
-    fn test_web5_status()  -> Result<(), Box<dyn Error>> {
+    fn test_web5_status()  -> Result<(), Box<dyn std::error::Error>> {
         let config = Web5Config::default();
         let manager = Web5Manager::new(config)?;
         

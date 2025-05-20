@@ -1,7 +1,9 @@
-use std::error::Error;
-// Verifiable Credentials Implementation
+// [AIR-3][AIS-3][BPC-3][RES-3] Verifiable Credentials Implementation
 // Provides W3C Verifiable Credentials functionality for Web5
 // [AIR-012] Operational Reliability and [AIP-002] Modular Architecture
+
+// Import std::error::Error for use in trait bounds
+use std::error::Error;
 
 use std::collections::HashMap;
 use serde::{Serialize, Deserialize};
@@ -23,9 +25,9 @@ pub struct VerifiableCredential {
     /// Credential issuer
     pub issuer: String,
     /// Issuance date
-    pub issuanceDate: String,
+    pub issuance_date: String,
     /// Credential subject
-    pub credentialSubject: CredentialSubject,
+    pub credential_subject: CredentialSubject,
     /// Credential proof
     pub proof: Option<CredentialProof>,
 }
@@ -53,9 +55,9 @@ pub struct CredentialProof {
     /// Proof creation date
     pub created: String,
     /// Verification method
-    pub verificationMethod: String,
+    pub verification_method: String,
     /// Proof purpose
-    pub proofPurpose: String,
+    pub proof_purpose: String,
     /// Signature value
     pub jws: String,
 }
@@ -108,8 +110,8 @@ impl CredentialManager {
                 credential_type.to_string(),
             ],
             issuer: issuer_did.to_string(),
-            issuanceDate: current_iso_date(),
-            credentialSubject: credential_subject,
+            issuance_date: current_iso_date(),
+            credential_subject: credential_subject,
             proof: None,
         };
         
@@ -178,8 +180,8 @@ impl CredentialManager {
         let proof = CredentialProof {
             proof_type: "Ed25519Signature2020".to_string(),
             created: current_iso_date(),
-            verificationMethod: format!("{}#keys-1", issuer_did),
-            proofPurpose: "assertionMethod".to_string(),
+            verification_method: format!("{}#keys-1", issuer_did),
+            proof_purpose: "assertionMethod".to_string(),
             jws: hex::encode(signature),
         };
         
@@ -212,11 +214,12 @@ fn current_iso_date() -> String {
 
 #[cfg(test)]
 mod tests {
+    // [AIR-3][AIS-3][BPC-3][RES-3] Error trait is already imported in the parent module
     use super::*;
     use crate::web5::identity::DIDManager;
     
     #[test]
-    fn test_issue_credential()  -> Result<(), Box<dyn Error>> {
+    fn test_issue_credential()  -> Result<(), Box<dyn std::error::Error>> {
         let did_manager = DIDManager::new("ion");
         let mut credential_manager = CredentialManager::new(did_manager);
         
@@ -237,7 +240,7 @@ mod tests {
         
         // Verify basic properties
         assert_eq!(credential.issuer, issuer_did);
-        assert_eq!(credential.credentialSubject.id, subject_did);
+        assert_eq!(credential.credential_subject.id, subject_did);
         assert!(credential.credential_type.contains(&"ExampleCredential".to_string()));
         assert!(credential.proof.is_some());
         

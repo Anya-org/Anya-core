@@ -1,14 +1,17 @@
-use std::error::Error;
-// Decentralized Web Node (DWN) Implementation
+// [AIR-3][AIS-3][BPC-3][RES-3] Decentralized Web Node (DWN) Implementation
 // Provides storage and messaging capabilities for Web5
 // [AIR-012] Operational Reliability and [AIP-002] Modular Architecture
+
+// Import std::error::Error for use in trait bounds
+use std::error::Error;
 
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use std::time::{SystemTime, UNIX_EPOCH};
 use serde::{Serialize, Deserialize};
 use crate::web5::{Web5Error, Web5Result};
-use crate::web5::identity::{Web5Result as IdentityWeb5Result, Web5Error as IdentityWeb5Error, DID};
+// [AIR-3][AIS-3][BPC-3][RES-3] Removed unused imports: DID, Web5Error as IdentityWeb5Error, Web5Result as IdentityWeb5Result
+// [AIR-3][AIS-3][BPC-3][RES-3] Removed unused identity imports
 
 /// DWN configuration
 #[derive(Clone, Debug)]
@@ -346,7 +349,9 @@ impl DWNManager {
     pub fn update_record(&self, id: &str, data: serde_json::Value) -> Web5Result<()> {
         let mut storage = self.records.lock()
             .map_err(|e| Web5Error::Storage(format!("Failed to acquire lock: {}", e)))?;
-        if let Some(mut record) = storage.get_mut(id) {
+        // [AIR-3][AIS-3][BPC-3][RES-3] Remove unnecessary mut keyword
+        // This follows the Bitcoin Development Framework v2.5 standards for clean code
+        if let Some(record) = storage.get_mut(id) {
             record.data = data;
             record.metadata.insert("updated".to_string(), current_time().to_string());
             Ok(())
@@ -464,10 +469,12 @@ fn generate_random_id() -> String {
 
 #[cfg(test)]
 mod tests {
+    // [AIR-3][AIS-3][BPC-3][RES-3] Error trait is already imported in the parent module
     use super::*;
+    use crate::web5::Web5Result;
     
     #[test]
-    fn test_store_record()  -> Result<(), Box<dyn Error>> {
+    fn test_store_record()  -> Result<(), Box<dyn std::error::Error>> {
         let dwn_manager = DWNManager::new(vec!["https://dwn.tbddev.org".to_string()]);
         
         let record = DWNRecord {
@@ -494,7 +501,7 @@ mod tests {
     }
     
     #[test]
-    fn test_create_and_read_record()  -> Result<(), Box<dyn Error>> {
+    fn test_create_and_read_record()  -> Result<(), Box<dyn std::error::Error>> {
         let dwn_manager = DWNManager::new(vec!["https://dwn.tbddev.org".to_string()]);
         
         let data = serde_json::json!({
@@ -512,7 +519,7 @@ mod tests {
     }
     
     #[test]
-    fn test_update_record()  -> Result<(), Box<dyn Error>> {
+    fn test_update_record()  -> Result<(), Box<dyn std::error::Error>> {
         let dwn_manager = DWNManager::new(vec!["https://dwn.tbddev.org".to_string()]);
         
         let data = serde_json::json!({
@@ -536,7 +543,7 @@ mod tests {
     }
     
     #[test]
-    fn test_delete_record()  -> Result<(), Box<dyn Error>> {
+    fn test_delete_record()  -> Result<(), Box<dyn std::error::Error>> {
         let dwn_manager = DWNManager::new(vec!["https://dwn.tbddev.org".to_string()]);
         
         let data = serde_json::json!({
