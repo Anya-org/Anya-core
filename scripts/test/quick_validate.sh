@@ -1,4 +1,5 @@
 #!/bin/bash
+# [AIR-3][AIS-3][BPC-3][RES-3]
 # Quick validation of Anya Core Installation System
 
 set -euo pipefail

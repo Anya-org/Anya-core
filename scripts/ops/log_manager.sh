@@ -1,4 +1,5 @@
 #!/bin/bash
+# [AIR-3][AIS-3][BPC-3][RES-3]
 
 # Log management script for Anya operations
 # Handles log rotation, backup, and deprecation based on requirements

@@ -110,6 +110,32 @@ The test system follows the hexagonal architecture principles as defined in the 
    - Tests for hardware-specific adapters
    - Tests for network-specific adapters
 
+## Hexagonal Architecture Implementation
+
+```text
+                      +----------------+
+                      |  Test Core     |
+                      +-------+--------+
+                              |
+                      +-------v--------+
+                      |  Test Adapters |
+                      +-------+--------+
+                              |
++----------------+    +-------v--------+    +----------------+
+|   Test Drivers <----+  Test Runner   +----> Test Reports   |
+| (CLI, CI/CD)   |    +-------+--------+    | (JSON, HTML)   |
++----------------+            |             +----------------+
+                      +-------v--------+
+                      |   Test        |
+                      |   Repositories|
+                      +-------+--------+
+                              |
+                      +-------v--------+
+                      |  Test Data    |
+                      |  Sources      |
+                      +----------------+
+```
+
 ## AI Labeling Compliance
 
 All test scripts include proper AI labeling according to the Bitcoin Development Framework v2.5 standards:

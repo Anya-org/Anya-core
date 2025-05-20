@@ -1,4 +1,5 @@
 #!/bin/bash
+# [AIR-3][AIS-3][BPC-3][RES-3]
 #
 # Server Setup Script for Anya Core
 # This script sets up the required services on the server

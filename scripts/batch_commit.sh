@@ -1,4 +1,5 @@
 #!/bin/bash
+# [AIR-3][AIS-3][BPC-3][RES-3]
 # batch_commit.sh
 #
 # Batch commit script for Anya Core ecosystem

@@ -1,4 +1,5 @@
 #!/bin/bash
+# [AIR-3][AIS-3][BPC-3][RES-3]
 # [AIR-3][AIS-3][AIT-3]
 # Anya Core AI Label Enforcement Script
 # This script checks and enforces the proper AI labeling across the codebase

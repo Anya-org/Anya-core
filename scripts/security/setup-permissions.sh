@@ -1,4 +1,5 @@
 #!/bin/bash
+# [AIR-3][AIS-3][BPC-3][RES-3]
 # Setup permissions for security scripts
 # [AIR-2][AIS-2]
 

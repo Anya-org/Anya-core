@@ -1,5 +1,7 @@
 # Anya Core Installation System
+
 # [AIR-3][AIS-3][BPC-3][RES-3]
+
 Date: 2025-05-20
 
 This directory contains the Anya Core installation system scripts. This system has been designed to provide a unified installation experience with automatic hardware detection, appropriate feature flag configuration, and support for both fresh installations and upgrades. The system follows the Bitcoin Development Framework v2.5 standards and implements hexagonal architecture principles.
@@ -129,6 +131,7 @@ The installation system follows the hexagonal architecture principles as defined
    - Script management utilities in `scripts/maintenance/script_manager.sh`
 
 This hexagonal architecture design ensures:
+
 - Clear separation of concerns
 - Consistent behavior across different environments
 - Simplified maintenance and extensibility
@@ -137,6 +140,7 @@ This hexagonal architecture design ensures:
 ## AI Labeling Compliance
 
 All installation scripts include proper AI labeling according to the Bitcoin Development Framework v2.5 standards:
+
 - [AIR-3] - AI Responsibility
 - [AIS-3] - AI Security
 - [BPC-3] - Bitcoin Protocol Compliance

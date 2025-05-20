@@ -1,4 +1,5 @@
 #!/bin/bash
+# [AIR-3][AIS-3][BPC-3][RES-3]
 
 # Commit cycle script for Anya project
 # Usage: ./commit_cycle.sh <commit_message>

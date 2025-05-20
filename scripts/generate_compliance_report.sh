@@ -1,4 +1,5 @@
 #!/bin/bash
+# [AIR-3][AIS-3][BPC-3][RES-3]
 # [AIR-3][AIS-3][AIT-3][BPC-3]
 # Anya Core Compliance Report Generator
 # This script analyzes the codebase for BDF v2.5 compliance and AI labeling

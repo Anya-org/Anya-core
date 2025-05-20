@@ -1,4 +1,5 @@
 #!/bin/bash
+# [AIR-3][AIS-3][BPC-3][RES-3]
 
 # Simple Documentation Link Checker
 # This script checks for broken markdown links in the documentation

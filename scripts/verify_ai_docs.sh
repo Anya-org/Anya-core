@@ -1,4 +1,5 @@
 #!/bin/bash
+# [AIR-3][AIS-3][BPC-3][RES-3]
 
 # Verify AI Documentation Links Script
 # This script checks for broken links in the AI documentation

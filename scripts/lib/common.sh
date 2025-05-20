@@ -1,4 +1,5 @@
 #!/bin/bash
+# [AIR-3][AIS-3][BPC-3][RES-3]
 # Common utilities and standards for Anya project
 # Following Bitcoin Core build and script standards
 

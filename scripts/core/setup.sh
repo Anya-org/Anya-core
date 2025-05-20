@@ -1,67 +1,100 @@
-#!/bin/bash
+#!/usr/bin/env bash
+# [AIR-3][AIS-3][BPC-3][RES-3]
 
-# Setup script for Anya Core
+set -euo pipefail
 
-# Source common utilities
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-# shellcheck source=../common/utils.sh
-source "$SCRIPT_DIR/common/utils.sh"
+# Setup script for Anya Core project
 
-# Initialize core-specific variables
-CORE_FEATURES=(
-    "bitcoin_support"
-    "lightning_support"
-    "dlc_support"
-    "kademlia"
-    "ml_logic"
-    "web5_integration"
-    "dao_governance"
-)
+CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/anya-core"
+CONFIG_FILE="$CONFIG_DIR/config"
+LOG_FILE="$CONFIG_DIR/setup.log"
 
-setup_core() {
-    log "Setting up Anya Core..."
-    
-    # Check system requirements
-    check_system_requirements 20
-    
-    # Load environment
-    load_env "$(get_project_root)/.env"
-    
-    # Initialize core configuration
-    if [ ! -f "$CORE_CONFIG_FILE" ]; then
-        log "Initializing core configuration..."
-        
-        # Prompt for user role if not in CI
-        if ! is_ci; then
-            select USER_ROLE in "developer" "user" "owner"; do
-                case $USER_ROLE in
-                    developer|user|owner) break;;
-                    *) log "Invalid selection. Please try again.";;
-                esac
-            done
-            
-            # Save core configuration
-            save_config "$CORE_CONFIG_FILE" \
-                "USER_ROLE=$USER_ROLE" \
-                "SETUP_DATE=$(date +%Y-%m-%d)"
-        fi
-    fi
-    
-    # Install core dependencies
-    log "Installing core dependencies..."
-    run_cargo build --workspace
-    
-    # Initialize core features
-    log "Initializing core features..."
-    for feature in "${CORE_FEATURES[@]}"; do
-        log "Setting up $feature..."
-        run_cargo test --package anya-core --lib "$feature" || log "Warning: $feature setup incomplete"
-    done
-    
-    log "Anya Core setup completed successfully"
+# Ensure config directory exists
+mkdir -p "$CONFIG_DIR"
+
+# Function to log messages
+log() {
+    local DATE_FORMAT="+%Y-%m-%d %H:%M:%S"
+    echo "[$(date "$DATE_FORMAT")] $*" | tee -a "$LOG_FILE"
 }
 
-# Run setup if script is executed directly
-if [ "${BASH_SOURCE[0]}" = "$0" ]; then
-    setup_core
+# Function to check if a command exists
+command_exists() { command -v "$1" &> /dev/null; }
+
+# Function to save configuration
+save_config() {
+    cat > "$CONFIG_FILE" <<EOF
+USER_ROLE=$USER_ROLE
+ENVIRONMENT=$ENVIRONMENT
+EOF
+}
+
+# Function to load configuration
+load_config() {
+    if [ -f "$CONFIG_FILE" ]; then
+        # shellcheck source=/dev/null
+        source "$CONFIG_FILE"
+    fi
+}
+
+# Load existing configuration if available
+load_config
+
+# Determine user role if not already set
+if [ -z "${USER_ROLE:-}" ]; then
+    log "Select your user role:"
+    select USER_ROLE in "developer" "user" "owner"; do
+        PS3="Please enter your choice: "
+        case $USER_ROLE in
+            developer|user|owner) break ;;
+            *)                    log "Invalid selection. Please try again." ;;
+        esac
+    done
 fi
+
+# Determine environment if not already set
+if [ -z "${ENVIRONMENT:-}" ]; then
+    if [ "$USER_ROLE" = "user" ]; then
+        ENVIRONMENT="live"
+    elif [ "$USER_ROLE" = "owner" ]; then
+        ENVIRONMENT="all"
+    else
+        PS3="Please select the environment: "
+        select ENVIRONMENT in "testnet" "live"; do
+            case $ENVIRONMENT in
+                testnet|live) break ;;
+                *)            log "Invalid selection. Please try again." ;;
+            esac
+        done
+    fi
+fi
+
+# Save configuration
+save_config
+
+log "Setting up for $USER_ROLE in $ENVIRONMENT environment"
+
+# Install Rust if not already installed
+if ! command -v rustc &> /dev/null
+then
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+    source $HOME/.cargo/env
+fi
+
+# Install system dependencies
+sudo apt-get update
+sudo apt-get install -y build-essential pkg-config libssl-dev
+
+# Build the project
+cargo build --release
+
+# Set up environment variables
+{
+    echo "export ANYA_LOG_LEVEL=info"
+    echo "export ANYA_NETWORK_TYPE=$ENVIRONMENT"
+} >> ~/.bashrc
+
+# Source the updated bashrc
+source ~/.bashrc
+
+log "Anya Core setup complete!"

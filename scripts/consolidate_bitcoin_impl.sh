@@ -1,4 +1,5 @@
 #!/bin/bash
+# [AIR-3][AIS-3][BPC-3][RES-3]
 # [AIR-3][AIS-3][AIT-3][BPC-3]
 # Anya Core Bitcoin Implementation Consolidation Script
 # This script consolidates and reorganizes Bitcoin implementations according to BDF v2.5

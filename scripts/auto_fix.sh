@@ -1,4 +1,5 @@
 #!/bin/bash
+# [AIR-3][AIS-3][BPC-3][RES-3]
 # Auto-fix script for Anya Core compilation issues
 # Created: 2025-05-17
 
