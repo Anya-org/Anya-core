@@ -2,7 +2,9 @@
 // Implements adapter pattern for Web5 functionality in the Anya Core system
 
 use std::sync::Arc;
-use crate::web5::{Web5Config, Web5Manager, Web5Error, Web5Result};
+// [AIR-3][AIS-3][BPC-3][RES-3] Removed unused imports: Web5Error, Web5Result
+// [AIR-3][AIS-3][BPC-3][RES-3] Removed unused Web5Error and Web5Result imports
+use crate::web5::{Web5Config, Web5Manager};
 use crate::AnyaResult;
 use crate::AnyaError;
 
