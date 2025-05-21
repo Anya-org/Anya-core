@@ -3,6 +3,7 @@
 [AIR-3][AIS-3][BPC-3][RES-3]
 
 ## Table of Contents
+
 - [Prerequisites](#prerequisites)
 - [Quick Start](#quick-start)
 - [Installation Options](#installation-options)
@@ -50,6 +51,7 @@ To install with comprehensive monitoring:
 ```
 
 This will set up:
+
 - Prometheus for metrics collection
 - Grafana for visualization
 - Alertmanager for notifications
@@ -82,9 +84,10 @@ docker-compose -f monitoring/docker-compose.yml ps
 ```
 
 Access the monitoring dashboards:
-- Grafana: http://localhost:3000
-- Prometheus: http://localhost:9090
-- Alertmanager: http://localhost:9093
+
+- Grafana: <http://localhost:3000>
+- Prometheus: <http://localhost:9090>
+- Alertmanager: <http://localhost:9093>
 
 ## Troubleshooting
 
@@ -121,6 +124,7 @@ docker-compose -f monitoring/docker-compose.yml up -d
 ## Support
 
 For additional help:
+
 1. Check the [troubleshooting guide](troubleshooting.md)
 2. Open an issue on [GitHub](https://github.com/your-org/anya-core/issues)
-3. Email support: botshelomokoka@gmail.com
+3. Email support: <botshelomokoka@gmail.com>
