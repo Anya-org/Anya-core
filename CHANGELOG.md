@@ -8,6 +8,32 @@ All notable changes to the Anya Core project will be documented in this file.
 
 ## [Unreleased]
 
+## [2.6.0] - 2025-05-21
+
+### Added
+
+- [AIR-3][AIS-3][BPC-3][RES-3] Comprehensive monitoring stack with Prometheus, Grafana, and Alertmanager
+- [AIR-3][AIS-3] Integrated monitoring setup with main installer using `--with-monitoring` flag
+- [BPC-3][RES-3] Email notification system with Anya Core branding
+- [RES-3] System and Bitcoin node dashboards for real-time monitoring
+- [AIS-3] Secure credential management for monitoring components
+- [AIS-3][BPC-3] Alerting rules for node health, resource usage, and security events
+- [AIS-3] Documentation for monitoring setup and configuration
+
+### Changed
+
+- Updated installation process to support monitoring components
+- Improved error handling and logging in the installer
+- Enhanced security configuration for monitoring services
+- Updated documentation with monitoring best practices
+
+### Fixed
+
+- Resolved potential security issues in monitoring configuration
+- Fixed permission issues in monitoring setup script
+- Addressed compatibility issues with different Docker versions
+
+
 ## [2.5.1] - 2025-05-19
 
 ### Fixed

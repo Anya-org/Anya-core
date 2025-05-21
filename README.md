@@ -1,12 +1,17 @@
-# Anya-Core
+# Anya Core
 
 [![BIP-341](https://img.shields.io/badge/BIP-341_Compliant-green)](https://bips.xyz/341)
 [![AIS-3](https://img.shields.io/badge/AIS-3_Secured-blue)](https://bitcoin-development-framework.org)
 [![PSBT-v2](https://img.shields.io/badge/PSBT_v2-100%25-brightgreen)](https://bips.xyz/370)
+[![BDF-v2.5](https://img.shields.io/badge/Bitcoin%20Dev%20Framework-v2.5-yellow)](https://bitcoin-development-framework.org)
 
-[AIR-3][AIS-3][AIT-3][AIM-3][AIP-3][AIE-3][BPC-3][W5C-3][DID-3][PFM-2][SCL-2][RES-3][UXA-2][DAO-3]
+[AIR-3][AIS-3][AIT-3][AIM-3][AIP-3][AIE-3][BPC-3][W5C-3][DID-3][PFM-3][SCL-3][RES-3][UXA-3][DAO-3]
 
-*Last Updated: May 19, 2025*
+*Last Updated: May 24, 2025*
+
+**Latest Release: v0.3.0-rc2**
+
+> **Note**: This release includes comprehensive updates to the Taproot implementation, enhanced security features with HSM integration, and a fully refactored installation system following Bitcoin Development Framework v2.5 standards.
 
 A powerful platform combining Bitcoin/crypto functionality, ML-based analytics,
 Web5 decentralized data management, and a Bitcoin-style DAO governance system.
@@ -20,15 +25,33 @@ Web5 decentralized data management, and a Bitcoin-style DAO governance system.
 > based on the Bitcoin Development Framework v2.5 standards. All components are labeled with
 > appropriate Core and Extended category labels.
 
-## Documentation Quick Links
+## Documentation Quick Links [AIR-3][AIS-3][BPC-3][RES-3]
+
+### Core Documentation
 
 - [Documentation Index](docs/INDEX.md) - Main documentation index
 - [System Architecture](SYSTEM_MAP.md) - Complete system architecture
-- [DAO System](docs/DAO_SYSTEM_GUIDE.md) - Comprehensive DAO documentation
-- [Tokenomics System](docs/TOKENOMICS_SYSTEM.md) - Bitcoin-style tokenomics
-- [Implementation Milestones](docs/IMPLEMENTATION_MILESTONES.md) - Project progress
+- [Bitcoin Development Framework v2.5](docs/standards/BITCOIN_DEVELOPMENT_FRAMEWORK.md) - Standards compliance
 - [AI Labeling System](docs/standards/AI_LABELING.md) - Component labeling standards
-- [Installation Guide](docs/installation/README.md) - Installation instructions
+
+### Installation & Setup
+
+- [Installation Guide](docs/installation/README.md) - Comprehensive installation instructions
+- [Quick Start Guide](docs/getting-started/quickstart.md) - Get up and running in minutes
+- [Configuration Reference](docs/configuration/README.md) - Detailed configuration options
+
+### Developer Resources
+
+- [API Reference](docs/api/README.md) - Complete API documentation
+- [Development Guide](docs/development/README.md) - Contributing and development workflow
+- [Testing Guide](docs/testing/README.md) - Testing framework and guidelines
+
+### Advanced Topics
+
+- [Monitoring & Observability](monitoring/README.md) - Comprehensive monitoring with Prometheus, Grafana, and Alertmanager
+- [Taproot Implementation](docs/bitcoin/taproot.md) - Taproot integration details
+- [Security Model](docs/security/README.md) - Security best practices and features
+- [Performance Tuning](docs/performance/README.md) - Optimization guidelines
 
 ## Licensing
 

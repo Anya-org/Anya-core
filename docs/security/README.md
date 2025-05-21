@@ -1,34 +1,67 @@
-<!-- markdownlint-disable MD013 line-length -->
+# Security Documentation [AIS-3][SEC-3][BPC-3]
 
-# Security Documentation
+*Last Updated: May 24, 2025*
+
+> **Note**: This document follows Bitcoin Development Framework v2.5 security standards and includes AI labeling for compliance tracking. All security implementations comply with [BIP-341](https://bips.xyz/341) and [BIP-342](https://bips.xyz/342) Taproot standards.
+
+## AI Labeling Compliance
+
+- [AIR-3] - AI Readiness
+- [AIS-3] - AI Security
+- [BPC-3] - Bitcoin Protocol Compliance
+- [SEC-3] - Security Implementation
+- [CRY-3] - Cryptography Standards
+- [HSM-3] - Hardware Security Module Integration
 
 ## Overview
 
-This document outlines the security architecture, practices, and guidelines for the Anya platform.
+This document outlines the security architecture, practices, and guidelines for the Anya platform, focusing on cryptographic security, secure key management, and compliance with industry standards.
 
-## Security Architecture
+## Security Architecture [AIS-3][BPC-3]
 
-### Authentication
+### Authentication [AIS-3][AUT-3]
 
-- JWT-based authentication
-- Multi-factor authentication support
-- Session management
-- API key authentication for services
+- **JWT-based authentication** with configurable expiration
+- **Multi-factor authentication** (TOTP, WebAuthn, FIDO2)
+- **Biometric authentication** integration
+- **Hardware-backed** authentication tokens
+- **Session management** with secure cookie policies
+- **API key authentication** with rate limiting
 
-### Authorization
+### Authorization [AIS-3][AUT-3]
 
-- Role-based access control (RBAC)
-- Permission management
-- Resource-level access control
-- Scope-based authorization
+- **Role-based access control** (RBAC) with hierarchical roles
+- **Attribute-based access control** (ABAC) for fine-grained permissions
+- **Resource-level access control** with ownership verification
+- **Time-based access** restrictions
+- **Delegated authorization** with OAuth 2.0 and OIDC
 
-### Data Protection
+### Data Protection [AIS-3][SEC-3]
 
-- End-to-end encryption
-- At-rest encryption
-- Data masking
-- Secure key management
-- **Hardware Security Module (HSM) integration**
+- **End-to-end encryption** for all sensitive communications
+- **At-rest encryption** using AES-256-GCM
+- **Data masking** and tokenization for PII
+- **Secure key management** with HSM integration
+- **Key rotation** and lifecycle management
+- **Secure enclave** support for sensitive operations
+
+### Hardware Security Module (HSM) Integration [AIS-3][HSM-3]
+
+- **PKCS#11** and **KMIP** protocol support
+- **FIPS 140-2 Level 3** compliant HSM support
+- **Secure key generation** and storage
+- **Hardware-backed** cryptographic operations
+- **Multi-signature** support with threshold cryptography
+- **Remote attestation** for secure boot verification
+
+### Taproot Security [BIP-341][BIP-342]
+
+- **Schnorr signature** verification (BIP 340)
+- **Taproot** key path and script path validation
+- **Tapscript** execution environment
+- **Signature hash** computation (BIP 341)
+- **Batch verification** for improved performance
+- **Side-channel resistant** implementations
   - **Multiple provider types (Software, Hardware, Simulator, Bitcoin)**
   - **Bitcoin-specific key derivation and operations**
   - **Comprehensive audit logging of all HSM operations**
@@ -131,6 +164,100 @@ hsm:
     storage_type: file
     retention_days: 90
 ```
+
+## Security Best Practices [AIS-3][SEC-3]
+
+### Secure Coding [DEV-3][SEC-3]
+
+- **Input validation** with strict type checking
+- **Output encoding** contextually aware (HTML, URL, JavaScript)
+- **Memory-safe** operations with bounds checking
+- **Dependency management** with automated vulnerability scanning
+- **Automated testing** for security vulnerabilities
+- **Static analysis** integration in CI/CD pipeline
+- **Fuzz testing** for critical components
+- **Formal verification** for cryptographic primitives
+
+### Network Security [NET-3][SEC-3]
+
+- **TLS 1.3** with modern cipher suites
+- **Certificate pinning** with HPKP alternatives
+- **DNS-over-HTTPS/TLS** for secure name resolution
+- **Network segmentation** with zero-trust principles
+- **Intrusion detection/prevention** systems (IDS/IPS)
+- **DDoS protection** with rate limiting and challenge-response
+- **Tor and I2P** network support for privacy
+- **Secure peer discovery** with authenticated peer lists
+
+### Cryptographic Standards [CRY-3][SEC-3]
+
+- **Elliptic Curve Cryptography**: secp256k1 (Bitcoin), Ed25519
+- **Hashing**: SHA-256, SHA-3, BLAKE3
+- **Key Derivation**: PBKDF2, Argon2, scrypt
+- **Digital Signatures**: ECDSA, Schnorr, BLS
+- **Zero-Knowledge Proofs**: zk-SNARKs, Bulletproofs
+- **Post-Quantum Cryptography**: Dilithium, Falcon
+
+### Security Audits and Compliance [AUD-3][SEC-3]
+
+- **Annual third-party security audits**
+- **Automated vulnerability scanning**
+- **Bug bounty program**
+- **Compliance with**:
+  - Bitcoin Development Framework v2.5
+  - NIST Cybersecurity Framework
+  - ISO/IEC 27001
+  - GDPR and CCPA compliance
+  - Financial-grade security standards policies
+
+## Incident Response [RES-3][SEC-3]
+
+### Incident Management
+
+- **24/7 security monitoring** and alerting
+- **Automated incident detection** using ML-based anomaly detection
+- **Incident severity classification** (P0-P4)
+- **Automated containment** procedures
+- **Forensic evidence** preservation
+
+### Response Procedures
+
+1. **Detection and Analysis**
+   - Log collection and correlation
+   - Threat intelligence integration
+   - Impact assessment
+
+2. **Containment and Eradication**
+   - Isolation of affected systems
+   - Malware analysis
+   - Root cause analysis
+
+3. **Recovery**
+   - System restoration from verified backups
+   - Credential rotation
+   - Security controls verification
+
+4. **Post-Incident Activities**
+   - Comprehensive incident report
+   - Lessons learned
+   - Process improvement implementation
+
+### Communication Plan
+
+- **Stakeholder notification** procedures
+- **Regulatory reporting** requirements
+- **Public communication** guidelines
+- **Customer notification** process
+
+## Security Contact
+
+For security-related issues, please contact:
+
+- **Security Team**: <security@anya.org>
+- **PGP Key**: [Link to public key]
+- **Security Advisories**: [Link to security advisories page]
+
+**Note**: For sensitive security reports, please use our encrypted communication channels.
 
 ## Incident Response
 
