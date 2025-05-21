@@ -1,4 +1,18 @@
+---
+title: "Hsm_bitcoin_integration"
+description: "Documentation for Hsm_bitcoin_integration"
+---
+
+[AIR-3][AIS-3][BPC-3][RES-3]
+
+
 # HSM Bitcoin Integration \[AIR-3\]\[AIS-3\]\[AIT-3\]\[AIP-3\]\[RES-3\]
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 
 <!-- markdownlint-disable MD013 line-length -->
 
@@ -253,3 +267,8 @@ The HSM Bitcoin integration follows the hexagonal architecture pattern defined i
 5. Miniscript Specification
 6. RGB Protocol Documentation
 7. DLC Specification
+
+## See Also
+
+- [Related Document](#related-document)
+
