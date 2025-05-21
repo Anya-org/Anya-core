@@ -459,7 +459,6 @@ impl DWNManager {
 mod tests {
     // [AIR-3][AIS-3][BPC-3][RES-3] Error trait is already imported in the parent module
     use super::*;
-    use crate::web5::Web5Result;
     
     #[test]
     fn test_store_record()  -> Result<(), Box<dyn std::error::Error>> {

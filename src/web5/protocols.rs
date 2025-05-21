@@ -252,7 +252,6 @@ impl ProtocolHandler for CredentialProtocolHandler {
 mod tests {
     use super::*;
     use std::error::Error;
-    use crate::web5::Web5Error;
     
     #[tokio::test]
     async fn test_protocol_manager() -> Result<(), Box<dyn Error>> {
