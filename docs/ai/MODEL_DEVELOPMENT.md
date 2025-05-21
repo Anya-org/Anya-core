@@ -1,4 +1,13 @@
+---
+title: "Model_development"
+description: "Documentation for Model_development"
+---
+
+[AIR-3][AIS-3][BPC-3][RES-3]
+
+
 # AI Model Development Guide
+
 
 This guide outlines the process for developing and training AI models for the Anya Core platform.
 
@@ -445,3 +454,8 @@ torch.autograd.detect_anomaly()
 ## Conclusion
 
 This guide provides a comprehensive overview of AI model development for the Anya Core platform. For more information, refer to the [API documentation](https://docs.anya.org/api/ai) and [examples](https://github.com/anya-org/anya-core/examples).
+
+## See Also
+
+- [Related Document](#related-document)
+

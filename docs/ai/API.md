@@ -1,4 +1,17 @@
+---
+title: "Api"
+description: "Documentation for Api"
+---
+
+[AIR-3][AIS-3][BPC-3][RES-3]
+
+
 # AI API Reference
+
+## Overview
+
+Add a brief overview of this document here.
+
 
 This document provides a comprehensive reference for the Anya Core AI API.
 
@@ -176,3 +189,8 @@ X-RateLimit-Reset: 1625097600
 ```
 
 When the rate limit is exceeded, the API will return a 429 status code with a `Retry-After` header indicating how long to wait before making another request.
+
+## See Also
+
+- [Related Document](#related-document)
+

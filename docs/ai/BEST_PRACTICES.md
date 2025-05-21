@@ -1,4 +1,17 @@
+---
+title: "Best_practices"
+description: "Documentation for Best_practices"
+---
+
+[AIR-3][AIS-3][BPC-3][RES-3]
+
+
 # AI Best Practices
+
+## Overview
+
+Add a brief overview of this document here.
+
 
 This document outlines best practices for working with AI components in Anya Core.
 
@@ -97,3 +110,8 @@ This document outlines best practices for working with AI components in Anya Cor
   - Implement retries with exponential backoff
   - Set maximum retry limits
   - Log all retry attempts
+
+## See Also
+
+- [Related Document](#related-document)
+

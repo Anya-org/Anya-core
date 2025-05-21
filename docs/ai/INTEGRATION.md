@@ -1,4 +1,15 @@
+---
+title: "Integration"
+description: "Documentation for Integration"
+---
+
 # AI Integration Guide
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 
 > **Documentation Version**: 2.0  
 > **Last Updated**: 2025-05-16  
@@ -705,3 +716,8 @@ println!("Predicted class: {}", class);
 ## Conclusion
 
 This guide covers the essentials of AI integration in Anya Core. For more advanced usage, refer to the [API documentation](https://docs.anya.org/api/ai) and [examples](https://github.com/anya-org/anya-core/examples).
+
+## See Also
+
+- [Related Document](#related-document)
+

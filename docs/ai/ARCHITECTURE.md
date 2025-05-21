@@ -1,6 +1,17 @@
+---
+title: "Architecture"
+description: "Documentation for Architecture"
+---
+
 <!-- markdownlint-disable MD013 line-length -->
 
 # ML System Architecture
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 
 *Last Updated: 2025-03-06*
 
@@ -307,4 +318,12 @@ This integration ensures that our ML*/Agent Checker system provides comprehensiv
 
 ---
 
+[AIR-3][AIS-3][BPC-3][RES-3]
+
+
 *For more details on how AI components are labeled, see the [AI Labeling System](../standards/AI_LABELING.md).*
+
+## See Also
+
+- [Related Document](#related-document)
+
