@@ -1,4 +1,17 @@
+---
+title: "Bip_compliance"
+description: "Documentation for Bip_compliance"
+---
+
+[AIR-3][AIS-3][BPC-3][RES-3]
+
+
 # Bitcoin Improvement Proposal (BIP) Compliance
+
+## Overview
+
+Add a brief overview of this document here.
+
 
 This document outlines the BIPs implemented in Anya Core and their compliance status.
 
@@ -168,3 +181,8 @@ cargo test --test bip_integration -- --test-threads=1
 - [BIP Repository](https://github.com/bitcoin/bips)
 - [Bitcoin Core](https://github.com/bitcoin/bitcoin)
 - [BIP-Status](https://bip-status.com/)
+
+## See Also
+
+- [Related Document](#related-document)
+

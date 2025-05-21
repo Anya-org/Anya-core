@@ -1,4 +1,15 @@
+---
+title: "Ai_labeling"
+description: "Documentation for Ai_labeling"
+---
+
 # AI Labeling System [AIR-3][AIS-3][BPC-3]
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 
 <!-- markdownlint-disable MD013 line-length -->
 
@@ -439,3 +450,8 @@ All experimental code must:
 
 - Privacy: Silent leaf implementation
 - Security: PSBT version validation
+
+## See Also
+
+- [Related Document](#related-document)
+

@@ -1,4 +1,17 @@
+---
+title: "Security"
+description: "Documentation for Security"
+---
+
+[AIR-3][AIS-3][BPC-3][RES-3]
+
+
 # Security Standards
+
+## Overview
+
+Add a brief overview of this document here.
+
 
 This document outlines the security standards and best practices for Anya Core development.
 
@@ -183,3 +196,8 @@ RUSTFLAGS="-Zsanitizer=address" cargo test
 ## Security Contact
 
 For security-related issues, please contact security@anya.org.
+
+## See Also
+
+- [Related Document](#related-document)
+
