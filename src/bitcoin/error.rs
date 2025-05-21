@@ -13,6 +13,7 @@
 use bitcoin::key::FromSliceError;
 use bitcoin::secp256k1;
 use bitcoin::{
+    secp256k1::Error as KeyError,
     sighash::P2wpkhError, sighash::TaprootError, taproot::SigFromSliceError,
     taproot::TaprootBuilder, taproot::TaprootBuilderError,
 };
@@ -34,14 +35,14 @@ pub enum BitcoinError {
     #[error("Invalid sighash")]
     InvalidSighash,
 
-    #[error("Invalid public key")]
-    InvalidPublicKey,
+    #[error("Invalid public key: {0}")]
+    InvalidPublicKey(String),
 
     #[error("Invalid private key")]
     InvalidPrivateKey,
 
-    #[error("Invalid script")]
-    InvalidScript,
+    #[error("Invalid script: {0}")]
+    InvalidScript(String),
 
     #[error("Invalid address: {0}")]
     InvalidAddress(String),
@@ -93,18 +94,24 @@ pub enum BitcoinError {
 
     #[error("IO error: {0}")]
     IOError(String),
+    
+    #[error("Key error: {0}")]
+    KeyError(String),
 
     #[error("Invalid transaction: {0}")]
     InvalidTransaction(String),
 
     #[error("Invalid signature: {0}")]
     InvalidSignature(String),
+    
+    #[error("Encoding error: {0}")]
+    EncodingError(String),
+    
+    #[error("Script error: {0}")]
+    ScriptError(String),
 
     #[error("Invalid oracle signature")]
     InvalidOracleSignature,
-
-    #[error("Key error: {0}")]
-    KeyError(String),
 
     #[error("P2WPKH error: {0}")]
     P2wpkhError(String),
@@ -189,6 +196,18 @@ impl From<secp256k1::Error> for BitcoinError {
 impl From<&str> for BitcoinError {
     fn from(error: &str) -> Self {
         BitcoinError::Other(error.to_string())
+    }
+}
+
+impl From<KeyError> for BitcoinError {
+    fn from(error: KeyError) -> Self {
+        BitcoinError::KeyError(error.to_string())
+    }
+}
+
+impl From<&KeyError> for BitcoinError {
+    fn from(error: &KeyError) -> Self {
+        BitcoinError::KeyError(error.to_string())
     }
 }
 
