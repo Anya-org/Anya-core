@@ -78,20 +78,10 @@ services:
     image: prom/node-exporter:latest
     container_name: node-exporter
     user: root
-    pid: host
+    command: --path.procfs=/host/proc --path.sysfs=/host/sys
     volumes:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
-      - /:/rootfs:ro,rslave
-    command:
-      - '--path.procfs=/host/proc'
-      - '--path.sysfs=/host/sys'
-      - '--collector.filesystem.ignored-mount-points=^(sys|proc|dev|host|etc)(\u0024|/)'
-      - '--collector.netdev.ignored-devices=^(lo|docker[0-9]*|veth.+)$'
-      - '--collector.processes'
-      - '--collector.systemd'
-      - '--collector.tcpstat'
-      - '--collector.ntp'
     networks:
       - monitoring
     restart: unless-stopped

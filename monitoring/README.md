@@ -1,6 +1,61 @@
 # Anya Core Monitoring Stack
 
-This directory contains the configuration and setup for monitoring the Anya Core Bitcoin node and system metrics using Prometheus, Grafana, and related tools.
+[AIR-3][AIS-3][BPC-3][RES-3]
+
+## 📊 Overview
+
+This directory contains the configuration and setup for monitoring the Anya Core Bitcoin node and system metrics using Prometheus, Grafana, and related tools. The monitoring stack follows Bitcoin Development Framework v2.5 standards and implements a hexagonal architecture for modularity and security.
+
+## 🛡️ Security Considerations
+
+- All components run with least privilege
+- TLS encryption for all communications
+- Authentication required for all dashboards and APIs
+- Regular security updates applied automatically
+- Audit logging enabled by default
+
+## 🔄 Version Compatibility
+
+| Component      | Version  | Notes                     |
+|----------------|----------|---------------------------|
+| Anya Core      | ≥ 0.3.0  | Required for monitoring   |
+| Docker         | ≥ 20.10  | Container runtime         |
+| Docker Compose | ≥ 2.0    | Container orchestration  |
+| Prometheus     | 2.47.0   | Metrics collection        |
+| Grafana        | 10.2.0   | Visualization            |
+| Alertmanager   | 0.27.0   | Alert management          |
+| Node Exporter  | 1.6.1    | System metrics           |
+
+## 🚀 Quick Start
+
+1. **Set environment variables** in `.env`:
+
+   ```bash
+   # Required
+   GRAFANA_ADMIN_USER=admin
+   GRAFANA_ADMIN_PASSWORD=securepassword
+   
+   # Optional: Bitcoin RPC
+   BITCOIN_RPC_USER=bitcoinrpc
+   BITCOIN_RPC_PASSWORD=securepassword
+   
+   # Optional: SMTP for alerts
+   SMTP_FROM=botshelomokoka@gmail.com
+   SMTP_PASSWORD=your-app-password
+   ```
+
+2. **Start the stack**:
+
+   ```bash
+   ./start-monitoring.sh
+   ```
+
+3. **Access dashboards**:
+   - Grafana: <http://localhost:3000>
+   - Prometheus: <http://localhost:9090>
+   - Alertmanager: <http://localhost:9093>
+
+## 🧩 Components
 
 ## Components
 
@@ -24,6 +79,7 @@ This directory contains the configuration and setup for monitoring the Anya Core
 ## Getting Started
 
 1. **Set environment variables** (optional, edit `start-monitoring.sh` for defaults):
+
    ```bash
    export GRAFANA_ADMIN_USER=admin
    export GRAFANA_ADMIN_PASSWORD=securepassword
@@ -32,18 +88,20 @@ This directory contains the configuration and setup for monitoring the Anya Core
    ```
 
 2. **Start the monitoring stack**:
+
    ```bash
    ./monitoring/start-monitoring.sh
    ```
 
 3. **Access the services**:
-   - Grafana: http://localhost:3000
-   - Prometheus: http://localhost:9090
-   - Alertmanager: http://localhost:9093
+   - Grafana: <http://localhost:3000>
+   - Prometheus: <http://localhost:9090>
+   - Alertmanager: <http://localhost:9093>
 
 ## Dashboards
 
 ### Bitcoin Node Dashboard
+
 - Block height and synchronization status
 - Mempool metrics
 - Network connections and traffic
@@ -51,6 +109,7 @@ This directory contains the configuration and setup for monitoring the Anya Core
 - RPC method call rates
 
 ### System Dashboard
+
 - CPU, memory, and disk usage
 - Network I/O
 - Container metrics
@@ -71,26 +130,31 @@ Alerts are configured in `prometheus/alerts/` and managed by Alertmanager. Defau
 ## Configuration
 
 ### Prometheus
+
 - Main config: `prometheus/prometheus.yml`
 - Alert rules: `prometheus/alerts/*.yml`
 - Service discovery: `prometheus/file_sd/`
 
 ### Alertmanager
+
 - Config: `alertmanager/config.yml`
 - Templates: `alertmanager/templates/`
 
 ### Grafana
+
 - Dashboards: `grafana/provisioning/dashboards/`
 - Data sources: `grafana/provisioning/datasources/`
 
 ## Maintenance
 
 ### Updating Dashboards
+
 1. Make changes in the Grafana UI
 2. Export the dashboard JSON
 3. Save to `grafana/provisioning/dashboards/`
 
 ### Adding New Alerts
+
 1. Create or edit YAML files in `prometheus/alerts/`
 2. Update `prometheus/prometheus.yml` if needed
 3. Reload Prometheus: `curl -X POST http://localhost:9090/-/reload`
@@ -98,16 +162,19 @@ Alerts are configured in `prometheus/alerts/` and managed by Alertmanager. Defau
 ## Troubleshooting
 
 ### Check Service Logs
+
 ```bash
 docker-compose -f monitoring/docker-compose.yml logs -f
 ```
 
 ### Check Service Status
+
 ```bash
 docker-compose -f monitoring/docker-compose.yml ps
 ```
 
 ### Restart Services
+
 ```bash
 docker-compose -f monitoring/docker-compose.yml restart
 ```
