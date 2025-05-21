@@ -1,6 +1,24 @@
+---
+title: "Sensitive_data_setup"
+description: "Documentation for Sensitive_data_setup"
+---
+
+[AIR-3][AIS-3][BPC-3][RES-3]
+
+
 <!-- markdownlint-disable MD013 line-length -->
 
 # Anya Core Sensitive Data Management
+
+## Overview
+
+Add a brief overview of this document here.
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 
 This guide explains how to set up and manage sensitive data for your Anya Core installation.
 
@@ -85,3 +103,8 @@ If you encounter issues:
 4. Check configuration file locations
 
 *Last updated: 2024-12-07*
+
+## See Also
+
+- [Related Document](#related-document)
+

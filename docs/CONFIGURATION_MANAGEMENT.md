@@ -1,6 +1,17 @@
+---
+title: "Configuration_management"
+description: "Documentation for Configuration_management"
+---
+
 <!-- markdownlint-disable MD013 line-length -->
 
 # Configuration Management Architecture
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 
 *Last Updated: 2025-03-06*
 
@@ -324,4 +335,11 @@ impl CoreSystem {
 
 ---
 
+[AIR-3][AIS-3][BPC-3][RES-3]
+
+
 *This document follows the [AI Labeling System](../docs/standards/AI_LABELING.md) standards based on the Bitcoin Development Framework v2.5.* 
+## See Also
+
+- [Related Document](#related-document)
+

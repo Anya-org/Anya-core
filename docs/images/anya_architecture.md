@@ -1,4 +1,22 @@
+---
+title: "Anya_architecture"
+description: "Documentation for Anya_architecture"
+---
+
+[AIR-3][AIS-3][BPC-3][RES-3]
+
+
 # Anya Core Architecture
+
+## Overview
+
+Add a brief overview of this document here.
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 
 This document describes the high-level architecture of Anya Core.
 
@@ -200,3 +218,8 @@ graph TD
 - Distributed tracing across services
 - Performance analysis
 - Dependency mapping
+
+## See Also
+
+- [Related Document](#related-document)
+

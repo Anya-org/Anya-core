@@ -1,6 +1,24 @@
+---
+title: "Environment"
+description: "Documentation for Environment"
+---
+
+[AIR-3][AIS-3][BPC-3][RES-3]
+
+
 <!-- markdownlint-disable MD013 line-length -->
 
 # Environment Variables Documentation
+
+## Overview
+
+Add a brief overview of this document here.
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 
 All environment variables in the Anya platform are prefixed with `ANYA_` to avoid conflicts with other applications.
 
@@ -79,3 +97,8 @@ ANYA_NETWORK_CAPACITY=5000
 The platform includes built-in validation for all configuration values. See `src/config/validator.rs` for validation rules.
 
 *Last updated: 2024-12-07*
+
+## See Also
+
+- [Related Document](#related-document)
+

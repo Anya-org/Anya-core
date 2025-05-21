@@ -1,4 +1,18 @@
+---
+title: "Migration"
+description: "Documentation for Migration"
+---
+
+[AIR-3][AIS-3][BPC-3][RES-3]
+
+
 # Python to Rust Migration Guide [AIS-3][BPC-3][DAO-3]
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 
 ## Overview
 
@@ -105,3 +119,7 @@ The migration to Rust has achieved:
 1. Complete migration of any remaining Python components
 2. Enhance test coverage for Rust implementations
 3. Remove legacy Python dependencies from the codebase 
+## See Also
+
+- [Related Document](#related-document)
+

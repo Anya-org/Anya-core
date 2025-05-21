@@ -1,4 +1,18 @@
+---
+title: "High_availability"
+description: "Documentation for High_availability"
+---
+
+[AIR-3][AIS-3][BPC-3][RES-3]
+
+
 # High Availability System \[AIR-3\]\[AIS-3\]\[RES-3\]\[SCL-3\]
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 
 <!-- markdownlint-disable MD013 line-length -->
 
@@ -238,3 +252,8 @@ Planned improvements to the HA subsystem include:
 ## Last Updated
 
 2025-03-12
+
+## See Also
+
+- [Related Document](#related-document)
+

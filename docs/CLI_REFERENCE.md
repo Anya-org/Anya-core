@@ -1,4 +1,22 @@
+---
+title: "Cli_reference"
+description: "Documentation for Cli_reference"
+---
+
+[AIR-3][AIS-3][BPC-3][RES-3]
+
+
 # Anya Core CLI Reference v2.5
+
+## Overview
+
+Add a brief overview of this document here.
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 
 ## Bitcoin Protocol Commands
 ```bash
@@ -168,3 +186,7 @@ anya audit security --component cli
 ```
 
 These changes improve CLI usability while maintaining strict Bitcoin protocol compliance and AI security standards. 
+## See Also
+
+- [Related Document](#related-document)
+

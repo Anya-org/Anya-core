@@ -1,4 +1,18 @@
+---
+title: "Implementation_architecture"
+description: "Documentation for Implementation_architecture"
+last_updated: 2025-05-21
+---
+[AIR-3][AIS-3][BPC-3][RES-3]
+
+
 # Implementation Architecture
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 
 [AIS-3][BPC-3][DAO-3]
 
@@ -27,3 +41,7 @@ Supporting off-chain components include:
 ## System Architecture
 
 ### Component Architecture 
+## See Also
+
+- [Related Document 1](./related1.md)
+- [Related Document 2](./related2.md)

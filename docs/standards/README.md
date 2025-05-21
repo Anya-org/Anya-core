@@ -1,4 +1,19 @@
+---
+title: "Readme"
+description: "Documentation for Readme"
+---
+
 # Anya Core Standards
+
+## Overview
+
+Add a brief overview of this document here.
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 
 [AIR-3][AIS-3][BPC-3]
 
@@ -82,3 +97,7 @@ The following scripts help with standards implementation:
 | `scripts/validate_ai_labels.ps1` | Validates AI labels in code and documentation |
 | `scripts/install_hooks.ps1` | Installs Git hooks for standards validation |
 | `scripts/update_ai_labeling_docs.ps1` | Updates deprecated documentation with notices | 
+## See Also
+
+- [Related Document](#related-document)
+

@@ -1,4 +1,13 @@
+---
+title: "Web5_integration"
+description: "Documentation for Web5_integration"
+---
+
+[AIR-3][AIS-3][BPC-3][RES-3]
+
+
 # Web5 Integration Guide
+
 
 This document outlines how Anya Core integrates with Web5, a decentralized web platform built on Bitcoin and IPFS.
 
@@ -344,3 +353,8 @@ fn init_logging() {
 ## Conclusion
 
 This guide covers the basics of integrating Web5 with Anya Core. For more advanced usage, refer to the [Web5 specification](https://identity.foundation/web5/) and the [Anya Core API documentation](https://docs.anya.org).
+
+## See Also
+
+- [Related Document](#related-document)
+

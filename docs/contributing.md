@@ -1,4 +1,17 @@
+---
+title: "Contributing"
+description: "Documentation for Contributing"
+---
+
+[AIR-3][AIS-3][BPC-3][RES-3]
+
+
 # Contributing to Anya Core
+
+## Overview
+
+Add a brief overview of this document here.
+
 
 Thank you for your interest in contributing to Anya Core! This document provides guidelines for contributing to the project.
 
@@ -117,3 +130,8 @@ When reporting issues, please include:
 ## License
 
 By contributing, you agree that your contributions will be licensed under the project's [LICENSE](LICENSE) file.
+
+## See Also
+
+- [Related Document](#related-document)
+

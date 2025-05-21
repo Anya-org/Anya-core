@@ -1,4 +1,15 @@
+---
+title: "Bitcoin_integration"
+description: "Documentation for Bitcoin_integration"
+---
+
 # Bitcoin-Compatible DAO: Integration Documentation
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 
 [AIR-3][AIS-3][BPC-3][AIT-3][RES-3]
 
@@ -207,3 +218,8 @@ The result is a DAO system that inherits the security properties of Bitcoin whil
 ---
 
 *Last updated: 2025-04-29 15:45 UTC+2* 
+
+## See Also
+
+- [Related Document](#related-document)
+

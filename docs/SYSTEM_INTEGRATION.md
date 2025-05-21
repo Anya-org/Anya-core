@@ -1,4 +1,18 @@
+---
+title: "System_integration"
+description: "Documentation for System_integration"
+---
+
+[AIR-3][AIS-3][BPC-3][RES-3]
+
+
 # System Integration Architecture \[AIR-3\]\[AIS-2\]
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 
 <!-- markdownlint-disable MD013 line-length -->
 
@@ -57,3 +71,8 @@ This document outlines the architecture for system integration, focusing on core
 ## Last Updated
 
 2025-03-12
+
+## See Also
+
+- [Related Document](#related-document)
+

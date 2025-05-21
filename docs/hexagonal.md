@@ -1,4 +1,13 @@
+---
+title: "Hexagonal"
+description: "Documentation for Hexagonal"
+last_updated: 2025-05-21
+---
+[AIR-3][AIS-3][BPC-3][RES-3]
+
+
 # Hexagonal Architecture in Anya Core
+
 
 This document describes the Hexagonal (Ports and Adapters) architecture used in Anya Core.
 
@@ -255,3 +264,8 @@ where
 ## Conclusion
 
 The Hexagonal Architecture provides a clean separation of concerns, making the codebase more maintainable and testable. By following these patterns, we ensure that Anya Core remains flexible and adaptable to future changes.
+
+## See Also
+
+- [Related Document 1](./related1.md)
+- [Related Document 2](./related2.md)

@@ -1,4 +1,15 @@
+---
+title: "Dashboards"
+description: "Documentation for Dashboards"
+---
+
 # Anya Core Monitoring Dashboards
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 
 [AIR-3][AIS-3][BPC-3][RES-3]
 
@@ -184,3 +195,8 @@ For assistance with monitoring:
 - [AIS-3] - Secure dashboard access and configuration
 - [BPC-3] - Bitcoin monitoring best practices
 - [RES-3] - Comprehensive monitoring coverage
+
+## See Also
+
+- [Related Document](#related-document)
+

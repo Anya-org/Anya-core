@@ -1,4 +1,22 @@
+---
+title: "Workspace_management"
+description: "Documentation for Workspace_management"
+---
+
+[AIR-3][AIS-3][BPC-3][RES-3]
+
+
 ## Updated Workspace Structure (v2.5-compliant)
+
+## Overview
+
+Add a brief overview of this document here.
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 
 ```mermaid
 graph TD
@@ -28,3 +46,7 @@ graph TD
 | anya-bitcoin | ✅ | ✅ | ✅ | ✅ | ✅ |
 | anya-enterprise | ✅ | ✅ | ✅ | 🔜 | ✅ |
 | anya-extensions | ✅ | ✅ | ✅ | ✅ | ✅ | 
+## See Also
+
+- [Related Document](#related-document)
+

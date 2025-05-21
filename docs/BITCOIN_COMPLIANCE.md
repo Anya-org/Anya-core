@@ -1,4 +1,18 @@
+---
+title: "Bitcoin_compliance"
+description: "Documentation for Bitcoin_compliance"
+last_updated: 2025-05-21
+---
+[AIR-3][AIS-3][BPC-3][RES-3]
+
+
 # Bitcoin Protocol Compliance
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 
 [AIS-3][BPC-3][DAO-3]
 
@@ -185,3 +199,8 @@ fn validate_psbt_v2(psbt: &Psbt) -> Result<()> {
     validate_silent_leaf(psbt)?; // BIP-341 integration
 }
 ```
+
+## See Also
+
+- [Related Document 1](./related1.md)
+- [Related Document 2](./related2.md)

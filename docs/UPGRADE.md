@@ -1,4 +1,15 @@
+---
+title: "Upgrade"
+description: "Documentation for Upgrade"
+---
+
 # Anya Core Upgrade Guide
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 
 [AIR-3][AIS-3][BPC-3][RES-3]
 
@@ -207,3 +218,8 @@ If you encounter issues:
 - [AIS-3] - Secure upgrade procedures with rollback
 - [BPC-3] - Follows Bitcoin node upgrade best practices
 - [RES-3] - Resilient upgrade process with verification
+
+## See Also
+
+- [Related Document](#related-document)
+

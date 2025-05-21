@@ -1,6 +1,20 @@
+---
+title: "Consensus_algorithm"
+description: "Documentation for Consensus_algorithm"
+last_updated: 2025-05-21
+---
+[AIR-3][AIS-3][BPC-3][RES-3]
+
+
 <!-- markdownlint-disable MD013 line-length -->
 
 # Consensus Algorithm
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 
 ## Overview
 
@@ -34,3 +48,8 @@ Time Complexity:  O(|P| * |B|)
 Space Complexity: O(|B|)
 
 *Last updated: 2024-12-07*
+
+## See Also
+
+- [Related Document 1](./related1.md)
+- [Related Document 2](./related2.md)

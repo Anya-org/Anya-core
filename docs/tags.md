@@ -1,6 +1,24 @@
+---
+title: "Tags"
+description: "Documentation for Tags"
+---
+
+[AIR-3][AIS-3][BPC-3][RES-3]
+
+
 <!-- markdownlint-disable MD013 line-length -->
 
 # Documentation Tags
+
+## Overview
+
+Add a brief overview of this document here.
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 
 This page provides a comprehensive index of documentation tags to help you find relevant content quickly.
 
@@ -93,3 +111,8 @@ If you'd like to suggest new tags or improvements to the tagging system:
 3. Provide examples of how the new tags would be used
 
 *Last updated: 2024-12-07*
+
+## See Also
+
+- [Related Document](#related-document)
+

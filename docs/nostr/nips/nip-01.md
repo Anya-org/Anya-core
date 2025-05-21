@@ -1,6 +1,20 @@
+---
+title: "Nip 01"
+description: "Documentation for Nip 01"
+---
+
+[AIR-3][AIS-3][BPC-3][RES-3]
+
+
 <!-- markdownlint-disable MD013 line-length -->
 
 # NIP-01: Basic Protocol Flow
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 
 ## Overview
 NIP-01 defines the basic protocol flow in Nostr, including event format, relay communication, and message types. This document explains how Anya Core implements these fundamental features.
@@ -154,3 +168,8 @@ match client.connect_relay("wss://relay.example.com").await {
 - [NIP-20: Command Results](./nip-20.md)
 
 *Last updated: 2024-12-07*
+
+## See Also
+
+- [Related Document](#related-document)
+

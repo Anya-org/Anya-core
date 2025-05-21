@@ -1,4 +1,15 @@
+---
+title: "Alert_reference"
+description: "Documentation for Alert_reference"
+---
+
 # Anya Core Alert Reference
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 
 [AIR-3][AIS-3][BPC-3][RES-3]
 
@@ -197,3 +208,8 @@ For alert-related issues:
 - [AIS-3] - Secure alert handling
 - [BPC-3] - Bitcoin monitoring best practices
 - [RES-3] - Comprehensive alert coverage
+
+## See Also
+
+- [Related Document](#related-document)
+

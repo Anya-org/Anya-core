@@ -1,4 +1,15 @@
+---
+title: "Readme"
+description: "Documentation for Readme"
+last_updated: 2025-05-21
+---
+
 # Anya Core Installation Guide
+
+## Overview
+
+Add a brief overview of this document here.
+
 
 [AIR-3][AIS-3][BPC-3][RES-3]
 
@@ -128,3 +139,8 @@ For additional help:
 1. Check the [troubleshooting guide](troubleshooting.md)
 2. Open an issue on [GitHub](https://github.com/your-org/anya-core/issues)
 3. Email support: <botshelomokoka@gmail.com>
+
+## See Also
+
+- [Related Document 1](./related1.md)
+- [Related Document 2](./related2.md)

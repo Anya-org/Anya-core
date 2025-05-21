@@ -1,6 +1,24 @@
+---
+title: "Private Messaging"
+description: "Documentation for Private Messaging"
+---
+
+[AIR-3][AIS-3][BPC-3][RES-3]
+
+
 <!-- markdownlint-disable MD013 line-length -->
 
 # Private Messaging Integration Guide
+
+## Overview
+
+Add a brief overview of this document here.
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 
 This guide demonstrates how to implement secure private messaging using Anya Core's Nostr integration.
 
@@ -351,3 +369,8 @@ mod tests {
 - [API Reference](../api/client.md)
 
 *Last updated: 2024-12-07*
+
+## See Also
+
+- [Related Document](#related-document)
+

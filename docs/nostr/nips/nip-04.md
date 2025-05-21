@@ -1,6 +1,20 @@
+---
+title: "Nip 04"
+description: "Documentation for Nip 04"
+---
+
+[AIR-3][AIS-3][BPC-3][RES-3]
+
+
 <!-- markdownlint-disable MD013 line-length -->
 
 # NIP-04: Encrypted Direct Messages
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 
 ## Overview
 NIP-04 defines the protocol for end-to-end encrypted direct messages in Nostr. Anya Core implements this using ChaCha20-Poly1305 encryption with shared secret computation.
@@ -200,3 +214,8 @@ fn verify_key_exchange(&self, pubkey: &str) -> Result<(), CoreError> {
 - [NIP-13: Proof of Work](./nip-13.md)
 
 *Last updated: 2024-12-07*
+
+## See Also
+
+- [Related Document](#related-document)
+

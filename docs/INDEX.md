@@ -1,13 +1,24 @@
 ---
 layout: default
-title: Anya Core
-description: AI-Powered Bitcoin Protocol
+title: "Index"
+description: "Documentation for Index"
 show_support: true
+last_updated: 2025-05-21
 ---
 
 <!-- markdownlint-disable MD013 line-length -->
 
 # Anya Core Documentation
+
+## Overview
+
+Add a brief overview of this document here.
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 
 [AIR-3][AIS-3][BPC-3][RES-3]
 
@@ -327,4 +338,9 @@ async fn main() -> Result<()> {
 ## Last Update
 
 *Last updated: 2025-04-28*
+
+
+## See Also
+
+- [Related Document](#related-document)
 

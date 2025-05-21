@@ -1,4 +1,19 @@
+---
+title: "Troubleshooting"
+description: "Documentation for Troubleshooting"
+---
+
 ## Common Resolution Workflow
+
+## Overview
+
+Add a brief overview of this document here.
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 
 ```mermaid
 graph LR
@@ -74,4 +89,10 @@ auth_key = { path = "security/hsm_keys", required_approvals = 2 }
 ```
 
 ---
-*All solutions verified against BDF v2.5 security requirements* 
+
+[AIR-3][AIS-3][BPC-3][RES-3]
+
+## See Also
+
+- [Related Document](#related-document)
+

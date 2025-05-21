@@ -1,6 +1,21 @@
+---
+title: "Tokenomics_system"
+description: "Documentation for Tokenomics_system"
+---
+
 <!-- markdownlint-disable MD013 line-length -->
 
 # Anya Tokenomics System [AIR-3][AIP-3][BPC-3][DAO-3]
+
+## Overview
+
+Add a brief overview of this document here.
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 
 This document outlines the complete tokenomics system for the Anya Governance Token (AGT), including distribution model, emission schedule, and treasury management framework.
 
@@ -159,3 +174,8 @@ All token movements and treasury operations are:
 - **Current Version**: 2.0.0
 - **Last Updated**: [CURRENT_DATE]
 - **Previous Version**: 1.0.0 (Bitcoin-fixed halving model)
+
+## See Also
+
+- [Related Document](#related-document)
+

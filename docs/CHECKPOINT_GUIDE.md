@@ -1,6 +1,24 @@
+---
+title: "Checkpoint_guide"
+description: "Documentation for Checkpoint_guide"
+last_updated: 2025-05-21
+---
+[AIR-3][AIS-3][BPC-3][RES-3]
+
+
 <!-- markdownlint-disable MD013 line-length -->
 
 # Checkpoint Creation Guide
+
+## Overview
+
+Add a brief overview of this document here.
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 
 **Date:** 2025-03-02
 **Version:** 1.0
@@ -143,3 +161,8 @@ Each checkpoint creates a Markdown file in `docs/checkpoints/` with:
 ## Support
 
 For assistance with the checkpoint system, contact the DevOps team or repository maintainers.
+
+## See Also
+
+- [Related Document 1](./related1.md)
+- [Related Document 2](./related2.md)

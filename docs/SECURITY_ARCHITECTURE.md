@@ -1,7 +1,19 @@
+---
+title: "Security_architecture"
+description: "Documentation for Security_architecture"
+last_updated: 2025-05-21
+---
+
 <!-- markdownlint-disable MD013 line-length -->
 
 [AIS-3][BPC-3][DAO-3]
 # Security Architecture
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 
 *Last Updated: 2024-03-10*
 
@@ -302,5 +314,11 @@ pub struct L2SecurityMonitor {
 - **Legal Wrapper Integration**: Digital legal bindings with blockchain attestation
 
 ---
+[AIR-3][AIS-3][BPC-3][RES-3]
+
 
 *This document follows the [AI Labeling System](../docs/standards/AI_LABELING.md) standards based on the Bitcoin Development Framework v2.5.* 
+## See Also
+
+- [Related Document 1](./related1.md)
+- [Related Document 2](./related2.md)

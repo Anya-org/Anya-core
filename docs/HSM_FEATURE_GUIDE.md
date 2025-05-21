@@ -1,4 +1,18 @@
+---
+title: "Hsm_feature_guide"
+description: "Documentation for Hsm_feature_guide"
+---
+
+[AIR-3][AIS-3][BPC-3][RES-3]
+
+
 # HSM Feature Guide
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 
 [AIS-3][RES-3][PFM-2]
 
@@ -107,3 +121,8 @@ pub trait HsmProvider: std::fmt::Debug + Send + Sync {
 3. **Audit Logging**: Comprehensive logging of all HSM operations
 4. **Tamper Resistance**: Hardware providers offer physical tamper protection
 5. **Performance vs Security**: Configurable trade-offs based on use case
+
+## See Also
+
+- [Related Document](#related-document)
+

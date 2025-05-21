@@ -1,6 +1,17 @@
+---
+title: "Core_system_integration"
+description: "Documentation for Core_system_integration"
+---
+
 <!-- markdownlint-disable MD013 line-length -->
 
 # Core System Integration
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 
 *Last Updated: 2024-03-10*
 
@@ -282,4 +293,11 @@ pub struct L2Integration {
 
 ---
 
+[AIR-3][AIS-3][BPC-3][RES-3]
+
+
 *This document follows the [AI Labeling System](../docs/standards/AI_LABELING.md) standards based on the Bitcoin Development Framework v2.5.* 
+## See Also
+
+- [Related Document](#related-document)
+

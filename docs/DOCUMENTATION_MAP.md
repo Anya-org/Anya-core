@@ -1,4 +1,22 @@
+---
+title: "Documentation_map"
+description: "Documentation for Documentation_map"
+---
+
+[AIR-3][AIS-3][BPC-3][RES-3]
+
+
 # Anya Core Documentation Map
+
+## Overview
+
+Add a brief overview of this document here.
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 
 This document provides a comprehensive map of all documentation in the Anya Core project, showing relationships between different components and identifying areas for improvement.
 
@@ -205,3 +223,8 @@ docs/ai/
 - Review documentation structure quarterly
 - Remove deprecated content
 - Keep cross-references up to date
+
+## See Also
+
+- [Related Document](#related-document)
+

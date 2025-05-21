@@ -1,4 +1,18 @@
+---
+title: "Governance_token"
+description: "Documentation for Governance_token"
+---
+
+[AIR-3][AIS-3][BPC-3][RES-3]
+
+
 # Anya Governance Token (AGT)
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 
 [AIS-3][BPC-3][DAO-3]
 
@@ -124,3 +138,7 @@ The AGT token is implemented as a standard-compliant token with additional gover
 - [Tokenomics Flowchart](TOKENOMICS_FLOWCHART.md) - Visual representation of token flows
 
 *Last updated: 2025-02-24* 
+## See Also
+
+- [Related Document](#related-document)
+

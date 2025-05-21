@@ -1,4 +1,22 @@
+---
+title: "Post_rc_fixes"
+description: "Documentation for Post_rc_fixes"
+---
+
+[AIR-3][AIS-3][BPC-3][RES-3]
+
+
 # Post-RC Compilation Fixes
+
+## Overview
+
+Add a brief overview of this document here.
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 
 This document outlines the specific fixes needed after the RC validation to resolve the compilation errors. These fixes are meant to be applied after the RC testing is complete, as they don't affect the functional validation of the RC candidate.
 
@@ -96,3 +114,8 @@ use bitcoin::bip32::ExtendedPrivKey;
 ## Note on Base64 Warnings
 
 The deprecated base64 functions should be addressed separately as they're just warnings and don't affect compilation. Follow the cleanup script created earlier to address these warnings after the RC process.
+
+## See Also
+
+- [Related Document](#related-document)
+

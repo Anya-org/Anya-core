@@ -1,6 +1,20 @@
+---
+title: "Hexagonal"
+description: "Documentation for Hexagonal"
+---
+
+[AIR-3][AIS-3][BPC-3][RES-3]
+
+
 <!-- markdownlint-disable MD013 line-length -->
 
 # Hexagonal Architecture Implementation
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 
 ## Overview
 
@@ -521,3 +535,8 @@ The architecture supports future protocol additions:
    - Optimize performance
 
 *Last updated: 2024-12-07*
+
+## See Also
+
+- [Related Document](#related-document)
+

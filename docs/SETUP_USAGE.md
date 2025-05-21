@@ -1,4 +1,18 @@
+---
+title: "Setup_usage"
+description: "Documentation for Setup_usage"
+---
+
+[AIR-3][AIS-3][BPC-3][RES-3]
+
+
 # Setup & Usage
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 
 [AIS-3][BPC-3][DAO-3]
 
@@ -27,3 +41,7 @@ If you don't have Clarinet installed, you can use the provided installation scri
 ## On MacOS/Linux
 chmod +x scripts/install-clarinet.sh
 ./scripts/install-clarinet.sh 
+## See Also
+
+- [Related Document](#related-document)
+

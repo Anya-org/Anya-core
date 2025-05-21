@@ -1,4 +1,17 @@
+---
+title: "Error_handling"
+description: "Documentation for Error_handling"
+---
+
+[AIR-3][AIS-3][BPC-3][RES-3]
+
+
 # Error Handling in Anya Core
+
+## Overview
+
+Add a brief overview of this document here.
+
 
 This document outlines the error handling strategy and patterns used throughout the Anya Core codebase.
 
@@ -353,3 +366,8 @@ groups:
 ## Conclusion
 
 Proper error handling is crucial for building reliable and maintainable applications. By following these patterns and best practices, we can ensure that Anya Core handles errors gracefully and provides meaningful feedback to users and developers.
+
+## See Also
+
+- [Related Document](#related-document)
+

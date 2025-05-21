@@ -1,4 +1,18 @@
+---
+title: "Dex_integration"
+description: "Documentation for Dex_integration"
+---
+
+[AIR-3][AIS-3][BPC-3][RES-3]
+
+
 # DEX Integration
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 
 [AIS-3][BPC-3][DAO-3]
 
@@ -217,3 +231,7 @@ To withdraw liquidity:
 - [Setup & Usage](SETUP_USAGE.md) - How to interact with the DEX
 
 *Last updated: 2025-02-24* 
+## See Also
+
+- [Related Document](#related-document)
+

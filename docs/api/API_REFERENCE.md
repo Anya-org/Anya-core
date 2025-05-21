@@ -1,6 +1,24 @@
+---
+title: "Api_reference"
+description: "Documentation for Api_reference"
+---
+
+[AIR-3][AIS-3][BPC-3][RES-3]
+
+
 <!-- markdownlint-disable MD013 line-length -->
 
 # API Reference
+
+## Overview
+
+Add a brief overview of this document here.
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 
 ## Core API
 
@@ -89,3 +107,8 @@ DELETE /api/v1/notifications/{id}
 - Standard: 100 requests/minute
 - Enterprise: 1000 requests/minute
 - Custom: Configurable
+
+## See Also
+
+- [Related Document](#related-document)
+

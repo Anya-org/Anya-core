@@ -1,4 +1,22 @@
+---
+title: "Configuration"
+description: "Documentation for Configuration"
+---
+
+[AIR-3][AIS-3][BPC-3][RES-3]
+
+
 # Anya-Core Configuration Guide
+
+## Overview
+
+Add a brief overview of this document here.
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 
 ## Bitcoin RPC Configuration
 
@@ -48,3 +66,8 @@ To switch between mainnet and testnet:
    ```
 
 The system will automatically use the appropriate default RPC endpoint based on the selected network, unless overridden by `bitcoin_custom_rpc_url`.
+
+## See Also
+
+- [Related Document](#related-document)
+

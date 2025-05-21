@@ -1,4 +1,17 @@
+---
+title: "Dev_setup"
+description: "Documentation for Dev_setup"
+---
+
+[AIR-3][AIS-3][BPC-3][RES-3]
+
+
 # Development Environment Setup
+
+## Overview
+
+Add a brief overview of this document here.
+
 
 This guide will help you set up your development environment for Anya Core.
 
@@ -184,3 +197,8 @@ If you encounter any issues, please:
 - [Contribution Guidelines](CONTRIBUTING.md)
 - [Code of Conduct](CODE_OF_CONDUCT.md)
 - [API Documentation](https://docs.anya.org/api)
+
+## See Also
+
+- [Related Document](#related-document)
+

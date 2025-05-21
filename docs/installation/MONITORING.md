@@ -1,4 +1,15 @@
+---
+title: "Monitoring"
+description: "Documentation for Monitoring"
+---
+
 # Anya Core Monitoring Guide
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 
 [AIR-3][AIS-3][BPC-3][RES-3]
 
@@ -178,3 +189,8 @@ For assistance with monitoring:
 
 - Email: <botshelomokoka@gmail.com>
 - GitHub Issues: <https://github.com/your-org/anya-core/issues>
+
+## See Also
+
+- [Related Document](#related-document)
+

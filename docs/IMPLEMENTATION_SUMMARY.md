@@ -1,4 +1,19 @@
+---
+title: "Implementation_summary"
+description: "Documentation for Implementation_summary"
+---
+
 # [AIR-3][AIS-3][BPC-3][RES-3] Anya Core Implementation Summary
+
+## Overview
+
+Add a brief overview of this document here.
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 
 *Last Updated: May 19, 2025*
 
@@ -95,3 +110,8 @@ All modules now comply with the Bitcoin Development Framework v2.5 standards and
 - [x] Miniscript Support
 - [x] Testnet Validation
 - [x] AI Labeling (AIR-3, AIS-3, BPC-3, RES-3)
+
+## See Also
+
+- [Related Document](#related-document)
+

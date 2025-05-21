@@ -1,6 +1,20 @@
+---
+title: "Architecture"
+description: "Documentation for Architecture"
+last_updated: 2025-05-21
+---
+[AIR-3][AIS-3][BPC-3][RES-3]
+
+
 <!-- markdownlint-disable MD013 line-length -->
 
 # Anya System Architecture
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 
 ## Overview
 Anya is an integrated system combining Bitcoin/crypto functionality, ML-based analysis, and Web5 decentralized data management.
@@ -47,3 +61,8 @@ Anya is an integrated system combining Bitcoin/crypto functionality, ML-based an
 1. Authentication Flow:
 
 *Last updated: 2024-12-07*
+
+## See Also
+
+- [Related Document 1](./related1.md)
+- [Related Document 2](./related2.md)
