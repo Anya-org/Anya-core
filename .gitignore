@@ -36,6 +36,8 @@ Thumbs.db
 logs/
 *.log
 reports/
+*REPORT_*.md
+REVIEW_*.md
 
 # Build artifacts
 /target/
@@ -49,3 +51,10 @@ compile_output.log
 
 # Temporary files
 backups/
+
+# Private scripts and systemd files
+scripts/anya-*
+scripts/shutdown_cleanup.sh
+scripts/setup_wakeup.sh
+scripts/setup_scheduled_shutdown.sh
+scripts/systemd/
