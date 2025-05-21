@@ -1,70 +1,28 @@
-# Rust
-/target/
-**/*.rs.bk
-Cargo.lock
 
-# IDE
-.idea/
+# Documentation build files
+venv/
+__pycache__/
+*.py[cod]
+*.class
+
+# MkCache
+.mkdocs/
+
+# Local development
+.env
+.env.local
+
+# IDE specific files
 .vscode/
+.idea/
 *.swp
 *.swo
 
-# Dependencies
-/node_modules/
-/.pnp
-.pnp.js
-
-# Testing
-/coverage/
-
-# Production
-/build/
-/dist/
-
-# Environment
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
-# Web5
-.web5/
-*.db
-*.db-*
-
-# Large files (Web5 handled)
-*.exe
-!*.exe.web5ref
-*.msi
-*.zip
-*.tar.gz
-*.rar
-*.7z
-*.iso
-
-# Logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# System Files
+# OS generated files
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
-
-# Allow core Bitcoin files
-!lib/src/core/bitcoin/
-!test/core/bitcoin/
-
-# Backup and temporary files
-*_backup_*/
-reorganized_backup_*/
-*.bak
-*.bak/
-scripts/target/
-
-# Specific backup directories
-scripts/install/utils/backup_*
-config/*.backup.*
-backups/
