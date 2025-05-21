@@ -1,4 +1,19 @@
+---
+title: "Readme"
+description: "Documentation for Readme"
+---
+
 # Anya Core
+
+## Overview
+
+Add a brief overview of this document here.
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 
 [![BIP-341](https://img.shields.io/badge/BIP-341_Compliant-green)](https://bips.xyz/341)
 [![AIS-3](https://img.shields.io/badge/AIS-3_Secured-blue)](https://bitcoin-development-framework.org)
@@ -26,6 +41,91 @@ Web5 decentralized data management, and a Bitcoin-style DAO governance system.
 > appropriate Core and Extended category labels.
 
 ## Documentation Quick Links [AIR-3][AIS-3][BPC-3][RES-3]
+
+### New Documentation System
+
+We've recently upgraded our documentation system to use MkDocs with the Material theme, providing a modern, searchable, and mobile-friendly experience. The new system includes automated tools for maintaining documentation quality and consistency.
+
+- [Documentation System Guide](docs/DOCUMENTATION_SYSTEM.md) - Learn about our new documentation system
+- [View Documentation](https://docs.anya.org/) - Browse the latest documentation online
+- [Contribute to Docs](CONTRIBUTING.md#documentation) - Help improve our documentation
+- [Documentation Standards](docs/standards/MARKDOWN_STYLE_GUIDE.md) - Our documentation writing guidelines
+
+### Documentation Tools
+
+We provide several scripts to help maintain documentation quality:
+
+| Script | Purpose |
+|--------|----------|
+| `./scripts/setup_docs.sh` | Set up the documentation environment |
+| `./scripts/serve_docs.sh` | Serve documentation locally |
+| `./scripts/update_docs.sh` | Update documentation files to follow standards |
+| `./scripts/review_docs.sh` | Review documentation for issues |
+| `./scripts/check_links.sh` | Check for broken links in documentation |
+| `./scripts/doc_status.sh` | Generate a documentation status report |
+| `./scripts/generate_toc.sh` | Generate/update table of contents |
+
+### Quick Start with Local Docs
+
+1. Install dependencies:
+   ```bash
+   ./scripts/setup_docs.sh
+   ```
+
+2. Update documentation to follow standards:
+   ```bash
+   ./scripts/update_docs.sh
+   ```
+
+3. Serve documentation locally:
+   ```bash
+   ./scripts/serve_docs.sh
+   ```
+
+4. Check for documentation issues:
+   ```bash
+   ./scripts/review_docs.sh
+   ```
+
+### Documentation Standards
+
+All documentation must follow our [Markdown Style Guide](docs/standards/MARKDOWN_STYLE_GUIDE.md) and include proper AI labeling:
+
+```markdown
+[AIR-3][AIS-3][BPC-3][RES-3]
+```
+
+### Documentation Structure
+
+```
+docs/
+├── api/                  # API reference documentation
+├── architecture/         # System architecture docs
+├── assets/               # Images and other assets
+├── getting-started/      # Getting started guides
+├── guides/               # How-to guides and tutorials
+├── installation/         # Installation instructions
+├── standards/            # Documentation standards
+├── tutorials/            # Step-by-step tutorials
+├── .template.md          # Documentation template
+└── index.md              # Main documentation index
+```
+
+### Contributing to Documentation
+
+1. Follow the [Markdown Style Guide](docs/standards/MARKDOWN_STYLE_GUIDE.md)
+2. Use the template: `.template.md`
+3. Run documentation checks before committing:
+   ```bash
+   ./scripts/update_docs.sh
+   ./scripts/check_links.sh
+   ./scripts/review_docs.sh
+   ```
+4. Commit with a descriptive message, e.g., "docs: update API reference"
+
+3. Open <http://127.0.0.1:8000> in your browser
+
+### Core Documentation
 
 ### Core Documentation
 
@@ -1119,3 +1219,8 @@ For more installation options, run:
 ```bash
 sudo ./scripts/install/install-anya.sh --help
 ```
+
+## See Also
+
+- [Related Document](#related-document)
+
