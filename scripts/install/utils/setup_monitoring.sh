@@ -1,8 +1,40 @@
 #!/bin/bash
 # [AIR-3][AIS-3][BPC-3][RES-3]
-# Monitoring Setup Script for Anya Core
+# ===================================================================
+# MONITORING SETUP SCRIPT
 # Part of the Anya Core Hexagonal Architecture
-# Date: 2025-05-21
+# Version: 2.6.0
+# Last Updated: 2025-05-21
+#
+# Description:
+#   This script sets up the monitoring stack for Anya Core, including
+#   Prometheus, Grafana, Alertmanager, and related components.
+#
+# Security:
+#   - Validates Docker and Docker Compose versions
+#   - Enforces secure default configurations
+#   - Implements proper error handling and logging
+#
+# Dependencies:
+#   - Docker 20.10.0+
+#   - Docker Compose 2.0.0+
+#   - 4GB+ RAM (8GB recommended for production)
+#   - 10GB+ free disk space
+#
+# Usage:
+#   ./setup_monitoring.sh [--network=NETWORK] [--email=EMAIL]
+#
+# Parameters:
+#   --network     Network type (mainnet|testnet|regtest) [default: testnet]
+#   --email       Email for alert notifications [default: botshelomokoka@gmail.com]
+#   --help        Show this help message
+#
+# AI Labeling:
+#   [AIR-3] - Implements automated monitoring setup
+#   [AIS-3] - Includes security validations
+#   [BPC-3] - Follows Bitcoin development best practices
+#   [RES-3] - Provides resilient error handling
+# ===================================================================
 
 set -e
 

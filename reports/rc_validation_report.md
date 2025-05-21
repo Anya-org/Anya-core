@@ -1,8 +1,8 @@
 # Anya Core RC Validation Report
-Generated: Thu May 15 12:59:30 PM UTC 2025
+Generated: Wed May 21 11:49:51 AM UTC 2025
 
 ## Version
-0.2.0-rc1
+0.3.0-rc.1-rc1
 
 ## Validation Results
 ✅ Compilation test: PASSED
@@ -10,7 +10,7 @@ Generated: Thu May 15 12:59:30 PM UTC 2025
 ⚠️ HSM module: PARTIAL - Software provider only for RC
 
 ## Warnings and Issues
-- Compiler warnings: 67
+- Compiler warnings: 4
 - Base64 deprecated functions need updating (scheduled for post-RC)
 - Unused imports should be cleaned up (scheduled for post-RC)
 

@@ -1,34 +1,64 @@
-# Anya Bitcoin [BPC-3]
+# Anya Bitcoin [BPC-3][AIS-3][RES-3]
 
-A comprehensive Bitcoin implementation following the Bitcoin Development Framework v2.5 standards and hexagonal architecture principles.
+*Last Updated: May 21, 2025*
+
+**Version: v0.3.0-rc1**
+
+> **Note**: This release includes full Taproot support, enhanced security features, and performance improvements.
+
+A comprehensive Bitcoin implementation following the Bitcoin Development Framework v2.5 standards with a focus on security, performance, and extensibility. Built with a hexagonal architecture for clean separation of concerns and maximum flexibility.
 
 ## Overview
 
 Anya Bitcoin provides a complete Bitcoin implementation with support for Layer 2 protocols, RISC-V integration, and extensible architecture. It follows a hexagonal architecture pattern for clean separation of concerns.
 
-## Directory Structure
+## Quick Start [BPC-3][UXA-2]
 
+### Prerequisites
+
+- Rust 1.65+ (stable)
+- Clang and LLVM
+- Protobuf compiler
+- OpenSSL/LibreSSL
+
+### Building from Source
+
+```bash
+# Clone the repository
+git clone https://github.com/your-org/anya-core.git
+cd anya-core/anya-bitcoin
+
+# Build in release mode
+cargo build --release
+
+# Run tests
+cargo test --all-features
+
+# Start a testnet node
+cargo run --release -- --network=testnet
 ```
-anya-bitcoin/
-├── src/
-│   ├── core/                       # Core Bitcoin functionality
-│   │   ├── consensus/              # Consensus rules and validation
-│   │   ├── mempool/                # Transaction memory pool
-│   │   ├── network/                # P2P networking
-│   │   ├── script/                 # Script validation and execution
-│   │   └── error.rs                # Error types
-│   ├── layer2/                     # Layer 2 protocols
-│   │   ├── framework/              # Common Layer 2 framework
-│   │   ├── bob/                    # Bitcoin Optimistic Blockchain
-│   │   ├── lightning/              # Lightning Network implementation
-│   │   ├── rgb/                    # RGB Protocol implementation
-│   │   ├── rsk/                    # RSK integration
-│   │   ├── dlc/                    # Discreet Log Contracts
-│   │   └── taproot_assets/         # Taproot Assets implementation
-│   ├── ports/                      # Hexagonal architecture ports
-│   │   ├── blockchain_port.rs      # Primary blockchain interfaces
-│   │   ├── transaction_port.rs     # Transaction interfaces
-│   │   └── layer2_port.rs          # Layer 2 protocols interfaces
+
+## Taproot Support [BIP-341][BIP-342]
+
+Full support for Taproot (BIP 341) and Tapscript (BIP 342) including:
+
+- Schnorr signatures (BIP 340)
+- Taproot key path spending
+- Tapscript script path spending
+- Signature hashing (BIP 341)
+- Taproot descriptor support
+
+Example Taproot address generation:
+
+```rust
+use anya_bitcoin::core::taproot::TaprootBuilder;
+use secp256k1::{Secp256k1, KeyPair};
+
+let secp = Secp256k1::new();
+let keypair = KeyPair::new(&secp, &mut rand::thread_rng());
+let builder = TaprootBuilder::new();
+// ... build taproot tree ...
+```
 │   ├── adapters/                   # External system adapters
 │   │   ├── rpc/                    # RPC adapters
 │   │   ├── storage/                # Storage adapters
