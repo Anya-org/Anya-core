@@ -12,6 +12,10 @@ UTILS_DIR="${SCRIPT_DIR}/utils"
 
 if [ -f "${UTILS_DIR}/install_common.sh" ]; then
     source "${UTILS_DIR}/install_common.sh"
+    source "${UTILS_DIR}/setup_monitoring.sh" 2>/dev/null || {
+        log "WARNING" "Monitoring setup script not found. Monitoring will be skipped."
+        MONITORING_AVAILABLE=false
+    }
 else
     echo "[ERROR] Common utilities not found: ${UTILS_DIR}/install_common.sh"
     exit 1
@@ -21,6 +25,8 @@ fi
 INSTALL_TYPE="standard"
 NETWORK="testnet"
 DRY_RUN=false
+MONITORING=false
+MONITORING_AVAILABLE=${MONITORING_AVAILABLE:-false}
 
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
@@ -31,6 +37,14 @@ while [[ $# -gt 0 ]]; do
             ;;
         --network=*)
             NETWORK="${1#*=}"
+            shift
+            ;;
+        --with-monitoring)
+            if [ "$MONITORING_AVAILABLE" = true ]; then
+                MONITORING=true
+            else
+                log "WARNING" "Monitoring setup is not available. Skipping monitoring installation."
+            fi
             shift
             ;;
         --dry-run)
@@ -49,6 +63,7 @@ install_anya_core() {
     
     if [ "$DRY_RUN" = true ]; then
         echo "[DRY RUN] Would install Anya Core with the following configuration:"
+        echo "[DRY RUN] - Monitoring: ${MONITORING:-false}"
         echo "  - Installation Type: $INSTALL_TYPE"
         echo "  - Network: $NETWORK"
         echo "  - Install Dependencies: $INSTALL_DEPS"
@@ -287,9 +302,23 @@ EOF
         chown "$(whoami):$(id -gn)" "$config_path"
     fi
     
+    # Install monitoring if requested
+    if [ "$MONITORING" = true ] && [ "$MONITORING_AVAILABLE" = true ]; then
+        echo "[INFO] Setting up monitoring stack..."
+        if ! setup_monitoring; then
+            echo "[WARNING] Failed to set up monitoring stack. Continuing with installation..."
+        fi
+    fi
+
     echo "[SUCCESS] Anya Core installation completed successfully"
-    echo ""
-    echo "Next steps:"
+    echo "[INFO] You can now start using Anya Core"
+    
+    if [ "$MONITORING" = true ] && [ "$MONITORING_AVAILABLE" = true ]; then
+        echo "[INFO] Monitoring is enabled and running"
+        echo "       - Grafana: http://localhost:3000"
+        echo "       - Prometheus: http://localhost:9090"
+        echo "       - Alertmanager: http://localhost:9093"
+    fi
     echo "1. Edit the configuration file: ${INSTALL_DIR}/config/anya.toml"
     echo "2. Start the service: sudo systemctl start anya-core"
     echo "3. Check status: sudo systemctl status anya-core"

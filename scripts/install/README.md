@@ -1,34 +1,80 @@
 # Anya Core Installation System
 
-# [AIR-3][AIS-3][BPC-3][RES-3]
+# [AIR-3][AIS-3][BPC-3][RES-3][HSM-3][CRY-3]
 
-Date: 2025-05-20
+*Last Updated: May 24, 2025*
+
+**Latest Version: v0.3.0-rc2**
+
+> **Note**: This version includes a complete refactor of the installation system following Bitcoin Development Framework v2.5 standards, with enhanced security features including HSM integration, Taproot support, and automated hardware detection.
 
 This directory contains the Anya Core installation system scripts. This system has been designed to provide a unified installation experience with automatic hardware detection, appropriate feature flag configuration, and support for both fresh installations and upgrades. The system follows the Bitcoin Development Framework v2.5 standards and implements hexagonal architecture principles.
 
-## System Components
+## System Components [AIR-3][AIS-3][BPC-3]
 
-- **unified_install_framework.sh** - Comprehensive installation framework following BDF v2.5 standards
-- **install.sh** - Main entry point for the installation system (at project root level)
-- **auto_install.sh** - Automated installation with hardware detection and system analysis
-- **linux_install.sh** - Core installation script for Linux systems
-- **systemd_config.sh** - Systemd service configuration
-- **uninstall.sh** - Clean uninstallation
+### Core Installation Scripts
+- **main_installer.sh** - Comprehensive installation framework following BDF v2.5 standards
+- **unified_install_framework.sh** - Unified installation framework with hardware detection
+- **systemd_config.sh** - Systemd service configuration and management
+- **dashboard.sh** - System monitoring and status dashboard
 - **utils/** - Directory containing utility scripts and common functions
 
-## Installation Options
+### Security Features [AIS-3][SEC-3]
+- Hardware-based security recommendations
+- Automatic TPM attestation verification
+- Secure key generation and management
+- System hardening configurations
+
+### Monitoring & Maintenance [RES-3]
+- System health checks
+- Performance monitoring
+- Automatic updates and patches
+- Logging and audit trails
+
+## Installation Guide [BPC-3][UXA-2]
+
+### Quick Start
+
+```bash
+# Clone the repository
+git clone https://github.com/your-org/anya-core.git
+cd anya-core
+
+# Run the installer
+./install.sh --network=testnet --type=standard
+```
+
+### Installation Options
 
 The installation system supports various modes and configurations:
 
-### Installation Types
+#### Installation Types
 
-- **minimal**: Basic functionality with minimal resource usage
-- **standard**: Default installation with balanced features
-- **full**: Complete installation with all features
+- **minimal**: Basic functionality with minimal resource usage (recommended for embedded systems)
+- **standard**: Default installation with balanced features (recommended for most users)
+- **full**: Complete installation with all features (for development and testing)
 
-### Security Hardening Levels
+#### Network Options
 
-- **basic**: Minimal security configuration
+- **mainnet**: Connect to Bitcoin mainnet (requires full node)
+- **testnet**: Connect to Bitcoin testnet (recommended for development)
+- **regtest**: Local regtest environment (for testing)
+- **signet**: Bitcoin signet (for testing with real BTC)
+
+### Security Hardening [AIS-3][SEC-3]
+
+#### Hardening Levels
+- **basic**: Minimal security configuration (not recommended for production)
+- **standard**: Balanced security with reasonable performance impact (default)
+- **high**: Enhanced security with additional protections (recommended for production)
+- **paranoid**: Maximum security with significant performance impact (for high-security environments)
+
+#### Security Features
+- Automatic firewall configuration
+- Process isolation
+- Memory protection
+- Secure boot verification
+- Hardware security module (HSM) integration
 - **standard**: Default security configuration
 - **strict**: Maximum security configuration
 

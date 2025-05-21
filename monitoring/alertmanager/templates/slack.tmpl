@@ -1,0 +1,37 @@
+{{ define "slack.anya.title" }}{{ .CommonLabels.alertname }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }} firing{{ end }}{{ end }}
+
+{{ define "slack.anya.text" }}
+{{ if eq .Status "firing" }}
+:warning: *{{ .CommonLabels.severity | toUpper }}: {{ .CommonLabels.alertname }}*
+{{ else }}
+:white_check_mark: *RESOLVED: {{ .CommonLabels.alertname }}*
+{{ end }}
+
+*Summary*: {{ .CommonAnnotations.summary }}
+*Description*: {{ .CommonAnnotations.description }}
+*Status*: {{ .Status | toUpper }}
+*Starts at*: {{ .StartsAt }}
+{{ if eq .Status "resolved" }}
+*Ends at*: {{ .EndsAt }}
+{{ end }}
+
+{{ if .Alerts }}
+*Alerts*:
+{{ range .Alerts }}
+• *{{ .Status | toUpper }}*: {{ .Labels.alertname }}
+  - *Instance*: {{ .Labels.instance }}
+  - *Severity*: {{ .Labels.severity }}
+  - *Summary*: {{ .Annotations.summary }}
+  - *Description*: {{ .Annotations.description }}
+  - *Starts at*: {{ .StartsAt }}
+  {{ if eq .Status "resolved" }}
+  - *Ends at*: {{ .EndsAt }}
+  {{ end }}
+{{ end }}
+{{ end }}
+
+*Common Labels*:
+{{ range $key, $value := .CommonLabels }}
+• *{{ $key }}*: `{{ $value }}`
+{{ end }}
+{{ end }}

@@ -1,0 +1,73 @@
+global:
+  resolve_timeout: 5m
+  # SMTP configuration for email alerts
+  smtp_smarthost: 'smtp.gmail.com:587'
+  smtp_from: 'botshelomokoka@gmail.com'
+  smtp_auth_username: 'botshelomokoka@gmail.com'
+  smtp_auth_password: '${SMTP_PASSWORD}'
+  smtp_require_tls: true
+  smtp_hello: 'gmail.com'
+
+route:
+  # Group alerts by alertname and severity
+  group_by: ['alertname', 'severity']
+  # Initial delay before sending first notification for a new group
+  group_wait: 30s
+  # Time between sending notifications about new groups
+  group_interval: 5m
+  # Time between sending notifications if new alerts are still firing
+  repeat_interval: 3h
+  # Default receiver
+  receiver: 'slack'
+  # Child routes for specific alert types
+  routes:
+    # Suppress Watchdog alerts
+    - match:
+        alertname: Watchdog
+      receiver: 'null'
+    # Critical alerts
+    - match:
+        severity: 'critical'
+      receiver: 'slack'
+      continue: true
+    # Warning alerts
+    - match:
+        severity: 'warning'
+      receiver: 'slack'
+
+receivers:
+  # Null receiver for suppressed alerts
+  - name: 'null'
+  
+  # Slack receiver
+  - name: 'slack'
+    slack_configs:
+      - api_url: '${SLACK_WEBHOOK_URL}'
+        channel: '#alerts'
+        send_resolved: true
+        title: '{{ template "slack.anya.title" . }}'
+        text: '{{ template "slack.anya.text" . }}'
+        color: '{{ if eq .Status "firing" }}{{ if eq .CommonLabels.severity "critical" }}danger{{ else }}warning{{ end }}{{ else }}good{{ end }}'
+
+  # Email receiver
+  - name: 'email'
+    email_configs:
+      - to: 'botshelomokoka@gmail.com'
+        send_resolved: true
+        headers:
+          subject: '[ANYA-CORE {{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] {{ .CommonLabels.alertname }}'
+        html: '{{ template "email.anya.html" . }}'
+
+  # PagerDuty receiver
+  - name: 'pagerduty'
+    pagerduty_configs:
+      - service_key: '${PAGERDUTY_KEY}'
+        description: '{{ .CommonAnnotations.summary }}'
+        details:
+          firing: '{{ .CommonAnnotations.description }}'
+          severity: '{{ .CommonLabels.severity }}'
+          status: '{{ .Status }}'
+
+# Templates for alert messages
+templates:
+  - '/etc/alertmanager/templates/*.tmpl'
