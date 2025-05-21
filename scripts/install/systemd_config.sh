@@ -70,7 +70,8 @@ show_help() {
     echo "  --start                 Start the service after configuration"
     echo "  --binary-path=PATH      Custom path to the binary (default: auto-detect)"
     echo "  --config-path=PATH      Custom path to config file (default: auto-detect)"
-    echo "  --hardening=LEVEL       Security hardening level (basic, standard, strict)"
+    echo "  --network=NETWORK      Network to connect to (mainnet, testnet, regtest, signet)"
+    echo "  --hardening=LEVEL      Security hardening level (basic, standard, strict)"
     echo "  --help                  Display this help message"
     echo "  --version               Display script version"
     echo ""
@@ -118,29 +119,18 @@ parse_args() {
                 ;;
             --binary-path=*)
                 BINARY_PATH="${1#*=}"
-                # Validate binary path exists
-                if [ ! -f "$BINARY_PATH" ]; then
-                    log ERROR "Binary not found at path: $BINARY_PATH"
-                    exit 1
-                fi
                 shift
                 ;;
             --config-path=*)
                 CONFIG_PATH="${1#*=}"
-                # Validate config path exists
-                if [ ! -f "$CONFIG_PATH" ]; then
-                    log ERROR "Config file not found at path: $CONFIG_PATH"
-                    exit 1
-                fi
+                shift
+                ;;
+            --network=*)
+                NETWORK="${1#*=}"
                 shift
                 ;;
             --hardening=*)
                 HARDENING_LEVEL="${1#*=}"
-                # Validate hardening level
-                if ! [[ "$HARDENING_LEVEL" =~ ^(basic|standard|strict)$ ]]; then
-                    log ERROR "Invalid hardening level: $HARDENING_LEVEL (must be basic, standard, or strict)"
-                    exit 1
-                fi
                 shift
                 ;;
             --help)
@@ -159,11 +149,17 @@ parse_args() {
         esac
     done
     
-    # Check if user exists
-    if ! id "$USER_NAME" &>/dev/null; then
-        log ERROR "User $USER_NAME does not exist"
-        exit 1
-    fi
+    # Set default network if not provided and validate
+    NETWORK="${NETWORK:-testnet}"
+    case "$NETWORK" in
+        mainnet|testnet|regtest|signet)
+            # Valid network, continue
+            ;;
+        *)
+            log ERROR "Invalid network: $NETWORK. Must be one of: mainnet, testnet, regtest, signet"
+            exit 1
+            ;;
+    esac
     
     # Auto-detect binary path if not specified
     if [ -z "$BINARY_PATH" ]; then
@@ -215,6 +211,7 @@ configure_systemd() {
 ProtectSystem=full
 PrivateTmp=true
 NoNewPrivileges=true
+ProtectHome=tmpfs
 EOF
 )
             ;;
@@ -226,7 +223,7 @@ PrivateTmp=true
 NoNewPrivileges=true
 PrivateDevices=true
 MemoryDenyWriteExecute=true
-ProtectHome=read-only
+ProtectHome=tmpfs
 ProtectKernelTunables=true
 ProtectControlGroups=true
 RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
@@ -242,7 +239,7 @@ PrivateTmp=true
 NoNewPrivileges=true
 PrivateDevices=true
 MemoryDenyWriteExecute=true
-ProtectHome=true
+ProtectHome=tmpfs
 ProtectKernelTunables=true
 ProtectKernelModules=true
 ProtectControlGroups=true
@@ -311,6 +308,7 @@ Nice=${NICE_VALUE}
 Environment="RUST_LOG=info"
 Environment="ANYA_HOME=${PROJECT_ROOT}"
 Environment="ANYA_CONFIG=${CONFIG_PATH}"
+Environment="BITCOIN_NETWORK=${NETWORK}"
 # System-specific environment variables
 Environment="ANYA_CPU_CORES=${CPU_CORES}"
 Environment="ANYA_MEMORY_LIMIT=${MEM_LIMIT}"
@@ -390,6 +388,7 @@ create_environment_file() {
 export ANYA_HOME="${PROJECT_ROOT}"
 export ANYA_CONFIG="${CONFIG_PATH}"
 export RUST_LOG="info"
+export BITCOIN_NETWORK="${NETWORK}"
 export PATH="\$PATH:$(dirname "$BINARY_PATH")"
 
 # Add this to your shell config or run source ~/.anya-env

@@ -28,25 +28,68 @@ else
     exit 1
 fi
 
+# Import validation functions
+source <(node scripts/install/validator.js)
+
+validate_installation() {
+  node scripts/install/validator.js check_bip_compliance
+}
+
 # Script version
 VERSION="1.0.0"
 
-# Display header
-print_header "Unified Installation Framework" "$VERSION"
+# Default directories
+LOG_DIR="/var/log/anya"
+CONFIG_DIR="/etc/anya"
+INSTALL_DIR="/opt/anya"
+
+# Parse command line arguments
+DRY_RUN=false
+for arg in "$@"; do
+  case $arg in
+    --dry-run)
+      DRY_RUN=true
+      shift
+      ;;
+    --network=*)
+      NETWORK="${arg#*=}"
+      shift
+      ;;
+    --type=*)
+      INSTALL_TYPE="${arg#*=}"
+      shift
+      ;;
+    *)
+      shift
+      ;;
+  esac
+done
 
 # Default configuration
-NETWORK="testnet"
-INSTALL_TYPE="standard"  # minimal, standard, full
+NETWORK="${NETWORK:-testnet}"
+INSTALL_TYPE="${INSTALL_TYPE:-standard}"  # minimal, standard, full
 HARDENING_LEVEL="standard"  # basic, standard, strict
 START_SERVICE=true
 INSTALL_DEPS=true
 CONFIGURE_FIREWALL=true
+
+# Display header
+print_header "Anya Core Installation" "$VERSION"
+
+echo "[INFO] Installation type: $INSTALL_TYPE"
+echo "[INFO] Network: $NETWORK"
+
+if [ "$DRY_RUN" = true ]; then
+  echo "[DRY RUN] Running in dry-run mode. No changes will be made."
+fi
 AUTO_RUN=false
 FEATURE_FLAGS=""
 RUN_TESTS=false
 TEST_TYPE="basic"  # basic, comprehensive, full
 FORCE_CLEAN=false
 UPGRADE_EXISTING=true
+DRY_RUN=false
+SILENT_MODE=false
 
 # Function to show help
 function show_help {
@@ -67,8 +110,11 @@ function show_help {
     echo "  --features=FLAGS        Explicitly set Cargo feature flags (overrides auto-detection)"
     echo "  --force-clean           Force clean installation even if already installed"
     echo "  --no-upgrade            Don't upgrade existing installation (exit if installed)"
+    echo "  --dry-run               Perform a dry run (don't make any changes)"
+    echo "  --silent                Run in silent mode (suppress output)"
     echo "  --help                  Display this help message"
     echo "  --version               Display script version"
+    echo "  --log-level=LEVEL       Set log level (debug, info, warn, error)"
     echo ""
     echo "Example:"
     echo "  sudo $0 --network=testnet --type=standard --auto-run"
@@ -153,6 +199,18 @@ function parse_args {
                 ;;
             --no-upgrade)
                 UPGRADE_EXISTING=false
+                shift
+                ;;
+            --dry-run)
+                DRY_RUN=true
+                shift
+                ;;
+            --silent)
+                SILENT_MODE=true
+                shift
+                ;;
+            --log-level=*)
+                LOG_LEVEL="${1#*=}"
                 shift
                 ;;
             *)
@@ -261,6 +319,17 @@ function analyze_system {
     log INFO "System analysis completed"
 }
 
+# Hardware Recommendations
+recommend_features() {
+  if lscpu | grep -q 'avx2'; then
+    echo "Recommended Features: AVX2_OPTIMIZED BITCOIN_FULL_NODE"
+  elif [ $(free -g | awk '/Mem:/ {print $2}') -ge 16 ]; then
+    echo "Recommended Features: HIGH_MEM_MODE"
+  else
+    echo "Recommended Features: STANDARD_MODE"
+  fi
+}
+
 # Function to check for existing installation
 function check_existing_installation {
     log INFO "Checking for existing installation..."
@@ -353,9 +422,25 @@ function run_uninstall {
                 fi
             fi
         fi
+        
+        # Remove legacy script references
+        rm -f install-anya.sh install-master.sh linux_install.sh
     fi
     
     log INFO "Uninstall completed"
+}
+
+# Core Ports
+declare_ports() {
+    # Bitcoin interface port
+    echo "Bitcoin RPC port: 8332"
+}
+
+# Adapter Implementations
+implement_bitcoin_adapter() {
+    # Using previous security configurations
+    verify_tpm_attestation
+    configure_firewall
 }
 
 # Function to configure feature flags
@@ -388,6 +473,11 @@ function configure_feature_flags {
         fi
     fi
     
+    # Hardware-based feature recommendations
+    local recommended_features=$(recommend_features)
+    log INFO "$recommended_features"
+    FEATURE_FLAGS="${FEATURE_FLAGS},${recommended_features#*:}"
+    
     log INFO "Configured feature flags: $FEATURE_FLAGS"
 }
 
@@ -395,12 +485,12 @@ function configure_feature_flags {
 function run_main_installer {
     log INFO "Running main installer..."
     
-    # Check if linux_install.sh exists
-    if [ -f "${SCRIPT_DIR}/linux_install.sh" ]; then
-        log INFO "Using linux_install.sh"
+    # Check if main installer script exists
+    if [ -f "${SCRIPT_DIR}/main_installer.sh" ]; then
+        log INFO "Using main_installer.sh"
         
         # Build command
-        local cmd="${SCRIPT_DIR}/linux_install.sh"
+        local cmd="${SCRIPT_DIR}/main_installer.sh"
         cmd+=" --network=$NETWORK"
         cmd+=" --type=$INSTALL_TYPE"
         cmd+=" --hardening=$HARDENING_LEVEL"
@@ -426,8 +516,43 @@ function run_main_installer {
         log INFO "Executing: $cmd"
         eval "$cmd"
     else
-        log ERROR "linux_install.sh not found. Cannot proceed with installation."
-        exit 1
+        log WARN "main_installer.sh not found. Using minimal installation mode."
+        log INFO "Creating basic directory structure..."
+        
+        if [ "$DRY_RUN" != true ]; then
+            # Create minimal directory structure
+            mkdir -p "$INSTALL_DIR/bin"
+            mkdir -p "$INSTALL_DIR/config"
+            mkdir -p "$INSTALL_DIR/logs"
+            
+            # Create basic configuration
+            cat > "$CONFIG_DIR/anya.conf" <<EOL
+# Anya Core Configuration
+# Generated on $(date)
+
+[network]
+type=$NETWORK
+rpcport=8332
+rpcuser=anya
+rpcpassword=$(openssl rand -hex 32)
+
+[core]
+datadir=/var/lib/anya
+logdir=/var/log/anya
+
+[bitcoin]
+rpchost=127.0.0.1
+rpcport=8332
+rpcuser=bitcoin
+rpcpassword=bitcoin
+EOL
+            
+            log INFO "Created minimal installation at $INSTALL_DIR"
+            log INFO "Configuration file created at $CONFIG_DIR/anya.conf"
+        else
+            log INFO "[DRY RUN] Would create minimal installation at $INSTALL_DIR"
+            log INFO "[DRY RUN] Would create configuration at $CONFIG_DIR/anya.conf"
+        fi
     fi
     
     log INFO "Main installer completed"
@@ -567,6 +692,32 @@ function show_completion {
     echo
 }
 
+# Post-install audit
+log INFO "Running system audit..."
+./scripts/audit/system_audit.sh
+
+# Function to create directories with proper permissions
+create_directories() {
+    local dirs=("$LOG_DIR" "$CONFIG_DIR" "$INSTALL_DIR")
+    
+    for dir in "${dirs[@]}"; do
+        if [ ! -d "$dir" ]; then
+            if [ "$DRY_RUN" = true ]; then
+                echo "[DRY RUN] Would create directory: $dir"
+            else
+                echo "[INFO] Creating directory: $dir"
+                if ! mkdir -p "$dir"; then
+                    echo "[ERROR] Failed to create directory: $dir"
+                    exit 1
+                fi
+                chmod 755 "$dir"
+            fi
+        else
+            echo "[INFO] Directory exists: $dir"
+        fi
+    done
+}
+
 # Main function
 function main {
     # Parse command line arguments
@@ -574,6 +725,19 @@ function main {
     
     # Check for root privileges
     check_root
+    
+    # Log level handling
+    LOG_LEVEL="info"
+    case $1 in
+      --log-level=*)
+        LOG_LEVEL="${1#*=}"
+        shift
+        ;;
+    esac
+    
+    # Create required directories
+    create_directories
+    chmod 0755 "$LOG_DIR"
     
     # Analyze system
     analyze_system
@@ -600,11 +764,22 @@ function main {
         run_tests
     fi
     
+    # Validate installation
+    validate_installation
+    
     # Show completion message
-    show_completion
+    if [ "$SILENT_MODE" = false ]; then
+        show_completion
+    fi
     
     log INFO "Anya Core installation completed successfully"
 }
 
 # Run the script
+if [ "$DRY_RUN" = true ]; then
+    log INFO "Dry run mode, exiting without making changes"
+    exit 0
+fi
+
 main "$@"
+sudo apt-get install -y fdclone

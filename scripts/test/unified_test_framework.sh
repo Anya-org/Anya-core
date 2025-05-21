@@ -176,7 +176,7 @@ function run_core_tests {
         log "INFO" "Running full core tests"
         
         # Run cargo test with all features
-        if ! run_test_with_timeout "Core full tests" "cd $ROOT_DIR && cargo test --all-features" "$TIMEOUT"; then
+        if ! run_test_with_timeout "Core full tests" "cd $ROOT_DIR && cargo test --all-features" "600"; then
             core_tests_passed=false
         fi
     fi
@@ -221,7 +221,7 @@ function run_bitcoin_tests {
         log "INFO" "Running full Bitcoin tests"
         
         # Run cargo test for Bitcoin module with all features
-        if ! run_test_with_timeout "Bitcoin full tests" "cd $ROOT_DIR && cargo test --package anya-core --lib bitcoin --all-features" "$TIMEOUT"; then
+        if ! run_test_with_timeout "Bitcoin full tests" "cd $ROOT_DIR && cargo test --package anya-core --lib bitcoin --all-features" "600"; then
             bitcoin_tests_passed=false
         fi
     fi
@@ -266,7 +266,7 @@ function run_hsm_tests {
         log "INFO" "Running full HSM tests"
         
         # Run cargo test for HSM module with all features
-        if ! run_test_with_timeout "HSM full tests" "cd $ROOT_DIR && cargo test --package anya-core --lib security::hsm --all-features" "$TIMEOUT"; then
+        if ! run_test_with_timeout "HSM full tests" "cd $ROOT_DIR && cargo test --package anya-core --lib security::hsm --all-features" "600"; then
             hsm_tests_passed=false
         fi
     fi
@@ -311,7 +311,7 @@ function run_web5_tests {
         log "INFO" "Running full Web5 tests"
         
         # Run cargo test for Web5 module with all features
-        if ! run_test_with_timeout "Web5 full tests" "cd $ROOT_DIR && cargo test --package anya-core --lib web5 --all-features" "$TIMEOUT"; then
+        if ! run_test_with_timeout "Web5 full tests" "cd $ROOT_DIR && cargo test --package anya-core --lib web5 --all-features" "600"; then
             web5_tests_passed=false
         fi
     fi

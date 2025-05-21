@@ -183,6 +183,9 @@ run_install() {
     fi
 }
 
+# Use configuration port
+CONFIG_PORT=8332
+
 # Parse arguments
 parse_args() {
     local command=""
