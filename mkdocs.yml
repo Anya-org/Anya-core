@@ -1,17 +1,21 @@
+# Site Information
 site_name: Anya Core
 site_url: https://docs.anya.org/
-repo_url: https://github.com/anya-org/anya-core
-repo_name: anya-org/anya-core
 site_author: Anya Core Team
 site_description: |
   Anya Core - Enterprise-grade Bitcoin infrastructure for the next generation of financial applications.
   [AIR-3][AIS-3][BPC-3][RES-3]
 
+# Repository
+repo_url: https://github.com/anya-org/anya-core
+repo_name: anya-org/anya-core
+edit_uri: edit/main/docs/
+
 # Copyright
 copyright: |
   Copyright &copy; 2025 Anya Foundation
 
-# Theme configuration
+# Theme Configuration
 theme:
   name: material
   palette:
@@ -48,21 +52,26 @@ theme:
     - content.action.edit
     - content.action.view
 
-# Extensions
+# Markdown Extensions
 markdown_extensions:
+  # Emoji support
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+  
+  # Code highlighting
   - pymdownx.highlight:
       anchor_linenums: true
       line_spans: __span
       pygments_lang_class: true
-  - pymdownx.inlinehilite
   - pymdownx.superfences:
       custom_fences:
         - name: mermaid
           class: mermaid
           format: !!python/name:pymdownx.superfences.fence_code_format
-  - pymdownx.emoji:
-      emoji_index: !!python/name:materialx.emoji.twemoji
-      emoji_generator: !!python/name:materialx.emoji.to_svg
+  - pymdownx.inlinehilite
+  
+  # Content organization
   - pymdownx.snippets:
       base_path: docs
   - pymdownx.tabbed:
@@ -84,9 +93,14 @@ plugins:
   - awesome-pages
   - git-revision-date-localized:
       type: timeago
+      timezone: UTC
       fallback_to_build_date: false
   - git-committers:
       repository: anya-org/anya-core
+      branch: main
+      docs_path: docs/
+  - include-markdown:
+      base_path: docs
   - minify:
       minify_html: true
       minify_js: true
@@ -125,17 +139,7 @@ nav:
       - Code of Conduct: community/code-of-conduct.md
       - Changelog: community/changelog.md
 
-# Extra
-extra:
-  social:
-    - icon: fontawesome/brands/github
-      link: https://github.com/anya-org/anya-core
-    - icon: fontawesome/brands/twitter
-      link: https://twitter.com/anyacore
-    - icon: fontawesome/brands/discord
-      link: https://discord.gg/anya-core
-
-# Build options
+# Build Configuration
 docs_dir: docs
 site_dir: site
 strict: true
@@ -148,8 +152,10 @@ extra_css:
 extra_javascript:
   - js/extra.js
 
-# Extras
+# Extra Context
 extra:
+  version:
+    provider: mike
   analytics:
     provider: google
     property: G-XXXXXXXXXX
@@ -157,6 +163,13 @@ extra:
   favicon: assets/favicon.ico
   features:
     - navigation.tabs
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/anya-org/anya-core
+    - icon: fontawesome/brands/twitter
+      link: https://twitter.com/anyacore
+    - icon: fontawesome/brands/discord
+      link: https://discord.gg/anya-core
     - navigation.tabs.sticky
     - navigation.sections
     - navigation.indexes
