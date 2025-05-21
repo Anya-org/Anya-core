@@ -1,4 +1,22 @@
+---
+title: "Contributing"
+description: "Documentation for Contributing"
+---
+
+[AIR-3][AIS-3][BPC-3][RES-3]
+
+
 # Contributing Guide \[AIR-1\]\[AIT-2\]
+
+## Overview
+
+Add a brief overview of this document here.
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 
 <!-- markdownlint-disable MD013 line-length -->
 
@@ -148,3 +166,8 @@ By contributing to Anya Core, you agree that your contributions will be licensed
 ## Last Updated
 
 2025-03-12
+
+## See Also
+
+- [Related Document](#related-document)
+

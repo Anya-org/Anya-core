@@ -1,6 +1,21 @@
+---
+title: "Roadmap"
+description: "Documentation for Roadmap"
+---
+
 <!-- markdownlint-disable MD013 line-length -->
 
 # Anya Core Development Roadmap v2.6
+
+## Overview
+
+Add a brief overview of this document here.
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 
 ## Critical Path
 
@@ -138,4 +153,12 @@ journey
 | Q4 2025 | 342       | 95%    | ⏳      |
 
 ---
+
+[AIR-3][AIS-3][BPC-3][RES-3]
+
 *Aligned with Bitcoin Core development schedule and BDF v2.5 requirements*
+
+## See Also
+
+- [Related Document](#related-document)
+
