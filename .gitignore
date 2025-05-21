@@ -26,3 +26,26 @@ __pycache__/
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# Backup files
+*.bak
+*.backup
+*~
+
+# Logs and reports
+logs/
+*.log
+reports/
+
+# Build artifacts
+/target/
+Cargo.lock
+scripts/Cargo.lock
+scripts/target/
+scripts/install/logs/
+scripts/logs/
+scripts/compile_output.log
+compile_output.log
+
+# Temporary files
+backups/
