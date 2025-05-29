@@ -1,17 +1,17 @@
 //! YubiHSM2 Integration Tests
 #![cfg(feature = "hsm")]
 
-use anya_core::hsm::{YubiHSM, HsmSigner};
+use anya_core::hsm::{HsmSigner, YubiHSM};
 use bitcoin::psbt::PartiallySignedTransaction;
 
 #[test]
 fn test_hsm_signing() {
     let hsm = YubiHSM::connect("mock://localhost").unwrap();
     let signer = HsmSigner::new(hsm, "secp256k1").unwrap();
-    
+
     let mut psbt = load_test_psbt();
     signer.sign_psbt(&mut psbt).unwrap();
-    
+
     assert!(psbt.finalized(), "HSM failed to properly sign PSBT");
     verify_taproot_signature(&psbt);
 }
@@ -19,4 +19,4 @@ fn test_hsm_signing() {
 #[cfg(not(feature = "hsm"))]
 mod hsm_mock {
     // Mock implementation for CI environments
-} 
+}

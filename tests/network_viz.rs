@@ -14,7 +14,7 @@ async fn test_network_visualization() {
         .await
         .unwrap();
     assert_eq!(resp.status(), StatusCode::OK);
-    
+
     // Test data endpoint
     let data: NetworkState = reqwest::get(&format!("http://localhost:{}/data", port))
         .await
@@ -22,9 +22,9 @@ async fn test_network_visualization() {
         .json()
         .await
         .unwrap();
-    
+
     assert!(!data.nodes.is_empty(), "No nodes in network visualization");
     assert!(data.tps >= 0.0, "Invalid TPS metric");
-    
+
     server_task.abort();
-} 
+}
