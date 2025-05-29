@@ -26,6 +26,7 @@
         "gitlens.defaultDateShortFormat": "YYYY-MM-DD",
         "gitlens.views.searchAndCompare.enabled": true,
         "rust-analyzer.checkOnSave": true,
-        "rust-tests-bin.display.showCodeLens": true
+        "rust-tests-bin.display.showCodeLens": true,
+        "github.copilot.nextEditSuggestions.enabled": true
     }
 }
