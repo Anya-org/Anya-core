@@ -1,6 +1,6 @@
 // Test utilities for standalone tests
-use std::path::{Path, PathBuf};
 use std::fs;
+use std::path::{Path, PathBuf};
 
 pub struct TestEnvironment {
     pub test_dir: PathBuf,
@@ -12,14 +12,14 @@ pub fn setup_test_environment() -> TestEnvironment {
         .duration_since(std::time::UNIX_EPOCH)
         .unwrap()
         .as_secs();
-    
+
     let test_dir = std::env::temp_dir().join(format!("anya_test_{}", timestamp));
-    
+
     // Create the directory if it doesn't exist
     if !test_dir.exists() {
         fs::create_dir_all(&test_dir).expect("Failed to create test directory");
     }
-    
+
     TestEnvironment { test_dir }
 }
 
@@ -36,7 +36,7 @@ pub fn simulate_bitcoin_txid() -> String {
         .duration_since(std::time::UNIX_EPOCH)
         .unwrap()
         .as_secs();
-    
+
     format!("txid{:x}", timestamp)
 }
 
@@ -46,7 +46,7 @@ pub fn simulate_bitcoin_address() -> String {
         .duration_since(std::time::UNIX_EPOCH)
         .unwrap()
         .as_secs();
-    
+
     format!("bc1q{:x}qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq", timestamp % 10000)
 }
 
@@ -56,7 +56,7 @@ pub fn simulate_did() -> String {
         .duration_since(std::time::UNIX_EPOCH)
         .unwrap()
         .as_secs();
-    
+
     format!("did:key:z{:x}", timestamp)
 }
 
@@ -66,6 +66,6 @@ pub fn simulate_rgb_asset_id() -> String {
         .duration_since(std::time::UNIX_EPOCH)
         .unwrap()
         .as_secs();
-    
+
     format!("rgb1{:x}", timestamp)
 }

@@ -2,7 +2,7 @@
 async fn test_psbt_validation() {
     let valid_psbt = hex::decode("02000000000101...").unwrap();
     assert!(psbt_validation::validate_psbt_structure(&valid_psbt).is_ok());
-    
+
     let invalid_psbt = hex::decode("0000000000").unwrap();
     assert!(psbt_validation::validate_psbt_structure(&invalid_psbt).is_err());
 }
@@ -11,7 +11,7 @@ async fn test_psbt_validation() {
 async fn test_taproot_validation() {
     let mut tx = Transaction::default();
     assert!(tx.validate_taproot().is_err());
-    
+
     // Add Taproot-compliant transaction elements
     // ...
     assert!(tx.validate_taproot().is_ok());
@@ -29,14 +29,11 @@ mod tests {
             taproot_enabled: true,
             ..Default::default()
         };
-        
-        let manager = EnterpriseClusterManager::new(
-            "license".into(),
-            "cluster.url".into(),
-            None,
-            config
-        ).unwrap();
-        
+
+        let manager =
+            EnterpriseClusterManager::new("license".into(), "cluster.url".into(), None, config)
+                .unwrap();
+
         // Simulate node discovery
         manager.nodes.push(ClusterNode {
             address: "127.0.0.1:8333".parse().unwrap(),
@@ -44,7 +41,7 @@ mod tests {
             supported_bips: vec![174, 341, 370],
             taproot_active: true,
         });
-        
+
         assert!(manager.validate_cluster_protocol().is_ok());
     }
 
@@ -53,14 +50,15 @@ mod tests {
         let tx = Transaction {
             // ... valid Taproot transaction ...
         };
-        
+
         let manager = EnterpriseClusterManager::new(
             "license".into(),
             "cluster.url".into(),
             Some(tx),
-            BitcoinConfig::default()
-        ).unwrap();
-        
+            BitcoinConfig::default(),
+        )
+        .unwrap();
+
         assert!(manager.execute_contract().await.is_ok());
     }
-} 
+}

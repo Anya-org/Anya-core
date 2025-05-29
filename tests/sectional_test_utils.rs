@@ -3,9 +3,9 @@
 
 use std::collections::HashMap;
 use std::env;
-use std::path::Path;
 use std::fs::{self, File};
 use std::io::Write;
+use std::path::Path;
 use std::time::{Duration, Instant};
 
 /// Utility module for sectional testing
@@ -93,17 +93,17 @@ pub mod sectional {
     {
         let mut result = TestResult::new(section);
         let start = Instant::now();
-        
+
         let passed = test_fn();
-        
+
         result.set_duration(start.elapsed());
         if passed {
             result.mark_passed();
         }
-        
+
         // Report test result
         report_test_result(&result);
-        
+
         result
     }
 
@@ -114,23 +114,23 @@ pub mod sectional {
         if !reports_dir.exists() {
             let _ = fs::create_dir_all(reports_dir);
         }
-        
+
         // Write result to file
         let file_path = reports_dir.join(format!("{}_result.txt", result.section.as_str()));
         let mut file = match File::create(&file_path) {
             Ok(f) => f,
             Err(_) => return, // Skip reporting if we can't create the file
         };
-        
+
         // Write basic info
         let _ = writeln!(file, "Section: {}", result.section.as_str());
         let _ = writeln!(file, "Passed: {}", result.passed);
         let _ = writeln!(file, "Duration: {:?}", result.duration);
-        
+
         if let Some(memory) = result.memory_usage {
             let _ = writeln!(file, "Memory usage: {} bytes", memory);
         }
-        
+
         // Write details
         if !result.details.is_empty() {
             let _ = writeln!(file, "\nDetails:");
@@ -149,13 +149,13 @@ pub mod sectional {
             }
             return filter.split(',').any(|s| s.trim() == section.as_str());
         }
-        
+
         // By default, test all sections
         true
     }
 
     /// Measure memory usage during a function execution
-    /// 
+    ///
     /// Note: This is a basic approximation and should be used with caution
     #[cfg(feature = "memory_tracking")]
     pub fn measure_memory_usage<F, T>(f: F) -> (T, usize)
@@ -166,14 +166,14 @@ pub mod sectional {
 
         // Force a garbage collection if possible
         let _ = std::alloc::System.alloc(std::alloc::Layout::new::<u8>());
-        
+
         // Run the function and measure the result
         let result = f();
-        
+
         // This is a very rough approximation
         // For better results, use a proper memory profiler
         let estimate = mem::size_of_val(&result);
-        
+
         (result, estimate)
     }
 
@@ -206,7 +206,7 @@ macro_rules! sectional_test {
 mod tests {
     use super::*;
     use crate::sectional_test_utils::sectional::Section;
-    
+
     #[test]
     fn test_core_issuance() {
         if sectional::should_test_section(Section::CoreIssuance) {
