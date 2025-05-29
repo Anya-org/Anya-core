@@ -1,11 +1,7 @@
-use anya_core::{
-    privacy::PrivacyModule,
-    bitcoin::BitcoinModule,
-    api::ApiServer,
-};
-use log::{info, error};
-use bitcoin::Network;
+use anya_core::{api::ApiServer, bitcoin::BitcoinModule, privacy::PrivacyModule};
 use anyhow::Result;
+use bitcoin::Network;
+use log::{error, info};
 
 fn handle_error(module: &str) -> impl Fn(anyhow::Error) -> anyhow::Error {
     move |err| {
@@ -24,7 +20,8 @@ fn create_bitcoin_module() -> Result<BitcoinModule, anyhow::Error> {
         "http://localhost:18332",
         "rpcuser",
         "rpcpassword",
-    ).map_err(handle_error("BitcoinModule"))
+    )
+    .map_err(handle_error("BitcoinModule"))
 }
 
 #[tokio::main]
