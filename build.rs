@@ -10,15 +10,12 @@ fn main() {
     match target_os.as_str() {
         "linux" => {
             println!("cargo:rustc-cfg=feature=\"secure-storage-linux\"");
-            println!("cargo:rustc-cfg=unix");
         }
         "windows" => {
             println!("cargo:rustc-cfg=feature=\"secure-storage-windows\"");
-            println!("cargo:rustc-cfg=windows");
         }
         "macos" => {
             println!("cargo:rustc-cfg=feature=\"secure-storage-macos\"");
-            println!("cargo:rustc-cfg=unix");
         }
         _ => {
             println!("cargo:rustc-cfg=feature=\"secure-storage-fallback\"");
