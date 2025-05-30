@@ -16,6 +16,7 @@ Add a brief overview of this document here.
 This document outlines the security standards and best practices for Anya Core development.
 
 ## Table of Contents
+
 - [Secure Coding Guidelines](#secure-coding-guidelines)
 - [Cryptographic Standards](#cryptographic-standards)
 - [Authentication & Authorization](#authentication--authorization)
@@ -143,7 +144,10 @@ fn verify_hash(input: &[u8], expected_hash: &[u8]) -> bool {
 
 ### Reporting Security Issues
 
-Report security issues to security@anya.org. Include:
+Report security issues to security@anya.org.
+
+ Include:
+
 - Description of the vulnerability
 - Steps to reproduce
 - Impact assessment
@@ -199,5 +203,5 @@ For security-related issues, please contact security@anya.org.
 
 ## See Also
 
-- [Related Document](#related-document)
+- [Secure Coding Guidelines](#secure-coding-guidelines)
 

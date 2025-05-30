@@ -19,6 +19,7 @@ Add a brief overview of this document here.
 
 
 ## Bitcoin Protocol Commands
+
 ```bash
 # Verify BIP compliance
 anya verify compliance --bip 341,342,370
@@ -34,6 +35,7 @@ anya monitor mempool --threshold 100000 --alert
 ```
 
 ## Security Operations
+
 ```bash
 # Run security audit (AIS-3)
 anya audit security --full --format json
@@ -46,6 +48,7 @@ anya verify silent-leaf 0x8f3a1c29566443e2e2d6e5a9a5a4e8d
 ```
 
 ## AI System Management
+
 ```bash
 # Train ML model (AIR-3)
 anya ml train --dataset transactions.csv --model taproot-predictor
@@ -55,6 +58,7 @@ anya governance check --proposal proposal.yaml
 ```
 
 ## Installation Enhancements
+
 ```markdown:docs/INSTALLATION.md
 ### Advanced Installation
 ```bash
@@ -71,6 +75,7 @@ anya install security \
 ```
 
 ### Maintenance Operations
+
 ```bash
 # Update BIP compliance rules
 anya update compliance --bip 341,342,370
@@ -80,6 +85,7 @@ anya security rotate-credentials --rpc --api
 ```
 
 ## Enhanced User Manual Structure
+
 ```markdown:docs/USER_MANUAL.md
 ### Bitcoin Transaction Flow
 ```mermaid
@@ -93,11 +99,13 @@ graph TD
 ```
 
 ### Security Model (AIS-3)
+
 | Layer | Components | Bitcoin Compliance |
 |-------|------------|--------------------|
 | **Cryptography** | Schnorr, Taproot, Silent Leaf | BIP-340/341/342 |
 | **Network** | Encrypted P2P, SPV Proofs | BIP-37/157/158 |
 | **Storage** | HSM Integration, SGX Enclaves | BIP-32/39/44 |
+
 ```
 
 2. **System Map Integration**
@@ -127,6 +135,7 @@ $index = @{
 ```
 
 3. **Search Index Update**
+
 ```json:docs/search-index.json
 {
   "title": "CLI Reference",
@@ -145,6 +154,7 @@ $index = @{
 ```
 
 4. **DAO CLI Integration** [DAO-3][BPC-3]
+
 ```markdown:docs/DAO_INDEX.md
 ### Governance CLI
 ```bash
@@ -163,6 +173,7 @@ anya dao execute --proposal 42 --key-file governor.key
 ```
 
 ### Compliance Checks
+
 ```bash
 # Verify BIP compliance
 anya dao verify-compliance --bip 341,342,174
@@ -172,6 +183,7 @@ anya dao audit-treasury --full --format json
 ```
 
 Implementation checklist:
+
 - [x] Add CLI reference documentation
 - [x] Integrate with system map
 - [x] Update search index
@@ -180,12 +192,14 @@ Implementation checklist:
 - [ ] Run security audit
 
 To validate the enhancements:
+
 ```bash
 anya verify documentation --check links,labels
 anya audit security --component cli
 ```
 
 These changes improve CLI usability while maintaining strict Bitcoin protocol compliance and AI security standards. 
+
 ## See Also
 
 - [Related Document](#related-document)

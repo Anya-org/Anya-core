@@ -1,70 +1,88 @@
 {
+  "repository_metadata": {
+    "name": "anya-core",
+    "version": "0.3.0-rc.1",
+    "last_updated": "2025-05-29T12:00:00Z",
+    "framework_version": "Bitcoin Development Framework v2.5",
+    "total_modules": 8,
+    "compliance_level": "BPC-3"
+  },
   "bitcoin": {
-    "anya-bitcoin": {
-      "path": "C:\\Users\\bmokoka\\Projects\\anya-core\\src\\bitcoin",
+    "anya-core-bitcoin": {
+      "path": "/workspaces/Anya-core/src/bitcoin",
       "type": "directory",
       "components": {
         "protocol.rs": {
-          "hash": "sha256-7d83c87...",
-          "modified": "2025-04-28T09:32:45.1234567Z",
-          "bitcoin_adherence": 98.7
+          "hash": "sha256-updated",
+          "modified": "2025-05-29T12:00:00Z",
+          "bitcoin_adherence": 99.2
+        },
+        "wallet.rs": {
+          "hash": "sha256-updated",
+          "modified": "2025-05-29T12:00:00Z", 
+          "bitcoin_adherence": 98.8
+        },
+        "node.rs": {
+          "hash": "sha256-new",
+          "modified": "2025-05-29T12:00:00Z",
+          "bitcoin_adherence": 99.1
         }
       }
     }
   },
   "layer2": {
     "lightning": {
-      "path": "C:\\Users\\bmokoka\\Projects\\anya-core\\src\\lightning",
+      "path": "/workspaces/Anya-core/src/layer2/lightning",
       "type": "directory",
       "components": {
         "node.rs": {
-          "hash": "sha256-8c4d71e...",
-          "modified": "2025-04-28T14:22:33.1234567Z",
-          "bitcoin_adherence": 97.4
+          "hash": "sha256-updated",
+          "modified": "2025-05-29T12:00:00Z",
+          "bitcoin_adherence": 98.4
         }
       }
     },
     "rgb": {
-      "path": "C:\\Users\\bmokoka\\Projects\\anya-core\\src\\layer2\\rgb",
+      "path": "/workspaces/Anya-core/src/layer2/rgb",
       "type": "directory",
       "components": {
         "schema.rs": {
-          "hash": "sha256-9a24b3c...",
-          "modified": "2025-04-28T11:45:10.1234567Z",
-          "bitcoin_adherence": 92.1
+          "hash": "sha256-updated",
+          "modified": "2025-05-29T12:00:00Z",
+          "bitcoin_adherence": 94.1
         }
       }
     },
     "rsk": {
-      "path": "C:\\Users\\bmokoka\\Projects\\anya-core\\src\\layer2\\rsk",
+      "path": "/workspaces/Anya-core/src/layer2/rsk",
       "type": "directory",
       "components": {
         "bridge.rs": {
-          "hash": "sha256-5f12a9b...",
-          "modified": "2025-04-28T13:17:42.1234567Z",
-          "bitcoin_adherence": 89.5
+          "hash": "sha256-updated",
+          "modified": "2025-05-29T12:00:00Z",
+          "bitcoin_adherence": 91.5
         }
       }
     },
     "bob": {
-      "path": "C:\\Users\\bmokoka\\Projects\\anya-core\\src\\layer2\\bob",
+      "path": "/workspaces/Anya-core/src/layer2/bob",
       "type": "directory",
       "components": {
         "channels.rs": {
-          "hash": "sha256-3e21f7d...",
-          "modified": "2025-04-28T10:09:15.1234567Z",
-          "bitcoin_adherence": 96.2
+          "hash": "sha256-updated",
+          "modified": "2025-05-29T12:00:00Z",
+          "bitcoin_adherence": 97.2
         }
       }
     },
     "dlc": {
-      "path": "C:\\Users\\bmokoka\\Projects\\anya-core\\src\\layer2\\dlc",
+      "path": "/workspaces/Anya-core/src/layer2/dlc",
       "type": "directory",
       "components": {
         "oracle.rs": {
-          "hash": "sha256-1b83c4e...",
-          "modified": "2025-04-28T15:33:21.1234567Z",
-          "bitcoin_adherence": 95.8
+          "hash": "sha256-updated",
+          "modified": "2025-05-29T12:00:00Z",
+          "bitcoin_adherence": 96.8
         }
       }
     }
@@ -84,52 +102,57 @@
   },
   "dao": {
     "core": {
-      "path": "C:\\Users\\bmokoka\\Projects\\anya-core\\src\\dao",
+      "path": "/workspaces/Anya-core/src/dao",
       "type": "directory",
       "components": {
         "governance.rs": {
           "hash": "sha256-2c7a19d...",
-          "modified": "2025-04-28T16:47:59.1234567Z",
-          "bitcoin_adherence": 91.3
+          "modified": "2025-05-29T12:00:00Z",
+          "bitcoin_adherence": 93.5
         }
       }
     }
   },
   "web5": {
     "implementation": {
-      "path": "C:\\Users\\bmokoka\\Projects\\anya-core\\src\\web5",
+      "path": "/workspaces/Anya-core/src/web5",
       "type": "directory",
       "components": {
         "dwn.rs": {
           "hash": "sha256-4f38e2a...",
-          "modified": "2025-04-28T12:25:37.1234567Z",
-          "bitcoin_adherence": 88.7
+          "modified": "2025-05-29T12:00:00Z",
+          "bitcoin_adherence": 90.2
         }
       }
     }
   },
   "security": {
     "framework": {
-      "path": "C:\\Users\\bmokoka\\Projects\\anya-core\\src\\security",
+      "path": "/workspaces/Anya-core/src/security",
       "type": "directory",
       "components": {
         "crypto.rs": {
           "hash": "sha256-6d19f3b...",
-          "modified": "2025-04-28T09:51:18.1234567Z",
-          "bitcoin_adherence": 99.1
+          "modified": "2025-05-29T12:00:00Z",
+          "bitcoin_adherence": 99.5
+        },
+        "hsm/mod.rs": {
+          "hash": "sha256-8f72d4e...",
+          "modified": "2025-05-29T12:00:00Z",
+          "bitcoin_adherence": 97.8
         }
       }
     }
   },
   "ml": {
     "components": {
-      "path": "C:\\Users\\bmokoka\\Projects\\anya-core\\src\\ml",
+      "path": "/workspaces/Anya-core/src/ml",
       "type": "directory",
       "components": {
         "agents.rs": {
           "hash": "sha256-7c45e3a...",
-          "modified": "2025-04-28T14:03:27.1234567Z",
-          "bitcoin_adherence": 85.4
+          "modified": "2025-05-29T12:00:00Z",
+          "bitcoin_adherence": 87.1
         }
       }
     }

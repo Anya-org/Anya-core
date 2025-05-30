@@ -2,20 +2,39 @@
 
 [AIR-3][AIS-3][BPC-3][RES-3]
 
-*Last Updated: May 19, 2025*
+*Last Updated: May 29, 2025*
 
 Welcome to the Anya Core documentation. This is the authoritative root index for all Anya Core documentation, following Bitcoin Development Framework v2.5 standards.
 
-## Recent Updates (May 19, 2025) [AIR-3][AIS-3][BPC-3][RES-3]
+## Recent Updates (May 29, 2025) [AIR-3][AIS-3][BPC-3][RES-3]
 
-The following modules have been updated to fix compilation errors and ensure compliance with the Bitcoin Development Framework v2.5 standards:
+Major system-wide updates have been completed to enhance stability, security, and Bitcoin protocol compliance:
 
-- **RGB Module**: Fixed duplicate implementation of the `generate_asset_id` function and ensured Taproot-compatible asset ID generation
-- **Bitcoin Module**: Resolved error handling issues and fixed network configuration handling
-- **ML Module**: Implemented missing `predict_proposal_metrics` method and fixed `Device` usage
-- **DLC Module**: Added missing `OracleClient` implementation and fixed method signatures
+### Core System Improvements
+- **Dependency Management**: All Cargo.toml dependencies pinned to specific versions for enhanced stability
+- **Import Path Migration**: Successfully migrated from `anya_bitcoin` to `anya_core` throughout the codebase
+- **Function Signature Fixes**: Removed duplicate return type annotations and malformed signatures
+- **Build System Cleanup**: Streamlined build.rs configuration, removed redundant OS-specific flags
 
-All modules now include proper AI labeling according to the canonical AI Labeling System. For detailed information about these changes, see the [Changelog](CHANGELOG.md) and [Implementation Summary](docs/IMPLEMENTATION_SUMMARY.md).
+### Bitcoin Protocol Enhancements [BPC-3]
+- **HSM Module Restructuring**: Fixed provider imports, corrected type definitions, resolved module conflicts
+- **Secp256k1 Updates**: Upgraded to version 0.29.1 with proper API structure alignment
+- **Bitcoin Protocol Testing**: Enhanced testing modules with proper error handling and BIP compliance
+- **Taproot Implementation**: Improved asset creation and script generation functionality
+
+### Security & Documentation [AIS-3]
+- **AI Labeling Compliance**: Added comprehensive AI labeling tags to all documentation files
+- **Documentation Enhancement**: Improved formatting and structure across all markdown files
+- **Security Module Updates**: Fixed HSM provider imports and enhanced error handling
+- **Trait Implementations**: Added missing trait methods and fixed trait object boxing issues
+
+### Development Tools & APIs
+- **Binary Executables**: Updated all binary files with correct import paths and enhanced error handling
+- **API Structure**: Created new API handlers and server modules with proper organization
+- **Tools Module**: Implemented markdown validation and commit tracking utilities
+- **Module Organization**: Enhanced module structure with proper visibility and exports
+
+All modules maintain compliance with the Bitcoin Development Framework v2.5 and include proper AI labeling according to the canonical AI Labeling System. For detailed information about these changes, see the [Changelog](CHANGELOG.md) and [Implementation Summary](docs/IMPLEMENTATION_SUMMARY.md).
 
 ## Quick Navigation [AIR-3]
 
@@ -139,5 +158,5 @@ The repository follows a structured organization:
 - [Discussions](https://github.com/anya-org/anya-core/discussions)
 
 ---
-*Last updated: 2025-04-29 14:30 UTC+2*
+*Last updated: 2025-05-29 12:00 UTC+2*
 *All components comply with [AI Labeling Standards](docs/standards/AI_LABELING.md)*

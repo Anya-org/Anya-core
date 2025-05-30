@@ -99,8 +99,14 @@ Redirecting to [ROOT_INDEX.md](ROOT_INDEX.md)...
 
 ## Release Information
 
-- **Current Version**: 3.1.0
-- **Last Updated**: 2025-04-28 14:30 UTC+2
+- **Current Version**: 0.3.0-rc.1
+- **Last Updated**: 2025-05-29 12:00 UTC+2
+- **Recent Updates**: 
+  - Major dependency updates and version pinning
+  - Import path migration from `anya_bitcoin` to `anya_core`
+  - Bitcoin protocol enhancements and BIP compliance improvements
+  - Security framework updates with HSM provider fixes
+  - Enhanced documentation with AI labeling compliance
 - **Compatibility**:
   - Stacks v2.4
   - Web5 Protocol v1.0
@@ -157,8 +163,8 @@ For full details on the AI labeling system, see [docs/standards/AI_LABELING.md](
 
 ## Version Information
 
-- Current Version: 3.1.0
-- Last Updated: April 28, 2025
+- Current Version: 0.3.0-rc.1
+- Last Updated: May 29, 2025
 - Bitcoin Development Framework: v2.5
 
 ## Directory Structure
@@ -200,4 +206,4 @@ The repository is organized into the following main directories:
 - [Mobile Security Guide](docs/mobile/SECURITY.md) - Secure mobile implementation
 - [Taproot Mobile Demo](docs/mobile/TAPROOT_DEMO.md) - Mobile Taproot examples
 
-*Last updated: 2025-04-28 18:05 UTC+2*
+*Last updated: 2025-05-29 12:00 UTC+2*
