@@ -1,7 +1,7 @@
 ---
 title: "Lightning"
 description: "Documentation for Lightning"
-last_updated: 2025-05-21
+last_updated: 2025-05-30
 ---
 
 <!-- markdownlint-disable MD013 line-length -->

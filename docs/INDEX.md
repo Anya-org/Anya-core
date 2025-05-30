@@ -3,7 +3,7 @@ layout: default
 title: "Index"
 description: "Documentation for Index"
 show_support: true
-last_updated: 2025-05-21
+last_updated: 2025-05-30
 ---
 
 <!-- markdownlint-disable MD013 line-length -->
@@ -28,9 +28,9 @@ This is the central index for all Anya Core documentation. All documentation fol
 
 | Document | Description | Version | Last Updated |
 |----------|-------------|---------|--------------|
-| [AI Labeling Reference Guide](./standards/AI_LABELING.md) | Standardized AI labeling tags | 2.6.0 | 2025-05-21 |
-| [High Availability](./high_availability.md) | High Availability subsystem | 2.5.0 | 2025-05-15 |
-| [Security Policy](../SECURITY.md) | Security policies and procedures | 2.6.0 | 2025-05-21 |
+| [AI Labeling Reference Guide](./standards/AI_LABELING.md) | Standardized AI labeling tags | 2.6.0 | 2025-05-30 |
+| [High Availability](./high_availability.md) | High Availability subsystem | 2.5.0 | 2025-05-30 |
+| [Security Policy](../SECURITY.md) | Security policies and procedures | 2.6.0 | 2025-05-30 |
 | [Upgrade Guide](./UPGRADE.md) | Version upgrade instructions | 2.6.0 | 2025-05-21 |
 
 ## Monitoring & Observability

@@ -18,7 +18,7 @@ Add a brief overview of this document here.
 redirect_to: /docs/ARCHITECTURE.md
 title: "System_map"
 description: "Documentation for System_map"
-last_updated: 2025-05-21
+last_updated: 2025-05-30
 ---
 
 [AIR-3][AIS-3][BPC-3][RES-3]

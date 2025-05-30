@@ -1,7 +1,7 @@
 ---
 title: "Hsm_guide"
 description: "Documentation for Hsm_guide"
-last_updated: 2025-05-21
+last_updated: 2025-05-30
 ---
 
 # Hardware Security Module (HSM) Implementation Guide
@@ -367,7 +367,7 @@ The Anya Core HSM implementation provides a secure, flexible foundation for cryp
 
 The support for Bitcoin-specific operations makes it particularly valuable for blockchain applications, while the comprehensive audit capabilities ensure compliance with security best practices and regulatory requirements.
 
-*Last updated: 2025-05-04* 
+*Last updated: 2025-05-30* 
 ## See Also
 
 - [Related Document 1](./related1.md)

@@ -1,7 +1,7 @@
 ---
 title: "Markdown_style_guide"
 description: "Documentation for Markdown_style_guide"
-last_updated: 2025-05-21
+last_updated: 2025-05-30
 ---
 
 # Markdown Style Guide \[AIR-1\]\[AIT-1\]
@@ -127,7 +127,7 @@ This component provides... \[AIT-2\]
 title: "Markdown_style_guide"
 date: 2025-03-12
 author: Anya Documentation Team
-last_updated: 2025-05-21
+last_updated: 2025-05-30
 ---
 [AIR-3][AIS-3][BPC-3][RES-3]
 
