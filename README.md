@@ -68,21 +68,25 @@ We provide several scripts to help maintain documentation quality:
 ### Quick Start with Local Docs
 
 1. Install dependencies:
+
    ```bash
    ./scripts/setup_docs.sh
    ```
 
 2. Update documentation to follow standards:
+
    ```bash
    ./scripts/update_docs.sh
    ```
 
 3. Serve documentation locally:
+
    ```bash
    ./scripts/serve_docs.sh
    ```
 
 4. Check for documentation issues:
+
    ```bash
    ./scripts/review_docs.sh
    ```
@@ -116,11 +120,13 @@ docs/
 1. Follow the [Markdown Style Guide](docs/standards/MARKDOWN_STYLE_GUIDE.md)
 2. Use the template: `.template.md`
 3. Run documentation checks before committing:
+
    ```bash
    ./scripts/update_docs.sh
    ./scripts/check_links.sh
    ./scripts/review_docs.sh
    ```
+
 4. Commit with a descriptive message, e.g., "docs: update API reference"
 
 3. Open <http://127.0.0.1:8000> in your browser

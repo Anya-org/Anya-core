@@ -11,6 +11,7 @@ Best practices for developing high-quality, secure, and maintainable extensions 
 ### Rust Best Practices
 
 #### Error Handling
+
 ```rust
 // ✅ Good: Use Result types with meaningful error messages
 fn process_transaction(tx: &Transaction) -> Result<ProcessingResult, ExtensionError> {
@@ -29,6 +30,7 @@ fn process_transaction_bad(tx: &Transaction) -> ProcessingResult {
 ```
 
 #### Memory Management
+
 ```rust
 // ✅ Good: Use Arc for shared ownership, minimize clones
 use std::sync::Arc;
@@ -49,6 +51,7 @@ impl Drop for MyExtension {
 ```
 
 #### Concurrency
+
 ```rust
 // ✅ Good: Use async/await for I/O operations
 async fn fetch_bitcoin_data(&self, block_hash: &str) -> Result<Block, BitcoinError> {
@@ -84,6 +87,7 @@ impl CacheManager {
 ### Architecture Patterns
 
 #### Hexagonal Architecture
+
 ```rust
 // ✅ Good: Separate domain logic from infrastructure
 pub struct TransactionProcessor {
@@ -114,6 +118,7 @@ impl NetworkPort for BitcoinNetworkAdapter {
 ```
 
 #### Dependency Injection
+
 ```rust
 // ✅ Good: Use dependency injection for testability
 pub struct MyExtension<N: NetworkPort, S: StoragePort> {
@@ -151,6 +156,7 @@ mod tests {
 ## Security Best Practices
 
 ### Input Validation
+
 ```rust
 // ✅ Good: Validate all inputs
 fn process_user_input(input: &str) -> Result<ProcessedInput, ValidationError> {
@@ -173,6 +179,7 @@ fn process_user_input(input: &str) -> Result<ProcessedInput, ValidationError> {
 ```
 
 ### Cryptographic Operations
+
 ```rust
 // ✅ Good: Use secure random number generation
 use rand::rngs::OsRng;
@@ -203,6 +210,7 @@ impl Drop for PrivateKey {
 ```
 
 ### Permission Management
+
 ```rust
 // ✅ Good: Implement principle of least privilege
 impl ExtensionTrait for MyExtension {
@@ -231,6 +239,7 @@ fn access_bitcoin_data(&self) -> Result<BitcoinData, SecurityError> {
 ## Performance Best Practices
 
 ### Efficient Data Structures
+
 ```rust
 // ✅ Good: Use appropriate data structures
 use std::collections::HashMap;
@@ -257,6 +266,7 @@ struct EfficientData {
 ```
 
 ### Caching Strategies
+
 ```rust
 // ✅ Good: Implement LRU cache with TTL
 use lru::LruCache;
@@ -295,6 +305,7 @@ impl<T> TimedLruCache<T> {
 ```
 
 ### Resource Management
+
 ```rust
 // ✅ Good: Use connection pooling
 use deadpool_postgres::{Config, Pool};
@@ -331,6 +342,7 @@ impl RateLimitedProcessor {
 ## Testing Best Practices
 
 ### Unit Testing
+
 ```rust
 #[cfg(test)]
 mod tests {
@@ -383,6 +395,7 @@ mod tests {
 ```
 
 ### Integration Testing
+
 ```rust
 #[cfg(test)]
 mod integration_tests {
@@ -412,6 +425,7 @@ mod integration_tests {
 ## Documentation Best Practices
 
 ### Code Documentation
+
 ```rust
 /// Processes Bitcoin transactions according to BIP-341 Taproot specifications.
 /// 
@@ -458,6 +472,7 @@ pub async fn process_transaction(
 ```
 
 ### Error Messages
+
 ```rust
 // ✅ Good: Provide helpful error messages with context
 #[derive(Debug, Error)]
@@ -486,6 +501,7 @@ pub enum ValidationError {
 ## Configuration Management
 
 ### Environment-Specific Settings
+
 ```rust
 // ✅ Good: Use configuration files with environment overrides
 #[derive(Debug, Deserialize)]
@@ -520,6 +536,7 @@ let config = ConfigBuilder::new()
 ```
 
 ### Secrets Management
+
 ```rust
 // ✅ Good: Use proper secrets management
 use anya_core::security::SecretManager;
@@ -540,6 +557,7 @@ async fn load_api_key() -> Result<String, SecurityError> {
 ## Monitoring and Observability
 
 ### Metrics and Logging
+
 ```rust
 use tracing::{info, warn, error, instrument};
 use anya_core::metrics::Counter;
@@ -570,6 +588,7 @@ pub async fn process_transaction(&self, transaction: &Transaction) -> Result<(),
 ```
 
 ### Health Checks
+
 ```rust
 impl ExtensionTrait for MyExtension {
     fn health_check(&self) -> HealthStatus {
@@ -597,6 +616,7 @@ impl ExtensionTrait for MyExtension {
 ## Deployment Best Practices
 
 ### Container Configuration
+
 ```dockerfile
 # ✅ Good: Multi-stage build for smaller images
 FROM rust:1.70 as builder
@@ -624,6 +644,7 @@ CMD ["my-extension"]
 ```
 
 ### Resource Limits
+
 ```yaml
 # ✅ Good: Set appropriate resource limits
 apiVersion: v1
@@ -656,6 +677,7 @@ spec:
 ## Common Anti-Patterns to Avoid
 
 ### ❌ Bad Practices
+
 ```rust
 // Don't use global mutable state
 static mut GLOBAL_CONFIG: Option<Config> = None;
@@ -676,6 +698,7 @@ let value = might_fail().unwrap(); // Can panic!
 ```
 
 ### ✅ Good Alternatives
+
 ```rust
 // Use dependency injection for configuration
 struct MyExtension {
