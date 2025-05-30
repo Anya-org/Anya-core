@@ -11,10 +11,16 @@ pub mod config;
 pub mod taproot;
 pub mod rust;
 pub mod layer2; // Export layer2 module for Layer2Protocol trait
+pub mod protocol; // Bitcoin protocol compliance module
+pub mod node; // Bitcoin node management
+pub mod wallet; // Bitcoin wallet management
 
 // Re-export key interfaces for easier access
 pub use interface::BitcoinInterface;
 pub use adapters::BitcoinAdapter;
+pub use protocol::{BitcoinProtocol, BPCLevel};
+pub use node::BitcoinNode;
+pub use wallet::{BitcoinWallet, WalletConfig, AddressInfo};
 
 // [AIR-3][AIS-3][BPC-3][RES-3] Re-export Bitcoin types for convenience
 // This follows the Bitcoin Development Framework v2.5 standards for type consistency

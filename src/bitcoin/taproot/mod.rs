@@ -6,7 +6,7 @@
 //! [AIR-3][AIS-3][BPC-3][RES-3] Implementation follows Bitcoin Development Framework v2.5
 
 // [AIR-3][AIS-3][BPC-3][RES-3] Taproot module for Bitcoin asset management
-use bitcoin::hashes::{sha256, Hash as _};
+use bitcoin::hashes::sha256;
 use bitcoin::secp256k1::{self, Secp256k1, SecretKey};
 use bitcoin::taproot::TaprootBuilder;
 use bitcoin::ScriptBuf;
@@ -369,15 +369,16 @@ pub fn issue_asset(asset: &TaprootAsset, issuer_secret_key: &[u8]) -> Result<Str
     let mut builder = TaprootBuilder::new();
     
     // Add the asset script as a leaf with depth 1 (SILENT_LEAF)
-    builder = builder.add_leaf(1, asset_script.into_bytes())
+    builder = builder.add_leaf(1, asset_script.clone())
         .map_err(|e| TaprootError::BuilderError(format!("Failed to add leaf: {}", e)))?;
     
     // Finalize the Taproot tree with the internal key (KEY)
     let taproot_spend_info = builder.finalize(&secp, x_only_pubkey)
-        .map_err(|e| TaprootError::TaprootError(format!("Failed to finalize builder: {}", e)))?;
+        .map_err(|e| TaprootError::TaprootError(format!("Failed to finalize builder: {:?}", e)))?;
     
     // Get the Taproot output script
-    let output_script = taproot_spend_info.output_script();
+    let output_key = taproot_spend_info.output_key();
+    let output_script = bitcoin::ScriptBuf::new_p2tr(&secp, output_key.into(), None);
     
     // [AIR-3][AIS-3][BPC-3][RES-3] Verify the output script follows tr(KEY,{SILENT_LEAF}) pattern
     let script_bytes = output_script.as_bytes();
@@ -388,4 +389,146 @@ pub fn issue_asset(asset: &TaprootAsset, issuer_secret_key: &[u8]) -> Result<Str
     }
     
     Ok(hex::encode(output_script.as_bytes()))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use bitcoin::secp256k1::rand::rngs::OsRng;
+    use bitcoin::secp256k1::Secp256k1;
+
+    #[test]
+    fn test_generate_keypair() {
+        let result = generate_keypair();
+        assert!(result.is_ok());
+        
+        let (secret_key, public_key) = result.unwrap();
+        
+        // Verify the keys are related
+        let secp = Secp256k1::new();
+        let derived_pubkey = secret_key.x_only_public_key(&secp).0;
+        assert_eq!(public_key, derived_pubkey);
+    }
+
+    #[test]
+    fn test_generate_asset_id() {
+        let asset_id1 = generate_asset_id("TEST", 1000, 8, "metadata").unwrap();
+        let asset_id2 = generate_asset_id("TEST", 1000, 8, "metadata").unwrap();
+        let asset_id3 = generate_asset_id("TEST", 1001, 8, "metadata").unwrap();
+        
+        // Same inputs should produce same ID
+        assert_eq!(asset_id1, asset_id2);
+        
+        // Different inputs should produce different IDs
+        assert_ne!(asset_id1, asset_id3);
+        
+        // Asset ID should be 32 bytes
+        assert_eq!(asset_id1.len(), 32);
+    }
+
+    #[test]
+    fn test_taproot_asset_creation() {
+        let secp = Secp256k1::new();
+        let mut rng = OsRng;
+        let (secret_key, _) = secp.generate_keypair(&mut rng);
+        
+        let asset = TaprootAsset::new(
+            "TESTCOIN",
+            1000000,
+            8,
+            "Test asset metadata",
+            &secret_key[..],
+        );
+        
+        assert!(asset.is_ok());
+        let asset = asset.unwrap();
+        
+        assert_eq!(asset.name, "TESTCOIN");
+        assert_eq!(asset.supply, 1000000);
+        assert_eq!(asset.precision, 8);
+        assert_eq!(asset.metadata, "Test asset metadata");
+        assert!(asset.issued);
+        assert_eq!(asset.num_leaves, 1);
+        assert_eq!(asset.leaves.len(), 1);
+    }
+
+    #[test]
+    fn test_asset_validation() {
+        let secp = Secp256k1::new();
+        let mut rng = OsRng;
+        let (secret_key, _) = secp.generate_keypair(&mut rng);
+        
+        // Test empty name
+        let result = TaprootAsset::new("", 1000, 8, "metadata", &secret_key[..]);
+        assert!(result.is_err());
+        
+        // Test name too long
+        let long_name = "a".repeat(33);
+        let result = TaprootAsset::new(&long_name, 1000, 8, "metadata", &secret_key[..]);
+        assert!(result.is_err());
+        
+        // Test zero supply
+        let result = TaprootAsset::new("TEST", 0, 8, "metadata", &secret_key[..]);
+        assert!(result.is_err());
+        
+        // Test precision too high
+        let result = TaprootAsset::new("TEST", 1000, 9, "metadata", &secret_key[..]);
+        assert!(result.is_err());
+        
+        // Test metadata too large
+        let large_metadata = "a".repeat(1025);
+        let result = TaprootAsset::new("TEST", 1000, 8, &large_metadata, &secret_key[..]);
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_create_asset_script() {
+        let secp = Secp256k1::new();
+        let mut rng = OsRng;
+        let (secret_key, _) = secp.generate_keypair(&mut rng);
+        
+        let asset = TaprootAsset::new(
+            "TEST",
+            1000,
+            8,
+            "metadata",
+            &secret_key[..],
+        ).unwrap();
+        
+        let script = asset.create_asset_script();
+        assert!(script.is_ok());
+        
+        let script = script.unwrap();
+        assert!(!script.is_empty());
+        
+        // Should start with OP_RETURN
+        let script_bytes = script.as_bytes();
+        assert_eq!(script_bytes[0], 0x6a); // OP_RETURN opcode
+    }
+
+    #[test]
+    fn test_create_asset_function() {
+        let secp = Secp256k1::new();
+        let mut rng = OsRng;
+        let (secret_key, _) = secp.generate_keypair(&mut rng);
+        
+        let result = create_asset(
+            "TESTCOIN",
+            1000000,
+            8,
+            "Test metadata",
+            &secret_key[..],
+        );
+        
+        assert!(result.is_ok());
+        let asset = result.unwrap();
+        
+        assert_eq!(asset.name, "TESTCOIN");
+        assert_eq!(asset.supply, 1000000);
+        assert_eq!(asset.precision, 8);
+        assert_eq!(asset.metadata, "Test metadata");
+        assert!(asset.issued);
+        assert_eq!(asset.num_leaves, 1);
+        assert_eq!(asset.leaves.len(), 1);
+    }
 }

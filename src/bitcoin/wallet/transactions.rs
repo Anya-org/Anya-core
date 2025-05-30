@@ -43,7 +43,7 @@ pub struct TxOptions {
 }
 
 impl Default for TxOptions {
-    fn default() -> Self  -> Result<(), Box<dyn Error>> {
+    fn default() -> Self {
         Self {
             coin_selection: CoinSelectionStrategy::default(),
             rbf: true,
@@ -84,7 +84,7 @@ pub enum CoinSelectionStrategy {
 }
 
 impl Default for CoinSelectionStrategy {
-    fn default() -> Self  -> Result<(), Box<dyn Error>> {
+    fn default() -> Self {
         Self::BranchAndBound
     }
 }
@@ -100,7 +100,7 @@ pub enum SignatureType {
 }
 
 impl Default for SignatureType {
-    fn default() -> Self  -> Result<(), Box<dyn Error>> {
+    fn default() -> Self {
         Self::ECDSA
     }
 }
@@ -138,12 +138,12 @@ pub struct TransactionAnalyzer;
 
 impl TransactionAnalyzer {
     /// Calculate the fee for a transaction given its size and fee rate
-    pub fn calculate_fee(tx_size: usize, fee_rate: f64) -> u64  -> Result<(), Box<dyn Error>> {
+    pub fn calculate_fee(tx_size: usize, fee_rate: f64) -> u64 {
         (tx_size as f64 * fee_rate).ceil() as u64
     }
     
     /// Estimate the size of a transaction with the given number of inputs and outputs
-    pub fn estimate_tx_size(input_count: usize, output_count: usize) -> usize  -> Result<(), Box<dyn Error>> {
+    pub fn estimate_tx_size(input_count: usize, output_count: usize) -> usize {
         // Simple estimation for P2WPKH inputs and outputs
         let header_size = 10; // 4 bytes version, 1 byte input count, 1 byte output count, 4 bytes locktime
         let input_size = 148; // Approximate P2WPKH input size with signature
@@ -153,7 +153,7 @@ impl TransactionAnalyzer {
     }
     
     /// Estimate the vsize of a transaction with the given number of inputs and outputs
-    pub fn estimate_tx_vsize(input_count: usize, output_count: usize) -> usize  -> Result<(), Box<dyn Error>> {
+    pub fn estimate_tx_vsize(input_count: usize, output_count: usize) -> usize {
         // Simple estimation for P2WPKH inputs and outputs
         let header_vsize = 10.0; // 4 bytes version, 1 byte input count, 1 byte output count, 4 bytes locktime
         let input_vsize = 68.0;  // Approximate P2WPKH input vsize with signature
@@ -163,7 +163,7 @@ impl TransactionAnalyzer {
     }
     
     /// Calculate the fee rate from transaction size and fee
-    pub fn calculate_fee_rate(tx_size: usize, fee: u64) -> f64  -> Result<(), Box<dyn Error>> {
+    pub fn calculate_fee_rate(tx_size: usize, fee: u64) -> f64 {
         fee as f64 / tx_size as f64
     }
 } 

@@ -13,7 +13,6 @@
 use bitcoin::key::FromSliceError;
 use bitcoin::secp256k1;
 use bitcoin::{
-    secp256k1::Error as KeyError,
     sighash::P2wpkhError, sighash::TaprootError, taproot::SigFromSliceError,
     taproot::TaprootBuilder, taproot::TaprootBuilderError,
 };
@@ -160,9 +159,9 @@ impl From<TaprootBuilderError> for BitcoinError {
     }
 }
 
-impl From<TaprootError> for BitcoinError {
-    fn from(err: TaprootError) -> Self {
-        BitcoinError::TaprootError(err.to_string())
+impl From<secp256k1::Error> for BitcoinError {
+    fn from(error: secp256k1::Error) -> Self {
+        BitcoinError::Secp256k1Error(error.to_string())
     }
 }
 
@@ -190,26 +189,10 @@ impl From<FromSliceError> for BitcoinError {
     }
 }
 
-// Implementation for secp256k1::Error
-impl From<secp256k1::Error> for BitcoinError {
-    fn from(error: secp256k1::Error) -> Self {
-        BitcoinError::Secp256k1Error(error.to_string())
-    }
-}
-
 // Implementation for TaprootError
 impl From<TaprootError> for BitcoinError {
     fn from(error: TaprootError) -> Self {
-        match error {
-            TaprootError::KeyError(e) => BitcoinError::KeyError(e),
-            TaprootError::ScriptError(e) => BitcoinError::ScriptError(e),
-            TaprootError::TaprootError(e) => BitcoinError::Other(format!("Taproot error: {}", e)),
-            TaprootError::BuilderError(e) => BitcoinError::Other(format!("Builder error: {}", e)),
-            TaprootError::BitcoinError(e) => BitcoinError::Other(e),
-            TaprootError::Secp256k1Error(e) => BitcoinError::Secp256k1Error(e.to_string()),
-            TaprootError::HexError(_) => BitcoinError::HexDecodingError,
-            TaprootError::ValidationError(e) => BitcoinError::ValidationError(e),
-        }
+        BitcoinError::TaprootError(error.to_string())
     }
 }
 

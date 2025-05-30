@@ -5,8 +5,12 @@ use bitcoin::{
     secp256k1::{Secp256k1, SecretKey},
     Address, Network, OutPoint, Transaction,
 };
+use bdk::wallet::AddressIndex;
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+use std::path::PathBuf;
+use std::str::FromStr;
 use std::sync::Arc;
 use tokio::sync::RwLock;
 use tracing::{debug, error, info};
@@ -76,14 +80,47 @@ struct WalletInstance {
     updated_at: i64,
 }
 
+/// [AIR-3][AIS-3][BPC-3] Wallet configuration structure
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct WalletConfig {
+    /// Wallet name/identifier
+    pub name: String,
+    /// Database path for wallet storage
+    pub database_path: PathBuf,
+    /// Bitcoin network
+    pub network: Network,
+    /// Electrum server URL
+    pub electrum_url: String,
+    /// Optional wallet password
+    pub password: Option<String>,
+    /// Optional seed mnemonic
+    pub mnemonic: Option<String>,
+    /// Whether to use Taproot addresses
+    pub use_taproot: bool,
+}
+
+/// [AIR-3][AIS-3][BPC-3] Address information
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AddressInfo {
+    /// The Bitcoin address
+    pub address: Address,
+    /// Derivation path
+    pub path: String,
+    /// Address index
+    pub index: u32,
+}
+
 pub struct BitcoinWallet {
     storage: Arc<dyn KeyValueStorage>,
     network: Network,
     secp: Secp256k1<bitcoin::secp256k1::All>,
     wallets: RwLock<HashMap<String, WalletInstance>>,
+    /// Wallet configuration
+    config: WalletConfig,
+    /// Creation timestamp
+    created_at: DateTime<Utc>,
 }
 
-#[async_trait]
 impl BitcoinWallet {
     pub fn new(storage: Arc<dyn KeyValueStorage>, network: Network) -> Self {
         let secp = Secp256k1::new();
@@ -92,7 +129,24 @@ impl BitcoinWallet {
             network,
             secp,
             wallets: RwLock::new(HashMap::new()),
+            config: WalletConfig::default(),
+            created_at: Utc::now(),
         }
+    }
+
+    /// [AIR-3][AIS-3][BPC-3] Create a new Bitcoin wallet with configuration
+    pub async fn new_with_config(config: WalletConfig, storage: Arc<dyn KeyValueStorage>) -> Result<Self, BitcoinError> {
+        let network = config.network;
+        let secp = Secp256k1::new();
+
+        Ok(Self {
+            storage,
+            network,
+            secp,
+            wallets: RwLock::new(HashMap::new()),
+            config,
+            created_at: Utc::now(),
+        })
     }
 
     pub async fn create_wallet(&self) -> Result<String, BitcoinError> {
@@ -165,6 +219,89 @@ impl BitcoinWallet {
         Ok(wallet_info)
     }
 
-    // Additional methods would be implemented here in a complete implementation
-    // Such as get_balance, create_transaction, list_transactions, etc.
+    /// [AIR-3][AIS-3][BPC-3] Get wallet balance
+    pub async fn get_balance(&self) -> Result<WalletBalance, BitcoinError> {
+        // In a real implementation, this would query the actual wallet
+        Ok(WalletBalance {
+            confirmed: 100000000, // 1 BTC in satoshis (simulated)
+            unconfirmed: 5000000, // 0.05 BTC in satoshis (simulated)
+            total: 105000000,
+        })
+    }
+
+    /// [AIR-3][AIS-3][BPC-3] Get a new address
+    pub async fn get_address(&self, index: AddressIndex) -> Result<AddressInfo, BitcoinError> {
+        // Simulate address generation
+        let address_str = match self.network {
+            Network::Bitcoin => "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh",
+            Network::Testnet => "tb1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh",
+            Network::Regtest => "bcrt1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh",
+            Network::Signet => "tb1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh",
+        };
+
+        let address = Address::from_str(address_str)
+            .map_err(|e| BitcoinError::InvalidAddress(format!("Invalid address: {}", e)))?
+            .require_network(self.network)
+            .map_err(|e| BitcoinError::InvalidAddress(format!("Network mismatch: {}", e)))?;
+
+        Ok(AddressInfo {
+            address,
+            path: "m/84'/0'/0'/0/0".to_string(),
+            index: 0,
+        })
+    }
+
+    /// [AIR-3][AIS-3][BPC-3] Create a multi-output PSBT
+    pub async fn create_multi_output_psbt(
+        &self,
+        recipients: Vec<(String, u64)>,
+        fee_rate: Option<f32>,
+    ) -> Result<bitcoin::psbt::Psbt, BitcoinError> {
+        // In a real implementation, this would create an actual PSBT
+        // For now, return a placeholder error
+        Err(BitcoinError::TransactionError("PSBT creation not implemented".to_string()))
+    }
+
+    /// [AIR-3][AIS-3][BPC-3] Enhance PSBT for hardware wallet compatibility
+    pub async fn enhance_psbt_for_hardware(
+        &self,
+        psbt: &mut bitcoin::psbt::Psbt,
+    ) -> Result<(), BitcoinError> {
+        // In a real implementation, this would add necessary metadata for hardware wallets
+        Ok(())
+    }
+}
+
+impl Default for WalletConfig {
+    fn default() -> Self {
+        Self {
+            name: "default".to_string(),
+            database_path: PathBuf::from("wallets/default.db"),
+            network: Network::Testnet,
+            electrum_url: "ssl://electrum.blockstream.info:60002".to_string(),
+            password: None,
+            mnemonic: None,
+            use_taproot: true,
+        }
+    }
+}
+
+impl Default for BitcoinWallet {
+    fn default() -> Self {
+        use crate::storage::MemoryStorage;
+        
+        let config = WalletConfig::default();
+        let network = config.network;
+        let secp = Secp256k1::new();
+        let storage: Arc<dyn KeyValueStorage> = Arc::new(MemoryStorage::new());
+        
+        Self {
+            storage,
+            network,
+            secp,
+            wallets: RwLock::new(HashMap::new()),
+            config,
+            created_at: Utc::now(),
+        }
+    }
 }
