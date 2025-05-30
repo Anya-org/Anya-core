@@ -11,7 +11,6 @@ use crate::security::hsm::types::{
     MerkleProof, SignatureAlgorithm, KeyInfo, SignParams, VerifyParams, EncryptionAlgorithm, EncryptParams, DecryptParams, GetKeyParams, DeleteKeyParams, RotateKeyParams, HsmRequest, KeyType, GenerateKeyParams
 };
 use crate::security::hsm::providers::simulator::SimulatorHsmProvider;
-use crate::security::hsm::providers::cloud::CloudHsmProvider;
 use crate::security::hsm::providers::hardware::HardwareHsmProvider;
 use serde::{Serialize, Deserialize};
 use bitcoin::ScriptBuf;
@@ -55,18 +54,14 @@ pub mod security;
 pub mod types;
 
 // Re-export types for easier access
-pub use types::{HsmAuditEvent, HsmProviderStatus};
-pub use types::HsmOperation;
+pub use types::{HsmAuditEvent, HsmOperation};
+pub use provider::HsmProviderStatus;
 
 // Re-export security manager for easier access
 pub use security::SecurityManager;
 
 // Re-export error types for easier access
 pub use error::*;
-
-// [AIR-3][AIS-3][BPC-3][RES-3] HSM provider module declarations
-// This follows the Bitcoin Development Framework v2.5 standards for HSM providers
-pub mod providers;
 
 // Re-export provider implementations for easier access
 // Only export what's needed to avoid duplicate exports
@@ -81,7 +76,7 @@ use bitcoin::{Txid, Psbt, Script, XOnlyPublicKey};
 use bitcoin::taproot::TaprootBuilder;
 use bitcoin::bip32::Xpriv;
 use bitcoin::key::Secp256k1;
-use bitcoin_opcodes::{self, OpCode, all as opcodes};
+use bitcoin::opcodes::{self, all as opcodes};
 use chrono::{DateTime, Utc};
 use secp256k1::ecdsa::Signature;
 use base64::{Engine as _, engine::general_purpose::STANDARD as BASE64};
@@ -89,15 +84,15 @@ use std::collections::HashMap;
 use tokio::sync::{Mutex, RwLock};
 use std::convert::TryInto;
 use tracing::{debug, error, info};
-use bitcoin::blockdata::block::BlockHeader;
+use bitcoin::block::Header as BlockHeader;
 // No need for debug import
 
 // Import HSM provider types
 // [AIR-3][AIS-3][BPC-3][RES-3] Import necessary HSM components
 // This follows the Bitcoin Development Framework v2.5 standards for HSM implementations
 use self::config::HsmConfig;
-use self::operations::{OperationRequest, OperationResult};
-use self::provider::{HsmProvider, HsmProviderType, HsmProviderStatus};
+use self::operations::OperationResponse;
+use self::provider::{HsmProvider, HsmProviderType};
 
 /// HSM Manager that provides a unified interface to hardware security modules
 /// [AIR-3][AIS-3][AIT-3][AIP-3][RES-3]

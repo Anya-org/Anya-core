@@ -10,6 +10,8 @@ pub mod simulator;
 pub mod software;
 pub mod tpm;
 
-// Re-export only the BitcoinHsmProvider to avoid duplicate exports
-// This is the primary provider used in the application
-pub use self::bitcoin::BitcoinHsmProvider; // [AIR-3][AIS-3][BPC-3][RES-3] AI labeling for compliance
+// Re-export provider structs for use by other modules
+pub use self::bitcoin::BitcoinHsmProvider;
+pub use self::software::SoftwareHsmProvider;
+pub use self::simulator::SimulatorHsmProvider;
+pub use self::hardware::HardwareHsmProvider;

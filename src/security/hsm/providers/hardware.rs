@@ -4,13 +4,21 @@ use std::collections::HashMap;
 // This follows the Bitcoin Development Framework v2.5 standards for secure HSM implementation
 use async_trait::async_trait;
 use uuid::Uuid;
+use tokio::sync::Mutex;
 
 // Types from the HSM module
 use tracing::debug;
 use bitcoin::Network;
-use crate::security::hsm::error::{HsmError, HsmProviderStatus, HsmResponse, HsmOperation};
-use crate::security::hsm::types::{HsmRequest, KeyGenParams};
-use crate::security::hsm::providers::{KeyInfo, KeyPair, KeyType, SigningAlgorithm};
+use bitcoin::{Address, psbt::Psbt};
+use crate::security::hsm::error::HsmError;
+use crate::security::hsm::config::{HardwareConfig, HardwareDeviceType};
+use crate::security::hsm::provider::{
+    HsmProviderStatus, HsmRequest, HsmResponse, HsmOperation, 
+    KeyGenParams, KeyInfo, KeyPair, KeyType, SigningAlgorithm, HsmProvider, KeyUsage
+};
+use std::sync::Arc;
+use bitcoin::secp256k1::{Secp256k1, SecretKey, PublicKey};
+use chrono::Utc;
 
 /// Hardware connection state
 #[derive(Debug, Clone, PartialEq)]

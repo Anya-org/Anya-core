@@ -1,5 +1,4 @@
-#[macro_use] extern crate log;
-
+use std::sync::Arc;
 use async_trait::async_trait;
 use serde::{Serialize, Deserialize};
 use uuid::Uuid;
@@ -10,6 +9,7 @@ use chrono::{DateTime, Utc};
 use std::str::FromStr;
 use base64::{Engine as _, engine::general_purpose::STANDARD as BASE64};
 use bitcoin::psbt::Psbt;
+use tracing::warn;
 
 use crate::security::hsm::config::{
     HsmConfig, SoftHsmConfig, CloudHsmConfig, TpmConfig, Pkcs11Config
@@ -533,7 +533,7 @@ impl HsmProvider for SoftHsmProvider {
         Ok(())
     }
     
-    async fn execute_operation(&self, _request: HsmRequest) -> Result<HsmResponse, HsmError> {
+    async fn execute_operation(&self, request: HsmRequest) -> Result<HsmResponse, HsmError> {
         // Log the operation
         debug!("Executing operation: {:?}", request.operation);
         

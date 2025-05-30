@@ -204,7 +204,7 @@ impl From<std::io::Error> for HsmError {
 // This From implementation is not needed as Rust automatically implements From<T> for T
 
 /// HSM audit event type
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum AuditEventType {
     /// HSM initialization
     HsmInitialize,

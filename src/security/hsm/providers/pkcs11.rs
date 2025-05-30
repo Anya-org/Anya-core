@@ -14,7 +14,8 @@ use std::collections::HashMap;
 // [AIR-3][AIS-3][BPC-3][RES-3] Import HSM module types following BDF v2.5 standards
 use crate::security::hsm::config::Pkcs11Config;
 use crate::security::hsm::provider::{HsmProvider, KeyGenParams, KeyInfo, KeyPair, SigningAlgorithm};
-use crate::security::hsm::types::{HsmRequest, HsmResponse, HsmProviderStatus};
+use crate::security::hsm::types::{HsmRequest, HsmResponse};
+use crate::security::hsm::provider::HsmProviderStatus;
 use crate::security::hsm::error::HsmError;
 use uuid::Uuid;
 use crate::security::hsm::audit::AuditLogger;

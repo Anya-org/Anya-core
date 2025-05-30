@@ -30,7 +30,6 @@ use std::{
     collections::HashMap,
     sync::Arc,
     time::{SystemTime, UNIX_EPOCH},
-    mem::zeroize,
     sync::atomic::{AtomicBool, Ordering},
 };
 
@@ -42,7 +41,7 @@ use async_trait::async_trait;
 // This follows the Bitcoin Development Framework v2.5 standards for secure HSM implementation
 use bitcoin::{
     hashes::{Hash as BitcoinHash},
-    bitcoin::secp256k1::{
+    secp256k1::{
         Message, PublicKey, Secp256k1, SecretKey,
         XOnlyPublicKey,
     },
@@ -56,17 +55,14 @@ use serde::Serialize;
 use crate::{
     security::hsm::{
         error::HsmError,
-        provider::{HsmProvider, KeyGenParams, SigningAlgorithm, HsmRequest, HsmResponse},
+        provider::{HsmProvider, KeyGenParams, SigningAlgorithm, HsmRequest, HsmResponse, KeyType, KeyUsage, EcCurve, HsmProviderStatus, KeyPair, KeyInfo, EncryptionAlgorithm},
     },
-    util::mem::SecureString,
 };
 
 // Import from parent modules
 use crate::security::hsm::config::SoftHsmConfig;
 use crate::security::hsm::audit::AuditLogger;
-use crate::security::hsm::types::{provider::KeyType, provider::HsmOperation, provider::KeyUsage, EncryptionAlgorithm, EcCurve, HsmProviderStatus, SignatureAlgorithm};
-use crate::security::hsm::provider::{KeyPair, KeyInfo};
-use crate::security::hsm::{AuditEventType, AuditEventResult};
+use crate::security::hsm::error::{AuditEventType, AuditEventResult};
 use chrono::{DateTime, Utc};
 use base64::Engine;
 use sha2::Digest;
@@ -420,7 +416,7 @@ impl SoftwareHsmProvider {
     /// Generate a new key pair
     async fn generate_key(&self, params: KeyGenParams) -> Result<(KeyPair, KeyInfo), HsmError> {
         use crate::security::hsm::provider::EcCurve;
-        use crate::security::hsm::types::{KeyPair, provider::KeyType};
+        use crate::security::hsm::provider::{EcCurve, KeyType};
         use chrono::Utc;
         
         // Generate a unique key ID
@@ -812,5 +808,3 @@ struct Base64SignatureResponse {
     signature: String,
     algorithm: SigningAlgorithm,
 }
-
-#[derive(Debug, serde::Deserialize)]

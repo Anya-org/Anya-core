@@ -1,6 +1,8 @@
 use crate::security::hsm::error::{HsmError, AuditEventType, AuditEventResult, AuditEventSeverity, HsmAuditEvent};
 use serde::{Serialize, Deserialize, Serializer, Deserializer};
 use std::sync::Arc;
+use std::path::Path;
+use std::fs;
 use tokio::sync::Mutex;
 use tracing::{debug, warn};
 use chrono::{DateTime, Utc};
@@ -8,6 +10,7 @@ use std::fs::{OpenOptions, File};
 use std::io::{Write, Seek, SeekFrom};
 use async_trait::async_trait;
 use std::collections::HashMap;
+use uuid::Uuid;
 
 // [AIR-3][AIS-3][BPC-3][RES-3] Imports cleaned up for BDF v2.5 compliance
 

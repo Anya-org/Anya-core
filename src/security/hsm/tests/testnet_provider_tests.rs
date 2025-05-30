@@ -16,9 +16,9 @@ mod tests {
     };
     use crate::security::hsm::providers::{
         simulator::SimulatorHsmProvider,
-        hardware::HardwareHsmProvider
+        hardware::HardwareHsmProvider,
+        software::SoftwareHsmProvider,
     };
-    use crate::security::hsm::provider::software::SoftwareHsmProvider;
     
     #[tokio::test]
     async fn test_software_provider_bitcoin_testnet() {
