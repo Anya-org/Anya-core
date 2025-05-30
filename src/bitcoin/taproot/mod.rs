@@ -3,7 +3,7 @@
 //! This module provides functionality for working with Taproot, including
 //! key generation, asset creation, and transaction building.
 //!
-//! [AIR-3][AIS-3][BPC-3][RES-3] Implementation follows Bitcoin Development Framework v2.5
+//! [AIR-3][AIS-3][BPC-3][RES-3] Implementation follows official Bitcoin Improvement Proposals (BIPs)
 
 // [AIR-3][AIS-3][BPC-3][RES-3] Taproot module for Bitcoin asset management
 use bitcoin::hashes::sha256;

@@ -1,7 +1,7 @@
 #!/bin/bash
 # [AIR-3][AIS-3][BPC-3][RES-3]
 # script_manager.sh - Comprehensive script management utility
-# Following Bitcoin Development Framework v2.5 standards
+# Following official Bitcoin Improvement Proposals (BIPs)
 # Part of the Anya Core Hexagonal Architecture
 # Date: 2025-05-20
 
@@ -55,7 +55,7 @@ function log {
 # Function to display help
 function show_help {
     echo -e "${BOLD}Anya Core Script Management Utility${NC}"
-    echo -e "Following Bitcoin Development Framework v2.5 standards"
+    echo -e "Following official Bitcoin Improvement Proposals (BIPs)"
     echo
     echo -e "Usage: $0 [OPTION]"
     echo

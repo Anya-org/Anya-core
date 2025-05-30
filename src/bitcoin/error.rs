@@ -8,7 +8,7 @@
 // [AIR-3][AIS-3][AIT-2][AIM-2][AIP-2][BPC-3][RES-3]
 // This module provides structured error types with comprehensive coverage
 // for all Bitcoin-related operations with good resilience characteristics.
-// Complete implementation as per Bitcoin Development Framework v2.5 standards
+// Complete implementation as per official Bitcoin Improvement Proposals (BIPs) standards
 
 use bitcoin::key::FromSliceError;
 use bitcoin::secp256k1;
@@ -131,7 +131,7 @@ pub enum BitcoinError {
     TransactionError(String),
 
     // [AIR-3][AIS-3][BPC-3][RES-3] Invalid configuration error
-    // This follows the Bitcoin Development Framework v2.5 standards for configuration validation
+    // This follows official Bitcoin Improvement Proposals (BIPs) standards for configuration validation
     #[error("Invalid configuration: {0}")]
     InvalidConfiguration(String),
 
@@ -148,7 +148,7 @@ pub enum BitcoinError {
     InternalError(String),
     
     // [AIR-3][AIS-3][BPC-3][RES-3] Configuration error handling
-    // This follows the Bitcoin Development Framework v2.5 standards for error handling
+    // This follows official Bitcoin Improvement Proposals (BIPs) standards for error handling
     #[error("Configuration error: {0}")]
     ConfigError(String),
 }

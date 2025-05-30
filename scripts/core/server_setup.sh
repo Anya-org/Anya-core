@@ -3,14 +3,14 @@
 #
 # Server Setup Script for Anya Core
 # This script sets up the required services on the server
-# Following the Bitcoin Development Framework principles v2.5
+# Following official Bitcoin Improvement Proposals (BIPs) standards
 # Implementing Hexagonal Architecture for clean separation of concerns
 
 set -e
 
 echo "==== Anya Core Server Setup ===="
 echo "Version: 1.0.0"
-echo "Following Bitcoin Development Framework v2.5"
+echo "Following official Bitcoin Improvement Proposals (BIPs)"
 echo "Implementing Hexagonal Architecture"
 echo
 

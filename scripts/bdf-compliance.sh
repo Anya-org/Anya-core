@@ -1,5 +1,5 @@
 #!/bin/bash
-# [AIR-3][AIS-3][BPC-3][RES-3] Bitcoin Development Framework v2.5 Compliance Validator
+# [AIR-3][AIS-3][BPC-3][RES-3] Bitcoin Improvement Proposals (BIPs) Compliance Validator
 # This script validates compliance with BDF v2.5 standards for Bitcoin protocol implementations
 
 set -e
@@ -65,7 +65,7 @@ echo -e "${GREEN}Hexagonal architecture compliance passed!${NC}"
 # Step 6: Generate BDF compliance status
 echo -e "${YELLOW}[6/7] Generating BDF compliance status...${NC}"
 cat > BDF-STATUS.md << EOF
-# Bitcoin Development Framework v2.5 Compliance Status
+# Bitcoin Improvement Proposals (BIPs) Compliance Status
 
 Last Updated: $(date -u +"%Y-%m-%d %H:%M UTC")
 

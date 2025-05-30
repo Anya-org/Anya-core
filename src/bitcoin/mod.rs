@@ -1,6 +1,6 @@
 // [AIR-3][AIS-3][BPC-3][RES-3] Fixed import to use the correct BitcoinAdapter
 // [AIR-3][AIS-3][BPC-3][RES-3] Bitcoin module implementation
-// This follows the Bitcoin Development Framework v2.5 standards for hexagonal architecture
+// This follows official Bitcoin Improvement Proposals (BIPs) standards for hexagonal architecture
 
 // Core modules for Bitcoin functionality
 pub mod interface;
@@ -23,7 +23,7 @@ pub use node::BitcoinNode;
 pub use wallet::{BitcoinWallet, WalletConfig, AddressInfo};
 
 // [AIR-3][AIS-3][BPC-3][RES-3] Re-export Bitcoin types for convenience
-// This follows the Bitcoin Development Framework v2.5 standards for type consistency
+// This follows official Bitcoin Improvement Proposals (BIPs) standards for type consistency
 pub use bitcoin::{Address, Block, BlockHash, Network, Transaction, Txid};
 
 // Export our manager and config for easier access

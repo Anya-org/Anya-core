@@ -1,6 +1,6 @@
 use bitcoin::hashes::*;
 // [AIR-3][AIS-3][BPC-3][RES-3] Import necessary dependencies for HSM types
-// This follows the Bitcoin Development Framework v2.5 standards for secure HSM implementation
+// This follows official Bitcoin Improvement Proposals (BIPs) standards for secure HSM implementation
 use secp256k1::ecdsa::Signature;
 use chrono::{DateTime, Utc};
 use serde::{Serialize, Deserialize};

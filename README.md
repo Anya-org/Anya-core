@@ -16,9 +16,9 @@ Add a brief overview of this document here.
 
 
 [![BIP-341](https://img.shields.io/badge/BIP-341_Compliant-green)](https://bips.xyz/341)
-[![AIS-3](https://img.shields.io/badge/AIS-3_Secured-blue)](https://bitcoin-development-framework.org)
+[![AIS-3](https://img.shields.io/badge/AIS-3_Secured-blue)](https://bips.xyz)
 [![PSBT-v2](https://img.shields.io/badge/PSBT_v2-100%25-brightgreen)](https://bips.xyz/370)
-[![BDF-v2.5](https://img.shields.io/badge/Bitcoin%20Dev%20Framework-v2.5-yellow)](https://bitcoin-development-framework.org)
+[![BIP-Standards](https://img.shields.io/badge/BIP-Standards_Compliant-green)](https://bips.xyz)
 
 [AIR-3][AIS-3][AIT-3][AIM-3][AIP-3][AIE-3][BPC-3][W5C-3][DID-3][PFM-3][SCL-3][RES-3][UXA-3][DAO-3]
 
@@ -26,7 +26,7 @@ Add a brief overview of this document here.
 
 **Latest Release: v0.3.0-rc2**
 
-> **Note**: This release includes comprehensive updates to the Taproot implementation, enhanced security features with HSM integration, and a fully refactored installation system following Bitcoin Development Framework v2.5 standards.
+> **Note**: This release includes comprehensive updates to the Taproot implementation, enhanced security features with HSM integration, and a fully refactored installation system following official Bitcoin Improvement Proposals (BIPs).
 
 A powerful platform combining Bitcoin/crypto functionality, ML-based analytics,
 Web5 decentralized data management, and a Bitcoin-style DAO governance system.
@@ -37,7 +37,7 @@ Web5 decentralized data management, and a Bitcoin-style DAO governance system.
 ![Anya Architecture](docs/images/anya_architecture.png)
 
 > **AI Labeling**: This project follows the [canonical AI Labeling System](docs/standards/AI_LABELING.md)
-> based on the Bitcoin Development Framework v2.5 standards. All components are labeled with
+> based on official Bitcoin Improvement Proposals (BIPs). All components are labeled with
 > appropriate Core and Extended category labels.
 
 ## Documentation Quick Links [AIR-3][AIS-3][BPC-3][RES-3]
@@ -131,7 +131,7 @@ docs/
 
 - [Documentation Index](docs/INDEX.md) - Main documentation index
 - [System Architecture](SYSTEM_MAP.md) - Complete system architecture
-- [Bitcoin Development Framework v2.5](docs/standards/BITCOIN_DEVELOPMENT_FRAMEWORK.md) - Standards compliance
+- [BIP Compliance Standards](docs/standards/BIP_COMPLIANCE.md) - Official Bitcoin standards compliance
 - [AI Labeling System](docs/standards/AI_LABELING.md) - Component labeling standards
 
 ### Installation & Setup
@@ -1177,7 +1177,7 @@ let signature = hsm_manager.sign_data(
 ).await?;
 ```
 
-This implementation follows the Bitcoin Development Framework v2.5 requirements for HSM integration, with full compliance with the Hexagonal Architecture principles.
+This implementation follows official Bitcoin Improvement Proposals (BIPs) for HSM integration, with full compliance with the Hexagonal Architecture principles.
 
 ## Installation
 

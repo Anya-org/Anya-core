@@ -38,7 +38,7 @@ use zeroize::Zeroize;
 
 use async_trait::async_trait;
 // [AIR-3][AIS-3][BPC-3][RES-3] Import Bitcoin types for software HSM implementation
-// This follows the Bitcoin Development Framework v2.5 standards for secure HSM implementation
+// This follows official Bitcoin Improvement Proposals (BIPs) standards for secure HSM implementation
 use bitcoin::{
     hashes::{Hash as BitcoinHash},
     secp256k1::{
@@ -175,7 +175,7 @@ impl SoftwareHsmProvider {
 
     /// Generate a secure random key ID using the system's secure RNG
     /// [AIR-3][AIS-3][BPC-3][RES-3] Generate a secure random key ID using the system's secure RNG
-    /// This follows the Bitcoin Development Framework v2.5 standards for secure key generation
+    /// This follows official Bitcoin Improvement Proposals (BIPs) standards for secure key generation
     fn generate_key_id(&self) -> String {
         // Use system's secure RNG to generate a unique key ID
         let mut rng = OsRng;

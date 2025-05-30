@@ -4,7 +4,7 @@ use crate::prelude::StdError;
 // Original file: C:\Users\bmokoka\Downloads\OPSource\src\bitcoin\dlc\mod.rs
 // Discrete Log Contracts (DLCs) Module
 // Implements privacy-preserving DLCs using non-interactive oracle patterns
-// to maintain transaction indistinguishability as per Bitcoin Development Framework v2.5
+// to maintain transaction indistinguishability as per official Bitcoin Improvement Proposals (BIPs)
 //
 // [AIR-2][AIS-3][AIT-3][AIM-2][AIP-2][BPC-3][PFM-2][RES-2]
 // This module meets DLC Oracle Integration requirements with non-interactive pattern

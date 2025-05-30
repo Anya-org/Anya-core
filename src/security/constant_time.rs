@@ -77,7 +77,7 @@ pub fn constant_time_is_zero_u8(val: u8) -> u8 {
     result |= result >> 1;
     
     // [AIR-3][AIS-3][BPC-3][RES-3] Invert and mask to get 1 for 0 input, 0 for non-zero input
-    // This follows the Bitcoin Development Framework v2.5 standards for clean code
+    // This follows official Bitcoin Improvement Proposals (BIPs) standards for clean code
     !result & 1
 }
 

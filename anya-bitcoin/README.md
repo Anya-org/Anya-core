@@ -6,7 +6,7 @@
 
 > **Note**: This release includes full Taproot support, enhanced security features, and performance improvements.
 
-A comprehensive Bitcoin implementation following the Bitcoin Development Framework v2.5 standards with a focus on security, performance, and extensibility. Built with a hexagonal architecture for clean separation of concerns and maximum flexibility.
+A comprehensive Bitcoin implementation following official Bitcoin Improvement Proposals (BIPs) standards with a focus on security, performance, and extensibility. Built with a hexagonal architecture for clean separation of concerns and maximum flexibility.
 
 ## Overview
 

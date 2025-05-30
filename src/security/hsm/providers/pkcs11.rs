@@ -5,7 +5,7 @@
 //! security modules (HSM) and smart cards.
 
 // [AIR-3][AIS-3][BPC-3][RES-3] Import necessary dependencies for PKCS#11 HSM provider
-// This follows the Bitcoin Development Framework v2.5 standards for secure HSM implementation
+// This follows official Bitcoin Improvement Proposals (BIPs) standards for secure HSM implementation
 use std::sync::Arc;
 use async_trait::async_trait;
 use tokio::sync::Mutex;

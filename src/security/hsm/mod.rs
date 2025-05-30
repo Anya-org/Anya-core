@@ -4,7 +4,7 @@
 //! with a focus on open-source solutions that align with Bitcoin's philosophy.
 
 // [AIR-3][AIS-3][BPC-3][RES-3] Import necessary dependencies for HSM module
-// This follows the Bitcoin Development Framework v2.5 standards for secure HSM implementation
+// This follows official Bitcoin Improvement Proposals (BIPs) standards for secure HSM implementation
 use std::sync::Arc;
 use std::error::Error;
 use crate::security::hsm::types::{
@@ -20,7 +20,7 @@ use uuid::Uuid;
 use crate::security::hsm::audit::AuditLogger;
 
 // [AIR-3][AIS-3][BPC-3][RES-3] Import HSM provider modules
-// This follows the Bitcoin Development Framework v2.5 standards for HSM providers
+// This follows official Bitcoin Improvement Proposals (BIPs) standards for HSM providers
 
 // Re-export types for easier access
 pub use providers::{
@@ -71,7 +71,7 @@ pub use providers::bitcoin::BitcoinHsmProvider;
 pub mod tests;
 
 // [AIR-3][AIS-3][BPC-3][RES-3] Import Bitcoin types for HSM functionality
-// This follows the Bitcoin Development Framework v2.5 standards for HSM implementations
+// This follows official Bitcoin Improvement Proposals (BIPs) standards for HSM implementations
 use bitcoin::{Txid, Psbt, Script, XOnlyPublicKey};
 use bitcoin::taproot::TaprootBuilder;
 use bitcoin::bip32::Xpriv;
@@ -89,7 +89,7 @@ use bitcoin::block::Header as BlockHeader;
 
 // Import HSM provider types
 // [AIR-3][AIS-3][BPC-3][RES-3] Import necessary HSM components
-// This follows the Bitcoin Development Framework v2.5 standards for HSM implementations
+// This follows official Bitcoin Improvement Proposals (BIPs) standards for HSM implementations
 use self::config::HsmConfig;
 use self::operations::OperationResponse;
 use self::provider::{HsmProvider, HsmProviderType};

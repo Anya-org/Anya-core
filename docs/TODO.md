@@ -141,7 +141,7 @@ Add a brief overview of this document here.
 - [ ] Create architecture overview documents
 - [ ] Develop integration guides for all supported chains
 - [ ] Build comprehensive developer onboarding materials
-- [ ] Document compliance with Bitcoin Development Framework
+- [ ] Document compliance with official Bitcoin Improvement Proposals (BIPs)
 
 ## Current Work (Q1 2025)
 

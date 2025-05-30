@@ -4,7 +4,7 @@
 
 ## 🛡️ Security Overview
 
-Anya Core implements a comprehensive security model following Bitcoin Development Framework v2.5 standards. This document outlines our security policies, procedures, and best practices.
+Anya Core implements a comprehensive security model following official Bitcoin Improvement Proposals (BIPs) including BIP-340 (Schnorr Signatures), BIP-341 (Taproot), BIP-342 (Tapscript), and BIP-174 (PSBT). This document outlines our security policies, procedures, and best practices.
 
 ## 🔄 Supported Versions
 
@@ -251,7 +251,7 @@ For security-related issues:
 *Last updated: 2024-12-07*
 
 ## Cryptographic Implementation [AIS-3][BPC-3]
-Aligned with Bitcoin Development Framework v2.5 Chapter 7
+Aligned with official Bitcoin Improvement Proposals (BIPs)
 
 ### Mandatory Requirements
 - 256-bit keys for all operations

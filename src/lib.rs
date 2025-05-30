@@ -49,7 +49,7 @@ pub mod dao;
 pub mod extensions;
 
 // Re-export key types for crate-wide visibility
-// [AIR-3][BPC-3] Following Bitcoin Development Framework v2.5 standards
+// [AIR-3][BPC-3] Following official Bitcoin Improvement Proposals (BIPs)
 pub use crate::dao::DaoLevel;
 pub use crate::bitcoin::interface::BitcoinInterface;
 pub use crate::bitcoin::adapters::BitcoinAdapter;

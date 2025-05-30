@@ -317,7 +317,7 @@ pub struct L2SecurityMonitor {
 [AIR-3][AIS-3][BPC-3][RES-3]
 
 
-*This document follows the [AI Labeling System](../docs/standards/AI_LABELING.md) standards based on the Bitcoin Development Framework v2.5.* 
+*This document follows the [AI Labeling System](../docs/standards/AI_LABELING.md) standards based on official Bitcoin Improvement Proposals (BIPs).* 
 ## See Also
 
 - [Related Document 1](./related1.md)

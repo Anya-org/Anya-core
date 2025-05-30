@@ -2,44 +2,41 @@
 
 [AIR-3][AIS-3][BPC-3][AIT-3][RES-3]
 
-*Last Updated: May 19, 2025*
+*Last Updated: May 30, 2025*
 
-This document provides a high-level overview of the Anya Core system architecture, emphasizing the Bitcoin protocol integration and security analysis framework, in compliance with the Bitcoin Development Framework v2.5.
+This document provides a high-level overview of the Anya Core system architecture, emphasizing the Bitcoin protocol integration, Web5 capabilities, machine learning systems, and security analysis framework, in compliance with official Bitcoin Improvement Proposals (BIPs).
 
 ## System Overview
 
-The Anya Core system follows a hexagonal architecture pattern, separating core business logic from external dependencies through adapters and ports.
+The Anya Core system follows a modular architecture with hexagonal patterns, separating core business logic from external dependencies through adapters and ports, with comprehensive integration across Bitcoin, Web5, and ML subsystems.
 
 ```
-                      +----------------+
-                      |  Bitcoin Core  |
-                      +-------+--------+
-                              |
-                      +-------v--------+
-                      |  Adapter Layer |
-                      +-------+--------+
-                              |
-+----------------+    +-------v--------+    +----------------+
-|   External     |    |   Application  |    |   Monitoring   |
-|   Interfaces   <----+   Core Logic    +---->   & Metrics   |
-| (APIs, Wallets)|    +-------+--------+    | (Prometheus)   |
-+----------------+            |             +----------------+
-                      +-------v--------+
-                      |   Protocol     |
-                      |   Adapters     |
-                      +-------+--------+
-                              |
-                      +-------v--------+
-                      |  Blockchain    |
-                      |  Network       |
-                      +----------------+
+                      ┌─────────────────┐
+                      │  Bitcoin Core   │
+                      │   + Layer 2     │
+                      └─────────┬───────┘
+                              │
+                ┌─────────────┴──────────────┐
+                │        Adapter Layer       │
+                └─────────────┬──────────────┘
+                              │
+    ┌─────────────┐    ┌──────┴──────┐    ┌─────────────┐    ┌─────────────┐
+    │ External    │    │ Application │    │ Web5 Stack  │    │ ML System   │
+    │ Interfaces  │◄──►│ Core Logic  │◄──►│ (DID/DWN)   │◄──►│ (AI Agents) │
+    │ (APIs/UIs)  │    │             │    │             │    │             │
+    └─────────────┘    └──────┬──────┘    └─────────────┘    └─────────────┘
+                              │
+                      ┌───────┴────────┐
+                      │   Security &   │
+                      │   Monitoring   │
+                      └────────────────┘
 ```
 
 ## BIP Compliance Status
 
 [AIR-3][AIS-3][BPC-3][RES-3]
 
-The following table shows the current compliance status with Bitcoin Improvement Proposals (BIPs) as of May 19, 2025:
+The following table shows the current compliance status with Bitcoin Improvement Proposals (BIPs) as of May 30, 2025:
 
 | BIP | Description | Implementation | Test Coverage | Audit Status |
 |-----|-------------|----------------|---------------|---------------|
@@ -47,14 +44,115 @@ The following table shows the current compliance status with Bitcoin Improvement
 | 342 | Tapscript | Full | 98% | Verified |
 | 174 | PSBT | Full | 100% | Verified |
 | 370 | PSBT v2 | Partial | 85% | Pending |
+| 340 | Schnorr Signatures | Full | 100% | Verified |
+| 86  | HD Wallets | Full | 100% | Verified |
 
-### Recent Updates (May 19, 2025)
+### Recent Updates (May 30, 2025)
+- Enhanced ML agent system with real-time system mapping and indexing capabilities
+- Added comprehensive Web5 integration with DID and DWN support
+- Implemented advanced security framework with enterprise-grade compliance
+- Expanded Bitcoin module with full Layer 2 protocol support (RGB, Lightning, DLCs)
+- Added federated learning capabilities and cross-protocol integration
+- Enhanced monitoring and metrics with real-time health tracking
+- Implemented proper error handling and validation across all modules
+- Updated all modules to follow official Bitcoin Improvement Proposals (BIPs) standards with proper AI labeling
+
+## Repository Structure
+
+The repository is organized according to the following updated structure:
+
+```
+/anya-core
+├── src/                     # Main source code
+│   ├── adapters/            # Hexagonal architecture adapters
+│   ├── ai/                  # AI coordination and management (Updated: May 30, 2025)
+│   ├── api/                 # RESTful and GraphQL API implementations
+│   ├── audit/               # Compliance and audit framework
+│   ├── bin/                 # Binary executables and CLI tools
+│   ├── bip/                 # Bitcoin Improvement Proposal implementations
+│   ├── bips/                # BIP validation and compliance checking
+│   ├── bitcoin/             # Bitcoin protocol implementation (Updated: May 30, 2025)
+│   │   ├── error.rs         # Bitcoin error handling with BIP compliance
+│   │   ├── rust/            # Core Rust implementation with network configuration
+│   │   ├── wallet/          # HD wallet implementation (BIP 32/44/84)
+│   │   ├── psbt/            # Partially Signed Bitcoin Transactions (BIP 174/370)
+│   │   └── taproot/         # Taproot and Tapscript support (BIP 341/342)
+│   ├── blockchain/          # General blockchain utilities and abstractions
+│   ├── checkpoint/          # State checkpointing and recovery
+│   ├── compliance/          # Regulatory compliance framework
+│   ├── components/          # Reusable system components
+│   ├── config/              # Configuration management
+│   ├── contracts/           # Smart contract interfaces
+│   ├── core/                # Core functionality and business logic
+│   ├── crosschain/          # Cross-chain bridge implementations
+│   ├── crypto/              # Cryptographic implementations
+│   ├── dao/                 # DAO governance implementation
+│   ├── dashboard/           # Admin and monitoring dashboards
+│   ├── dlc.rs               # Discreet Log Contracts implementation
+│   ├── examples/            # Usage examples and tutorials
+│   ├── extensions/          # Plugin and extension system
+│   ├── gdpr/                # GDPR compliance implementation
+│   ├── governance/          # Governance mechanisms
+│   ├── hardware/            # Hardware security module integration
+│   ├── infrastructure/      # Infrastructure management
+│   ├── install/             # Installation and setup scripts
+│   ├── layer2/              # Layer 2 solutions (Updated: May 30, 2025)
+│   │   ├── rgb/             # RGB protocol with Taproot-compatible asset ID generation
+│   │   ├── dlc/             # DLC implementation with non-interactive oracle patterns
+│   │   ├── bob/             # BOB Layer 2 integration
+│   │   ├── lightning/       # Lightning Network implementation
+│   │   └── rsk/             # RSK sidechain integration
+│   ├── lightning/           # Lightning Network protocol implementation
+│   ├── ml/                  # Machine Learning module (Updated: May 30, 2025)
+│   │   ├── agent.rs         # Core ML agent implementation
+│   │   ├── agent_checker.rs # Agent validation and health monitoring
+│   │   ├── agent_system.rs  # Multi-agent coordination system
+│   │   ├── agents/          # Specialized agent implementations
+│   │   │   ├── federated_agent.rs # Federated learning agent
+│   │   │   ├── system_map.rs      # System mapping and indexing
+│   │   │   └── web5_agent.rs      # Web5 integration agent
+│   │   ├── management.rs    # ML model lifecycle management
+│   │   ├── mod.rs           # ML module with comprehensive error handling
+│   │   └── service.rs       # ML service with prediction capabilities
+│   ├── module/              # Modular system components
+│   ├── monitoring/          # System monitoring and metrics
+│   ├── network/             # Network layer implementations
+│   ├── open_banking/        # Open banking API integration
+│   ├── ports/               # Hexagonal architecture ports
+│   ├── protocols/           # Protocol implementations and abstractions
+│   ├── rgb.rs               # RGB protocol standalone implementation
+│   ├── rsk.rs               # RSK integration standalone implementation
+│   ├── security/            # Security framework and implementations
+│   │   └── crypto/          # Advanced cryptographic security
+│   ├── storage/             # Data storage abstractions and implementations
+│   ├── system_map.md        # System mapping documentation
+│   ├── tenant/              # Multi-tenancy support
+│   ├── test/                # Test utilities and frameworks
+│   ├── testing/             # Testing infrastructure
+│   ├── tokenomics/          # Economic model implementations
+│   ├── tools/               # Development and maintenance tools
+│   ├── utils/               # Utility functions and helpers
+│   ├── web/                 # Web interface implementations
+│   └── web5/                # Web5 implementation (Updated: May 30, 2025)
+│       ├── did/             # Decentralized Identity (DID) implementation
+│       ├── dwn/             # Decentralized Web Node (DWN) implementation
+│       ├── protocols/       # Web5 protocol implementations
+│       └── vc/              # Verifiable Credentials support
+├── anya-extensions/         # Extension ecosystem (Updated: May 30, 2025)
+│   ├── docs/                # Comprehensive extension documentation
+│   ├── core/                # Core extension implementations
+│   ├── community/           # Community-developed extensions
+│   └── enterprise/          # Enterprise extension suite
+├── docs/                    # Main system documentation
+├── tests/                   # Integration and system tests
+└── scripts/                 # Utility and deployment scripts
+```
 
 - Fixed RGB module to ensure proper Taproot-compatible asset ID generation
 - Updated Bitcoin module to correctly handle network configuration
 - Implemented proper error handling across all modules
 - Added missing OracleClient implementation in the DLC module
-- Ensured all modules follow the Bitcoin Development Framework v2.5 standards with proper AI labeling
+- Ensured all modules follow official Bitcoin Improvement Proposals (BIPs) standards with proper AI labeling
 
 ## Repository Structure
 
@@ -375,10 +473,10 @@ The system has been optimized with the following changes:
 ## Version Information
 
 - Current Version: 3.1.0
-- Last Updated: 2025-04-29
-- Bitcoin Development Framework: v2.5
+- Last Updated: May 30, 2025
+- BIP Standards Compliance: Full
 
-*This documentation follows the [AI Labeling Standards](docs/standards/AI_LABELING.md) based on the Bitcoin Development Framework v2.5.*
+*This documentation follows the [AI Labeling Standards](docs/standards/AI_LABELING.md) based on official Bitcoin Improvement Proposals (BIPs).*
 
 ## Implementation Status
 

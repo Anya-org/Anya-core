@@ -3,7 +3,7 @@ use std::error::Error;
 //! [AIR-3][AIS-3][BPC-3][AIT-3][RES-3]
 //!
 //! This module implements BIP-340 (Schnorr Signatures) for Bitcoin Core integration.
-//! Compliant with Bitcoin Development Framework v2.5.
+//! Compliant with official Bitcoin Improvement Proposals (BIPs).
 
 use bitcoin::{secp256k1, PublicKey, hashes::{sha256, Hash}};
 use secp256k1::{Secp256k1, Message, SecretKey};

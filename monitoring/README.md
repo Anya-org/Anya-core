@@ -4,7 +4,7 @@
 
 ## 📊 Overview
 
-This directory contains the configuration and setup for monitoring the Anya Core Bitcoin node and system metrics using Prometheus, Grafana, and related tools. The monitoring stack follows Bitcoin Development Framework v2.5 standards and implements a hexagonal architecture for modularity and security.
+This directory contains the configuration and setup for monitoring the Anya Core Bitcoin node and system metrics using Prometheus, Grafana, and related tools. The monitoring stack follows official Bitcoin Improvement Proposals (BIPs) and implements a hexagonal architecture for modularity and security.
 
 ## 🛡️ Security Considerations
 

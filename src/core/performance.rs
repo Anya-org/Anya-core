@@ -1,7 +1,7 @@
 use std::error::Error;
 // Core performance module
 // Implements performance metrics for Bitcoin operations
-// as per Bitcoin Development Framework v2.5 requirements
+// as per official Bitcoin Improvement Proposals (BIPs) requirements
 
 use std::collections::HashMap;
 

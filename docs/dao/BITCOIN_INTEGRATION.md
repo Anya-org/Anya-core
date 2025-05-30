@@ -173,7 +173,7 @@ The DAO treasury implements Bitcoin-standard security practices:
 
 ## Implementation Compliance
 
-The implementation adheres to the Bitcoin Development Framework v2.5, with the following BIP support:
+The implementation adheres to official Bitcoin Improvement Proposals (BIPs), with the following BIP support:
 
 | BIP | Implementation | Description | Status |
 |-----|----------------|-------------|--------|

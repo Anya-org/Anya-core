@@ -1,6 +1,6 @@
 # Security Framework Implementation [AIR-3][AIS-3][BPC-3]
 
-This directory contains the security framework implementation for Anya Core, following the Bitcoin Development Framework v2.5 standards.
+This directory contains the security framework implementation for Anya Core, following official Bitcoin Improvement Proposals (BIPs) including BIP-340, BIP-341, BIP-342, and BIP-174.
 
 ## Overview
 
@@ -107,6 +107,6 @@ For more information, see:
 
 - Current Version: 3.1.0
 - Last Updated: 2025-04-29
-- Bitcoin Development Framework: v2.5
+- Bitcoin Improvement Proposals: BIP-340, BIP-341, BIP-342, BIP-174
 
 *This component complies with [AI Labeling Standards](../../../docs/standards/AI_LABELING.md)* 

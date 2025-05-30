@@ -172,6 +172,6 @@ To integrate the reorganized structure with the existing codebase:
 
 ## Additional Notes
 
-- The reorganization maintains compliance with the Bitcoin Development Framework v2.5 standards
+- The reorganization maintains compliance with official Bitcoin Improvement Proposals (BIPs) standards
 - The hexagonal architecture ensures clean separation of concerns
 - All components are properly labeled according to the AI labeling system 

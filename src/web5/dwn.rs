@@ -345,7 +345,7 @@ impl DWNManager {
         let mut storage = self.records.lock()
             .map_err(|e| Web5Error::Storage(format!("Failed to acquire lock: {}", e)))?;
         // [AIR-3][AIS-3][BPC-3][RES-3] Remove unnecessary mut keyword
-        // This follows the Bitcoin Development Framework v2.5 standards for clean code
+        // This follows official Bitcoin Improvement Proposals (BIPs) standards for clean code
         if let Some(record) = storage.get_mut(id) {
             record.data = data;
             record.metadata.insert("updated".to_string(), current_time().to_string());

@@ -3,7 +3,7 @@ use std::error::Error;
 //! [AIR-3][AIS-3][BPC-3][AIT-3][RES-3]
 //!
 //! This module implements BIP-341 (Taproot) for Bitcoin Core integration.
-//! Compliant with Bitcoin Development Framework v2.5.
+//! Compliant with official Bitcoin Improvement Proposals (BIPs).
 
 use bitcoin::{hashes::{sha256, Hash}, secp256k1, Transaction, TxOut, Script};
 use thiserror::Error;
@@ -383,7 +383,7 @@ impl Bip341Taproot {
         })
     }
     
-    /// Create a silent leaf as required by Bitcoin Development Framework v2.5
+    /// Create a silent leaf as required by official Bitcoin Improvement Proposals (BIPs)
     pub fn create_silent_leaf(&self) -> TaprootLeaf {
         // The SILENT_LEAF is a special script that is always spendable without revealing
         // any information in case of emergency (BIP-341 compliance)

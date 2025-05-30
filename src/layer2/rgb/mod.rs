@@ -4,7 +4,7 @@
 //! This module is refactored from src/rgb.rs to fit the Layer2 hexagonal architecture.
 
 // [AIR-3][AIS-3][BPC-3][RES-3] Import necessary dependencies for RGB implementation
-// This follows the Bitcoin Development Framework v2.5 standards for Taproot-enabled protocols
+// This follows official Bitcoin Improvement Proposals (BIPs) standards for Taproot-enabled protocols
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use uuid::Uuid;
@@ -13,7 +13,7 @@ use chrono;
 use bitcoin::hashes::{Hash, HashEngine};
 use bitcoin::secp256k1::Secp256k1;
 // [AIR-3][AIS-3][BPC-3][RES-3] Use bitcoin's hashing functionality
-// This follows the Bitcoin Development Framework v2.5 standards for cryptographic operations
+// This follows official Bitcoin Improvement Proposals (BIPs) standards for cryptographic operations
 use bitcoin::hashes::sha256;
 // [AIR-3][AIS-3][BPC-3][RES-3] Import hex for encoding/decoding
 use hex;
@@ -95,10 +95,10 @@ pub struct ContractManager {
 
 impl ContractManager {
     /// [AIR-3][AIS-3][BPC-3][RES-3] Generate a unique asset ID using Taproot-compatible hashing
-    /// This follows the Bitcoin Development Framework v2.5 standards for asset ID generation
+    /// This follows official Bitcoin Improvement Proposals (BIPs) standards for asset ID generation
     fn generate_asset_id(issuer_address: &str, total_supply: u64, precision: u8, metadata: &str) -> RgbResult<String> {
         // [AIR-3][AIS-3][BPC-3][RES-3] Create a Taproot-compatible hash by combining all asset parameters
-        // This follows the Bitcoin Development Framework v2.5 standards for asset ID generation
+        // This follows official Bitcoin Improvement Proposals (BIPs) standards for asset ID generation
         let mut engine = sha256::HashEngine::default();
         
         // Add all components to the hash
@@ -108,7 +108,7 @@ impl ContractManager {
         engine.input(metadata.as_bytes());
         
         // [AIR-3][AIS-3][BPC-3][RES-3] Add current timestamp for uniqueness
-        // This follows the Bitcoin Development Framework v2.5 standards for asset ID generation
+        // This follows official Bitcoin Improvement Proposals (BIPs) standards for asset ID generation
         let timestamp = chrono::Utc::now().timestamp();
         engine.input(&timestamp.to_le_bytes());
         
@@ -116,7 +116,7 @@ impl ContractManager {
         let hash = sha256::Hash::from_engine(engine);
         
         // [AIR-3][AIS-3][BPC-3][RES-3] Convert to hex string with RGB prefix
-        // This follows the Bitcoin Development Framework v2.5 standards for asset ID generation
+        // This follows official Bitcoin Improvement Proposals (BIPs) standards for asset ID generation
         // [AIR-3][AIS-3][BPC-3][RES-3] Specify type for hex::encode to resolve ambiguity
         let hex_string = hex::encode::<&[u8]>(hash.as_ref());
         let asset_id = format!("rgb1{}", hex_string);
@@ -149,7 +149,7 @@ impl ContractManager {
         metadata_map.insert("tr_pattern".to_string(), "tr(KEY,{SILENT_LEAF})".to_string());
         
         // [AIR-3][AIS-3][BPC-3][RES-3] Create RGB asset with proper ID fields
-        // This follows the Bitcoin Development Framework v2.5 standards for asset creation
+        // This follows official Bitcoin Improvement Proposals (BIPs) standards for asset creation
         Ok(RgbAsset {
             id: asset_id.clone(), // Use the same value for both id and asset_id fields
             asset_id,
@@ -211,7 +211,7 @@ impl ContractManager {
 
 
 /// RGB Error types
-/// [AIR-3][AIS-3][BPC-3][RES-3] Error handling following Bitcoin Development Framework v2.5
+/// [AIR-3][AIS-3][BPC-3][RES-3] Error handling following official Bitcoin Improvement Proposals (BIPs)
 #[derive(Debug, Error)]
 pub enum RgbError {
     #[error("Invalid asset ID")]
@@ -241,14 +241,14 @@ impl From<bitcoin::consensus::encode::Error> for RgbError {
 }
 
 /// [AIR-3][AIS-3][BPC-3][RES-3] RGB Result type
-/// This follows the Bitcoin Development Framework v2.5 standards for error handling
+/// This follows official Bitcoin Improvement Proposals (BIPs) standards for error handling
 pub type RgbResult<T> = Result<T, RgbError>;
 
 /// [AIR-3][AIS-3][BPC-3][RES-3] Generate a unique asset ID using Taproot-compatible approach
-/// This follows the Bitcoin Development Framework v2.5 standards for asset identification
+/// This follows official Bitcoin Improvement Proposals (BIPs) standards for asset identification
 pub fn generate_asset_id(issuer_address: &str, total_supply: u64, precision: u8, metadata: &str) -> RgbResult<String> {
     // [AIR-3][AIS-3][BPC-3][RES-3] Create a Taproot-compatible hash by combining all asset parameters
-    // This follows the Bitcoin Development Framework v2.5 standards for asset ID generation
+    // This follows official Bitcoin Improvement Proposals (BIPs) standards for asset ID generation
     let mut engine = sha256::HashEngine::default();
     
     // Add all components to the hash
@@ -258,7 +258,7 @@ pub fn generate_asset_id(issuer_address: &str, total_supply: u64, precision: u8,
     engine.input(metadata.as_bytes());
     
     // [AIR-3][AIS-3][BPC-3][RES-3] Add current timestamp for uniqueness
-    // This follows the Bitcoin Development Framework v2.5 standards for asset ID generation
+    // This follows official Bitcoin Improvement Proposals (BIPs) standards for asset ID generation
     let timestamp = chrono::Utc::now().timestamp();
     engine.input(&timestamp.to_le_bytes());
     
@@ -266,7 +266,7 @@ pub fn generate_asset_id(issuer_address: &str, total_supply: u64, precision: u8,
     let hash = sha256::Hash::from_engine(engine);
     
     // [AIR-3][AIS-3][BPC-3][RES-3] Convert to hex string with RGB prefix
-    // This follows the Bitcoin Development Framework v2.5 standards for asset ID generation
+    // This follows official Bitcoin Improvement Proposals (BIPs) standards for asset ID generation
     // [AIR-3][AIS-3][BPC-3][RES-3] Specify type for hex::encode to resolve ambiguity
     let hex_string = hex::encode::<&[u8]>(hash.as_ref());
     let asset_id = format!("rgb1{}", hex_string);

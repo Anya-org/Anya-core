@@ -6,7 +6,7 @@ description: "Documentation for Compliance_checklist"
 [AIR-3][AIS-3][BPC-3][RES-3]
 
 
-# Bitcoin Development Framework Compliance Checklist v2.5
+# Bitcoin Improvement Proposals (BIPs) Compliance Checklist
 
 ## Overview
 

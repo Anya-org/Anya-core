@@ -489,7 +489,7 @@ impl HsmProvider for BitcoinHsmProvider {
                     })?;
 
                 // [AIR-3][AIS-3][BPC-3][RES-3] Use base64 Engine for encoding/decoding
-                // This follows the Bitcoin Development Framework v2.5 standards for secure data handling
+                // This follows official Bitcoin Improvement Proposals (BIPs) standards for secure data handling
                 let data = base64::engine::general_purpose::STANDARD.decode(&params.data)
                     .map_err(|e| HsmError::InvalidParameters(format!("Invalid data: {}", e)))?;
 
@@ -509,7 +509,7 @@ impl HsmProvider for BitcoinHsmProvider {
                     })?;
 
                 // [AIR-3][AIS-3][BPC-3][RES-3] Use base64 Engine for encoding/decoding
-                // This follows the Bitcoin Development Framework v2.5 standards for secure data handling
+                // This follows official Bitcoin Improvement Proposals (BIPs) standards for secure data handling
                 let data = base64::engine::general_purpose::STANDARD.decode(&params.data)
                     .map_err(|e| HsmError::InvalidParameters(format!("Invalid data: {}", e)))?;
 
@@ -537,7 +537,7 @@ impl HsmProvider for BitcoinHsmProvider {
                 let public_key = self.export_public_key(&params.key_name).await?;
 
                 // [AIR-3][AIS-3][BPC-3][RES-3] Use base64 Engine for encoding
-                // This follows the Bitcoin Development Framework v2.5 standards for secure data handling
+                // This follows official Bitcoin Improvement Proposals (BIPs) standards for secure data handling
                 Ok(HsmResponse::success(
                     request.id,
                     Some(json!({

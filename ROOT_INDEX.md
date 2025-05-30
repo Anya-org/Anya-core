@@ -4,7 +4,7 @@
 
 *Last Updated: May 29, 2025*
 
-Welcome to the Anya Core documentation. This is the authoritative root index for all Anya Core documentation, following Bitcoin Development Framework v2.5 standards.
+Welcome to the Anya Core documentation. This is the authoritative root index for all Anya Core documentation, following official Bitcoin Improvement Proposals (BIPs).
 
 ## Recent Updates (May 29, 2025) [AIR-3][AIS-3][BPC-3][RES-3]
 
@@ -34,7 +34,7 @@ Major system-wide updates have been completed to enhance stability, security, an
 - **Tools Module**: Implemented markdown validation and commit tracking utilities
 - **Module Organization**: Enhanced module structure with proper visibility and exports
 
-All modules maintain compliance with the Bitcoin Development Framework v2.5 and include proper AI labeling according to the canonical AI Labeling System. For detailed information about these changes, see the [Changelog](CHANGELOG.md) and [Implementation Summary](docs/IMPLEMENTATION_SUMMARY.md).
+All modules maintain compliance with official Bitcoin Improvement Proposals (BIPs) and include proper AI labeling according to the canonical AI Labeling System. For detailed information about these changes, see the [Changelog](CHANGELOG.md) and [Implementation Summary](docs/IMPLEMENTATION_SUMMARY.md).
 
 ## Quick Navigation [AIR-3]
 
@@ -127,7 +127,7 @@ All modules maintain compliance with the Bitcoin Development Framework v2.5 and 
 
 - Version: 3.1.1
 - Released: 2025-04-29
-- Framework: Bitcoin Development Framework v2.5
+- Framework: Bitcoin Improvement Proposals (BIPs)
 
 ## Support
 

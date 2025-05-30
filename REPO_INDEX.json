@@ -3,7 +3,7 @@
     "name": "anya-core",
     "version": "0.3.0-rc.1",
     "last_updated": "2025-05-29T12:00:00Z",
-    "framework_version": "Bitcoin Development Framework v2.5",
+    "framework_version": "Bitcoin Improvement Proposals (BIPs)",
     "total_modules": 8,
     "compliance_level": "BPC-3"
   },

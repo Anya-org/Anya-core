@@ -14,7 +14,7 @@ last_updated: 2025-05-21
 
 *Last Updated: May 24, 2025*
 
-> **Note**: This document follows Bitcoin Development Framework v2.5 security standards and includes AI labeling for compliance tracking. All security implementations comply with [BIP-341](https://bips.xyz/341) and [BIP-342](https://bips.xyz/342) Taproot standards.
+> **Note**: This document follows official Bitcoin Improvement Proposals (BIPs) security standards and includes AI labeling for compliance tracking. All security implementations comply with [BIP-341](https://bips.xyz/341) and [BIP-342](https://bips.xyz/342) Taproot standards.
 
 ## AI Labeling Compliance
 
@@ -216,7 +216,7 @@ hsm:
 - **Automated vulnerability scanning**
 - **Bug bounty program**
 - **Compliance with**:
-  - Bitcoin Development Framework v2.5
+  - Official Bitcoin Improvement Proposals (BIPs)
   - NIST Cybersecurity Framework
   - ISO/IEC 27001
   - GDPR and CCPA compliance

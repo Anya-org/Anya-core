@@ -1,7 +1,7 @@
 #!/bin/bash
 # [AIR-3][AIS-3][BPC-3][RES-3]
 # Unified Installation Framework for Anya Core
-# Following Bitcoin Development Framework v2.5 standards
+# Following official Bitcoin Improvement Proposals (BIPs)
 # Part of the Anya Core Hexagonal Architecture
 # Date: 2025-05-20
 

@@ -20,7 +20,7 @@ Add a brief overview of this document here.
 
 ## Summary of Changes
 
-This document outlines the changes made to the Anya Core codebase on May 19, 2025, focusing on fixing compilation errors and ensuring compliance with the Bitcoin Development Framework v2.5 standards.
+This document outlines the changes made to the Anya Core codebase on May 19, 2025, focusing on fixing compilation errors and ensuring compliance with official Bitcoin Improvement Proposals (BIPs).
 
 ### RGB Module Fixes
 - Fixed duplicate implementation of the `generate_asset_id` function
@@ -52,7 +52,7 @@ This document outlines the changes made to the Anya Core codebase on May 19, 202
 
 ## Compliance Status
 
-All modules now comply with the Bitcoin Development Framework v2.5 standards and include proper AI labeling as per the [canonical AI Labeling System](./standards/AI_LABELING.md).
+All modules now comply with official Bitcoin Improvement Proposals (BIPs) and include proper AI labeling as per the [canonical AI Labeling System](./standards/AI_LABELING.md).
 
 | Module | BIP Compliance | AI Labeling | Error Handling |
 |--------|---------------|-------------|----------------|

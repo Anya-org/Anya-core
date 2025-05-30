@@ -1,11 +1,11 @@
 use std::error::Error;
 // [AIR-3][AIS-3][BPC-3][RES-3] Bitcoin adapters module implementation
-// This follows the Bitcoin Development Framework v2.5 standards for hexagonal architecture
+// This follows official Bitcoin Improvement Proposals (BIPs) standards for hexagonal architecture
 use std::sync::Arc;
 // [AIR-3][AIS-3][BPC-3][RES-3] Removed unused import: async_trait::async_trait
 
 // [AIR-3][AIS-3][BPC-3][RES-3] Import Bitcoin interface types
-// This follows the Bitcoin Development Framework v2.5 standards for type consistency
+// This follows official Bitcoin Improvement Proposals (BIPs) standards for type consistency
 use crate::bitcoin::interface::{
 // [AIR-3][AIS-3][BPC-3][RES-3] Removed unused import: BitcoinError
     BitcoinInterface, BitcoinResult, Transaction,

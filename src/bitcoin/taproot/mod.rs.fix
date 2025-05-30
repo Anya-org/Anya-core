@@ -6,7 +6,7 @@ pub fn string_to_address(address_str: &str) -> Result<Address<NetworkChecked>, B
         .map_err(|_| Box::new(BitcoinError::InvalidAddress(address_str.to_string())) as Box<dyn Error>)?;
     
     // [AIR-3][AIS-3][BPC-3][RES-3] Require the address to be network checked
-    // This follows the Bitcoin Development Framework v2.5 standards for network validation
+    // This follows official Bitcoin Improvement Proposals (BIPs) standards for network validation
     let checked_address = address.require_network(Network::Bitcoin)
         .map_err(|_| Box::new(BitcoinError::InvalidAddress(format!("Network validation failed for {}", address_str))) as Box<dyn Error>)?;
     
@@ -20,7 +20,7 @@ pub fn from_str(address_str: &str) -> Result<Address<NetworkChecked>, Box<dyn Er
         .map_err(|_| Box::new(BitcoinError::InvalidAddress(address_str.to_string())) as Box<dyn Error>)?;
     
     // [AIR-3][AIS-3][BPC-3][RES-3] Require the address to be network checked
-    // This follows the Bitcoin Development Framework v2.5 standards for network validation
+    // This follows official Bitcoin Improvement Proposals (BIPs) standards for network validation
     let checked_address = address.require_network(Network::Bitcoin)
         .map_err(|_| Box::new(BitcoinError::InvalidAddress(format!("Network validation failed for {}", address_str))) as Box<dyn Error>)?;
     

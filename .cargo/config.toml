@@ -1,5 +1,5 @@
 # [AIR-3][AIS-3][BPC-3][RES-3] Minimal configuration to avoid --cfg unix flag error
-# This follows the Bitcoin Development Framework v2.5 standards for secure builds
+# This follows official Bitcoin Improvement Proposals (BIPs) for secure builds
 
 # No target-specific configurations to avoid potential flag conflicts
 

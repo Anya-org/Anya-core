@@ -146,7 +146,7 @@ mod tests {
 
 // Core module
 // Implements core functionality for Bitcoin operations
-// as per Bitcoin Development Framework v2.5 requirements
+// as per official Bitcoin Improvement Proposals (BIPs) requirements
 
 pub mod performance;
 
@@ -291,7 +291,7 @@ impl AnyaCore {
 // [AIR-3][BPC-3] Hexagonal RPC ports
 pub mod rpc_ports {
     // [AIR-3][AIS-3][BPC-3][RES-3] Import necessary synchronization primitives
-    // This follows the Bitcoin Development Framework v2.5 standards for clean code
+    // This follows official Bitcoin Improvement Proposals (BIPs) standards for clean code
     use std::sync::{Arc, Mutex};
     use serde_json::Value as JsonValue;
     use crate::core::metrics::PrometheusMetrics;
@@ -314,7 +314,7 @@ pub mod rpc_ports {
         bitcoin: Arc<dyn BitcoinRpc + Send + Sync>,
         lightning: Arc<dyn LightningRpc + Send + Sync>,
         // [AIR-3][AIS-3][BPC-3][RES-3] Using imported Mutex
-        // This follows the Bitcoin Development Framework v2.5 standards for clean code
+        // This follows official Bitcoin Improvement Proposals (BIPs) standards for clean code
         metrics: Arc<Mutex<PrometheusMetrics>>
     }
 } 

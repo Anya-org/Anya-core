@@ -1,9 +1,9 @@
 # [AIR-3][AIS-3][BPC-3][RES-3] Script Management Policy
 
-## Bitcoin Development Framework v2.5 Script Standards
+## Bitcoin Improvement Proposals (BIPs) Script Standards
 *Last Updated: 2025-05-20*
 
-This document defines the script management policy for the Anya Core project, following Bitcoin Development Framework v2.5 standards with hexagonal architecture principles.
+This document defines the script management policy for the Anya Core project, following official Bitcoin Improvement Proposals (BIPs) with hexagonal architecture principles.
 
 ## Core Principles
 
@@ -75,4 +75,4 @@ Exceptions to this policy require:
 
 ---
 
-By adhering to this policy, we ensure our script ecosystem remains maintainable, secure, and aligned with the Bitcoin Development Framework v2.5 standards and hexagonal architecture principles.
+By adhering to this policy, we ensure our script ecosystem remains maintainable, secure, and aligned with official Bitcoin Improvement Proposals (BIPs) and hexagonal architecture principles.

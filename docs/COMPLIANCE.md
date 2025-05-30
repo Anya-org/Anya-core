@@ -3,7 +3,7 @@ title: "Compliance"
 description: "Documentation for Compliance"
 ---
 
-# Bitcoin Development Framework v2.5 Compliance
+# Bitcoin Improvement Proposals (BIPs) Compliance
 
 ## Overview
 

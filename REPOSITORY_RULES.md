@@ -2,13 +2,13 @@
 
 ## Overview
 
-This document outlines the comprehensive rules and standards for the Anya Core repository, ensuring alignment with the Bitcoin Development Framework v2.5 and proper integration with the AI labeling system. These rules govern all code contributions, documentation updates, and repository management practices.
+This document outlines the comprehensive rules and standards for the Anya Core repository, ensuring alignment with official Bitcoin Improvement Proposals (BIPs) and proper integration with the AI labeling system. These rules govern all code contributions, documentation updates, and repository management practices.
 
 ## Core Principles
 
 ### 1. Bitcoin Development Framework Compliance
 
-All code and documentation must maintain strict adherence to the Bitcoin Development Framework v2.5 core principles:
+All code and documentation must maintain strict adherence to official Bitcoin Improvement Proposals (BIPs) core principles:
 
 - **Decentralization**: Code must preserve Bitcoin's core tenets of decentralization, immutability, and censorship resistance
 - **Privacy-Preservation**: DLC implementations must use non-interactive oracle patterns to maintain transaction indistinguishability
@@ -30,7 +30,7 @@ All code must include appropriate AI labels as defined in [](docs/standards/AI_L
 /// [AIR-3][AIS-3][AIT-2][BPC-3] Taproot implementation
 /// 
 /// Implements BIP-341/342 (Taproot) functionality following
-/// the Bitcoin Development Framework v2.5 requirements.
+/// official Bitcoin Improvement Proposals (BIPs) requirements.
 pub struct TaprootImplementation {
     // Implementation details
 }

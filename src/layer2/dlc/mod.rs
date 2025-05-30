@@ -2,12 +2,12 @@
 //!
 //! This module is refactored from src/dlc.rs to fit the Layer2 hexagonal architecture.
 //! Implements privacy-preserving DLCs using non-interactive oracle patterns
-//! to maintain transaction indistinguishability as per Bitcoin Development Framework v2.5
+//! to maintain transaction indistinguishability as per official Bitcoin Improvement Proposals (BIPs)
 //!
 //! [AIR-3][AIS-3][BPC-3][RES-3]
 
 // [AIR-3][AIS-3][BPC-3][RES-3] Import necessary dependencies for DLC implementation
-// This follows the Bitcoin Development Framework v2.5 standards for non-interactive oracle patterns
+// This follows official Bitcoin Improvement Proposals (BIPs) for non-interactive oracle patterns
 use std::collections::HashMap;
 use std::time::{SystemTime, UNIX_EPOCH};
 use serde::{Deserialize, Serialize};
@@ -20,7 +20,7 @@ use thiserror::Error;
 use uuid::Uuid;
 
 // [AIR-3][AIS-3][BPC-3][RES-3] Define DlcResult type for consistent error handling
-// This follows the Bitcoin Development Framework v2.5 standards for error management
+// This follows official Bitcoin Improvement Proposals (BIPs) standards for error management
 pub type DlcResult<T> = Result<T, DlcError>;
 
 /// [AIR-3][AIS-3][BPC-3][RES-3] DLC Contract definition
@@ -124,7 +124,7 @@ impl ContractManager {
         payout_curve: &PayoutCurve,
     ) -> Result<DlcContract, DlcError> {
         // [AIR-3][AIS-3][BPC-3][RES-3] Extract outcomes and payouts from oracle info and payout curve
-        // This follows the Bitcoin Development Framework v2.5 standards for DLC contracts
+        // This follows official Bitcoin Improvement Proposals (BIPs) standards for DLC contracts
         let outcomes = oracle_info.outcome_domain.clone();
         
         // Generate payouts based on the payout curve
@@ -157,7 +157,7 @@ impl ContractManager {
     pub fn sign_contract(&self, contract: &DlcContract, private_key: &SecretKey) -> Result<DlcSignature, DlcError> {
         // Create a signature for the contract
         // [AIR-3][AIS-3][BPC-3][RES-3] Use from_digest_slice instead of deprecated from_slice
-        // This follows the Bitcoin Development Framework v2.5 standards for cryptographic operations
+        // This follows official Bitcoin Improvement Proposals (BIPs) standards for cryptographic operations
         let contract_hash = self.hash_contract(contract)?;
         let message = Message::from_digest_slice(&contract_hash).map_err(|_| DlcError::ContractError("Invalid message format".to_string()))?;
         
@@ -198,7 +198,7 @@ impl ContractManager {
             transaction_id: format!("tx_{}", Uuid::new_v4()), // In a real implementation, this would be the actual transaction ID
             executed_at: chrono::Utc::now().timestamp() as u64,
             // [AIR-3][AIS-3][BPC-3][RES-3] Convert String to Vec<u8> for oracle attestation
-            // This follows the Bitcoin Development Framework v2.5 standards for binary data handling
+            // This follows official Bitcoin Improvement Proposals (BIPs) standards for binary data handling
             oracle_attestation: attestation.signature.clone().into_bytes(),
         })
     }
@@ -267,7 +267,7 @@ impl ContractManager {
             executed_at: execution.executed_at,
             transaction_id: tx_id,
             // [AIR-3][AIS-3][BPC-3][RES-3] Convert String to Vec<u8> for oracle attestation
-            // This follows the Bitcoin Development Framework v2.5 standards for binary data handling
+            // This follows official Bitcoin Improvement Proposals (BIPs) standards for binary data handling
             oracle_attestation: attestation.signature.clone().into_bytes(),
         };
         
@@ -290,7 +290,7 @@ pub enum DlcContractStatus {
 }
 
 /// DLC errors
-/// [AIR-3][AIS-3][BPC-3][RES-3] Error handling following Bitcoin Development Framework v2.5
+/// [AIR-3][AIS-3][BPC-3][RES-3] Error handling following official Bitcoin Improvement Proposals (BIPs)
 #[derive(Debug, Error)]
 pub enum DlcError {
     #[error("Invalid parameters: {0}")]
@@ -330,7 +330,7 @@ impl From<&DlcError> for String {
 }
 
 /// DLC Configuration with non-interactive oracle support
-/// [AIR-3][AIS-3][BPC-3][RES-3] This follows the Bitcoin Development Framework v2.5 standards
+/// [AIR-3][AIS-3][BPC-3][RES-3] This follows official Bitcoin Improvement Proposals (BIPs) standards
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct DlcConfig {
     pub oracle_pubkey: String,  // Oracle public key for non-interactive pattern
@@ -341,7 +341,7 @@ pub struct DlcConfig {
     pub payout_curve: PayoutCurve,
     pub oracle_event_id: String,
     // [AIR-3][AIS-3][BPC-3][RES-3] Private key field for signing DLC contracts
-    // This follows the Bitcoin Development Framework v2.5 standards for non-interactive oracle patterns
+    // This follows official Bitcoin Improvement Proposals (BIPs) standards for non-interactive oracle patterns
     pub private_key: String,
     pub oracle_event_type: OracleEventType,
     pub outcome_domain: Vec<String>,
@@ -414,7 +414,7 @@ impl Default for DlcConfig {
 }
 
 /// [AIR-3][AIS-3][BPC-3][RES-3] Oracle Client for non-interactive oracle patterns
-/// This follows the Bitcoin Development Framework v2.5 standards for oracle interactions
+/// This follows official Bitcoin Improvement Proposals (BIPs) standards for oracle interactions
 pub struct OracleClient {
     /// Oracle public key in hex format
     pub oracle_pubkey: String,
@@ -424,7 +424,7 @@ pub struct OracleClient {
 
 impl OracleClient {
     /// [AIR-3][AIS-3][BPC-3][RES-3] Create a new Oracle Client
-    /// This follows the Bitcoin Development Framework v2.5 standards for oracle interactions
+    /// This follows official Bitcoin Improvement Proposals (BIPs) standards for oracle interactions
     pub fn new(oracle_pubkey: &str) -> Self {
         Self {
             oracle_pubkey: oracle_pubkey.to_string(),
@@ -433,7 +433,7 @@ impl OracleClient {
     }
     
     /// [AIR-3][AIS-3][BPC-3][RES-3] Get event information from the oracle
-    /// This follows the Bitcoin Development Framework v2.5 standards for oracle interactions
+    /// This follows official Bitcoin Improvement Proposals (BIPs) standards for oracle interactions
     pub async fn get_event_info(&self, event_id: &str) -> DlcResult<OracleEvent> {
         // In a real implementation, this would fetch data from the oracle
         // For now, we'll return mock data
@@ -449,7 +449,7 @@ impl OracleClient {
     }
     
     /// [AIR-3][AIS-3][BPC-3][RES-3] Verify an oracle attestation
-    /// This follows the Bitcoin Development Framework v2.5 standards for oracle attestations
+    /// This follows official Bitcoin Improvement Proposals (BIPs) standards for oracle attestations
     pub fn verify_attestation(&self, _attestation: &OracleAttestation) -> DlcResult<bool> {
         // In a real implementation, this would verify the signature using the oracle's public key
         // For now, we'll just return true
@@ -496,7 +496,7 @@ impl DlcManager {
     /// [AIR-3][AIS-3][BPC-3][RES-3]
     pub async fn sign_contract(&self, contract: &DlcContract) -> DlcResult<DlcSignature> {
         // [AIR-3][AIS-3][BPC-3][RES-3] Using the private key from the config
-        // This follows the Bitcoin Development Framework v2.5 standards for key handling
+        // This follows official Bitcoin Improvement Proposals (BIPs) standards for key handling
         let private_key = match SecretKey::from_slice(&hex::decode(&self.config.private_key).map_err(|_| {
             DlcError::SerializationError("Failed to decode private key hex".to_string())
         })?) {

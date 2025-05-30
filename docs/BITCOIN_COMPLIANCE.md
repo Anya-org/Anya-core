@@ -29,9 +29,9 @@ The Anya DAO is designed to fully comply with Bitcoin protocol standards and bes
 | 370 | PSBT v2 | ✅ | Advanced operations (BIP-370 full implementation) |
 | 342 | Tapscript | ✅ | Governance script validation |
 
-## Bitcoin Development Framework Compliance
+## Bitcoin Improvement Proposals (BIPs) Compliance
 
-This implementation follows the Bitcoin Development Framework v2.5 requirements:
+This implementation follows official Bitcoin Improvement Proposals (BIPs) requirements:
 
 1. **Protocol Adherence**
    - Bitcoin-style issuance with halving schedule
@@ -170,7 +170,7 @@ Verification Command:
 anya audit lightning --protocol bolt12 --network testnet
 ```
 
-This implementation achieves full BOLT 12 compliance while maintaining all Bitcoin Development Framework v2.5 requirements for Lightning Network integration.
+This implementation achieves full BOLT 12 compliance while maintaining all official Bitcoin Improvement Proposals (BIPs) requirements for Lightning Network integration.
 
 *Last updated: 2025-02-24 18:05 UTC+2*
 

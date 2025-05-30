@@ -4,7 +4,7 @@ Date: 2025-05-20
 
 ## Overview
 
-This report provides a comprehensive analysis of the Anya Core script management system following the Bitcoin Development Framework v2.5 standards and our Script Management Policy. The goal is to maintain a clean, organized, and efficient script ecosystem that follows hexagonal architecture principles.
+This report provides a comprehensive analysis of the Anya Core script management system following official Bitcoin Improvement Proposals (BIPs) standards and our Script Management Policy. The goal is to maintain a clean, organized, and efficient script ecosystem that follows hexagonal architecture principles.
 
 ## Current Script Organization
 
@@ -59,7 +59,7 @@ scripts/
 
 ## Hexagonal Architecture Compliance
 
-The script organization follows the hexagonal architecture principles as defined in the Bitcoin Development Framework v2.5:
+The script organization follows the hexagonal architecture principles as defined in official Bitcoin Improvement Proposals (BIPs):
 
 1. **Core Domain**
    - Scripts that implement core business logic
@@ -77,7 +77,7 @@ The script organization follows the hexagonal architecture principles as defined
 
 ## AI Labeling Compliance
 
-All scripts now include proper AI labeling according to the Bitcoin Development Framework v2.5 standards:
+All scripts now include proper AI labeling according to official Bitcoin Improvement Proposals (BIPs) standards:
 - [AIR-3] - AI Responsibility
 - [AIS-3] - AI Security
 - [BPC-3] - Bitcoin Protocol Compliance
@@ -115,6 +115,6 @@ All scripts now include proper AI labeling according to the Bitcoin Development 
 
 ## Conclusion
 
-The Anya Core script management system has been significantly improved to align with the Bitcoin Development Framework v2.5 standards and our Script Management Policy. The hexagonal architecture principles have been applied to organize scripts into appropriate categories, and all scripts now include proper AI labeling.
+The Anya Core script management system has been significantly improved to align with official Bitcoin Improvement Proposals (BIPs) standards and our Script Management Policy. The hexagonal architecture principles have been applied to organize scripts into appropriate categories, and all scripts now include proper AI labeling.
 
 Further work is needed to address the remaining redundant scripts and consolidation opportunities, but the foundation for a clean, organized, and efficient script ecosystem has been established.

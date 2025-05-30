@@ -1,7 +1,7 @@
-# CodeQL Configuration for Bitcoin Development Framework v2.5
+# CodeQL Configuration for Official Bitcoin Improvement Proposals (BIPs)
 [AIR-3][AIS-3][BPC-3][AIT-2]
 
-This directory contains CodeQL configuration files for analyzing the Anya Bitcoin implementation according to the Bitcoin Development Framework v2.5 security standards.
+This directory contains CodeQL configuration files for analyzing the Anya Bitcoin implementation according to official Bitcoin Improvement Proposals (BIPs) security standards.
 
 ## Configuration Files
 
@@ -72,7 +72,7 @@ To add new custom queries:
 
 ## BDF v2.5 Compliance
 
-The CodeQL configuration is designed to validate compliance with the Bitcoin Development Framework v2.5, focusing on:
+The CodeQL configuration is designed to validate compliance with official Bitcoin Improvement Proposals (BIPs), focusing on:
 
 - BPC-3 level compliance for Bitcoin protocol features
 - AIS-3 level security for cryptographic operations

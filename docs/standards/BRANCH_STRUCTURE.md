@@ -15,7 +15,7 @@ Add a brief overview of this document here.
 - [Section 2](#section-2)
 
 
-This document defines the standardized branch structure for the Anya Core repository, in accordance with the Bitcoin Development Framework v2.5 and our hexagonal architecture.
+This document defines the standardized branch structure for the Anya Core repository, in accordance with official Bitcoin Improvement Proposals (BIPs) and our hexagonal architecture.
 
 ## Branch Naming Convention
 

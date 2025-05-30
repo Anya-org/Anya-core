@@ -1,7 +1,7 @@
 //! Bitcoin Protocol Testing Module [AIR-3][AIS-3][BPC-3][AIT-3]
 //! 
 //! This module provides testing utilities for Bitcoin protocol operations,
-//! following Bitcoin Development Framework v2.5 standards.
+//! following official Bitcoin Improvement Proposals (BIPs) standards.
 
 use std::error::Error;
 

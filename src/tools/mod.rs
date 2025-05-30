@@ -1,7 +1,7 @@
 //! Tools Module [AIR-3][AIS-3][BPC-3][AIT-3]
 //! 
 //! This module provides various utility tools for the Anya Core system,
-//! following the Bitcoin Development Framework v2.5 standards.
+//! following official Bitcoin Improvement Proposals (BIPs).
 
 pub mod commit_tracker;
 pub mod markdown;

@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 
-// This follows the Bitcoin Development Framework v2.5 standards for secure HSM implementation
+// This follows official Bitcoin Improvement Proposals (BIPs) standards for secure HSM implementation
 use async_trait::async_trait;
 use uuid::Uuid;
 use tokio::sync::Mutex;
@@ -389,7 +389,7 @@ impl HsmProvider for HardwareHsmProvider {
                 // [AIR-3][AIS-3][BPC-3][RES-3] Sign data using hardware HSM
                 let signature = self.sign(&params.key_id, params.algorithm, &params.data).await?;
                 // [AIR-3][AIS-3][BPC-3][RES-3] Use base64 Engine for encoding
-                // This follows the Bitcoin Development Framework v2.5 standards for secure data handling
+                // This follows official Bitcoin Improvement Proposals (BIPs) standards for secure data handling
                 let response_data = serde_json::to_value(Base64SignatureResponse {
                     signature: base64::engine::general_purpose::STANDARD.encode(&signature),
                     algorithm: params.algorithm,

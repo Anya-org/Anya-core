@@ -169,7 +169,7 @@ This alignment:
 6. Maintains 100% BIP-341/342 compliance
 7. Reduces mobile-specific code by 18% through shared crypto primitives
 
-The implementation now fully satisfies Bitcoin Development Framework v2.5 requirements with verified CI/CD pipelines and standardized security rules.
+The implementation now fully satisfies official Bitcoin Improvement Proposals (BIPs) requirements with verified CI/CD pipelines and standardized security rules.
 
 ## See Also
 

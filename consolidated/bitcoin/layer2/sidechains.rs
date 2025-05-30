@@ -1,7 +1,7 @@
 use std::error::Error;
 // Sidechains module for Layer 2
 // Implements sidechains for Bitcoin Layer 2 solutions
-// as per Bitcoin Development Framework v2.5 requirements
+// as per official Bitcoin Improvement Proposals (BIPs) requirements
 
 use crate::layer2::{Layer2Protocol, TransactionStatus, ProtocolState, AssetParams, AssetTransfer, TransferResult, Proof, VerificationResult, ValidationResult};
 

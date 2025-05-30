@@ -1,7 +1,7 @@
 //! Bitcoin Protocol Implementation [AIR-3][AIS-3][BPC-3][AIT-3]
 //! 
 //! This module implements Bitcoin protocol compliance following the
-//! Bitcoin Development Framework v2.5 standards.
+//! official Bitcoin Improvement Proposals (BIPs) standards.
 
 use serde::{Deserialize, Serialize};
 use std::fmt;

@@ -1,7 +1,7 @@
 #!/bin/bash
 # [AIR-3][AIS-3][BPC-3][RES-3]
 # Bitcoin Drive Preparation Script with Pruning Configuration
-# Follows Bitcoin Development Framework v2.5 standards
+# Follows official Bitcoin Improvement Proposals (BIPs)
 # May 20, 2025
 #
 # This script prepares drives for Bitcoin data storage with pruning
@@ -285,7 +285,7 @@ mkdir -p $BACKUP_MOUNT/bitcoin/backups/$(date +%Y-%m-%d)
 cat > $DATA_MOUNT/bitcoin/bitcoin.conf << EOF
 # [AIR-3][AIS-3][BPC-3][RES-3]
 # Bitcoin Core Configuration with Pruning
-# Following Bitcoin Development Framework v2.5 standards
+# Following official Bitcoin Improvement Proposals (BIPs)
 # Generated on $(date)
 
 # Network Configuration
@@ -354,7 +354,7 @@ cat > $DATA_MOUNT/bitcoin/README.md << EOF
 # Bitcoin Storage with Pruning Configuration
 
 ## Overview
-This Bitcoin node is configured with pruning enabled to optimize storage usage according to the Bitcoin Development Framework v2.5 standards. The pruning configuration helps maintain a smaller blockchain footprint while preserving full validation capabilities.
+This Bitcoin node is configured with pruning enabled to optimize storage usage according to official Bitcoin Improvement Proposals (BIPs). The pruning configuration helps maintain a smaller blockchain footprint while preserving full validation capabilities.
 
 ## Pruning Configuration
 - Prune Mode: Enabled
@@ -396,7 +396,7 @@ echo ""
 echo "Daily maintenance scheduled at 2:30 AM"
 echo "See $DATA_MOUNT/bitcoin/README.md for details"
 echo ""
-echo "Directory structure follows Bitcoin Development Framework v2.5 standards"
+echo "Directory structure follows official Bitcoin Improvement Proposals (BIPs)"
 echo "with proper hexagonal architecture implementation."
 echo ""
 

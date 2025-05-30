@@ -4,7 +4,7 @@
  * [AIR-3][AIS-3][BPC-3][AIT-2]
  * 
  * This script validates compliance with Bitcoin Improvement Proposals (BIPs)
- * as required by the Bitcoin Development Framework v2.5.
+ * as required by official Bitcoin Improvement Proposals (BIPs).
  */
 
 const fs = require('fs');
@@ -122,7 +122,7 @@ const SILENT_LEAF_REGEX = /tr\([^)]*SILENT_LEAF[^)]*\)/i;
 
 // Output validation header
 console.log('\n===== BIP Standards Compliance Validation =====');
-console.log('Bitcoin Development Framework v2.5\n');
+console.log('Bitcoin Improvement Proposals (BIPs) Compliance\n');
 
 // Track overall compliance status
 let overallCompliance = true;

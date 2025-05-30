@@ -18,11 +18,11 @@ description: "Documentation for Hsm_bitcoin_integration"
 
 ## Overview
 
-This document describes how the Hardware Security Module (HSM) implementation in Anya Core integrates with Bitcoin according to the Bitcoin Development Framework v2.5 requirements.
+This document describes how the Hardware Security Module (HSM) implementation in Anya Core integrates with Bitcoin according to official Bitcoin Improvement Proposals (BIPs) requirements.
 
-## Bitcoin Development Framework v2.5 Compliance
+## Bitcoin Improvement Proposals (BIPs) Compliance
 
-The HSM implementation provides comprehensive support for Bitcoin security operations, with full compliance with the Bitcoin Development Framework v2.5 requirements:
+The HSM implementation provides comprehensive support for Bitcoin security operations, with full compliance with official Bitcoin Improvement Proposals (BIPs):
 
 ### Protocol Adherence \[AIR-3\]
 
@@ -205,7 +205,7 @@ The HSM Bitcoin integration follows these security principles:
 
 ## Hexagonal Architecture Integration \[AIS-3\]\[RES-3\]
 
-The HSM Bitcoin integration follows the hexagonal architecture pattern defined in the Bitcoin Development Framework:
+The HSM Bitcoin integration follows the hexagonal architecture pattern defined in official Bitcoin Improvement Proposals (BIPs):
 
 ```
                   +----------------+
@@ -260,7 +260,7 @@ The HSM Bitcoin integration follows the hexagonal architecture pattern defined i
 
 ## References
 
-1. Bitcoin Development Framework v2.5
+1. Official Bitcoin Improvement Proposals (BIPs)
 2. BIP 341/342 (Taproot)
 3. BIP 174 (PSBT)
 4. BIP 340 (Schnorr Signatures)

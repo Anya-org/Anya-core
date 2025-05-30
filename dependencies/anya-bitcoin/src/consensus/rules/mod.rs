@@ -180,9 +180,9 @@ For more detailed information about the DAO system, see:
 - [Tokenomics System](../docs/TOKENOMICS_SYSTEM.md) - Token economics details
 - [Implementation Milestones](../docs/IMPLEMENTATION_MILESTONES.md) - Current status and roadmap
 
-## Bitcoin Development Framework Compliance
+## Bitcoin Improvement Proposals (BIPs) Compliance
 
-This implementation follows the Bitcoin Development Framework v2.5 standards, including:
+This implementation follows official Bitcoin Improvement Proposals (BIPs) standards, including:
 
 - **Protocol Adherence**: Bitcoin-style issuance with halving schedule
 - **Privacy-Preserving Architecture**: Constant product market maker for DEX

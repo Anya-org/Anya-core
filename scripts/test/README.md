@@ -6,7 +6,7 @@ Date: 2025-05-20
 
 ## Overview
 
-The Anya Core Test System provides a comprehensive framework for testing all components of the Anya Core project following the Bitcoin Development Framework v2.5 standards. This system is designed to ensure that all code meets the quality, security, and compliance requirements specified in the BDF v2.5.
+The Anya Core Test System provides a comprehensive framework for testing all components of the Anya Core project following official Bitcoin Improvement Proposals (BIPs). This system is designed to ensure that all code meets the quality, security, and compliance requirements specified in the BIPs.
 
 ## Unified Test Framework
 
@@ -95,7 +95,7 @@ Exhaustive tests that verify all functionality with all features enabled. These 
 
 ## Hexagonal Architecture Compliance
 
-The test system follows the hexagonal architecture principles as defined in the Bitcoin Development Framework v2.5:
+The test system follows the hexagonal architecture principles as defined in official Bitcoin Improvement Proposals (BIPs):
 
 1. **Core Domain Tests**
    - Tests that verify core business logic
@@ -138,7 +138,7 @@ The test system follows the hexagonal architecture principles as defined in the 
 
 ## AI Labeling Compliance
 
-All test scripts include proper AI labeling according to the Bitcoin Development Framework v2.5 standards:
+All test scripts include proper AI labeling according to official Bitcoin Improvement Proposals (BIPs):
 
 - [AIR-3] - AI Responsibility
 - [AIS-3] - AI Security
@@ -173,10 +173,10 @@ Test logs are stored in the `logs/tests/` directory with timestamps for easy ref
 To add new tests to the system:
 
 1. Create a new test file in the appropriate module directory
-2. Ensure the test follows the Bitcoin Development Framework v2.5 standards
+2. Ensure the test follows official Bitcoin Improvement Proposals (BIPs)
 3. Add proper AI labeling to the test file
 4. Update the unified test framework if necessary
 
 ## Conclusion
 
-The Anya Core Test System provides a robust framework for ensuring the quality, security, and compliance of the Anya Core project according to the Bitcoin Development Framework v2.5 standards. By following the hexagonal architecture principles and implementing proper AI labeling, the test system helps maintain a high standard of code quality and reliability.
+The Anya Core Test System provides a robust framework for ensuring the quality, security, and compliance of the Anya Core project according to official Bitcoin Improvement Proposals (BIPs). By following the hexagonal architecture principles and implementing proper AI labeling, the test system helps maintain a high standard of code quality and reliability.

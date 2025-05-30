@@ -17,7 +17,7 @@ Add a brief overview of this document here.
 
 [AIR-3][AIS-3][BPC-3]
 
-This directory contains the canonical standards documentation for the Anya Core project, in compliance with the Bitcoin Development Framework v2.5.
+This directory contains the canonical standards documentation for the Anya Core project, in compliance with official Bitcoin Improvement Proposals (BIPs).
 
 ## Available Standards
 
@@ -27,9 +27,9 @@ This directory contains the canonical standards documentation for the Anya Core 
 
 All components in the Anya Core codebase must adhere to these standards. When introducing new components or modifying existing ones, refer to these documents for guidance on labeling, security requirements, and architectural constraints.
 
-## Integration with Bitcoin Development Framework
+## Integration with Official Bitcoin Standards
 
-These standards are aligned with the Bitcoin Development Framework v2.5, ensuring proper implementation of:
+These standards are aligned with official Bitcoin Improvement Proposals (BIPs), ensuring proper implementation of:
 
 1. Protocol Adherence
 2. Privacy-Preserving Architecture

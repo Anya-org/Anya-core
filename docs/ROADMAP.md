@@ -21,7 +21,7 @@ Add a brief overview of this document here.
 
 ```mermaid
 gantt
-    title Bitcoin Development Framework v2.6
+    title Bitcoin Standards Implementation v2.6
     dateFormat  YYYY-MM-DD
     section Protocol Compliance
     BIP-370 Implementation       :active, bip370, 2025-03-01, 30d
@@ -117,7 +117,7 @@ fn log_audit_event(event: AuditEvent) {
 ![AIS-3](https://img.shields.io/badge/AIS-3_Certified-blue)  
 ![PSBT-v2](https://img.shields.io/badge/PSBT_v2-85%25-yellow)
 
-This roadmap maintains full compatibility with Bitcoin Development Framework v2.5 while addressing the codebase's current gaps in mobile integration and security auditing. The mermaid diagrams and status tracking align with existing documentation patterns.
+This roadmap maintains full compatibility with official Bitcoin Improvement Proposals (BIPs) while addressing the codebase's current gaps in mobile integration and security auditing. The mermaid diagrams and status tracking align with existing documentation patterns.
 
 ## Updates
 

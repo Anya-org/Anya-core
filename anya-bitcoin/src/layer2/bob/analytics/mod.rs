@@ -1,7 +1,7 @@
 use crate::prelude::StdError;
 // Hybrid analytics module for BOB
 // Implements analytics for Bitcoin Optimistic Blockchain
-// as per Bitcoin Development Framework v2.5 requirements
+// as per official Bitcoin Improvement Proposals (BIPs) requirements
 
 use crate::layer2::bob::BobConfig;
 use std::collections::HashMap;

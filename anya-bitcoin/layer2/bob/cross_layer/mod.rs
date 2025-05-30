@@ -1,7 +1,7 @@
 use std::error::Error;
 // Cross-layer transaction handling module for BOB
 // Implements cross-layer transaction handling for Bitcoin Optimistic Blockchain
-// as per Bitcoin Development Framework v2.5 requirements
+// as per official Bitcoin Improvement Proposals (BIPs) requirements
 
 use crate::layer2::bob::{BobConfig, BobError, EvmTransaction};
 use crate::security::validation::ValidationResult;

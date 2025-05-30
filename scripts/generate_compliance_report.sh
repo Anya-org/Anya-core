@@ -37,9 +37,9 @@ initialize_report() {
 # Anya Core Compliance Report
 **Generated:** $(date '+%Y-%m-%d %H:%M:%S')
 
-## Bitcoin Development Framework v2.5 Compliance
+## Bitcoin Improvement Proposals (BIPs) Compliance
 
-This report analyzes the Anya Core codebase for compliance with Bitcoin Development Framework v2.5
+This report analyzes the Anya Core codebase for compliance with official Bitcoin Improvement Proposals (BIPs)
 requirements and proper AI labeling standards.
 
 ## Executive Summary
@@ -222,7 +222,7 @@ finish_report() {
 ## Conclusion
 
 This automatic compliance report provides an overview of the current state of the Anya Core
-codebase with respect to Bitcoin Development Framework v2.5 requirements and AI labeling standards.
+codebase with respect to official Bitcoin Improvement Proposals (BIPs) requirements and AI labeling standards.
 
 Follow the recommendations above to address any compliance gaps and improve code quality.
 

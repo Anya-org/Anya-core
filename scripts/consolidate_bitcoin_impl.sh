@@ -109,7 +109,7 @@ create_index_files() {
   # Create main index file
   cat > "${CONSOLIDATED_DIR}/mod.rs" << EOF
 // [AIR-3][AIS-3][AIM-3][BPC-3][RES-3]
-//! Bitcoin implementation according to Bitcoin Development Framework v2.5
+//! Bitcoin implementation according to official Bitcoin Improvement Proposals (BIPs)
 //! 
 //! This module provides a consolidated implementation of Bitcoin functionality
 //! following the hexagonal architecture pattern and BDF v2.5 requirements.

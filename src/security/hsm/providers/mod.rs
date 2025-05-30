@@ -1,5 +1,5 @@
 // [AIR-3][AIS-3][BPC-3][RES-3] HSM provider module declarations
-// This follows the Bitcoin Development Framework v2.5 standards for HSM providers
+// This follows official Bitcoin Improvement Proposals (BIPs) standards for HSM providers
 // Each provider implements the HsmProvider trait with specific security features
 
 pub mod bitcoin;

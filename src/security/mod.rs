@@ -94,13 +94,13 @@ mod tests {
 
 // Security module
 // Implements security features for Bitcoin operations
-// as per Bitcoin Development Framework v2.5 requirements
+// as per official Bitcoin Improvement Proposals (BIPs) requirements
 
 use log::info;
 // [AIR-3][AIS-3][BPC-3][RES-3] Constant time module already declared above
 
 // [AIR-3][AIS-3][BPC-3][RES-3] Conditionally export HSM types when the feature is enabled
-// This follows the Bitcoin Development Framework v2.5 standards for HSM implementations
+// This follows official Bitcoin Improvement Proposals (BIPs) standards for HSM implementations
 #[cfg(feature = "hsm")]
 pub use hsm::{
     // Only export the types that are actually used in the codebase
@@ -141,7 +141,7 @@ pub use hsm::{
 /// 
 /// This function initializes the security subsystem, including the HSM manager
 /// if configured. It follows the security requirements specified in the
-/// Bitcoin Development Framework v2.5.
+/// official Bitcoin Improvement Proposals (BIPs).
 /// 
 /// # Returns
 /// `Ok(())` on success, `Err` on failure
@@ -190,7 +190,7 @@ pub fn create_bitcoin_hsm_provider(_base_provider: std::sync::Arc<dyn hsm_shim::
 /// Verify a Bitcoin payment using SPV proof
 /// 
 /// This function verifies a Bitcoin payment using SPV proof, as described
-/// in the Bitcoin Development Framework v2.5 requirements.
+/// in official Bitcoin Improvement Proposals (BIPs) requirements.
 /// 
 /// # Arguments
 /// * `bitcoin_provider` - Bitcoin HSM provider

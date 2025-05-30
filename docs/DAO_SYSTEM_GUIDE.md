@@ -540,9 +540,9 @@ Current implementation status:
 
 For detailed progress, see the [Implementation Milestones](IMPLEMENTATION_MILESTONES.md) document.
 
-## Bitcoin Development Framework Compliance
+## Bitcoin Improvement Proposals (BIPs) Compliance
 
-This implementation follows the Bitcoin Development Framework v2.5 requirements:
+This implementation follows official Bitcoin Improvement Proposals (BIPs) requirements:
 
 1. **Protocol Adherence**
    - Bitcoin-style issuance with halving schedule

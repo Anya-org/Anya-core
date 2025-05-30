@@ -60,7 +60,7 @@ cargo doc --workspace --no-deps --open
 git diff HEAD~1 --name-only | grep .md | xargs markdownlint
 ```
 
-All documentation updates follow Bitcoin Development Framework v2.5 requirements and match the current codebase structure. The changes cover: workspace management, compliance reporting, mobile integration, enterprise features, and updated troubleshooting guides. 
+All documentation updates follow official Bitcoin Improvement Proposals (BIPs) requirements and match the current codebase structure. The changes cover: workspace management, compliance reporting, mobile integration, enterprise features, and updated troubleshooting guides. 
 
 ## Common Issues Resolution
 

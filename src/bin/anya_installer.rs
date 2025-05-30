@@ -1,7 +1,7 @@
 /// Anya-Core Installer v2.5
 /// [AIR-3][AIS-3][BPC-3][AIT-2][RES-2][SCL-3][PFM-2]
 /// 
-/// Compliant with Bitcoin Development Framework v2.5
+/// Compliant with official Bitcoin Improvement Proposals (BIPs)
 /// Implements BIP-341, BIP-342, BIP-174, and AIS-3 security standards
 use std::error::Error;
 

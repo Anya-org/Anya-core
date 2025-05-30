@@ -1,6 +1,6 @@
 # BIP Compliance Validation Module [AIR-3][AIS-3][BPC-3]
 
-This directory contains the BIP (Bitcoin Improvement Proposal) compliance validation implementation for Anya Core, following the Bitcoin Development Framework v2.5 standards.
+This directory contains the BIP (Bitcoin Improvement Proposal) compliance validation implementation for Anya Core, following official Bitcoin Improvement Proposals (BIPs) standards.
 
 ## Overview
 
@@ -146,6 +146,6 @@ For more information, see:
 
 - Current Version: 3.1.0
 - Last Updated: 2025-04-29
-- Bitcoin Development Framework: v2.5
+- Bitcoin Improvement Proposals (BIPs): Latest standards
 
 *This component complies with [AI Labeling Standards](../../../../docs/standards/AI_LABELING.md)*

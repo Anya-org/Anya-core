@@ -144,9 +144,9 @@ The DAO is tightly integrated with the tokenomics system through:
    - 55% to DAO/community
 3. **Governance Control**: DAO proposals can adjust tokenomics parameters
 
-## Bitcoin Development Framework Compliance
+## Bitcoin Improvement Proposals (BIPs) Compliance
 
-All DAO components adhere to the Bitcoin Development Framework v2.5 requirements:
+All DAO components adhere to official Bitcoin Improvement Proposals (BIPs) requirements:
 
 - Protocol adherence through trait-based design
 - Privacy-preserving architecture

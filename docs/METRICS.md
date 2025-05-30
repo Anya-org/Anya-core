@@ -19,7 +19,7 @@ Add a brief overview of this document here.
 
 [AIR-3][AIS-3][AIT-3][AIM-3][PFM-3]
 
-This document describes the metrics and monitoring capabilities of the Anya-Core platform, following the hexagonal architecture requirements specified in the Bitcoin Development Framework v2.5 standards.
+This document describes the metrics and monitoring capabilities of the Anya-Core platform, following the hexagonal architecture requirements specified in official Bitcoin Improvement Proposals (BIPs).
 
 ## Metrics Architecture
 

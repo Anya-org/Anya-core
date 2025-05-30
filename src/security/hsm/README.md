@@ -4,7 +4,7 @@
 
 ## Overview
 
-The HSM module provides secure cryptographic operations for Anya Core with special support for Bitcoin operations. This implementation follows the Bitcoin Development Framework v2.5 requirements for security, privacy, and integration.
+The HSM module provides secure cryptographic operations for Anya Core with special support for Bitcoin operations. This implementation follows official Bitcoin Improvement Proposals (BIPs) requirements for security, privacy, and integration.
 
 ## Key Features
 
@@ -150,7 +150,7 @@ let asset_id = create_taproot_asset(
 
 This implementation complies with the following standards:
 
-- Bitcoin Development Framework v2.5 (Updated March 2025)
+- Bitcoin Improvement Proposals (BIPs) (Updated March 2025)
 - BIP 341/342 (Taproot)
 - BIP 174 (PSBT)
 - BIP 340 (Schnorr Signatures)

@@ -1,7 +1,7 @@
 #!/bin/bash
 # [AIR-3][AIS-3][BPC-3][RES-3]
 # script_cleanup.sh - Maintenance script for cleaning up temporary fix scripts
-# Following Bitcoin Development Framework v2.5 standards
+# Following official Bitcoin Improvement Proposals (BIPs)
 # Part of the Anya Core Hexagonal Architecture
 # Date: 2025-05-20
 
@@ -50,6 +50,6 @@ done
 
 echo "[INFO] Script cleanup completed successfully!"
 echo "[INFO] All temporary fix scripts have been removed according to Script Management Policy."
-echo "[INFO] Maintaining minimal script approach as per Bitcoin Development Framework v2.5 standards."
+echo "[INFO] Maintaining minimal script approach as per official Bitcoin Improvement Proposals (BIPs)."
 
 exit 0

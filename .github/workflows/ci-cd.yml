@@ -1,4 +1,4 @@
-# [AIR-3][AIS-3][BPC-3][RES-3] CI/CD Pipeline for Bitcoin Development Framework v2.5
+# [AIR-3][AIS-3][BPC-3][RES-3] CI/CD Pipeline for Official Bitcoin Improvement Proposals (BIPs)
 name: Bitcoin Framework CI/CD
 
 on:

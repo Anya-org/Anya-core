@@ -2,11 +2,11 @@
 //! Lightning Network implementation following BDF v2.5 standards
 //! 
 //! This module provides a Lightning Network implementation that conforms to
-//! Bitcoin Development Framework v2.5 requirements, including proper hexagonal
+//! official Bitcoin Improvement Proposals (BIPs) requirements, including proper hexagonal
 //! architecture and non-interactive oracle patterns.
 
 // [AIR-3][AIS-3][BPC-3][RES-3] Import necessary dependencies for Lightning implementation
-// This follows the Bitcoin Development Framework v2.5 standards for Lightning Network
+// This follows official Bitcoin Improvement Proposals (BIPs) for Lightning Network
 use std::error::Error;
 use serde::{Serialize, Deserialize};
 

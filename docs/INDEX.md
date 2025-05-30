@@ -22,7 +22,7 @@ Add a brief overview of this document here.
 
 [AIR-3][AIS-3][BPC-3][RES-3]
 
-This is the central index for all Anya Core documentation. All documentation follows the AI labeling convention defined in [AI Labeling Reference Guide](./standards/AI_LABELING.md) and adheres to Bitcoin Development Framework v2.5 standards.
+This is the central index for all Anya Core documentation. All documentation follows the AI labeling convention defined in [AI Labeling Reference Guide](./standards/AI_LABELING.md) and adheres to official Bitcoin Improvement Proposals (BIPs).
 
 ## Core Documentation
 

@@ -269,7 +269,7 @@ Log-Message "Port interfaces generated."
 # Create main library entry point
 $libRsContent = @"
 //! Bitcoin Core Implementation
-//! Following hexagonal architecture principles and Bitcoin Development Framework v2.5
+//! Following hexagonal architecture principles and official Bitcoin Improvement Proposals (BIPs)
 
 use std::{sync::Arc, path::PathBuf};
 

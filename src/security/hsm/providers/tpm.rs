@@ -5,7 +5,7 @@
 //! protection for private keys.
 
 // [AIR-3][AIS-3][BPC-3][RES-3] Import necessary dependencies for TPM HSM provider
-// This follows the Bitcoin Development Framework v2.5 standards for secure HSM implementation
+// This follows official Bitcoin Improvement Proposals (BIPs) standards for secure HSM implementation
 use std::sync::Arc;
 use tokio::sync::Mutex;
 use uuid::Uuid;

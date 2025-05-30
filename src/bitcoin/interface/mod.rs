@@ -7,10 +7,10 @@
 
 // [AIR-3][AIS-3][RES-3]
 // BitcoinInterface trait for hexagonal architecture pattern
-// Following Bitcoin Development Framework v2.5 standards
+// Following official Bitcoin Improvement Proposals (BIPs) standards
 
 // [AIR-3][AIS-3][BPC-3][RES-3] Import necessary dependencies for Bitcoin interface
-// This follows the Bitcoin Development Framework v2.5 standards for hexagonal architecture
+// This follows official Bitcoin Improvement Proposals (BIPs) standards for hexagonal architecture
 use std::error::Error as StdError;
 use std::sync::Arc;
 // [AIR-3][AIS-3][BPC-3][RES-3] Removed unused import: async_trait::async_trait
@@ -20,7 +20,7 @@ pub use bitcoin::{Address, Transaction, Block, Network};
 pub use crate::bitcoin::error::{BitcoinError, BitcoinResult};
 
 // [AIR-3][AIS-3][BPC-3][RES-3] Import Bitcoin configuration
-// This follows the Bitcoin Development Framework v2.5 standards for configuration management
+// This follows official Bitcoin Improvement Proposals (BIPs) standards for configuration management
 use crate::config::BitcoinConfig as ConfigBitcoinConfig;
 use crate::bitcoin::config::BitcoinConfig as BitcoinInternalConfig;
 // Use fully qualified paths to avoid type conflicts
@@ -150,7 +150,7 @@ pub struct BlockHeader {
 /// adapters (implementations) to be plugged in while maintaining a consistent API.
 /// 
 /// [AIR-3][AIS-3][BPC-3][RES-3]
-/// Complete implementation as per Bitcoin Development Framework v2.5 standards
+/// Complete implementation as per official Bitcoin Improvement Proposals (BIPs) standards
 #[async_trait::async_trait]
 pub trait BitcoinInterface: Send + Sync {
     /// Get transaction by txid
@@ -224,13 +224,13 @@ pub trait BitcoinInterface: Send + Sync {
 /// This factory function creates and returns a Bitcoin interface implementation
 /// based on the requested type and configuration.
 /// 
-/// [AIR-3][BPC-3] Implementation according to Bitcoin Development Framework v2.5
+/// [AIR-3][BPC-3] Implementation according to official Bitcoin Improvement Proposals (BIPs)
 pub fn create_bitcoin_interface(
     implementation_type: BitcoinImplementationType,
     config: &ConfigBitcoinConfig,
 ) -> Result<Arc<dyn BitcoinInterface + 'static>, Box<dyn StdError>> {
     // [AIR-3][AIS-3][BPC-3][RES-3] Convert from config::BitcoinConfig to bitcoin::config::BitcoinConfig
-    // This follows the Bitcoin Development Framework v2.5 standards for configuration handling
+    // This follows official Bitcoin Improvement Proposals (BIPs) standards for configuration handling
     let _internal_config = BitcoinInternalConfig {
         enabled: true,
         network: config.network.clone(),
@@ -277,10 +277,10 @@ pub fn create_bitcoin_interface(
 /// This function returns the appropriate Bitcoin interface implementation
 /// based on the current configuration settings.
 /// 
-/// [AIR-3][BPC-3] Implementation according to Bitcoin Development Framework v2.5
+/// [AIR-3][BPC-3] Implementation according to official Bitcoin Improvement Proposals (BIPs)
 pub fn get_current_bitcoin_interface(config: &ConfigBitcoinConfig) -> Result<Arc<dyn BitcoinInterface + 'static>, Box<dyn StdError>> {
     // [AIR-3][AIS-3][BPC-3][RES-3] Convert from config::BitcoinConfig to bitcoin::config::BitcoinConfig
-    // This follows the Bitcoin Development Framework v2.5 standards for configuration handling
+    // This follows official Bitcoin Improvement Proposals (BIPs) standards for configuration handling
     let _internal_config = BitcoinInternalConfig {
         enabled: true,
         network: config.network.clone(),

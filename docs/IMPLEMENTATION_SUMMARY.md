@@ -19,7 +19,7 @@ Add a brief overview of this document here.
 
 ## Hexagonal Architecture Implementation
 
-This document provides a comprehensive overview of the Anya Core implementation, following the Bitcoin Development Framework v2.5 standards and the hexagonal architecture requirements.
+This document provides a comprehensive overview of the Anya Core implementation, following official Bitcoin Improvement Proposals (BIPs) and the hexagonal architecture requirements.
 
 ```
                       +----------------+
@@ -79,7 +79,7 @@ This document provides a comprehensive overview of the Anya Core implementation,
 
 ## Compliance Status
 
-All modules now comply with the Bitcoin Development Framework v2.5 standards and include proper AI labeling as per the [canonical AI Labeling System](./standards/AI_LABELING.md).
+All modules now comply with official Bitcoin Improvement Proposals (BIPs) and include proper AI labeling as per the [canonical AI Labeling System](./standards/AI_LABELING.md).
 
 ### Security Audit Trail
 

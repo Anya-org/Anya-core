@@ -2,7 +2,7 @@
 
 [AIR-3][AIS-3][BPC-3][AIT-3][RES-3]
 
-This directory contains scripts for building, testing, and maintaining the Anya Core project, including the documentation system and Bitcoin MCP Server implementation according to the Bitcoin Development Framework v2.5.
+This directory contains scripts for building, testing, and maintaining the Anya Core project, including the documentation system and Bitcoin MCP Server implementation according to official Bitcoin Improvement Proposals (BIPs).
 
 ## Directory Structure
 
@@ -95,7 +95,7 @@ Scripts for building and setting up the development environment:
 
 ## Compliance
 
-The scripts in this directory have been updated to comply with the Bitcoin Development Framework v2.5 requirements and include proper AI labeling ([AIR-3][AIS-3][BPC-3][AIT-3][RES-3]).
+The scripts in this directory have been updated to comply with official Bitcoin Improvement Proposals (BIPs) requirements and include proper AI labeling ([AIR-3][AIS-3][BPC-3][AIT-3][RES-3]).
 
 For more information on security analysis and compliance, see `SECURITY_CODEQL.md` in the project root.
 

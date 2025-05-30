@@ -6,7 +6,7 @@ Last Updated: 2025-03-10 09:15 UTC+2
 
 ## Overview
 
-This directory contains the Model Context Protocol (MCP) configuration for the Cursor AI assistant within the Anya-Core repository. The MCP allows the AI to use specialized Bitcoin development tools according to the Bitcoin Development Framework v2.5.
+This directory contains the Model Context Protocol (MCP) configuration for the Cursor AI assistant within the Anya-Core repository. The MCP allows the AI to use specialized Bitcoin development tools according to official Bitcoin Improvement Proposals (BIPs).
 
 ## Consolidated MCP Servers
 
@@ -159,7 +159,7 @@ When adding new tools to the MCP server:
 
 ## Related Documentation
 
-* [Bitcoin Development Framework v2.5](../docs/bitcoin-framework.md)
+* [Official Bitcoin Improvement Proposals (BIPs)](../docs/bitcoin-framework.md)
 * [AI Labelling Guidelines](../docs/standards/AI_LABELING.md)
 * [Hexagonal Architecture Requirements](../docs/hexagonal-architecture.md)
 * [Cursor MCP Documentation](https://docs.cursor.com/context/model-context-protocol) 

@@ -1,7 +1,7 @@
 #!/bin/bash
 # [AIR-3][AIS-3][BPC-3][RES-3]
 # Anya Core Installation Script
-# Following Bitcoin Development Framework v2.5 standards
+# Following official Bitcoin Improvement Proposals (BIPs)
 # Date: 2025-05-21
 
 set -euo pipefail

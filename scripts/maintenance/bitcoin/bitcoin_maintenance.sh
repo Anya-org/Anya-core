@@ -1,7 +1,7 @@
 #!/bin/bash
 # [AIR-3][AIS-3][BPC-3][RES-3]
 # Bitcoin Data Maintenance Script
-# Following Bitcoin Development Framework v2.5 standards
+# Following official Bitcoin Improvement Proposals (BIPs)
 
 DATA_MOUNT="/mnt/bitcoin-data"
 BACKUP_MOUNT="/mnt/bitcoin-backup"

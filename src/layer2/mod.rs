@@ -1,11 +1,11 @@
 // [AIR-3][AIS-3][AIM-3][BPC-3][RES-3]
-//! Layer2 implementation for Bitcoin Development Framework v2.5
+//! Layer2 implementation for official Bitcoin Improvement Proposals (BIPs)
 //!
 //! This module implements Layer2 protocols for Bitcoin, following
 //! the hexagonal architecture pattern required by BDF v2.5.
 
 // [AIR-3][AIS-3][BPC-3][RES-3] Import necessary dependencies for Layer2 implementation
-// This follows the Bitcoin Development Framework v2.5 standards for Layer2 protocols
+// This follows official Bitcoin Improvement Proposals (BIPs) for Layer2 protocols
 use std::error::Error;
 use serde::{Serialize, Deserialize};
 
@@ -169,7 +169,7 @@ pub mod dlc;
 // Re-export key components
 pub use lightning::LightningNetwork;
 // [AIR-3][AIS-3][BPC-3][RES-3] Re-export Layer2 protocol implementations
-// This follows the Bitcoin Development Framework v2.5 standards for Layer2 protocols
+// This follows official Bitcoin Improvement Proposals (BIPs) for Layer2 protocols
 pub use state_channels::StateChannel;
 
 // Define the RGB Protocol trait implementation

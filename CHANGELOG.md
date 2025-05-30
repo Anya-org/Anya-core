@@ -72,7 +72,7 @@ All notable changes to the Anya Core project will be documented in this file.
 ### Changed
 
 - Improved script directory organization for security focus
-- Updated documentation to reflect Bitcoin Development Framework v2.5 compliance
+- Updated documentation to reflect Bitcoin Improvement Proposals (BIPs) compliance
 - Enhanced TODO list with critical security fixes based on test results
 - Prioritized cryptographic implementation fixes
 - Replaced insecure DES algorithm with modern alternatives (AES-256, ChaCha20)

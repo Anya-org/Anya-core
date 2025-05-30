@@ -110,9 +110,9 @@ pub struct RedisCache {
 - Follow the AI labelling guidelines for all documentation
 - Keep diagrams and architecture documents current
 
-## Bitcoin Development Framework Compliance \[AIR-1\]
+## Bitcoin Improvement Proposals (BIPs) Compliance \[AIR-1\]
 
-Contributions that touch Bitcoin-related functionality must comply with the Bitcoin Development Framework v2.5:
+Contributions that touch Bitcoin-related functionality must comply with official Bitcoin Improvement Proposals (BIPs):
 
 1. Ensure protocol adherence to Bitcoin's core tenets
 2. Follow privacy-preserving architecture principles

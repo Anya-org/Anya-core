@@ -1,6 +1,6 @@
 # Web5 Implementation [AIR-3][AIS-3][BPC-3][W5C-3][DID-3]
 
-This directory contains the Web5 implementation for Anya Core, following the Bitcoin Development Framework v2.5 standards.
+This directory contains the Web5 implementation for Anya Core, following official Bitcoin Improvement Proposals (BIPs) standards.
 
 ## Overview
 
@@ -77,7 +77,7 @@ To contribute to the Web5 implementation:
 
 1. Read the [Contributing Guide](../../../CONTRIBUTING.md)
 2. Follow the [AI Labeling Standards](../../../docs/standards/AI_LABELING.md)
-3. Ensure all code meets [Bitcoin Development Framework v2.5](../../../docs/standards/BIP_COMPLIANCE.md) requirements
+3. Ensure all code meets [official Bitcoin Improvement Proposals (BIPs)](../../../docs/standards/BIP_COMPLIANCE.md) requirements
 
 ## Testing
 

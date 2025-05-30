@@ -1,7 +1,7 @@
 use std::error::Error;
 // Security validation module
 // Implements security validation for Bitcoin operations
-// as per Bitcoin Development Framework v2.5 requirements
+// as per official Bitcoin Improvement Proposals (BIPs) requirements
 
 /// Validation result for security operations
 #[derive(Debug, Clone)]

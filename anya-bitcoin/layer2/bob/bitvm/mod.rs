@@ -1,7 +1,7 @@
 use std::error::Error;
 // BitVM integration module for BOB
 // Implements BitVM integration for Bitcoin Optimistic Blockchain
-// as per Bitcoin Development Framework v2.5 requirements
+// as per official Bitcoin Improvement Proposals (BIPs) requirements
 
 use crate::layer2::bob::{BobConfig, BobError, BitVMProof};
 use std::sync::Arc;

@@ -51,7 +51,7 @@ The security system provides comprehensive protection for identity credentials a
 
 ## Cryptographic Implementation [AIS-3][BPC-3]
 
-Aligned with Bitcoin Development Framework v2.5 Chapter 7
+Aligned with official Bitcoin Improvement Proposals (BIPs)
 
 ### Mandatory Requirements
 

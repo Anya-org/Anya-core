@@ -21,7 +21,7 @@ description: "Documentation for Ai_labeling"
 
 ## Overview
 
-This document defines the standardized AI labeling system used throughout the Anya Core codebase, following the Bitcoin Development Framework v2.5 standards. This system ensures all components are properly categorized for AI readiness, security, compliance, and other critical aspects.
+This document defines the standardized AI labeling system used throughout the Anya Core codebase, following official Bitcoin Improvement Proposals (BIPs). This system ensures all components are properly categorized for AI readiness, security, compliance, and other critical aspects.
 
 ## Tag Format
 

@@ -1,7 +1,7 @@
 // [AIR-3][AIS-3][AIM-3][BPC-3][RES-3]
 //! RSK Sidechain integration module
 //! 
-//! Implementation following Bitcoin Development Framework v2.5
+//! Implementation following official Bitcoin Improvement Proposals (BIPs)
 
 mod bitcoin_verification;
 

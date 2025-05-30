@@ -118,7 +118,7 @@ Redirecting to [ROOT_INDEX.md](ROOT_INDEX.md)...
 - [Issue Tracker](https://github.com/anya/anya-core/issues)
 - [GitHub Discussions](https://github.com/anya/anya-core/discussions)
 
-*This documentation follows the [AI Labeling Standards](docs/standards/AI_LABELING.md) based on the Bitcoin Development Framework v2.5. All components are labeled with appropriate Core and Extended category labels.*
+*This documentation follows the [AI Labeling Standards](docs/standards/AI_LABELING.md) based on official Bitcoin Improvement Proposals (BIPs). All components are labeled with appropriate Core and Extended category labels.*
 
 ## Bitcoin Protocol Implementation
 
@@ -151,7 +151,7 @@ Redirecting to [ROOT_INDEX.md](ROOT_INDEX.md)...
 
 ## Bitcoin Development Framework Compliance
 
-All components conform to the Bitcoin Development Framework v2.5 guidelines and include proper AI labeling according to the following system:
+All components conform to official Bitcoin Improvement Proposals (BIPs) guidelines and include proper AI labeling according to the following system:
 
 - [AIR-3] - AI Readiness Level 3
 - [AIS-3] - AI Security Level 3

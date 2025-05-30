@@ -88,7 +88,7 @@ pub enum SigningAlgorithm {
 pub trait HsmProvider: Send + Sync {}
 
 /// [AIR-3][AIS-3][BPC-3][RES-3] Stub for BitcoinHsmProvider
-/// This follows the Bitcoin Development Framework v2.5 standards
+/// This follows official Bitcoin Improvement Proposals (BIPs) standards
 #[derive(Debug, Clone, Default)]
 pub struct BitcoinHsmProvider;
 
@@ -99,7 +99,7 @@ impl BitcoinHsmProvider {
 }
 
 /// [AIR-3][AIS-3][BPC-3][RES-3] Stub for SoftwareHsmProvider
-/// This follows the Bitcoin Development Framework v2.5 standards
+/// This follows official Bitcoin Improvement Proposals (BIPs) standards
 #[derive(Debug, Clone, Default)]
 pub struct SoftwareHsmProvider;
 
@@ -110,7 +110,7 @@ impl SoftwareHsmProvider {
 }
 
 /// [AIR-3][AIS-3][BPC-3][RES-3] Stub for SimulatorHsmProvider
-/// This follows the Bitcoin Development Framework v2.5 standards
+/// This follows official Bitcoin Improvement Proposals (BIPs) standards
 #[derive(Debug, Clone, Default)]
 pub struct SimulatorHsmProvider;
 
@@ -121,7 +121,7 @@ impl SimulatorHsmProvider {
 }
 
 /// [AIR-3][AIS-3][BPC-3][RES-3] Stub for HardwareHsmProvider
-/// This follows the Bitcoin Development Framework v2.5 standards
+/// This follows official Bitcoin Improvement Proposals (BIPs) standards
 #[derive(Debug, Clone, Default)]
 pub struct HardwareHsmProvider;
 
@@ -132,7 +132,7 @@ impl HardwareHsmProvider {
 }
 
 /// [AIR-3][AIS-3][BPC-3][RES-3] Stub for Pkcs11HsmProvider
-/// This follows the Bitcoin Development Framework v2.5 standards
+/// This follows official Bitcoin Improvement Proposals (BIPs) standards
 #[derive(Debug, Clone, Default)]
 pub struct Pkcs11HsmProvider;
 
@@ -143,7 +143,7 @@ impl Pkcs11HsmProvider {
 }
 
 /// [AIR-3][AIS-3][BPC-3][RES-3] Stub for TpmHsmProvider
-/// This follows the Bitcoin Development Framework v2.5 standards
+/// This follows official Bitcoin Improvement Proposals (BIPs) standards
 #[derive(Debug, Clone, Default)]
 pub struct TpmHsmProvider;
 
@@ -154,7 +154,7 @@ impl TpmHsmProvider {
 }
 
 /// [AIR-3][AIS-3][BPC-3][RES-3] Stub for LedgerHsmProvider
-/// This follows the Bitcoin Development Framework v2.5 standards
+/// This follows official Bitcoin Improvement Proposals (BIPs) standards
 #[derive(Debug, Clone, Default)]
 pub struct LedgerHsmProvider;
 

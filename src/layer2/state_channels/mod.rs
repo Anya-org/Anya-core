@@ -2,11 +2,11 @@
 //! State Channels implementation following BDF v2.5 standards
 //! 
 //! This module provides a State Channels implementation that conforms to
-//! Bitcoin Development Framework v2.5 requirements, with support for
+//! official Bitcoin Improvement Proposals (BIPs) requirements, with support for
 //! non-interactive oracle patterns and transaction indistinguishability.
 
 // [AIR-3][AIS-3][BPC-3][RES-3] Import necessary dependencies for State Channels implementation
-// This follows the Bitcoin Development Framework v2.5 standards for transaction indistinguishability
+// This follows official Bitcoin Improvement Proposals (BIPs) for transaction indistinguishability
 use std::error::Error;
 use std::collections::HashMap;
 use serde::{Serialize, Deserialize};

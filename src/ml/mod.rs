@@ -5,7 +5,7 @@
 
 use std::error::Error;
 // [AIR-3][AIS-3][BPC-3][RES-3] Import necessary dependencies for ML module
-// This follows the Bitcoin Development Framework v2.5 standards for ML operations
+// This follows official Bitcoin Improvement Proposals (BIPs) standards for ML operations
 use crate::{AnyaResult, AnyaError};
 // Re-export these types to make them public
 pub use crate::dao::{Proposal, ProposalMetrics, RiskMetrics};

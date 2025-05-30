@@ -37,7 +37,7 @@ The current focus is on hardening security, ensuring BIP compliance, and prepari
 
 - Complete CI/CD integration for security analysis
 - Implement automated vulnerability reporting
-- Achieve 100% compliance with Bitcoin Development Framework v2.5
+- Achieve 100% compliance with official Bitcoin Improvement Proposals (BIPs)
 - Enhance BIP-342 (Tapscript) implementation
 - Optimize DLC oracle implementation for reduced latency
 - **Extend HSM support for additional hardware vendors**

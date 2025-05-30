@@ -6,9 +6,9 @@
 
 **Latest Version: v0.3.0-rc2**
 
-> **Note**: This version includes a complete refactor of the installation system following Bitcoin Development Framework v2.5 standards, with enhanced security features including HSM integration, Taproot support, and automated hardware detection.
+> **Note**: This version includes a complete refactor of the installation system following official Bitcoin Improvement Proposals (BIPs), with enhanced security features including HSM integration, Taproot support, and automated hardware detection.
 
-This directory contains the Anya Core installation system scripts. This system has been designed to provide a unified installation experience with automatic hardware detection, appropriate feature flag configuration, and support for both fresh installations and upgrades. The system follows the Bitcoin Development Framework v2.5 standards and implements hexagonal architecture principles.
+This directory contains the Anya Core installation system scripts. This system has been designed to provide a unified installation experience with automatic hardware detection, appropriate feature flag configuration, and support for both fresh installations and upgrades. The system follows official Bitcoin Improvement Proposals (BIPs) and implements hexagonal architecture principles.
 
 ## System Components [AIR-3][AIS-3][BPC-3]
 
@@ -156,7 +156,7 @@ Installation logs are stored in:
 
 ## Hexagonal Architecture
 
-The installation system follows the hexagonal architecture principles as defined in the Bitcoin Development Framework v2.5:
+The installation system follows the hexagonal architecture principles as defined in official Bitcoin Improvement Proposals (BIPs):
 
 1. **Core Domain**:
    - `unified_install_framework.sh` provides the comprehensive installation framework
@@ -181,11 +181,11 @@ This hexagonal architecture design ensures:
 - Clear separation of concerns
 - Consistent behavior across different environments
 - Simplified maintenance and extensibility
-- Compliance with Bitcoin Development Framework v2.5 standards
+- Compliance with official Bitcoin Improvement Proposals (BIPs)
 
 ## AI Labeling Compliance
 
-All installation scripts include proper AI labeling according to the Bitcoin Development Framework v2.5 standards:
+All installation scripts include proper AI labeling according to official Bitcoin Improvement Proposals (BIPs):
 
 - [AIR-3] - AI Responsibility
 - [AIS-3] - AI Security

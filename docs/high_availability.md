@@ -24,7 +24,7 @@ The High Availability subsystem provides fault tolerance, automatic failover, an
 
 ## Architecture
 
-The HA system follows the hexagonal architecture pattern defined in the Bitcoin Development Framework v2.5:
+The HA system follows the hexagonal architecture pattern defined by official Bitcoin Improvement Proposals (BIPs):
 
 ```
                   +----------------+
@@ -243,7 +243,7 @@ Planned improvements to the HA subsystem include:
 
 ## References
 
-1. Bitcoin Development Framework v2.5
+1. Official Bitcoin Improvement Proposals (BIPs)
 2. Raft Consensus Algorithm
 3. Kubernetes Operator Framework
 4. Prometheus Monitoring System

@@ -147,7 +147,7 @@ impl MLModel for MLService {
         metrics.insert("is_initialized".to_string(), if self.is_initialized { 1.0 } else { 0.0 });
         
         // [AIR-3][AIS-3][BPC-3][RES-3] Check if device is CUDA
-        // This follows the Bitcoin Development Framework v2.5 standards for device handling
+        // This follows official Bitcoin Improvement Proposals (BIPs) standards for device handling
         let is_cuda = self.device.is_cuda();
         metrics.insert("gpu_available".to_string(), if is_cuda { 1.0 } else { 0.0 });
         
@@ -159,7 +159,7 @@ impl MLService {
     /// Create a new ML service instance
     pub fn new() -> Self {
         // [AIR-3][AIS-3][BPC-3][RES-3] Default to CPU for now since we don't have tch in scope
-        // This follows the Bitcoin Development Framework v2.5 standards for device handling
+        // This follows official Bitcoin Improvement Proposals (BIPs) standards for device handling
         let device = Device::cpu();
         
         Self {
@@ -204,7 +204,7 @@ impl MLService {
         let _features = self.extract_features(proposal)?;
         
         // [AIR-3][AIS-3][BPC-3][RES-3] Get predictions for various metrics
-        // This follows the Bitcoin Development Framework v2.5 standards for ML operations
+        // This follows official Bitcoin Improvement Proposals (BIPs) standards for ML operations
         // Replace with direct implementation since the method is missing
         let mut predictions = HashMap::new();
         predictions.insert("confidence".to_string(), 0.95); // Default confidence value
@@ -225,7 +225,7 @@ impl MLService {
     /// Extract features from a proposal for ML processing
     fn extract_features(&self, _proposal: &Proposal) -> AnyaResult<Vec<f64>> {
         // [AIR-3][AIS-3][BPC-3][RES-3] In a real implementation, this would extract relevant features from the proposal
-        // This follows the Bitcoin Development Framework v2.5 standards for ML feature extraction
+        // This follows official Bitcoin Improvement Proposals (BIPs) standards for ML feature extraction
         // Create a zero-filled vector of the expected dimension
         let zeros = vec![0.0; self.features_dim];
         Ok(zeros)
@@ -260,7 +260,7 @@ impl MLService {
 
     /// Assess risks for a proposal
     // [AIR-3][AIS-3][BPC-3][RES-3] Assess risks for a proposal
-    // This follows the Bitcoin Development Framework v2.5 standards for ML operations
+    // This follows official Bitcoin Improvement Proposals (BIPs) standards for ML operations
     fn assess_risks(&self, _proposal: &Proposal) -> AnyaResult<RiskMetrics> {
         // In a real implementation, this would perform detailed risk analysis
         
@@ -334,7 +334,7 @@ impl MLService {
     }
     
     /// [AIR-3][AIS-3][BPC-3][RES-3] Predict proposal metrics based on proposal data
-    /// This follows the Bitcoin Development Framework v2.5 standards for ML predictions
+    /// This follows official Bitcoin Improvement Proposals (BIPs) standards for ML predictions
     pub async fn predict_proposal_metrics(&self, proposal: &Proposal) -> AnyaResult<ProposalMetrics> {
         // Extract features from the proposal
         let features = self.extract_features(proposal)?;

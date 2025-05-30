@@ -121,7 +121,7 @@ The implementation follows the prescribed hexagonal architecture pattern:
 
 ## Final Alignment Check
 
-The implemented configuration management system satisfies the requirements of the Bitcoin Development Framework v2.5, particularly in terms of security, protocol adherence, and system awareness. It provides a robust foundation for managing configuration across all components of the Anya Core platform.
+The implemented configuration management system satisfies the requirements of official Bitcoin Improvement Proposals (BIPs), particularly in terms of security, protocol adherence, and system awareness. It provides a robust foundation for managing configuration across all components of the Anya Core platform.
 
 ### BIP Implementation Status
 
@@ -172,7 +172,7 @@ The configuration management system implements several security features:
 [AIR-3][AIS-3][BPC-3][RES-3]
 
 
-*This document follows the [AI Labeling System](../docs/standards/AI_LABELING.md) standards based on the Bitcoin Development Framework v2.5.* 
+*This document follows the [AI Labeling System](../docs/standards/AI_LABELING.md) standards based on official Bitcoin Improvement Proposals (BIPs).* 
 ## See Also
 
 - [Related Document](#related-document)

@@ -163,7 +163,7 @@ The following documentation files must be maintained across all repositories:
 2. **Review Requirements**:
    - Technical accuracy
    - Adherence to style guidelines
-   - Compliance with Bitcoin Development Framework
+   - Compliance with official Bitcoin Improvement Proposals (BIPs)
    - Cross-reference validation
 
 3. **Approval Process**:
@@ -323,7 +323,7 @@ component.doSomething();
 
 ## Conclusion
 
-This documentation synchronization plan ensures that all Anya ecosystem repositories maintain consistent, up-to-date, and high-quality documentation that follows the Bitcoin Development Framework v2.5 standards.
+This documentation synchronization plan ensures that all Anya ecosystem repositories maintain consistent, up-to-date, and high-quality documentation that follows official Bitcoin Improvement Proposals (BIPs).
 
 ## See Also
 

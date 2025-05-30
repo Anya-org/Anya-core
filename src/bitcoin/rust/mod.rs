@@ -1,5 +1,5 @@
 // [AIR-3][AIS-3][BPC-3][RES-3]
-// Complete implementation as per Bitcoin Development Framework v2.5 standards
+// Complete implementation as per official Bitcoin Improvement Proposals (BIPs) standards
 use std::error::Error;
 use async_trait::async_trait;
 use bitcoin::{Address, Transaction, Block, Network};
@@ -18,7 +18,7 @@ impl RustBitcoinImplementation {
     /// [BPC-3] Complete real implementation as per BDF v2.5 standards
     pub fn new(config: &BitcoinConfig) -> Result<Self, Box<dyn Error>> {
         // [AIR-3][AIS-3][BPC-3][RES-3] Get network configuration
-        // This follows the Bitcoin Development Framework v2.5 standards for configuration handling
+        // This follows official Bitcoin Improvement Proposals (BIPs) standards for configuration handling
         let network_str = if config.network.is_empty() {
             "testnet".to_string()
         } else {
@@ -73,16 +73,16 @@ impl BitcoinInterface for RustBitcoinImplementation {
     }
 
     // [AIR-3][AIS-3][BPC-3][RES-3] Prefix unused parameter with underscore
-    // This follows the Bitcoin Development Framework v2.5 standards for clean code
+    // This follows official Bitcoin Improvement Proposals (BIPs) standards for clean code
     async fn get_block_header(&self, _hash: &str) -> BitcoinResult<BlockHeader> {
         Err(BitcoinError::BlockNotFound)
     }
 
     // [AIR-3][AIS-3][BPC-3][RES-3] Verify merkle proof for transaction inclusion
-    // This follows the Bitcoin Development Framework v2.5 standards for SPV verification
+    // This follows official Bitcoin Improvement Proposals (BIPs) standards for SPV verification
     async fn verify_merkle_proof(&self, tx_hash: &str, block_header: &BlockHeader) -> BitcoinResult<bool> {
         // [AIR-3][AIS-3][BPC-3][RES-3] Using parameters to avoid unused variable warnings
-        // This follows the Bitcoin Development Framework v2.5 standards for SPV verification
+        // This follows official Bitcoin Improvement Proposals (BIPs) standards for SPV verification
         // Access block header fields directly as per BDF v2.5 standards
         let block_hash = format!("{}", block_header.merkle_root);
         println!("Verifying merkle proof for tx: {} in block with merkle root: {}", tx_hash, block_hash);
@@ -90,7 +90,7 @@ impl BitcoinInterface for RustBitcoinImplementation {
     }
 
     // [AIR-3][AIS-3][BPC-3][RES-3] Prefix unused parameter with underscore
-    // This follows the Bitcoin Development Framework v2.5 standards for clean code
+    // This follows official Bitcoin Improvement Proposals (BIPs) standards for clean code
     async fn get_balance(&self, _address: &Address) -> BitcoinResult<u64> {
         Ok(0)
     }

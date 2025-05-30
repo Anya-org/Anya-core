@@ -17,7 +17,7 @@ Add a brief overview of this document here.
 - [Section 1](#section-1)
 - [Section 2](#section-2)
 
-Reference: Bitcoin Development Framework v2.5 Section 4.2.1
+Reference: Official Bitcoin Improvement Proposals (BIPs) - BIP-340, BIP-341, BIP-342
 
 ### Required Components
 - SILENT_LEAF pattern enforcement

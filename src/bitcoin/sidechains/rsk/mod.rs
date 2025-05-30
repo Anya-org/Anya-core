@@ -2,7 +2,7 @@
 use std::error::Error;
 // src/bitcoin/sidechains/rsk/mod.rs
 
-//! RSK Sidechain implementation according to Bitcoin Development Framework v2.5
+//! RSK Sidechain implementation according to official Bitcoin Improvement Proposals (BIPs)
 //!
 //! This module provides integration with RSK (Rootstock), a Bitcoin sidechain
 //! for smart contracts that enables Ethereum-compatible functionality
