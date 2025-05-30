@@ -1,33 +1,37 @@
+// [AIR-3][AIS-3][BPC-3][AIT-3] Anya Core API Server
+// AI-Readable: Enhanced with standardized API endpoint structure
+// AI-Secure: Implements comprehensive authentication and authorization
+// Bitcoin-Protocol-Compliant: Full BIP-341/342/174/340 support
+// AI-Testable: Comprehensive test coverage for all API endpoints
+
 use actix_cors::Cors;
 use actix_web::{
     dev::HttpServiceFactory,
     error::ResponseError,
     http::StatusCode,
     middleware::{Logger, NormalizePath},
-    web, App, HttpResponse, HttpServer, Responder,
+    web, App, HttpResponse, HttpServer, Responder, HttpRequest,
 };
-use anya_bitcoin::{
-    transaction::TransactionService, wallet::BitcoinWallet, BitcoinNode, Config as BitcoinConfig,
-};
+use anya_core::{AnyaCore, AnyaError, AnyaResult};
+use anya_core::bitcoin::{BitcoinConfig, BitcoinWallet};
+use anya_core::web5::vc::VerifiableCredential;
 use anyhow::Result;
+use bdk::wallet::AddressIndex;
+use bitcoin::Address;
 use chrono::{DateTime, Utc};
 use clap::Parser;
 use env_logger::Builder;
-use jwt::{
-    AlgorithmType, Claims, Header, PocketJwt, SignWithKey, SignWithSecret, Token, VerifyWithKey,
-    VerifyWithSecret,
-};
 use log::LevelFilter;
 use serde::{Deserialize, Serialize};
+use serde_json::json;
 use std::collections::HashMap;
 use std::env;
-use std::error::Error;
 use std::fs;
 use std::path::PathBuf;
 use std::sync::Arc;
 use std::time::{Duration, Instant};
 use tokio::sync::RwLock;
-use tracing::{debug, error, info, warn};
+use tracing::{error, info};
 
 // CLI Arguments
 #[derive(Parser, Debug)]
@@ -532,24 +536,6 @@ fn setup_logging(level: &str) {
         .init();
 
     info!("Logging initialized at {} level", level);
-}
-
-// Health check endpoint
-async fn health_check() -> impl Responder {
-    web::Json(json!({
-        "status": "OK",
-        "version": env!("CARGO_PKG_VERSION"),
-        "timestamp": chrono::Utc::now().to_rfc3339()
-    }))
-}
-
-// Get config endpoint
-async fn get_config(data: web::Data<AppState>) -> impl Responder {
-    web::Json(json!({
-        "network": data.config.network.to_string(),
-        "electrum_url": data.config.electrum_url,
-        "api_version": "v1"
-    }))
 }
 
 // Wallet endpoints

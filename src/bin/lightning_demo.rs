@@ -1,20 +1,19 @@
+/// Lightning Network Demo
+///
+/// This program demonstrates the Lightning Network functionality
+/// provided by the anya-core library, including node operations,
+/// channel management, and payment processing.
 use std::error::Error;
-//! Lightning Network Demo
-//!
-//! This program demonstrates the Lightning Network functionality
-//! provided by the anya-core library, including node operations,
-//! channel management, and payment processing.
 
-use anya::AnyaConfig;
-use anya::AnyaCore;
-use anya::AnyaResult;
-use anya::bitcoin::BitcoinManager;
-use anya::bitcoin::lightning::{LightningNode, BitcoinLightningBridge};
+use anya_core::{AnyaCore, AnyaResult};
+use anya_core::config::AnyaConfig;
+use anya_core::bitcoin::manager::BitcoinManager;
+use anya_core::layer2::lightning::{LightningNode, BitcoinLightningBridge};
 use std::sync::Arc;
 use std::thread;
 use std::time::Duration;
 
-fn main() -> AnyaResult<()>  -> Result<(), Box<dyn Error>> {
+fn main() -> Result<(), Box<dyn Error>> {
     println!("===================================================");
     println!("⚡ Anya Core Lightning Network Demonstration");
     println!("===================================================");

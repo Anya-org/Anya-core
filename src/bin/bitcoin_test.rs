@@ -1,4 +1,4 @@
-use anya::bitcoin::protocol::testing::mock;
+use anya_core::bitcoin::protocol::testing::mock;
 use anyhow::Result;
 use std::env;
 use std::error::Error;
