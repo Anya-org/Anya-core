@@ -2,7 +2,7 @@
 
 # [AIR-3][AIS-3][BPC-3][RES-3] Anya Core TODO List
 
-*Last Updated: May 19, 2025*
+*Last Updated: May 30, 2025*
 
 ## Production Environment Setup
 
@@ -551,7 +551,7 @@ Priority areas for development:
   - [-] Configuration mapping (50% complete)
   - [-] Persistent storage (45% complete)
 
-*Last updated: 2025-05-04*
+*Last updated: 2025-05-30*
 
 # Anya Core Development TODO
 

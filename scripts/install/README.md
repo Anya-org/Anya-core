@@ -2,7 +2,7 @@
 
 # [AIR-3][AIS-3][BPC-3][RES-3][HSM-3][CRY-3]
 
-*Last Updated: May 24, 2025*
+*Last Updated: May 30, 2025*
 
 **Latest Version: v0.3.0-rc2**
 

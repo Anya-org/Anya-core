@@ -48,6 +48,7 @@ The following table shows the current compliance status with Bitcoin Improvement
 | 86  | HD Wallets | Full | 100% | Verified |
 
 ### Recent Updates (May 30, 2025)
+
 - Enhanced ML agent system with real-time system mapping and indexing capabilities
 - Added comprehensive Web5 integration with DID and DWN support
 - Implemented advanced security framework with enterprise-grade compliance
@@ -65,17 +66,17 @@ The repository is organized according to the following updated structure:
 /anya-core
 ├── src/                     # Main source code
 │   ├── adapters/            # Hexagonal architecture adapters
-│   ├── ai/                  # AI coordination and management (Updated: May 30, 2025)
+│   ├── ai/                  # AI coordination and management
 │   ├── api/                 # RESTful and GraphQL API implementations
 │   ├── audit/               # Compliance and audit framework
 │   ├── bin/                 # Binary executables and CLI tools
 │   ├── bip/                 # Bitcoin Improvement Proposal implementations
 │   ├── bips/                # BIP validation and compliance checking
-│   ├── bitcoin/             # Bitcoin protocol implementation (Updated: May 30, 2025)
+│   ├── bitcoin/             # Bitcoin protocol implementation
 │   │   ├── error.rs         # Bitcoin error handling with BIP compliance
 │   │   ├── rust/            # Core Rust implementation with network configuration
 │   │   ├── wallet/          # HD wallet implementation (BIP 32/44/84)
-│   │   ├── psbt/            # Partially Signed Bitcoin Transactions (BIP 174/370)
+│   │   ├── psbt.rs          # Partially Signed Bitcoin Transactions (BIP 174/370)
 │   │   └── taproot/         # Taproot and Tapscript support (BIP 341/342)
 │   ├── blockchain/          # General blockchain utilities and abstractions
 │   ├── checkpoint/          # State checkpointing and recovery
@@ -96,14 +97,13 @@ The repository is organized according to the following updated structure:
 │   ├── hardware/            # Hardware security module integration
 │   ├── infrastructure/      # Infrastructure management
 │   ├── install/             # Installation and setup scripts
-│   ├── layer2/              # Layer 2 solutions (Updated: May 30, 2025)
-│   │   ├── rgb/             # RGB protocol with Taproot-compatible asset ID generation
-│   │   ├── dlc/             # DLC implementation with non-interactive oracle patterns
-│   │   ├── bob/             # BOB Layer 2 integration
+│   ├── layer2/              # Layer 2 solutions
+│   │   ├── rgb/             # RGB protocol implementation
+│   │   ├── dlc/             # DLC implementation
 │   │   ├── lightning/       # Lightning Network implementation
-│   │   └── rsk/             # RSK sidechain integration
+│   │   └── state_channels/  # State channel implementations
 │   ├── lightning/           # Lightning Network protocol implementation
-│   ├── ml/                  # Machine Learning module (Updated: May 30, 2025)
+│   ├── ml/                  # Machine Learning module
 │   │   ├── agent.rs         # Core ML agent implementation
 │   │   ├── agent_checker.rs # Agent validation and health monitoring
 │   │   ├── agent_system.rs  # Multi-agent coordination system
@@ -133,16 +133,19 @@ The repository is organized according to the following updated structure:
 │   ├── tools/               # Development and maintenance tools
 │   ├── utils/               # Utility functions and helpers
 │   ├── web/                 # Web interface implementations
-│   └── web5/                # Web5 implementation (Updated: May 30, 2025)
-│       ├── did/             # Decentralized Identity (DID) implementation
-│       ├── dwn/             # Decentralized Web Node (DWN) implementation
-│       ├── protocols/       # Web5 protocol implementations
-│       └── vc/              # Verifiable Credentials support
-├── anya-extensions/         # Extension ecosystem (Updated: May 30, 2025)
+│   └── web5/                # Web5 implementation
+│       ├── adapter.rs       # Web5 adapter implementations
+│       ├── dwn.rs           # Decentralized Web Node implementation
+│       ├── identity.rs      # Decentralized Identity implementation
+│       ├── protocols.rs     # Web5 protocol implementations
+│       └── vc.rs            # Verifiable Credentials support
+├── anya-extensions/         # Extension ecosystem
 │   ├── docs/                # Comprehensive extension documentation
 │   ├── core/                # Core extension implementations
 │   ├── community/           # Community-developed extensions
 │   └── enterprise/          # Enterprise extension suite
+├── anya-bitcoin/            # Bitcoin-specific module
+├── anya-enterprise/         # Enterprise features module
 ├── docs/                    # Main system documentation
 ├── tests/                   # Integration and system tests
 └── scripts/                 # Utility and deployment scripts
@@ -151,41 +154,8 @@ The repository is organized according to the following updated structure:
 - Fixed RGB module to ensure proper Taproot-compatible asset ID generation
 - Updated Bitcoin module to correctly handle network configuration
 - Implemented proper error handling across all modules
-- Added missing OracleClient implementation in the DLC module
+- Added missing implementation details in various modules
 - Ensured all modules follow official Bitcoin Improvement Proposals (BIPs) standards with proper AI labeling
-
-## Repository Structure
-
-The repository is organized according to the following structure:
-
-```
-/anya-core
-├── src/                     # Main source code
-│   ├── adapters/            # Hexagonal architecture adapters
-│   ├── api/                 # API implementations
-│   ├── bitcoin/             # Bitcoin protocol implementation (Updated: May 19, 2025)
-│   │   ├── error.rs         # Bitcoin error handling with BDF v2.5 compliance
-│   │   └── rust/            # Rust implementation with proper network configuration
-│   ├── core/                # Core functionality
-│   ├── crypto/              # Cryptographic implementations
-│   ├── dao/                 # DAO implementation
-│   ├── layer2/              # Layer 2 solutions (Updated: May 19, 2025)
-│   │   ├── rgb/             # RGB protocol with Taproot-compatible asset ID generation
-│   │   ├── dlc/             # DLC implementation with non-interactive oracle patterns
-│   │   ├── bob/             # BOB Layer 2
-│   │   ├── lightning/       # Lightning Network
-│   │   └── rsk/             # RSK Integration
-│   ├── ml/                  # Machine Learning module (Updated: May 19, 2025)
-│   │   ├── service.rs       # ML service with predict_proposal_metrics implementation
-│   │   └── mod.rs           # ML module with proper error handling
-│   ├── lightning/           # Lightning Network implementation
-│   ├── security/            # Security framework
-│   │   └── crypto/          # Cryptographic security
-│   └── web5/                # Web5 implementation
-├── docs/                    # Documentation
-├── tests/                   # Tests
-└── scripts/                 # Utility scripts
-```
 
 ## Key Components
 
@@ -305,11 +275,10 @@ graph TB
     end
 
     subgraph Layer2[Layer 2 Support]
-        BOB[BOB Integration]
         LN[Lightning Integration]
         RGB[RGB Protocol]
-        RSK[RSK Sidechain]
         DLC[Discreet Log Contracts]
+        StateChannels[State Channels]
     end
 
     subgraph AI[AI Layer]
@@ -330,11 +299,10 @@ graph TB
     Issuance --> Distribution
     Distribution --> Economics
 
-    CrossChain --> BOB
     CrossChain --> LN
     CrossChain --> RGB
-    CrossChain --> RSK
     CrossChain --> DLC
+    CrossChain --> StateChannels
 
     Distribution --> Liquidity
     DAOCore --> Buyback
@@ -396,15 +364,11 @@ graph TB
 2. **Asset Management** - RGB asset management
 3. **Validation** - RGB validation
 
-### RSK Integration (src/layer2/rsk/)
+### State Channels (src/layer2/state_channels/)
 
-1. **Bridge Implementation** - RSK bridge implementation
-2. **Smart Contract Interface** - RSK smart contract interface
-
-### BOB Layer 2 (src/layer2/bob/)
-
-1. **Channel Implementation** - BOB channel implementation
-2. **State Management** - BOB state management
+1. **Channel Implementation** - State channel implementation
+2. **State Management** - Off-chain state management
+3. **Dispute Resolution** - State channel dispute resolution
 
 ### DLC (src/layer2/dlc/)
 
@@ -413,17 +377,18 @@ graph TB
 
 ## Web5 Architecture (src/web5/)
 
-### Decentralized Web Node (DWN)
+### Core Implementation
 
-1. **Implementation** - DWN implementation
-2. **Protocol Support** - Web5 protocol support
-3. **Data Management** - Decentralized data management
+1. **web5.rs** - Main Web5 implementation and entry point
+2. **types.rs** - Web5 type definitions and data structures
+3. **utils.rs** - Web5 utility functions and helpers
 
-### Decentralized Identity (DID)
+### Features
 
-1. **DID Implementation** - DID implementation
-2. **Verifiable Credentials** - Verifiable credentials
-3. **Authentication** - Decentralized authentication
+1. **Decentralized Web Node (DWN)** - DWN protocol implementation
+2. **Decentralized Identity (DID)** - DID implementation and management
+3. **Verifiable Credentials** - Verifiable credentials support
+4. **Decentralized Authentication** - Authentication mechanisms
 
 ## AI & Machine Learning Architecture (src/ml/)
 
@@ -465,9 +430,9 @@ The system has been optimized with the following changes:
    - Removed deprecated code elements
 
 3. **Layer 2 Integration**
-   - Enhanced integration with all Bitcoin Layer 2 protocols
-   - Added BOB (Bitcoin Optimistic Blockchain) support
-   - Integrated with RGB, RSK, and other Layer 2 solutions
+   - Enhanced integration with Bitcoin Layer 2 protocols
+   - Added State Channels support
+   - Integrated with RGB and other Layer 2 solutions
    - Added DLC (Discreet Log Contracts) support
 
 ## Version Information
@@ -485,40 +450,10 @@ Current implementation status:
 - ✅ Core architecture and interfaces
 - ✅ Bitcoin-style issuance model with 21 billion token supply
 - ✅ Bitcoin-compatible DAO implementation
-- ✅ Full Layer 2 integration support
+- ✅ Layer 2 integration support
 - 🔄 Distribution allocation mechanisms (In Progress)
 - ⏳ DEX integration (Pending)
 
-## Last Updated
+---
 
-*Last updated: 2025-04-29 14:30 UTC+2*
-
-+----------------------------+
-| Mobile Interface           |
-| (React Native)             |
-| - Taproot Wallet           |
-| - Lightning Payments       |
-| - BIP-174 PSBT Support     |
-+------------+---------------+
-             |
-+------------v---------------+
-| Mobile Security Layer      |
-| - Hardware Key Storage     |
-| - Secure SPV Proofs        |
-| - BIP-341 Compliance       |
-+----------------------------+
-
-*Last updated: 2025-02-24 18:05 UTC+2*
-
-            +----------------------------+
-            | React Native TurboModules   |
-            | - Taproot Wallet (BIP-341)  |
-            | - PSBTv2 Transactions       |
-            | - SILENT_LEAF Validation    |
-            +-------------+---------------+
-                           |
-            +--------------v---------------+
-            | Mobile Security Layer        |
-            | - Hardware Key Storage       |
-            | - BIP-341 Compliance         |
-            +------------------------------+ 
+*Last updated: May 30, 2025* 

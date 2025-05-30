@@ -14,7 +14,7 @@ description: "Documentation for Ai_labeling"
 <!-- markdownlint-disable MD013 line-length -->
 
 > **IMPORTANT: This is the canonical and authoritative AI labeling documentation for Anya Core.**
-> **Version: 3.1 (2025-05-19)**
+> **Version: 3.1 (2025-05-30)**
 > 
 > All other labeling documents are deprecated in favor of this standardized system.
 > For migration details, see the [Migration Guide](#migration-from-legacy-systems) section.

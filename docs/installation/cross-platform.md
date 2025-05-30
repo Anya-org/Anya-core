@@ -1,5 +1,5 @@
 ---
-last_updated: 2025-05-21
+last_updated: 2025-05-30
 layout: default
 title: "Cross Platform"
 description: "Documentation for Cross Platform"
@@ -7,7 +7,7 @@ description: "Documentation for Cross Platform"
 
 [AIR-3][AIS-3][BPC-3][RES-3]
 
-last_updated: 2025-05-21
+last_updated: 2025-05-30
 
 # Cross-Platform Installation Guide
 

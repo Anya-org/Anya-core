@@ -1,7 +1,7 @@
 ---
 title: "Readme"
 description: "Documentation for Readme"
-last_updated: 2025-05-21
+last_updated: 2025-05-30
 ---
 
 # Security Documentation [AIS-3][SEC-3][BPC-3]
@@ -12,7 +12,7 @@ last_updated: 2025-05-21
 - [Section 2](#section-2)
 
 
-*Last Updated: May 24, 2025*
+*Last Updated: May 30, 2025*
 
 > **Note**: This document follows official Bitcoin Improvement Proposals (BIPs) security standards and includes AI labeling for compliance tracking. All security implementations comply with [BIP-341](https://bips.xyz/341) and [BIP-342](https://bips.xyz/342) Taproot standards.
 
@@ -362,7 +362,7 @@ For security-related issues, please contact:
 - Advanced threat protection
 - **Extend HSM support for post-quantum algorithms**
 
-*Last updated: 2025-05-04*
+*Last updated: 2025-05-30*
 
 ## See Also
 
