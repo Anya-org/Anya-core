@@ -44,6 +44,7 @@ Publishing Anya Core extensions involves several steps to ensure quality, securi
 **URL**: `https://extensions.anya.org`
 
 **Characteristics:**
+
 - ✅ Curated and thoroughly tested
 - ✅ Security audited by Anya Core team
 - ✅ Long-term support guarantee
@@ -51,6 +52,7 @@ Publishing Anya Core extensions involves several steps to ensure quality, securi
 - ✅ Production-ready stability
 
 **Requirements:**
+
 - Exceptional code quality and documentation
 - Comprehensive test coverage (>95%)
 - Security audit compliance
@@ -58,6 +60,7 @@ Publishing Anya Core extensions involves several steps to ensure quality, securi
 - Community adoption evidence
 
 **Publishing Process:**
+
 ```bash
 # Submit proposal first
 anya ext propose --registry official --proposal proposal.md
@@ -71,6 +74,7 @@ anya ext publish --registry official --license official
 **URL**: `https://community.anya.org/extensions`
 
 **Characteristics:**
+
 - 🌍 Open to all developers
 - 🌍 Community-driven quality assurance
 - 🌍 Rapid innovation and experimentation
@@ -78,6 +82,7 @@ anya ext publish --registry official --license official
 - 🌍 Collaborative development
 
 **Requirements:**
+
 - Open source license (MIT, Apache 2.0, GPL)
 - Basic documentation and examples
 - Test coverage (minimum 80%)
@@ -85,6 +90,7 @@ anya ext publish --registry official --license official
 - Issue tracking and support
 
 **Publishing Process:**
+
 ```bash
 # Standard community publishing
 anya ext publish --registry community
@@ -98,6 +104,7 @@ anya ext publish --registry community --request-review
 **URL**: `https://enterprise.anya.org/extensions`
 
 **Characteristics:**
+
 - 🏢 Commercial and premium extensions
 - 🏢 Professional support and SLA
 - 🏢 Enterprise-grade security and compliance
@@ -105,6 +112,7 @@ anya ext publish --registry community --request-review
 - 🏢 Dedicated customer success
 
 **Requirements:**
+
 - Valid enterprise license
 - Commercial support agreement
 - Security and compliance certification
@@ -112,6 +120,7 @@ anya ext publish --registry community --request-review
 - Customer success metrics
 
 **Publishing Process:**
+
 ```bash
 # Requires enterprise license
 anya ext publish --registry enterprise --license enterprise.license
@@ -125,6 +134,7 @@ anya ext publish --registry enterprise --support-tier premium
 **Self-hosted or organizational registries**
 
 **Characteristics:**
+
 - 🔒 Internal organizational use
 - 🔒 Custom security requirements
 - 🔒 Proprietary features and data
@@ -132,6 +142,7 @@ anya ext publish --registry enterprise --support-tier premium
 - 🔒 Custom approval workflows
 
 **Setup:**
+
 ```bash
 # Configure private registry
 anya registry add private https://registry.company.com --auth-token $TOKEN
@@ -456,30 +467,35 @@ anya ext install my-extension --registry community --dry-run
 ### Review Criteria
 
 #### Code Quality (Weight: 25%)
+
 - Code structure and organization
 - Error handling and edge cases
 - Performance optimization
 - Memory safety and security
 
 #### Documentation (Weight: 20%)
+
 - Completeness and accuracy
 - Code examples and tutorials
 - API reference quality
 - User experience
 
 #### Testing (Weight: 20%)
+
 - Test coverage and quality
 - Integration test completeness
 - Performance benchmarks
 - Platform compatibility
 
 #### Security (Weight: 20%)
+
 - Vulnerability assessment
 - Cryptographic practices
 - Permission model
 - Data handling
 
 #### Community Value (Weight: 15%)
+
 - Innovation and uniqueness
 - Community demand
 - Ecosystem integration
@@ -628,6 +644,7 @@ anya ext contact-reviewers my-extension
 ### Error Resolution
 
 #### "Extension Already Exists"
+
 ```bash
 # Check existing versions
 anya ext versions my-extension --registry community
@@ -637,6 +654,7 @@ anya ext rename my-extension my-extension-v2
 ```
 
 #### "Incompatible Anya Version"
+
 ```bash
 # Update compatibility in extension.toml
 [extension.compatibility]
@@ -647,6 +665,7 @@ anya test-compatibility my-extension
 ```
 
 #### "Security Scan Failed"
+
 ```bash
 # Run local security scan
 anya security-scan ./my-extension --detailed
@@ -659,6 +678,7 @@ cargo update
 ```
 
 #### "Insufficient Documentation"
+
 ```bash
 # Generate documentation template
 anya ext doc-template my-extension
@@ -673,6 +693,7 @@ anya ext validate-examples my-extension
 ### Performance Optimization
 
 #### Package Size Optimization
+
 ```bash
 # Minimize package size
 cargo clean
@@ -684,6 +705,7 @@ echo "*.tmp" >> .packageignore
 ```
 
 #### Build Time Optimization
+
 ```bash
 # Parallel builds
 cargo build --release -j8
