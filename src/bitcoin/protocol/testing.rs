@@ -3,8 +3,6 @@
 //! This module provides testing utilities for Bitcoin protocol operations,
 //! following official Bitcoin Improvement Proposals (BIPs) standards.
 
-use std::error::Error;
-
 #[cfg(test)]
 pub mod mock {
     use bitcoin::Transaction;

@@ -151,6 +151,9 @@ pub enum BitcoinError {
     // This follows official Bitcoin Improvement Proposals (BIPs) standards for error handling
     #[error("Configuration error: {0}")]
     ConfigError(String),
+
+    #[error("Key derivation error: {0}")]
+    KeyDerivation(String),
 }
 
 impl From<TaprootBuilderError> for BitcoinError {

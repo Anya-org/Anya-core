@@ -20,8 +20,7 @@ use maplit::hashmap;
 use ring::rand::SecureRandom;
 use std::collections::HashSet;
 use std::time::UNIX_EPOCH;
-use crate::compliance::bdf_verification::{ProtocolCompliance, BipSupportLevel, VerificationStatus};
-use crate::bip_compliance::BipComplianceReport as BIPCompliance;
+use anya_core::bip_compliance::{BipComplianceReport as BIPCompliance, ComplianceStatus};
 
 const BIP341_SILENT_LEAF: &str = "0x8f3a1c29566443e2e2d6e5a9a5a4e8d";
 const REQUIRED_BIPS: [&str; 4] = ["BIP-341", "BIP-342", "BIP-174", "BIP-370"];
@@ -1006,17 +1005,15 @@ impl AnyaInstaller {
     fn generate_file_manifest(&self) -> Result<Vec<FileIntegrity>> { Ok(vec![]) }
     fn apply_config(&mut self, _config: BitcoinConfig) -> Result<()> { Ok(()) }
 }
-// Fix OptionAnyhow trait visibility and usage
-pub trait OptionAnyhow<T> {
-    fn ok_or_anyhow<E: std::fmt::Display>(self, err: E) -> Result<T>;
-}
-impl<T> OptionAnyhow<T> for Option<T> {
-    fn ok_or_anyhow<E: std::fmt::Display>(self, err: E) -> Result<T> {
-        self.ok_or_else(|| anyhow::anyhow!("{}", err))
-    }
-}
-// Fix trait object boxing for module_registry
-// When inserting into module_registry, use Box::new(LightningModule::default()) as Box<dyn InstallableModule>
-// Fix .cpu_usage() on f32 (remove .cpu_usage())
-// Remove duplicate install method
-// Fix closure ? operator usage in warp handler (return dummy value or handle error inline)
+// Fix compliance and BIP type imports
+use anya_core::bip_compliance::{BipComplianceReport as BIPCompliance, ComplianceStatus};
+// Remove or comment out broken crate::compliance imports
+// use crate::compliance::bdf_verification::{ProtocolCompliance, BipSupportLevel, VerificationStatus};
+
+// Fix AnyaResult/AnyaError imports
+use anya_core::{AnyaResult, AnyaError};
+
+// Add warp::Filter for .and_then usage
+use warp::Filter;
+
+// If any missing modules (handlers, wallet, identity, etc.) are referenced, stub them here or comment out their usage for now to allow a clean build.

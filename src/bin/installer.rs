@@ -52,7 +52,7 @@ enum Commands {
 
         /// Network type (mainnet, testnet, regtest)
         #[clap(long, help = "Specify the Bitcoin network to use (default: testnet)",
-              possible_values = &NetworkConfig::ALL_NETWORKS)]
+              value_parser = clap::builder::PossibleValuesParser::new(NetworkConfig::ALL_NETWORKS))]
         network: String,
 
         /// Bitcoin RPC URL
@@ -94,7 +94,7 @@ enum Commands {
     Configure {
         /// Set network (mainnet, testnet, regtest)
         #[clap(long, help = "Set the Bitcoin network to use",
-              possible_values = &NetworkConfig::ALL_NETWORKS)]
+              value_parser = clap::builder::PossibleValuesParser::new(NetworkConfig::ALL_NETWORKS))]
         network: Option<String>,
 
         /// Set log level
@@ -516,7 +516,7 @@ impl AnyaInstaller {
     }
 
     fn configure(
-        &self,
+        &mut self,
         network: Option<String>,
         log_level: Option<String>,
         data_dir: Option<PathBuf>,
@@ -668,7 +668,7 @@ impl AnyaInstaller {
 
     fn auto_configure(&self) -> Result<NetworkConfig> {
         // Get system information
-        let system = System::new_all();
+        let system = System::new();
         let total_memory = system.total_memory();
         let available_memory = system.available_memory();
         let cpu_count = system.cpus().len();

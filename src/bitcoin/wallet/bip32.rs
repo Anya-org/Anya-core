@@ -5,7 +5,7 @@
 // AI-Testable: Comprehensive test coverage for key derivation paths
 
 use crate::bitcoin::error::{BitcoinError, BitcoinResult};
-use bitcoin::{Network, bip32::{DerivationPath, ExtendedPrivKey, ExtendedPubKey}};
+use bitcoin::{Network, bip32::{DerivationPath, Xpriv, Xpub}};
 use bitcoin::secp256k1::{Secp256k1, SecretKey};
 use rand::RngCore;
 use std::str::FromStr;
@@ -13,8 +13,8 @@ use std::str::FromStr;
 /// [AIR-3] Extended key pair for BIP32 HD wallet
 #[derive(Debug, Clone)]
 pub struct ExtendedKey {
-    pub xpriv: ExtendedPrivKey,
-    pub xpub: ExtendedPubKey,
+    pub xpriv: Xpriv,
+    pub xpub: Xpub,
 }
 
 /// [AIS-3][BPC-3] Generate a new seed from an optional password
@@ -43,7 +43,7 @@ pub fn derive_key_from_seed(seed: &[u8; 64], path: &str) -> BitcoinResult<Secret
     let secp = Secp256k1::new();
     
     // Create master key from seed
-    let master_key = ExtendedPrivKey::new_master(Network::Bitcoin, seed)
+    let master_key = Xpriv::new_master(Network::Bitcoin, seed)
         .map_err(|e| BitcoinError::KeyDerivation(format!("Failed to create master key: {}", e)))?;
     
     // Parse derivation path
@@ -61,10 +61,10 @@ pub fn derive_key_from_seed(seed: &[u8; 64], path: &str) -> BitcoinResult<Secret
 pub fn derive_master_key(seed: &[u8], network: Network) -> BitcoinResult<ExtendedKey> {
     let secp = Secp256k1::new();
     
-    let xpriv = ExtendedPrivKey::new_master(network, seed)
+    let xpriv = Xpriv::new_master(network, seed)
         .map_err(|e| BitcoinError::KeyDerivation(format!("Failed to create master key: {}", e)))?;
     
-    let xpub = ExtendedPubKey::from_priv(&secp, &xpriv);
+    let xpub = Xpub::from_priv(&secp, &xpriv);
     
     Ok(ExtendedKey { xpriv, xpub })
 }
@@ -76,7 +76,7 @@ pub fn derive_child_key(parent: &ExtendedKey, path: &DerivationPath) -> BitcoinR
     let xpriv = parent.xpriv.derive_priv(&secp, path)
         .map_err(|e| BitcoinError::KeyDerivation(format!("Failed to derive child key: {}", e)))?;
     
-    let xpub = ExtendedPubKey::from_priv(&secp, &xpriv);
+    let xpub = Xpub::from_priv(&secp, &xpriv);
     
     Ok(ExtendedKey { xpriv, xpub })
 }

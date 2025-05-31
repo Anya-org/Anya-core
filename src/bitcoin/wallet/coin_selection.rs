@@ -1,8 +1,7 @@
-use std::error::Error;
-//! Coin selection algorithms for Bitcoin wallet
-//!
-//! This module provides various coin selection algorithms for Bitcoin transactions.
-//! [AIR-1][AIS-1][AIM-1][AIP-1][RES-1]
+// Coin selection algorithms for Bitcoin wallet
+//
+// This module provides various coin selection algorithms for Bitcoin transactions.
+// [AIR-1][AIS-1][AIM-1][AIP-1][RES-1]
 
 use std::collections::BTreeSet;
 use rand::{thread_rng, seq::SliceRandom};

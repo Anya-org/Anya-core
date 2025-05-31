@@ -13,7 +13,7 @@
 
 use bitcoin::secp256k1::{Message, PublicKey, Secp256k1, SecretKey};
 use bitcoin::secp256k1::schnorr::{Signature, TapTweak};
-use bitcoin::util::taproot::{TapBranchHash, TapLeafHash, TapTweakHash, TAPROOT_VER_LEAF};
+use bitcoin::taproot::{TapBranchHash, TapLeafHash, TapTweakHash};
 use bitcoin::{Address, Network, Script, Transaction, TxIn, TxOut, Witness};
 use std::collections::HashMap;
 use std::time::{SystemTime, UNIX_EPOCH};

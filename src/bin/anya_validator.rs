@@ -1,5 +1,6 @@
-use anya_core::bitcoin::protocol::{BPCLevel, BitcoinProtocol};
-use anya_core::bitcoin::taproot::TaprootValidator;
+use anya_bitcoin::protocol::core_protocol::{BPCLevel, BitcoinProtocol};
+use anya_bitcoin::core::script::taproot::TaprootValidator;
+use anya_core::ml::agent_checker::{ComponentStatus, SecurityPosture};
 use anya_core::dao::governance::{DaoGovernance, DaoLevel};
 use anya_core::tools::markdown::{DocError, DocumentationValidator};
 use clap::{Parser, Subcommand};

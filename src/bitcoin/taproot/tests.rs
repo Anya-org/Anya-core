@@ -1,6 +1,6 @@
 use super::*;
 use bitcoin::secp256k1::Secp256k1;
-use bitcoin::util::key::KeyPair;
+use bitcoin::key::Keypair;
 use bitcoin::taproot::TaprootBuilder;
 
 #[test]

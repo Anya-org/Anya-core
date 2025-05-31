@@ -110,6 +110,25 @@ impl fmt::Display for AnyaError {
 
 impl Error for AnyaError {}
 
+impl From<crate::bitcoin::error::BitcoinError> for AnyaError {
+    fn from(err: crate::bitcoin::error::BitcoinError) -> Self {
+        AnyaError::Bitcoin(err.to_string())
+    }
+}
+
+impl From<String> for AnyaError {
+    fn from(err: String) -> Self {
+        AnyaError::Generic(err)
+    }
+}
+
+// Use the secp256k1 crate directly
+impl From<secp256k1::Error> for AnyaError {
+    fn from(err: secp256k1::Error) -> Self {
+        AnyaError::Bitcoin(format!("Secp256k1 error: {}", err))
+    }
+}
+
 /// Result type for Anya operations
 pub type AnyaResult<T> = Result<T, AnyaError>;
 
@@ -363,4 +382,4 @@ pub mod prelude {
     pub use crate::bitcoin::adapters::BitcoinAdapter; // Now re-exported at crate root
     // pub use crate::tools::markdown::DocumentationValidator;
     // pub use crate::security::hsm::TaprootValidator;
-} 
+}
