@@ -9,7 +9,7 @@ const path = require('path');
 const crypto = require('crypto');
 const fs = require('fs');
 const { Command } = require('commander');
-const secp256k1 = require('@noble/secp256k1');
+const { secp256k1 } = require('@noble/curves/secp256k1');
 const cryptoUtils = require('./crypto-utils');
 
 // BIP-340 Schnorr signature verification
@@ -56,10 +56,10 @@ program
 program.parse(process.argv);
 const options = program.opts();
 
-// Initialize logger
+// Initialize logger (use stderr to avoid interfering with JSON-RPC stdout communication)
 function log(message) {
   const timestamp = new Date().toISOString();
-  console.log(`[${timestamp}] [Bitcoin MCP] ${message}`);
+  console.error(`[${timestamp}] [Bitcoin MCP] ${message}`);
 }
 
 log('Bitcoin MCP Server starting...');
@@ -306,11 +306,260 @@ function handleToolCall(toolName, params) {
   }
 }
 
-// Start server
-log('Bitcoin MCP Server is ready. Listening for tool calls...');
+// MCP Protocol Implementation
+class MCPServer {
+  constructor() {
+    this.requestId = 0;
+    this.initialized = false;
+  }
+
+  async handleRequest(request) {
+    try {
+      const { method, params, id } = request;
+
+      switch (method) {
+        case 'initialize':
+          return this.handleInitialize(params, id);
+        
+        case 'tools/list':
+          return this.handleToolsList(id);
+        
+        case 'tools/call':
+          return this.handleToolCall(params, id);
+        
+        default:
+          return {
+            jsonrpc: '2.0',
+            id,
+            error: {
+              code: -32601,
+              message: `Method not found: ${method}`
+            }
+          };
+      }
+    } catch (error) {
+      log(`Error handling request: ${error.message}`);
+      return {
+        jsonrpc: '2.0',
+        id: request.id,
+        error: {
+          code: -32603,
+          message: `Internal error: ${error.message}`
+        }
+      };
+    }
+  }
+
+  handleInitialize(params, id) {
+    log('Handling initialize request');
+    this.initialized = true;
+    
+    return {
+      jsonrpc: '2.0',
+      id,
+      result: {
+        protocolVersion: '2024-11-05',
+        capabilities: {
+          tools: {
+            listChanged: true
+          }
+        },
+        serverInfo: {
+          name: 'anya-bitcoin-tools',
+          version: '1.0.0'
+        }
+      }
+    };
+  }
+
+  handleToolsList(id) {
+    log('Handling tools/list request');
+    
+    return {
+      jsonrpc: '2.0',
+      id,
+      result: {
+        tools: [
+          {
+            name: 'verifySchnorrSignature',
+            description: 'Verify a Schnorr signature according to BIP-340',
+            inputSchema: {
+              type: 'object',
+              properties: {
+                pubkey: { type: 'string', description: 'Public key in hex' },
+                msg: { type: 'string', description: 'Message in hex' },
+                signature: { type: 'string', description: 'Signature in hex' }
+              },
+              required: ['pubkey', 'msg', 'signature']
+            }
+          },
+          {
+            name: 'validateTaprootStructure',
+            description: 'Validate a Taproot structure according to BIP-341',
+            inputSchema: {
+              type: 'object',
+              properties: {
+                structure: { type: 'string', description: 'Taproot structure data' }
+              },
+              required: ['structure']
+            }
+          },
+          {
+            name: 'generateSecureRandom',
+            description: 'Generate cryptographically secure random bytes',
+            inputSchema: {
+              type: 'object',
+              properties: {
+                length: { type: 'number', description: 'Number of bytes to generate (1-1024)' }
+              },
+              required: ['length']
+            }
+          },
+          {
+            name: 'createTaprootOutput',
+            description: 'Create a Taproot output with optional script paths',
+            inputSchema: {
+              type: 'object',
+              properties: {
+                internalKey: { type: 'string', description: 'Internal key in hex' },
+                scriptPaths: { 
+                  type: 'array', 
+                  description: 'Optional script paths',
+                  items: {
+                    type: 'object',
+                    properties: {
+                      script: { type: 'string' },
+                      leafVersion: { type: 'number' }
+                    }
+                  }
+                }
+              },
+              required: ['internalKey']
+            }
+          },
+          {
+            name: 'createTaprootAsset',
+            description: 'Create a Taproot-compliant asset',
+            inputSchema: {
+              type: 'object',
+              properties: {
+                assetType: { type: 'string', description: 'Type of asset to create' },
+                amount: { type: 'number', description: 'Asset amount' },
+                issuer: { type: 'string', description: 'Asset issuer (optional)' }
+              },
+              required: ['assetType', 'amount']
+            }
+          },
+          {
+            name: 'verifyBitcoinPrinciples',
+            description: 'Verify alignment with Bitcoin Core principles',
+            inputSchema: {
+              type: 'object',
+              properties: {}
+            }
+          }
+        ]
+      }
+    };
+  }
+
+  handleToolCall(params, id) {
+    const { name, arguments: args } = params;
+    log(`Handling tool call: ${name}`);
+    
+    let result;
+    
+    switch (name) {
+      case 'verifySchnorrSignature':
+        result = verifySchnorrSignature(args.pubkey, args.msg, args.signature);
+        break;
+      case 'validateTaprootStructure':
+        result = validateTaprootStructure(args.structure);
+        break;
+      case 'generateSecureRandom':
+        result = generateSecureRandom(args.length);
+        break;
+      case 'createTaprootOutput':
+        result = createTaprootOutput(args);
+        break;
+      case 'createTaprootAsset':
+        result = createTaprootAsset(args);
+        break;
+      case 'verifyBitcoinPrinciples':
+        result = verifyBitcoinPrinciples();
+        break;
+      default:
+        return {
+          jsonrpc: '2.0',
+          id,
+          error: {
+            code: -32601,
+            message: `Unknown tool: ${name}`
+          }
+        };
+    }
+
+    return {
+      jsonrpc: '2.0',
+      id,
+      result: {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result, null, 2)
+          }
+        ]
+      }
+    };
+  }
+}
+
+// Start MCP Server
+const server = new MCPServer();
+
+// Handle stdin input
+process.stdin.setEncoding('utf8');
+process.stdin.on('data', async (data) => {
+  const lines = data.trim().split('\n');
+  
+  for (const line of lines) {
+    if (line.trim()) {
+      try {
+        const request = JSON.parse(line);
+        const response = await server.handleRequest(request);
+        process.stdout.write(JSON.stringify(response) + '\n');
+      } catch (error) {
+        log(`Error parsing request: ${error.message}`);
+        const errorResponse = {
+          jsonrpc: '2.0',
+          id: null,
+          error: {
+            code: -32700,
+            message: 'Parse error'
+          }
+        };
+        process.stdout.write(JSON.stringify(errorResponse) + '\n');
+      }
+    }
+  }
+});
+
+// Handle process shutdown
+process.on('SIGINT', () => {
+  log('Bitcoin MCP Server shutting down...');
+  process.exit(0);
+});
+
+process.on('SIGTERM', () => {
+  log('Bitcoin MCP Server shutting down...');
+  process.exit(0);
+});
+
+log('Bitcoin MCP Server started. Waiting for requests...');
 
 // Export for testing
 module.exports = {
+  MCPServer,
   handleToolCall,
   verifySchnorrSignature,
   validateTaprootStructure,

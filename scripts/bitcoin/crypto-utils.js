@@ -7,11 +7,11 @@
  */
 
 const crypto = require('crypto');
-const secp256k1 = require('@noble/secp256k1');
+const { schnorr } = require('@noble/curves/secp256k1');
 const { utils } = require('@noble/curves/abstract/utils');
 
 // BIP-340 Schnorr signature verification
-const schnorr = secp256k1.schnorr;
+// schnorr is already imported directly
 
 /**
  * Log helper function
@@ -19,7 +19,7 @@ const schnorr = secp256k1.schnorr;
  * @param {string} message - Message to log 
  */
 function log(message) {
-  console.log(`[Bitcoin Crypto Utils] ${message}`);
+  console.error(`[Bitcoin Crypto Utils] ${message}`);
 }
 
 /**

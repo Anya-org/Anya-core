@@ -3,7 +3,9 @@
   "mcpServers": {
     "anya-bitcoin-core": {
       "command": "node",
-      "args": ["anya-core/scripts/bitcoin/mcp-server.js"],
+      "args": [
+        "anya-core/scripts/bitcoin/mcp-server.js"
+      ],
       "environment": {
         "BITCOIN_NETWORK": "mainnet",
         "MAX_PSBT_SIZE": "1048576",
@@ -12,8 +14,7 @@
         "SECURITY_LEVEL": "AIS-3"
       },
       "watchFiles": [
-        "scripts/bitcoin/*.js",
-        "src/bitcoin/**/*.rs"
+        "scripts/bitcoin*.rs"
       ]
     }
   }

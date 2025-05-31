@@ -1,0 +1,42 @@
+{
+  "timestamp": "2025-05-31T07:45:00.034Z",
+  "updates": {
+    "mcpProtocol": {
+      "protocolVersion": "2024-11-05",
+      "jsonRpcCompliant": true,
+      "stderrLogging": true,
+      "stdinStdoutCommunication": true,
+      "toolCount": 6,
+      "bipCompliance": [
+        "BIP-340",
+        "BIP-341",
+        "BIP-342",
+        "BIP-370"
+      ]
+    },
+    "dependencies": {
+      "@noble/curves": "^1.6.0",
+      "crypto-js": "^4.2.0",
+      "node-fetch": "^2.7.0",
+      "zod": "^3.23.8",
+      "commander": "^12.1.0",
+      "mocha": "^10.7.3"
+    },
+    "bipCompliance": [
+      "BIP-340",
+      "BIP-341",
+      "BIP-342",
+      "BIP-370"
+    ]
+  },
+  "status": "completed",
+  "files_updated": [
+    "package.json",
+    "dependencies/package.json",
+    ".cursor/mcp.json",
+    "scripts/bitcoin/mcp-server.js",
+    "scripts/bitcoin/mcp-server-fixed.js",
+    "scripts/bitcoin/crypto-utils.js",
+    "CHANGELOG.md"
+  ]
+}

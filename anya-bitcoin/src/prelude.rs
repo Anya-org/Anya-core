@@ -9,7 +9,7 @@ pub use bitcoin::{Block, BlockHash, Transaction, Txid};
 pub use bitcoin::hash_types::*;
 pub use bitcoin::blockdata::script::Script;
 pub use bitcoin::blockdata::transaction::{OutPoint, Sequence, TxIn, TxOut};
-pub use bitcoin::util::address::Address;
+pub use bitcoin::Address;
 pub use bitcoin::Network;
 
 // Re-export Layer 2 types
