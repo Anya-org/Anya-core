@@ -62,3 +62,9 @@ Thumbs.db
 reorganized_backup_*/
 *.bak
 *.bak/
+
+# Ignore mcp directory
+mcp/
+
+# Ignore reports JSON files
+reports/*.json
