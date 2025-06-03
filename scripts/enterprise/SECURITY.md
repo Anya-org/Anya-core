@@ -14,4 +14,4 @@ Please report security vulnerabilities to security@example.com.
 ## Audit Reports
 Links to security audit reports.
 
-*Last updated: 2024-12-07*
+*Last updated: 2025-06-02*
