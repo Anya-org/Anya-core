@@ -1,8 +1,27 @@
+---
+last_updated: 2025-05-30
+title: "Feature_matrix"
+description: "Documentation for Feature_matrix"
+---
+last_updated: 2025-05-30
+[AIR-3][AIS-3][BPC-3][RES-3]
+
+
 <!-- markdownlint-disable MD013 line-length -->
 
 // docs/features/FEATURE_MATRIX.md
 
 # Feature Matrix
+
+## Overview
+
+Add a brief overview of this document here.
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 
 ## Core Features
 
@@ -30,4 +49,9 @@
 | Research | Academic Integration | Research paper analysis | Beta |
 |          | Model Generation | Automated model creation | Alpha |
 
-*Last updated: 2024-12-07*
+*Last updated: 2025-06-02*
+
+## See Also
+
+- [Related Document 1](./related1.md)
+- [Related Document 2](./related2.md)

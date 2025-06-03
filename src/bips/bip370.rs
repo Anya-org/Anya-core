@@ -1,8 +1,8 @@
 use std::error::Error;
 use bitcoin::psbt::Psbt;
 use bitcoin::secp256k1::Secp256k1;
-use bitcoin::util::bip32::ExtendedPrivKey;
-use bitcoin::util::psbt::PartiallySignedTransaction;
+use bitcoin::bip32::ExtendedPrivKey;
+use bitcoin::psbt::PartiallySignedTransaction;
 use std::collections::HashMap;
 
 pub struct BIP370 {

@@ -1,14 +1,28 @@
+---
+title: "Hsm_bitcoin_integration"
+description: "Documentation for Hsm_bitcoin_integration"
+---
+
+[AIR-3][AIS-3][BPC-3][RES-3]
+
+
 # HSM Bitcoin Integration \[AIR-3\]\[AIS-3\]\[AIT-3\]\[AIP-3\]\[RES-3\]
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 
 <!-- markdownlint-disable MD013 line-length -->
 
 ## Overview
 
-This document describes how the Hardware Security Module (HSM) implementation in Anya Core integrates with Bitcoin according to the Bitcoin Development Framework v2.5 requirements.
+This document describes how the Hardware Security Module (HSM) implementation in Anya Core integrates with Bitcoin according to official Bitcoin Improvement Proposals (BIPs) requirements.
 
-## Bitcoin Development Framework v2.5 Compliance
+## Bitcoin Improvement Proposals (BIPs) Compliance
 
-The HSM implementation provides comprehensive support for Bitcoin security operations, with full compliance with the Bitcoin Development Framework v2.5 requirements:
+The HSM implementation provides comprehensive support for Bitcoin security operations, with full compliance with official Bitcoin Improvement Proposals (BIPs):
 
 ### Protocol Adherence \[AIR-3\]
 
@@ -191,7 +205,7 @@ The HSM Bitcoin integration follows these security principles:
 
 ## Hexagonal Architecture Integration \[AIS-3\]\[RES-3\]
 
-The HSM Bitcoin integration follows the hexagonal architecture pattern defined in the Bitcoin Development Framework:
+The HSM Bitcoin integration follows the hexagonal architecture pattern defined in official Bitcoin Improvement Proposals (BIPs):
 
 ```
                   +----------------+
@@ -246,10 +260,15 @@ The HSM Bitcoin integration follows the hexagonal architecture pattern defined i
 
 ## References
 
-1. Bitcoin Development Framework v2.5
+1. Official Bitcoin Improvement Proposals (BIPs)
 2. BIP 341/342 (Taproot)
 3. BIP 174 (PSBT)
 4. BIP 340 (Schnorr Signatures)
 5. Miniscript Specification
 6. RGB Protocol Documentation
 7. DLC Specification
+
+## See Also
+
+- [Related Document](#related-document)
+

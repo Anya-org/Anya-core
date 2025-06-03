@@ -1,6 +1,6 @@
 # Bitcoin Protocol Implementation [AIR-3][AIS-3][BPC-3][AIT-3]
 
-This directory contains the core Bitcoin protocol implementation for Anya Core, following the Bitcoin Development Framework v2.5 standards.
+This directory contains the core Bitcoin protocol implementation for Anya Core, implementing official Bitcoin Improvement Proposals (BIPs) including BIP-340 (Schnorr Signatures), BIP-341 (Taproot), BIP-342 (Tapscript), BIP-174 (PSBT), and BIP-370 (PSBT v2).
 
 ## Overview
 
@@ -91,7 +91,7 @@ To contribute to the Bitcoin implementation:
 
 1. Read the [Contributing Guide](../../../CONTRIBUTING.md)
 2. Follow the [AI Labeling Standards](../../../docs/standards/AI_LABELING.md)
-3. Ensure all code meets [Bitcoin Development Framework v2.5](../../../docs/standards/BIP_COMPLIANCE.md) requirements
+3. Ensure all code meets [BIP Compliance Standards](../../../docs/standards/BIP_COMPLIANCE.md) requirements
 
 ## Testing
 
@@ -114,6 +114,6 @@ For more information, see:
 
 - Current Version: 3.1.0
 - Last Updated: 2025-04-28
-- Bitcoin Development Framework: v2.5
+- Bitcoin Improvement Proposals: BIP-340, BIP-341, BIP-342, BIP-174, BIP-370
 
 *This component complies with [AI Labeling Standards](../../../docs/standards/AI_LABELING.md)* 

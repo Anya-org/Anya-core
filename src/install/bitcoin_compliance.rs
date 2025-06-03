@@ -3,7 +3,7 @@ use std::process::Command;
 use log::{info, warn, error};
 use bitcoin::blockdata::transaction::Transaction;
 use bitcoin::consensus::encode::deserialize;
-use bitcoin::util::psbt::PartiallySignedTransaction;
+use bitcoin::psbt::PartiallySignedTransaction;
 
 pub fn verify_bip_compliance() -> Result<(), String> {
     info!("Verifying BIP compliance...");

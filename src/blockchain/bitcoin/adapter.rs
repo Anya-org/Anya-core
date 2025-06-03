@@ -291,7 +291,7 @@ impl BitcoinAdapter {
         };
 
         // Cache the block info
-        let mut blocks_cache = self.blocks_cache.lock()?;
+        let mut blocks_cache = self.blocks_cache.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         blocks_cache.insert(hash.to_string(), block_info.clone());
         
         // Limit cache size
@@ -382,7 +382,7 @@ impl BitcoinAdapter {
         };
         
         // Cache the transaction info
-        let mut tx_cache = self.tx_cache.lock()?;
+        let mut tx_cache = self.tx_cache.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         tx_cache.insert(txid.to_string(), tx_info.clone());
         
         // Limit cache size
@@ -404,7 +404,7 @@ impl BitcoinAdapter {
         
         // Check cache first
         {
-            let utxo_cache = self.utxo_cache.lock()?;
+            let utxo_cache = self.utxo_cache.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
             if let Some(utxo) = utxo_cache.get(&cache_key) {
                 return Ok(Some(utxo.clone()));
             }
@@ -431,7 +431,7 @@ impl BitcoinAdapter {
                 };
                 
                 // Cache the UTXO
-                let mut utxo_cache = self.utxo_cache.lock()?;
+                let mut utxo_cache = self.utxo_cache.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
                 utxo_cache.insert(cache_key, utxo.clone());
                 
                 // Limit cache size
@@ -616,7 +616,7 @@ impl NodePort for BitcoinAdapter {
     async fn get_block_by_hash(&self, hash: &str) -> Result<BlockInfo, BlockchainError> {
         // Check if the block is in the cache
         {
-            let blocks_cache = self.blocks_cache.lock()?;
+            let blocks_cache = self.blocks_cache.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
             if let Some(block) = blocks_cache.get(hash) {
                 return Ok(block.clone());
             }
@@ -642,7 +642,7 @@ impl NodePort for BitcoinAdapter {
         
         // Check if the block is in the cache
         {
-            let blocks_cache = self.blocks_cache.lock()?;
+            let blocks_cache = self.blocks_cache.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
             if let Some(block) = blocks_cache.get(&hash) {
                 return Ok(block.clone());
             }
@@ -666,7 +666,7 @@ impl NodePort for BitcoinAdapter {
     async fn get_transaction(&self, txid: &str) -> Result<TransactionInfo, BlockchainError> {
         // Check if the transaction is in the cache
         {
-            let tx_cache = self.tx_cache.lock()?;
+            let tx_cache = self.tx_cache.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
             if let Some(tx) = tx_cache.get(txid) {
                 return Ok(tx.clone());
             }
@@ -687,7 +687,7 @@ impl NodePort for BitcoinAdapter {
             .map_err(|e| BlockchainError::SerializationError(format!("Failed to decode transaction hex: {}", e)))
     }
     
-    async fn broadcast_transaction(&self, tx_data: &[u8]) -> Result<String, BlockchainError> {
+    async fn broadcast_transaction(&self, tx__data: &[u8]) -> Result<String, BlockchainError> {
         // Encode the transaction as hex
         let tx_hex = hex::encode(tx_data);
         
@@ -1940,9 +1940,9 @@ impl Clone for BitcoinAdapter {
             state: RwLock::new(self.state.try_read().unwrap_or_else(|_| None).clone()),
             metrics: RwLock::new(self.metrics.try_read().unwrap_or_else(|_| None).clone()),
             mempool: RwLock::new(self.mempool.try_read().unwrap_or_else(|_| None).clone()),
-            blocks_cache: Mutex::new(self.blocks_cache.lock()?.clone()),
-            tx_cache: Mutex::new(self.tx_cache.lock()?.clone()),
-            utxo_cache: Mutex::new(self.utxo_cache.lock()?.clone()),
+            blocks_cache: Mutex::new(self.blocks_cache.lock().map_err(|e| format!("Mutex lock error: {}", e))?.clone()),
+            tx_cache: Mutex::new(self.tx_cache.lock().map_err(|e| format!("Mutex lock error: {}", e))?.clone()),
+            utxo_cache: Mutex::new(self.utxo_cache.lock().map_err(|e| format!("Mutex lock error: {}", e))?.clone()),
             fee_estimates: RwLock::new(self.fee_estimates.try_read().unwrap_or_else(|_| HashMap::new()).clone()),
             unusual_txs: RwLock::new(self.unusual_txs.try_read().unwrap_or_else(|_| Vec::new()).clone()),
             security_alerts: RwLock::new(self.security_alerts.try_read().unwrap_or_else(|_| Vec::new()).clone()),

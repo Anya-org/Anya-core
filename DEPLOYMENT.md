@@ -76,6 +76,7 @@ After deployment, you can:
 1. Check the status of the services:
    ```bash
    systemctl status bitcoind
+   systemctl status bitcoin-exporter # Added bitcoin-exporter
    systemctl status web5-dwn
    systemctl status prometheus
    ```
@@ -83,6 +84,7 @@ After deployment, you can:
 2. Access the Web5 DWN API at `http://your-server-ip:3000`
 
 3. Access Prometheus metrics at `http://your-server-ip:9090`
+   - Bitcoin-specific metrics will be available from the 'bitcoin-exporter' job.
 
 ## Troubleshooting
 
@@ -91,6 +93,7 @@ If you encounter issues during deployment:
 1. Check the logs:
    ```bash
    journalctl -u bitcoind -n 50
+   journalctl -u bitcoin-exporter -n 50 # Added bitcoin-exporter
    journalctl -u web5-dwn -n 50
    journalctl -u prometheus -n 50
    ```
@@ -103,7 +106,8 @@ If you encounter issues during deployment:
 3. Check if the required ports are open:
    ```bash
    nc -zv localhost 8332
-   nc -zv localhost 18332
+   nc -zv localhost 18443 # Testnet RPC
+   nc -zv localhost 9332 # Bitcoin Exporter
    nc -zv localhost 3000
    nc -zv localhost 9090
    ```
@@ -127,4 +131,4 @@ After successful deployment:
 1. Set up monitoring and alerts
 2. Configure regular backups
 3. Implement additional security measures
-4. Deploy your application code to interact with the infrastructure 
+4. Deploy your application code to interact with the infrastructure

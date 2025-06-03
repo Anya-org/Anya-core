@@ -1,4 +1,4 @@
-# CodeQL Configuration for Bitcoin Development Framework v2.5
+# CodeQL Configuration for Official Bitcoin Improvement Proposals (BIPs)
 # [AIR-3][AIS-3][BPC-3]
 
 name: "Anya Bitcoin CodeQL Configuration"
@@ -81,7 +81,7 @@ security-severity-levels:
   - name: low
     severity: 2.0
 
-# Bitcoin Development Framework v2.5 specific settings
+# Official Bitcoin Improvement Proposals (BIPs) specific settings
 bitcoin-framework:
   compliance-level: BPC-3
   validation:

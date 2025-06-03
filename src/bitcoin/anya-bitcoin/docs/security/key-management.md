@@ -28,4 +28,4 @@ Anya provides a Key Management API to allow applications to interact with the ke
 
 Anya provides a Key Management SDK to allow applications to interact with the key management system. The SDK provides libraries for key generation, distribution, storage, and revocation.
 
-*Last updated: 2024-12-07*
+*Last updated: 2025-06-02*

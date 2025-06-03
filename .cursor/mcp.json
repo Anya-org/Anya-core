@@ -6,6 +6,17 @@
       "args": [
         "scripts/bitcoin/mcp-server.js"
       ],
+      "protocolVersion": "2024-11-05",
+      "capabilities": {
+        "tools": {
+          "listChanged": true
+        }
+      },
+      "serverInfo": {
+        "name": "anya-bitcoin-tools",
+        "version": "1.0.0",
+        "description": "Bitcoin development tools with Taproot and Schnorr signature support"
+      },
       "features": {
         "schnorrVerify": true,
         "constantTimeComparison": true,
@@ -18,7 +29,14 @@
         "errorHandling": true,
         "taprootCompliance": true,
         "signatureAggregation": true,
-        "BIPs": ["BIP-340", "BIP-341", "BIP-342", "BIP-370"]
+        "jsonRpcProtocol": true,
+        "stdinStdoutCommunication": true,
+        "BIPs": [
+          "BIP-340",
+          "BIP-341",
+          "BIP-342",
+          "BIP-370"
+        ]
       },
       "bitcoinPrinciples": {
         "decentralization": {

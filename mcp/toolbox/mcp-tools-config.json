@@ -1,0 +1,346 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2025-06-02",
+  "description": "Comprehensive MCP Tools Toolbox for Anya Core Development",
+  "aiLabels": {
+    "BPC-3": true,
+    "AIR-3": true,
+    "AIS-3": true,
+    "AIT-3": true,
+    "PFM-3": true,
+    "SCL-3": true,
+    "RES-3": true,
+    "DID-3": true
+  },
+  "mcpServers": {
+    "mem0-knowledge": {
+      "command": "pipx",
+      "args": [
+        "run",
+        "mem0-mcp-for-pm==0.3.2",
+        "--log=off"
+      ],
+      "env": {
+        "MEM0_API_KEY": "${MEM0_API_KEY}"
+      },
+      "protocolVersion": "2024-11-05",
+      "capabilities": {
+        "resources": {
+          "listChanged": true
+        },
+        "tools": {
+          "listChanged": true
+        }
+      },
+      "serverInfo": {
+        "name": "mem0-knowledge",
+        "version": "0.3.2",
+        "description": "Personal memory and knowledge management for project context"
+      },
+      "features": {
+        "contextRetention": true,
+        "knowledgeGraph": true,
+        "projectMemory": true,
+        "crossSessionContinuity": true,
+        "semanticSearch": true
+      }
+    },
+    "github-tools": {
+      "command": "npx",
+      "args": [
+        "@modelcontextprotocol/server-github"
+      ],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
+      },
+      "protocolVersion": "2024-11-05",
+      "capabilities": {
+        "tools": {
+          "listChanged": true
+        }
+      },
+      "serverInfo": {
+        "name": "github-tools",
+        "version": "0.3.0",
+        "description": "GitHub repository management and automation tools"
+      },
+      "features": {
+        "repositoryManagement": true,
+        "issueTracking": true,
+        "pullRequestAutomation": true,
+        "branchManagement": true,
+        "codeSearch": true,
+        "releaseManagement": true,
+        "webhookIntegration": true
+      }
+    },
+    "filesystem-tools": {
+      "command": "npx",
+      "args": [
+        "@modelcontextprotocol/server-filesystem",
+        "/home/bmokoka/Anya-core"
+      ],
+      "protocolVersion": "2024-11-05",
+      "capabilities": {
+        "resources": {
+          "listChanged": true
+        },
+        "tools": {
+          "listChanged": true
+        }
+      },
+      "serverInfo": {
+        "name": "filesystem-tools",
+        "version": "0.4.0",
+        "description": "File system operations for Anya core development"
+      },
+      "features": {
+        "fileOperations": true,
+        "directoryTraversal": true,
+        "contentSearch": true,
+        "fileWatching": true,
+        "binaryFileSupport": true
+      }
+    },
+    "postgres-tools": {
+      "command": "npx",
+      "args": [
+        "@modelcontextprotocol/server-postgres",
+        "postgresql://localhost/anya_dev"
+      ],
+      "protocolVersion": "2024-11-05",
+      "capabilities": {
+        "resources": {
+          "listChanged": true
+        },
+        "tools": {
+          "listChanged": true
+        }
+      },
+      "serverInfo": {
+        "name": "postgres-tools",
+        "version": "0.2.0",
+        "description": "PostgreSQL database operations for Anya development"
+      },
+      "features": {
+        "queryExecution": true,
+        "schemaInspection": true,
+        "dataAnalysis": true,
+        "performanceMonitoring": true,
+        "backupOperations": true
+      }
+    },
+    "web-scraper": {
+      "command": "npx",
+      "args": [
+        "@modelcontextprotocol/server-puppeteer"
+      ],
+      "protocolVersion": "2024-11-05",
+      "capabilities": {
+        "tools": {
+          "listChanged": true
+        }
+      },
+      "serverInfo": {
+        "name": "web-scraper",
+        "version": "0.1.0",
+        "description": "Web scraping and browser automation for research and testing"
+      },
+      "features": {
+        "browserAutomation": true,
+        "webScraping": true,
+        "screenshotCapture": true,
+        "formInteraction": true,
+        "apiTesting": true
+      }
+    },
+    "anya-bitcoin-tools": {
+      "command": "node",
+      "args": [
+        "scripts/bitcoin/mcp-server.js"
+      ],
+      "protocolVersion": "2024-11-05",
+      "capabilities": {
+        "tools": {
+          "listChanged": true
+        }
+      },
+      "serverInfo": {
+        "name": "anya-bitcoin-tools",
+        "version": "1.0.0",
+        "description": "Bitcoin development tools with Taproot and Schnorr signature support"
+      },
+      "features": {
+        "schnorrVerify": true,
+        "constantTimeComparison": true,
+        "SILENT_LEAF": true,
+        "key_path": true,
+        "script_path": true,
+        "validateTaprootStructure": true,
+        "secureRandomGeneration": true,
+        "inputValidation": true,
+        "errorHandling": true,
+        "taprootCompliance": true,
+        "signatureAggregation": true,
+        "jsonRpcProtocol": true,
+        "stdinStdoutCommunication": true,
+        "BIPs": [
+          "BIP-340",
+          "BIP-341",
+          "BIP-342",
+          "BIP-370"
+        ]
+      },
+      "bitcoinPrinciples": {
+        "decentralization": {
+          "permissionless": true,
+          "trustless": true,
+          "userSelfSovereignty": true
+        },
+        "security": {
+          "constantTimeOperations": true,
+          "secureRandomNumberGeneration": true,
+          "inputValidation": true,
+          "errorHandling": true
+        },
+        "privacy": {
+          "scriptPathWithSilentLeaf": true,
+          "keyPathIndistinguishable": true,
+          "crossInputSignatureAggregation": true,
+          "muSigKeyAggregation": true
+        },
+        "immutability": {
+          "properTransactionSigning": true,
+          "bip341CompliantStructure": true,
+          "taprootOutputConstruction": true
+        },
+        "verifiability": {
+          "oracleSignatureVerification": true,
+          "schnorrSignatureVerification": true,
+          "independentContractVerification": true
+        }
+      }
+    },
+    "brave-search": {
+      "command": "npx",
+      "args": [
+        "@modelcontextprotocol/server-brave-search"
+      ],
+      "env": {
+        "BRAVE_API_KEY": "${BRAVE_API_KEY}"
+      },
+      "protocolVersion": "2024-11-05",
+      "capabilities": {
+        "tools": {
+          "listChanged": true
+        }
+      },
+      "serverInfo": {
+        "name": "brave-search",
+        "version": "0.2.0",
+        "description": "Web search capabilities for research and development"
+      },
+      "features": {
+        "webSearch": true,
+        "imageSearch": true,
+        "newsSearch": true,
+        "privacyFocused": true,
+        "realTimeResults": true
+      }
+    },
+    "sequential-thinking": {
+      "command": "npx",
+      "args": [
+        "@modelcontextprotocol/server-sequential-thinking"
+      ],
+      "protocolVersion": "2024-11-05",
+      "capabilities": {
+        "tools": {
+          "listChanged": true
+        }
+      },
+      "serverInfo": {
+        "name": "sequential-thinking",
+        "version": "0.1.0",
+        "description": "Sequential thinking and problem-solving framework"
+      },
+      "features": {
+        "structuredThinking": true,
+        "problemDecomposition": true,
+        "solutionGeneration": true,
+        "hypothesisTesting": true,
+        "iterativeRefinement": true
+      }
+    }
+  },
+  "environmentVariables": {
+    "required": [
+      "MEM0_API_KEY",
+      "GITHUB_TOKEN"
+    ],
+    "optional": [
+      "BRAVE_API_KEY",
+      "MCP_GITHUB_USERNAME",
+      "MCP_GITHUB_EMAIL",
+      "MCP_GITHUB_DEFAULT_OWNER",
+      "MCP_GITHUB_DEFAULT_REPO"
+    ],
+    "defaults": {
+      "MCP_GITHUB_USERNAME": "Bo_theBig",
+      "MCP_GITHUB_EMAIL": "botshelomokoka@gmail.com",
+      "MCP_GITHUB_DEFAULT_OWNER": "Bo_theBig",
+      "MCP_GITHUB_DEFAULT_REPO": "anya-core"
+    }
+  },
+  "toolboxCapabilities": {
+    "codeGeneration": {
+      "enabled": true,
+      "languages": ["rust", "javascript", "typescript", "python", "clarity"],
+      "frameworks": ["bitcoin", "web5", "ml", "blockchain"]
+    },
+    "projectManagement": {
+      "enabled": true,
+      "features": ["memory", "context", "planning", "tracking"]
+    },
+    "research": {
+      "enabled": true,
+      "sources": ["web", "github", "documentation", "papers"]
+    },
+    "automation": {
+      "enabled": true,
+      "capabilities": ["deployment", "testing", "monitoring", "maintenance"]
+    },
+    "collaboration": {
+      "enabled": true,
+      "platforms": ["github", "documentation", "review"]
+    }
+  },
+  "integrationPoints": {
+    "anya-core": {
+      "bitcoin": {
+        "taproot": true,
+        "schnorr": true,
+        "psbt": true,
+        "miniscript": true
+      },
+      "ml": {
+        "governance": true,
+        "federated": true,
+        "privacy": true,
+        "validation": true
+      },
+      "web5": {
+        "did": true,
+        "dwn": true,
+        "vc": true,
+        "pfi": true
+      },
+      "enterprise": {
+        "compliance": true,
+        "risk": true,
+        "reporting": true,
+        "audit": true
+      }
+    }
+  }
+}

@@ -1,7 +1,7 @@
 use crate::prelude::StdError;
 // EVM compatibility module for BOB
 // Implements EVM compatibility for Bitcoin Optimistic Blockchain
-// as per Bitcoin Development Framework v2.5 requirements
+// as per official Bitcoin Improvement Proposals (BIPs) requirements
 
 use crate::layer2::bob::{BobConfig, BobError, EvmTransaction, EvmTransactionReceipt};
 use std::sync::Arc;

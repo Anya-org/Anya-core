@@ -1,6 +1,17 @@
+---
+title: "Core_system_integration"
+description: "Documentation for Core_system_integration"
+---
+
 <!-- markdownlint-disable MD013 line-length -->
 
 # Core System Integration
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 
 *Last Updated: 2024-03-10*
 
@@ -10,11 +21,12 @@ Anya Core's System Integration provides a unified framework for all components t
 
 ## System Components
 
-### 1. Core System Integration [AIR-3] ✅
+### 1. Core System Integration (AIR-008) ✅
 
 The Core System Integration component provides a unified interface for all P1 components with consistent auto-save functionality.
 
 **Key Features:**
+
 - Unified interface for all P1 components
 - Consistent auto-save frequency configuration
 - Cross-component interaction
@@ -22,12 +34,14 @@ The Core System Integration component provides a unified interface for all P1 co
 - Comprehensive test coverage for integration
 
 **Implementation:**
+
 - Location: `src/core/mod.rs`
-- AI Label: [AIR-3]
+- AI Label: AIR-008
 - Status: ✅ Complete
 - Auto-Save: Enabled (every 20th input/change)
 
 **Core System Structure:**
+
 ```rust
 pub struct CoreSystem {
     // Component managers with auto-save functionality
@@ -38,6 +52,7 @@ pub struct CoreSystem {
 ```
 
 **Architecture:**
+
 ```
 ┌────────────────────┐    ┌─────────────────────┐    ┌────────────────────┐
 │                    │    │                     │    │                    │
@@ -59,18 +74,21 @@ pub struct CoreSystem {
 The Core System integrates the following components:
 
 #### 2.1 ML*/Agent Checker (AIP-002)
+
 - System stage management
 - Component readiness assessment
 - Input monitoring and analysis
 - Auto-save functionality
 
 #### 2.2 System Hardening (AIE-001)
+
 - Security level management
 - Component-specific security configuration
 - Configuration status tracking
 - Automated security hardening
 
-#### 2.3 Performance Optimization [AIR-3]
+#### 2.3 Performance Optimization (AIR-008)
+
 - Resource type management
 - Performance metrics tracking
 - Target-based optimization
@@ -144,6 +162,7 @@ impl CoreSystem {
 ## System Interfaces
 
 ### Input Ports
+
 - System configuration API
 - Component management interface
 - Input processing endpoints
@@ -151,6 +170,7 @@ impl CoreSystem {
 - Status query interface
 
 ### Output Ports
+
 - System status reports
 - Component health indicators
 - Performance metrics
@@ -160,12 +180,14 @@ impl CoreSystem {
 ## Implementation Details
 
 ### Core System Components
-- `CoreSystem` - Main system integration manager [AIR-3]
+
+- `CoreSystem` - Main system integration manager (AIR-008)
 - `AgentChecker` - System verification component (AIP-002)
 - `SystemHardening` - Security configuration manager (AIE-001)
-- `PerformanceOptimizer` - Resource optimization manager [AIR-3]
+- `PerformanceOptimizer` - Resource optimization manager (AIR-008)
 
 ### Technology Stack
+
 - Rust for system components
 - Thread-safe concurrent data structures
 - Asynchronous processing
@@ -209,21 +231,27 @@ The core system includes comprehensive testing:
 ## Integration with Other Components
 
 ### 1. Security Integration
+
 The Core System integrates with the Security Architecture to ensure:
+
 - Secure component interaction
 - Access control for cross-component operations
 - Audit logging for system operations
 - Threat detection in component inputs/outputs
 
 ### 2. Performance Integration
+
 The Core System integrates with the Performance Architecture to:
+
 - Monitor resource usage across components
 - Optimize core system execution
 - Control scaling of system operations
 - Ensure efficient resource utilization
 
 ### 3. ML Agent Integration
+
 The Core System integrates with the ML System to:
+
 - Process input through the AgentChecker
 - Receive system health status from ML components
 - Coordinate ML operations with other components
@@ -234,6 +262,7 @@ The Core System integrates with the ML System to:
 The Core System now includes integration with Bitcoin Layer 2 solutions, particularly BOB (Bitcoin Optimistic Blockchain):
 
 #### BOB Hybrid L2 Integration
+
 - **Bitcoin Relay Interface**: Core system provides interfaces to monitor and interact with BOB's Bitcoin relay
 - **EVM Compatibility Layer**: Enables interaction with BOB's EVM-compatible smart contracts
 - **Hybrid Execution Environment**: Manages the execution context for operations spanning Bitcoin L1 and BOB L2
@@ -241,6 +270,7 @@ The Core System now includes integration with Bitcoin Layer 2 solutions, particu
 - **Cross-Layer State Management**: Coordinates state synchronization between L1 and L2 operations
 
 **Implementation:**
+
 ```rust
 pub struct L2Integration {
     // BOB-specific components
@@ -257,6 +287,7 @@ pub struct L2Integration {
 ```
 
 **Integration Architecture:**
+
 ```
 ┌─────────────────┐           ┌─────────────────┐
 │                 │           │                 │
@@ -282,4 +313,12 @@ pub struct L2Integration {
 
 ---
 
-*This document follows the [AI Labeling System](../docs/standards/AI_LABELING.md) standards based on the Bitcoin Development Framework v2.5.* 
+[AIR-3][AIS-3][BPC-3][RES-3]
+
+
+*This document follows the [AI Labeling System](../docs/standards/AI_LABELING.md) standards based on official Bitcoin Improvement Proposals (BIPs).* 
+
+## See Also
+
+- [Related Document](#related-document)
+

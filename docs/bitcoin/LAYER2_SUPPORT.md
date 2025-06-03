@@ -1,6 +1,18 @@
+---
+title: "Layer2_support"
+description: "Documentation for Layer2_support"
+last_updated: 2025-05-30
+---
+
 <!-- markdownlint-disable MD013 line-length -->
 
 # Bitcoin Layer 2 Solutions Support
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 
 *Last Updated: 2025-03-06*
 
@@ -434,5 +446,12 @@ As the Bitcoin ecosystem evolves, we will consider supporting additional Layer 2
 4. **Lightning Service Providers (LSPs)**: Managed Lightning services
 
 ---
+[AIR-3][AIS-3][BPC-3][RES-3]
 
-*This document follows the [AI Labeling System](../docs/standards/AI_LABELING.md) standards based on the Bitcoin Development Framework v2.5.*
+
+*This document follows the [AI Labeling System](../docs/standards/AI_LABELING.md) standards based on official Bitcoin Improvement Proposals (BIPs).*
+
+## See Also
+
+- [Related Document 1](./related1.md)
+- [Related Document 2](./related2.md)

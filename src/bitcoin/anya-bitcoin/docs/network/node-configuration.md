@@ -276,4 +276,4 @@ For node-related support:
 - [Feature Requests](../../support/features.md)
 - [Bug Reports](../../support/bugs.md)
 
-*Last updated: 2024-12-07*
+*Last updated: 2025-06-02*

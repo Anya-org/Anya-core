@@ -89,43 +89,43 @@ struct NoopHsmProvider {}
 #[async_trait]
 impl HsmProvider for NoopHsmProvider {
     async fn initialize(&mut self) -> Result<(), HsmError> {
-        Err(HsmError::NotImplemented)
+        Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
     
-    async fn generate_key_pair(&self, _params: KeyGenParams) -> Result<PublicKeyInfo, HsmError> {
-        Err(HsmError::NotImplemented)
+    async fn generate_key_pair(&self, __params: KeyGenParams) -> Result<PublicKeyInfo, HsmError> {
+        Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
     
-    async fn sign(&self, _key_id: &str, _algorithm: SigningAlgorithm, _data: &[u8]) -> Result<Vec<u8>, HsmError> {
-        Err(HsmError::NotImplemented)
+    async fn sign(&self, __key_id: &str, __algorithm: SigningAlgorithm, __data: &[u8]) -> Result<Vec<u8>, HsmError> {
+        Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
     
-    async fn verify(&self, _key_id: &str, _algorithm: SigningAlgorithm, _data: &[u8], _signature: &[u8]) -> Result<bool, HsmError> {
-        Err(HsmError::NotImplemented)
+    async fn verify(&self, __key_id: &str, __algorithm: SigningAlgorithm, __data: &[u8], __signature: &[u8]) -> Result<bool, HsmError> {
+        Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
     
-    async fn encrypt(&self, _key_id: &str, _algorithm: EncryptionAlgorithm, _data: &[u8], _iv: Option<&[u8]>) -> Result<Vec<u8>, HsmError> {
-        Err(HsmError::NotImplemented)
+    async fn encrypt(&self, __key_id: &str, _algorithm: EncryptionAlgorithm, __data: &[u8], _iv: Option<&[u8]>) -> Result<Vec<u8>, HsmError> {
+        Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
     
-    async fn decrypt(&self, _key_id: &str, _algorithm: EncryptionAlgorithm, _data: &[u8], _iv: Option<&[u8]>) -> Result<Vec<u8>, HsmError> {
-        Err(HsmError::NotImplemented)
+    async fn decrypt(&self, __key_id: &str, _algorithm: EncryptionAlgorithm, __data: &[u8], _iv: Option<&[u8]>) -> Result<Vec<u8>, HsmError> {
+        Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
     
-    async fn get_key_info(&self, _key_id: &str) -> Result<KeyInfo, HsmError> {
-        Err(HsmError::NotImplemented)
+    async fn get_key_info(&self, __key_id: &str) -> Result<KeyInfo, HsmError> {
+        Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
     
     async fn list_keys(&self) -> Result<Vec<KeyInfo>, HsmError> {
-        Err(HsmError::NotImplemented)
+        Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
     
-    async fn delete_key(&self, _key_id: &str) -> Result<(), HsmError> {
-        Err(HsmError::NotImplemented)
+    async fn delete_key(&self, __key_id: &str) -> Result<(), HsmError> {
+        Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
     
     async fn close(&self) -> Result<(), HsmError> {
-        Err(HsmError::NotImplemented)
+        Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
 }
 
@@ -326,7 +326,7 @@ impl BitcoinHsmProvider {
     /// Sign a Bitcoin transaction
     pub async fn sign_bitcoin_transaction(
         &self,
-        key_id: &str,
+        _key_id: &str,
         tx_hex: &str,
         signature_type: BitcoinSignatureType,
         sighash_type: u8,
@@ -339,7 +339,7 @@ impl BitcoinHsmProvider {
             let scripts = self.script_details.lock().await;
             match scripts.get(key_id) {
                 Some(script) => script.clone(),
-                None => return Err(HsmError::InvalidParameters(format!("No script details found for key {}", key_id))),
+                None => return Err(HsmError::InvalidParameterss(format!("No script details found for key {}", key_id))),
             }
         };
         
@@ -350,7 +350,7 @@ impl BitcoinHsmProvider {
             BitcoinSignatureType::Schnorr => {
                 // Check if key type supports Schnorr
                 if script_details.script_type != BitcoinScriptType::P2TR {
-                    return Err(HsmError::InvalidParameters(
+                    return Err(HsmError::InvalidParameterss(
                         "Schnorr signatures can only be used with Taproot keys".to_string()
                     ));
                 }
@@ -378,7 +378,7 @@ impl BitcoinHsmProvider {
     /// Create a Taproot output
     pub async fn create_taproot_output(
         &self,
-        internal_key_id: &str,
+        internal__key_id: &str,
         script_tree: Option<TaprootScriptTree>,
     ) -> Result<TaprootOutputInfo, HsmError> {
         // Get internal key info
@@ -387,12 +387,12 @@ impl BitcoinHsmProvider {
         // Ensure it's the right type of key
         if let KeyType::Ec { curve } = internal_key_info.key_type {
             if curve != EcCurve::Secp256k1 {
-                return Err(HsmError::InvalidParameters(
+                return Err(HsmError::InvalidParameterss(
                     "Taproot internal key must be secp256k1".to_string()
                 ));
             }
         } else {
-            return Err(HsmError::InvalidParameters(
+            return Err(HsmError::InvalidParameterss(
                 "Taproot internal key must be EC key".to_string()
             ));
         }
@@ -441,7 +441,7 @@ impl BitcoinHsmProvider {
     }
     
     /// Get Bitcoin key info
-    pub async fn get_bitcoin_key_info(&self, key_id: &str) -> Result<BitcoinKeyInfo, HsmError> {
+    pub async fn get_bitcoin_key_info(&self, _key_id: &str) -> Result<BitcoinKeyInfo, HsmError> {
         // Get key info from base provider
         let public_key_info = match self.config.base_provider.get_key_info(key_id).await {
             Ok(key_info) => PublicKeyInfo {
@@ -509,7 +509,7 @@ impl BitcoinHsmProvider {
     /// Sign a message using a Bitcoin key (for message signing, not transactions)
     pub async fn sign_bitcoin_message(
         &self,
-        key_id: &str,
+        _key_id: &str,
         message: &str,
         use_standard_format: bool,
     ) -> Result<String, HsmError> {
@@ -521,7 +521,7 @@ impl BitcoinHsmProvider {
             let scripts = self.script_details.lock().await;
             match scripts.get(key_id) {
                 Some(script) => script.clone(),
-                None => return Err(HsmError::InvalidParameters(format!("No script details found for key {}", key_id))),
+                None => return Err(HsmError::InvalidParameterss(format!("No script details found for key {}", key_id))),
             }
         };
         
@@ -683,7 +683,7 @@ pub struct DlcCetInfo {
 /// Create a DLC (Discreet Log Contract)
 pub async fn create_dlc(
     hsm_provider: &BitcoinHsmProvider,
-    funding_key_id: &str,
+    funding__key_id: &str,
     dlc_params: DlcParams,
 ) -> Result<DlcInfo, HsmError> {
     // In a real implementation, this would create a DLC using the funding key

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 // Copyright (C) 2023-2025 Anya Project Contributors
-// Protocol Version: 2.5 (2025-02-24)
+// Protocol Version: 2.5 (2025-05-30)
 
 //! Bitcoin transaction service implementation
 //!

@@ -127,10 +127,10 @@ pub trait SidechainManager {
     fn list_cross_chain_txs(&self) -> AnyaResult<Vec<CrossChainTx>>;
     
     /// Gets a cross-chain transaction by ID
-    fn get_cross_chain_tx(&self, tx_id: &str) -> AnyaResult<Option<CrossChainTx>>;
+    fn get_cross_chain_tx(&self, _tx_id: tx_id: &strstr) -> AnyaResult<Option<CrossChainTx>>;
     
     /// Gets the status of a cross-chain transaction
-    fn get_cross_chain_tx_status(&self, tx_id: &str) -> AnyaResult<CrossChainTxStatus>;
+    fn get_cross_chain_tx_status(&self, _tx_id: tx_id: &strstr) -> AnyaResult<CrossChainTxStatus>;
 }
 
 /// Status of a sidechain
@@ -196,12 +196,12 @@ impl SidechainManager for DefaultSidechainManager {
         unimplemented!("Cross-chain transaction listing not yet implemented")
     }
     
-    fn get_cross_chain_tx(&self, tx_id: &str) -> AnyaResult<Option<CrossChainTx>>  -> Result<(), Box<dyn Error>> {
+    fn get_cross_chain_tx(&self, _tx_id: tx_id: &strstr) -> AnyaResult<Option<CrossChainTx>>  -> Result<(), Box<dyn Error>> {
         // Implementation goes here
         unimplemented!("Cross-chain transaction querying not yet implemented")
     }
     
-    fn get_cross_chain_tx_status(&self, tx_id: &str) -> AnyaResult<CrossChainTxStatus>  -> Result<(), Box<dyn Error>> {
+    fn get_cross_chain_tx_status(&self, _tx_id: tx_id: &strstr) -> AnyaResult<CrossChainTxStatus>  -> Result<(), Box<dyn Error>> {
         // Implementation goes here
         unimplemented!("Cross-chain transaction status querying not yet implemented")
     }

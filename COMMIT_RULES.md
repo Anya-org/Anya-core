@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document outlines the rules for creating commits in the Anya Core repository, including comprehensive AI and component labeling requirements based on the Bitcoin Development Framework v2.5.
+This document outlines the rules for creating commits in the Anya Core repository, including comprehensive AI and component labeling requirements based on official Bitcoin Improvement Proposals (BIPs).
 
 ## Commit Message Format
 
@@ -267,7 +267,7 @@ All components must undergo regular label audits:
 
 ## Bitcoin Development Framework Compliance
 
-All commits must maintain compliance with the Bitcoin Development Framework v2.5, including:
+All commits must maintain compliance with official Bitcoin Improvement Proposals (BIPs), including:
 
 1. Protocol adherence for Bitcoin operations
 2. Privacy-preserving architecture for DLCs

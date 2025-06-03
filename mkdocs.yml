@@ -1,0 +1,188 @@
+# Site Information
+site_name: Anya Core
+site_url: https://docs.anya.org/
+site_author: Anya Core Team
+site_description: |
+  Anya Core - Enterprise-grade Bitcoin infrastructure for the next generation of financial applications.
+  [AIR-3][AIS-3][BPC-3][RES-3]
+
+# Repository
+repo_url: https://github.com/anya-org/anya-core
+repo_name: anya-org/anya-core
+edit_uri: edit/main/docs/
+
+# Copyright
+copyright: |
+  Copyright &copy; 2025 Anya Foundation
+
+# Theme Configuration
+theme:
+  name: material
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-night
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.indexes
+    - navigation.instant
+    - navigation.tracking
+    - navigation.expand
+    - navigation.top
+    - navigation.footer
+    - search.highlight
+    - search.suggest
+    - search.share
+    - content.code.annotate
+    - content.code.copy
+    - content.tooltips
+    - content.action.edit
+    - content.action.view
+
+# Markdown Extensions
+markdown_extensions:
+  # Emoji support
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+  
+  # Code highlighting
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.inlinehilite
+  
+  # Content organization
+  - pymdownx.snippets:
+      base_path: docs
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tilde
+  - pymdownx.caret
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.details
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - toc:
+      permalink: true
+      toc_depth: 3
+
+# Plugins
+plugins:
+  - search
+  - awesome-pages
+  - git-revision-date-localized:
+      type: timeago
+      timezone: UTC
+      fallback_to_build_date: false
+  - git-committers:
+      repository: anya-org/anya-core
+      branch: main
+      docs_path: docs/
+  - include-markdown:
+      base_path: docs
+  - minify:
+      minify_html: true
+      minify_js: true
+      minify_css: true
+  - redirects:
+      redirect_maps:
+        'old/path': 'new/path'
+  - mermaid2:
+      arguments:
+        theme: dark
+        themeVariables:
+          primaryColor: '#303030'
+          primaryTextColor: '#fff'
+          primaryBorderColor: '#3f51b5'
+          lineColor: '#3f51b5'
+          secondaryColor: '#3f51b5'
+          tertiaryColor: '#3f51b5'
+
+# Navigation
+nav:
+  - Home: index.md
+  - Getting Started:
+      - Installation: getting-started/installation.md
+      - Quick Start: getting-started/quick-start.md
+      - Configuration: getting-started/configuration.md
+  - Guides:
+      - Architecture: guides/architecture.md
+      - Development: guides/development.md
+      - Security: guides/security.md
+  - API Reference:
+      - Overview: api/overview.md
+      - Bitcoin: api/bitcoin.md
+      - Layer 2: api/layer2.md
+  - Community:
+      - Contributing: community/contributing.md
+      - Code of Conduct: community/code-of-conduct.md
+      - Changelog: community/changelog.md
+
+# Build Configuration
+docs_dir: docs
+site_dir: site
+strict: true
+use_directory_urls: true
+
+# Customization
+extra_css:
+  - styles/extra.css
+
+extra_javascript:
+  - js/extra.js
+
+# Extra Context
+extra:
+  version:
+    provider: mike
+  analytics:
+    provider: google
+    property: G-XXXXXXXXXX
+  logo: assets/logo.svg
+  favicon: assets/favicon.ico
+  features:
+    - navigation.tabs
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/anya-org/anya-core
+    - icon: fontawesome/brands/twitter
+      link: https://twitter.com/anyacore
+    - icon: fontawesome/brands/discord
+      link: https://discord.gg/anya-core
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.indexes
+    - navigation.instant
+    - navigation.tracking
+    - navigation.expand
+    - navigation.top
+    - navigation.footer
+    - search.highlight
+    - search.suggest
+    - search.share
+    - content.code.annotate
+    - content.code.copy
+    - content.tooltips
+    - content.action.edit
+    - content.action.view

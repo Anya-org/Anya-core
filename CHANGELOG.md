@@ -1,10 +1,70 @@
 # Changelog for Anya Core
 
+## [1.0.0] - 2025-05-31
+
+### Fixed
+- Updated Noble curves dependency from @noble/secp256k1 to @noble/curves/secp256k1
+- Fixed MCP server JSON-RPC protocol implementation for proper compliance
+- Corrected logging to use stderr instead of stdout for MCP communication compliance
+- Updated all Bitcoin-related dependencies to latest versions
+
+### Added
+- Proper MCP protocol v2024-11-05 compliance implementation
+- JSON-RPC 2.0 communication over stdin/stdout
+- 6 Bitcoin development tools with proper input schemas
+- Comprehensive error handling and validation
+
+### Changed
+- MCP server now implements full JSON-RPC protocol specification
+- Logging moved to stderr to avoid stdout conflicts in MCP communication
+- Updated package dependencies to latest versions
+
+
 [AIR-3][AIS-3][BPC-3][AIT-3][RES-3]
 
 All notable changes to the Anya Core project will be documented in this file.
 
+*Last Updated: May 19, 2025*
+
 ## [Unreleased]
+
+## [2.6.0] - 2025-05-21
+
+### Added
+
+- [AIR-3][AIS-3][BPC-3][RES-3] Comprehensive monitoring stack with Prometheus, Grafana, and Alertmanager
+- [AIR-3][AIS-3] Integrated monitoring setup with main installer using `--with-monitoring` flag
+- [BPC-3][RES-3] Email notification system with Anya Core branding
+- [RES-3] System and Bitcoin node dashboards for real-time monitoring
+- [AIS-3] Secure credential management for monitoring components
+- [AIS-3][BPC-3] Alerting rules for node health, resource usage, and security events
+- [AIS-3] Documentation for monitoring setup and configuration
+
+### Changed
+
+- Updated installation process to support monitoring components
+- Improved error handling and logging in the installer
+- Enhanced security configuration for monitoring services
+- Updated documentation with monitoring best practices
+
+### Fixed
+
+- Resolved potential security issues in monitoring configuration
+- Fixed permission issues in monitoring setup script
+- Addressed compatibility issues with different Docker versions
+
+
+## [2.5.1] - 2025-05-19
+
+### Fixed
+
+- [AIR-3][AIS-3][BPC-3][RES-3] RGB Module: Fixed duplicate implementation of the `generate_asset_id` function
+- [AIR-3][AIS-3][BPC-3][RES-3] Bitcoin Module: Removed duplicate `InvalidConfiguration` error variant in the `BitcoinError` enum
+- [AIR-3][AIS-3][BPC-3][RES-3] Bitcoin Module: Fixed network configuration handling and updated `block_hash` method usage
+- [AIR-3][AIS-3][BPC-3][RES-3] ML Module: Fixed `Device::cuda` and `Device::Cpu` usage to use the correct method calls
+- [AIR-3][AIS-3][BPC-3][RES-3] ML Module: Implemented the missing `predict_proposal_metrics` method in the MLService
+- [AIR-3][AIS-3][BPC-3][RES-3] DLC Module: Added the missing `OracleClient` struct and its implementation
+- [AIR-3][AIS-3][BPC-3][RES-3] DLC Module: Fixed the `create_contract` method signature and updated error handling
 
 ### Added
 
@@ -32,14 +92,14 @@ All notable changes to the Anya Core project will be documented in this file.
 ### Changed
 
 - Improved script directory organization for security focus
-- Updated documentation to reflect Bitcoin Development Framework v2.5 compliance
+- Updated documentation to reflect Bitcoin Improvement Proposals (BIPs) compliance
 - Enhanced TODO list with critical security fixes based on test results
 - Prioritized cryptographic implementation fixes
 - Replaced insecure DES algorithm with modern alternatives (AES-256, ChaCha20)
 - Updated encryption algorithms in HSM modules to remove legacy TripleDesCbc
 - Implemented constant-time comparison operations for cryptographic functions
 - Enhanced security of Bitcoin Taproot implementation
-- Improved Bitcoin MCP server with secure SPV verification implementation
+- Improved Bitcoin MCP server with secure SPV verification and cryptographic compliance
 - Updated verifyBitcoinSPV function with proper Merkle path verification and constant-time comparisons
 - Standardized AI labeling system to use consistent 0-3 scale and bracket format [XXX-N]
 - Consolidated multiple inconsistent AI labeling documentation files into a single canonical source
@@ -82,8 +142,8 @@ All notable changes to the Anya Core project will be documented in this file.
 
 ### Added
 
-- Bitcoin MCP server security analysis script
-- Bitcoin BIP compliance validation script
+- Bitcoin MCP server security analysis and compliance validation script
+- Bitcoin BIP compliance validation script with comprehensive checks
 - PowerShell script for comprehensive CodeQL analysis
 - Cryptographic validation framework for Bitcoin operations
 - SECURITY_CODEQL.md documentation for security analysis

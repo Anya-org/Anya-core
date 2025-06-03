@@ -1,4 +1,22 @@
+---
+title: "Dao_overview"
+description: "Documentation for Dao_overview"
+---
+
+[AIR-3][AIS-3][BPC-3][RES-3]
+
+
 # Anya DAO Overview
+
+## Overview
+
+Add a brief overview of this document here.
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 
 [AIS-3][BPC-3][DAO-3]
 
@@ -56,3 +74,7 @@ The DAO dashboard is available at [https://dao.anya-core.org](https://dao.anya-c
 - [Treasury Management](TREASURY_MANAGEMENT.md) - Treasury operations
 
 *Last updated: 2025-02-24* 
+## See Also
+
+- [Related Document](#related-document)
+

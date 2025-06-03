@@ -1,4 +1,18 @@
+---
+title: "High_availability"
+description: "Documentation for High_availability"
+---
+
+[AIR-3][AIS-3][BPC-3][RES-3]
+
+
 # High Availability System \[AIR-3\]\[AIS-3\]\[RES-3\]\[SCL-3\]
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 
 <!-- markdownlint-disable MD013 line-length -->
 
@@ -10,7 +24,7 @@ The High Availability subsystem provides fault tolerance, automatic failover, an
 
 ## Architecture
 
-The HA system follows the hexagonal architecture pattern defined in the Bitcoin Development Framework v2.5:
+The HA system follows the hexagonal architecture pattern defined by official Bitcoin Improvement Proposals (BIPs):
 
 ```
                   +----------------+
@@ -229,7 +243,7 @@ Planned improvements to the HA subsystem include:
 
 ## References
 
-1. Bitcoin Development Framework v2.5
+1. Official Bitcoin Improvement Proposals (BIPs)
 2. Raft Consensus Algorithm
 3. Kubernetes Operator Framework
 4. Prometheus Monitoring System
@@ -238,3 +252,8 @@ Planned improvements to the HA subsystem include:
 ## Last Updated
 
 2025-03-12
+
+## See Also
+
+- [Related Document](#related-document)
+

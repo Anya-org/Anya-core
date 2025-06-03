@@ -1,17 +1,73 @@
-use std::error::Error;
 //! DAO module
 //! 
 //! This module provides decentralized autonomous organization functionality,
 //! including governance, voting, and proposal management.
 
-use crate::AnyaResult;
-use crate::AnyaError;
+use std::error::Error;
 use std::collections::HashMap;
-use chrono::{DateTime, Utc};
-use serde_json;
+use chrono::Utc;
+use crate::AnyaError;
+use serde_json::json as serde_json;
+use rand::random;
 
-pub mod types;
-pub use types::{Proposal, ProposalMetrics, RiskMetrics};
+// DAO Module for Anya Core
+// Implements governance and voting mechanisms
+
+pub mod voting;
+pub mod legal;
+pub mod governance;
+pub use governance::DaoLevel;
+
+// Re-export main components
+
+#[cfg(test)]
+mod tests;
+
+pub use governance::{DaoGovernance, ProposalStatus};
+
+// Define the types that were previously imported from a non-existent module
+#[derive(Debug, Clone)]
+pub struct Proposal {
+    pub id: String,
+    pub title: String,
+    pub description: String,
+    pub author: String,
+    pub status: ProposalStatus,
+    pub votes: i32,
+    pub votes_for: u64,
+    pub votes_against: u64,
+    pub amount: u64,
+    pub proposer: String,
+    pub created_at: chrono::DateTime<Utc>,
+    pub updated_at: chrono::DateTime<Utc>,
+    pub execution_time: Option<chrono::DateTime<Utc>>,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct ProposalMetrics {
+    // General metrics
+    pub proposal_count: usize,
+    pub passed_count: usize,
+    pub rejected_count: usize,
+    pub active_count: usize,
+    
+    // ML analysis metrics
+    pub sentiment_score: f64,
+    pub risk_assessment: RiskMetrics,
+    pub ml_predictions: std::collections::HashMap<String, f64>,
+    pub federated_consensus: std::collections::HashMap<String, f64>,
+    pub last_updated: chrono::DateTime<Utc>,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct RiskMetrics {
+    pub risk_score: f64,
+    pub compliance_level: String,
+    pub audit_status: bool,
+    pub risk_factors: Vec<(String, f64)>,
+    pub mitigation_suggestions: Vec<String>,
+    pub last_updated: chrono::DateTime<Utc>,
+}
 
 /// Configuration options for DAO functionality
 #[derive(Debug, Clone)]
@@ -29,7 +85,7 @@ pub struct DAOConfig {
 }
 
 impl Default for DAOConfig {
-    fn default() -> Self  -> Result<(), Box<dyn Error>> {
+    fn default() -> Self {
         Self {
             enabled: true,
             contract_address: None,
@@ -48,7 +104,7 @@ pub struct DAOManager {
 
 impl DAOManager {
     /// Create a new DAOManager with the given configuration
-    pub fn new(config: DAOConfig) -> AnyaResult<Self>  -> Result<(), Box<dyn Error>> {
+    pub fn new(config: DAOConfig) -> Result<Self, Box<dyn Error>> {
         if !config.enabled {
             return Ok(Self {
                 config,
@@ -63,25 +119,27 @@ impl DAOManager {
     }
 
     /// Create a new proposal
-    pub fn create_proposal(&mut self, title: &str, description: &str, amount: u64) -> AnyaResult<Proposal>  -> Result<(), Box<dyn Error>> {
+    pub fn create_proposal(&mut self, title: &str, description: &str, amount: u64) -> Result<Proposal, Box<dyn Error>> {
         if amount < self.config.proposal_threshold {
-            return Err(AnyaError::DAO(format!(
+            return Err(Box::new(AnyaError::DAO(format!(
                 "Proposal amount ({}) is below the threshold ({})",
                 amount, self.config.proposal_threshold
-            )));
+            ))));
         }
 
-        let proposal_id = format!("proposal:{:x}", rand::random::<u64>());
+        let proposal_id = format!("proposal:{:x}", random::<u64>());
         
         let proposal = Proposal {
             id: proposal_id.clone(),
             title: title.to_string(),
             description: description.to_string(),
+            author: "unknown".to_string(),
             proposer: "unknown".to_string(), // Would be set from context in real implementation
             amount,
             votes_for: 0,
             votes_against: 0,
-            status: types::ProposalStatus::Active,
+            votes: 0,
+            status: ProposalStatus::Active,
             created_at: Utc::now(),
             updated_at: Utc::now(),
             execution_time: None,
@@ -93,14 +151,14 @@ impl DAOManager {
     }
 
     /// Vote on a proposal
-    pub fn vote(&mut self, proposal_id: &str, vote_for: bool, amount: u64) -> AnyaResult<()>  -> Result<(), Box<dyn Error>> {
+    pub fn vote(&mut self, proposal_id: &str, vote_for: bool, amount: u64) -> Result<(), Box<dyn Error>> {
         let proposal = self.proposals.get_mut(proposal_id)
-            .ok_or_else(|| AnyaError::DAO(format!("Proposal not found: {}", proposal_id)))?;
+            .ok_or_else(|| Box::new(AnyaError::DAO(format!("Proposal not found: {}", proposal_id))))?;
         
-        if proposal.status != types::ProposalStatus::Active {
-            return Err(AnyaError::DAO(format!(
+        if proposal.status != ProposalStatus::Active {
+            return Err(Box::new(AnyaError::DAO(format!(
                 "Proposal is not active: {:?}", proposal.status
-            )));
+            ))));
         }
         
         if vote_for {
@@ -115,37 +173,38 @@ impl DAOManager {
     }
 
     /// Get a proposal by ID
-    pub fn get_proposal(&self, proposal_id: &str) -> AnyaResult<Proposal>  -> Result<(), Box<dyn Error>> {
-        self.proposals.get(proposal_id)
+    pub fn get_proposal(&self, proposal_id: &str) -> Result<Proposal, Box<dyn Error>> {
+        Ok(self.proposals.get(proposal_id)
             .cloned()
-            .ok_or_else(|| AnyaError::DAO(format!("Proposal not found: {}", proposal_id)))
+            .ok_or_else(|| Box::new(AnyaError::DAO(format!("Proposal not found: {}", proposal_id))))?
+        )
     }
 
     /// List all proposals
-    pub fn list_proposals(&self) -> Vec<Proposal>  -> Result<(), Box<dyn Error>> {
+    pub fn list_proposals(&self) -> Vec<Proposal> {
         self.proposals.values().cloned().collect()
     }
 
     /// Execute a proposal
-    pub fn execute_proposal(&mut self, proposal_id: &str) -> AnyaResult<()>  -> Result<(), Box<dyn Error>> {
+    pub fn execute_proposal(&mut self, proposal_id: &str) -> Result<(), Box<dyn Error>> {
         let proposal = self.proposals.get_mut(proposal_id)
-            .ok_or_else(|| AnyaError::DAO(format!("Proposal not found: {}", proposal_id)))?;
+            .ok_or_else(|| Box::new(AnyaError::DAO(format!("Proposal not found: {}", proposal_id))))?;
         
-        if proposal.status != types::ProposalStatus::Active {
-            return Err(AnyaError::DAO(format!(
+        if proposal.status != ProposalStatus::Active {
+            return Err(Box::new(AnyaError::DAO(format!(
                 "Proposal is not active: {:?}", proposal.status
-            )));
+            ))));
         }
         
         if proposal.votes_for <= proposal.votes_against {
-            return Err(AnyaError::DAO(format!(
+            return Err(Box::new(AnyaError::DAO(format!(
                 "Proposal does not have enough votes: {} vs {}",
                 proposal.votes_for, proposal.votes_against
-            )));
+            ))));
         }
         
         // In a real implementation, this would execute the proposal
-        proposal.status = types::ProposalStatus::Executed;
+        proposal.status = ProposalStatus::Executed;
         proposal.execution_time = Some(Utc::now());
         proposal.updated_at = Utc::now();
         
@@ -153,7 +212,7 @@ impl DAOManager {
     }
 
     /// Get the system status
-    pub fn get_status(&self) -> (bool, u8)  -> Result<(), Box<dyn Error>> {
+    pub fn get_status(&self) -> (bool, u8) {
         let operational = self.config.enabled;
         let health = if operational {
             // Basic health check based on configuration
@@ -170,7 +229,7 @@ impl DAOManager {
     }
     
     /// Get system metrics
-    pub fn get_metrics(&self) -> HashMap<String, serde_json::Value>  -> Result<(), Box<dyn Error>> {
+    pub fn get_metrics(&self) -> HashMap<String, serde_json::Value> {
         let mut metrics = HashMap::new();
         
         // Add basic metrics
@@ -186,25 +245,19 @@ impl DAOManager {
         
         // Add proposal status counts
         let active_proposals = self.proposals.values()
-            .filter(|p| p.status == types::ProposalStatus::Active)
+            .filter(|p| p.status == ProposalStatus::Active)
             .count();
         let passed_proposals = self.proposals.values()
-            .filter(|p| p.status == types::ProposalStatus::Passed)
+            .filter(|p| p.status == ProposalStatus::Passed)
             .count();
         let executed_proposals = self.proposals.values()
-            .filter(|p| p.status == types::ProposalStatus::Executed)
+            .filter(|p| p.status == ProposalStatus::Executed)
             .count();
         
         metrics.insert("active_proposals".to_string(), serde_json::json!(active_proposals));
-        metrics.insert("passed_proposals".to_string(), serde_json::json!(passed_proposals));
-        metrics.insert("executed_proposals".to_string(), serde_json::json!(executed_proposals));
+        metrics.insert("passed_proposals".to_string(), serde_json!(passed_proposals));
+        metrics.insert("executed_proposals".to_string(), serde_json!(executed_proposals));
         
         metrics
     }
 }
-
-pub mod governance;
-pub mod legal;
-pub mod voting;
-
-pub use governance::{DaoGovernance, DaoLevel, GovernanceError}; 

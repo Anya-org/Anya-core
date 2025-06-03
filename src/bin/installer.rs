@@ -1,18 +1,18 @@
-use std::error::Error;
+use anyhow::{anyhow, Context, Result};
+use chrono::{DateTime, Utc};
+use clap::{Parser, Subcommand};
+use log::{debug, error, info, warn};
+use reqwest;
+use serde::{Deserialize, Serialize};
+use serde_json;
 use std::env;
-use std::path::{Path, PathBuf};
-use std::process::{Command, exit};
+use std::error::Error;
 use std::fs;
 use std::io::{self, Write};
-use anyhow::{Result, Context, anyhow};
-use clap::{Parser, Subcommand};
-use serde::{Deserialize, Serialize};
-use log::{info, warn, error, debug};
-use serde_json;
-use systemstat::{System, Platform};
-use chrono::{Utc, DateTime};
-use reqwest;
-use std::time::{Instant, Duration};
+use std::path::{Path, PathBuf};
+use std::process::{exit, Command};
+use std::time::{Duration, Instant};
+use systemstat::{Platform, System};
 
 /// Unified Anya installation and configuration tool
 #[derive(Parser)]
@@ -24,11 +24,11 @@ use std::time::{Instant, Duration};
 struct Cli {
     #[clap(subcommand)]
     command: Commands,
-    
+
     /// Enable dry run (no real changes)
     #[clap(long, help = "Perform a dry run without making any actual changes")]
     dry_run: bool,
-    
+
     /// Verbose output
     #[clap(short, long, help = "Enable verbose output for detailed logging")]
     verbose: bool,
@@ -40,92 +40,104 @@ enum Commands {
     #[clap(about = "Install Anya Core and its dependencies")]
     Install {
         /// Install only core components
-        #[clap(long, help = "Install only core components without additional features")]
+        #[clap(
+            long,
+            help = "Install only core components without additional features"
+        )]
         core_only: bool,
-        
+
         /// Skip confirmation prompts
         #[clap(long, help = "Skip all confirmation prompts and proceed automatically")]
         yes: bool,
-        
+
         /// Network type (mainnet, testnet, regtest)
         #[clap(long, help = "Specify the Bitcoin network to use (default: testnet)",
-              possible_values = &NetworkConfig::ALL_NETWORKS)]
+              value_parser = clap::builder::PossibleValuesParser::new(NetworkConfig::ALL_NETWORKS))]
         network: String,
-        
+
         /// Bitcoin RPC URL
-        #[clap(long, help = "Custom Bitcoin RPC URL (overrides default for selected network)")]
+        #[clap(
+            long,
+            help = "Custom Bitcoin RPC URL (overrides default for selected network)"
+        )]
         rpc_url: Option<String>,
-        
+
         /// Bitcoin RPC username
-        #[clap(long, help = "Custom Bitcoin RPC username (overrides default for selected network)")]
+        #[clap(
+            long,
+            help = "Custom Bitcoin RPC username (overrides default for selected network)"
+        )]
         rpc_user: Option<String>,
-        
+
         /// Bitcoin RPC password
-        #[clap(long, help = "Custom Bitcoin RPC password (overrides default for selected network)")]
+        #[clap(
+            long,
+            help = "Custom Bitcoin RPC password (overrides default for selected network)"
+        )]
         rpc_password: Option<String>,
     },
-    
+
     /// Test installation and create report
     #[clap(about = "Run installation tests and generate reports")]
     Test {
         /// Test specific component
         #[clap(long, help = "Test a specific component (e.g., network, rpc, core)")]
         component: Option<String>,
-        
+
         /// Output test report
         #[clap(long, help = "Generate a detailed test report in JSON format")]
         report: bool,
     },
-    
+
     /// Configure the installation
     #[clap(about = "Configure Anya Core installation settings")]
     Configure {
         /// Set network (mainnet, testnet, regtest)
         #[clap(long, help = "Set the Bitcoin network to use",
-              possible_values = &NetworkConfig::ALL_NETWORKS)]
+              value_parser = clap::builder::PossibleValuesParser::new(NetworkConfig::ALL_NETWORKS))]
         network: Option<String>,
-        
+
         /// Set log level
         #[clap(long, help = "Set the logging level (trace, debug, info, warn, error)",
               possible_values = &["trace", "debug", "info", "warn", "error"])]
         log_level: Option<String>,
-        
+
         /// Set data directory
         #[clap(long, help = "Set the data directory for Anya Core")]
         data_dir: Option<PathBuf>,
-        
+
         /// Bitcoin RPC URL
         #[clap(long, help = "Set custom Bitcoin RPC URL")]
         rpc_url: Option<String>,
-        
+
         /// Bitcoin RPC username
         #[clap(long, help = "Set custom Bitcoin RPC username")]
         rpc_user: Option<String>,
-        
+
         /// Bitcoin RPC password
         #[clap(long, help = "Set custom Bitcoin RPC password")]
         rpc_password: Option<String>,
-        
+
         /// Enable DLC
         #[clap(long, help = "Enable DLC")]
         dlc_enabled: Option<bool>,
-        
+
         /// Enable RGB
         #[clap(long, help = "Enable RGB")]
         rgb_enabled: Option<bool>,
-        
+
         /// Enable RSK
         #[clap(long, help = "Enable RSK")]
         rsk_enabled: Option<bool>,
-        
+
         /// Enable Web5
         #[clap(long, help = "Enable Web5")]
         web5_enabled: Option<bool>,
-        
+
         /// Show current configuration
         #[clap(long, help = "Display the current configuration settings")]
         show: bool,
-        
+
         /// Auto-configure based on system resources
         #[clap(long, help = "Auto-configure based on system resources")]
         auto: bool,
@@ -242,7 +254,7 @@ impl NetworkConfig {
     const DEFAULT_RGB_DIR: &'static str = "rgb";
     const DEFAULT_RSK_DIR: &'static str = "rsk";
     const DEFAULT_WEB5_DIR: &'static str = "web5";
-    
+
     fn new(network: &str) -> Self {
         let (url, user, password) = match network {
             "mainnet" => (
@@ -255,14 +267,10 @@ impl NetworkConfig {
                 "publicnode",
                 "publicnode",
             ),
-            "regtest" => (
-                "http://localhost:18443/",
-                "bitcoin",
-                "password",
-            ),
+            "regtest" => ("http://localhost:18443/", "bitcoin", "password"),
             _ => panic!("Invalid network type: {}", network),
         };
-        
+
         Self {
             network: network.to_string(),
             rpc_url: url.to_string(),
@@ -282,30 +290,30 @@ impl NetworkConfig {
             web5_config: Web5Config::default(),
         }
     }
-    
+
     fn get_bdk_wallet_dir(&self) -> PathBuf {
         self.bdk_wallet_dir
             .as_ref()
             .map(|dir| PathBuf::from(dir))
             .unwrap_or_else(|| PathBuf::from(Self::DEFAULT_BDK_WALLET_DIR))
     }
-    
+
     fn get_ldk_dir(&self) -> PathBuf {
         PathBuf::from(Self::DEFAULT_LDK_DIR)
     }
-    
+
     fn get_dlc_dir(&self) -> PathBuf {
         PathBuf::from(Self::DEFAULT_DLC_DIR)
     }
-    
+
     fn get_rgb_dir(&self) -> PathBuf {
         PathBuf::from(Self::DEFAULT_RGB_DIR)
     }
-    
+
     fn get_rsk_dir(&self) -> PathBuf {
         PathBuf::from(Self::DEFAULT_RSK_DIR)
     }
-    
+
     fn get_web5_dir(&self) -> PathBuf {
         PathBuf::from(Self::DEFAULT_WEB5_DIR)
     }
@@ -329,39 +337,42 @@ impl AnyaInstaller {
             verbose,
         }
     }
-    
+
     /// Check if system meets minimum requirements
     fn check_system_requirements(&self) -> Result<bool> {
         println!("Checking system requirements...");
-        
+
         if self.dry_run {
             println!("DRY RUN: Would check system requirements");
             return Ok(true);
         }
-        
+
         // OS Check
         let os = env::consts::OS;
         println!("Detected OS: {}", os);
-        
+
         // TODO: Implement actual memory and disk space checks
-        
+
         // Rust version check
         let rust_version = Command::new("rustc")
             .arg("--version")
             .output()
             .context("Failed to get Rust version. Is Rust installed?")?;
-        
+
         if self.verbose {
-            println!("Rust version: {}", String::from_utf8_lossy(&rust_version.stdout));
+            println!(
+                "Rust version: {}",
+                String::from_utf8_lossy(&rust_version.stdout)
+            );
         }
-        
+
         Ok(true)
     }
-    
+
     /// Install dependencies based on platform
     fn install_dependencies(&self, core_only: bool) -> Result<()> {
         println!("Installing dependencies...");
-        
+
         if self.dry_run {
             println!("DRY RUN: Would install the following dependencies:");
             println!("  - Bitcoin Dev Kit (BDK)");
@@ -373,7 +384,7 @@ impl AnyaInstaller {
             }
             return Ok(());
         }
-        
+
         // Platform-specific dependency installation
         match env::consts::OS {
             "windows" => self.install_windows_dependencies(core_only),
@@ -382,41 +393,41 @@ impl AnyaInstaller {
             _ => Err(anyhow!("Unsupported operating system")),
         }
     }
-    
+
     fn install_windows_dependencies(&self, core_only: bool) -> Result<()> {
         // Install Rust dependencies via cargo
         println!("Installing Rust dependencies...");
-        
+
         let mut cmd = Command::new("cargo");
         cmd.arg("install")
             .arg("bdk-cli")
             .arg("--features=electrum,esplora,sqlite-bundled");
-        
+
         let status = cmd.status().context("Failed to install BDK CLI")?;
         if !status.success() {
             return Err(anyhow!("BDK installation failed"));
         }
-        
+
         // Install optional components if not core_only
         if !core_only {
             println!("Installing optional dependencies...");
             // Add additional dependency installation here
         }
-        
+
         Ok(())
     }
-    
+
     fn install_linux_dependencies(&self, core_only: bool) -> Result<()> {
         // Install system dependencies
         println!("Installing system dependencies...");
-        
+
         let apt_deps = ["build-essential", "pkg-config", "libssl-dev"];
         let status = Command::new("apt-get")
             .arg("install")
             .arg("-y")
             .args(apt_deps)
             .status();
-            
+
         if let Ok(status) = status {
             if !status.success() {
                 warn!("Some apt packages might not have installed correctly");
@@ -424,7 +435,7 @@ impl AnyaInstaller {
         } else {
             warn!("Could not install apt packages, you may need to install them manually");
         }
-        
+
         // Install Rust dependencies
         let status = Command::new("cargo")
             .arg("install")
@@ -432,24 +443,21 @@ impl AnyaInstaller {
             .arg("--features=electrum,esplora,sqlite-bundled")
             .status()
             .context("Failed to install BDK CLI")?;
-            
+
         if !status.success() {
             return Err(anyhow!("BDK installation failed"));
         }
-        
+
         Ok(())
     }
-    
+
     fn install_macos_dependencies(&self, core_only: bool) -> Result<()> {
         // Install Homebrew dependencies
         println!("Installing Homebrew dependencies...");
-        
+
         let brew_deps = ["pkg-config", "openssl"];
-        let status = Command::new("brew")
-            .arg("install")
-            .args(brew_deps)
-            .status();
-            
+        let status = Command::new("brew").arg("install").args(brew_deps).status();
+
         if let Ok(status) = status {
             if !status.success() {
                 warn!("Some Homebrew packages might not have installed correctly");
@@ -457,7 +465,7 @@ impl AnyaInstaller {
         } else {
             warn!("Could not install Homebrew packages, you may need to install them manually");
         }
-        
+
         // Install Rust dependencies
         let status = Command::new("cargo")
             .arg("install")
@@ -465,51 +473,62 @@ impl AnyaInstaller {
             .arg("--features=electrum,esplora,sqlite-bundled")
             .status()
             .context("Failed to install BDK CLI")?;
-            
+
         if !status.success() {
             return Err(anyhow!("BDK installation failed"));
         }
-        
+
         Ok(())
     }
-    
+
     fn get_default_network_config(&self, network: &str) -> Result<NetworkConfig> {
         Ok(NetworkConfig::new(network))
     }
-    
+
     fn save_network_config(&self, config: &NetworkConfig) -> Result<()> {
         let config_path = self.data_dir.join("network_config.json");
         let config_str = serde_json::to_string_pretty(config)?;
-        
+
         if self.dry_run {
-            println!("DRY RUN: Would save network config to: {}\n{}", 
-                     config_path.display(), config_str);
+            println!(
+                "DRY RUN: Would save network config to: {}\n{}",
+                config_path.display(),
+                config_str
+            );
             return Ok(());
         }
-        
+
         fs::write(&config_path, config_str)?;
         info!("Saved network configuration to: {}", config_path.display());
         Ok(())
     }
-    
+
     fn load_network_config(&self) -> Result<Option<NetworkConfig>> {
         let config_path = self.data_dir.join("network_config.json");
-        
+
         if !config_path.exists() {
             return Ok(None);
         }
-        
+
         let config_str = fs::read_to_string(&config_path)?;
         let config: NetworkConfig = serde_json::from_str(&config_str)?;
         Ok(Some(config))
     }
-    
-    fn configure(&self, network: Option<String>, log_level: Option<String>, 
-                 data_dir: Option<PathBuf>, rpc_url: Option<String>, 
-                 rpc_user: Option<String>, rpc_password: Option<String>,
-                 dlc_enabled: Option<bool>, rgb_enabled: Option<bool>,
-                 rsk_enabled: Option<bool>, web5_enabled: Option<bool>,
-                 auto: bool) -> Result<()> {
+
+    fn configure(
+        &mut self,
+        network: Option<String>,
+        log_level: Option<String>,
+        data_dir: Option<PathBuf>,
+        rpc_url: Option<String>,
+        rpc_user: Option<String>,
+        rpc_password: Option<String>,
+        dlc_enabled: Option<bool>,
+        rgb_enabled: Option<bool>,
+        rsk_enabled: Option<bool>,
+        web5_enabled: Option<bool>,
+        auto: bool,
+    ) -> Result<()> {
         if auto {
             let config = self.auto_configure()?;
             self.save_network_config(&config)?;
@@ -525,8 +544,11 @@ impl AnyaInstaller {
 
         if let Some(network) = network {
             if !NetworkConfig::ALL_NETWORKS.contains(&network.as_str()) {
-                return Err(anyhow!("Invalid network type: {}. Valid options are: {}", 
-                    network, NetworkConfig::ALL_NETWORKS.join(", ")));
+                return Err(anyhow!(
+                    "Invalid network type: {}. Valid options are: {}",
+                    network,
+                    NetworkConfig::ALL_NETWORKS.join(", ")
+                ));
             }
             config = NetworkConfig::new(&network);
         }
@@ -560,8 +582,14 @@ impl AnyaInstaller {
         }
 
         if let Some(level) = log_level {
-            if !matches!(level.to_lowercase().as_str(), "trace" | "debug" | "info" | "warn" | "error") {
-                return Err(anyhow!("Invalid log level: {}. Valid options are: trace, debug, info, warn, error", level));
+            if !matches!(
+                level.to_lowercase().as_str(),
+                "trace" | "debug" | "info" | "warn" | "error"
+            ) {
+                return Err(anyhow!(
+                    "Invalid log level: {}. Valid options are: trace, debug, info, warn, error",
+                    level
+                ));
             }
             info!("Setting log level to: {}", level);
         }
@@ -625,7 +653,7 @@ impl AnyaInstaller {
         }
 
         self.save_network_config(&config)?;
-        
+
         info!("Configuration updated successfully");
         info!("Network: {}", config.network);
         info!("BDK Enabled: {}", config.bdk_enabled);
@@ -634,13 +662,13 @@ impl AnyaInstaller {
         info!("RGB Enabled: {}", config.rgb_enabled);
         info!("RSK Enabled: {}", config.rsk_enabled);
         info!("Web5 Enabled: {}", config.web5_enabled);
-        
+
         Ok(())
     }
-    
+
     fn auto_configure(&self) -> Result<NetworkConfig> {
         // Get system information
-        let system = System::new_all();
+        let system = System::new();
         let total_memory = system.total_memory();
         let available_memory = system.available_memory();
         let cpu_count = system.cpus().len();
@@ -650,11 +678,13 @@ impl AnyaInstaller {
         let mut config = self.get_default_network_config("testnet")?;
 
         // Memory-based configuration
-        if available_memory > 8_000_000 { // 8GB
+        if available_memory > 8_000_000 {
+            // 8GB
             config.rgb_enabled = true;
             config.rsk_enabled = true;
             config.web5_enabled = true;
-        } else if available_memory > 4_000_000 { // 4GB
+        } else if available_memory > 4_000_000 {
+            // 4GB
             config.rgb_enabled = true;
             config.rsk_enabled = true;
             config.web5_enabled = false;
@@ -674,7 +704,8 @@ impl AnyaInstaller {
         }
 
         // Disk space configuration
-        if disk_space > 100_000_000 { // 100GB
+        if disk_space > 100_000_000 {
+            // 100GB
             config.bdk_enabled = true;
             config.ldk_enabled = true;
         } else {
@@ -684,7 +715,8 @@ impl AnyaInstaller {
 
         // Network configuration based on available bandwidth
         let bandwidth = self.get_available_bandwidth()?;
-        if bandwidth > 100_000_000 { // 100Mbps
+        if bandwidth > 100_000_000 {
+            // 100Mbps
             config.network = "mainnet".to_string();
         } else {
             config.network = "testnet".to_string();
@@ -768,11 +800,11 @@ impl AnyaInstaller {
         let bandwidth = (response as f64 / duration) as u64;
         Ok(bandwidth)
     }
-    
+
     /// Run tests to verify installation
     fn run_tests(&self, component: Option<String>, generate_report: bool) -> Result<()> {
         println!("Running tests...");
-        
+
         if self.dry_run {
             println!("DRY RUN: Would run tests for:");
             if let Some(comp) = &component {
@@ -785,12 +817,12 @@ impl AnyaInstaller {
             }
             return Ok(());
         }
-        
+
         // Core Bitcoin tests
         if component.is_none() || component.as_deref() == Some("bitcoin") {
             println!("Testing Bitcoin functionality...");
             let test_script = self.project_root.join("tests").join("bitcoin");
-            
+
             // Run Rust tests for Bitcoin functionality
             let status = Command::new("cargo")
                 .current_dir(&self.project_root)
@@ -798,44 +830,44 @@ impl AnyaInstaller {
                 .arg("--package=anya-bitcoin")
                 .status()
                 .context("Failed to run Bitcoin tests")?;
-                
+
             if !status.success() {
                 return Err(anyhow!("Bitcoin tests failed"));
             }
         }
-        
+
         // Web5 tests
         if component.is_none() || component.as_deref() == Some("web5") {
             println!("Testing Web5 functionality...");
             // Implement Web5 testing here
         }
-        
+
         // Generate test report if requested
         if generate_report {
             self.generate_test_report()?;
         }
-        
+
         println!("All tests passed successfully!");
         Ok(())
     }
-    
+
     fn generate_test_report(&self) -> Result<()> {
         println!("Generating test report...");
-        
+
         let report_dir = self.project_root.join("reports");
         fs::create_dir_all(&report_dir).context("Failed to create report directory")?;
-        
+
         let report_path = report_dir.join("test_report.md");
         let mut report = String::new();
-        
+
         report.push_str("# Anya Project Test Report\n\n");
         report.push_str(&format!("Generated: {}\n\n", chrono::Local::now()));
-        
+
         // Add system information
         report.push_str("## System Information\n\n");
         report.push_str(&format!("- OS: {}\n", env::consts::OS));
         report.push_str(&format!("- Arch: {}\n", env::consts::ARCH));
-        
+
         // Add test results
         report.push_str("\n## Test Results\n\n");
         report.push_str("| Component | Status | Details |\n");
@@ -843,18 +875,17 @@ impl AnyaInstaller {
         report.push_str("| Bitcoin Core | ✅ Pass | All tests passed |\n");
         report.push_str("| Wallet | ✅ Pass | Address generation successful |\n");
         report.push_str("| Web5 | ✅ Pass | DID resolution working |\n");
-        
+
         fs::write(&report_path, report).context("Failed to write test report")?;
         println!("Test report generated at {}", report_path.display());
-        
+
         Ok(())
     }
 
     /// Updated to include BIP-341 SILENT_LEAF validation
     fn verify_taproot_installation(&self) -> Result<()> {
         let config_path = self.data_dir.join("bitcoin.conf");
-        let config = fs::read_to_string(&config_path)
-            .context("Failed to read bitcoin config")?;
+        let config = fs::read_to_string(&config_path).context("Failed to read bitcoin config")?;
 
         // BIP-341 Compliance Check
         if !config.contains("SILENT_LEAF") {
@@ -865,53 +896,85 @@ impl AnyaInstaller {
         if !config.contains("psbt_version=2") {
             return Err(anyhow!("BIP-174 Violation: PSBT v2 not enabled"));
         }
-        
+
         Ok(())
     }
 }
 
 fn main() -> Result<()> {
     let cli = Cli::parse();
-    
+
     // Initialize the installer
     let project_root = env::current_dir().context("Failed to get current directory")?;
     let installer = AnyaInstaller::new(project_root, cli.dry_run, cli.verbose);
-    
+
     // Set up logging based on verbosity
     if cli.verbose {
         env::set_var("RUST_LOG", "debug");
     } else {
         env::set_var("RUST_LOG", "info");
     }
-    
+
     // Process commands
     match cli.command {
-        Commands::Install { core_only, yes, network, rpc_url, rpc_user, rpc_password } => {
+        Commands::Install {
+            core_only,
+            yes,
+            network,
+            rpc_url,
+            rpc_user,
+            rpc_password,
+        } => {
             if !yes && !cli.dry_run {
                 print!("This will install Anya and its dependencies. Continue? [y/N] ");
                 io::stdout().flush()?;
-                
+
                 let mut response = String::new();
                 io::stdin().read_line(&mut response)?;
-                
+
                 if !response.trim().eq_ignore_ascii_case("y") {
                     println!("Installation cancelled.");
                     return Ok(());
                 }
             }
-            
+
             installer.check_system_requirements()?;
             installer.install_dependencies(core_only)?;
-            installer.configure(Some(network), None, None, rpc_url, rpc_user, rpc_password, None, None, None, None, false)?;
-            
+            installer.configure(
+                Some(network),
+                None,
+                None,
+                rpc_url,
+                rpc_user,
+                rpc_password,
+                None,
+                None,
+                None,
+                None,
+                false,
+            )?;
+
             println!("Installation completed successfully!");
-        },
-        
+        }
+
         Commands::Test { component, report } => {
             installer.run_tests(component, report)?;
-        },
-        
-        Commands::Configure { network, log_level, data_dir, rpc_url, rpc_user, rpc_password, dlc_enabled, rgb_enabled, rsk_enabled, web5_enabled, show, auto } => {
+        }
+
+        Commands::Configure {
+            network,
+            log_level,
+            data_dir,
+            rpc_url,
+            rpc_user,
+            rpc_password,
+            dlc_enabled,
+            rgb_enabled,
+            rsk_enabled,
+            web5_enabled,
+            show,
+            auto,
+        } => {
             if show {
                 let config = installer.load_network_config()?;
                 if let Some(config) = config {
@@ -928,11 +991,22 @@ fn main() -> Result<()> {
                     println!("No configuration found.");
                 }
             } else {
-                installer.configure(network, log_level, data_dir, rpc_url, rpc_user, rpc_password, dlc_enabled, rgb_enabled, rsk_enabled, web5_enabled, auto)?;
+                installer.configure(
+                    network,
+                    log_level,
+                    data_dir,
+                    rpc_url,
+                    rpc_user,
+                    rpc_password,
+                    dlc_enabled,
+                    rgb_enabled,
+                    rsk_enabled,
+                    web5_enabled,
+                    auto,
+                )?;
             }
-        },
+        }
     }
-    
+
     Ok(())
 }
-

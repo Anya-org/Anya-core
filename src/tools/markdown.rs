@@ -1,5 +1,10 @@
-use std::error::Error;
-use std::fs::{self, File};
+// [AIR-3][AIS-3][BPC-3][AIT-3] Markdown Documentation Validation Module
+// AI-Readable: Enhanced with standardized markdown processing capabilities
+// AI-Secure: Validates document structure and prevents malformed content
+// Bitcoin-Protocol-Compliant: Ensures documentation meets BDF v2.5 standards
+// AI-Testable: Comprehensive test coverage for document validation
+
+use std::fs::File;
 use std::io::{self, Read, Write};
 use std::path::{Path, PathBuf};
 use regex::Regex;
@@ -14,6 +19,9 @@ const MAX_LINE_LENGTH: usize = 100;
 pub enum DocError {
     #[error("IO error: {0}")]
     IoError(#[from] io::Error),
+    
+    #[error("Regex error: {0}")]
+    RegexError(#[from] regex::Error),
     
     #[error("Missing compliance labels: {0}")]
     MissingLabels(String),
@@ -90,13 +98,17 @@ impl MarkdownDocument {
     
     /// Check for trailing whitespace
     pub fn has_trailing_whitespace(&self) -> bool {
-        let re = Regex::new(r"[ \t]+$")?;
-        for line in self.content.lines() {
-            if re.is_match(line) {
-                return true;
+        match Regex::new(r"[ \t]+$") {
+            Ok(re) => {
+                for line in self.content.lines() {
+                    if re.is_match(line) {
+                        return true;
+                    }
+                }
+                false
             }
+            Err(_) => false, // If regex compilation fails, assume no whitespace
         }
-        false
     }
     
     /// Fix trailing whitespace

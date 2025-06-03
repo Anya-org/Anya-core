@@ -1,11 +1,12 @@
-use std::error::Error;
-// Verifiable Credentials Implementation
+// [AIR-3][AIS-3][BPC-3][RES-3] Verifiable Credentials Implementation
 // Provides W3C Verifiable Credentials functionality for Web5
 // [AIR-012] Operational Reliability and [AIP-002] Modular Architecture
 
+// Import std::error::Error for use in trait bounds
 use std::collections::HashMap;
 use serde::{Serialize, Deserialize};
 use crate::web5::identity::{Web5Result, Web5Error, DIDManager};
+use std::fmt::{Display, Formatter, Result as FmtResult};
 
 /// Verifiable Credential
 /// 
@@ -23,9 +24,9 @@ pub struct VerifiableCredential {
     /// Credential issuer
     pub issuer: String,
     /// Issuance date
-    pub issuanceDate: String,
+    pub issuance_date: String,
     /// Credential subject
-    pub credentialSubject: CredentialSubject,
+    pub credential_subject: CredentialSubject,
     /// Credential proof
     pub proof: Option<CredentialProof>,
 }
@@ -53,9 +54,9 @@ pub struct CredentialProof {
     /// Proof creation date
     pub created: String,
     /// Verification method
-    pub verificationMethod: String,
+    pub verification_method: String,
     /// Proof purpose
-    pub proofPurpose: String,
+    pub proof_purpose: String,
     /// Signature value
     pub jws: String,
 }
@@ -108,8 +109,8 @@ impl CredentialManager {
                 credential_type.to_string(),
             ],
             issuer: issuer_did.to_string(),
-            issuanceDate: current_iso_date(),
-            credentialSubject: credential_subject,
+            issuance_date: current_iso_date(),
+            credential_subject: credential_subject,
             proof: None,
         };
         
@@ -126,7 +127,7 @@ impl CredentialManager {
     /// Verify a credential
     pub fn verify_credential(&self, credential: &VerifiableCredential) -> Web5Result<bool> {
         // Check if proof exists
-        let proof = match &credential.proof {
+        let _proof = match &credential.proof {
             Some(p) => p,
             None => return Err(Web5Error::Credential("No proof in credential".to_string())),
         };
@@ -138,7 +139,14 @@ impl CredentialManager {
     
     /// Store a credential
     pub fn store_credential(&mut self, credential: VerifiableCredential) -> Web5Result<()> {
-        self.credentials.insert(credential.id.clone(), credential);
+        // In a real implementation, this would store the credential securely
+        // and return its ID
+        let id = if credential.id.is_empty() {
+            generate_uuid()
+        } else {
+            credential.id.clone()
+        };
+        self.credentials.insert(id, credential);
         Ok(())
     }
     
@@ -171,8 +179,8 @@ impl CredentialManager {
         let proof = CredentialProof {
             proof_type: "Ed25519Signature2020".to_string(),
             created: current_iso_date(),
-            verificationMethod: format!("{}#keys-1", issuer_did),
-            proofPurpose: "assertionMethod".to_string(),
+            verification_method: format!("{}#keys-1", issuer_did),
+            proof_purpose: "assertionMethod".to_string(),
             jws: hex::encode(signature),
         };
         
@@ -186,7 +194,8 @@ fn generate_uuid() -> String {
     
     let now = SystemTime::now()
         .duration_since(UNIX_EPOCH)
-        .unwrap();
+        .unwrap_or_default()
+        .as_secs();
     
     format!("{:x}-{:x}-{:x}-{:x}-{:x}", 
         now & 0xFFFF, 
@@ -198,24 +207,37 @@ fn generate_uuid() -> String {
 
 /// Get current date in ISO 8601 format
 fn current_iso_date() -> String {
-    use std::time::{SystemTime, UNIX_EPOCH};
-    
-    let now = SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        ?
-        .as_secs();
-    
-    // Simplified ISO 8601 format for demonstration
-    format!("{}Z", now)
+    use chrono::Utc;
+    Utc::now().to_rfc3339()
+}
+
+#[derive(Debug)]
+pub enum VCError {
+    Credential(String),
+    Serialization(String),
+    Signing(String),
+}
+
+impl Display for VCError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+        write!(f, "{:?}", self)
+    }
+}
+
+impl std::error::Error for VCError {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        None
+    }
 }
 
 #[cfg(test)]
 mod tests {
+    // [AIR-3][AIS-3][BPC-3][RES-3] Error trait is already imported in the parent module
     use super::*;
     use crate::web5::identity::DIDManager;
     
     #[test]
-    fn test_issue_credential()  -> Result<(), Box<dyn Error>> {
+    fn test_issue_credential()  -> Result<(), Box<dyn std::error::Error>> {
         let did_manager = DIDManager::new("ion");
         let mut credential_manager = CredentialManager::new(did_manager);
         
@@ -236,9 +258,10 @@ mod tests {
         
         // Verify basic properties
         assert_eq!(credential.issuer, issuer_did);
-        assert_eq!(credential.credentialSubject.id, subject_did);
+        assert_eq!(credential.credential_subject.id, subject_did);
         assert!(credential.credential_type.contains(&"ExampleCredential".to_string()));
         assert!(credential.proof.is_some());
+        
+        Ok(())
     }
 } 
-

@@ -29,11 +29,38 @@ pub enum Web5Error {
     #[error("Credential error: {0}")]
     Credential(String),
     
+    #[error("Not found: {0}")]
+    NotFound(String),
+    
     #[error("DWN error: {0}")]
     DWNError(String),
     
     #[error("Serialization error: {0}")]
     SerializationError(String),
+}
+
+// [AIS-3] Implementation for From<Box<dyn std::error::Error>> for Web5Error
+// This allows the ? operator to work correctly when converting from Box<dyn Error> to Web5Error
+impl From<Box<dyn std::error::Error>> for Web5Error {
+    fn from(err: Box<dyn std::error::Error>) -> Self {
+        Web5Error::Protocol(err.to_string())
+    }
+}
+
+// [AIS-3] Implementation for From<String> for Web5Error
+// This allows the ? operator to work correctly when converting from String to Web5Error
+impl From<String> for Web5Error {
+    fn from(err: String) -> Self {
+        Web5Error::Protocol(err)
+    }
+}
+
+// [AIS-3] Implementation for From<&str> for Web5Error
+// This allows the ? operator to work correctly when converting from &str to Web5Error
+impl From<&str> for Web5Error {
+    fn from(err: &str) -> Self {
+        Web5Error::Protocol(err.to_string())
+    }
 }
 
 /// DID Manager
@@ -176,7 +203,7 @@ impl DIDManager {
         
         // Store the DID
         {
-            let mut dids = self.dids.lock()?;
+            let mut dids = self.dids.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
             dids.insert(id.clone(), did.clone());
         }
         
@@ -184,46 +211,43 @@ impl DIDManager {
     }
     
     /// Resolve a DID to its document
-    pub fn resolve_did(&self, did: &str) -> Web5Result<DIDDocument> {
+    pub fn resolve_did(&self, did: &str) -> Result<DIDDocument, Box<dyn Error>> {
         // First, check if we have the DID locally
-        let dids = self.dids.lock()?;
+        let dids = self.dids.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         if let Some(did_obj) = dids.get(did) {
             return Ok(did_obj.document.clone());
         }
         
         // If not found locally, return an error (future: implement remote resolution)
-        Err(Web5Error::Identity(format!("DID not found: {}", did)))
+        Err(format!("DID not found: {}", did).into())
     }
     
     /// Set the default DID
-    pub fn set_default_did(&mut self, did: &str) -> Web5Result<()> {
-        // Check if the DID exists
-        let dids = self.dids.lock()?;
-        if !dids.contains_key(did) {
-            return Err(Web5Error::Identity(format!("DID not found: {}", did)));
+    pub fn set_default_did(&mut self, did: &str) -> Result<(), Box<dyn Error>> {
+        let dids = self.dids.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
+        if dids.contains_key(did) {
+            self.default_did = Some(did.to_string());
+            Ok(())
+        } else {
+            Err(format!("DID {} not found", did).into())
         }
-        
-        // Set the default DID
-        self.default_did = Some(did.to_string());
-        
-        Ok(())
     }
     
     /// Get the default DID
-    pub fn get_default_did(&self) -> Web5Result<Option<String>> {
+    pub fn get_default_did(&self) -> Result<Option<String>, Box<dyn Error>> {
         Ok(self.default_did.clone())
     }
     
     /// Sign data with a DID's private key
-    pub fn sign(&self, did: &str, data: &[u8]) -> Web5Result<Vec<u8>> {
+    pub fn sign(&self, did: &str, _data: &[u8]) -> Result<Vec<u8>, Box<dyn Error>> {
         // This is a simplified implementation
         // In a real implementation, this would use the DID's private key
         
         // Get the DID
-        let dids = self.dids.lock()?;
-        let did_obj = dids.get(did).ok_or_else(|| {
-            Web5Error::Identity(format!("DID not found: {}", did))
-        })?;
+        let dids = self.dids.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
+        if !dids.contains_key(did) {
+            return Err(format!("DID not found: {}", did).into());
+        }
         
         // For now, just return a placeholder signature
         // In a real implementation, this would use the appropriate
@@ -232,17 +256,18 @@ impl DIDManager {
     }
     
     /// Get a list of all DIDs
-    pub fn dids(&self) -> Vec<String> {
-        let dids = self.dids.lock().unwrap_or_default();
-        dids.keys().cloned().collect()
+    pub fn dids(&self) -> Result<Vec<String>, Box<dyn Error>> {
+        let dids = self.dids.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
+        Ok(dids.keys().cloned().collect())
     }
 }
 
 /// Generate a random ID for a DID
-pub fn generate_random_id() -> String {
+/// [AIS-3] Properly handles errors without using ? operator
+fn generate_random_id() -> String {
     let now = SystemTime::now()
         .duration_since(UNIX_EPOCH)
-        .unwrap()
+        .unwrap_or_default()
         .as_secs();
     
     format!("{:x}", now)
@@ -253,27 +278,26 @@ mod tests {
     use super::*;
     
     #[test]
-    fn test_create_did()  -> Result<(), Box<dyn Error>> {
-        let manager = DIDManager::new("ion");
+    fn test_create_did() -> Result<(), Box<dyn Error>> {
+        let manager = DIDManager::new("example");
         let did = manager.create_did()?;
-        
-        assert!(did.id.starts_with("did:ion:"));
-        assert_eq!(did.document.id, did.id);
+        assert!(!did.id.is_empty());
+        assert_eq!(did.id.starts_with("did:example:"), true);
+        assert!(!did.private_keys.is_empty());
+        Ok(())
     }
     
     #[test]
-    fn test_default_did()  -> Result<(), Box<dyn Error>> {
-        let mut manager = DIDManager::new("ion");
+    fn test_default_did() -> Result<(), Box<dyn Error>> {
+        let mut manager = DIDManager::new("example");
         let did = manager.create_did()?;
         
         // Initially no default DID
         assert!(manager.get_default_did()?.is_none());
         
-        // Set default DID
+        // Set and get default DID
         manager.set_default_did(&did.id)?;
-        
-        // Check default DID
-        assert_eq!(manager.get_default_did()??, did.id);
+        assert_eq!(manager.get_default_did()?.unwrap(), did.id);
+        Ok(())
     }
 } 
-

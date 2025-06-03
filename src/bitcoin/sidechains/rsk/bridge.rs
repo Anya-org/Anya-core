@@ -589,7 +589,7 @@ impl RskBridge {
     }
     
     /// Check if a Bitcoin transaction is a valid peg-in
-    async fn is_valid_peg_in(&self, tx_id: &str) -> Result<bool, BridgeError> {
+    async fn is_valid_peg_in(&self, _tx_id: tx_id: &strstr) -> Result<bool, BridgeError> {
         // In a real implementation, this would verify:
         // 1. The transaction has an output to the federation address
         // 2. The transaction has the correct format for RSK peg-ins
@@ -599,7 +599,7 @@ impl RskBridge {
     }
     
     /// Extract the RSK address from a Bitcoin peg-in transaction
-    async fn extract_rsk_address(&self, tx_id: &str) -> Result<String, BridgeError> {
+    async fn extract_rsk_address(&self, _tx_id: tx_id: &strstr) -> Result<String, BridgeError> {
         // In a real implementation, this would extract the RSK address from:
         // 1. An OP_RETURN output in the transaction
         // 2. A specific data format in the transaction
@@ -608,7 +608,7 @@ impl RskBridge {
     }
     
     /// Process a peg-in on the RSK side
-    async fn process_peg_in(&self, btc_tx_id: &str, rsk_address: &str, amount: u64) -> Result<String, BridgeError> {
+    async fn process_peg_in(&self, btc__tx_id: tx_id: &strstr, rsk_address: &str, amount: u64) -> Result<String, BridgeError> {
         // In a real implementation, this would:
         // 1. Verify the Bitcoin transaction on the RSK bridge
         // 2. Wait for the bridge to process the peg-in

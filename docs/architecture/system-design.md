@@ -1,10 +1,28 @@
+---
+title: "System Design"
+description: "Documentation for System Design"
+---
+
+[AIR-3][AIS-3][BPC-3][RES-3]
+
+
 <!-- markdownlint-disable MD013 line-length -->
 
 # System Design
 
+## Overview
+
+Add a brief overview of this document here.
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
+
 Documentation for System Design
 
-*Last updated: 2024-12-07*
+*Last updated: 2025-06-02*
 
 ## Installation Architecture
 
@@ -17,3 +35,8 @@ Documentation for System Design
 | Rust Installer         | Full    | Full    | Yes   | Yes   | 2025  |
 | Python Installer       | No      | Partial | No    | Yes   | -     |
 | PowerShell Installer   | No      | No      | No    | Yes   | -     |
+
+## See Also
+
+- [Related Document](#related-document)
+

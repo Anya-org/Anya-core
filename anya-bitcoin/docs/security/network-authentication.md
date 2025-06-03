@@ -38,4 +38,4 @@ This document details the network authentication processes in Anya.
 - [P2P Communication](../network/p2p-communication.md)
 - [Node Configuration](../network/node-configuration.md)
 
-*Last updated: 2024-12-07*
+*Last updated: 2025-06-02*

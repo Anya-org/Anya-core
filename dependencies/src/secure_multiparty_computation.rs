@@ -1,5 +1,5 @@
 use bitcoin::secp256k1::{Secp256k1, SecretKey};
-use bitcoin::util::bip340; // For Schnorr signatures
+use bitcoin::secp256k1; // For Schnorr signatures
 
 impl SecureMultipartyComputation {
     // Add Taproot/Schnorr support

@@ -141,7 +141,7 @@ Each component includes comprehensive unit tests that verify:
 
 ## Contributors
 
-This implementation follows the Bitcoin Development Framework v2.5 and adheres to the Hexagonal Architecture requirements as specified in the project documentation.
+This implementation follows official Bitcoin Improvement Proposals (BIPs) and adheres to the Hexagonal Architecture requirements as specified in the project documentation.
 
 *Last updated: 2024-03-10*
 

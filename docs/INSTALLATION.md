@@ -1,4 +1,18 @@
+---
+title: "Installation"
+description: "Documentation for Installation"
+---
+
+[AIR-3][AIS-3][BPC-3][RES-3]
+
+
 # Anya Core Installation v2.5
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 
 ## Compliance Requirements
 
@@ -509,4 +523,9 @@ cargo test --release --lib --bins -p anya-installer -- security::
   ```bash
   anya-validator check-revocation --credential credential.json
   ```
+
+
+## See Also
+
+- [Related Document](#related-document)
 

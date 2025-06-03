@@ -1,4 +1,4 @@
-use std::error::Error;
+// [AIR-3][AIS-3][BPC-3][RES-3] Removed unused import: std::error::Error
 // AIR-008: Performance Optimization Implementation
 // Priority: HIGH - Performance tuning with in-memory auto-save
 
@@ -78,7 +78,7 @@ impl PerformanceOptimizer {
                              target_utilization: f64,
                              target_throughput: f64,
                              target_latency: Duration) -> Result<(), String> {
-        let mut resources = self.resources.lock()?;
+        let mut resources = self.resources.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         
         let config = OptimizationConfig {
             resource_type,
@@ -94,7 +94,7 @@ impl PerformanceOptimizer {
         resources.insert(resource_name.to_string(), config);
         
         // Record input and potentially auto-save
-        self.record_input_and_check_save();
+let _ =         self.record_input_and_check_save();
         
         Ok(())
     }
@@ -108,17 +108,17 @@ impl PerformanceOptimizer {
                          additional_metrics: HashMap<String, f64>) -> Result<(), String> {
         // Check if resource exists
         {
-            let resources = self.resources.lock()?;
+            let resources = self.resources.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
             if !resources.contains_key(resource_name) {
                 return Err(format!("Resource not found: {}", resource_name));
             }
         }
         
         // Update metrics
-        let mut metrics_map = self.metrics.lock()?;
+        let mut metrics_map = self.metrics.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         let resource_type = {
-            let resources = self.resources.lock()?;
-            resources.get(resource_name)?.resource_type
+            let resources = self.resources.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
+            resources.get(resource_name).ok_or(format!("Resource not found: {}", resource_name))?.resource_type
         };
         
         let metrics = PerformanceMetrics {
@@ -133,40 +133,45 @@ impl PerformanceOptimizer {
         metrics_map.insert(resource_name.to_string(), metrics);
         
         // Record input and potentially auto-save
-        self.record_input_and_check_save();
+let _ =         self.record_input_and_check_save();
         
         Ok(())
     }
     
     /// Record an input and check if auto-save is needed
-    fn record_input_and_check_save(&self) {
-        let mut counter = self.input_counter.lock()?;
+    fn record_input_and_check_save(&self) -> Result<(), String> {
+        let mut counter = self.input_counter.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         *counter += 1;
         
         // Auto-save every Nth input (e.g., every 20th input)
         if *counter % self.auto_save_frequency == 0 {
-            self.save_state_to_memory();
-            println!("Auto-saved performance state after {} changes", *counter);
+            match self.save_state_to_memory() {
+                Ok(_) => println!("Auto-saved performance state after {} changes", *counter),
+                Err(e) => eprintln!("Failed to auto-save: {}", e),
+            }
         }
+        
+        Ok(())
     }
     
     /// Save the current state to memory (no file writing)
-    fn save_state_to_memory(&self) {
+    fn save_state_to_memory(&self) -> Result<(), String> {
         // In a real implementation, this would create a snapshot of current performance state
         // For this implementation, we're just keeping everything in memory
-        let resources = self.resources.lock()?;
-        let metrics = self.metrics.lock()?;
+        let resources = self.resources.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
+        let metrics = self.metrics.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         
         println!("In-memory performance snapshot created: {} resources, {} metrics", 
                 resources.len(), metrics.len());
         
         // Here you would normally serialize the state and store it
+        Ok(())
     }
     
     /// Optimize a specific resource
     pub fn optimize_resource(&self, resource_name: &str) -> Result<OptimizationStatus, String> {
         // Get resource configuration
-        let mut resources = self.resources.lock()?;
+        let mut resources = self.resources.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         
         let config = match resources.get_mut(resource_name) {
             Some(config) => config,
@@ -175,7 +180,7 @@ impl PerformanceOptimizer {
         
         // Check if metrics exist
         let metrics = {
-            let metrics_map = self.metrics.lock()?;
+            let metrics_map = self.metrics.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
             match metrics_map.get(resource_name) {
                 Some(metrics) => metrics.clone(),
                 None => return Err(format!("No metrics available for resource: {}", resource_name)),
@@ -218,17 +223,26 @@ impl PerformanceOptimizer {
         config.last_modified = Instant::now();
         
         // Record input and potentially auto-save
-        self.record_input_and_check_save();
+let _ =         self.record_input_and_check_save();
         
         Ok(config.status.clone())
     }
     
     /// Optimize all resources
     pub fn optimize_all_resources(&self) -> HashMap<String, Result<OptimizationStatus, String>> {
-        let resources = self.resources.lock()?;
-        let resource_names: Vec<String> = resources.keys().cloned().collect();
-        
-        drop(resources); // Release the lock
+        let resource_names = match self.resources.lock() {
+            Ok(resources) => {
+                let names: Vec<String> = resources.keys().cloned().collect();
+                drop(resources); // Release the lock
+                names
+            },
+            Err(e) => {
+                // Return empty map with error for all resources if we can't even get the lock
+                let mut map = HashMap::new();
+                map.insert("general".to_string(), Err(format!("Mutex lock error: {}", e)));
+                return map;
+            }
+        };
         
         // Optimize each resource
         let mut results = HashMap::new();
@@ -241,35 +255,75 @@ impl PerformanceOptimizer {
     
     /// Get resource configuration
     pub fn get_resource_config(&self, resource_name: &str) -> Option<OptimizationConfig> {
-        let resources = self.resources.lock()?;
-        resources.get(resource_name).cloned()
+        match self.resources.lock() {
+            Ok(resources) => resources.get(resource_name).cloned(),
+            Err(e) => {
+                eprintln!("Mutex lock error: {}", e);
+                None
+            }
+        }
     }
     
     /// Get resource metrics
     pub fn get_resource_metrics(&self, resource_name: &str) -> Option<PerformanceMetrics> {
-        let metrics = self.metrics.lock()?;
-        metrics.get(resource_name).cloned()
+        match self.metrics.lock() {
+            Ok(metrics) => metrics.get(resource_name).cloned(),
+            Err(e) => {
+                eprintln!("Mutex lock error: {}", e);
+                None
+            }
+        }
     }
     
     /// Get all resource configurations
     pub fn get_all_resources(&self) -> Vec<OptimizationConfig> {
-        let resources = self.resources.lock()?;
-        resources.values().cloned().collect()
+        match self.resources.lock() {
+            Ok(resources) => resources.values().cloned().collect(),
+            Err(e) => {
+                eprintln!("Mutex lock error: {}", e);
+                Vec::new()
+            }
+        }
     }
     
     /// Get all resource metrics
     pub fn get_all_metrics(&self) -> Vec<PerformanceMetrics> {
-        let metrics = self.metrics.lock()?;
-        metrics.values().cloned().collect()
+        match self.metrics.lock() {
+            Ok(metrics) => metrics.values().cloned().collect(),
+            Err(e) => {
+                eprintln!("Mutex lock error: {}", e);
+                Vec::new()
+            }
+        }
     }
     
     /// Get number of changes and resources
     pub fn get_stats(&self) -> (usize, usize, usize) {
-        let counter = self.input_counter.lock()?;
-        let resources = self.resources.lock()?;
-        let metrics = self.metrics.lock()?;
+        let counter = match self.input_counter.lock() {
+            Ok(counter) => *counter,
+            Err(e) => {
+                eprintln!("Mutex lock error for counter: {}", e);
+                0
+            }
+        };
         
-        (*counter, resources.len(), metrics.len())
+        let resources_len = match self.resources.lock() {
+            Ok(resources) => resources.len(),
+            Err(e) => {
+                eprintln!("Mutex lock error for resources: {}", e);
+                0
+            }
+        };
+        
+        let metrics_len = match self.metrics.lock() {
+            Ok(metrics) => metrics.len(),
+            Err(e) => {
+                eprintln!("Mutex lock error for metrics: {}", e);
+                0
+            }
+        };
+        
+        (counter, resources_len, metrics_len)
     }
 }
 
@@ -279,7 +333,7 @@ mod tests {
     use super::*;
     
     #[test]
-    fn test_resource_configuration_and_auto_save() {
+    fn test_resource_configuration_and_auto_save() -> Result<(), Box<dyn std::error::Error>> {
         let optimizer = PerformanceOptimizer::new(20); // Auto-save every 20th change
         
         // Configure 25 resources to trigger auto-save
@@ -302,10 +356,12 @@ mod tests {
         let (changes, resources, _) = optimizer.get_stats();
         assert_eq!(changes, 25);
         assert_eq!(resources, 25);
+        
+        Ok(())
     }
     
     #[test]
-    fn test_optimization_workflow() {
+    fn test_optimization_workflow() -> Result<(), Box<dyn std::error::Error>> {
         let optimizer = PerformanceOptimizer::new(10);
         
         // Configure a resource
@@ -335,12 +391,16 @@ mod tests {
         )?;
         
         // Optimize the resource
-        let result = optimizer.optimize_resource("database");
-        assert!(result.is_ok());
-        assert_eq!(result?, OptimizationStatus::Optimized);
+        let result = optimizer.optimize_resource("database")?;
+        assert_eq!(result, OptimizationStatus::Optimized);
         
         // Verify the status
-        let config = optimizer.get_resource_config("database")?;
-        assert_eq!(config.status, OptimizationStatus::Optimized);
+        if let Some(config) = optimizer.get_resource_config("database") {
+            assert_eq!(config.status, OptimizationStatus::Optimized);
+        } else {
+            return Err("Resource config not found".into());
+        }
+        
+        Ok(())
     }
 } 

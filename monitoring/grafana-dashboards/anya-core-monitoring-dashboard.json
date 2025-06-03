@@ -1,0 +1,306 @@
+{
+  "__inputs": [
+    {
+      "name": "DS_PROMETHEUS",
+      "label": "Prometheus",
+      "description": "",
+      "type": "datasource",
+      "pluginId": "prometheus",
+      "pluginName": "Prometheus"
+    }
+  ],
+  "__requires": [
+    {
+      "type": "grafana",
+      "id": "grafana",
+      "name": "Grafana",
+      "version": "6.4.1" 
+    },
+    {
+      "type": "panel",
+      "id": "graph",
+      "name": "Graph",
+      "version": ""
+    },
+    {
+      "type": "datasource",
+      "id": "prometheus",
+      "name": "Prometheus",
+      "version": "1.0.0"
+    },
+    {
+      "type": "panel",
+      "id": "stat",
+      "name": "Stat",
+      "version": ""
+    },
+    {
+      "type": "panel",
+      "id": "text",
+      "name": "Text",
+      "version": ""
+    }
+  ],
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "gnetId": null,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "id": 1,
+      "type": "graph",
+      "title": "Anya Core: CPU & Memory Usage",
+      "description": "CPU and Memory usage for the anya-core service. Requires cAdvisor metrics. Update with specific application metrics if available.",
+      "datasource": "${DS_PROMETHEUS}",
+      "gridPos": { "h": 8, "w": 16, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "expr": "sum(rate(container_cpu_usage_seconds_total{container_label_com_docker_compose_service=\"anya-core\"}[1m])) by (pod) * 100",
+          "legendFormat": "CPU Usage {{pod}} (%)",
+          "refId": "A",
+          "hide": false
+        },
+        {
+          "expr": "sum(container_memory_usage_bytes{container_label_com_docker_compose_service=\"anya-core\"}",
+          "legendFormat": "Memory Usage {{pod}}",
+          "refId": "B",
+          "hide": false
+        }
+      ],
+      "yaxis": { "align": false },
+      "yaxes": [
+        { "format": "percentunit", "label": "CPU %", "logBase": 1, "show": true },
+        { "format": "bytes", "label": "Memory", "logBase": 1, "show": true }
+      ],
+      "lines": true,
+      "fill": 1,
+      "linewidth": 1,
+      "pointradius": 2,
+      "options": { "dataLinks": [] }
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "Bitcoin: Block Height",
+      "description": "Current Bitcoin block height from bitcoin-exporter.",
+      "datasource": "${DS_PROMETHEUS}",
+      "gridPos": { "h": 4, "w": 8, "x": 16, "y": 0 },
+      "targets": [
+        {
+          "expr": "max(bitcoin_blocks)",
+          "legendFormat": "Block Height",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "reduceOptions": { "values": false, "calcs": ["lastNotNull"], "fields": "" },
+        "orientation": "horizontal",
+        "textMode": "auto",
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto"
+      }
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "Bitcoin: Network Hashrate",
+      "description": "Estimated Bitcoin network hashrate from bitcoin-exporter.",
+      "datasource": "${DS_PROMETHEUS}",
+      "gridPos": { "h": 4, "w": 8, "x": 16, "y": 4 },
+      "targets": [
+        {
+          "expr": "avg(bitcoin_hashps)",
+          "legendFormat": "Hashrate",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "reduceOptions": { "values": false, "calcs": ["lastNotNull"], "fields": "" },
+        "orientation": "horizontal",
+        "textMode": "auto",
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto"
+      },
+      "fieldConfig": {
+        "defaults": { "unit": "H/s" }
+      }
+    },
+    {
+      "id": 4,
+      "type": "graph",
+      "title": "System CPU Usage",
+      "datasource": "${DS_PROMETHEUS}",
+      "gridPos": { "h": 7, "w": 12, "x": 0, "y": 8 },
+      "targets": [
+        {
+          "expr": "100 - (avg by (instance) (rate(node_cpu_seconds_total{mode=\"idle\"}[1m])) * 100)",
+          "legendFormat": "{{instance}} CPU Usage",
+          "refId": "A"
+        }
+      ],
+      "yaxes": [{ "format": "percent", "label": "CPU Usage", "logBase": 1, "max": 100, "min": 0, "show": true }],
+      "options": { "dataLinks": [] }
+    },
+    {
+      "id": 5,
+      "type": "graph",
+      "title": "System Memory Usage",
+      "datasource": "${DS_PROMETHEUS}",
+      "gridPos": { "h": 7, "w": 12, "x": 12, "y": 8 },
+      "targets": [
+        {
+          "expr": "(node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes * 100",
+          "legendFormat": "{{instance}} Memory Usage",
+          "refId": "A"
+        }
+      ],
+      "yaxes": [{ "format": "percent", "label": "Memory Usage", "logBase": 1, "max": 100, "min": 0, "show": true }],
+      "options": { "dataLinks": [] }
+    },
+    {
+      "id": 6,
+      "type": "graph",
+      "title": "CPU Usage by Service (Containers)",
+      "description": "CPU usage per service based on cAdvisor metrics.",
+      "datasource": "${DS_PROMETHEUS}",
+      "gridPos": { "h": 7, "w": 12, "x": 0, "y": 15 },
+      "targets": [
+        {
+          "expr": "sum(rate(container_cpu_usage_seconds_total{container_label_com_docker_compose_service=~\"anya-core|dwn|bitcoin|bitcoin-exporter\"}[1m])) by (container_label_com_docker_compose_service) * 100",
+          "legendFormat": "{{container_label_com_docker_compose_service}}",
+          "refId": "A"
+        }
+      ],
+      "yaxes": [{ "format": "percent", "label": "CPU Usage", "logBase": 1, "show": true }],
+      "options": { "dataLinks": [] }
+    },
+    {
+      "id": 7,
+      "type": "graph",
+      "title": "Memory Usage by Service (Containers)",
+      "description": "Memory usage per service based on cAdvisor metrics.",
+      "datasource": "${DS_PROMETHEUS}",
+      "gridPos": { "h": 7, "w": 12, "x": 12, "y": 15 },
+      "targets": [
+        {
+          "expr": "sum(container_memory_usage_bytes{container_label_com_docker_compose_service=~\"anya-core|dwn|bitcoin|bitcoin-exporter\"}) by (container_label_com_docker_compose_service)",
+          "legendFormat": "{{container_label_com_docker_compose_service}}",
+          "refId": "A"
+        }
+      ],
+      "yaxes": [{ "format": "bytes", "label": "Memory Usage", "logBase": 1, "show": true }],
+      "options": { "dataLinks": [] }
+    },
+    {
+      "id": 8,
+      "type": "graph",
+      "title": "Bitcoin Difficulty",
+      "datasource": "${DS_PROMETHEUS}",
+      "gridPos": { "h": 7, "w": 8, "x": 0, "y": 22 },
+      "targets": [
+        { "expr": "avg(bitcoin_difficulty)", "legendFormat": "difficulty", "refId": "A" }
+      ],
+      "yaxes": [{ "format": "short", "label": null, "logBase": 1, "show": true }],
+      "options": { "dataLinks": [] }
+    },
+    {
+      "id": 9,
+      "type": "graph",
+      "title": "Bitcoin Network Traffic",
+      "datasource": "${DS_PROMETHEUS}",
+      "gridPos": { "h": 7, "w": 8, "x": 8, "y": 22 },
+      "targets": [
+        { "expr": "sum(irate(bitcoin_total_bytes_sent[5m]))", "legendFormat": "sent", "refId": "A" },
+        { "expr": "-sum(irate(bitcoin_total_bytes_recv[5m]))", "legendFormat": "received", "refId": "B" }
+      ],
+      "yaxes": [{ "format": "Bps", "label": null, "logBase": 1, "show": true }],
+      "options": { "dataLinks": [] }
+    },
+    {
+      "id": 10,
+      "type": "graph",
+      "title": "Bitcoin Peers",
+      "datasource": "${DS_PROMETHEUS}",
+      "gridPos": { "h": 7, "w": 8, "x": 16, "y": 22 },
+      "targets": [
+        { "expr": "sum(bitcoin_peers)", "legendFormat": "peers", "refId": "A" },
+        { "expr": "count(bitcoin_banned_until) by (reason)", "legendFormat": "banned - {{reason}}", "refId": "B"}
+      ],
+      "yaxes": [{ "format": "short", "label": null, "logBase": 1, "show": true }],
+      "options": { "dataLinks": [] }
+    },
+    {
+      "id": 11,
+      "type": "text",
+      "title": "MCP Health (Placeholder)",
+      "description": "This panel is a placeholder for Model Context Protocol (MCP) metrics. Update with specific PromQL queries once MCP exposes Prometheus metrics (e.g., request rates, error rates, processing times, queue lengths).",
+      "gridPos": { "h": 7, "w": 12, "x": 0, "y": 29 },
+      "options": {
+        "mode": "markdown",
+        "content": "**MCP Metrics Not Yet Available**\n\nTo monitor MCP health, ensure your MCP application/service exposes metrics in a Prometheus-compatible format.\n\nCommon MCP metrics to track might include:\n- Request throughput (requests/sec)\n- Request latency (average, p95, p99)\n- Error rates (by type or overall)\n- Active connections or sessions\n- Resource utilization specific to MCP operations\n\nUpdate this panel\'s PromQL queries once these metrics are available from your Prometheus datasource."
+      }
+    },
+    {
+      "id": 12,
+      "type": "graph",
+      "title": "DWN Service Health (Container)",
+      "description": "CPU and Memory usage for the dwn service. Requires cAdvisor metrics.",
+      "datasource": "${DS_PROMETHEUS}",
+      "gridPos": { "h": 7, "w": 12, "x": 12, "y": 29 },
+      "targets": [
+        {
+          "expr": "sum(rate(container_cpu_usage_seconds_total{container_label_com_docker_compose_service=\"dwn\"}[1m])) by (pod) * 100",
+          "legendFormat": "CPU Usage {{pod}} (%)",
+          "refId": "A"
+        },
+        {
+          "expr": "sum(container_memory_usage_bytes{container_label_com_docker_compose_service=\"dwn\"}) by (pod)",
+          "legendFormat": "Memory Usage {{pod}}",
+          "refId": "B"
+        }
+      ],
+      "yaxis": { "align": false },
+      "yaxes": [
+        { "format": "percentunit", "label": "CPU %", "logBase": 1, "show": true },
+        { "format": "bytes", "label": "Memory", "logBase": 1, "show": true }
+      ],
+      "options": { "dataLinks": [] }
+    }
+  ],
+  "refresh": "5m",
+  "schemaVersion": 36,
+  "style": "dark",
+  "tags": ["anya-core", "monitoring"],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "",
+  "title": "Anya Core Monitoring Dashboard",
+  "uid": "anya-core-main-v1",
+  "version": 1,
+  "weekStart": ""
+}

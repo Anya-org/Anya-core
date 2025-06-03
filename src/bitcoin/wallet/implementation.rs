@@ -1,9 +1,8 @@
-//! Bitcoin wallet implementation details
-//!
-//! This module contains the implementation details for the Bitcoin wallet.
-//! [AIR-1][AIS-1][AIM-1][AIP-1][RES-1]
+// Bitcoin wallet implementation details
+//
+// This module contains the implementation details for the Bitcoin wallet.
+// [AIR-1][AIS-1][AIM-1][AIP-1][RES-1]
 
-use std::error::Error;
 use std::collections::HashMap;
 use std::path::Path;
 use std::str::FromStr;
@@ -14,8 +13,8 @@ use async_trait::async_trait;
 use bitcoin::{Address, Network, OutPoint, Script, Transaction, TxIn, TxOut, Txid};
 use bitcoin::consensus::encode;
 use bitcoin::secp256k1::{self, Secp256k1};
-use bitcoin::util::bip32::{ExtendedPrivKey, ExtendedPubKey, DerivationPath};
-use bitcoin::util::psbt::PartiallySignedTransaction as PSBT;
+use bitcoin::bip32::{ExtendedPrivKey, ExtendedPubKey, DerivationPath};
+use bitcoin::psbt::PartiallySignedTransaction as PSBT;
 use log::{debug, info, error, warn};
 use rand::{thread_rng, Rng};
 use serde_json;

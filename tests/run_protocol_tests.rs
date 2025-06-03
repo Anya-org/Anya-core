@@ -1,22 +1,8 @@
 use anya_core::layer2::{
-    Layer2Protocol,
-    ProtocolState,
-    TransactionStatus,
-    AssetParams,
-    AssetTransfer,
-    TransferResult,
-    Proof,
-    VerificationResult,
-    ValidationResult,
-    bob::BobClient,
-    lightning::LightningProtocol,
-    rgb::RgbProtocol,
-    rsk::RskProtocol,
-    dlc::DlcProtocol,
-    stacks::StacksProtocol,
-    liquid::LiquidProtocol,
-    state_channels::StateChannelsProtocol,
-    mock::MockLayer2Protocol,
+    bob::BobClient, dlc::DlcProtocol, lightning::LightningProtocol, liquid::LiquidProtocol,
+    mock::MockLayer2Protocol, rgb::RgbProtocol, rsk::RskProtocol, stacks::StacksProtocol,
+    state_channels::StateChannelsProtocol, AssetParams, AssetTransfer, Layer2Protocol, Proof,
+    ProtocolState, TransactionStatus, TransferResult, ValidationResult, VerificationResult,
 };
 
 #[tokio::test]
@@ -48,7 +34,10 @@ async fn test_all_protocols() {
 
         // Test transaction status
         let status = protocol.get_transaction_status(&tx_id).await.unwrap();
-        assert!(matches!(status, TransactionStatus::Confirmed | TransactionStatus::Pending));
+        assert!(matches!(
+            status,
+            TransactionStatus::Confirmed | TransactionStatus::Pending
+        ));
 
         // Test state management
         let state = protocol.get_state().await.unwrap();
@@ -76,7 +65,10 @@ async fn test_all_protocols() {
         };
         let transfer_result = protocol.transfer_asset(transfer).await.unwrap();
         assert!(!transfer_result.tx_id.is_empty());
-        assert!(matches!(transfer_result.status, TransactionStatus::Confirmed | TransactionStatus::Pending));
+        assert!(matches!(
+            transfer_result.status,
+            TransactionStatus::Confirmed | TransactionStatus::Pending
+        ));
         assert!(transfer_result.timestamp >= 0);
 
         // Test proof verification
@@ -97,4 +89,4 @@ async fn test_all_protocols() {
         // Test disconnection
         assert!(protocol.disconnect().await.is_ok());
     }
-} 
+}

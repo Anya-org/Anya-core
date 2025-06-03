@@ -1,4 +1,18 @@
+---
+title: "Governance_framework"
+description: "Documentation for Governance_framework"
+last_updated: 2025-05-30
+---
+[AIR-3][AIS-3][BPC-3][RES-3]
+
+
 # Governance Framework
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 
 [AIS-3][BPC-3][DAO-3]
 
@@ -155,3 +169,7 @@ const proposal = await anyaDAO.createProposal({
 - [API Reference](api/GOVERNANCE_API.md) - Technical API documentation
 
 *Last updated: 2025-02-24* 
+## See Also
+
+- [Related Document 1](./related1.md)
+- [Related Document 2](./related2.md)

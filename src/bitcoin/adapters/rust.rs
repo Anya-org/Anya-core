@@ -83,7 +83,7 @@ impl RustBitcoinImplementation {
         println!("Generated new wallet with mnemonic: {}", mnemonic.to_string());
         
         // Store the mnemonic
-        *self.mnemonic.lock()? = Some(mnemonic.clone());
+        *self.mnemonic.lock().map_err(|e| format!("Mutex lock error: {}", e))? = Some(mnemonic.clone());
         
         // Create extended key from mnemonic
         let xkey: ExtendedKey = mnemonic.into_extended_key()
@@ -112,7 +112,7 @@ impl RustBitcoinImplementation {
         ).map_err(|e| BitcoinError::WalletError(format!("Failed to create wallet: {}", e)))?;
         
         // Store the wallet
-        *self.wallet.lock()? = Some(wallet);
+        *self.wallet.lock().map_err(|e| format!("Mutex lock error: {}", e))? = Some(wallet);
         
         // Connect to Electrum server
         let electrum_url = match self.network {
@@ -135,11 +135,11 @@ impl RustBitcoinImplementation {
             .map_err(|e| BitcoinError::NetworkError(format!("Failed to connect to Electrum server: {}", e)))?;
         
         // Store the blockchain
-        *self.blockchain.lock()? = Some(blockchain);
+        *self.blockchain.lock().map_err(|e| format!("Mutex lock error: {}", e))? = Some(blockchain);
         
         // Sync the wallet if blockchain is available
-        if let Some(blockchain) = &*self.blockchain.lock()? {
-            if let Some(wallet) = &mut *self.wallet.lock()? {
+        if let Some(blockchain) = &*self.blockchain.lock().map_err(|e| format!("Mutex lock error: {}", e))? {
+            if let Some(wallet) = &mut *self.wallet.lock().map_err(|e| format!("Mutex lock error: {}", e))? {
                 wallet.sync(blockchain, SyncOptions::default())
                     .map_err(|e| BitcoinError::NetworkError(format!("Failed to sync wallet: {}", e)))?;
                 
@@ -152,12 +152,12 @@ impl RustBitcoinImplementation {
     
     /// Get the wallet instance, initializing it if needed
     fn get_wallet(&self) -> BitcoinResult<std::sync::MutexGuard<Option<Wallet<MemoryDatabase>>>>  -> Result<(), Box<dyn Error>> {
-        let wallet_guard = self.wallet.lock()?;
+        let wallet_guard = self.wallet.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         
         if wallet_guard.is_none() {
             drop(wallet_guard); // Release the lock before initializing
             self.initialize_wallet()?;
-            return Ok(self.wallet.lock()?);
+            return Ok(self.wallet.lock().map_err(|e| format!("Mutex lock error: {}", e))?);
         }
         
         Ok(wallet_guard)
@@ -165,12 +165,12 @@ impl RustBitcoinImplementation {
     
     /// Get the blockchain instance, initializing it if needed
     fn get_blockchain(&self) -> BitcoinResult<std::sync::MutexGuard<Option<ElectrumBlockchain>>>  -> Result<(), Box<dyn Error>> {
-        let blockchain_guard = self.blockchain.lock()?;
+        let blockchain_guard = self.blockchain.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         
         if blockchain_guard.is_none() {
             drop(blockchain_guard); // Release the lock before initializing
             self.initialize_wallet()?;
-            return Ok(self.blockchain.lock()?);
+            return Ok(self.blockchain.lock().map_err(|e| format!("Mutex lock error: {}", e))?);
         }
         
         Ok(blockchain_guard)

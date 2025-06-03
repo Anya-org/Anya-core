@@ -19,7 +19,7 @@ Compliance:
 - [x] Miniscript Support
 - [ ] Testnet Validation (pending)
 
-References Bitcoin Development Framework v2.5
+References official Bitcoin Improvement Proposals (BIPs)
 Related to: AIR-342, AIT-367
 
 Signed-off-by: bo_thebig <botshelomokoka@gmail.com> 

@@ -1,4 +1,5 @@
 #!/bin/bash
+# [AIR-3][AIS-3][BPC-3][RES-3]
 # Module management system for Anya project
 # Handles script dependencies and cross-module integration
 

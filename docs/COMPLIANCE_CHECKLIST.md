@@ -1,4 +1,22 @@
-# Bitcoin Development Framework Compliance Checklist v2.5
+---
+title: "Compliance_checklist"
+description: "Documentation for Compliance_checklist"
+---
+
+[AIR-3][AIS-3][BPC-3][RES-3]
+
+
+# Bitcoin Improvement Proposals (BIPs) Compliance Checklist
+
+## Overview
+
+Add a brief overview of this document here.
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 
 ## Core Protocol (BIP-341/342)
 - [ ] SILENT_LEAF pattern verification
@@ -96,3 +114,7 @@ Would you like me to generate a specific compliance report or update the validat
 - [x] BIP-341 (Taproot Mobile)
 - [x] BIP-275 (PSBT Metadata)
 - [x] DID v1 (Web5-RS 0.6) 
+## See Also
+
+- [Related Document](#related-document)
+

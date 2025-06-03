@@ -52,6 +52,7 @@ This branch (`installer-dev`) contains updates to the Anya Core installation and
 
 - **Web5 DWN**: Port 3000
 - **Prometheus**: Port 9090
+- **Bitcoin Exporter**: Port 9332 (for Prometheus metrics)
 
 ## Usage
 
@@ -79,6 +80,6 @@ This branch (`installer-dev`) contains updates to the Anya Core installation and
 ## Next Steps
 
 1. Test deployment on a fresh Ubuntu server
-2. Implement additional monitoring for Bitcoin testnet
+2. Implement additional monitoring for Bitcoin testnet using the new `bitcoin-exporter` and Grafana.
 3. Add a fallback mechanism if the public RPC endpoint is unavailable
-4. Expand test coverage for all Bitcoin-related operations 
+4. Expand test coverage for all Bitcoin-related operations

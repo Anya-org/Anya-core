@@ -1,16 +1,25 @@
-use std::error::Error;
+use std::sync::Arc;
 use async_trait::async_trait;
 use serde::{Serialize, Deserialize};
-use thiserror::Error;
 use uuid::Uuid;
 use std::collections::HashMap;
 use tokio::sync::Mutex;
-use std::sync::Arc;
+use std::fmt::Debug;
+use chrono::{DateTime, Utc};
+use std::str::FromStr;
+use base64::{Engine as _, engine::general_purpose::STANDARD as BASE64};
+use bitcoin::psbt::Psbt;
+use tracing::warn;
 
 use crate::security::hsm::config::{
     HsmConfig, SoftHsmConfig, CloudHsmConfig, TpmConfig, Pkcs11Config
 };
 use crate::security::hsm::error::HsmError;
+use crate::security::hsm::providers::{
+    SoftwareHsmProvider,
+    SimulatorHsmProvider,
+    HardwareHsmProvider,
+};
 
 /// Supported HSM provider types
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -33,221 +42,99 @@ pub enum HsmProviderType {
     Custom,
 }
 
-/// Key types supported by HSM providers
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+/// HSM provider status
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub enum HsmProviderStatus {
+    /// Provider is ready
+    Ready,
+    /// Provider is initializing
+    Initializing,
+    /// Provider is unavailable
+    Unavailable,
+    /// Provider needs authentication
+    NeedsAuthentication,
+    /// Provider has an error
+    Error(String),
+}
+
+/// Supported key types
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum KeyType {
     /// RSA key
-    Rsa { bits: u32 },
-    
-    /// EC key with specified curve
-    Ec { curve: EcCurve },
-    
-    /// AES key with specified variant
-    Aes { variant: AesVariant },
-    
-    /// ChaCha20 key
-    ChaCha20,
-    
-    /// HMAC key with specified algorithm
-    Hmac { algorithm: HmacAlgorithm },
-    
+    Rsa {
+        /// Bits (e.g., 2048, 4096)
+        bits: usize,
+    },
+    /// Elliptic curve key
+    Ec {
+        /// Curve (e.g., secp256k1, P-256)
+        curve: EcCurve,
+    },
     /// Ed25519 key
     Ed25519,
-    
     /// X25519 key
     X25519,
+    /// AES key
+    Aes {
+        /// Bits (e.g., 128, 256)
+        bits: usize,
+    },
+    /// HMAC key
+    Hmac {
+        /// Bits
+        bits: usize,
+    },
+    /// Raw key
+    Raw {
+        /// Bits
+        bits: usize,
+    },
 }
 
-impl std::fmt::Display for KeyType {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            KeyType::Rsa { bits } => write!(f, "rsa::{}", bits),
-            KeyType::Ec { curve } => write!(f, "ec::{}", curve),
-            KeyType::Aes { variant } => write!(f, "aes::{}", variant),
-            KeyType::ChaCha20 => write!(f, "chacha20"),
-            KeyType::Hmac { algorithm } => write!(f, "hmac::{}", algorithm),
-            KeyType::Ed25519 => write!(f, "ed25519"),
-            KeyType::X25519 => write!(f, "x25519"),
-        }
-    }
+/// Supported elliptic curves
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub enum EcCurve {
+    /// secp256k1 (used by Bitcoin)
+    Secp256k1,
+    /// P-256 (NIST curve)
+    P256,
+    /// P-384 (NIST curve)
+    P384,
+    /// P-521 (NIST curve)
+    P521,
 }
 
-impl std::str::FromStr for KeyType {
+impl FromStr for EcCurve {
     type Err = HsmError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let parts: Vec<&str> = s.split("::").collect();
-        if parts.is_empty() {
-            return Err(HsmError::InvalidKeyType(s.to_string()));
-        }
-
-        match parts[0].to_lowercase().as_str() {
-            "rsa" => {
-                if parts.len() != 2 {
-                    return Err(HsmError::InvalidKeyType(s.to_string()));
-                }
-                let bits = parts[1].parse::<u32>()
-                    .map_err(|_| HsmError::InvalidKeyType(s.to_string()))?;
-                Ok(KeyType::Rsa { bits })
-            },
-            "ec" => {
-                if parts.len() != 2 {
-                    return Err(HsmError::InvalidKeyType(s.to_string()));
-                }
-                let curve = match parts[1].to_lowercase().as_str() {
-                    "p256" => EcCurve::P256,
-                    "p384" => EcCurve::P384,
-                    "p521" => EcCurve::P521,
-                    "secp256k1" => EcCurve::Secp256k1,
-                    _ => return Err(HsmError::InvalidKeyType(s.to_string())),
-                };
-                Ok(KeyType::Ec { curve })
-            },
-            "hmac" => {
-                if parts.len() != 2 {
-                    return Err(HsmError::InvalidKeyType(s.to_string()));
-                }
-                let algorithm = match parts[1].to_lowercase().as_str() {
-                    "sha1" => HmacAlgorithm::Sha1,
-                    "sha256" => HmacAlgorithm::Sha256,
-                    "sha384" => HmacAlgorithm::Sha384,
-                    "sha512" => HmacAlgorithm::Sha512,
-                    _ => return Err(HsmError::InvalidKeyType(s.to_string())),
-                };
-                Ok(KeyType::Hmac { algorithm })
-            },
-            "aes" => {
-                if parts.len() != 2 {
-                    return Err(HsmError::InvalidKeyType(s.to_string()));
-                }
-                let variant = match parts[1].to_lowercase().as_str() {
-                    "128" => AesVariant::Aes128,
-                    "192" => AesVariant::Aes192,
-                    "256" => AesVariant::Aes256,
-                    _ => return Err(HsmError::InvalidKeyType(s.to_string())),
-                };
-                Ok(KeyType::Aes { variant })
-            },
-            "chacha20" => {
-                if parts.len() != 1 {
-                    return Err(HsmError::InvalidKeyType(s.to_string()));
-                }
-                Ok(KeyType::ChaCha20)
-            },
-            "ed25519" => Ok(KeyType::Ed25519),
-            "x25519" => Ok(KeyType::X25519),
-            _ => Err(HsmError::InvalidKeyType(s.to_string())),
+        match s.to_lowercase().as_str() {
+            "secp256k1" => Ok(EcCurve::Secp256k1),
+            "p-256" | "p256" => Ok(EcCurve::P256),
+            "p-384" | "p384" => Ok(EcCurve::P384),
+            "p-521" | "p521" => Ok(EcCurve::P521),
+            _ => Err(HsmError::InvalidParameters(format!("Unsupported curve: {}", s))),
         }
     }
 }
 
-/// EC curves supported by HSM providers
-#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
-pub enum EcCurve {
-    /// P-256 (NIST)
-    P256,
-    /// P-384 (NIST)
-    P384,
-    /// P-521 (NIST)
-    P521,
-    /// secp256k1 (used by Bitcoin/Ethereum)
-    Secp256k1,
-}
-
-impl std::fmt::Display for EcCurve {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            EcCurve::P256 => write!(f, "p256"),
-            EcCurve::P384 => write!(f, "p384"),
-            EcCurve::P521 => write!(f, "p521"),
-            EcCurve::Secp256k1 => write!(f, "secp256k1"),
-        }
-    }
-}
-
-/// HMAC algorithms supported by HSM providers
-#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
-pub enum HmacAlgorithm {
-    /// SHA-1 (legacy, not recommended for new applications)
-    Sha1,
-    /// SHA-256
-    Sha256,
-    /// SHA-384
-    Sha384,
-    /// SHA-512
-    Sha512,
-}
-
-impl std::fmt::Display for HmacAlgorithm {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            HmacAlgorithm::Sha1 => write!(f, "sha1"),
-            HmacAlgorithm::Sha256 => write!(f, "sha256"),
-            HmacAlgorithm::Sha384 => write!(f, "sha384"),
-            HmacAlgorithm::Sha512 => write!(f, "sha512"),
-        }
-    }
-}
-
-/// AES variants supported by HSM providers
-#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
-pub enum AesVariant {
-    /// AES-128 (128 bits)
-    Aes128,
-    /// AES-192 (192 bits)
-    Aes192,
-    /// AES-256 (256 bits, recommended)
-    Aes256,
-}
-
-impl std::fmt::Display for AesVariant {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            AesVariant::Aes128 => write!(f, "128"),
-            AesVariant::Aes192 => write!(f, "192"),
-            AesVariant::Aes256 => write!(f, "256"),
-        }
-    }
-}
-
-/// Key usage flags
-#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
+/// Key usage
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum KeyUsage {
-    /// Key can be used for signing
+    /// Sign
     Sign,
-    /// Key can be used for verification
+    /// Verify
     Verify,
-    /// Key can be used for encryption
+    /// Encrypt
     Encrypt,
-    /// Key can be used for decryption
+    /// Decrypt
     Decrypt,
-    /// Key can be used for wrapping other keys
+    /// Wrap
     Wrap,
-    /// Key can be used for unwrapping other keys
+    /// Unwrap
     Unwrap,
-    /// Key can be used for deriving other keys
+    /// Derive
     Derive,
-}
-
-/// Public key information
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct PublicKeyInfo {
-    /// Key ID
-    pub id: String,
-    /// Key label
-    pub label: String,
-    /// Key type
-    pub key_type: KeyType,
-    /// Public key data
-    pub public_key: Vec<u8>,
-    /// Key usages
-    pub usages: Vec<KeyUsage>,
-    /// Creation timestamp
-    pub created_at: chrono::DateTime<chrono::Utc>,
-    /// Expiration timestamp (if any)
-    pub expires_at: Option<chrono::DateTime<chrono::Utc>>,
-    /// Additional attributes
-    pub attributes: HashMap<String, String>,
 }
 
 /// Key information
@@ -256,68 +143,67 @@ pub struct KeyInfo {
     /// Key ID
     pub id: String,
     /// Key label
-    pub label: String,
+    pub label: Option<String>,
     /// Key type
     pub key_type: KeyType,
-    /// Whether key is extractable
+    /// Whether the key is extractable
     pub extractable: bool,
     /// Key usages
     pub usages: Vec<KeyUsage>,
-    /// Creation timestamp
-    pub created_at: chrono::DateTime<chrono::Utc>,
-    /// Expiration timestamp (if any)
-    pub expires_at: Option<chrono::DateTime<chrono::Utc>>,
-    /// Additional attributes
+    /// Created at
+    pub created_at: DateTime<Utc>,
+    /// Expires at
+    pub expires_at: Option<DateTime<Utc>>,
+    /// Attributes
     pub attributes: HashMap<String, String>,
 }
 
-/// Parameters for generating a key pair
+/// Key pair
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct KeyPair {
+    /// Key ID
+    pub id: String,
+    /// Key type
+    pub key_type: KeyType,
+    /// Public key
+    pub public_key: Vec<u8>,
+    /// Private key handle (typically a reference to the key stored in the HSM)
+    pub private_key_handle: String,
+}
+
+/// Key generation parameters
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct KeyGenParams {
-    /// Key ID (optional, will be generated if not provided)
+    /// Key ID (optional, generated if not provided)
     pub id: Option<String>,
     /// Key label
-    pub label: String,
+    pub label: Option<String>,
     /// Key type
     pub key_type: KeyType,
-    /// Whether private key is extractable
+    /// Whether the key is extractable
     pub extractable: bool,
     /// Key usages
     pub usages: Vec<KeyUsage>,
-    /// Expiration timestamp (if any)
-    pub expires_at: Option<chrono::DateTime<chrono::Utc>>,
-    /// Additional attributes
+    /// Expires at
+    pub expires_at: Option<DateTime<Utc>>,
+    /// Attributes
     pub attributes: HashMap<String, String>,
-}
-
-impl Default for KeyGenParams {
-    fn default() -> Self {
-        Self {
-            id: None,
-            label: String::new(),
-            key_type: KeyType::Rsa { bits: 2048 },
-            extractable: false,
-            usages: vec![KeyUsage::Sign, KeyUsage::Verify],
-            expires_at: None,
-            attributes: HashMap::new(),
-        }
-    }
 }
 
 /// Signing algorithm
-#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum SigningAlgorithm {
-    /// RSASSA-PKCS1-v1_5 with SHA-256
+    /// RSA-PKCS1-v1_5 with SHA-256
     RsaPkcs1Sha256,
-    /// RSASSA-PKCS1-v1_5 with SHA-384
+    /// RSA-PKCS1-v1_5 with SHA-384
     RsaPkcs1Sha384,
-    /// RSASSA-PKCS1-v1_5 with SHA-512
+    /// RSA-PKCS1-v1_5 with SHA-512
     RsaPkcs1Sha512,
-    /// RSASSA-PSS with SHA-256
+    /// RSA-PSS with SHA-256
     RsaPssSha256,
-    /// RSASSA-PSS with SHA-384
+    /// RSA-PSS with SHA-384
     RsaPssSha384,
-    /// RSASSA-PSS with SHA-512
+    /// RSA-PSS with SHA-512
     RsaPssSha512,
     /// ECDSA with SHA-256
     EcdsaSha256,
@@ -327,103 +213,245 @@ pub enum SigningAlgorithm {
     EcdsaSha512,
     /// Ed25519
     Ed25519,
+    /// HMAC with SHA-256
+    HmacSha256,
+    /// HMAC with SHA-384
+    HmacSha384,
+    /// HMAC with SHA-512
+    HmacSha512,
 }
 
 /// Encryption algorithm
-#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum EncryptionAlgorithm {
-    /// RSA PKCS#1 v1.5
+    /// RSA-PKCS1-v1_5
     RsaPkcs1,
-    /// RSA OAEP with SHA-256
+    /// RSA-OAEP with SHA-256
     RsaOaepSha256,
-    /// AES-CBC
-    AesCbc,
-    /// AES-GCM
-    AesGcm,
-    /// AES-CTR
-    AesCtr,
-    /// 3DES-CBC
-    TripleDesCbc,
+    /// AES-GCM 128-bit
+    AesGcm128,
+    /// AES-GCM 256-bit
+    AesGcm256,
+    /// AES-CBC 128-bit
+    AesCbc128,
+    /// AES-CBC 256-bit
+    AesCbc256,
+    /// ChaCha20-Poly1305
+    ChaCha20Poly1305,
+}
+
+/// HSM request operation
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum HsmOperation {
+    /// Generate key
+    GenerateKey,
+    /// Sign
+    Sign,
+    /// Verify
+    Verify,
+    /// Encrypt
+    Encrypt,
+    /// Decrypt
+    Decrypt,
+    /// Export public key
+    ExportPublicKey,
+    /// List keys
+    ListKeys,
+    /// Get status
+    GetStatus,
+    /// Delete key
+    DeleteKey,
+    /// Custom operation
+    Custom(String),
+}
+
+/// HSM request
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct HsmRequest {
+    /// Request ID
+    pub id: String,
+    /// Operation
+    pub operation: HsmOperation,
+    /// Parameters
+    pub parameters: serde_json::Value,
+}
+
+/// HSM response
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct HsmResponse {
+    /// Request ID
+    pub id: String,
+    /// Success
+    pub success: bool,
+    /// Error message
+    pub error: Option<String>,
+    /// Response data
+    pub data: Option<serde_json::Value>,
+}
+
+impl HsmResponse {
+    /// Create a success response
+    pub fn success(id: String, data: Option<serde_json::Value>) -> Self {
+        Self {
+            id,
+            success: true,
+            error: None,
+            data,
+        }
+    }
+
+    /// Create an error response
+    pub fn error(id: String, error: String) -> Self {
+        Self {
+            id,
+            success: false,
+            error: Some(error),
+            data: None,
+        }
+    }
 }
 
 /// HSM provider trait
-/// 
-/// This trait defines the interface for HSM providers.
 #[async_trait]
-pub trait HsmProvider: Send + Sync {
-    /// Initialize the HSM provider
+pub trait HsmProvider: Send + Sync + Debug {
+    /// Initialize provider
     async fn initialize(&self) -> Result<(), HsmError>;
     
-    /// Generate a new key pair
-    async fn generate_key(&self, key_type: KeyType) -> Result<KeyPair, HsmError>;
+    /// Generate key
+    async fn generate_key(&self, params: KeyGenParams) -> Result<(KeyPair, KeyInfo), HsmError>;
     
-    /// Sign data with a key
-    async fn sign(&self, key_id: &str, data: &[u8]) -> Result<Vec<u8>, HsmError>;
+    /// Sign data
+    async fn sign(&self, key_id: &str, algorithm: SigningAlgorithm, data: &[u8]) -> Result<Vec<u8>, HsmError>;
     
-    /// Verify a signature
-    async fn verify(&self, key_id: &str, data: &[u8], signature: &[u8]) -> Result<bool, HsmError>;
+    /// Verify signature
+    async fn verify(&self, key_id: &str, algorithm: SigningAlgorithm, data: &[u8], signature: &[u8]) -> Result<bool, HsmError> {
+        Err(HsmError::UnsupportedOperation("Verification not implemented".into()))
+    }
     
-    /// Encrypt data
-    async fn encrypt(&self, key_id: &str, data: &[u8]) -> Result<Vec<u8>, HsmError>;
+    /// Sign PSBT (Partially Signed Bitcoin Transaction)
+    async fn sign_psbt(&self, psbt: &mut Psbt) -> Result<(), HsmError> {
+        Err(HsmError::UnsupportedOperation("PSBT signing not implemented".into()))
+    }
     
-    /// Decrypt data
-    async fn decrypt(&self, key_id: &str, encrypted_data: &[u8]) -> Result<Vec<u8>, HsmError>;
-    
-    /// Export a public key
+    /// Export public key
     async fn export_public_key(&self, key_id: &str) -> Result<Vec<u8>, HsmError>;
     
-    /// List all keys
+    /// List keys
     async fn list_keys(&self) -> Result<Vec<KeyInfo>, HsmError>;
     
-    /// Delete a key
+    /// Delete key
     async fn delete_key(&self, key_id: &str) -> Result<(), HsmError>;
     
-    /// Get HSM provider status
+    /// Get provider status
     async fn get_status(&self) -> Result<HsmProviderStatus, HsmError>;
     
-    /// Close the HSM provider connection
+    /// Close provider
     async fn close(&self) -> Result<(), HsmError>;
     
-    /// Execute an HSM operation based on a request
+    /// Execute operation
     async fn execute_operation(&self, request: HsmRequest) -> Result<HsmResponse, HsmError>;
+    
+    /// Perform a comprehensive health check of the HSM
+    /// Returns true if all checks pass, false otherwise
+    async fn perform_health_check(&self) -> Result<bool, HsmError> {
+        // Default implementation performs basic status check and key operation tests
+        // Each provider should override this with more specific checks
+        let status = self.get_status().await?;
+        
+        // Generate a test key to verify key operations
+        let test_params = KeyGenParams {
+            id: Some(format!("health_check_{}", Utc::now().timestamp())),
+            label: Some("health_check_test_key".to_string()),
+            key_type: KeyType::Ec { curve: EcCurve::Secp256k1 },
+            extractable: true,
+            usages: vec![KeyUsage::Sign, KeyUsage::Verify],
+            expires_at: None,
+            attributes: HashMap::new(),
+        };
+        
+        // Test key generation
+        let (key_pair, _) = match self.generate_key(test_params).await {
+            Ok(result) => result,
+            Err(e) => {
+                warn!("HSM health check failed: Key generation error: {}", e);
+                return Ok(false);
+            }
+        };
+        
+        // Test signing
+        let test_data = b"HSM health check test data";
+        let signature = match self.sign(&key_pair.id, SigningAlgorithm::EcdsaSha256, test_data).await {
+            Ok(sig) => sig,
+            Err(e) => {
+                warn!("HSM health check failed: Signing error: {}", e);
+                // Try to clean up test key before returning
+                let _ = self.delete_key(&key_pair.id).await;
+                return Ok(false);
+            }
+        };
+        
+        // Test verification
+        let verify_result = match self.verify(&key_pair.id, SigningAlgorithm::EcdsaSha256, test_data, &signature).await {
+            Ok(result) => result,
+            Err(e) => {
+                warn!("HSM health check failed: Verification error: {}", e);
+                // Try to clean up test key before returning
+                let _ = self.delete_key(&key_pair.id).await;
+                return Ok(false);
+            }
+        };
+        
+        // Clean up test key
+        match self.delete_key(&key_pair.id).await {
+            Ok(_) => {},
+            Err(e) => {
+                warn!("HSM health check warning: Could not delete test key: {}", e);
+                // Non-fatal error, don't fail the health check just for this
+            }
+        };
+        
+        // All checks should pass and verification should succeed
+        Ok(verify_result);
+    }
 }
 
 /// Creates an HSM provider based on the configuration
 pub async fn create_hsm_provider(config: &HsmConfig) -> Result<Arc<dyn HsmProvider>, HsmError> {
     match config.provider_type {
         HsmProviderType::SoftwareKeyStore => {
-            let provider = SoftHsmProvider::new(&config.software)?;
+            // Import the SoftwareHsmProvider from providers/software.rs
+            let provider = SoftwareHsmProvider::new(&config.software)?;
             Ok(Arc::new(provider))
         },
         HsmProviderType::CloudHsm => {
-            let provider = CloudHsmProvider::new(&config.cloud)?;
-            Ok(Arc::new(provider))
+            // Not implemented for this phase
+            Err(HsmError::ProviderError("CloudHsm provider not implemented".to_string()))
         },
         HsmProviderType::Tpm => {
-            let provider = TpmProvider::new(&config.tpm)?;
-            Ok(Arc::new(provider))
+            // Not implemented for this phase
+            Err(HsmError::ProviderError("Tpm provider not implemented".to_string()))
         },
         HsmProviderType::Pkcs11 => {
-            let provider = Pkcs11Provider::new(&config.pkcs11)?;
-            Ok(Arc::new(provider))
+            // Not implemented for this phase
+            Err(HsmError::ProviderError("Pkcs11 provider not implemented".to_string()))
         },
         HsmProviderType::Simulator => {
-            // Import the type from the module
-            use crate::security::hsm::providers::SimulatorHsmProvider;
+            // Import the SimulatorHsmProvider from providers/simulator.rs
             let provider = SimulatorHsmProvider::new(&config.simulator)?;
             Ok(Arc::new(provider))
         },
         HsmProviderType::Hardware => {
-            // Import the type from the module
-            use crate::security::hsm::providers::HardwareHsmProvider;
+            // Import the HardwareHsmProvider from providers/hardware.rs
             let provider = HardwareHsmProvider::new(&config.hardware)?;
             Ok(Arc::new(provider))
         },
         HsmProviderType::Bitcoin => {
-            Err(HsmError::ProviderError("Bitcoin provider not implemented".to_string()))
+            // This would be Bitcoin-specific HSM implementation
+            // For now, we'll recommend using the Hardware provider with Bitcoin config
+            Err(HsmError::ProviderError("Use Hardware provider with Bitcoin configuration".to_string()))
         },
         HsmProviderType::Custom => {
-            Err(HsmError::ProviderError("Custom provider not implemented".to_string()))
+            Err(HsmError::ProviderError("Custom provider requires implementation".to_string()))
         },
     }
 }
@@ -431,6 +459,7 @@ pub async fn create_hsm_provider(config: &HsmConfig) -> Result<Arc<dyn HsmProvid
 /// SoftHSM provider
 ///
 /// This provider is used for development and testing purposes only.
+#[derive(Debug)]
 pub struct SoftHsmProvider {
     config: SoftHsmConfig,
     keys: Mutex<HashMap<String, KeyInfo>>,
@@ -455,34 +484,24 @@ impl HsmProvider for SoftHsmProvider {
         Ok(())
     }
     
-    async fn generate_key(&self, key_type: KeyType) -> Result<KeyPair, HsmError> {
+    async fn generate_key(&self, _params: KeyGenParams) -> Result<(KeyPair, KeyInfo), HsmError> {
         // Implementation needed
-        Err(HsmError::NotImplemented)
+        Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
     
-    async fn sign(&self, key_id: &str, data: &[u8]) -> Result<Vec<u8>, HsmError> {
+    async fn sign(&self, _key_id: &str, _algorithm: SigningAlgorithm, _data: &[u8]) -> Result<Vec<u8>, HsmError> {
         // Implementation needed
-        Err(HsmError::NotImplemented)
+        Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
     
-    async fn verify(&self, key_id: &str, data: &[u8], signature: &[u8]) -> Result<bool, HsmError> {
+    async fn verify(&self, _key_id: &str, _algorithm: SigningAlgorithm, _data: &[u8], _signature: &[u8]) -> Result<bool, HsmError> {
         // Implementation needed
-        Err(HsmError::NotImplemented)
+        Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
     
-    async fn encrypt(&self, key_id: &str, data: &[u8]) -> Result<Vec<u8>, HsmError> {
+    async fn export_public_key(&self, _key_id: &str) -> Result<Vec<u8>, HsmError> {
         // Implementation needed
-        Err(HsmError::NotImplemented)
-    }
-    
-    async fn decrypt(&self, key_id: &str, encrypted_data: &[u8]) -> Result<Vec<u8>, HsmError> {
-        // Implementation needed
-        Err(HsmError::NotImplemented)
-    }
-    
-    async fn export_public_key(&self, key_id: &str) -> Result<Vec<u8>, HsmError> {
-        // Implementation needed
-        Err(HsmError::NotImplemented)
+        Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
     
     async fn list_keys(&self) -> Result<Vec<KeyInfo>, HsmError> {
@@ -490,7 +509,7 @@ impl HsmProvider for SoftHsmProvider {
         Ok(keys.values().cloned().collect())
     }
     
-    async fn delete_key(&self, key_id: &str) -> Result<(), HsmError> {
+    async fn delete_key(&self, _key_id: &str) -> Result<(), HsmError> {
         let mut keys = self.keys.lock().await;
         let mut key_data = self.key_data.lock().await;
         
@@ -506,7 +525,7 @@ impl HsmProvider for SoftHsmProvider {
     
     async fn get_status(&self) -> Result<HsmProviderStatus, HsmError> {
         // Implementation needed
-        Err(HsmError::NotImplemented)
+        Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
     
     async fn close(&self) -> Result<(), HsmError> {
@@ -522,8 +541,8 @@ impl HsmProvider for SoftHsmProvider {
         match request.operation {
             HsmOperation::GenerateKey => {
                 // Parse the parameters
-                let params: KeyGenParams = serde_json::from_value(request.parameters.clone())
-                    .map_err(|e| HsmError::InvalidParameter(format!("Invalid parameters: {}", e)))?;
+                let _params: KeyGenParams = serde_json::from_value(request.parameters.clone())
+                    .map_err(|e| HsmError::InvalidParameters(format!("Invalid parameters: {}", e)))?;
                 
                 // Generate the key
                 let key_id = params.id.unwrap_or_else(|| Uuid::new_v4().to_string());
@@ -561,17 +580,17 @@ impl HsmProvider for SoftHsmProvider {
                 // Parse the parameters
                 let key_id: String = match request.parameters.get("key_id") {
                     Some(value) if value.is_string() => value.as_str()?.to_string(),
-                    _ => return Err(HsmError::InvalidParameter("Missing or invalid key_id parameter".to_string())),
+                    _ => return Err(HsmError::InvalidParameters("Missing or invalid key_id parameter".to_string())),
                 };
                 
                 let data_base64: String = match request.parameters.get("data") {
                     Some(value) if value.is_string() => value.as_str()?.to_string(),
-                    _ => return Err(HsmError::InvalidParameter("Missing or invalid data parameter".to_string())),
+                    _ => return Err(HsmError::InvalidParameters("Missing or invalid data parameter".to_string())),
                 };
                 
                 // Decode the data
-                let data = base64::decode(&data_base64)
-                    .map_err(|e| HsmError::InvalidParameter(format!("Invalid base64 data: {}", e)))?;
+                let data = BASE64.decode(&data_base64)
+                    .map_err(|e| HsmError::InvalidParameters(format!("Invalid base64 data: {}", e)))?;
                 
                 // Check if the key exists
                 let keys = self.keys.lock().await;
@@ -587,7 +606,7 @@ impl HsmProvider for SoftHsmProvider {
                 
                 // Return the response
                 let response_data = serde_json::json!({
-                    "signature": base64::encode(&signature),
+                    "signature": BASE64.encode(&signature),
                 });
                 
                 Ok(HsmResponse::success(request.id, Some(response_data)))
@@ -622,8 +641,8 @@ impl HsmProvider for SoftHsmProvider {
             HsmOperation::ExportPublicKey => {
                 // Parse the parameters
                 let key_id: String = match request.parameters.get("key_id") {
-                    Some(value) if value.is_string() => value.as_str()?.to_string(),
-                    _ => return Err(HsmError::InvalidParameter("Missing or invalid key_id parameter".to_string())),
+                    Some(value) if value.is_string() => value.as_str().ok_or(HsmError::InvalidParameters("Invalid string value".to_string()))?.to_string(),
+                    _ => return Err(HsmError::InvalidParameters("Missing or invalid key_id parameter".to_string())),
                 };
                 
                 // Check if the key exists
@@ -639,7 +658,7 @@ impl HsmProvider for SoftHsmProvider {
                 
                 // Return the response
                 let response_data = serde_json::json!({
-                    "public_key": base64::encode(&public_key),
+                    "public_key": BASE64.encode(&public_key),
                 });
                 
                 Ok(HsmResponse::success(request.id, Some(response_data)))
@@ -657,8 +676,8 @@ impl HsmProvider for SoftHsmProvider {
             HsmOperation::DeleteKey => {
                 // Parse the parameters
                 let key_id: String = match request.parameters.get("key_id") {
-                    Some(value) if value.is_string() => value.as_str()?.to_string(),
-                    _ => return Err(HsmError::InvalidParameter("Missing or invalid key_id parameter".to_string())),
+                    Some(value) if value.is_string() => value.as_str().ok_or(HsmError::InvalidParameters("Invalid string value".to_string()))?.to_string(),
+                    _ => return Err(HsmError::InvalidParameters("Missing or invalid key_id parameter".to_string())),
                 };
                 
                 // Delete the key
@@ -693,6 +712,7 @@ impl HsmProvider for SoftHsmProvider {
 }
 
 /// CloudHSM provider
+#[derive(Debug)]
 pub struct CloudHsmProvider {
     config: CloudHsmConfig,
 }
@@ -710,66 +730,57 @@ impl CloudHsmProvider {
 impl HsmProvider for CloudHsmProvider {
     async fn initialize(&self) -> Result<(), HsmError> {
         // In a real implementation, this would initialize the CloudHSM client
-        Err(HsmError::NotImplemented)
+        Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
     
-    async fn generate_key(&self, key_type: KeyType) -> Result<KeyPair, HsmError> {
+    async fn generate_key(&self, _params: KeyGenParams) -> Result<(KeyPair, KeyInfo), HsmError> {
         // Implementation needed
-        Err(HsmError::NotImplemented)
+        Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
     
-    async fn sign(&self, key_id: &str, data: &[u8]) -> Result<Vec<u8>, HsmError> {
+    async fn sign(&self, _key_id: &str, _algorithm: SigningAlgorithm, _data: &[u8]) -> Result<Vec<u8>, HsmError> {
         // Implementation needed
-        Err(HsmError::NotImplemented)
+        Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
     
-    async fn verify(&self, key_id: &str, data: &[u8], signature: &[u8]) -> Result<bool, HsmError> {
+    async fn verify(&self, _key_id: &str, _algorithm: SigningAlgorithm, _data: &[u8], _signature: &[u8]) -> Result<bool, HsmError> {
         // Implementation needed
-        Err(HsmError::NotImplemented)
+        Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
     
-    async fn encrypt(&self, key_id: &str, data: &[u8]) -> Result<Vec<u8>, HsmError> {
+    async fn export_public_key(&self, _key_id: &str) -> Result<Vec<u8>, HsmError> {
         // Implementation needed
-        Err(HsmError::NotImplemented)
-    }
-    
-    async fn decrypt(&self, key_id: &str, encrypted_data: &[u8]) -> Result<Vec<u8>, HsmError> {
-        // Implementation needed
-        Err(HsmError::NotImplemented)
-    }
-    
-    async fn export_public_key(&self, key_id: &str) -> Result<Vec<u8>, HsmError> {
-        // Implementation needed
-        Err(HsmError::NotImplemented)
+        Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
     
     async fn list_keys(&self) -> Result<Vec<KeyInfo>, HsmError> {
         // Implementation needed
-        Err(HsmError::NotImplemented)
+        Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
     
-    async fn delete_key(&self, key_id: &str) -> Result<(), HsmError> {
+    async fn delete_key(&self, _key_id: &str) -> Result<(), HsmError> {
         // Implementation needed
-        Err(HsmError::NotImplemented)
+        Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
     
     async fn get_status(&self) -> Result<HsmProviderStatus, HsmError> {
         // Implementation needed
-        Err(HsmError::NotImplemented)
+        Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
     
     async fn close(&self) -> Result<(), HsmError> {
         // In a real implementation, this would close the CloudHSM client
-        Err(HsmError::NotImplemented)
+        Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
     
-    async fn execute_operation(&self, request: HsmRequest) -> Result<HsmResponse, HsmError> {
+    async fn execute_operation(&self, _request: HsmRequest) -> Result<HsmResponse, HsmError> {
         // Implementation needed
-        Err(HsmError::NotImplemented)
+        Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
 }
 
 /// TPM provider
+#[derive(Debug)]
 pub struct TpmProvider {
     config: TpmConfig,
 }
@@ -787,66 +798,57 @@ impl TpmProvider {
 impl HsmProvider for TpmProvider {
     async fn initialize(&self) -> Result<(), HsmError> {
         // In a real implementation, this would initialize the TPM client
-        Err(HsmError::NotImplemented)
+        Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
     
-    async fn generate_key(&self, key_type: KeyType) -> Result<KeyPair, HsmError> {
+    async fn generate_key(&self, _params: KeyGenParams) -> Result<(KeyPair, KeyInfo), HsmError> {
         // Implementation needed
-        Err(HsmError::NotImplemented)
+        Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
     
-    async fn sign(&self, key_id: &str, data: &[u8]) -> Result<Vec<u8>, HsmError> {
+    async fn sign(&self, _key_id: &str, _algorithm: SigningAlgorithm, _data: &[u8]) -> Result<Vec<u8>, HsmError> {
         // Implementation needed
-        Err(HsmError::NotImplemented)
+        Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
     
-    async fn verify(&self, key_id: &str, data: &[u8], signature: &[u8]) -> Result<bool, HsmError> {
+    async fn verify(&self, _key_id: &str, _algorithm: SigningAlgorithm, _data: &[u8], _signature: &[u8]) -> Result<bool, HsmError> {
         // Implementation needed
-        Err(HsmError::NotImplemented)
+        Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
     
-    async fn encrypt(&self, key_id: &str, data: &[u8]) -> Result<Vec<u8>, HsmError> {
+    async fn export_public_key(&self, _key_id: &str) -> Result<Vec<u8>, HsmError> {
         // Implementation needed
-        Err(HsmError::NotImplemented)
-    }
-    
-    async fn decrypt(&self, key_id: &str, encrypted_data: &[u8]) -> Result<Vec<u8>, HsmError> {
-        // Implementation needed
-        Err(HsmError::NotImplemented)
-    }
-    
-    async fn export_public_key(&self, key_id: &str) -> Result<Vec<u8>, HsmError> {
-        // Implementation needed
-        Err(HsmError::NotImplemented)
+        Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
     
     async fn list_keys(&self) -> Result<Vec<KeyInfo>, HsmError> {
         // Implementation needed
-        Err(HsmError::NotImplemented)
+        Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
     
-    async fn delete_key(&self, key_id: &str) -> Result<(), HsmError> {
+    async fn delete_key(&self, _key_id: &str) -> Result<(), HsmError> {
         // Implementation needed
-        Err(HsmError::NotImplemented)
+        Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
     
     async fn get_status(&self) -> Result<HsmProviderStatus, HsmError> {
         // Implementation needed
-        Err(HsmError::NotImplemented)
+        Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
     
     async fn close(&self) -> Result<(), HsmError> {
         // In a real implementation, this would close the TPM client
-        Err(HsmError::NotImplemented)
+        Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
     
-    async fn execute_operation(&self, request: HsmRequest) -> Result<HsmResponse, HsmError> {
+    async fn execute_operation(&self, _request: HsmRequest) -> Result<HsmResponse, HsmError> {
         // Implementation needed
-        Err(HsmError::NotImplemented)
+        Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
 }
 
 /// PKCS#11 provider
+#[derive(Debug)]
 pub struct Pkcs11Provider {
     config: Pkcs11Config,
 }
@@ -864,207 +866,51 @@ impl Pkcs11Provider {
 impl HsmProvider for Pkcs11Provider {
     async fn initialize(&self) -> Result<(), HsmError> {
         // In a real implementation, this would initialize the PKCS#11 library
-        Err(HsmError::NotImplemented)
+        Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
     
-    async fn generate_key(&self, key_type: KeyType) -> Result<KeyPair, HsmError> {
+    async fn generate_key(&self, _params: KeyGenParams) -> Result<(KeyPair, KeyInfo), HsmError> {
         // Implementation needed
-        Err(HsmError::NotImplemented)
+        Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
     
-    async fn sign(&self, key_id: &str, data: &[u8]) -> Result<Vec<u8>, HsmError> {
+    async fn sign(&self, _key_id: &str, _algorithm: SigningAlgorithm, _data: &[u8]) -> Result<Vec<u8>, HsmError> {
         // Implementation needed
-        Err(HsmError::NotImplemented)
+        Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
     
-    async fn verify(&self, key_id: &str, data: &[u8], signature: &[u8]) -> Result<bool, HsmError> {
+    async fn verify(&self, _key_id: &str, _algorithm: SigningAlgorithm, _data: &[u8], _signature: &[u8]) -> Result<bool, HsmError> {
         // Implementation needed
-        Err(HsmError::NotImplemented)
+        Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
     
-    async fn encrypt(&self, key_id: &str, data: &[u8]) -> Result<Vec<u8>, HsmError> {
+    async fn export_public_key(&self, _key_id: &str) -> Result<Vec<u8>, HsmError> {
         // Implementation needed
-        Err(HsmError::NotImplemented)
-    }
-    
-    async fn decrypt(&self, key_id: &str, encrypted_data: &[u8]) -> Result<Vec<u8>, HsmError> {
-        // Implementation needed
-        Err(HsmError::NotImplemented)
-    }
-    
-    async fn export_public_key(&self, key_id: &str) -> Result<Vec<u8>, HsmError> {
-        // Implementation needed
-        Err(HsmError::NotImplemented)
+        Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
     
     async fn list_keys(&self) -> Result<Vec<KeyInfo>, HsmError> {
         // Implementation needed
-        Err(HsmError::NotImplemented)
+        Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
     
-    async fn delete_key(&self, key_id: &str) -> Result<(), HsmError> {
+    async fn delete_key(&self, _key_id: &str) -> Result<(), HsmError> {
         // Implementation needed
-        Err(HsmError::NotImplemented)
+        Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
     
     async fn get_status(&self) -> Result<HsmProviderStatus, HsmError> {
         // Implementation needed
-        Err(HsmError::NotImplemented)
+        Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
     
     async fn close(&self) -> Result<(), HsmError> {
         // In a real implementation, this would close the PKCS#11 library
-        Err(HsmError::NotImplemented)
+        Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
     
-    async fn execute_operation(&self, request: HsmRequest) -> Result<HsmResponse, HsmError> {
+    async fn execute_operation(&self, _request: HsmRequest) -> Result<HsmResponse, HsmError> {
         // Implementation needed
-        Err(HsmError::NotImplemented)
+        Err(HsmError::UnsupportedOperation("Not implemented".to_string()))
     }
 }
-
-/// HSM provider status
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub enum HsmProviderStatus {
-    /// Provider is ready
-    Ready,
-    /// Provider is initializing
-    Initializing,
-    /// Provider is not available
-    Unavailable,
-    /// Provider has encountered an error
-    Error(String),
-}
-
-/// HSM operation types
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub enum HsmOperation {
-    /// Generate a key pair
-    GenerateKey,
-    /// Sign data with a key
-    Sign,
-    /// Verify a signature
-    Verify,
-    /// Encrypt data
-    Encrypt,
-    /// Decrypt data
-    Decrypt,
-    /// Export a public key
-    ExportPublicKey,
-    /// List all keys
-    ListKeys,
-    /// Delete a key
-    DeleteKey,
-    /// Get HSM provider status
-    GetStatus,
-    /// Custom operation
-    Custom(String),
-}
-
-/// HSM request parameters
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct HsmRequest {
-    /// Request ID
-    pub id: String,
-    /// Operation to perform
-    pub operation: HsmOperation,
-    /// Parameters for the operation (encoded as JSON)
-    pub parameters: serde_json::Value,
-    /// User ID making the request
-    pub user_id: Option<String>,
-    /// Request timestamp
-    pub timestamp: chrono::DateTime<chrono::Utc>,
-}
-
-impl HsmRequest {
-    /// Create a new HSM request
-    pub fn new(operation: HsmOperation, parameters: serde_json::Value) -> Self {
-        Self {
-            id: Uuid::new_v4().to_string(),
-            operation,
-            parameters,
-            user_id: None,
-            timestamp: chrono::Utc::now(),
-        }
-    }
-    
-    /// Set the user ID
-    pub fn with_user_id(mut self, user_id: impl Into<String>) -> Self {
-        self.user_id = Some(user_id.into());
-        self
-    }
-}
-
-/// HSM response status
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub enum HsmResponseStatus {
-    /// Operation was successful
-    Success,
-    /// Operation failed
-    Failure,
-    /// Operation is still in progress
-    InProgress,
-}
-
-/// HSM response
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct HsmResponse {
-    /// Request ID that this response is for
-    pub request_id: String,
-    /// Response status
-    pub status: HsmResponseStatus,
-    /// Response data (encoded as JSON)
-    pub data: Option<serde_json::Value>,
-    /// Error message (if any)
-    pub error: Option<String>,
-    /// Response timestamp
-    pub timestamp: chrono::DateTime<chrono::Utc>,
-}
-
-impl HsmResponse {
-    /// Create a new successful HSM response
-    pub fn success(request_id: impl Into<String>, data: Option<serde_json::Value>) -> Self {
-        Self {
-            request_id: request_id.into(),
-            status: HsmResponseStatus::Success,
-            data,
-            error: None,
-            timestamp: chrono::Utc::now(),
-        }
-    }
-    
-    /// Create a new failure HSM response
-    pub fn failure(request_id: impl Into<String>, error: impl Into<String>) -> Self {
-        Self {
-            request_id: request_id.into(),
-            status: HsmResponseStatus::Failure,
-            data: None,
-            error: Some(error.into()),
-            timestamp: chrono::Utc::now(),
-        }
-    }
-    
-    /// Create a new in-progress HSM response
-    pub fn in_progress(request_id: impl Into<String>) -> Self {
-        Self {
-            request_id: request_id.into(),
-            status: HsmResponseStatus::InProgress,
-            data: None,
-            error: None,
-            timestamp: chrono::Utc::now(),
-        }
-    }
-}
-
-/// Key pair generated by the HSM
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct KeyPair {
-    /// Key ID
-    pub id: String,
-    /// Key type
-    pub key_type: KeyType,
-    /// Public key data
-    pub public_key: Vec<u8>,
-    /// Private key handle (not the actual private key)
-    pub private_key_handle: String,
-} 

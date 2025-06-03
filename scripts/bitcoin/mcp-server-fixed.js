@@ -9,7 +9,7 @@ const path = require('path');
 const crypto = require('crypto');
 const fs = require('fs');
 const { Command } = require('commander');
-const secp256k1 = require('@noble/secp256k1');
+const { secp256k1 } = require('@noble/curves/secp256k1');
 const cryptoUtils = require('./crypto-utils');
 
 // BIP-340 Schnorr signature verification
@@ -56,10 +56,10 @@ program
 program.parse(process.argv);
 const options = program.opts();
 
-// Initialize logger
+// Initialize logger (use stderr to avoid interfering with JSON-RPC stdout communication)
 function log(message) {
   const timestamp = new Date().toISOString();
-  console.log(`[${timestamp}] [Bitcoin MCP] ${message}`);
+  console.error(`[${timestamp}] [Bitcoin MCP] ${message}`);
 }
 
 log('Bitcoin MCP Server starting...');

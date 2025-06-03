@@ -1,6 +1,24 @@
+---
+title: "Vs_ai_rules"
+description: "Documentation for Vs_ai_rules"
+last_updated: 2025-05-30
+---
+[AIR-3][AIS-3][BPC-3][RES-3]
+
+
 <!-- markdownlint-disable MD013 line-length -->
 
 # Visual Studio AI IDE Rules
+
+## Overview
+
+Add a brief overview of this document here.
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 
 This document outlines the rules and best practices for using Visual Studio with AI-assisted development in our project.
 
@@ -37,3 +55,8 @@ This document outlines the rules and best practices for using Visual Studio with
 - Ensure that environment variables and configurations are managed securely, using provided configuration files and secret management systems.
 
 By following these rules, the development experience on Visual Studio will be optimized with AI-driven features, ensuring rapid development cycles, high code quality, and consistent deployment practices.
+
+## See Also
+
+- [Related Document 1](./related1.md)
+- [Related Document 2](./related2.md)

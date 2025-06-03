@@ -261,7 +261,7 @@ pub trait RskClientTrait {
     async fn get_transaction_count(&self, address: &str, block: Option<BlockNumber>) -> Result<U256, ClientError>;
     
     /// Send a raw transaction
-    async fn send_raw_transaction(&self, data: &[u8]) -> Result<H256, ClientError>;
+    async fn send_raw_transaction(&self, _data: &[u8]) -> Result<H256, ClientError>;
     
     /// Call a contract
     async fn call(&self, request: ContractCallRequest, block: Option<BlockNumber>) -> Result<Bytes, ClientError>;
@@ -591,7 +591,7 @@ impl RskClientTrait for RSKClient {
             .map_err(|e| ClientError::RpcError(format!("Failed to get transaction count: {}", e)))
     }
     
-    async fn send_raw_transaction(&self, data: &[u8]) -> Result<H256, ClientError> {
+    async fn send_raw_transaction(&self, _data: &[u8]) -> Result<H256, ClientError> {
         self.web3.eth().send_raw_transaction(web3::types::Bytes(data.to_vec())).await
             .map_err(|e| ClientError::TransactionError(format!("Failed to send raw transaction: {}", e)))
     }

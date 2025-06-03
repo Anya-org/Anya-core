@@ -1,6 +1,6 @@
 ;; Anya DAO Token Economics Module [AIR-3][AIS-3][BPC-3][AIT-3]
 ;; Implements the token distribution logic with Bitcoin-style tokenomics
-;; Compliant with Bitcoin Development Framework v2.5
+;; Compliant with official Bitcoin Improvement Proposals (BIPs)
 
 ;; Constants - Token Distribution
 (define-constant TOKEN-GENESIS-BLOCK u0)

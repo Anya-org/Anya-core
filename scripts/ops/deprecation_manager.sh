@@ -1,4 +1,5 @@
 #!/bin/bash
+# [AIR-3][AIS-3][BPC-3][RES-3]
 
 # Deprecation manager for Anya operations
 # Handles deprecation of various system resources and temporary files

@@ -32,4 +32,4 @@ Anya supports multiple wallet types to accommodate different use cases and secur
 
 See [Wallet Operations](wallet-operations.md) for implementation details.
 
-*Last updated: 2024-12-07*
+*Last updated: 2025-06-02*

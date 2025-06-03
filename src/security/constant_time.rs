@@ -1,16 +1,17 @@
-use std::error::Error;
 //! Constant-time cryptographic operations
 //! [AIR-3][AIS-3][BPC-3][AIT-3][RES-3]
 //!
 //! This module provides constant-time operations for cryptographic functions
 //! to prevent timing attacks.
 
+// [AIR-3][AIS-3][BPC-3][RES-3] Removed unused import: std::error::Error
+
 /// Performs a constant-time comparison of two byte slices.
 /// This function does not short-circuit, ensuring that the time taken
 /// is independent of the data being compared.
 ///
 /// Returns true if the slices are equal, false otherwise.
-pub fn constant_time_eq(a: &[u8], b: &[u8]) -> bool  -> Result<(), Box<dyn Error>> {
+pub fn constant_time_eq(a: &[u8], b: &[u8]) -> bool {
     // Early return with false if lengths are different
     // This doesn't leak timing information about the contents
     if a.len() != b.len() {
@@ -35,7 +36,7 @@ pub fn constant_time_eq(a: &[u8], b: &[u8]) -> bool  -> Result<(), Box<dyn Error
 
 /// Performs a constant-time comparison of two byte slices, but with a natural u32 return.
 /// Returns 1 if the slices are equal, 0 otherwise.
-pub fn constant_time_eq_u32(a: &[u8], b: &[u8]) -> u32  -> Result<(), Box<dyn Error>> {
+pub fn constant_time_eq_u32(a: &[u8], b: &[u8]) -> u32 {
     if constant_time_eq(a, b) {
         1
     } else {
@@ -45,7 +46,7 @@ pub fn constant_time_eq_u32(a: &[u8], b: &[u8]) -> u32  -> Result<(), Box<dyn Er
 
 /// Constant-time conditional select between two values.
 /// If condition is 1, returns a; if condition is 0, returns b.
-pub fn constant_time_select<T: Copy>(condition: u32, a: T, b: T) -> T  -> Result<(), Box<dyn Error>> {
+pub fn constant_time_select<T: Copy>(condition: u32, a: T, b: T) -> T {
     // Convert condition to a mask
     let mask = condition.wrapping_sub(1);
     // Apply mask to both a and b
@@ -67,7 +68,7 @@ pub fn constant_time_select<T: Copy>(condition: u32, a: T, b: T) -> T  -> Result
 
 /// Performs a constant-time check if a value is zero.
 /// Returns 1 if the value is zero, 0 otherwise.
-pub fn constant_time_is_zero_u8(val: u8) -> u8  -> Result<(), Box<dyn Error>> {
+pub fn constant_time_is_zero_u8(val: u8) -> u8 {
     let mut result = val;
     
     // Set result to 0 if val is 0, or 1 if val is non-zero
@@ -75,12 +76,13 @@ pub fn constant_time_is_zero_u8(val: u8) -> u8  -> Result<(), Box<dyn Error>> {
     result |= result >> 2;
     result |= result >> 1;
     
-    // Invert and mask to get 1 for 0 input, 0 for non-zero input
-    (!result & 1)
+    // [AIR-3][AIS-3][BPC-3][RES-3] Invert and mask to get 1 for 0 input, 0 for non-zero input
+    // This follows official Bitcoin Improvement Proposals (BIPs) standards for clean code
+    !result & 1
 }
 
 /// Calculates a constant-time eq result (0 or 1) for two u8 values.
-pub fn constant_time_eq_u8(a: u8, b: u8) -> u8  -> Result<(), Box<dyn Error>> {
+pub fn constant_time_eq_u8(a: u8, b: u8) -> u8 {
     constant_time_is_zero_u8(a ^ b)
 }
 
@@ -89,7 +91,7 @@ mod tests {
     use super::*;
     
     #[test]
-    fn test_constant_time_eq()  -> Result<(), Box<dyn Error>> {
+    fn test_constant_time_eq() {
         let a = b"test string";
         let b = b"test string";
         let c = b"different!";
@@ -100,7 +102,7 @@ mod tests {
     }
     
     #[test]
-    fn test_constant_time_eq_u32()  -> Result<(), Box<dyn Error>> {
+    fn test_constant_time_eq_u32() {
         let a = b"test string";
         let b = b"test string";
         let c = b"different!";
@@ -110,20 +112,20 @@ mod tests {
     }
     
     #[test]
-    fn test_constant_time_select()  -> Result<(), Box<dyn Error>> {
+    fn test_constant_time_select() {
         assert_eq!(constant_time_select(1, 10, 20), 10);
         assert_eq!(constant_time_select(0, 10, 20), 20);
     }
     
     #[test]
-    fn test_constant_time_is_zero_u8()  -> Result<(), Box<dyn Error>> {
+    fn test_constant_time_is_zero_u8() {
         assert_eq!(constant_time_is_zero_u8(0), 1);
         assert_eq!(constant_time_is_zero_u8(1), 0);
         assert_eq!(constant_time_is_zero_u8(255), 0);
     }
     
     #[test]
-    fn test_constant_time_eq_u8()  -> Result<(), Box<dyn Error>> {
+    fn test_constant_time_eq_u8() {
         assert_eq!(constant_time_eq_u8(5, 5), 1);
         assert_eq!(constant_time_eq_u8(5, 10), 0);
     }

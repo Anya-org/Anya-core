@@ -1,4 +1,22 @@
+---
+title: "Bip_compliance"
+description: "Documentation for Bip_compliance"
+last_updated: 2025-05-30
+---
+[AIR-3][AIS-3][BPC-3][RES-3]
+
+
 # Bitcoin Improvement Proposal Compliance  
+
+## Overview
+
+Add a brief overview of this document here.
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 **Validation Date:** 2025-02-24  
 
 | BIP | Component | Test Coverage | Audit Status | Implementation Date | Audit Expiry |
@@ -18,3 +36,7 @@
 
 - Q3 2024: Complete BIP-370 audit
 - Q4 2024: Finalize BIP-380 implementation and audit 
+## See Also
+
+- [Related Document 1](./related1.md)
+- [Related Document 2](./related2.md)

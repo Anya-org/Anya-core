@@ -1,4 +1,5 @@
 #!/bin/bash
+# [AIR-3][AIS-3][BPC-3][RES-3]
 
 # ML-specific deprecation manager for Anya
 # Handles ML model versions, training data, checkpoints, and embeddings

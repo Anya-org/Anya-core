@@ -1,4 +1,3 @@
-use std::error::Error;
 //! Error types for HSM security module
 //!
 //! This module provides comprehensive error types for HSM operations,
@@ -6,12 +5,13 @@ use std::error::Error;
 //! [AIR-3][AIS-3][AIM-3][AIP-3][RES-3]
 
 use std::fmt;
-use std::io;
 use thiserror::Error;
 use serde::{Serialize, Deserialize};
 
 /// Main HSM error type
-#[derive(Error, Debug)]
+#[derive(Error, Debug, Clone)]
+// Remove non_exhaustive attribute as it's causing pattern matching issues
+// Alternatively, we could add #[error(transparent)] to ensure all variants are covered
 pub enum HsmError {
     /// Invalid parameters provided
     #[error("Invalid parameters: {0}")]
@@ -57,157 +57,154 @@ pub enum HsmError {
     #[error("Decryption error: {0}")]
     DecryptionError(String),
     
-    /// Communication error
-    #[error("Communication error: {0}")]
-    CommunicationError(String),
-    
-    /// Timeout error
-    #[error("Timeout error: {0}")]
-    TimeoutError(String),
-    
-    /// Authentication error
-    #[error("Authentication error: {0}")]
-    AuthenticationError(String),
-    
-    /// Authorization error
-    #[error("Authorization error: {0}")]
-    AuthorizationError(String),
-    
-    /// HSM device error
-    #[error("HSM device error: {0}")]
-    DeviceError(String),
-    
-    /// Serialization error
-    #[error("Serialization error: {0}")]
-    SerializationError(String),
-    
-    /// Deserialization error
-    #[error("Deserialization error: {0}")]
-    DeserializationError(String),
-    
-    /// IO error
-    #[error("IO error: {0}")]
-    IoError(#[from] io::Error),
-    
-    /// Audit error
-    #[error("Audit error: {0}")]
-    AuditError(String),
-    
-    /// Audit storage error
-    #[error("Audit storage error: {0}")]
-    AuditStorageError(String),
-    
-    /// Audit logging error
-    #[error("Audit logging error: {0}")]
-    AuditLoggingError(String),
-    
-    /// Network error
-    #[error("Network error: {0}")]
-    NetworkError(String),
-    
-    /// Internal error
-    #[error("Internal error: {0}")]
-    InternalError(String),
-    
-    /// Invalid state
-    #[error("Invalid state: {0}")]
-    InvalidState(String),
-    
-    /// Invalid operation
-    #[error("Invalid operation: {0}")]
-    InvalidOperation(String),
-    
-    /// Not implemented
-    #[error("Not implemented: {0}")]
-    NotImplemented(String),
-    
-    /// Unsupported feature
-    #[error("Unsupported feature: {0}")]
-    UnsupportedFeature(String),
-    
-    /// Rate limit exceeded
-    #[error("Rate limit exceeded: {0}")]
-    RateLimitExceeded(String),
-    
-    /// Resource busy
-    #[error("Resource busy: {0}")]
-    ResourceBusy(String),
-    
-    /// Resource unavailable
-    #[error("Resource unavailable: {0}")]
-    ResourceUnavailable(String),
-    
-    /// Operation cancelled
-    #[error("Operation cancelled: {0}")]
-    OperationCancelled(String),
-    
-    /// HSM audit event error
-    #[error("HSM audit event error: {0}")]
-    HsmAuditEventError(String),
-    
-    /// Hardware failure
-    #[error("Hardware failure: {0}")]
-    HardwareFailure(String),
-    
-    /// Connection failure
-    #[error("Connection failure: {0}")]
-    ConnectionFailure(String),
-    
-    /// Unsupported hardware
-    #[error("Unsupported hardware: {0}")]
-    UnsupportedHardware(String),
-    
-    /// Hardware requires reset
-    #[error("Hardware requires reset: {0}")]
-    HardwareReset(String),
+    /// Provider error
+    #[error("Provider error: {0}")]
+    ProviderError(String),
     
     /// Permission denied
     #[error("Permission denied: {0}")]
     PermissionDenied(String),
     
-    /// PIN locked
-    #[error("PIN locked: {0}")]
-    PinLocked(String),
-    
-    /// Device locked
-    #[error("Device locked: {0}")]
-    DeviceLocked(String),
-    
-    /// Token not found
-    #[error("Token not found: {0}")]
-    TokenNotFound(String),
-    
-    /// Slot not found
-    #[error("Slot not found: {0}")]
-    SlotNotFound(String),
-    
-    /// Firmware error
-    #[error("Firmware error: {0}")]
-    FirmwareError(String),
-    
-    /// Invalid data
-    #[error("Invalid data: {0}")]
-    InvalidData(String),
+    /// Unsupported operation
+    #[error("Unsupported operation: {0}")]
+    UnsupportedOperation(String),
     
     /// Unsupported key type
     #[error("Unsupported key type")]
     UnsupportedKeyType,
     
-    /// Unsupported operation
-    #[error("Unsupported operation: {0}")]
-    UnsupportedOperation(String),
+    /// Serialization error
+    #[error("Serialization error: {0}")]
+    SerializationError(String),
     
-    /// HSM provider error
-    #[error("Provider error: {0}")]
-    ProviderError(String),
+    /// IO error
+    #[error("IO error: {0}")]
+    IoError(String),
     
-    /// Bitcoin specific error
+    /// Invalid key size
+    #[error("Invalid key size: {0}")]
+    InvalidKeySize(usize),
+    
+    /// Authentication error
+    #[error("Authentication error: {0}")]
+    AuthenticationError(String),
+    
+    /// Device locked
+    #[error("Device locked: {0}")]
+    DeviceLocked(String),
+    
+    /// Device disconnected
+    #[error("Device disconnected: {0}")]
+    DeviceDisconnected(String),
+    
+    /// Hardware failure
+    #[error("Hardware failure: {0}")]
+    HardwareFailure(String),
+    
+    /// Deserialization error
+    #[error("Deserialization error: {0}")]
+    DeserializationError(String),
+    
+    /// HSM is disabled
+    #[error("HSM is disabled: {0}")]
+    Disabled(String),
+    
+    /// HSM is not ready
+    #[error("HSM is not ready: {0}")]
+    NotReady(String),
+    
+    /// Key rotation failed
+    #[error("Key rotation failed: {0}")]
+    RotateKey(String),
+    
+    /// Network error (for testnet operations)
+    #[error("Network error: {0}")]
+    NetworkError(String),
+    
+    /// Transaction error (for testnet transactions)
+    #[error("Transaction error: {0}")]
+    TransactionError(String),
+    
+    /// PIN locked (for hardware devices)
+    #[error("PIN locked: {0}")]
+    PinLocked(String),
+    
+    /// Timeout error
+    #[error("Timeout error: {0}")]
+    TimeoutError(String),
+    
+    /// Bitcoin-specific error
     #[error("Bitcoin error: {0}")]
     BitcoinError(String),
+    
+    /// Device communication error (for hardware devices)
+    #[error("Device communication error: {0}")]
+    DeviceCommunicationError(String),
+    
+    /// Firmware error (for hardware devices)
+    #[error("Firmware error: {0}")]
+    FirmwareError(String),
+    
+    /// Signature verification failed
+    #[error("Signature verification failed")]
+    SignatureVerificationFailed,
+    
+    /// Transaction rejected by user (on hardware device)
+    #[error("Transaction rejected by user")]
+    TransactionRejected,
+    
+    /// Device needs firmware update
+    #[error("Device needs firmware update: {0}")]
+    FirmwareUpdateRequired(String),
+    
+    /// Session expired
+    #[error("Session expired")]
+    SessionExpired,
+    
+    /// Invalid address (for Bitcoin operations)
+    #[error("Invalid address: {0}")]
+    InvalidAddress(String),
+    
+    /// Invalid PSBT (for Bitcoin operations)
+    #[error("Invalid PSBT: {0}")]
+    InvalidPsbt(String),
+    
+    /// Audit storage error
+    #[error("Audit storage error: {0}")]
+    AuditStorageError(String),
+    
+    /// HSM audit event error
+    #[error("HSM audit event error: {0}")]
+    HsmAuditEventError(String),
+    
+    /// HSM overflow (too many keys or operations)
+    #[error("HSM overflow: {0}")]
+    HsmOverflow(String),
+    
+    /// Internal error
+    #[error("Internal error: {0}")]
+    InternalError(String),
+
+    /// Not implemented error
+    #[error("Not implemented: {0}")]
+    NotImplemented(String),
+    
+    /// Operation not supported
+    #[error("Operation not supported: {0}")]
+    OperationNotSupported(String),
 }
 
+// Implement From<std::io::Error> since we changed IoError to use String
+impl From<std::io::Error> for HsmError {
+    fn from(error: std::io::Error) -> Self {
+        HsmError::IoError(error.to_string())
+    }
+}
+
+// This From implementation is not needed as Rust automatically implements From<T> for T
+
 /// HSM audit event type
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum AuditEventType {
     /// HSM initialization
     HsmInitialize,
@@ -274,6 +271,9 @@ pub enum AuditEventType {
     
     /// HSM operation response
     OperationResponse,
+    
+    /// HSM operation
+    HsmOperation,
     
     /// Custom event
     Custom(String),

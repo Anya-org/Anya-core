@@ -1,6 +1,6 @@
 # Anya DAO System [AIR-3][AIS-3][BPC-3][DAO-3]
 
-This directory contains the implementation of the Anya DAO system, built according to the Bitcoin Development Framework v2.5 standards.
+This directory contains the implementation of the Anya DAO system, built according to official Bitcoin Improvement Proposals (BIPs) standards.
 
 ## Overview
 
@@ -68,7 +68,7 @@ To contribute to the DAO development:
 
 1. Read the [Contributing Guide](../../../CONTRIBUTING.md)
 2. Follow the [AI Labeling Standards](../../../docs/standards/AI_LABELING.md)
-3. Ensure all code meets [Bitcoin Development Framework v2.5](../../../docs/standards/BIP_COMPLIANCE.md) requirements
+3. Ensure all code meets [Bitcoin Improvement Proposals (BIPs)](../../../docs/standards/BIP_COMPLIANCE.md) requirements
 
 ## Testing
 
@@ -90,6 +90,6 @@ For more information, see:
 
 - Current Version: 3.1.0
 - Last Updated: 2025-04-28
-- Bitcoin Development Framework: v2.5
+- Bitcoin Improvement Proposals (BIPs): Latest standards
 
 *This component complies with [AI Labeling Standards](../../../docs/standards/AI_LABELING.md)*

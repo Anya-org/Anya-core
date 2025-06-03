@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# [AIR-3][AIS-3][BPC-3][RES-3]
 set -eo pipefail
 
 VERSION_TAG=$(git describe --tags --always --match 'v*.*.*')

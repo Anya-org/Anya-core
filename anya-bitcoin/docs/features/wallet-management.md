@@ -47,4 +47,4 @@ This document outlines the management features and best practices for wallet adm
 - [Wallet Operations](wallet-operations.md)
 - [Security Guidelines](../security/key-management.md)
 
-*Last updated: 2024-12-07*
+*Last updated: 2025-06-02*

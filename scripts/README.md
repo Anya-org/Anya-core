@@ -2,7 +2,7 @@
 
 [AIR-3][AIS-3][BPC-3][AIT-3][RES-3]
 
-This directory contains scripts for building, testing, and maintaining the Bitcoin MCP Server implementation according to the Bitcoin Development Framework v2.5.
+This directory contains scripts for building, testing, and maintaining the Anya Core project, including the documentation system and Bitcoin MCP Server implementation according to official Bitcoin Improvement Proposals (BIPs).
 
 ## Directory Structure
 
@@ -17,20 +17,49 @@ This directory contains scripts for building, testing, and maintaining the Bitco
   - `analyze-mcp-server.js`: Analyzes MCP server security
   - `setup-permissions.sh`: Sets up permissions for security scripts
 
+- `documentation/`: Documentation build and deployment scripts
+  - `setup_docs.sh`: Sets up the documentation environment
+  - `serve_docs.sh`: Serves documentation locally for development
+  - `update_docs.sh`: Updates documentation files to follow standards
+  - `verify_docs.sh`: Verifies documentation meets project standards
+  - `deploy_docs.sh`: Builds and deploys documentation to production
+
 ## Key Scripts
+
+### Documentation System
+
+The documentation system uses MkDocs with Material theme. Key scripts:
+
+1. **Setup Documentation Environment**:
+   ```bash
+   ./scripts/setup_docs.sh
+   ```
+
+2. **Serve Documentation Locally**:
+   ```bash
+   ./scripts/serve_docs.sh
+   ```
+
+3. **Verify Documentation Standards**:
+   ```bash
+   ./scripts/verify_docs.sh
+   ```
+
+4. **Deploy Documentation**:
+   ```bash
+   ./scripts/deploy_docs.sh
+   ```
 
 ### Security Analysis
 
 The security analysis framework consists of multiple components:
 
 1. **CodeQL Analysis**:
-
    ```powershell
    .\scripts\security\run-codeql-analysis.ps1
    ```
    
 2. **Component-specific Analysis**:
-
    ```bash
    node scripts/security/analyze-mcp-server.js --file=scripts/bitcoin/mcp-server.js
    node scripts/security/crypto-validation.js
@@ -66,7 +95,7 @@ Scripts for building and setting up the development environment:
 
 ## Compliance
 
-The scripts in this directory have been updated to comply with the Bitcoin Development Framework v2.5 requirements and include proper AI labeling ([AIR-3][AIS-3][BPC-3][AIT-3][RES-3]).
+The scripts in this directory have been updated to comply with official Bitcoin Improvement Proposals (BIPs) requirements and include proper AI labeling ([AIR-3][AIS-3][BPC-3][AIT-3][RES-3]).
 
 For more information on security analysis and compliance, see `SECURITY_CODEQL.md` in the project root.
 

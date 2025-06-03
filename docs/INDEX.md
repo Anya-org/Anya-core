@@ -1,28 +1,62 @@
 ---
 layout: default
-title: Anya Core
-description: AI-Powered Bitcoin Protocol
+title: "Index"
+description: "Documentation for Index"
 show_support: true
+last_updated: 2025-05-30
 ---
 
 <!-- markdownlint-disable MD013 line-length -->
 
-# Anya Core Documentation \[AIR-3\]\[AIS-3\]
+# Anya Core Documentation
 
-This is the central index for all Anya Core documentation. All documentation follows the AI labelling convention defined in [AI Labelling Reference Guide](./docs/standards/AI_LABELING.md).
+## Overview
+
+The Anya Core Documentation Index provides a structured entry point to all technical, architectural, and operational documentation for the Anya Core project. It includes links to implementation guides, system architecture, security, testing, and compliance resources, ensuring easy navigation and up-to-date references for all contributors and users.
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
+
+[AIR-3][AIS-3][BPC-3][RES-3]
+
+This is the central index for all Anya Core documentation. All documentation follows the AI labeling convention defined in [AI Labeling Reference Guide](./standards/AI_LABELING.md) and adheres to official Bitcoin Improvement Proposals (BIPs).
 
 ## Core Documentation
 
-| Document | Description | Tags |
-|----------|-------------|------|
-| [AI Labelling Reference Guide](./docs/standards/AI_LABELING.md) | Defines standardized AI labelling tags for use in the Anya Core codebase | \[AIR-3\]\[AIS-3\] |
-| [High Availability](./high_availability.md) | Documentation for the High Availability subsystem | \[AIR-3\]\[AIS-3\]\[RES-3\]\[SCL-3\] |
+| Document | Description | Version | Last Updated |
+|----------|-------------|---------|--------------|
+| [AI Labeling Reference Guide](./standards/AI_LABELING.md) | Standardized AI labeling tags | 2.6.0 | 2025-05-30 |
+| [High Availability](./high_availability.md) | High Availability subsystem | 2.5.0 | 2025-05-30 |
+| [Security Policy](../SECURITY.md) | Security policies and procedures | 2.6.0 | 2025-05-30 |
+| [Upgrade Guide](./UPGRADE.md) | Version upgrade instructions | 2.6.0 | 2025-05-21 |
+
+## Monitoring & Observability
+
+| Document | Description | Version | Last Updated |
+|----------|-------------|---------|--------------|
+| [Monitoring Guide](./installation/MONITORING.md) | Comprehensive monitoring setup | 2.6.0 | 2025-05-21 |
+| [Alerting Reference](./monitoring/ALERT_REFERENCE.md) | Alert rules and configurations | 2.6.0 | 2025-05-21 |
+| [Grafana Dashboards](./monitoring/DASHBOARDS.md) | Dashboard documentation | 2.6.0 | 2025-05-21 |
+
+## Installation & Setup
+
+| Document | Description | Version | Last Updated |
+|----------|-------------|---------|--------------|
+| [Installation Guide](./installation/README.md) | Complete installation instructions | 2.6.0 | 2025-05-21 |
+| [Configuration Reference](./installation/CONFIGURATION.md) | Configuration options | 2.6.0 | 2025-05-21 |
+| [Troubleshooting](./installation/TROUBLESHOOTING.md) | Common issues and solutions | 2.6.0 | 2025-05-21 |
 
 ## Security Documentation
 
-| Document | Description | Tags |
-|----------|-------------|------|
-| [HSM Bitcoin Integration](./hsm_bitcoin_integration.md) | Describes how the Hardware Security Module integrates with Bitcoin | \[AIR-3\]\[AIS-3\]\[AIT-3\]\[AIP-3\]\[RES-3\] |
+| Document | Description | Version | Last Updated |
+|----------|-------------|---------|--------------|
+| [Security Guidelines](./SECURITY_GUIDELINES.md) | Security best practices | 2.6.0 | 2025-05-21 |
+| [HSM Integration](./hsm_bitcoin_integration.md) | Hardware Security Module | 2.5.0 | 2025-05-15 |
+| [Audit Reports](./audits/) | Security audit reports | 2.5.0 | 2025-05-15 |
+| [Compliance](./compliance/README.md) | Regulatory compliance | 2.6.0 | 2025-05-21 |
 
 ## Module-Specific Documentation
 
@@ -34,21 +68,72 @@ The following README files provide documentation for specific modules:
 
 ## Development
 
-| Document | Description | Tags |
-|----------|-------------|------|
-| [Contributing Guide](./contributing.md) | Guidelines for contributing to Anya Core | \[AIR-1\]\[AIT-2\] |
-| [Development Setup](./dev_setup.md) | Development environment setup instructions | \[AIR-1\]\[AIT-1\] |
+| Document | Description | Version | Last Updated |
+|----------|-------------|---------|--------------|
+| [Contributing Guide](./contributing.md) | Contribution guidelines | 2.6.0 | 2025-05-21 |
+| [Development Setup](./dev_setup.md) | Environment setup | 2.6.0 | 2025-05-21 |
+| [API Reference](./api/README.md) | API documentation | 2.6.0 | 2025-05-21 |
+| [Testing Guide](./testing/README.md) | Testing procedures | 2.6.0 | 2025-05-21 |
 
 ## Architecture
 
-| Document | Description | Tags |
-|----------|-------------|------|
-| [System Architecture](./architecture.md) | Overall system architecture | \[AIR-4\]\[AIS-3\] |
-| [Hexagonal Architecture](./hexagonal.md) | Details on the hexagonal architecture pattern | \[AIR-3\] |
+| Document | Description | Version | Last Updated |
+|----------|-------------|---------|--------------|
+| [System Architecture](./architecture.md) | Overall system design | 2.6.0 | 2025-05-21 |
+| [Hexagonal Architecture](./hexagonal.md) | Architecture pattern | 2.6.0 | 2025-05-21 |
+| [Data Flow](./data_flow.md) | Data processing pipelines | 2.6.0 | 2025-05-21 |
+| [Performance](./performance/README.md) | Performance characteristics | 2.6.0 | 2025-05-21 |
+
+## Operations
+
+| Document | Description | Version | Last Updated |
+|----------|-------------|---------|--------------|
+| [Backup & Recovery](./operations/backup.md) | Data protection | 2.6.0 | 2025-05-21 |
+| [Scaling Guide](./operations/scaling.md) | System scaling | 2.6.0 | 2025-05-21 |
+| [Disaster Recovery](./operations/disaster_recovery.md) | Recovery procedures | 2.6.0 | 2025-05-21 |
+| [Monitoring Setup](./monitoring/SETUP.md) | Monitoring configuration | 2.6.0 | 2025-05-21 |
+
+## API Templates & Stubbing Approach
+
+| Module | API Template | Description | Status |
+|--------|-------------|-------------|--------|
+| CacheManager | [src/cache/mod.rs](../src/cache/mod.rs) | In-memory and persistent cache management | Stub/Template |
+| SecurityManager | [src/security/mod.rs](../src/security/mod.rs) | Security, HSM, and system hardening | Stub/Template |
+| CONFIG/ConfigManager | [src/config/mod.rs](../src/config/mod.rs) | Configuration management | Stub/Template |
+| ResourceManager | [src/resource/mod.rs](../src/resource/mod.rs) | Resource allocation and health | Stub/Template |
+| PerformanceMonitor | [src/performance/mod.rs](../src/performance/mod.rs) | Performance metrics and reporting | Stub/Template |
+| MonitoringSystem, Registry, NetworkMetric, FeeMetric | [src/monitoring/mod.rs](../src/monitoring/mod.rs) | Monitoring and metrics | Stub/Template |
+| QuantumResistantCrypto | [src/crypto/quantum.rs](../src/crypto/quantum.rs) | Quantum-safe cryptography | Stub/Template |
+| MobileSDK | [src/mobile/sdk.rs](../src/mobile/sdk.rs) | Mobile wallet and network | Stub/Template |
+| TenantManager, TenantConfig, RateLimits, ResourceUsage, Tenant, TenantSecurity, AccessPolicy, RateLimit | [src/tenant/manager.rs](../src/tenant/manager.rs) | Multi-tenant management | Stub/Template |
+
+All above modules are minimal, compilable stubs/templates to unblock the build and tests. Real logic will be implemented as features are prioritized. See [TODO.md](./TODO.md) and [ROADMAP.md](./ROADMAP.md) for status and plans.
+
+## AI Labeling
+
+- [AIR-3] - Automated documentation generation
+- [AIS-3] - Security-focused documentation
+- [BPC-3] - Bitcoin development best practices
+- [RES-3] - Comprehensive operational guides
+
+## Documentation Versioning
+
+All documentation follows [Semantic Versioning](https://semver.org/). Major version changes indicate breaking changes, while minor and patch versions indicate backward-compatible updates.
 
 ## Last Updated
 
-This index was last updated on 2025-04-28.
+This index was last updated on 2025-05-21.
+
+## Getting Help
+
+For documentation issues or suggestions:
+1. Open an issue on [GitHub](https://github.com/your-org/anya-core/issues)
+2. Email: botshelomokoka+docs@gmail.com
+3. Join our [community forum](https://community.anya-core.org)
+
+## License
+
+© 2025 Anya Core Project. All documentation is licensed under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
 
 ## Future Documentation
 
@@ -269,4 +354,9 @@ async fn main() -> Result<()> {
 ## Last Update
 
 *Last updated: 2025-04-28*
+
+
+## See Also
+
+- [Related Document](#related-document)
 

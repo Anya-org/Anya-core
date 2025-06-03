@@ -1,6 +1,6 @@
 use bitcoin::secp256k1::{Secp256k1, SecretKey, PublicKey, Message};
-use bitcoin::util::bip32::{ExtendedPrivKey, ExtendedPubKey};
-use bitcoin::util::key::PrivateKey;
+use bitcoin::bip32::{ExtendedPrivKey, ExtendedPubKey};
+use bitcoin::PrivateKey;
 use bitcoin::Network;
 use rand::RngCore;
 use crate::auth::error::AuthError;

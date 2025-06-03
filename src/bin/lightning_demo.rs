@@ -1,26 +1,22 @@
+/// Lightning Network Demo
+///
+/// This program demonstrates the Lightning Network functionality
+/// provided by the anya-core library, including node operations,
+/// channel management, and payment processing.
 use std::error::Error;
-//! Lightning Network Demo
-//!
-//! This program demonstrates the Lightning Network functionality
-//! provided by the anya-core library, including node operations,
-//! channel management, and payment processing.
 
-use anya::AnyaConfig;
-use anya::AnyaCore;
-use anya::AnyaResult;
-use anya::bitcoin::BitcoinManager;
-use anya::bitcoin::lightning::{LightningNode, BitcoinLightningBridge};
+use anya_core::{AnyaCore, AnyaResult, AnyaError};
 use std::sync::Arc;
 use std::thread;
 use std::time::Duration;
 
-fn main() -> AnyaResult<()>  -> Result<(), Box<dyn Error>> {
+fn main() -> Result<(), Box<dyn Error>> {
     println!("===================================================");
     println!("⚡ Anya Core Lightning Network Demonstration");
     println!("===================================================");
     
     // Initialize with Lightning enabled
-    let mut config = AnyaConfig::default();
+    let mut config = anya_core::config::Config::default();
     config.bitcoin_config.lightning_enabled = true;
     
     // Create the Anya Core instance
@@ -28,11 +24,11 @@ fn main() -> AnyaResult<()>  -> Result<(), Box<dyn Error>> {
     
     // Get the Bitcoin manager
     let bitcoin_manager = anya.bitcoin_manager.as_ref()
-        .ok_or_else(|| anya::AnyaError::Bitcoin("Bitcoin manager not initialized".to_string()))?;
+        .ok_or_else(|| AnyaError::Bitcoin("Bitcoin manager not initialized".to_string()))?;
     
     // Get the Lightning node
     let lightning_node = bitcoin_manager.lightning_node()
-        .ok_or_else(|| anya::AnyaError::Bitcoin("Lightning node not initialized".to_string()))?;
+        .ok_or_else(|| AnyaError::Bitcoin("Lightning node not initialized".to_string()))?;
     
     // Step 1: Get node information
     println!("\n1. Getting Lightning node information...");
@@ -64,7 +60,7 @@ fn main() -> AnyaResult<()>  -> Result<(), Box<dyn Error>> {
     // Step 4: Create a Bitcoin-Lightning bridge
     println!("\n4. Creating Bitcoin-Lightning bridge...");
     let lightning_node_arc = Arc::new(lightning_node.clone());
-    let bridge = match BitcoinLightningBridge::new(lightning_node_arc) {
+    let bridge = match anya_core::layer2::lightning::BitcoinLightningBridge::new(lightning_node_arc) {
         Ok(bridge) => {
             println!("   Bridge created successfully");
             bridge
@@ -241,4 +237,4 @@ fn main() -> AnyaResult<()>  -> Result<(), Box<dyn Error>> {
     println!("===================================================");
     
     Ok(())
-} 
+}

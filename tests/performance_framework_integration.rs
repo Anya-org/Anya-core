@@ -2,12 +2,10 @@
 
 #[cfg(test)]
 mod tests {
-    use anya_core::testing::performance::{
-        PerformanceTestRunner, TestConfig
-    };
     use anya_core::testing::performance::cache::{
-        CachePerformanceTest, CacheConfig, CacheAlgorithm, AccessPattern
+        AccessPattern, CacheAlgorithm, CacheConfig, CachePerformanceTest,
     };
+    use anya_core::testing::performance::{PerformanceTestRunner, TestConfig};
     use std::collections::HashMap;
 
     #[test]
@@ -21,11 +19,11 @@ mod tests {
             zipf_param: 1.0,
             repeated_set_size: 5,
         };
-        
+
         let test = CachePerformanceTest::new(config);
-        
+
         let mut runner = PerformanceTestRunner::new();
-        
+
         // Add test configuration
         let test_config = TestConfig {
             name: "cache_test".to_string(),
@@ -35,21 +33,24 @@ mod tests {
             parameters: HashMap::new(),
         };
         runner.add_config(test_config);
-        
+
         // Add the test component
         runner.add_component(Box::new(test));
-        
+
         // Run the test
         let result = runner.run_test("cache_test");
         assert!(result.is_ok(), "Integration test should run successfully");
-        
+
         // Verify results exist
         let results = runner.get_results();
         assert!(!results.is_empty(), "Should have test results");
-        
+
         // Verify report generation
         let report = runner.generate_report_markdown();
         assert!(!report.is_empty(), "Report should not be empty");
-        assert!(report.contains("Performance Test Results"), "Report should have title");
+        assert!(
+            report.contains("Performance Test Results"),
+            "Report should have title"
+        );
     }
-} 
+}

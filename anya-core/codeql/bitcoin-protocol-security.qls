@@ -41,7 +41,7 @@
 # Custom queries for Bitcoin protocol security
 - description: "Bitcoin Protocol Validation Checks"
   queries:
-    # Custom queries for the Bitcoin Development Framework v2.5
+    # Custom queries for official Bitcoin Improvement Proposals (BIPs)
     - include:
         id: js/taproot-signing-validation
         tags:

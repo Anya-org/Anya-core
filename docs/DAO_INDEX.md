@@ -1,6 +1,28 @@
+---
+title: "Dao_index"
+description: "Documentation for Dao_index"
+---
+
+[AIR-3][AIS-3][BPC-3][RES-3]
+
+
 <!-- markdownlint-disable MD013 line-length -->
 
 # Anya DAO Documentation Index
+
+## Overview
+
+The Anya DAO Documentation Index provides a comprehensive entry point to all documentation related to the Anya DAO, including governance, tokenomics, compliance, security, and technical architecture. It is designed to help contributors and users navigate DAO-specific resources efficiently.
+
+## Table of Contents
+
+- [Core Documentation](#core-documentation)
+- [Technical Documents](#technical-documents)
+- [Governance](#governance)
+- [Tokenomics](#tokenomics)
+- [Security](#security)
+- [Integration](#integration)
+
 
 [AIS-3][BPC-3][DAO-3]
 
@@ -126,9 +148,9 @@ The DAO is tightly integrated with the tokenomics system through:
    - 55% to DAO/community
 3. **Governance Control**: DAO proposals can adjust tokenomics parameters
 
-## Bitcoin Development Framework Compliance
+## Bitcoin Improvement Proposals (BIPs) Compliance
 
-All DAO components adhere to the Bitcoin Development Framework v2.5 requirements:
+All DAO components adhere to official Bitcoin Improvement Proposals (BIPs) requirements:
 
 - Protocol adherence through trait-based design
 - Privacy-preserving architecture
@@ -145,3 +167,7 @@ Current implementation status:
 - ⏳ Advanced governance features (Pending)
 
 For detailed progress, see the [Implementation Milestones](IMPLEMENTATION_MILESTONES.md) document.
+## See Also
+
+- [Related Document](#related-document)
+

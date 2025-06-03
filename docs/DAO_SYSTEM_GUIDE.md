@@ -1,3 +1,11 @@
+---
+title: "Dao_system_guide"
+description: "Documentation for Dao_system_guide"
+---
+
+[AIR-3][AIS-3][BPC-3][RES-3]
+
+
 <!-- markdownlint-disable MD013 line-length -->
 <!-- markdownlint-disable MD033 html -->
 <!-- markdownlint-disable MD040 fenced-code-language -->
@@ -5,6 +13,12 @@
 [AIS-3][BPC-3][DAO-3]
 
 # DAO System Guide
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 
 ## Compliance Framework
 
@@ -526,9 +540,9 @@ Current implementation status:
 
 For detailed progress, see the [Implementation Milestones](IMPLEMENTATION_MILESTONES.md) document.
 
-## Bitcoin Development Framework Compliance
+## Bitcoin Improvement Proposals (BIPs) Compliance
 
-This implementation follows the Bitcoin Development Framework v2.5 requirements:
+This implementation follows official Bitcoin Improvement Proposals (BIPs) requirements:
 
 1. **Protocol Adherence**
    - Bitcoin-style issuance with halving schedule
@@ -637,3 +651,8 @@ clarinet docs
 
 2. BIP-174 PSBT Flow:
    Construction → Validation → Signing → Broadcast
+
+## See Also
+
+- [Related Document](#related-document)
+

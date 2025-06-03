@@ -4,7 +4,7 @@
 
 ## Overview
 
-This report summarizes the results of testing our security analysis workflows as part of the Anya Core project. All tests were conducted on March 16, 2025, following the Bitcoin Development Framework v2.5 guidelines.
+This report summarizes the results of testing our security analysis workflows as part of the Anya Core project. All tests were conducted on March 16, 2025, following official Bitcoin Improvement Proposals (BIPs) guidelines.
 
 ## Workflow Test Results
 
@@ -153,7 +153,7 @@ This report summarizes the results of testing our security analysis workflows as
 
 ## Conclusion
 
-The security analysis workflows revealed several critical issues that need to be addressed to achieve BPC-3 compliance with the Bitcoin Development Framework v2.5. While some workflows are functioning properly (basic security validation), others require significant improvements.
+The security analysis workflows revealed several critical issues that need to be addressed to achieve BPC-3 compliance with official Bitcoin Improvement Proposals (BIPs). While some workflows are functioning properly (basic security validation), others require significant improvements.
 
 This test report provides a baseline for tracking progress toward full compliance and security hardening of the Anya Core system.
 

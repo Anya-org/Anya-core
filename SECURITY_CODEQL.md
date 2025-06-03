@@ -1,7 +1,7 @@
 # Bitcoin MCP Server Security and CodeQL Analysis
 [AIR-3][AIS-3][BPC-3][AIT-3][RES-3]
 
-This document describes the security analysis framework for the Bitcoin MCP server and related components, aligned with the Bitcoin Development Framework v2.5 requirements.
+This document describes the security analysis framework for the Bitcoin MCP server and related components, aligned with official Bitcoin Improvement Proposals (BIPs) requirements.
 
 ## Overview
 
@@ -98,7 +98,7 @@ To run security analysis manually:
 
 Security analysis is designed to validate compliance with:
 
-1. **Bitcoin Development Framework v2.5**
+1. **Official Bitcoin Improvement Proposals (BIPs)**
    - BPC-3 level compliance for Bitcoin protocol
    - Full support for BIP-340, BIP-341, BIP-342, BIP-174, BIP-370
 
@@ -130,7 +130,7 @@ The security analysis framework is:
 
 - Version: 1.0.0
 - Last Updated: March 2025
-- Compliance: Bitcoin Development Framework v2.5
+- Compliance: Official Bitcoin Improvement Proposals (BIPs)
 - AI Labels: [AIR-3][AIS-3][BPC-3][AIT-3][RES-3]
 
 Maintenance Schedule:

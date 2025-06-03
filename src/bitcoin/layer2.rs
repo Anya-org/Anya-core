@@ -1,11 +1,8 @@
-use std::error::Error;
-use bitcoin::{Transaction, Network};
+// [AIR-3][AIS-3][BPC-3][RES-3] Removed unused import: std::error::Error
+use bitcoin::{Transaction};
 use crate::bitcoin::error::BitcoinResult;
 
 /// Layer2Protocol trait defines the interface for Bitcoin Layer 2 protocols
-/// 
-/// This trait is implemented by different Layer 2 solutions like Lightning, 
-/// DLCs, and Taproot Assets to ensure a consistent API across implementations.
 pub trait Layer2Protocol {
     /// Generate a new address for the Layer 2 protocol
     fn generate_address(&self, address_type: &str) -> BitcoinResult<String>;
@@ -39,34 +36,30 @@ pub trait Layer2Protocol {
 }
 
 /// Registry of Layer 2 protocols
-pub struct Layer2Registry  -> Result<(), Box<dyn Error>> {
-    protocols: Vec<(String, Box<dyn Layer2Protocol>)>,
-}
+pub struct Layer2Registry(Vec<(String, Box<dyn Layer2Protocol>)>);
 
 impl Layer2Registry {
     /// Create a new Layer 2 registry
-    pub fn new() -> Self  -> Result<(), Box<dyn Error>> {
-        Self {
-            protocols: Vec::new(),
-        }
+    pub fn new() -> Self {
+        Self(Vec::new())
     }
     
     /// Register a Layer 2 protocol
-    pub fn register(&mut self, name: &str, protocol: Box<dyn Layer2Protocol>)  -> Result<(), Box<dyn Error>> {
-        self.protocols.push((name.to_string(), protocol));
+    pub fn register(&mut self, name: &str, protocol: Box<dyn Layer2Protocol>) {
+        self.0.push((name.to_string(), protocol));
     }
     
     /// Get a Layer 2 protocol by name
-    pub fn get(&self, name: &str) -> Option<&Box<dyn Layer2Protocol>>  -> Result<(), Box<dyn Error>> {
-        self.protocols.iter()
+    pub fn get(&self, name: &str) -> Option<&Box<dyn Layer2Protocol>> {
+        self.0.iter()
             .find(|(n, _)| n == name)
             .map(|(_, p)| p)
     }
     
     /// List all registered Layer 2 protocols
-    pub fn list_protocols(&self) -> Vec<String>  -> Result<(), Box<dyn Error>> {
-        self.protocols.iter()
+    pub fn list_protocols(&self) -> Vec<String> {
+        self.0.iter()
             .map(|(n, _)| n.clone())
             .collect()
     }
-} 
+}

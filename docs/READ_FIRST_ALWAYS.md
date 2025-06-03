@@ -1,6 +1,20 @@
+---
+title: "Read_first_always"
+description: "Documentation for Read_first_always"
+last_updated: 2025-05-30
+---
+[AIR-3][AIS-3][BPC-3][RES-3]
+
+
 <!-- markdownlint-disable MD013 line-length -->
 
 # Read First Always Principle
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 
 ## Overview
 
@@ -102,3 +116,8 @@ The Read First Always principle can be tested using the following approaches:
 ## Conclusion
 
 The Read First Always principle is a cornerstone of data integrity in decentralized systems like Web5. By strictly following this pattern, the Anya Core project maintains consistency and reliability in all data operations, particularly those anchored to the Bitcoin blockchain.
+
+## See Also
+
+- [Related Document 1](./related1.md)
+- [Related Document 2](./related2.md)

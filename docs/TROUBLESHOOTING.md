@@ -1,4 +1,19 @@
+---
+title: "Troubleshooting"
+description: "Documentation for Troubleshooting"
+---
+
 ## Common Resolution Workflow
+
+## Overview
+
+Add a brief overview of this document here.
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 
 ```mermaid
 graph LR
@@ -15,6 +30,7 @@ graph LR
 ```
 
 **New Resolution Script:**
+
 ```powershell
 # Fixes common workspace issues
 $ErrorActionPreference = "Stop"
@@ -39,23 +55,26 @@ cargo build --workspace --features "bip174 bip341 secp256k1/std"
 ```
 
 **Documentation Validation Protocol**  
+
 ```bash
 # Check doc consistency
 cargo doc --workspace --no-deps --open
 git diff HEAD~1 --name-only | grep .md | xargs markdownlint
 ```
 
-All documentation updates follow Bitcoin Development Framework v2.5 requirements and match the current codebase structure. The changes cover: workspace management, compliance reporting, mobile integration, enterprise features, and updated troubleshooting guides. 
+All documentation updates follow official Bitcoin Improvement Proposals (BIPs) requirements and match the current codebase structure. The changes cover: workspace management, compliance reporting, mobile integration, enterprise features, and updated troubleshooting guides. 
 
 ## Common Issues Resolution
 
 ### PSBT v2 Validation
+
 ```bash
 # Diagnostic command
 anya-cli validate-psbt --input tx.psbt --bip 174,370
 ```
 
 ### Taproot Commitment
+
 ```rust
 // Debugging snippet
 fn debug_commitment() {
@@ -66,6 +85,7 @@ fn debug_commitment() {
 ```
 
 ### HSM Integration
+
 ```toml
 # Valid configuration
 [hsm]
@@ -74,4 +94,10 @@ auth_key = { path = "security/hsm_keys", required_approvals = 2 }
 ```
 
 ---
-*All solutions verified against BDF v2.5 security requirements* 
+
+[AIR-3][AIS-3][BPC-3][RES-3]
+
+## See Also
+
+- [Related Document](#related-document)
+

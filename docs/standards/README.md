@@ -1,8 +1,23 @@
+---
+title: "Readme"
+description: "Documentation for Readme"
+---
+
 # Anya Core Standards
+
+## Overview
+
+Add a brief overview of this document here.
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 
 [AIR-3][AIS-3][BPC-3]
 
-This directory contains the canonical standards documentation for the Anya Core project, in compliance with the Bitcoin Development Framework v2.5.
+This directory contains the canonical standards documentation for the Anya Core project, in compliance with official Bitcoin Improvement Proposals (BIPs).
 
 ## Available Standards
 
@@ -12,9 +27,9 @@ This directory contains the canonical standards documentation for the Anya Core 
 
 All components in the Anya Core codebase must adhere to these standards. When introducing new components or modifying existing ones, refer to these documents for guidance on labeling, security requirements, and architectural constraints.
 
-## Integration with Bitcoin Development Framework
+## Integration with Official Bitcoin Standards
 
-These standards are aligned with the Bitcoin Development Framework v2.5, ensuring proper implementation of:
+These standards are aligned with official Bitcoin Improvement Proposals (BIPs), ensuring proper implementation of:
 
 1. Protocol Adherence
 2. Privacy-Preserving Architecture
@@ -82,3 +97,7 @@ The following scripts help with standards implementation:
 | `scripts/validate_ai_labels.ps1` | Validates AI labels in code and documentation |
 | `scripts/install_hooks.ps1` | Installs Git hooks for standards validation |
 | `scripts/update_ai_labeling_docs.ps1` | Updates deprecated documentation with notices | 
+## See Also
+
+- [Related Document](#related-document)
+

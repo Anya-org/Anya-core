@@ -4,7 +4,7 @@
  * [AIR-3][AIS-3][BPC-3][AIT-3][RES-3]
  * 
  * This script validates cryptographic implementations according to
- * Bitcoin Development Framework v2.5 standards and security best practices.
+ * official Bitcoin Improvement Proposals (BIPs) and security best practices.
  */
 
 const fs = require('fs');
@@ -352,7 +352,7 @@ const CRYPTO_CHECKS = [
 
 // Banner
 console.log('\n===== Cryptographic Implementation Validation =====');
-console.log('Bitcoin Development Framework v2.5');
+console.log('Bitcoin Improvement Proposals (BIPs) Compliance');
 console.log('Checking for secure cryptographic implementations...\n');
 
 // Find all relevant files

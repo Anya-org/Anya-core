@@ -1,16 +1,27 @@
+---
+title: "Ai_labeling"
+description: "Documentation for Ai_labeling"
+---
+
 # AI Labeling System [AIR-3][AIS-3][BPC-3]
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 
 <!-- markdownlint-disable MD013 line-length -->
 
 > **IMPORTANT: This is the canonical and authoritative AI labeling documentation for Anya Core.**
-> **Version: 3.0 (2025-03-20)**
+> **Version: 3.1 (2025-05-30)**
 > 
 > All other labeling documents are deprecated in favor of this standardized system.
 > For migration details, see the [Migration Guide](#migration-from-legacy-systems) section.
 
 ## Overview
 
-This document defines the standardized AI labeling system used throughout the Anya Core codebase, following the Bitcoin Development Framework v2.5 standards. This system ensures all components are properly categorized for AI readiness, security, compliance, and other critical aspects.
+This document defines the standardized AI labeling system used throughout the Anya Core codebase, following official Bitcoin Improvement Proposals (BIPs). This system ensures all components are properly categorized for AI readiness, security, compliance, and other critical aspects.
 
 ## Tag Format
 
@@ -439,3 +450,8 @@ All experimental code must:
 
 - Privacy: Silent leaf implementation
 - Security: PSBT version validation
+
+## See Also
+
+- [Related Document](#related-document)
+

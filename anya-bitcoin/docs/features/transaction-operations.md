@@ -38,4 +38,4 @@ This document details the operations available for transaction handling in Anya.
 - [Transaction Management](transaction-management.md)
 - [Block Processing](block-processing.md)
 
-*Last updated: 2024-12-07*
+*Last updated: 2025-06-02*

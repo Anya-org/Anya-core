@@ -1,10 +1,25 @@
 ---
+last_updated: 2025-05-30
 layout: default
-title: Cross-Platform Installation
-description: Install Anya on any platform using Dart
+title: "Cross Platform"
+description: "Documentation for Cross Platform"
 ---
 
+[AIR-3][AIS-3][BPC-3][RES-3]
+
+last_updated: 2025-05-30
+
 # Cross-Platform Installation Guide
+
+## Overview
+
+Add a brief overview of this document here.
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 
 Anya now supports cross-platform installation using Dart SDK, making it easier to deploy and run on any operating system.
 
@@ -133,4 +148,9 @@ dart compile exe bin/anya.dart
 - [API Reference](../api/)
 - [Security Best Practices](../security/)
 
-*Last updated: 2024-12-07*
+*Last updated: 2025-06-02*
+
+## See Also
+
+- [Related Document](#related-document)
+

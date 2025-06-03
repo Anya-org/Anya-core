@@ -4,7 +4,7 @@
 use bitcoin::bip::{BIP340, BIP341, BIP342};
 use serde::Serialize;
 
-#[derive(Serialize)]
+#[derive(Serialize, Clone, Default)]
 pub struct BipComplianceReport {
     pub bip340: ComplianceStatus,
     pub bip341: ComplianceStatus,
@@ -12,7 +12,7 @@ pub struct BipComplianceReport {
     pub last_verified: chrono::DateTime<chrono::Utc>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Clone, Default)]
 pub struct ComplianceStatus {
     implemented: bool,
     test_coverage: f32,
@@ -40,4 +40,4 @@ fn check_bip340_compliance() -> ComplianceStatus {
     }
 }
 
-// Similar implementations for BIP341/342 checks... 
+// Similar implementations for BIP341/342 checks...

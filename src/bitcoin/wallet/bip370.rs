@@ -251,7 +251,7 @@ impl EnhancedPsbt {
     }
     
     /// Deserialize an enhanced PSBT from bytes
-    pub fn deserialize(data: &[u8], network: Network) -> Result<Self> {
+    pub fn deserialize(_data: &[u8], network: Network) -> Result<Self> {
         // Deserialize the base PSBT
         let psbt = match Psbt::deserialize(data) {
             Ok(psbt) => psbt,

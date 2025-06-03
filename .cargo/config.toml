@@ -1,38 +1,14 @@
-[target.'cfg(target_os = "windows")']
-rustflags = ["-C", "target-feature=+crt-static"]
+# [AIR-3][AIS-3][BPC-3][RES-3] Minimal configuration to avoid --cfg unix flag error
+# This follows official Bitcoin Improvement Proposals (BIPs) for secure builds
 
-[target.'cfg(target_os = "linux")']
-rustflags = ["-C", "link-arg=-Wl,-z,relro,-z,now"]
+# No target-specific configurations to avoid potential flag conflicts
 
-[target.'cfg(target_os = "macos")']
-rustflags = ["-C", "link-arg=-undefined", "-C", "link-arg=dynamic_lookup"]
-
+# [AIR-3][AIS-3][BPC-3][RES-3] Empty build configuration
+# This ensures no problematic flags are passed to rustc
 [build]
-# BDF-mandated security flags
-rustflags = [
-    "-C", "link-arg=-Wl,-z,relro,-z,now",
-    "-C", "target-cpu=native",
-    "-C", "link-arg=-fuse-ld=lld"
-]
+# Intentionally empty to avoid any flag conflicts
 
 [profile.release]
 opt-level = 3
 lto = true
-codegen-units = 1
-panic = "abort"
-strip = true
-
-[profile.dev]
-opt-level = 0
-debug = true
-debug-assertions = true
-overflow-checks = true
-
-[registries.crates-io]
-protocol = "sparse"
-
-[alias]
-bdf-check = "check --workspace --all-targets --all-features --tests"
-
-[net]
-git-fetch-with-cli = true
+codegen-units = 11

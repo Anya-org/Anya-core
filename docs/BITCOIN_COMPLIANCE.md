@@ -1,4 +1,18 @@
+---
+title: "Bitcoin_compliance"
+description: "Documentation for Bitcoin_compliance"
+last_updated: 2025-05-30
+---
+[AIR-3][AIS-3][BPC-3][RES-3]
+
+
 # Bitcoin Protocol Compliance
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 
 [AIS-3][BPC-3][DAO-3]
 
@@ -15,9 +29,9 @@ The Anya DAO is designed to fully comply with Bitcoin protocol standards and bes
 | 370 | PSBT v2 | ✅ | Advanced operations (BIP-370 full implementation) |
 | 342 | Tapscript | ✅ | Governance script validation |
 
-## Bitcoin Development Framework Compliance
+## Bitcoin Improvement Proposals (BIPs) Compliance
 
-This implementation follows the Bitcoin Development Framework v2.5 requirements:
+This implementation follows official Bitcoin Improvement Proposals (BIPs) requirements:
 
 1. **Protocol Adherence**
    - Bitcoin-style issuance with halving schedule
@@ -156,7 +170,7 @@ Verification Command:
 anya audit lightning --protocol bolt12 --network testnet
 ```
 
-This implementation achieves full BOLT 12 compliance while maintaining all Bitcoin Development Framework v2.5 requirements for Lightning Network integration.
+This implementation achieves full BOLT 12 compliance while maintaining all official Bitcoin Improvement Proposals (BIPs) requirements for Lightning Network integration.
 
 *Last updated: 2025-02-24 18:05 UTC+2*
 
@@ -185,3 +199,8 @@ fn validate_psbt_v2(psbt: &Psbt) -> Result<()> {
     validate_silent_leaf(psbt)?; // BIP-341 integration
 }
 ```
+
+## See Also
+
+- [Related Document 1](./related1.md)
+- [Related Document 2](./related2.md)

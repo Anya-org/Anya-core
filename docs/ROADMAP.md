@@ -1,12 +1,29 @@
+---
+title: "Roadmap"
+description: "Documentation for Roadmap"
+---
+
 <!-- markdownlint-disable MD013 line-length -->
 
 # Anya Core Development Roadmap v2.6
+
+## Overview
+
+The Anya Core Development Roadmap outlines the planned features, milestones, and critical paths for the project. It provides a timeline for protocol compliance, security enhancements, mobile integration, and other major initiatives, helping all stakeholders track progress and upcoming priorities.
+
+## Table of Contents
+
+- [Critical Path](#critical-path)
+- [Compliance Milestones](#compliance-milestones)
+- [Feature Timeline](#feature-timeline)
+- [Release History](#release-history)
+
 
 ## Critical Path
 
 ```mermaid
 gantt
-    title Bitcoin Development Framework v2.6
+    title Bitcoin Standards Implementation v2.6
     dateFormat  YYYY-MM-DD
     section Protocol Compliance
     BIP-370 Implementation       :active, bip370, 2025-03-01, 30d
@@ -102,7 +119,7 @@ fn log_audit_event(event: AuditEvent) {
 ![AIS-3](https://img.shields.io/badge/AIS-3_Certified-blue)  
 ![PSBT-v2](https://img.shields.io/badge/PSBT_v2-85%25-yellow)
 
-This roadmap maintains full compatibility with Bitcoin Development Framework v2.5 while addressing the codebase's current gaps in mobile integration and security auditing. The mermaid diagrams and status tracking align with existing documentation patterns.
+This roadmap maintains full compatibility with official Bitcoin Improvement Proposals (BIPs) while addressing the codebase's current gaps in mobile integration and security auditing. The mermaid diagrams and status tracking align with existing documentation patterns.
 
 ## Updates
 
@@ -138,4 +155,25 @@ journey
 | Q4 2025 | 342       | 95%    | ⏳      |
 
 ---
+
+[AIR-3][AIS-3][BPC-3][RES-3]
+
 *Aligned with Bitcoin Core development schedule and BDF v2.5 requirements*
+
+## See Also
+
+- [IMPLEMENTATION_MILESTONES.md](./IMPLEMENTATION_MILESTONES.md) – Implementation milestones
+- [IMPLEMENTATION_ARCHITECTURE.md](./IMPLEMENTATION_ARCHITECTURE.md) – Architecture overview
+- [IMPLEMENTATION_SUMMARY.md](./IMPLEMENTATION_SUMMARY.md) – Implementation summary
+- [TESTING_IMPLEMENTATION.md](./TESTING_IMPLEMENTATION.md) – Testing implementation
+- [TESTING_STRATEGY.md](./TESTING_STRATEGY.md) – Testing strategy
+- [SECURITY_ARCHITECTURE.md](./SECURITY_ARCHITECTURE.md) – Security architecture
+- [PERFORMANCE_ARCHITECTURE.md](./PERFORMANCE_ARCHITECTURE.md) – Performance architecture
+
+## API Template & Stubbing Milestone
+
+- Q2 2025: All missing types/modules referenced in tests and binaries are now covered by minimal, compilable API templates (see [INDEX.md](./INDEX.md)).
+- All legacy/incomplete test modules and protocol binaries are stubbed or auto-fixed to unblock the build.
+- No open source drop-in replacements exist for these APIs; all stubs/templates are custom and will be replaced with real logic as features are prioritized.
+- See [TODO.md](./TODO.md) for implementation checklist and [INDEX.md](./INDEX.md) for template locations.
+

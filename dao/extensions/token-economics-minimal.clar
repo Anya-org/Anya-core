@@ -1,6 +1,6 @@
 ;; Minimal Token Economics file [AIR-3][AIS-3][BPC-3][AIT-3]
 ;; Implements the core constants of the Bitcoin-style tokenomics model
-;; Compliant with Bitcoin Development Framework v2.5
+;; Compliant with official Bitcoin Improvement Proposals (BIPs)
 
 ;; Bitcoin-style tokenomics constants
 (define-constant TOTAL-SUPPLY u21000000000) ;; 21 billion tokens

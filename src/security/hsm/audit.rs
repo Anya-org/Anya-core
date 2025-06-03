@@ -1,19 +1,18 @@
-use std::error::Error;
-use crate::security::hsm::{HsmError, HsmAuditEvent};
-use serde::{Serialize, Deserialize};
+use crate::security::hsm::error::{HsmError, AuditEventType, AuditEventResult, AuditEventSeverity, HsmAuditEvent};
+use serde::{Serialize, Deserialize, Serializer, Deserializer};
 use std::sync::Arc;
+use std::path::Path;
+use std::fs;
 use tokio::sync::Mutex;
-use tracing::{debug, info, error, warn};
+use tracing::{debug, warn};
 use chrono::{DateTime, Utc};
-use std::path::PathBuf;
-use std::fs::{self, OpenOptions, File};
-use std::io::{Write, Read, Seek, SeekFrom};
+use std::fs::{OpenOptions, File};
+use std::io::{Write, Seek, SeekFrom};
 use async_trait::async_trait;
 use std::collections::HashMap;
 use uuid::Uuid;
-use std::path::Path;
 
-use crate::security::hsm::error::{AuditEventType, AuditEventResult, AuditEventSeverity};
+// [AIR-3][AIS-3][BPC-3][RES-3] Imports cleaned up for BDF v2.5 compliance
 
 /// Audit logger configuration for HSM operations
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -123,7 +122,7 @@ impl AuditLogger {
         storage.store_event(event).await?;
         
         // Perform cleanup if needed
-        if let Err(e) = storage.cleanup(self.config.retention_days, Some(self.config.max_events)).await {
+        if let Err(e) = storage.cleanup(self.config.retention_days, Some(self.config.max_events as usize)).await {
             warn!("Failed to cleanup audit logs: {}", e);
         }
         
@@ -149,13 +148,15 @@ impl AuditLogger {
         let mut event = AuditEvent::new(event_type, result, severity);
         
         // Add details to the event
-        let details_map: HashMap<String, String> = serde_json::from_value(details_value)
-            .unwrap_or_else(|_| {
+        let details_map: HashMap<String, String> = match serde_json::from_value(details_value.clone()) {
+            Ok(map) => map,
+            Err(_) => {
                 // If we can't convert to a HashMap, create a single detail entry
                 let mut map = HashMap::new();
                 map.insert("data".to_string(), serde_json::to_string(&details_value).unwrap_or_default());
                 map
-            });
+            }
+        };
             
         for (key, value) in details_map {
             event = event.with_detail(key, value);
@@ -200,8 +201,11 @@ impl AuditLogger {
             return Ok(0);
         }
         
-        let mut storage = self.storage.lock().await;
-        storage.cleanup(self.config.retention_days, Some(self.config.max_events)).await
+        let storage = self.storage.lock().await;
+        storage.cleanup(
+            self.config.retention_days, 
+            Some(self.config.max_events as usize)
+        ).await
     }
     
     /// Track an operation
@@ -404,6 +408,37 @@ impl AuditEvent {
     pub fn with_client_ip(mut self, client_ip: impl Into<String>) -> Self {
         self.client_ip = Some(client_ip.into());
         self
+    }
+    
+    /// Convert to HsmAuditEvent
+    pub fn to_hsm_audit_event(&self) -> HsmAuditEvent {
+        let mut event = HsmAuditEvent::new(
+            self.event_type,
+            self.result,
+            self.severity
+        );
+        
+        if let Some(actor) = &self.actor {
+            event = event.with_user(actor.clone());
+        }
+        
+        if let Some(operation_id) = &self.operation_id {
+            event = event.with_operation_id(operation_id.clone());
+        }
+        
+        if let Some(key_id) = &self.key_id {
+            event = event.with_key_id(key_id.clone());
+        }
+        
+        if let Some(error) = &self.error {
+            event = event.with_error(error.clone());
+        }
+        
+        if !self.details.is_empty() {
+            event = event.with_metadata(serde_json::to_value(&self.details).unwrap_or_default());
+        }
+        
+        event
     }
 }
 

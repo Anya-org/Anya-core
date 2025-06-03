@@ -1,9 +1,9 @@
 use async_trait::async_trait;
 use bitcoin::secp256k1::{Secp256k1, SecretKey, PublicKey};
-use bitcoin::util::bip32::{ExtendedPrivKey, ExtendedPubKey, DerivationPath};
+use bitcoin::bip32::{ExtendedPrivKey, ExtendedPubKey, DerivationPath};
 use bitcoin::Network;
-use bitcoin::util::bip32::ChildNumber;
-use bitcoin::util::bip32::ExtendedPubKey;
+use bitcoin::bip32::ChildNumber;
+use bitcoin::bip32::ExtendedPubKey;
 use bitcoin::psbt::PartiallySignedTransaction;
 use lightning::util::message_signing;
 use bitcoin::taproot::{TapTweakHash, TaprootBuilder, LeafVersion};

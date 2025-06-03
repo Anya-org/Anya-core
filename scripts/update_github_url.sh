@@ -1,4 +1,5 @@
 #!/bin/bash
+# [AIR-3][AIS-3][BPC-3][RES-3]
 # GitHub URL Update Script (Bash version)
 # This script updates all references to the old GitHub repository URL
 

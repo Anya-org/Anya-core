@@ -1,6 +1,20 @@
+---
+title: "Architecture"
+description: "Documentation for Architecture"
+---
+
+[AIR-3][AIS-3][BPC-3][RES-3]
+
+
 <!-- markdownlint-disable MD013 line-length -->
 
 # Anya Core Architecture
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 
 ## Overview
 
@@ -968,7 +982,7 @@ Anya is a decentralized ML agent system built on Web5 technology, featuring:
    - Security hardening
    - Integration expansion
 
-*Last updated: 2024-12-07*
+*Last updated: 2025-06-02*
 
 # Mobile SDK Architecture v2.5
 
@@ -1027,3 +1041,8 @@ interface MobileSDK {
   // ... other methods ...
 }
 ```
+
+## See Also
+
+- [Related Document](#related-document)
+

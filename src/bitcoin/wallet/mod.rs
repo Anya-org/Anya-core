@@ -1,7 +1,3 @@
-use std::error::Error;
-// Migrated from OPSource to anya-core
-// This file was automatically migrated as part of the Rust-only implementation
-// Original file: C:\Users\bmokoka\Downloads\OPSource\src\bitcoin\wallet\mod.rs
 // Bitcoin Wallet Module
 // Implements unified wallet capabilities for Bitcoin and related chains
 //
@@ -13,25 +9,21 @@ use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use std::str::FromStr;
 use bitcoin::secp256k1::{Secp256k1, SecretKey};
-use bitcoin::{Network, Address, Transaction, TxOut};
-use bitcoin::LockTime;
-use crate::bitcoin::error::{BitcoinError, BitcoinResult};
+use bitcoin::{Network, Address, Transaction, TxOut, OutPoint, Txid};
+use bitcoin::absolute::LockTime;
+use crate::bitcoin::error::BitcoinError;
 use crate::AnyaResult;
 use crate::bitcoin::interface::BitcoinInterface;
 use bitcoin::hashes::Hash as BitcoinHashTrait;
 use crate::AnyaError;
-use bitcoin::{Script, ScriptBuf, Sequence, TxIn, TxOut, Amount};
+use bitcoin::{ScriptBuf, Amount};
 use std::path::{Path, PathBuf};
-use bitcoin::consensus::encode;
-use bitcoin::util::bip32::{ExtendedPrivKey, ExtendedPubKey, DerivationPath, KeySource};
-use bitcoin::util::psbt::PartiallySignedTransaction as PSBT;
-use bip39::{Mnemonic, MnemonicType, Seed};
+use bitcoin::bip32::DerivationPath;
+use bitcoin::psbt::Psbt as PSBT;
 use thiserror::Error;
-use log::{debug, info, error, warn};
+use log::{error};
 use serde::{Serialize, Deserialize};
 use async_trait::async_trait;
-use crate::bitcoin::rpc::BitcoinRpcClient;
-use crate::bitcoin::network::NetworkConfig;
 
 pub mod bip32;
 pub mod transactions;
@@ -65,7 +57,7 @@ pub trait KeyManager {
     fn derive_key(&self, path: &str) -> AnyaResult<SecretKey>;
     fn get_public_key(&self, path: &str) -> AnyaResult<bitcoin::secp256k1::PublicKey>;
     fn sign_message(&self, message: &[u8], path: &str) -> AnyaResult<Vec<u8>>;
-    fn verify_message(&self, message: &[u8], signature: &[u8], path: &str) -> AnyaResult<bool>;
+    fn verify_message(&self, message: &[u8], _signature: &[u8], path: &str) -> AnyaResult<bool>;
 }
 
 pub trait AddressManager {
@@ -87,8 +79,8 @@ pub trait TransactionManager {
     fn create_transaction(
         &self,
         outputs: Vec<(String, u64)>,
-        fee_rate: f64,
-        options: transactions::TxOptions,
+        _fee_rate: f64,
+        _options: transactions::TxOptions,
     ) -> AnyaResult<Transaction>;
     
     fn sign_transaction(&self, tx: &mut Transaction) -> AnyaResult<()>;
@@ -169,7 +161,7 @@ impl Wallet {
             bip32::generate_seed(password.unwrap_or(""))?
         };
         
-        let mut seed_guard = self.seed.lock()?;
+        let mut seed_guard = self.seed.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         *seed_guard = Some(seed);
         
         // Generate initial addresses
@@ -179,7 +171,7 @@ impl Wallet {
     }
     
     fn init_addresses(&self) -> AnyaResult<()> {
-        let mut addresses = self.addresses.lock()?;
+        let mut addresses = self.addresses.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         
         // Generate 20 addresses of each type
         for address_type in [
@@ -228,7 +220,7 @@ impl Wallet {
 
 impl KeyManager for Wallet {
     fn derive_key(&self, path: &str) -> AnyaResult<SecretKey> {
-        let seed_guard = self.seed.lock()?;
+        let seed_guard = self.seed.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         let seed = seed_guard.as_ref()
             .ok_or_else(|| BitcoinError::Wallet("Wallet not initialized".to_string()))?;
         
@@ -269,7 +261,7 @@ impl KeyManager for Wallet {
 
 impl AddressManager for Wallet {
     fn get_new_address(&self, address_type: AddressType) -> AnyaResult<Address> {
-        let mut addresses = self.addresses.lock()?;
+        let mut addresses = self.addresses.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         
         let type_addresses = addresses.entry(address_type)
             .or_insert_with(Vec::new);
@@ -307,7 +299,7 @@ impl AddressManager for Wallet {
     }
     
     fn get_address(&self, index: u32, address_type: AddressType) -> AnyaResult<Address> {
-        let addresses = self.addresses.lock()?;
+        let addresses = self.addresses.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         
         if let Some(type_addresses) = addresses.get(&address_type) {
             if let Some(address) = type_addresses.get(index as usize) {
@@ -345,7 +337,7 @@ impl AddressManager for Wallet {
     }
     
     fn is_address_mine(&self, address: &str) -> AnyaResult<bool> {
-        let addresses = self.addresses.lock()?;
+        let addresses = self.addresses.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         
         for type_addresses in addresses.values() {
             for addr in type_addresses {
@@ -359,7 +351,7 @@ impl AddressManager for Wallet {
     }
     
     fn get_all_addresses(&self) -> AnyaResult<Vec<Address>> {
-        let addresses = self.addresses.lock()?;
+        let addresses = self.addresses.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         
         let mut result = Vec::new();
         for type_addresses in addresses.values() {
@@ -374,7 +366,7 @@ impl TransactionManager for Wallet {
     fn create_transaction(
         &self,
         outputs: Vec<(String, u64)>,
-        fee_rate: f64,
+        _fee_rate: f64,
         _options: transactions::TxOptions,
     ) -> AnyaResult<Transaction> {
         // Simplified implementation
@@ -436,7 +428,7 @@ impl BalanceManager for Wallet {
     }
     
     fn get_asset_balance(&self, asset_id: &str) -> AnyaResult<u64> {
-        let assets = self.assets.lock()?;
+        let assets = self.assets.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         
         if let Some(asset) = assets.get(asset_id) {
             Ok(asset.balance)
@@ -446,7 +438,7 @@ impl BalanceManager for Wallet {
     }
     
     fn get_all_asset_balances(&self) -> AnyaResult<HashMap<String, u64>> {
-        let assets = self.assets.lock()?;
+        let assets = self.assets.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         
         let mut balances = HashMap::new();
         for (id, asset) in assets.iter() {
@@ -498,7 +490,7 @@ impl UnifiedWallet for Wallet {
     }
     
     fn add_asset(&self, asset_id: &str, name: &str, asset_type: &str) -> AnyaResult<()> {
-        let mut assets = self.assets.lock()?;
+        let mut assets = self.assets.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         
         if assets.contains_key(asset_id) {
             return Err(BitcoinError::Wallet(format!("Asset already exists: {}", asset_id)).into());
@@ -519,7 +511,7 @@ impl UnifiedWallet for Wallet {
     }
     
     fn remove_asset(&self, asset_id: &str) -> AnyaResult<()> {
-        let mut assets = self.assets.lock()?;
+        let mut assets = self.assets.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         
         if assets.remove(asset_id).is_none() {
             return Err(BitcoinError::Wallet(format!("Asset not found: {}", asset_id)).into());
@@ -529,7 +521,7 @@ impl UnifiedWallet for Wallet {
     }
     
     fn get_assets(&self) -> AnyaResult<Vec<Asset>> {
-        let assets = self.assets.lock()?;
+        let assets = self.assets.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         Ok(assets.values().cloned().collect())
     }
     
@@ -565,32 +557,6 @@ fn determine_chain_from_asset_id(asset_id: &str) -> String {
         "RSK".to_string()
     } else {
         "Unknown".to_string()
-    }
-}
-
-pub struct BitcoinWallet {
-    network: Network,
-    interface: Box<dyn BitcoinInterface>,
-}
-
-impl BitcoinWallet {
-    pub fn new(network: Network, interface: Box<dyn BitcoinInterface>) -> Self {
-        Self {
-            network,
-            interface,
-        }
-    }
-
-    pub async fn get_balance(&self, address: &Address) -> BitcoinResult<u64> {
-        self.interface.get_balance(address).await
-    }
-
-    pub async fn send_transaction(&self, tx: &Transaction) -> BitcoinResult<String> {
-        self.interface.send_transaction(tx).await
-    }
-
-    pub async fn get_transaction(&self, txid: &str) -> BitcoinResult<Transaction> {
-        self.interface.get_transaction(txid).await
     }
 }
 
@@ -680,10 +646,10 @@ pub struct Utxo {
     pub txout: TxOut,
     
     /// The redeem script (if available)
-    pub redeem_script: Option<Script>,
+    pub redeem_script: Option<ScriptBuf>,
     
     /// The witness script (if available)
-    pub witness_script: Option<Script>,
+    pub witness_script: Option<ScriptBuf>,
     
     /// Confirmations (0 for unconfirmed)
     pub confirmations: u32,
@@ -775,7 +741,7 @@ pub struct SyncState {
 
 /// Wallet trait definition
 #[async_trait]
-pub trait Wallet: Send + Sync {
+pub trait WalletTrait: Send + Sync {
     /// Initialize the wallet
     async fn init(&self) -> Result<(), WalletError>;
     
@@ -900,17 +866,11 @@ pub struct BitcoinWallet {
     /// Wallet configuration
     config: WalletConfig,
     
-    /// Network configuration
-    network_config: NetworkConfig,
-    
-    /// RPC client (if used)
-    rpc_client: Option<Arc<BitcoinRpcClient>>,
-    
     /// Wallet data storage
     storage: Arc<Mutex<WalletStorage>>,
     
     /// Secp256k1 context
-    secp: Secp256k1<secp256k1::All>,
+    secp: Secp256k1<bitcoin::secp256k1::All>,
 }
 
 /// Wallet storage structure
@@ -956,25 +916,19 @@ struct WalletMetadata {
 
 /// Wallet address information
 #[derive(Debug, Clone, Serialize, Deserialize)]
-struct AddressInfo {
+pub struct AddressInfo {
     /// The address string
-    address: String,
-    
+    pub address: String,
     /// The path from which this address was derived
     path: Option<DerivationPath>,
-    
     /// The script
-    script: Script,
-    
+    script: ScriptBuf,
     /// Is this a change address
     is_change: bool,
-    
     /// Index in the derivation sequence
     index: u32,
-    
     /// The address labels
     labels: Vec<String>,
-    
     /// Last time this address was used
     last_used: Option<u64>,
 }
@@ -994,24 +948,6 @@ struct WalletIndexes {
     /// Last sync time
     last_sync: Option<u64>,
 }
-
-/// Module implementation details
-mod implementation;
-
-/// Module for HD key management
-pub mod hd;
-
-/// PSBT operations
-pub mod psbt;
-
-/// Coin selection algorithms
-pub mod coin_selection;
-
-/// Address management
-pub mod address;
-
-/// Descriptors
-pub mod descriptor;
 
 /// Fee strategy
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -1039,7 +975,7 @@ pub enum FeeStrategy {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TransactionParams {
     /// List of recipients with amounts
-    pub recipients: Vec<(Address, u64)>,
+    pub recipients: Vec<(String, u64)>,
     
     /// Optional coin selection (use specific UTXOs)
     pub utxos: Option<Vec<OutPoint>>,
@@ -1054,7 +990,7 @@ pub struct TransactionParams {
     pub enable_rbf: bool,
     
     /// Optional change address (if not using the default)
-    pub change_address: Option<Address>,
+    pub change_address: Option<String>,
     
     /// Include metadata in an OP_RETURN output
     pub op_return_data: Option<Vec<u8>>,
@@ -1086,4 +1022,4 @@ pub enum CoinSelectionStrategy {
 }
 
 // Copyright (C) 2023-2025 Anya Project Contributors  
-// Last Modified: 2025-02-24 
+// Last Modified: 2025-05-30

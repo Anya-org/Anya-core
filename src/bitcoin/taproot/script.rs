@@ -8,6 +8,11 @@ use miniscript::{Miniscript, Descriptor};
 use crate::common::error::AnyaResult;
 
 /// Types of Taproot scripts
+///
+/// # Compliance
+/// - BIP-341/342 (Taproot)
+/// - Miniscript support (future)
+/// - See @AI labelling.md
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum TaprootScriptType {
     /// Raw Bitcoin script
@@ -49,6 +54,11 @@ pub enum TaprootScriptType {
 }
 
 /// Represents a Taproot script for inclusion in a Taproot output
+///
+/// # Compliance
+/// - BIP-341/342 (Taproot)
+/// - RGB compatibility
+/// - See @AI labelling.md
 #[derive(Debug, Clone)]
 pub struct TaprootScript {
     /// Script type
@@ -69,7 +79,11 @@ pub struct TaprootScript {
 
 impl TaprootScript {
     /// Creates a new Taproot script from a Bitcoin script
-    pub fn new(script: ScriptBuf, script_type: TaprootScriptType) -> Self  -> Result<(), Box<dyn Error>> {
+    ///
+    /// # Compliance
+    /// - BIP-341/342 (Taproot)
+    /// - See @AI labelling.md
+    pub fn new(script: ScriptBuf, script_type: TaprootScriptType) -> Self {
         Self {
             script_type,
             script,
@@ -80,7 +94,12 @@ impl TaprootScript {
     }
     
     /// Creates a new Taproot script from a Miniscript
-    pub fn from_miniscript(miniscript_str: &str) -> AnyaResult<Self>  -> Result<(), Box<dyn Error>> {
+    ///
+    /// # Compliance
+    /// - BIP-341/342 (Taproot)
+    /// - Miniscript support (future)
+    /// - See @AI labelling.md
+    pub fn from_miniscript(miniscript_str: &str) -> AnyaResult<Self> {
         // Implementation goes here
         // Parse miniscript, convert to Script
         
@@ -95,7 +114,11 @@ impl TaprootScript {
     }
     
     /// Creates a multi-signature script
-    pub fn create_multisig(threshold: usize, public_keys: &[&str]) -> AnyaResult<Self>  -> Result<(), Box<dyn Error>> {
+    ///
+    /// # Compliance
+    /// - BIP-341/342 (Taproot)
+    /// - See @AI labelling.md
+    pub fn create_multisig(threshold: usize, public_keys: &[&str]) -> AnyaResult<Self> {
         // Implementation goes here
         // Create a threshold signature script
         
@@ -113,7 +136,11 @@ impl TaprootScript {
     }
     
     /// Creates a time-locked script
-    pub fn create_timelock(base_script: &TaprootScript, lock_value: u32, is_relative: bool) -> AnyaResult<Self>  -> Result<(), Box<dyn Error>> {
+    ///
+    /// # Compliance
+    /// - BIP-341/342 (Taproot)
+    /// - See @AI labelling.md
+    pub fn create_timelock(base_script: &TaprootScript, lock_value: u32, is_relative: bool) -> AnyaResult<Self> {
         // Implementation goes here
         // Create a timelock wrapper around base_script
         
@@ -131,7 +158,11 @@ impl TaprootScript {
     }
     
     /// Creates a hash lock script
-    pub fn create_hashlock(hash_hex: &str, hash_type: &str) -> AnyaResult<Self>  -> Result<(), Box<dyn Error>> {
+    ///
+    /// # Compliance
+    /// - BIP-341/342 (Taproot)
+    /// - See @AI labelling.md
+    pub fn create_hashlock(hash_hex: &str, hash_type: &str) -> AnyaResult<Self> {
         // Implementation goes here
         // Create a hash lock script
         
@@ -148,12 +179,20 @@ impl TaprootScript {
     }
     
     /// Adds metadata to the script
-    pub fn add_metadata(&mut self, key: &str, value: &str)  -> Result<(), Box<dyn Error>> {
+    ///
+    /// # Compliance
+    /// - BIP-341/342 (Taproot)
+    /// - See @AI labelling.md
+    pub fn add_metadata(&mut self, key: &str, value: &str) {
         self.metadata.insert(key.to_string(), value.to_string());
     }
     
     /// Gets the leaf hash of this script
-    pub fn leaf_hash(&self) -> AnyaResult<Vec<u8>>  -> Result<(), Box<dyn Error>> {
+    ///
+    /// # Compliance
+    /// - BIP-341/342 (Taproot)
+    /// - See @AI labelling.md
+    pub fn leaf_hash(&self) -> AnyaResult<Vec<u8>> {
         // Implementation goes here
         // Calculate TapLeafHash
         
@@ -162,7 +201,11 @@ impl TaprootScript {
     }
     
     /// Converts this script to a witness
-    pub fn to_witness(&self, control_block: Vec<u8>) -> Witness  -> Result<(), Box<dyn Error>> {
+    ///
+    /// # Compliance
+    /// - BIP-341/342 (Taproot)
+    /// - See @AI labelling.md
+    pub fn to_witness(&self, control_block: Vec<u8>) -> Witness {
         // Implementation goes here
         // Create a witness for spending this script
         
@@ -172,6 +215,14 @@ impl TaprootScript {
 }
 
 /// Builder for Taproot scripts
+///
+/// # Compliance
+/// - BIP-341/342 (Taproot)
+/// - Extensible for RGB/Miniscript
+/// - See @AI labelling.md
+///
+/// # Architecture
+/// - Use via adapter/port layer for hexagonal architecture
 pub struct TaprootScriptBuilder {
     script_type: TaprootScriptType,
     version: u8,
@@ -181,7 +232,11 @@ pub struct TaprootScriptBuilder {
 
 impl TaprootScriptBuilder {
     /// Creates a new Taproot script builder
-    pub fn new(script_type: TaprootScriptType) -> Self  -> Result<(), Box<dyn Error>> {
+    ///
+    /// # Compliance
+    /// - BIP-341/342 (Taproot)
+    /// - See @AI labelling.md
+    pub fn new(script_type: TaprootScriptType) -> Self {
         Self {
             script_type,
             version: 0xc0, // Tapscript version
@@ -191,25 +246,44 @@ impl TaprootScriptBuilder {
     }
     
     /// Sets the script version
-    pub fn with_version(mut self, version: u8) -> Self  -> Result<(), Box<dyn Error>> {
+    ///
+    /// # Compliance
+    /// - BIP-341/342 (Taproot)
+    /// - See @AI labelling.md
+    pub fn with_version(mut self, version: u8) -> Self {
         self.version = version;
         self
     }
     
     /// Adds an operation to the script
-    pub fn add_op(mut self, op: &str) -> Self  -> Result<(), Box<dyn Error>> {
+    ///
+    /// # Compliance
+    /// - BIP-341/342 (Taproot)
+    /// - See @AI labelling.md
+    pub fn add_op(mut self, op: &str) -> Self {
         self.operations.push(op.to_string());
         self
     }
     
     /// Adds metadata to the script
-    pub fn add_metadata(mut self, key: &str, value: &str) -> Self  -> Result<(), Box<dyn Error>> {
+    ///
+    /// # Compliance
+    /// - BIP-341/342 (Taproot)
+    /// - See @AI labelling.md
+    pub fn add_metadata(mut self, key: &str, value: &str) -> Self {
         self.metadata.insert(key.to_string(), value.to_string());
         self
     }
     
     /// Builds the Taproot script
-    pub fn build(self) -> AnyaResult<TaprootScript>  -> Result<(), Box<dyn Error>> {
+    ///
+    /// # Compliance
+    /// - BIP-341/342 (Taproot)
+    /// - See @AI labelling.md
+    ///
+    /// # TODO
+    /// - Implement full Miniscript and script conversion
+    pub fn build(self) -> AnyaResult<TaprootScript> {
         // Implementation goes here
         // Convert operations to ScriptBuf
         
@@ -229,6 +303,10 @@ pub struct ScriptParser;
 
 impl ScriptParser {
     /// Parses a Bitcoin script
+    ///
+    /// # Compliance
+    /// - BIP-341/342 (Taproot)
+    /// - See @AI labelling.md
     pub fn parse_script(script: &ScriptBuf) -> AnyaResult<TaprootScriptType>  -> Result<(), Box<dyn Error>> {
         // Implementation goes here
         // Detect script type from script
@@ -238,10 +316,14 @@ impl ScriptParser {
     }
     
     /// Parses a Miniscript
+    ///
+    /// # Compliance
+    /// - Miniscript support (future)
+    /// - See @AI labelling.md
     pub fn parse_miniscript(miniscript_str: &str) -> AnyaResult<Miniscript<String>>  -> Result<(), Box<dyn Error>> {
         // Implementation goes here
         
         // Placeholder for now
         Err("Miniscript parsing not yet implemented".into())
     }
-} 
+}

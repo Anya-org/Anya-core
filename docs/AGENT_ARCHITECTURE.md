@@ -1,6 +1,20 @@
+---
+title: "Agent_architecture"
+description: "Documentation for Agent_architecture"
+---
+
+[AIR-3][AIS-3][BPC-3][RES-3]
+
+
 <!-- markdownlint-disable MD013 line-length -->
 
 # Anya Core Agent Architecture
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 [AIS-3][BPC-3][DAO-3]
 
 ## Overview
@@ -375,3 +389,8 @@ The Anya Agent Architecture provides a robust, extensible framework for building
 ## Last Updated
 
 2025-03-12
+
+## See Also
+
+- [Related Document](#related-document)
+

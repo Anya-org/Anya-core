@@ -1,10 +1,38 @@
+---
+title: "Testing_strategy"
+description: "Documentation for Testing_strategy"
+---
+
+[AIR-3][AIS-3][BPC-3][RES-3]
+
 <!-- markdownlint-disable MD013 line-length -->
 
 # Anya-Core Testing Strategy
 
+## Overview
+
+This document outlines the comprehensive testing strategy for the Anya-Core platform, including component, integration, performance, and compliance testing, following official Bitcoin Improvement Proposals (BIPs).
+
+## Table of Contents
+
+- [Testing Framework](#testing-framework)
+- [Key Components](#key-components)
+- [Running Tests](#running-tests)
+- [Test Coverage](#test-coverage)
+- [Bitcoin Protocol Tests](#bitcoin-protocol-tests)
+- [DAO Tests](#dao-tests)
+- [Web5 Tests](#web5-tests)
+- [ML Tests](#ml-tests)
+- [System Integration Tests](#system-integration-tests)
+- [Continuous Integration](#continuous-integration)
+- [Test Reports](#test-reports)
+- [Adding New Tests](#adding-new-tests)
+- [See Also](#see-also)
+
+
 [AIR-3][AIS-3][AIT-3][AIP-3][BPC-3][DAO-3]
 
-This document outlines the comprehensive testing strategy for the Anya-Core platform, following the Bitcoin Development Framework v2.5 standards.
+This document outlines the comprehensive testing strategy for the Anya-Core platform, following official Bitcoin Improvement Proposals (BIPs).
 
 ## Testing Framework
 
@@ -122,3 +150,8 @@ To add new tests, follow these guidelines:
 2. Implement the test function following the established patterns
 3. Add the test to the relevant run_all() function
 4. Document the test in this testing strategy document
+
+## See Also
+
+- [Related Document](#related-document)
+

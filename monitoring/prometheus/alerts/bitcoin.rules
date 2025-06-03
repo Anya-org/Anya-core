@@ -1,0 +1,38 @@
+groups:
+- name: bitcoin.rules
+  rules:
+  - alert: BitcoinNodeDown
+    expr: up{job="bitcoin-node"} == 0
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Bitcoin node down"
+      description: "Bitcoin node has been down for more than 5 minutes"
+
+  - alert: BitcoinOutOfSync
+    expr: (time() - bitcoin_blocks_time) > 600
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Bitcoin node out of sync"
+      description: "Bitcoin node is more than 10 minutes behind the network"
+
+  - alert: HighCpuUsage
+    expr: 100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+    for: 10m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High CPU usage on {{ $labels.instance }}"
+      description: "CPU usage is above 80% for 10 minutes"
+
+  - alert: LowDiskSpace
+    expr: (node_filesystem_avail_bytes{mountpoint="/"} * 100) / node_filesystem_size_bytes{mountpoint="/"} < 10
+    for: 10m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Low disk space on {{ $labels.instance }}"
+      description: "Disk space is running low ({{ $value }}% available)"

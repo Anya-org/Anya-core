@@ -1,9 +1,11 @@
 use anya_core::auth::web5::{
-    protocols::identity::{IdentityProtocol, security::SecurityManager},
     data_manager::Web5DataManager,
+    protocols::identity::{security::SecurityManager, IdentityProtocol},
 };
+use anya_core::security::encryption::KeyEncryption;
+use chrono::{Duration, Utc};
 use did_key::Ed25519KeyPair;
-use chrono::{Utc, Duration};
+use std::sync::Arc;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -36,7 +38,8 @@ async fn issue_encrypted_credential(
     holder: &Ed25519KeyPair,
 ) -> Result<Vec<u8>, Box<dyn std::error::Error>> {
     // Create credential
-    let credential = protocol.credentials
+    let credential = protocol
+        .credentials
         .issue_credential(
             issuer,
             &holder.get_did().to_string(),
@@ -65,9 +68,21 @@ async fn verify_credential(
     let credential = security.decrypt_credential(encrypted)?;
 
     // Verify
-    let result = protocol.verification
+    let result = protocol
+        .verification
         .verify_credential(&credential, verifier)
         .await?;
 
     Ok(result.is_valid)
+}
+
+async fn create_identity(name: &str) -> Result<Ed25519KeyPair, Box<dyn std::error::Error>> {
+    let key_pair = Ed25519KeyPair::generate();
+    println!("Created identity {} with DID: {}", name, key_pair.get_did());
+    Ok(key_pair)
+}
+
+async fn setup_database() -> Result<Web5DataManager, Box<dyn std::error::Error>> {
+    let db = Web5DataManager::new_in_memory().await?;
+    Ok(db)
 }

@@ -1,6 +1,24 @@
+---
+title: "Readme_read_first"
+description: "Documentation for Readme_read_first"
+last_updated: 2025-05-30
+---
+[AIR-3][AIS-3][BPC-3][RES-3]
+
+
 <!-- markdownlint-disable MD013 line-length -->
 
 # Read First Always Principle in Web5
+
+## Overview
+
+Add a brief overview of this document here.
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 
 ## Introduction
 
@@ -107,3 +125,8 @@ flutter test test/web5/read_first_test.dart
 ## Conclusion
 
 The Read First Always principle is a critical component of the Anya Core Web5 implementation, ensuring data consistency and integrity across decentralized operations. By enforcing reads before writes, we maintain the reliability of our Web5 and Bitcoin-anchored services.
+
+## See Also
+
+- [Related Document 1](./related1.md)
+- [Related Document 2](./related2.md)

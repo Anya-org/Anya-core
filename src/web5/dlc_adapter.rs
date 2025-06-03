@@ -13,7 +13,7 @@
 
 use bitcoin::secp256k1::{Message, PublicKey, Secp256k1, SecretKey};
 use bitcoin::secp256k1::schnorr::{Signature, TapTweak};
-use bitcoin::util::taproot::{TapBranchHash, TapLeafHash, TapTweakHash, TAPROOT_VER_LEAF};
+use bitcoin::taproot::{TapBranchHash, TapLeafHash, TapTweakHash};
 use bitcoin::{Address, Network, Script, Transaction, TxIn, TxOut, Witness};
 use std::collections::HashMap;
 use std::time::{SystemTime, UNIX_EPOCH};
@@ -133,7 +133,7 @@ pub fn create_indistinguishable_output(internal_key: &PublicKey, merkle_root: Op
 
 /// Generate a commitment that can be embedded into a taproot output
 /// [Privacy] Creates privacy-preserving commitments suitable for taproot
-pub fn generate_taproot_commitment(data: &[u8], salt: &[u8; 32]) -> TapBranchHash {
+pub fn generate_taproot_commitment(_data: &[u8], salt: &[u8; 32]) -> TapBranchHash {
     // Create a commitment that can be embedded into a taproot output
     // without compromising privacy
     
@@ -422,7 +422,7 @@ impl TaprootDLC {
     pub fn execute(
         &mut self,
         outcome_id: &str,
-        oracle_signature: &[u8],
+        oracle__signature: &[u8],
         participant_signatures: &[Vec<u8>],
     ) -> Result<Transaction, &'static str> {
         // Verify we have the required outcome
@@ -474,7 +474,7 @@ impl TaprootDLC {
     }
 
     /// Verify an oracle signature for a specific outcome
-    pub fn verify_oracle_signature(&self, outcome_id: &str, signature: &[u8]) -> Result<bool, &'static str> {
+    pub fn verify_oracle_signature(&self, outcome_id: &str, _signature: &[u8]) -> Result<bool, &'static str> {
         // [AIR-3][AIS-3][BPC-3] Oracle signature verification is critical for DLC security
         let secp = Secp256k1::new();
         

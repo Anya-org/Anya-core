@@ -1,4 +1,5 @@
 #!/bin/bash
+# [AIR-3][AIS-3][BPC-3][RES-3]
 # Sign Previous Commits Script
 # This script helps retroactively sign git commits with your GPG key
 

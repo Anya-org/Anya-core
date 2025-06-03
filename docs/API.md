@@ -1,13 +1,10 @@
-# API Documentation
+---
+title: "Api"
+description: "Documentation for Api"
+---
 
-> **This document has been deprecated. Please refer to the canonical documentation.**
-> 
-> For the latest API specifications and documentation, please visit:
-> 
-> - [AI Labeling System](./standards/AI_LABELING.md) - Standardized labeling system used throughout Anya Core
-> - [API Reference](./api/README.md) - Comprehensive API reference
+[AIR-3][AIS-3][BPC-3][RES-3]
 
-[AIR-3][AIS-3][BPC-3]
 
 <!-- markdownlint-disable MD013 line-length -->
 
@@ -21,6 +18,12 @@
 <!-- markdownlint-disable MD013 line-length -->
 
 # AI-Driven Labeling System
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 
 ## Overview
 
@@ -339,4 +342,9 @@ function Update-RepositoryUrls {
 ```
 
 *Last updated: 2025-03-06*
+
+
+## See Also
+
+- [Related Document](#related-document)
 

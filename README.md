@@ -1,10 +1,32 @@
-# Anya-Core
+---
+title: "Readme"
+description: "Documentation for Readme"
+---
+
+# Anya Core
+
+## Overview
+
+Add a brief overview of this document here.
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 
 [![BIP-341](https://img.shields.io/badge/BIP-341_Compliant-green)](https://bips.xyz/341)
-[![AIS-3](https://img.shields.io/badge/AIS-3_Secured-blue)](https://bitcoin-development-framework.org)
+[![AIS-3](https://img.shields.io/badge/AIS-3_Secured-blue)](https://bips.xyz)
 [![PSBT-v2](https://img.shields.io/badge/PSBT_v2-100%25-brightgreen)](https://bips.xyz/370)
+[![BIP-Standards](https://img.shields.io/badge/BIP-Standards_Compliant-green)](https://bips.xyz)
 
-[AIR-3][AIS-3][AIT-3][AIM-3][AIP-3][AIE-3][BPC-3][W5C-3][DID-3][PFM-2][SCL-2][RES-3][UXA-2][DAO-3]
+[AIR-3][AIS-3][AIT-3][AIM-3][AIP-3][AIE-3][BPC-3][W5C-3][DID-3][PFM-3][SCL-3][RES-3][UXA-3][DAO-3]
+
+*Last Updated: May 30, 2025*
+
+**Latest Release: v0.3.0-rc2**
+
+> **Note**: This release includes comprehensive updates to the Taproot implementation, enhanced security features with HSM integration, and a fully refactored installation system following official Bitcoin Improvement Proposals (BIPs).
 
 A powerful platform combining Bitcoin/crypto functionality, ML-based analytics,
 Web5 decentralized data management, and a Bitcoin-style DAO governance system.
@@ -15,18 +37,127 @@ Web5 decentralized data management, and a Bitcoin-style DAO governance system.
 ![Anya Architecture](docs/images/anya_architecture.png)
 
 > **AI Labeling**: This project follows the [canonical AI Labeling System](docs/standards/AI_LABELING.md)
-> based on the Bitcoin Development Framework v2.5 standards. All components are labeled with
+> based on official Bitcoin Improvement Proposals (BIPs). All components are labeled with
 > appropriate Core and Extended category labels.
 
-## Documentation Quick Links
+## Documentation Quick Links [AIR-3][AIS-3][BPC-3][RES-3]
+
+### New Documentation System
+
+We've recently upgraded our documentation system to use MkDocs with the Material theme, providing a modern, searchable, and mobile-friendly experience. The new system includes automated tools for maintaining documentation quality and consistency.
+
+- [Documentation System Guide](docs/DOCUMENTATION_SYSTEM.md) - Learn about our new documentation system
+- [View Documentation](https://docs.anya.org/) - Browse the latest documentation online
+- [Contribute to Docs](CONTRIBUTING.md#documentation) - Help improve our documentation
+- [Documentation Standards](docs/standards/MARKDOWN_STYLE_GUIDE.md) - Our documentation writing guidelines
+
+### Documentation Tools
+
+We provide several scripts to help maintain documentation quality:
+
+| Script | Purpose |
+|--------|----------|
+| `./scripts/setup_docs.sh` | Set up the documentation environment |
+| `./scripts/serve_docs.sh` | Serve documentation locally |
+| `./scripts/update_docs.sh` | Update documentation files to follow standards |
+| `./scripts/review_docs.sh` | Review documentation for issues |
+| `./scripts/check_links.sh` | Check for broken links in documentation |
+| `./scripts/doc_status.sh` | Generate a documentation status report |
+| `./scripts/generate_toc.sh` | Generate/update table of contents |
+
+### Quick Start with Local Docs
+
+1. Install dependencies:
+
+   ```bash
+   ./scripts/setup_docs.sh
+   ```
+
+2. Update documentation to follow standards:
+
+   ```bash
+   ./scripts/update_docs.sh
+   ```
+
+3. Serve documentation locally:
+
+   ```bash
+   ./scripts/serve_docs.sh
+   ```
+
+4. Check for documentation issues:
+
+   ```bash
+   ./scripts/review_docs.sh
+   ```
+
+### Documentation Standards
+
+All documentation must follow our [Markdown Style Guide](docs/standards/MARKDOWN_STYLE_GUIDE.md) and include proper AI labeling:
+
+```markdown
+[AIR-3][AIS-3][BPC-3][RES-3]
+```
+
+### Documentation Structure
+
+```
+docs/
+├── api/                  # API reference documentation
+├── architecture/         # System architecture docs
+├── assets/               # Images and other assets
+├── getting-started/      # Getting started guides
+├── guides/               # How-to guides and tutorials
+├── installation/         # Installation instructions
+├── standards/            # Documentation standards
+├── tutorials/            # Step-by-step tutorials
+├── .template.md          # Documentation template
+└── index.md              # Main documentation index
+```
+
+### Contributing to Documentation
+
+1. Follow the [Markdown Style Guide](docs/standards/MARKDOWN_STYLE_GUIDE.md)
+2. Use the template: `.template.md`
+3. Run documentation checks before committing:
+
+   ```bash
+   ./scripts/update_docs.sh
+   ./scripts/check_links.sh
+   ./scripts/review_docs.sh
+   ```
+
+4. Commit with a descriptive message, e.g., "docs: update API reference"
+
+3. Open <http://127.0.0.1:8000> in your browser
+
+### Core Documentation
+
+### Core Documentation
 
 - [Documentation Index](docs/INDEX.md) - Main documentation index
 - [System Architecture](SYSTEM_MAP.md) - Complete system architecture
-- [DAO System](docs/DAO_SYSTEM_GUIDE.md) - Comprehensive DAO documentation
-- [Tokenomics System](docs/TOKENOMICS_SYSTEM.md) - Bitcoin-style tokenomics
-- [Implementation Milestones](docs/IMPLEMENTATION_MILESTONES.md) - Project progress
+- [BIP Compliance Standards](docs/standards/BIP_COMPLIANCE.md) - Official Bitcoin standards compliance
 - [AI Labeling System](docs/standards/AI_LABELING.md) - Component labeling standards
-- [Installation Guide](docs/installation/README.md) - Installation instructions
+
+### Installation & Setup
+
+- [Installation Guide](docs/installation/README.md) - Comprehensive installation instructions
+- [Quick Start Guide](docs/getting-started/quickstart.md) - Get up and running in minutes
+- [Configuration Reference](docs/configuration/README.md) - Detailed configuration options
+
+### Developer Resources
+
+- [API Reference](docs/api/README.md) - Complete API documentation
+- [Development Guide](docs/development/README.md) - Contributing and development workflow
+- [Testing Guide](docs/testing/README.md) - Testing framework and guidelines
+
+### Advanced Topics
+
+- [Monitoring & Observability](monitoring/README.md) - Comprehensive monitoring with Prometheus, Grafana, and Alertmanager
+- [Taproot Implementation](docs/bitcoin/taproot.md) - Taproot integration details
+- [Security Model](docs/security/README.md) - Security best practices and features
+- [Performance Tuning](docs/performance/README.md) - Optimization guidelines
 
 ## Licensing
 
@@ -48,6 +179,17 @@ See the [Enterprise License](./enterprise/LICENSE) for details.
 - Circuit breaker pattern implementation
 - Comprehensive health monitoring
 - Thread-safe caching layer
+
+### Hardware Security Module (HSM) Support
+
+[AIS-3][RES-3][PFM-2]
+
+- Modular HSM provider architecture
+- Software-based HSM implementation for development
+- Hardware device support including TPM and PKCS#11
+- Bitcoin-specific HSM operations
+- Feature-flag enabled for flexible deployment
+- Comprehensive key management and cryptographic operations
 
 ### Installation System
 
@@ -164,6 +306,89 @@ clarity-repl = { git = "https://github.com/hirosystems/clarinet", tag = "v1.7.0"
 ```
 
 ## Quick Start
+
+### Installation
+
+Anya Core features an intelligent installation system that automatically detects hardware capabilities and configures the system optimally.
+
+#### Quick Install
+
+```bash
+# Standard installation with auto-detection
+sudo ./scripts/install.sh
+
+# Minimal installation for low-resource environments
+sudo ./scripts/install.sh --type=minimal
+
+# Full installation with all features
+sudo ./scripts/install.sh --type=full
+```
+
+#### Installation Options
+
+```bash
+# Display all installation options
+./scripts/install.sh --help
+
+# Install with specific configuration
+sudo ./scripts/install.sh --network=testnet --hardening=strict --run-tests
+
+# Install with explicit feature flags
+sudo ./scripts/install.sh --features=std,hsm,bitcoin_integration
+
+# Upgrade an existing installation
+sudo ./scripts/install.sh
+
+# Force clean installation
+sudo ./scripts/install.sh --force-clean
+```
+
+#### Manual Installation (Alternative)
+
+```bash
+# Clone the repository
+git clone https://github.com/anya/anya-enterprise.git
+
+# Install dependencies
+sudo apt-get update
+sudo apt-get install -y build-essential cmake pkg-config libssl-dev
+
+# Install Rust
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+source $HOME/.cargo/env
+
+# Build with specific features
+cargo build --release --features="std,hsm,bitcoin_integration"
+
+# Run tests
+cargo test --all-features
+```
+
+#### Verify Installation
+
+```bash
+# Check system health
+./scripts/install/utils/monitor_health.sh
+
+# Run diagnostics
+./scripts/test/debug_test.sh
+
+# Verify hardware detection
+./scripts/install/utils/script_cleanup.sh
+```
+
+#### Configuration
+
+The installation creates a default configuration in `config/anya.conf`. You can modify this or use environment variables:
+
+```bash
+# Environment variables
+export BITCOIN_RPC_URL=http://localhost:8332
+export BITCOIN_RPC_USER=bitcoinrpc
+export BITCOIN_RPC_PASSWORD=your_password
+export WEB5_DWN_URL=http://localhost:3000
+export NETWORK=testnet
+```
 
 ### 1. Clone and Setup
 
@@ -760,6 +985,7 @@ Special thanks to our contributors and the following projects:
 *2025-03-12*
 
 ## Validation
+
 Run the following to verify system compliance:
 
 ```shell
@@ -767,12 +993,15 @@ Run the following to verify system compliance:
 ```
 
 ## Standards Compliance
+
 This project adheres to:
+
 - Bitcoin Protocol Compliance Level 3 (BPC-3)
 - DAO Governance Standard Level 4 (DAO-4)
 - AI Security Standard Level 3 (AIS-3)
 
 ## Bitcoin Protocol Compliance
+
 ```mermaid
 graph TD
     A[Bitcoin Core] --> B{{BIP-341}}
@@ -785,6 +1014,7 @@ graph TD
 ```
 
 ## Core Features
+
 ```rust
 // From src/security/hsm/mod.rs
 #[bip341]
@@ -801,6 +1031,7 @@ fn verify_taproot(commitment: [u8; 32]) -> Result<()> {
 ```
 
 ## Dependency Matrix
+
 ```toml
 [workspace.dependencies]
 bitcoin = { version = "0.32.1", features = ["bip341"] }
@@ -817,6 +1048,7 @@ last-audit = "2025-08-24"
 ```
 
 ## Security Implementation
+
 ```mermaid
 sequenceDiagram
     User->>+HSM: Sign Transaction
@@ -827,6 +1059,7 @@ sequenceDiagram
 ```
 
 ## Mobile Integration
+
 ```toml
 [features]
 mobile = [
@@ -840,6 +1073,7 @@ jsi = { version = "0.12", features = ["bip341"] }
 ```
 
 ## Audit Trail
+
 ```json
 {
   "2025-08": {
@@ -852,6 +1086,7 @@ jsi = { version = "0.12", features = ["bip341"] }
 ```
 
 ## Compliance Checklist
+
 - [x] BIP-341 (Taproot)
 - [x] BIP-174 (PSBT v2)
 - [x] BIP-342 (Tapscript)
@@ -863,6 +1098,7 @@ jsi = { version = "0.12", features = ["bip341"] }
 **Last Updated**: 2025-08-24 | [Full Roadmap](ROADMAP.md) | [Audit Reports](docs/SECURITY.md)
 
 ## CI/CD Pipeline
+
 ```mermaid
 sequenceDiagram
     User->>+HSM: Sign Transaction
@@ -890,21 +1126,107 @@ To run all operations:
 ```
 
 The script will:
+
 - Log all operations to the logs directory
 - Generate a comprehensive summary report
 - Handle failures gracefully
 - Provide timing information for each stage
 
-Author: Bo The Big (botshelomokokoka@gmail.com)
+Author: Bo The Big (<botshelomokokoka@gmail.com>)
 
-## Bitcoin Development Framework v2.5
+## Hardware Security Module (HSM) Integration
 
-This project implements the Bitcoin Development Framework v2.5, which provides a comprehensive approach to Bitcoin development with:
+Anya Core now includes comprehensive Hardware Security Module (HSM) integration with multiple provider types:
 
-- Full BIP compliance (BIP-341, BIP-342, BIP-174)
-- Hexagonal architecture for clean separation of concerns
-- Real-time monitoring with Prometheus metrics
-- Comprehensive security validation
-- Standardized development workflow
+- **Software HSM**: Secure key management for development and testing
+- **Simulator HSM**: Testing HSM functionality without hardware
+- **Hardware HSM**: Integration with physical HSM devices (YubiHSM, Ledger, etc.)
+- **Bitcoin HSM**: Specialized Bitcoin key management with hardware wallets
 
-See [README-BITCOIN-FRAMEWORK.md](README-BITCOIN-FRAMEWORK.md) for detailed documentation on the framework implementation.
+### Key Features
+
+- **Multiple Key Types**: RSA, EC (secp256k1, P-256/384/521), Ed25519, AES
+- **Secure Operations**: Signing, verification, encryption, decryption
+- **Comprehensive Audit**: Full audit logging for all HSM operations
+- **Bitcoin Integration**: Support for Bitcoin-specific key derivation and operations
+- **Taproot Ready**: Full support for Taproot transactions and signatures
+
+### Usage Example
+
+```rust
+// Initialize HSM Manager
+let config = HsmConfig {
+    provider_type: HsmProviderType::BitcoinHsm,
+    bitcoin: BitcoinConfig {
+        network: BitcoinNetworkType::Testnet,
+        use_taproot: true,
+        ..Default::default()
+    },
+    ..Default::default()
+};
+
+let hsm_manager = HsmManager::new(config).await?;
+hsm_manager.initialize().await?;
+
+// Generate key
+let key_info = hsm_manager.generate_key_pair(
+    KeyType::Ec { curve: EcCurve::Secp256k1 },
+    "payment-key"
+).await?;
+
+// Sign data
+let message = "transaction data".as_bytes();
+let signature = hsm_manager.sign_data(
+    "payment-key",
+    message,
+    SignatureAlgorithm::EcdsaSha256
+).await?;
+```
+
+This implementation follows official Bitcoin Improvement Proposals (BIPs) for HSM integration, with full compliance with the Hexagonal Architecture principles.
+
+## Installation
+
+### Linux Installation
+
+For automated installation on Linux systems, we provide comprehensive installation scripts:
+
+```bash
+# Quick automatic installation with system-optimization (NEW)
+sudo ./scripts/install/install-anya.sh
+
+# Installation with custom options
+sudo ./scripts/install/install-anya.sh --network=mainnet --type=full
+
+# Standard installation (recommended)
+sudo ./scripts/install/auto_install.sh
+
+# Advanced options
+sudo ./scripts/install/auto_install.sh --network=testnet --type=full --hardening=strict --auto-run
+
+# Manual installation steps
+sudo ./scripts/install/linux_install.sh    # Install dependencies and build
+sudo ./scripts/install/systemd_config.sh   # Configure systemd service
+
+# Uninstallation
+sudo ./scripts/install/uninstall.sh
+```
+
+The new system-optimized installation automatically:
+
+1. Analyzes your system capabilities (CPU, memory, disk, hardware security modules)
+2. Configures build parameters based on available resources
+3. Sets appropriate resource limits in systemd service
+4. Optimizes HSM configuration based on detected hardware
+5. Tunes performance parameters for your specific system
+
+For more installation options, run:
+
+```bash
+sudo ./scripts/install/install-anya.sh --help
+```
+
+## See Also
+
+- [Related Document](#related-document)
+

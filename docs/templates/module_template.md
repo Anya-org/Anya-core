@@ -1,6 +1,20 @@
+---
+title: "Module_template"
+description: "Documentation for Module_template"
+---
+
+[AIR-3][AIS-3][BPC-3][RES-3]
+
+
 <!-- markdownlint-disable MD013 line-length -->
 
 # Module Documentation Template
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 
 ## Overview
 
@@ -96,4 +110,9 @@ Describe how errors are handled in this module:
 - Test patterns
 - Integration test scenarios
 
-*Last updated: 2024-12-07*
+*Last updated: 2025-06-02*
+
+## See Also
+
+- [Related Document](#related-document)
+

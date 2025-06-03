@@ -4,7 +4,7 @@
  * [AIR-3][AIS-3][AIT-3][BPC-3][RES-3]
  * 
  * This script performs security analysis on the MCP server according to
- * Bitcoin Development Framework v2.5 standards and AI labeling guidelines.
+ * official Bitcoin Improvement Proposals (BIPs) and AI labeling guidelines.
  */
 
 const fs = require('fs');

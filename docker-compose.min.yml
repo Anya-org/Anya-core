@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  anya-core:
+    image: anya-enterprise:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - NODE_ENV=development
+      - LOG_LEVEL=info
+    depends_on:
+      - dwn
+      - bitcoin
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+
+  dwn:
+    image: web5/dwn:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - LOG_LEVEL=info
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+
+  bitcoin:
+    image: ruimarinho/bitcoin-core:24.0
+    command: bitcoind -printtoconsole -server -rpcallowip=::/0 -rpcbind=0.0.0.0 -testnet -prune=550 -maxconnections=30 -maxuploadtarget=50
+    ports:
+      - "8332:8332"
+      - "18443:18443"
+    environment:
+      - BITCOIN_DATA=/bitcoin
+    volumes:
+      - bitcoin-data:/bitcoin
+    healthcheck:
+      test: ["CMD", "bitcoin-cli", "getblockchaininfo"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1.5G
+
+volumes:
+  bitcoin-data:

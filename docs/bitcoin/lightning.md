@@ -1,6 +1,18 @@
+---
+title: "Lightning"
+description: "Documentation for Lightning"
+last_updated: 2025-05-30
+---
+
 <!-- markdownlint-disable MD013 line-length -->
 
 # Lightning Network Implementation
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 
 ## Overview
 
@@ -176,5 +188,12 @@ The Lightning implementation integrates with the Bitcoin functionality through:
 - [Lightning Network RFC](https://github.com/lightning/bolts/blob/master/00-introduction.md)
 
 ---
+[AIR-3][AIS-3][BPC-3][RES-3]
+
 
 _Last updated: 2025-03-01_
+
+## See Also
+
+- [Related Document 1](./related1.md)
+- [Related Document 2](./related2.md)

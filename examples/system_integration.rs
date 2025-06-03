@@ -1,9 +1,9 @@
 use anya_core::{
-    auth::{AuthManager, enterprise::advanced_security::AdvancedSecurity},
+    auth::{enterprise::advanced_security::AdvancedSecurity, AuthManager},
     ml::{advanced_features::AdvancedMLFeatures, advanced_processing::AdvancedMLProcessor},
+    monitoring::enhanced_system_monitoring::AdvancedSystemMonitoring,
     revenue::advanced_tracking::AdvancedRevenueTracker,
     web5::advanced_integration::AdvancedWeb5Integration,
-    monitoring::enhanced_system_monitoring::AdvancedSystemMonitoring,
 };
 use chrono::Utc;
 
@@ -13,7 +13,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let auth_manager = Arc::new(AuthManager::new());
     let security = Arc::new(AdvancedSecurity::new(auth_manager.clone()));
     let web5_integration = Arc::new(AdvancedWeb5Integration::new(security.clone()).await?);
-    let ml_features = Arc::new(AdvancedMLFeatures::new(security.clone(), web5_integration.clone()));
+    let ml_features = Arc::new(AdvancedMLFeatures::new(
+        security.clone(),
+        web5_integration.clone(),
+    ));
     let revenue_tracker = Arc::new(AdvancedRevenueTracker::new(
         auth_manager.clone(),
         security.clone(),
@@ -46,22 +49,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Track the operation
     let (result, revenue_impact) = revenue_tracker
-        .track_operation(
-            OperationType::Processing,
-            &context,
-            || ml_features.process_with_blockchain_data(&test_data, &context),
-        )
+        .track_operation(OperationType::Processing, &context, || {
+            ml_features.process_with_blockchain_data(&test_data, &context)
+        })
         .await?;
 
     // Store in Web5 DWN
-    web5_integration
-        .store_protocol_data(&result)
-        .await?;
+    web5_integration.store_protocol_data(&result).await?;
 
     // Monitor system health
-    let health = monitoring
-        .monitor_system_health()
-        .await;
+    let health = monitoring.monitor_system_health().await;
 
     println!("Processing Result: {:?}", result);
     println!("Revenue Impact: {:?}", revenue_impact);

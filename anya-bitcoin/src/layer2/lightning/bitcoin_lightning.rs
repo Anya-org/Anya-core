@@ -1,7 +1,7 @@
 use crate::prelude::StdError;
 // Lightning Network Implementation for Bitcoin Module
 // Implements Lightning Network functionality for Bitcoin operations
-// as per Bitcoin Development Framework v2.5 requirements
+// as per official Bitcoin Improvement Proposals (BIPs) requirements
 
 use crate::AnyaError;
 use crate::prelude::AnyaResult;

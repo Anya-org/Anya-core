@@ -1,4 +1,19 @@
-# Bitcoin Development Framework v2.5 Compliance
+---
+title: "Compliance"
+description: "Documentation for Compliance"
+---
+
+# Bitcoin Improvement Proposals (BIPs) Compliance
+
+## Overview
+
+Add a brief overview of this document here.
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 
 ## Implementation Status
 ```mermaid
@@ -44,6 +59,9 @@ sequenceDiagram
 ```
 
 ---
+
+[AIR-3][AIS-3][BPC-3][RES-3]
+
 *Compliance verified against Bitcoin Core 24.0.1 and BIP specifications*
 
 | Component       | BIP-342 | BIP-370 | GDPR   |
@@ -51,3 +69,7 @@ sequenceDiagram
 | Core            | ✅      | ✅      | ✅     |
 | Mobile          | ✅      | ✅      | ⚠️     |
 | HSM Interface   | ✅      | ✅      | ✅     |
+## See Also
+
+- [Related Document](#related-document)
+

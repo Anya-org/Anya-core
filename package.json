@@ -18,15 +18,12 @@
     "check-hexagonal": "bdk-cli audit --hexagonal --file ./src"
   },
   "dependencies": {
-    "@noble/curves": "1.2.0",
-    "crypto-js": "4.2.0",
+    "@noble/curves": "^1.6.0",
+    "commander": "^12.1.0",
+    "crypto-js": "^4.2.0",
+    "mem0ai": "^1.0.39",
     "node-fetch": "^2.7.0",
-    "zod": "3.22.4",
-    "schnorr-signatures": "2.1.4",
-    "bdk-wallet": "^1.0.0",
-    "lightningdevkit": "^0.8.2",
-    "bdk-descriptor": "^1.0.0",
-    "bdk-crypto": "^1.0.0"
+    "zod": "^3.23.8"
   },
   "directories": {
     "doc": "docs",
@@ -54,8 +51,6 @@
   "homepage": "https://github.com/anya-org/anya-core#readme",
   "devDependencies": {
     "markdownlint-cli2": "^0.17.2",
-    "bdk-cli": "1.2.0",
-    "ldk-test-vectors": "0.8.0",
-    "@lightningdevkit/ldk-node": "^0.8.2"
+    "mocha": "^10.7.3"
   }
 }

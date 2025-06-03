@@ -1,165 +1,99 @@
-[workspace]
-members = [
-  ".",
-  "core",
-  "anya-bitcoin",
-  "anya-extensions",
-  "anya-enterprise"
-]
-resolver = "2"
-
-[workspace.package]
-version = "0.9.0-alpha.7"
-edition = "2021"
-authors = ["Anya Bitcoin Core Team <dev@example.com>"]
-license = "MIT OR Apache-2.0"
-
-[workspace.dependencies]
-# Bitcoin Core aligned dependencies
-# We use valid features for bitcoin 0.32.1 - Taproot is included in the core functionality
-bitcoin = { version = "0.32.1", features = ["serde", "base64", "rand-std", "std"] }
-bitcoin-wallet = { version = "1.1.0" }
-bitcoin_hashes = "0.12.0"
-secp256k1 = { version = "0.28.1", features = ["global-context", "std", "rand-std", "hashes"] }
-bitcoin_hd = { version = "0.10.2" }
-lightning = { version = "0.0.118", features = ["no-std"] }
-bitcoincore-rpc = { version = "0.16.0" }
-
-# Web5 dependencies
-web5 = { git = "https://github.com/decentralized-identity/web5-rs.git", tag = "v4.0.0", default-features = false }
-
-# Serialization and utilities
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0.107"
-hex = "0.4.3"
-base64 = "0.21.4"
-uuid = { version = "1.4.1", features = ["v4", "serde"] }
-
-# Cryptography
-sha2 = "0.10.7"
-rand = "0.8.5"
-digest = "0.10.7"
-zeroize = { version = "1.6.0", features = ["zeroize_derive"] }
-
-# Async runtime and networking
-libp2p = "0.48.0"
-tokio = { version = "1.28.0", features = ["full"] }
-async-trait = "0.1.64"
-futures = "0.3.27"
-trust-dns-resolver = "0.23.0"
-
-# Logging and error handling
-thiserror = "1.0.40"
-tracing = "0.1.37"
-tracing-subscriber = "0.3.16"
-log = "0.4.17"
-anyhow = "1.0.70"
-
-# CLI and time
-clap = { version = "4.4.6", features = ["derive"] }
-chrono = { version = "0.4.31", features = ["serde"] }
-tch = "0.13.0"
-
-# Remove duplicate mobile entries
-# [AIS-3] Security: Enforce single source of truth
-
 [package]
 name = "anya-core"
-version = "0.9.0-alpha.7"
+version = "0.3.0-rc.1"
 edition = "2021"
-description = "Anya Bitcoin System"
-license = "MIT OR Apache-2.0"
-homepage = "https://example.com/anya"
-repository = "https://github.com/anya-org/anya-core.git"
-rust-version = "1.70.0"
-default-run = "anya"
-
-[lib]
-name = "anya_core"
-path = "src/lib.rs"
-
-[[bin]]
-name = "anya"
-path = "src/bin/anya.rs"
-
-[[bin]]
-name = "anya_installer"
-path = "src/bin/anya_installer.rs"
-
-[[bin]]
-name = "bip_health"
-path = "src/bin/bip_health.rs"
+description = "Enterprise-grade Bitcoin Infrastructure Platform"
+authors = ["botshelomokoka@gmail.com"]
+license = "MIT"
+repository = "https://github.com/anya-org/anya-core"
 
 [features]
-default = ["bitcoin", "dao", "web5", "enterprise"]
-# Core Bitcoin principles
-bitcoin = []
-dao = []
-web5 = []
-enterprise = []
-
-# Optional components
-p2p = ["libp2p", "trust-dns-resolver"] # Requires Protocol Buffers compiler
-machine-learning = ["tch"] # Requires LibTorch/PyTorch
-
-# Feature combinations
-networking = ["p2p"] # For backward compatibility
-full = ["bitcoin", "dao", "web5", "enterprise"]
-experimental = ["bitcoin", "dao", "web5", "enterprise", "machine-learning", "p2p"]
+default = ["std", "rust-bitcoin"]
+# Feature flag for HSM functionality
+hsm = ["dep:sha2", "dep:hmac"]
+# Feature flag for complete system (including HSM)
+complete = ["hsm"]
+std = []
+# Bitcoin implementation features
+bitcoin_integration = []
+rust-bitcoin = ["bitcoin", "bdk"]
+# RSK integration for Bitcoin verification
+rsk = []
 
 [dependencies]
-# Core Bitcoin dependencies
-bitcoin = { workspace = true }
-bitcoin-wallet = { workspace = true }
-bitcoin_hashes = { workspace = true }
-secp256k1 = { workspace = true }
-bitcoin_hd = { workspace = true }
-lightning = { workspace = true }
-# Machine learning dependency is made optional to align with Bitcoin Core's
-# principle of minimal dependencies and decentralization
-tch = { version = "0.13.0", optional = true }
+# API dependencies
+axum = "=0.8.4"
+tower = "=0.5.2"
+tower-http = { version = "=0.6.4", features = ["cors", "trace"] }
+hyper = { version = "=1.6.0", features = ["full"] }
+tokio = { version = "=1.45.1", features = ["full"] }
 
-# Web5/DID/Self-sovereign identity
-web5 = { workspace = true }
+# Bitcoin dependencies
+bitcoin = { version = "0.32", features = ["std", "serde", "rand", "bitcoinconsensus", "secp-recovery", "base64", "rand-std", "bitcoinconsensus-std"], optional = true }
+secp256k1 = { version = "0.29", features = ["rand-std", "global-context"] }
+bdk = { version = "0.30", optional = true }
+miniscript = "12.3"
+bip39 = "2.0"
 
-# Serialization and data handling
-serde = { workspace = true }
-serde_json = { workspace = true }
-hex = { workspace = true }
-base64 = { workspace = true }
-uuid = { workspace = true }
+# Web5/DID dependencies 
+web5 = { git = "https://github.com/TBD54566975/web5-rs", rev = "310d79c9" }
+jsonwebtoken = "=9.3.1"
+multibase = "=0.9.1"
+multihash = "=0.19.3"
 
-# Cryptography and security
-sha2 = { workspace = true }
-rand = { workspace = true }
-digest = { workspace = true }
-zeroize = { workspace = true }
+# Serialization/Deserialization
+serde = { version = "=1.0.214", features = ["derive"] }
+serde_json = "=1.0.133"
+humantime-serde = "=1.1.1"
+getrandom = "=0.3.3"
+url = "=2.5.4"
 
-# Networking and async
-libp2p = { workspace = true, optional = true }
-tokio = { workspace = true }
-async-trait = { workspace = true }
-futures = { workspace = true }
-trust-dns-resolver = { workspace = true, optional = true }
+# Error handling
+anyhow = "=1.0.93"
+thiserror = "=2.0.12"
 
-# Error handling and logging
-thiserror = { workspace = true }
-tracing = { workspace = true }
-tracing-subscriber = { workspace = true }
-log = { workspace = true }
-anyhow = { workspace = true }
+# Logging
+tracing = "=0.1.41"
+tracing-subscriber = { version = "=0.3.18", features = ["env-filter"] }
 
-# CLI tools
-clap = { workspace = true }
+# Utilities and common dependencies
+async-trait = "=0.1.84"
+clap = { version = "=4.5.39", features = ["derive"] }
+base64 = "=0.22.1"
+uuid = { version = "=1.11.0", features = ["v4", "serde"] }
+chrono = { version = "=0.4.38", features = ["serde"] }
+rand = "=0.8.5"
+argon2 = "=0.5.3"
+hex = "=0.4.3"
+log = "=0.4.22"
+reqwest = { version = "=0.12.9", features = ["json", "blocking"] }
+clap_derive = "=4.5.32"
+actix-web = "=4.11.0"
+actix-cors = "=0.7.1"
+env_logger = "=0.11.8"
+jwt = "=0.16.0"
+ring = "=0.17.8"
+sysinfo = "=0.32.1"
+dialoguer = "=0.11.0"
+warp = "=0.3.7"
+cargo_metadata = "=0.20.0"
+maplit = "=1.0.2"
+systemstat = "=0.2.3"
+regex = "=1.11.1"
+toml = "=0.8.19"
+serde_yaml = "=0.9.34"
+tokio-tungstenite = "=0.24.0"
 
-# Time handling
-chrono = { version = "0.4", features = ["serde"] }
-humantime-serde = "1.1"
+# Conditionally required dependencies (HSM feature and general codebase)
+sha2 = { version = "=0.10.8", optional = true }
+hmac = { version = "=0.12.1", optional = true }
+zeroize = "=1.8.1"
+criterion = "0.6.0"
+walkdir = "2.5.0"
 
-# Cryptography
-argon2 = { version = "0.5", features = ["std"] }
-chacha20poly1305 = "0.10"
-aes-gcm = "0.10"
+[dev-dependencies]
+mockall = "=0.13.1"
+tokio-test = "=0.4.4"
+tower-test = "=0.4.0"
 
-# Bitcoin Script 
-bitcoin-opcodes = { version = "0.1.0", package = "bitcoin_opcodes" }
+

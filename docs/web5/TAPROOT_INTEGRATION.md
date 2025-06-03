@@ -1,4 +1,15 @@
+---
+title: "Taproot_integration"
+description: "Documentation for Taproot_integration"
+last_updated: 2025-05-30
+---
+
 # Web5-BIP341 Taproot Integration Guide
+
+## Overview
+
+Add a brief overview of this document here.
+
 
 [BPC-3][AIR-3][AIS-3][AIT-3][PFM-3][SCL-3][RES-3][DID-3]
 
@@ -321,3 +332,8 @@ For complete test coverage, refer to the [test directory](../../tests/web5/valid
 - [BIP-341 Specification](https://github.com/bitcoin/bips/blob/master/bip-0341.mediawiki)
 - [BIP-342 Specification](https://github.com/bitcoin/bips/blob/master/bip-0342.mediawiki)
 - [Web5 DID Specification](https://www.w3.org/TR/did-core/)
+
+## See Also
+
+- [Related Document 1](./related1.md)
+- [Related Document 2](./related2.md)

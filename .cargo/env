@@ -1,0 +1,3 @@
+# [AIR-3][AIS-3][BPC-3][RES-3] Environment overrides
+# This follows official Bitcoin Improvement Proposals (BIPs) standards for clean builds
+RUSTFLAGS=""

@@ -1,54 +1,26 @@
-//! Machine Learning module for Anya Core
-//! 
-//! This module provides ML capabilities for system analysis and optimization.
-//! Aligned with Bitcoin Core principles of decentralization, security, immutability, and privacy.
+//! Machine Learning module
+//!
+//! This module provides machine learning capabilities for the Anya system,
+//! including model management, training, prediction, and federated learning.
 
-// Core ML modules - available always
-pub mod agent_checker;
+use std::error::Error;
+// [AIR-3][AIS-3][BPC-3][RES-3] Import necessary dependencies for ML module
+// This follows official Bitcoin Improvement Proposals (BIPs) standards for ML operations
+use crate::{AnyaResult, AnyaError};
+// Re-export these types to make them public
+pub use crate::dao::{Proposal, ProposalMetrics, RiskMetrics};
+// Import MLModel trait from service module
+pub use crate::ml::service::MLModel;
+use std::collections::HashMap;
+use std::sync::{Arc, Mutex};
+use std::path::Path;
 
-// Feature-gated ML functionality - requires machine-learning feature
-#[cfg(feature = "machine-learning")]
-pub mod service;
-
-// Simplified ML service for when the machine-learning feature is disabled
-#[cfg(not(feature = "machine-learning"))]
-pub mod service {
-    use std::error::Error;
-    
-    /// Simplified version of MLService that maintains Bitcoin Core alignment
-    /// without requiring heavy ML dependencies
-    pub struct MLService;
-    
-    impl MLService {
-        /// Creates a new ML service instance
-        pub fn new() -> Self {
-            Self {}
-        }
-        
-        /// Analyzes DAO proposals using lightweight heuristics
-        /// instead of full ML models
-        pub fn analyze_dao_proposal(&self, _proposal_data: &str) -> Result<f64, Box<dyn Error>> {
-            // Simplified implementation that always returns a default score
-            // when full ML capabilities are disabled
-            Ok(0.75) // Default reasonable score
-        }
-    }
-}
-
-// Re-export the MLService from the appropriate module
+mod service;
 pub use service::MLService;
 
-// Conditional imports for ML system - only used when machine-learning is enabled
-#[cfg(feature = "machine-learning")]
-use crate::AnyaError;
-#[cfg(feature = "machine-learning")]
-use crate::AnyaResult;
-#[cfg(feature = "machine-learning")]
-use std::collections::HashMap;
-#[cfg(feature = "machine-learning")]
-use std::sync::{Arc, Mutex};
-#[cfg(feature = "machine-learning")]
-use std::path::Path;
+// ML agent system module
+pub mod agent_system;
+pub use agent_system::MLAgentSystem;
 
 /// Configuration options for ML functionality
 #[derive(Debug, Clone)]
@@ -104,8 +76,7 @@ impl MLSystem {
             }
         }
 
-        let mut ml_service = MLService::new();
-        ml_service.initialize(10, "0.1.0")?;
+        let ml_service = MLService::new();
 
         Ok(Self {
             config,
@@ -130,13 +101,24 @@ impl MLSystem {
         self.models.get(name).cloned()
     }
 
+    /// Get health metrics for the ML system
+    pub fn get_health_metrics(&self) -> HashMap<String, f64> {
+        let mut metrics = HashMap::new();
+        metrics.insert("model_count".to_string(), self.models.len() as f64);
+        metrics.insert("enabled".to_string(), if self.config.enabled { 1.0 } else { 0.0 });
+        metrics.insert("federated_learning".to_string(), if self.config.federated_learning { 1.0 } else { 0.0 });
+        
+        // Add more detailed metrics here if needed
+        metrics
+    }
+
     /// List all registered models
     pub fn list_models(&self) -> Vec<String> {
         self.models.keys().cloned().collect()
     }
 
     /// Get health metrics for all models
-    pub fn get_health_metrics(&self) -> HashMap<String, HashMap<String, f64>> {
+    pub fn get_model_health_metrics(&self) -> HashMap<String, HashMap<String, f64>> {
         let mut metrics = HashMap::new();
         
         // Add service metrics
@@ -153,17 +135,9 @@ impl MLSystem {
     }
 }
 
-/// Trait for ML models
-pub trait MLModel: Send + Sync {
-    /// Train the model with new data
-    fn train(&mut self, features: &[f64], labels: &[f64]) -> AnyaResult<()>;
-    
-    /// Make predictions with the model
-    fn predict(&self, features: &[f64]) -> AnyaResult<Vec<f64>>;
-    
-    /// Get health metrics for the model
-    fn get_health_metrics(&self) -> HashMap<String, f64>;
-}
+/// Trait for ML models (re-exported from service module)
+/// This is just a placeholder to avoid duplicate definitions
+pub trait MLModelPlaceholder {}
 
 /// ML model input
 #[derive(Debug, Clone)]
@@ -215,13 +189,14 @@ impl FederatedLearningManager {
     }
     
     /// Add a node to the federation
-    pub fn add_node(&mut self, node: FederatedNode)  -> Result<(), Box<dyn Error>> {
+    pub fn add_node(&mut self, node: FederatedNode) {
         self.nodes.push(node);
     }
     
     /// Remove a node from the federation
     pub fn remove_node(&mut self, node_id: &str)  -> Result<(), Box<dyn Error>> {
         self.nodes.retain(|n| n.id != node_id);
+        Ok(())
     }
     
     /// List all nodes in the federation
@@ -267,12 +242,12 @@ mod tests {
     use super::*;
     
     #[test]
-    fn test_stage_readiness()  -> Result<(), Box<dyn Error>> {
+    fn test_stage_readiness() -> Result<(), Box<dyn Error>> {
         assert_eq!(is_ready_for_stage(0.55, SystemStage::Development), false);
         assert_eq!(is_ready_for_stage(0.65, SystemStage::Development), true);
         assert_eq!(is_ready_for_stage(0.85, SystemStage::Production), false);
         assert_eq!(is_ready_for_stage(0.95, SystemStage::Production), true);
+        Ok(())
     }
 }
-
 

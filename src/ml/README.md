@@ -1,6 +1,6 @@
 # Machine Learning System [AIR-3][AIS-3][BPC-3]
 
-This directory contains the Machine Learning system implementation for Anya Core, following the Bitcoin Development Framework v2.5 standards.
+This directory contains the Machine Learning system implementation for Anya Core, following official Bitcoin Improvement Proposals (BIPs) standards.
 
 ## Overview
 

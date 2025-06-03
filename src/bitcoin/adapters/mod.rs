@@ -1,87 +1,109 @@
 use std::error::Error;
-// Migrated from OPSource to anya-core
-// This file was automatically migrated as part of the Rust-only implementation
-// Original file: C:\Users\bmokoka\Downloads\OPSource\src\bitcoin\adapter.rs
-// src/bitcoin/adapter.rs
-//
-// This module provides adapter functionality for Bitcoin implementations
-// following the hexagonal architecture pattern.
-
+// [AIR-3][AIS-3][BPC-3][RES-3] Bitcoin adapters module implementation
+// This follows official Bitcoin Improvement Proposals (BIPs) standards for hexagonal architecture
 use std::sync::Arc;
-use crate::bitcoin::interface::{
-    BitcoinInterface, BitcoinError, BitcoinResult, BitcoinTransaction,
-    BitcoinAddress, AddressType, TransactionInput, TransactionOutput,
-    BlockHeader, BitcoinImplementationType
-};
-use crate::bitcoin::config::Config;
-use crate::bitcoin::rust::RustBitcoinImplementation;
+// [AIR-3][AIS-3][BPC-3][RES-3] Removed unused import: async_trait::async_trait
 
-/// Bitcoin adapter for Bitcoin implementation
+// [AIR-3][AIS-3][BPC-3][RES-3] Import Bitcoin interface types
+// This follows official Bitcoin Improvement Proposals (BIPs) standards for type consistency
+use crate::bitcoin::interface::{
+// [AIR-3][AIS-3][BPC-3][RES-3] Removed unused import: BitcoinError
+    BitcoinInterface, BitcoinResult, Transaction,
+    Address, AddressType, Block, BlockHeader, BitcoinImplementationType
+};
+use crate::bitcoin::config::BitcoinConfig;
+
+/// [AIR-3][AIS-3][BPC-3][RES-3] Bitcoin adapter for Bitcoin implementation
 pub struct BitcoinAdapter {
     /// Configuration
-    config: Arc<Config>,
+    config: Arc<BitcoinConfig>,
     
-    /// Rust implementation
+    /// Implementation
     implementation: Arc<dyn BitcoinInterface>,
 }
 
 impl BitcoinAdapter {
     /// Create a new Bitcoin adapter
-    pub fn new(config: Arc<Config>) -> Self  -> Result<(), Box<dyn Error>> {
-        // Create the Rust implementation
-        let implementation = Arc::new(RustBitcoinImplementation::new(&config)) as Arc<dyn BitcoinInterface>;
+    pub async fn new(config: BitcoinConfig) -> Result<Self, Box<dyn Error>> {
+        let implementation = Arc::new(crate::bitcoin::rust::RustBitcoinImplementation::new(&config)?) as Arc<dyn BitcoinInterface>;
         
-        Self {
-            config,
+        Ok(Self {
+            config: Arc::new(config),
             implementation,
-        }
+        })
     }
     
     /// Get the Bitcoin implementation
-    pub fn get_implementation(&self) -> Arc<dyn BitcoinInterface>  -> Result<(), Box<dyn Error>> {
+    pub fn get_implementation(&self) -> Arc<dyn BitcoinInterface> {
         self.implementation.clone()
     }
 }
 
+/// Implementation of BitcoinInterface following hexagonal architecture pattern
+/// [AIR-3][AIS-3][BPC-3][RES-3] Using async_trait for async interface implementation
+#[async_trait::async_trait]
 impl BitcoinInterface for BitcoinAdapter {
-    fn get_transaction(&self, txid: &str) -> BitcoinResult<BitcoinTransaction>  -> Result<(), Box<dyn Error>> {
-        self.implementation.get_transaction(txid)
+    /// [AIR-3][AIS-3][BPC-3][RES-3] Get transaction by ID
+    async fn get_transaction(&self, txid: &str) -> BitcoinResult<Transaction> {
+        self.implementation.get_transaction(txid).await
     }
     
-    fn get_block(&self, hash: &str) -> BitcoinResult<Vec<BitcoinTransaction>>  -> Result<(), Box<dyn Error>> {
-        self.implementation.get_block(hash)
+    /// [AIR-3][AIS-3][BPC-3][RES-3] Get block by hash
+    async fn get_block(&self, hash: &str) -> BitcoinResult<Block> {
+        self.implementation.get_block(hash).await
     }
     
-    fn get_block_height(&self) -> BitcoinResult<u32>  -> Result<(), Box<dyn Error>> {
-        self.implementation.get_block_height()
+    /// [AIR-3][AIS-3][BPC-3][RES-3] Get current block height
+    async fn get_block_height(&self) -> BitcoinResult<u32> {
+        self.implementation.get_block_height().await
     }
     
-    fn generate_address(&self, address_type: AddressType) -> BitcoinResult<BitcoinAddress>  -> Result<(), Box<dyn Error>> {
-        self.implementation.generate_address(address_type)
+    /// [AIR-3][AIS-3][BPC-3][RES-3] Generate address of specified type
+    async fn generate_address(&self, address_type: AddressType) -> BitcoinResult<Address> {
+        self.implementation.generate_address(address_type).await
     }
     
-    fn create_transaction(
+    /// [AIR-3][AIS-3][BPC-3][RES-3] Create transaction with outputs and fee rate
+    async fn create_transaction(
         &self,
         outputs: Vec<(String, u64)>,
         fee_rate: u64,
-    ) -> BitcoinResult<BitcoinTransaction>  -> Result<(), Box<dyn Error>> {
-        self.implementation.create_transaction(outputs, fee_rate)
+    ) -> BitcoinResult<Transaction> {
+        self.implementation.create_transaction(outputs, fee_rate).await
     }
     
-    fn broadcast_transaction(&self, transaction: &BitcoinTransaction) -> BitcoinResult<String>  -> Result<(), Box<dyn Error>> {
-        self.implementation.broadcast_transaction(transaction)
+    /// [AIR-3][AIS-3][BPC-3][RES-3] Broadcast transaction to network
+    async fn broadcast_transaction(&self, transaction: &Transaction) -> BitcoinResult<String> {
+        self.implementation.broadcast_transaction(transaction).await
     }
     
-    fn get_balance(&self) -> BitcoinResult<u64>  -> Result<(), Box<dyn Error>> {
-        self.implementation.get_balance()
+    /// [AIR-3][AIS-3][BPC-3][RES-3] Get balance for address
+    async fn get_balance(&self, address: &Address) -> BitcoinResult<u64> {
+        self.implementation.get_balance(address).await
     }
     
-    fn estimate_fee(&self, target_blocks: u8) -> BitcoinResult<u64>  -> Result<(), Box<dyn Error>> {
-        self.implementation.estimate_fee(target_blocks)
+    /// [AIR-3][AIS-3][BPC-3][RES-3] Estimate fee for target confirmation blocks
+    async fn estimate_fee(&self, target_blocks: u8) -> BitcoinResult<u64> {
+        self.implementation.estimate_fee(target_blocks).await
     }
     
-    fn implementation_type(&self) -> BitcoinImplementationType  -> Result<(), Box<dyn Error>> {
-        BitcoinImplementationType::Rust
+    /// [AIR-3][AIS-3][BPC-3][RES-3] Get block header by hash
+    async fn get_block_header(&self, hash: &str) -> BitcoinResult<BlockHeader> {
+        self.implementation.get_block_header(hash).await
+    }
+    
+    /// [AIR-3][AIS-3][BPC-3][RES-3] Verify merkle proof for transaction
+    async fn verify_merkle_proof(&self, tx_hash: &str, block_header: &BlockHeader) -> BitcoinResult<bool> {
+        self.implementation.verify_merkle_proof(tx_hash, block_header).await
+    }
+    
+    /// [AIR-3][AIS-3][BPC-3][RES-3] Send transaction to network
+    async fn send_transaction(&self, tx: &Transaction) -> BitcoinResult<String> {
+        self.implementation.send_transaction(tx).await
+    }
+    
+    fn implementation_type(&self) -> BitcoinImplementationType {
+        self.implementation.implementation_type()
     }
 }
 
@@ -89,10 +111,10 @@ impl BitcoinInterface for BitcoinAdapter {
 mod tests {
     use super::*;
     
-    #[test]
-    fn test_adapter_initialization()  -> Result<(), Box<dyn Error>> {
-        let config = Arc::new(Config::default());
-        let adapter = BitcoinAdapter::new(config);
+    #[tokio::test]
+    async fn test_adapter_initialization() -> Result<(), Box<dyn Error>> {
+        let config = BitcoinConfig::default();
+        let adapter = BitcoinAdapter::new(config).await?;
         
         // Check that we can get the implementation
         let implementation = adapter.get_implementation();
@@ -100,6 +122,8 @@ mod tests {
         
         // Check the default implementation type
         assert_eq!(adapter.implementation_type(), BitcoinImplementationType::Rust);
+        
+        // [BPC-3] Return success result
+        Ok(())
     }
-} 
-
+}

@@ -1,7 +1,20 @@
+---
+title: "Security_architecture"
+description: "Documentation for Security_architecture"
+last_updated: 2025-05-30
+---
+
 <!-- markdownlint-disable MD013 line-length -->
 
 [AIS-3][BPC-3][DAO-3]
+
 # Security Architecture
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
 
 *Last Updated: 2024-03-10*
 
@@ -16,6 +29,7 @@ Anya Core's Security Architecture provides comprehensive protection for the plat
 The System Hardening component provides security configuration management across all system components with an in-memory auto-save mechanism.
 
 **Key Features:**
+
 - Security level management (Basic, Enhanced, Strict, Custom)
 - Component-specific security configuration
 - Configuration status tracking and validation
@@ -23,12 +37,14 @@ The System Hardening component provides security configuration management across
 - Auto-save functionality for security state preservation
 
 **Implementation:**
+
 - Location: `src/security/system_hardening.rs`
 - AI Label: AIE-001
 - Status: ✅ Complete
 - Auto-Save: Enabled (every 20th change)
 
 **Security Levels:**
+
 ```rust
 pub enum SecurityLevel {
     Basic,     // Minimal security for development
@@ -39,6 +55,7 @@ pub enum SecurityLevel {
 ```
 
 **Configuration Status:**
+
 ```rust
 pub enum ConfigStatus {
     NotApplied,  // Configuration exists but not applied
@@ -49,6 +66,7 @@ pub enum ConfigStatus {
 ```
 
 **Architecture:**
+
 ```
 ┌────────────────────┐    ┌─────────────────────┐    ┌────────────────────┐
 │                    │    │                     │    │                    │
@@ -71,6 +89,7 @@ pub enum ConfigStatus {
 The Access Control component manages authentication, authorization, and permissions across the system.
 
 **Key Features:**
+
 - Role-based access control (RBAC)
 - Multi-factor authentication
 - Permission management
@@ -82,6 +101,7 @@ The Access Control component manages authentication, authorization, and permissi
 The Cryptographic Operations component provides secure cryptographic functions for the system.
 
 **Key Features:**
+
 - Key generation and management
 - Encryption and decryption
 - Digital signatures
@@ -93,6 +113,7 @@ The Cryptographic Operations component provides secure cryptographic functions f
 The Security Monitoring component tracks security events and detects potential threats.
 
 **Key Features:**
+
 - Event logging
 - Intrusion detection
 - Anomaly detection
@@ -148,6 +169,7 @@ fn save_state_to_memory(&self) {
 ## System Interfaces
 
 ### Input Ports
+
 - Security configuration API
 - Authentication requests
 - Authorization checks
@@ -155,6 +177,7 @@ fn save_state_to_memory(&self) {
 - Security event inputs
 
 ### Output Ports
+
 - Security status reports
 - Authentication responses
 - Authorization decisions
@@ -164,12 +187,14 @@ fn save_state_to_memory(&self) {
 ## Implementation Details
 
 ### Core Security Components
+
 - `SystemHardening` - Security configuration manager (AIE-001)
 - `AccessControl` - Authentication and authorization
 - `CryptoOperations` - Cryptographic functions
 - `SecurityMonitor` - Security event monitoring
 
 ### Technology Stack
+
 - Rust for system components
 - OpenSSL/libsodium for cryptographic operations
 - TOTP for multi-factor authentication
@@ -227,6 +252,7 @@ The Security Architecture includes specialized features for Bitcoin operations:
 The security architecture now includes specialized protections for Layer 2 solutions:
 
 #### BOB Hybrid L2 Security
+
 - **Bitcoin Relay Security**: Validating relay integrity and preventing relay manipulation
 - **Cross-Layer Transaction Validation**: Ensuring security of transactions between Bitcoin L1 and BOB L2
 - **EVM Smart Contract Security**: Static analysis and runtime verification for EVM contracts
@@ -235,6 +261,7 @@ The security architecture now includes specialized protections for Layer 2 solut
 - **MEV Protection**: Protection against maximal extractable value exploitation in the hybrid environment
 
 **Implementation:**
+
 ```rust
 pub struct L2SecurityMonitor {
     // Relay security components
@@ -252,6 +279,7 @@ pub struct L2SecurityMonitor {
 ```
 
 **Cross-Layer Security Architecture:**
+
 ```
 ┌─────────────────┐           ┌─────────────────┐
 │                 │           │                 │
@@ -286,11 +314,13 @@ pub struct L2SecurityMonitor {
 5. Zero-trust security model implementation
 
 ## Enterprise Protections
+
 - Multi-Sig Approval Workflows
 - Real-Time Sanctions Screening
 - AI-Powered Anomaly Detection
 
 ## Bitcoin-Specific Security Updates
+
 - **BitVM Security**: Added formal verification for BitVM operations
 - **Layer 2 Monitoring**: Enhanced fraud proof validation (BPC-3)
 - **Taproot Compliance**: Full BIP-341/342 implementation
@@ -302,5 +332,12 @@ pub struct L2SecurityMonitor {
 - **Legal Wrapper Integration**: Digital legal bindings with blockchain attestation
 
 ---
+[AIR-3][AIS-3][BPC-3][RES-3]
 
-*This document follows the [AI Labeling System](../docs/standards/AI_LABELING.md) standards based on the Bitcoin Development Framework v2.5.* 
+
+*This document follows the [AI Labeling System](../docs/standards/AI_LABELING.md) standards based on official Bitcoin Improvement Proposals (BIPs).* 
+
+## See Also
+
+- [Related Document 1](./related1.md)
+- [Related Document 2](./related2.md)

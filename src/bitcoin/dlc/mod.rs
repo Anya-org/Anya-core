@@ -1,10 +1,14 @@
-//! Discrete Log Contracts (DLCs) Module [AIR-3][AIS-3][AIT-3][AIM-2][AIP-2][BPC-3][PFM-3][RES-3]
-//!
-//! Implements privacy-preserving DLCs using non-interactive oracle patterns
-//! to maintain transaction indistinguishability as per Bitcoin Development Framework v2.5.
-//! Includes hardware-optimized batch verification specifically tuned for i3-7020U minimum spec.
-
 use std::error::Error;
+// Migrated from OPSource to anya-core
+// This file was automatically migrated as part of the Rust-only implementation
+// Original file: C:\Users\bmokoka\Downloads\OPSource\src\bitcoin\dlc\mod.rs
+// Discrete Log Contracts (DLCs) Module
+// Implements privacy-preserving DLCs using non-interactive oracle patterns
+// to maintain transaction indistinguishability as per official Bitcoin Improvement Proposals (BIPs)
+//
+// [AIR-2][AIS-3][AIT-3][AIM-2][AIP-2][BPC-3][PFM-2][RES-2]
+// This module meets DLC Oracle Integration requirements with non-interactive pattern
+// implementation and comprehensive security measures.
 
 use bitcoin::{Transaction, TxIn, TxOut, Script, OutPoint, Witness, ScriptBuf, Sequence, Amount, WitnessProgram, WitnessVersion};
 use bitcoin::secp256k1::{Secp256k1, SecretKey, PublicKey, Message};
@@ -22,12 +26,6 @@ use crate::bitcoin::error::BitcoinError;
 
 // Import BitcoinResult type
 use crate::bitcoin::error::BitcoinResult;
-
-// Export the batch verification module
-pub mod batch_verification;
-
-// Re-export optimized verification functions
-pub use batch_verification::{verify_oracle_signatures_batch, verify_oracle_signature_optimized};
 
 /// DLC Contract structure
 /// 
@@ -560,7 +558,6 @@ pub fn sign_execution_transaction(
 }
 
 /// Verify an oracle signature for a DLC outcome
-/// For better performance, use verify_oracle_signature_optimized instead
 pub fn verify_oracle_signature(
     outcome: &str,
     oracle_signature: &Signature,
@@ -582,18 +579,6 @@ pub fn verify_oracle_signature(
     }
     
     Ok(true)
-}
-
-/// Hardware-optimized verification for a DLC oracle signature
-/// Delegates to the batch_verification module with hardware acceleration
-/// specifically tuned for Intel i3-7020U minimum hardware specification
-pub fn verify_oracle_signature_hardware_optimized(
-    outcome: &str,
-    oracle_signature: &Signature,
-    oracle_public_key: &PublicKey,
-) -> BitcoinResult<bool> {
-    // Use the optimized batch verification even for a single signature
-    batch_verification::verify_oracle_signature_optimized(outcome, oracle_signature, oracle_public_key)
 }
 
 /// Create a contract script for a DLC

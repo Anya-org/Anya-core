@@ -1,0 +1,81 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  scrape_timeout: 10s
+  external_labels:
+    monitor: 'bitcoin-node-monitor'
+
+scrape_configs:
+  # Bitcoin Node Exporter
+  - job_name: 'bitcoin-exporter' # Renamed from bitcoin-node
+    scrape_interval: 15s
+    scrape_timeout: 10s
+    metrics_path: '/metrics' # Default for metalmatze/bitcoin-prometheus-exporter
+    scheme: 'http'
+    static_configs:
+      - targets: ['bitcoin-exporter:9332'] # Updated target
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+    # basic_auth removed as the exporter handles RPC authentication if needed
+
+  # Node Exporter (System Metrics)
+  - job_name: 'node-exporter'
+    scrape_interval: 15s
+    static_configs:
+      - targets: ['node-exporter:9100']
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        replacement: '${1}:9100'
+
+  # cAdvisor (Container Metrics)
+  - job_name: 'cadvisor'
+    scrape_interval: 15s
+    static_configs:
+      - targets: ['cadvisor:8080']
+    scheme: http
+    metrics_path: /metrics
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        replacement: '${1}:8080'
+
+  # Prometheus Self-Monitoring
+  - job_name: 'prometheus'
+    scrape_interval: 15s
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Blackbox Exporter (Network Probes)
+  - job_name: 'blackbox'
+    metrics_path: /probe
+    params:
+      module: [http_2xx]
+    static_configs:
+      - targets:
+        - 'http://bitcoind:8332'  # Bitcoin RPC
+        - 'http://grafana:3000'   # Grafana
+        - 'http://prometheus:9090' # Prometheus
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: blackbox-exporter:9115
+
+  # Process Exporter (Per-Process Metrics)
+  - job_name: 'process-exporter'
+    static_configs:
+      - targets: ['process-exporter:9256']
+
+rule_files:
+  - 'alerts/*.rules'
+
+alerting:
+  alertmanagers:
+  - static_configs:
+    - targets: ['alertmanager:9093']
+    scheme: http
+    timeout: 10s
