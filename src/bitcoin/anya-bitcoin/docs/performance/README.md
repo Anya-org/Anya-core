@@ -30,4 +30,4 @@ The following performance metrics are used to measure the performance of Anya Bi
 
 Performance metrics are monitored on a regular basis to ensure that the performance of Anya Bitcoin is within acceptable limits.
 
-*Last updated: 2024-12-07*
+*Last updated: 2025-06-02*

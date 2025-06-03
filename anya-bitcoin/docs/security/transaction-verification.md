@@ -38,4 +38,4 @@ This document details the transaction verification processes in Anya.
 - [Transaction Operations](../features/transaction-operations.md)
 - [Block Processing](../features/block-processing.md)
 
-*Last updated: 2024-12-07*
+*Last updated: 2025-06-02*

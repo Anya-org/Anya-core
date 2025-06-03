@@ -6,4 +6,4 @@ The following benchmarks are available for the Anya Bitcoin library:
 
 This benchmark measures the time it takes to verify a transaction's signature.
 
-*Last updated: 2024-12-07*
+*Last updated: 2025-06-02*

@@ -47,4 +47,4 @@ This document outlines the management features for block handling in Anya.
 - [Block Operations](block-operations.md)
 - [Network Security](../security/network-security.md)
 
-*Last updated: 2024-12-07*
+*Last updated: 2025-06-02*

@@ -35,4 +35,4 @@ Anya Bitcoin Platform uses a secure transaction monitoring process to detect and
 * **Transaction monitoring**: Anya Bitcoin Platform monitors all transactions for signs of fraud or tampering.
 * **Fraud detection**: Anya Bitcoin Platform uses a combination of algorithms and heuristics to detect and prevent fraudulent transactions.
 
-*Last updated: 2024-12-07*
+*Last updated: 2025-06-02*

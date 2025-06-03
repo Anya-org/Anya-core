@@ -33,4 +33,4 @@ This document describes the different types of cryptographic keys used in Anya.
 - [Key Management](key-management.md)
 - [Security Guidelines](../security/README.md)
 
-*Last updated: 2024-12-07*
+*Last updated: 2025-06-02*

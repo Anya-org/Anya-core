@@ -27,4 +27,4 @@ The Anya Bitcoin wallet integration provides enterprise-grade wallet management 
 
 ### Transaction Creation
 
-*Last updated: 2024-12-07*
+*Last updated: 2025-06-02*

@@ -12,4 +12,4 @@ Integration tests should be run before any release to ensure that the system wor
 
 To run the integration tests, use the following command: [run-integration-tests](../../../scripts/run-integration-tests.sh)
 
-*Last updated: 2024-12-07*
+*Last updated: 2025-06-02*

@@ -20,4 +20,4 @@ By default, the `network` field is set to `bitcoin`.
 
 The type of network that a node can connect to determines the type of network messages that the node can send and receive. It also determines the type of network peers that the node can connect to.
 
-*Last updated: 2024-12-07*
+*Last updated: 2025-06-02*

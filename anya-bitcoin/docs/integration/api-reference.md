@@ -10,4 +10,4 @@ The Anya Bitcoin API uses JSON Web Tokens for authentication. Every
 request must include an `Authorization` header with a valid JWT in
 order to authenticate.
 
-*Last updated: 2024-12-07*
+*Last updated: 2025-06-02*

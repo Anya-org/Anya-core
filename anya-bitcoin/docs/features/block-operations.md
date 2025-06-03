@@ -38,4 +38,4 @@ This document details the operations available for block handling in Anya.
 - [Block Management](block-management.md)
 - [Network Types](../network/network-types.md)
 
-*Last updated: 2024-12-07*
+*Last updated: 2025-06-02*

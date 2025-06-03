@@ -37,4 +37,4 @@ See [Key Management](../security/key-management.md) for security best practices.
 - [Wallet Management](wallet-management.md)
 - [Transaction Management](transaction-management.md)
 
-*Last updated: 2024-12-07*
+*Last updated: 2025-06-02*

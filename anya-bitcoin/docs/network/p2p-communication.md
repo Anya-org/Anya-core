@@ -64,4 +64,4 @@ The following error codes are supported:
 - `unsupported_message_type`: The message type is not supported.
 - `invalid_network_address`: The network address is invalid.
 
-*Last updated: 2024-12-07*
+*Last updated: 2025-06-02*
