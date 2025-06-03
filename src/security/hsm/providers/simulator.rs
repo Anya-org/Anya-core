@@ -7,10 +7,13 @@ use tokio::sync::Mutex;
 use tokio::time::sleep;
 use uuid::Uuid;
 use rand::prelude::*;
+use rand::rngs::OsRng;
 use chrono::Utc;
 use bitcoin::secp256k1::{Secp256k1, SecretKey, PublicKey};
 use bitcoin::{Network, Address, Script, ScriptBuf, psbt::Psbt};
 use sha2::{Sha256, Digest};
+use base64::Engine;
+use std::str::FromStr;
 
 use crate::security::hsm::config::SimulatorConfig;
 use crate::security::hsm::provider::{
@@ -27,7 +30,7 @@ pub struct SimulatorHsmProvider {
     config: SimulatorConfig,
     keys: Mutex<HashMap<String, KeyInfo>>,
     key_data: Mutex<HashMap<String, Vec<u8>>>,
-    rng: Mutex<ThreadRng>,
+    rng: Mutex<OsRng>,
     network: Network,
     secp: Secp256k1<bitcoin::secp256k1::All>,
     // Simulated hardware state
@@ -57,7 +60,7 @@ impl SimulatorHsmProvider {
             config: config.clone(),
             keys: Mutex::new(HashMap::new()),
             key_data: Mutex::new(HashMap::new()),
-            rng: Mutex::new(thread_rng()),
+            rng: Mutex::new(OsRng),
             network: Network::Testnet, // Always use testnet
             secp: Secp256k1::new(),
             state: Mutex::new(HardwareState {
@@ -230,7 +233,7 @@ impl HsmProvider for SimulatorHsmProvider {
         Ok(())
     }
     
-    async fn generate_key(&self, params: KeyGenParams) -> Result<KeyPair, HsmError> {
+    async fn generate_key(&self, params: KeyGenParams) -> Result<(KeyPair, KeyInfo), HsmError> {
         self.simulate_conditions().await?;
         
         let key_id = params.id.unwrap_or_else(|| self.generate_key_id());
@@ -258,15 +261,17 @@ impl HsmProvider for SimulatorHsmProvider {
         let mut keys = self.keys.lock().await;
         let mut key_data = self.key_data.lock().await;
         
-        keys.insert(key_id.clone(), key_info);
+        keys.insert(key_id.clone(), key_info.clone());
         key_data.insert(key_id.clone(), private_key);
         
-        Ok(KeyPair {
+        let key_pair = KeyPair {
             id: key_id,
             key_type: params.key_type,
             public_key,
             private_key_handle: key_id.clone(),
-        })
+        };
+        
+        Ok((key_pair, key_info))
     }
     
     async fn sign(&self, key_id: &str, algorithm: SigningAlgorithm, data: &[u8]) -> Result<Vec<u8>, HsmError> {
@@ -297,7 +302,7 @@ impl HsmProvider for SimulatorHsmProvider {
                 let message_hash = hasher.finalize();
                 
                 // Sign the hash
-                let message = bitcoin::secp256k1::Message::from_slice(&message_hash)
+                let message = bitcoin::secp256k1::Message::from_digest_slice(&message_hash)
                     .map_err(|e| HsmError::SigningError(format!("Invalid message hash: {}", e)))?;
                     
                 let signature = self.secp.sign_ecdsa(&message, &secret_key);
@@ -339,7 +344,7 @@ impl HsmProvider for SimulatorHsmProvider {
                             .map_err(|e| HsmError::VerificationError(format!("Invalid signature format: {}", e)))?;
                             
                         // Verify
-                        let message = bitcoin::secp256k1::Message::from_slice(&message_hash)
+                        let message = bitcoin::secp256k1::Message::from_digest_slice(&message_hash)
                             .map_err(|e| HsmError::VerificationError(format!("Invalid message hash: {}", e)))?;
                             
                         match self.secp.verify_ecdsa(&message, &sig, &public_key) {
