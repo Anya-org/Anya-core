@@ -121,4 +121,4 @@ To use Anya Enterprise, follow these steps:
 
 Anya Enterprise is available under a commercial license. Please contact [sales@anya-enterprise.co.za](mailto:sales@anya-enterprise.co.za) for more information.
 
-*Last updated: 2024-12-07*
+*Last updated: 2025-06-02*
