@@ -1,9 +1,8 @@
-use std::error::Error;
- an//! Federated Learning Agent
-//!
-//! This module provides agents that facilitate federated learning across the network,
-//! enabling privacy-preserving machine learning that respects Bitcoin principles of
-//! decentralization and individual sovereignty.
+// Federated Learning Agent
+//
+// This module provides agents that facilitate federated learning across the network,
+// enabling privacy-preserving machine learning that respects Bitcoin principles of
+// decentralization and individual sovereignty.
 
 use std::sync::{Arc, RwLock};
 use async_trait::async_trait;

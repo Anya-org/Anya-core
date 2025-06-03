@@ -30,6 +30,7 @@ pub struct AssetRegistryConfig {
 
 /// Asset Registry for managing RGB assets
 /// [AIR-3][AIS-3][BPC-3][RES-3]
+#[allow(dead_code)]
 pub struct AssetRegistry {
     config: AssetRegistryConfig,
     assets: Arc<Mutex<HashMap<String, RgbAsset>>>,

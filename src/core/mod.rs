@@ -222,6 +222,7 @@ pub struct Config {
 }
 
 // Hexagonal architecture implementation
+#[allow(dead_code)]
 pub struct AnyaCore {
     bitcoin_adapter: Arc<dyn crate::bitcoin::interface::BitcoinInterface>,
     web5_adapter: Arc<Web5Adapter>,
@@ -310,6 +311,7 @@ pub mod rpc_ports {
     }
 
     // BDF v2.5 compliant adapter
+    #[allow(dead_code)]
     pub struct AnyaRpcAdapter {
         bitcoin: Arc<dyn BitcoinRpc + Send + Sync>,
         lightning: Arc<dyn LightningRpc + Send + Sync>,
@@ -317,4 +319,4 @@ pub mod rpc_ports {
         // This follows official Bitcoin Improvement Proposals (BIPs) standards for clean code
         metrics: Arc<Mutex<PrometheusMetrics>>
     }
-} 
+}

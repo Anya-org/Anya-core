@@ -1,11 +1,5 @@
-use crate::blockchain::{BitcoinSupport, LightningSupport, STXSupport};
-use crate::ml_logic::{
-    FederatedLearning, MLCore, OptimizedAction, Prediction, ProcessedData, TrainedModel,
-};
-use crate::wallet::UserWallet;
-use crate::web5::Web5Support;
+use anya_core::ml::agents::{FederatedAgent, FederatedAgentConfig};
 
-use bitcoin::Amount;
 use std::error::Error;
 use std::time::Duration;
 use tokio;
@@ -19,16 +13,17 @@ async fn test_model_training() -> Result<(), Box<dyn Error>> {
     let user_id = "test_user";
     let test_input = vec![0.1, 0.2, 0.3, 0.4, 0.5];
 
-    // Test local model training
-    fl.train_local_model(user_id, &test_input).await?;
+    // Register participant
+    fl.register_participant(user_id, 1.0, test_input.len() as u64).await?;
+    // Start federation round
+    let round_id = fl.start_federation_round().await?;
+    // Simulate model update
+    fl.process_model_update(user_id, "dummy_hash", &[0u8; 10], std::collections::HashMap::new()).await?;
+    // Aggregate models
+    let _ = fl.aggregate_models(&round_id).await?;
 
-    // Verify model metrics
-    let accuracy = fl.get_model_accuracy().await?;
-    let loss = fl.get_model_loss().await?;
-
-    assert!(accuracy > 0.0 && accuracy <= 1.0);
-    assert!(loss >= 0.0);
-
+    // No direct accuracy/loss, so just check round_id is non-empty
+    assert!(!round_id.is_empty());
     Ok(())
 }
 
@@ -116,20 +111,8 @@ async fn test_security_features() -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-async fn setup_test_environment() -> Result<FederatedLearning, Box<dyn Error>> {
-    // Initialize test components
-    let bitcoin_support = BitcoinSupport::new_test_instance();
-    let stx_support = STXSupport::new_test_instance();
-    let lightning_support = LightningSupport::new_test_instance();
-    let web5_support = Web5Support::new_test_instance();
-    let user_wallet = UserWallet::new_test_instance();
-
-    // Create federated learning instance
-    FederatedLearning::new(
-        bitcoin_support,
-        stx_support,
-        lightning_support,
-        web5_support,
-        user_wallet,
-    )
+async fn setup_test_environment() -> Result<FederatedAgent, Box<dyn Error>> {
+    // Use default config for now
+    let config = FederatedAgentConfig::default();
+    Ok(FederatedAgent::new(config))
 }

@@ -130,6 +130,7 @@ pub struct Asset {
     pub metadata: HashMap<String, String>,
 }
 
+#[allow(dead_code)]
 pub struct Wallet {
     config: WalletConfig,
     seed: Mutex<Option<[u8; 64]>>,

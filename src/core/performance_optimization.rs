@@ -29,6 +29,7 @@ pub enum OptimizationStatus {
 
 /// Performance metrics for a resource
 #[derive(Debug, Clone)]
+#[allow(dead_code)]
 pub struct PerformanceMetrics {
     resource_type: ResourceType,
     utilization: f64,
@@ -40,6 +41,7 @@ pub struct PerformanceMetrics {
 
 /// Resource optimization configuration
 #[derive(Debug, Clone)]
+#[allow(dead_code)]
 pub struct OptimizationConfig {
     resource_type: ResourceType,
     name: String,
@@ -403,4 +405,4 @@ mod tests {
         
         Ok(())
     }
-} 
+}

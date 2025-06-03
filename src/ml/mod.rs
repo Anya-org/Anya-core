@@ -172,6 +172,7 @@ pub struct FederatedNode {
 }
 
 /// Federated learning manager
+#[allow(dead_code)]
 pub struct FederatedLearningManager {
     /// Known nodes
     nodes: Vec<FederatedNode>,
@@ -236,6 +237,9 @@ pub fn is_ready_for_stage(health: f64, stage: SystemStage) -> bool {
         SystemStage::Unavailable => false,
     }
 }
+
+pub mod agents;
+pub use agents::*;
 
 #[cfg(test)]
 mod tests {

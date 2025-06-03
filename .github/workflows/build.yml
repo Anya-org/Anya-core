@@ -1,5 +1,20 @@
 name: Validate TOML
-  run: |
-    npm install -g @iarna/toml
-    toml-verify Cargo.toml
-    cargo check 
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  validate-toml:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install TOML tools
+        run: |
+          npm install -g @iarna/toml
+      - name: Validate Cargo.toml
+        run: toml-verify Cargo.toml
+      - name: Cargo check
+        run: cargo check

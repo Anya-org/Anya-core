@@ -98,10 +98,12 @@ impl SystemMapValidation {
     pub fn validate_hexagonal(&mut self, installer: &AnyaInstaller) -> Result<()> {
         let compliance = installer.validate_system_map()?;
 
-        self.components.push(ComponentStatus {
-            name: "Bitcoin Core".into(),
-            status: compliance.bitcoin_core,
-        });
+        self.components.push(ComponentStatus::new(
+            "Bitcoin Core".into(),
+            compliance.bitcoin_core,
+            std::collections::HashMap::new(),
+            vec![],
+        ));
 
         self.bitcoin_adherence = calculate_adherence(installer);
 

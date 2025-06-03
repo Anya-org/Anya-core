@@ -1,8 +1,25 @@
-  - name: Web5 Compliance Check
-    id: web5-check
-    run: |
-      cargo run --bin web5-validator \
-        --features "web5" \
-        -- check \
-        --dwn-node ${{ secrets.DWN_NODE_URL }} \
-        --level strict 
+name: Web5 Compliance Scan
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  web5-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Web5 Compliance Check
+        id: web5-check
+        run: |
+          echo "DWN_NODE_URL is: ${{ secrets.DWN_NODE_URL }}"
+          if [ -z "${{ secrets.DWN_NODE_URL }}" ]; then
+            echo "DWN_NODE_URL secret is not set. Skipping Web5 compliance check." && exit 0
+          fi
+          cargo run --bin web5-validator \
+            --features "web5" \
+            -- check \
+            --dwn-node "${{ secrets.DWN_NODE_URL }}" \
+            --level strict

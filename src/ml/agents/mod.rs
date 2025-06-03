@@ -1,10 +1,9 @@
-use std::error::Error;
-//! Machine Learning Agents Module
-//!
-//! This module provides a modular system of ML agents that enhance decision-making
-//! across Anya's core functions, including Stacks blockchain operations, DAO governance,
-//! and Web5 capabilities. All agents adhere to the core principle of "read first always"
-//! to ensure informed decision-making, Bitcoin principles of decentralization, and ethical AI.
+// Machine Learning Agents Module
+//
+// This module provides a modular system of ML agents that enhance decision-making
+// across Anya's core functions, including Stacks blockchain operations, DAO governance,
+// and Web5 capabilities. All agents adhere to the core principle of "read first always"
+// to ensure informed decision-making, Bitcoin principles of decentralization, and ethical AI.
 
 use std::fmt;
 use std::collections::HashMap;
@@ -20,15 +19,14 @@ pub use system_map::*;
 pub mod federated_agent;
 pub use federated_agent::FederatedAgent;
 
-// Dynamic agent system that we'll implement later
-pub mod web5_agent;
-pub use web5_agent::Web5Agent;
+// pub mod web5_agent;
+// pub use web5_agent::Web5Agent;
 
-pub mod dao_agent;
-pub use dao_agent::DAOAgent;
+// pub mod dao_agent;
+// pub use dao_agent::DAOAgent;
 
-pub mod stacks_agent;
-pub use stacks_agent::StacksAgent;
+// pub mod stacks_agent;
+// pub use stacks_agent::StacksAgent;
 
 /// Unique identifier for an agent
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]

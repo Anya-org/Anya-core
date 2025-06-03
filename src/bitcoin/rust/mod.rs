@@ -9,6 +9,7 @@ use crate::bitcoin::config::BitcoinConfig;
 
 /// Rust implementation of the Bitcoin interface using rust-bitcoin
 /// [BPC-3] Complete real implementation as per BDF v2.5 standards
+#[allow(dead_code)]
 pub struct RustBitcoinImplementation {
     network: Network,
 }

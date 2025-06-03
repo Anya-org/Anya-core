@@ -16,6 +16,7 @@ use std::sync::Arc;
 use anyhow::Result;
 use chrono::prelude::*;
 
+#[allow(dead_code)]
 pub struct DaoGovernance {
     proposals: HashMap<u64, Proposal>,
     voters: HashMap<String, Voter>,
@@ -33,6 +34,7 @@ pub struct DaoGovernance {
 pub struct DaoConfig {
 }
 
+#[allow(dead_code)]
 pub struct Proposal {
     id: u64,
     title: String,
@@ -55,12 +57,14 @@ pub enum ProposalStatus {
     Executed,
 }
 
+#[allow(dead_code)]
 pub struct DelegationConfig {
     active: bool,
     max_delegates: u32,
     delegation_threshold: u64,
 }
 
+#[allow(dead_code)]
 pub struct CrossChainGovernanceConfig {
     enabled: bool,
     supported_chains: Vec<String>,
@@ -79,6 +83,7 @@ impl LegalWrappers {
     }
 }
 
+#[allow(dead_code)]
 pub struct CrossChainImpact {
     affected_chains: Vec<String>,
     estimated_cost: u64,
@@ -133,6 +138,7 @@ impl CrossChainBridge for DefaultCrossChainBridge {
     }
 }
 
+#[allow(dead_code)]
 pub struct Voter {
     address: String,
     stake: u64,

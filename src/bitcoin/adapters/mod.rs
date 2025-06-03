@@ -14,6 +14,7 @@ use crate::bitcoin::interface::{
 use crate::bitcoin::config::BitcoinConfig;
 
 /// [AIR-3][AIS-3][BPC-3][RES-3] Bitcoin adapter for Bitcoin implementation
+#[allow(dead_code)]
 pub struct BitcoinAdapter {
     /// Configuration
     config: Arc<BitcoinConfig>,

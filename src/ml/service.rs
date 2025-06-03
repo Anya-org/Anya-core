@@ -25,6 +25,7 @@ pub trait MLModel {
 
 pub struct Device {}
 
+#[allow(dead_code)]
 impl Device {
     // [AIS-3] Use snake_case for function names as per BDF v2.5 standards
     pub fn cuda(_device_id: i64) -> Self {
@@ -40,6 +41,7 @@ impl Device {
     }
 }
 
+#[allow(dead_code)]
 pub struct RandomForestClassifier<T> {
     features: Vec<String>,
     classes: Vec<String>,
@@ -60,6 +62,7 @@ impl<T> Default for RandomForestClassifier<T> {
     }
 }
 
+#[allow(dead_code)]
 impl<T> RandomForestClassifier<T> {
     pub fn new() -> Self {
         Self {

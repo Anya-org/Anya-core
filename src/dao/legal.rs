@@ -79,6 +79,7 @@ pub struct LegalWrapper {
 
 /// Signature requirements for a jurisdiction
 #[derive(Debug, Clone)]
+#[allow(dead_code)]
 struct SignatureRequirement {
     /// Minimum required signatures
     min_signatures: usize,
@@ -199,4 +200,4 @@ impl LegalWrapper {
         
         Ok(true)
     }
-} 
+}

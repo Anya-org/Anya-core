@@ -26,6 +26,7 @@ pub enum SecurityLevel {
 }
 
 /// Hardening configuration for a component
+#[allow(dead_code)]
 #[derive(Debug, Clone)]
 pub struct HardeningConfig {
     name: String,
@@ -275,4 +276,4 @@ mod tests {
         
         Ok(())
     }
-} 
+}

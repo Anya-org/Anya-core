@@ -97,7 +97,7 @@ mod tests {
         let master = derive_master_key(&seed, Network::Bitcoin).unwrap();
         
         // Verify the master key is valid
-        assert!(master.xpriv.network == Network::Bitcoin);
+        assert!(master.xpriv.network == Network::Bitcoin.into());
     }
 
     #[test]
@@ -107,6 +107,6 @@ mod tests {
         let path = DerivationPath::from_str("m/44'/0'/0'/0/0").unwrap();
         
         let child = derive_child_key(&master, &path).unwrap();
-        assert!(child.xpriv.network == Network::Bitcoin);
+        assert!(child.xpriv.network == Network::Bitcoin.into());
     }
 }

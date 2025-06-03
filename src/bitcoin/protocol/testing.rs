@@ -6,7 +6,8 @@
 #[cfg(test)]
 pub mod mock {
     use bitcoin::Transaction;
-    use bitcoin::psbt::PartiallySignedTransaction;
+    use std::error::Error;
+    use base64::{engine::general_purpose::STANDARD, Engine as _};
     
     /// Mock Bitcoin transaction verification that doesn't require a local node
     /// [BPC-3] BIP-341 Taproot transaction verification 
@@ -27,9 +28,9 @@ pub mod mock {
     /// [BPC-3] BIP-174 PSBT validation
     pub fn verify_psbt(psbt_base64: &str) -> Result<bool, Box<dyn Error>> {
         // Parse PSBT from base64
-        match base64::decode(psbt_base64) {
+        match STANDARD.decode(psbt_base64) {
             Ok(bytes) => {
-                match bitcoin::consensus::deserialize::<PartiallySignedTransaction>(&bytes) {
+                match bitcoin::psbt::Psbt::deserialize(&bytes) {
                     Ok(_) => Ok(true),
                     Err(e) => Err(Box::new(e))
                 }
@@ -48,4 +49,4 @@ pub mod mock {
             ("not_a_transaction", false)
         ]
     }
-} 
+}

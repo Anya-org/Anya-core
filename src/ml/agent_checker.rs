@@ -4,7 +4,8 @@
 
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
-use std::time::{Duration, Instant};
+use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
+use serde::{Serialize, Deserialize};
 
 /// Status threshold constants for system readiness
 const DEVELOPMENT_THRESHOLD: f64 = 0.60;
@@ -21,13 +22,31 @@ pub enum SystemStage {
 }
 
 /// Component readiness status
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ComponentStatus {
-    name: String,
-    status: f64,
-    last_check: Instant,
-    metrics: HashMap<String, f64>,
-    issues: Vec<String>,
+    /// Component name
+    pub name: String,
+    /// Component status (0.0 to 1.0)
+    pub status: f64,
+    /// Last check time as timestamp (u64)
+    pub last_check: u64,
+    /// Additional metrics
+    pub metrics: HashMap<String, f64>,
+    /// List of issues
+    pub issues: Vec<String>,
+}
+
+impl ComponentStatus {
+    /// Create a new component status
+    pub fn new(name: String, status: f64, metrics: HashMap<String, f64>, issues: Vec<String>) -> Self {
+        Self {
+            name,
+            status,
+            last_check: chrono::Utc::now().timestamp() as u64,
+            metrics,
+            issues,
+        }
+    }
 }
 
 /// System health metrics
@@ -184,7 +203,7 @@ impl AgentChecker {
         let component = ComponentStatus {
             name: component_name.to_string(),
             status,
-            last_check: Instant::now(),
+            last_check: SystemTime::now().duration_since(UNIX_EPOCH).unwrap_or(Duration::ZERO).as_secs(),
             metrics,
             issues,
         };
@@ -301,4 +320,4 @@ mod tests {
         
         Ok(())
     }
-} 
+}
