@@ -182,4 +182,4 @@ Our governance model integrates decentralized principles with structured innovat
 
 *"Governance is the art of enabling collective potential through transparent, adaptive mechanisms."*
 
-*Last updated: 2024-12-07*
+*Last updated: 2025-06-02*

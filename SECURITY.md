@@ -248,7 +248,7 @@ For security-related issues:
 **Last Updated**: [Current Date]
 **Version**: 1.0.0
 
-*Last updated: 2024-12-07*
+*Last updated: 2025-06-02*
 
 ## Cryptographic Implementation [AIS-3][BPC-3]
 Aligned with official Bitcoin Improvement Proposals (BIPs)

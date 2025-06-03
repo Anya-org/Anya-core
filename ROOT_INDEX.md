@@ -2,13 +2,40 @@
 
 [AIR-3][AIS-3][BPC-3][RES-3]
 
-*Last Updated: May 29, 2025*
+*Last Updated: June 2, 2025*
 
 Welcome to the Anya Core documentation. This is the authoritative root index for all Anya Core documentation, following official Bitcoin Improvement Proposals (BIPs).
 
-## Recent Updates (May 29, 2025) [AIR-3][AIS-3][BPC-3][RES-3]
+> **Note**: This documentation has been recently cleaned up and consolidated. All outdated timestamps have been updated and duplicate structures have been removed for improved clarity and maintenance.
 
-Major system-wide updates have been completed to enhance stability, security, and Bitcoin protocol compliance:
+## Recent Updates (June 2, 2025) [AIR-3][AIS-3][BPC-3][RES-3]
+
+**🎉 COMPREHENSIVE REPOSITORY EVALUATION COMPLETED**
+
+Major documentation cleanup, file consolidation, and **MCP (Model Context Protocol) tools integration** have been successfully completed:
+
+### 📋 Documentation Cleanup Achievements ✅
+- **Timestamp Standardization**: Updated 191 files from outdated "2024-12-07" to current "2025-06-02"
+- **Structure Consolidation**: Removed duplicate Bitcoin documentation structures for clarity
+- **File Cleanup**: Removed redundant INDEX.md (replaced by this ROOT_INDEX.md)
+- **Backup Removal**: Cleaned up accumulated backup files and old configuration archives
+- **Link Validation**: Ensured all internal documentation links remain functional
+
+### 🛠️ MCP Tools Integration ✅ **[NEW]**
+- **Comprehensive MCP Toolbox**: Integrated 9 MCP servers for enhanced development
+- **Custom Development Tools**: Created `anya-dev-tools.js` MCP server with 8 specialized tools
+- **Management Scripts**: Complete MCP lifecycle management with `manage-tools.sh`
+- **IDE Integration Ready**: Generated configuration files for seamless editor integration
+- **Automated Workflows**: Project analysis, testing, compliance, and optimization tools
+
+### 🚀 Enhanced Development Capabilities
+- **Memory-Enhanced Development**: Context retention across development sessions
+- **Automated Project Analysis**: Comprehensive repository insights and recommendations
+- **GitHub Integration**: Seamless repository management and automation
+- **Bitcoin Protocol Tools**: Advanced Taproot and Schnorr signature support
+- **Quality Assurance**: Automated documentation validation and compliance checking
+
+### Previous System Improvements (May 29, 2025)
 
 ### Core System Improvements
 - **Dependency Management**: All Cargo.toml dependencies pinned to specific versions for enhanced stability
@@ -71,6 +98,15 @@ All modules maintain compliance with official Bitcoin Improvement Proposals (BIP
 - [ML System Architecture](docs/ML_SYSTEM_ARCHITECTURE.md) - ML system design
 - [AI Component Reference](src/ml/README.md) - AI component details
 - [Model Management](docs/ml/models.md) - Model versioning and deployment
+
+### MCP Tools & Development [MCP-3] **[NEW]**
+
+- [MCP Tools Overview](mcp/toolbox/README.md) - Comprehensive MCP integration guide
+- [MCP Configuration](mcp/mcp.json) - Main MCP server configuration
+- [Development Tools](mcp/toolbox/servers/anya-dev-tools.js) - Custom Anya development server
+- [Management Scripts](scripts/mcp/manage-tools.sh) - MCP lifecycle management
+- [Setup Guide](scripts/mcp/init-toolbox.sh) - MCP toolbox initialization
+- [Tools Configuration](mcp/toolbox/mcp-tools-config.json) - Complete tools specification
 
 ## System Status
 

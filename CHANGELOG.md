@@ -4,19 +4,19 @@
 
 ### Fixed
 - Updated Noble curves dependency from @noble/secp256k1 to @noble/curves/secp256k1
-- Fixed MCP server JSON-RPC protocol implementation
-- Corrected logging to use stderr instead of stdout for MCP communication
+- Fixed MCP server JSON-RPC protocol implementation for proper compliance
+- Corrected logging to use stderr instead of stdout for MCP communication compliance
 - Updated all Bitcoin-related dependencies to latest versions
 
 ### Added
-- Proper MCP protocol v2024-11-05 compliance
+- Proper MCP protocol v2024-11-05 compliance implementation
 - JSON-RPC 2.0 communication over stdin/stdout
 - 6 Bitcoin development tools with proper input schemas
 - Comprehensive error handling and validation
 
 ### Changed
-- MCP server now implements full JSON-RPC protocol
-- Logging moved to stderr to avoid stdout conflicts
+- MCP server now implements full JSON-RPC protocol specification
+- Logging moved to stderr to avoid stdout conflicts in MCP communication
 - Updated package dependencies to latest versions
 
 
@@ -99,7 +99,7 @@ All notable changes to the Anya Core project will be documented in this file.
 - Updated encryption algorithms in HSM modules to remove legacy TripleDesCbc
 - Implemented constant-time comparison operations for cryptographic functions
 - Enhanced security of Bitcoin Taproot implementation
-- Improved Bitcoin MCP server with secure SPV verification implementation
+- Improved Bitcoin MCP server with secure SPV verification and cryptographic compliance
 - Updated verifyBitcoinSPV function with proper Merkle path verification and constant-time comparisons
 - Standardized AI labeling system to use consistent 0-3 scale and bracket format [XXX-N]
 - Consolidated multiple inconsistent AI labeling documentation files into a single canonical source
@@ -142,8 +142,8 @@ All notable changes to the Anya Core project will be documented in this file.
 
 ### Added
 
-- Bitcoin MCP server security analysis script
-- Bitcoin BIP compliance validation script
+- Bitcoin MCP server security analysis and compliance validation script
+- Bitcoin BIP compliance validation script with comprehensive checks
 - PowerShell script for comprehensive CodeQL analysis
 - Cryptographic validation framework for Bitcoin operations
 - SECURITY_CODEQL.md documentation for security analysis

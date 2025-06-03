@@ -1518,3 +1518,11 @@ lru = "0.10"
 - [x] Full BIP-341 compliance
 - [x] React Native 0.72 TurboModules
 - [x] PSBTv2 mobile implementation
+
+## Mobile SDK Alignment & Roadmap (June 2025)
+
+- Rust backend (`src/mobile/sdk.rs`) provides async wallet, transaction, and security logic as a minimal template.
+- No FFI/mobile bridge (JNI/Swift) is implemented yet; all mobile integration is planned.
+- Biometric, backup, wipe, and fee estimation features are documented but not yet implemented in Rust.
+- Contributors are encouraged to help implement FFI bindings, wrappers, and missing features for full parity with the documented API.
+- See [docs/mobile/SDK.md](./mobile/SDK.md) for the latest status and mapping between Rust and mobile APIs.
