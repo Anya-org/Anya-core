@@ -1,5 +1,7 @@
 # API Reference
 
+[AIR-3][AIS-3][BPC-3][RES-3]
+
 **AI Labeling**: This documentation is AI-generated with technical review and validation.
 
 **Date**: May 30, 2025

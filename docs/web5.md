@@ -3,7 +3,9 @@ title: "Web5"
 description: "Documentation for Web5"
 ---
 
-# Web5 Integration [AIR-3][W5C-3][BPC-3]
+[AIR-3][AIS-3][BPC-3][RES-3]
+
+# Web5 Integration
 
 ## Table of Contents
 

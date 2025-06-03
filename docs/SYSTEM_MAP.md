@@ -1,19 +1,20 @@
 ## Overview
 
-Add a brief overview of this document here.
+The Anya Core System Map provides a high-level visual and descriptive overview of the system's architecture, major components, and their interactions. It serves as a reference for understanding the modular structure, integration points, and relationships between subsystems such as Bitcoin, Web5, ML, and security modules.
 
-[1;33m⚠  Added missing Overview section to /home/anya/anyachainlabs/projects/anya-core/docs/SYSTEM_MAP.md[0m
 ## Table of Contents
 
-- [Section 1](#section-1)
-- [Section 2](#section-2)
+- [System Architecture](#system-architecture)
+- [Component Interactions](#component-interactions)
+- [Integration Points](#integration-points)
+- [See Also](#see-also)
 
-[1;33m⚠  Added missing Table of Contents to /home/anya/anyachainlabs/projects/anya-core/docs/SYSTEM_MAP.md[0m
 ## See Also
 
-- [Related Document](#related-document)
+- [ARCHITECTURE.md](./ARCHITECTURE.md) – Detailed architecture documentation
+- [ROOT_INDEX.md](../ROOT_INDEX.md) – Root documentation index
+- [DAO_SYSTEM_MAP.md](./DAO_SYSTEM_MAP.md) – DAO system map
 
-[1;33m⚠  Added missing See Also section to /home/anya/anyachainlabs/projects/anya-core/docs/SYSTEM_MAP.md[0m
 ---
 redirect_to: /docs/ARCHITECTURE.md
 title: "System_map"

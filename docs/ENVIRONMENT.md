@@ -96,7 +96,7 @@ ANYA_NETWORK_CAPACITY=5000
 
 The platform includes built-in validation for all configuration values. See `src/config/validator.rs` for validation rules.
 
-*Last updated: 2024-12-07*
+*Last updated: 2025-06-02*
 
 ## See Also
 

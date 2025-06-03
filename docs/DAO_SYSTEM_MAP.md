@@ -12,12 +12,15 @@ description: "Documentation for Dao_system_map"
 
 ## Overview
 
-Add a brief overview of this document here.
+The Anya DAO System Map provides a visual and descriptive overview of the DAO's architecture, governance, tokenomics, and integration points. It helps users and contributors understand the structure, relationships, and flow of information within the DAO subsystem.
 
 ## Table of Contents
 
-- [Section 1](#section-1)
-- [Section 2](#section-2)
+- [Documentation Structure](#documentation-structure)
+- [Governance](#governance)
+- [Tokenomics](#tokenomics)
+- [Security](#security)
+- [Integration](#integration)
 
 
 [AIS-3][BPC-3][DAO-3]

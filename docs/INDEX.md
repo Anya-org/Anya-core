@@ -12,7 +12,7 @@ last_updated: 2025-05-30
 
 ## Overview
 
-Add a brief overview of this document here.
+The Anya Core Documentation Index provides a structured entry point to all technical, architectural, and operational documentation for the Anya Core project. It includes links to implementation guides, system architecture, security, testing, and compliance resources, ensuring easy navigation and up-to-date references for all contributors and users.
 
 ## Table of Contents
 
@@ -92,6 +92,22 @@ The following README files provide documentation for specific modules:
 | [Scaling Guide](./operations/scaling.md) | System scaling | 2.6.0 | 2025-05-21 |
 | [Disaster Recovery](./operations/disaster_recovery.md) | Recovery procedures | 2.6.0 | 2025-05-21 |
 | [Monitoring Setup](./monitoring/SETUP.md) | Monitoring configuration | 2.6.0 | 2025-05-21 |
+
+## API Templates & Stubbing Approach
+
+| Module | API Template | Description | Status |
+|--------|-------------|-------------|--------|
+| CacheManager | [src/cache/mod.rs](../src/cache/mod.rs) | In-memory and persistent cache management | Stub/Template |
+| SecurityManager | [src/security/mod.rs](../src/security/mod.rs) | Security, HSM, and system hardening | Stub/Template |
+| CONFIG/ConfigManager | [src/config/mod.rs](../src/config/mod.rs) | Configuration management | Stub/Template |
+| ResourceManager | [src/resource/mod.rs](../src/resource/mod.rs) | Resource allocation and health | Stub/Template |
+| PerformanceMonitor | [src/performance/mod.rs](../src/performance/mod.rs) | Performance metrics and reporting | Stub/Template |
+| MonitoringSystem, Registry, NetworkMetric, FeeMetric | [src/monitoring/mod.rs](../src/monitoring/mod.rs) | Monitoring and metrics | Stub/Template |
+| QuantumResistantCrypto | [src/crypto/quantum.rs](../src/crypto/quantum.rs) | Quantum-safe cryptography | Stub/Template |
+| MobileSDK | [src/mobile/sdk.rs](../src/mobile/sdk.rs) | Mobile wallet and network | Stub/Template |
+| TenantManager, TenantConfig, RateLimits, ResourceUsage, Tenant, TenantSecurity, AccessPolicy, RateLimit | [src/tenant/manager.rs](../src/tenant/manager.rs) | Multi-tenant management | Stub/Template |
+
+All above modules are minimal, compilable stubs/templates to unblock the build and tests. Real logic will be implemented as features are prioritized. See [TODO.md](./TODO.md) and [ROADMAP.md](./ROADMAP.md) for status and plans.
 
 ## AI Labeling
 

@@ -3,6 +3,8 @@ title: "Tokenomics_system"
 description: "Documentation for Tokenomics_system"
 ---
 
+[AIR-3][AIS-3][BPC-3][RES-3]
+
 <!-- markdownlint-disable MD013 line-length -->
 
 # Anya Tokenomics System [AIR-3][AIP-3][BPC-3][DAO-3]

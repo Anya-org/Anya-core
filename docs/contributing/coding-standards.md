@@ -22,7 +22,7 @@ Add a brief overview of this document here.
 
 Documentation for Coding Standards
 
-*Last updated: 2024-12-07*
+*Last updated: 2025-06-02*
 
 ## See Also
 

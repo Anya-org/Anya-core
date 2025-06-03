@@ -9,12 +9,13 @@ description: "Documentation for Implementation_milestones"
 
 ## Overview
 
-Add a brief overview of this document here.
+This document tracks the implementation progress of the Anya Core platform, outlining major milestones achieved and upcoming development priorities for all core modules, including Bitcoin, ML, security, and performance.
 
 ## Table of Contents
 
-- [Section 1](#section-1)
-- [Section 2](#section-2)
+- [Recently Completed Milestones](#recently-completed-milestones)
+- [Architecture Documentation](#architecture-documentation)
+- [Upcoming Milestones](#upcoming-milestones)
 
 
 *Last Updated: 2025-03-06*

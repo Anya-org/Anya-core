@@ -1,5 +1,9 @@
 <!-- markdownlint-disable MD013 line-length -->
 
+[AIR-3][AIS-3][BPC-3][RES-3]
+
+**AI Labeling**: This documentation is AI-generated with technical review and validation.
+
 # Checkpoint: AIP-001-read_first_implementation_complete
 
 ## Overview

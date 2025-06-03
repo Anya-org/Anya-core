@@ -185,7 +185,65 @@ For additional help, please contact:
 - Email: support@anya.org
 - GitHub Issues: [https://github.com/anya-org/anya-core/issues](https://github.com/anya-org/anya-core/issues)
 
+## Rust Implementation Status & Roadmap
+
+> **Note:** The Anya Core Mobile SDK is currently implemented as a Rust backend module (`src/mobile/sdk.rs`) with async methods for wallet, transaction, and security operations. The Rust code is a minimal, compilable template and does not yet expose a direct FFI/mobile bridge for Android/iOS. Some features described below are planned but not yet implemented in Rust.
+
+### Current Rust API (as of June 2025)
+- Wallet management: initialize, sync, send transaction, get wallet info
+- Network: get balance, get transactions, create/broadcast transaction
+- Security: generate addresses, basic mnemonic validation
+
+### Missing Features (Planned)
+- FFI bindings for Android (JNI) and iOS (Swift/ObjC)
+- Biometric authentication, backup, and wipe logic
+- Fee estimation logic
+- Kotlin/Swift wrappers and mobile bridge code
+
+### Roadmap for Full Alignment
+1. **FFI Layer:** Implement JNI (Android) and Swift/ObjC (iOS) bindings for all core Rust methods.
+2. **Feature Parity:** Add Rust methods for biometric auth, backup, wipe, and fee estimation.
+3. **Documentation:** Document mapping between Rust and mobile APIs in this file.
+4. **Examples/Tests:** Add FFI usage examples and integration tests.
+
+---
+
+## API Reference (Planned/Target)
+
+### Wallet Management
+- `createWallet()`: Planned (Rust: `MobileSDK::initialize_wallet`)
+- `importWallet(mnemonic: String)`: Planned (Rust: not yet implemented)
+- `getBalance()`: Implemented (Rust: `MobileNetwork::get_balance`)
+
+### Transactions
+- `sendPayment(amount: Long, address: String)`: Implemented (Rust: `MobileSDK::send_transaction`)
+- `getTransactionHistory()`: Implemented (Rust: `MobileNetwork::get_transactions`)
+- `estimateFee()`: Planned (Rust: not yet implemented)
+
+### Security
+- `enableBiometricAuth()`: Planned (Rust: not yet implemented)
+- `backupWallet()`: Planned (Rust: not yet implemented)
+- `wipeWallet()`: Planned (Rust: not yet implemented)
+
+---
+
+## Implementation Notes
+- The Rust backend is designed for async, cross-platform operation and can be integrated with mobile via FFI.
+- All features listed in the API Reference are either implemented, stubbed, or planned for future releases.
+- For up-to-date status, see [src/mobile/sdk.rs](../../src/mobile/sdk.rs) and the project [ROADMAP.md](../../ROADMAP.md).
+
+---
+
+## Next Steps for Contributors
+- Help implement FFI bindings and missing features in Rust.
+- Contribute Kotlin/Swift wrappers and integration tests.
+- Update this documentation as new features are added.
+
+---
+
 ## See Also
 
+- [Rust Mobile SDK Source](../../src/mobile/sdk.rs)
+- [Project Roadmap](../../ROADMAP.md)
 - [Related Document](#related-document)
 

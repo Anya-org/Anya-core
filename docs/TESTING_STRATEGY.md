@@ -3,18 +3,31 @@ title: "Testing_strategy"
 description: "Documentation for Testing_strategy"
 ---
 
+[AIR-3][AIS-3][BPC-3][RES-3]
+
 <!-- markdownlint-disable MD013 line-length -->
 
 # Anya-Core Testing Strategy
 
 ## Overview
 
-Add a brief overview of this document here.
+This document outlines the comprehensive testing strategy for the Anya-Core platform, including component, integration, performance, and compliance testing, following official Bitcoin Improvement Proposals (BIPs).
 
 ## Table of Contents
 
-- [Section 1](#section-1)
-- [Section 2](#section-2)
+- [Testing Framework](#testing-framework)
+- [Key Components](#key-components)
+- [Running Tests](#running-tests)
+- [Test Coverage](#test-coverage)
+- [Bitcoin Protocol Tests](#bitcoin-protocol-tests)
+- [DAO Tests](#dao-tests)
+- [Web5 Tests](#web5-tests)
+- [ML Tests](#ml-tests)
+- [System Integration Tests](#system-integration-tests)
+- [Continuous Integration](#continuous-integration)
+- [Test Reports](#test-reports)
+- [Adding New Tests](#adding-new-tests)
+- [See Also](#see-also)
 
 
 [AIR-3][AIS-3][AIT-3][AIP-3][BPC-3][DAO-3]

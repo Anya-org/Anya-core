@@ -982,7 +982,7 @@ Anya is a decentralized ML agent system built on Web5 technology, featuring:
    - Security hardening
    - Integration expansion
 
-*Last updated: 2024-12-07*
+*Last updated: 2025-06-02*
 
 # Mobile SDK Architecture v2.5
 

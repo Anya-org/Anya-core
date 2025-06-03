@@ -44,7 +44,7 @@ The identity protocol provides a comprehensive system for managing decentralized
 ### Issuing a Credential
 
 
-*Last updated: 2024-12-07*
+*Last updated: 2025-06-02*
 
 ## See Also
 

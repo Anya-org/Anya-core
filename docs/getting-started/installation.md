@@ -22,7 +22,7 @@ Add a brief overview of this document here.
 
 Documentation for Installation
 
-*Last updated: 2024-12-07*
+*Last updated: 2025-06-02*
 
 ## Compliance Requirements
 - **BIP-341**: Full implementation required for Taproot validation

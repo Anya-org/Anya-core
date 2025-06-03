@@ -10,15 +10,17 @@ last_updated: 2025-05-30
 
 ## Table of Contents
 
-- [Section 1](#section-1)
-- [Section 2](#section-2)
+- [On-Chain Components](#on-chain-components)
+- [Off-Chain Components](#off-chain-components)
+- [System Architecture](#system-architecture)
+- [See Also](#see-also)
 
 
 [AIS-3][BPC-3][DAO-3]
 
 ## Overview
 
-The Anya DAO implementation architecture describes the technical components and their interactions, providing a blueprint for the system's structure and behavior.
+This document describes the technical components and their interactions for the Anya Core and DAO implementation, providing a blueprint for the system's structure and behavior, both on-chain and off-chain.
 
 ## On-Chain Components
 
@@ -43,5 +45,6 @@ Supporting off-chain components include:
 ### Component Architecture 
 ## See Also
 
-- [Related Document 1](./related1.md)
-- [Related Document 2](./related2.md)
+- [ML_SYSTEM_ARCHITECTURE.md](../dependencies/docs/ML_SYSTEM_ARCHITECTURE.md) – ML system architecture
+- [SECURITY_ARCHITECTURE.md](./SECURITY_ARCHITECTURE.md) – Security system architecture
+- [PERFORMANCE_ARCHITECTURE.md](./PERFORMANCE_ARCHITECTURE.md) – Performance system architecture

@@ -368,7 +368,7 @@ mod tests {
 - [Security Best Practices](../security/best-practices.md)
 - [API Reference](../api/client.md)
 
-*Last updated: 2024-12-07*
+*Last updated: 2025-06-02*
 
 ## See Also
 

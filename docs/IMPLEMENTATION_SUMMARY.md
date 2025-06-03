@@ -7,12 +7,14 @@ description: "Documentation for Implementation_summary"
 
 ## Overview
 
-Add a brief overview of this document here.
+This summary provides a comprehensive overview of the Anya Core implementation, including architecture, core modules, BIP support, and compliance status. It is intended for contributors and reviewers to quickly assess project progress and technical scope.
 
 ## Table of Contents
 
-- [Section 1](#section-1)
-- [Section 2](#section-2)
+- [Hexagonal Architecture Implementation](#hexagonal-architecture-implementation)
+- [Core Modules](#core-modules)
+- [BIP Support Matrix](#bip-support-matrix)
+- [Compliance Status](#compliance-status)
 
 
 *Last Updated: May 19, 2025*

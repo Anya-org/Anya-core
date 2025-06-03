@@ -49,7 +49,7 @@ Add a brief overview of this document here.
 | Research | Academic Integration | Research paper analysis | Beta |
 |          | Model Generation | Automated model creation | Alpha |
 
-*Last updated: 2024-12-07*
+*Last updated: 2025-06-02*
 
 ## See Also
 

@@ -9,12 +9,14 @@ description: "Documentation for Roadmap"
 
 ## Overview
 
-Add a brief overview of this document here.
+The Anya Core Development Roadmap outlines the planned features, milestones, and critical paths for the project. It provides a timeline for protocol compliance, security enhancements, mobile integration, and other major initiatives, helping all stakeholders track progress and upcoming priorities.
 
 ## Table of Contents
 
-- [Section 1](#section-1)
-- [Section 2](#section-2)
+- [Critical Path](#critical-path)
+- [Compliance Milestones](#compliance-milestones)
+- [Feature Timeline](#feature-timeline)
+- [Release History](#release-history)
 
 
 ## Critical Path
@@ -160,5 +162,18 @@ journey
 
 ## See Also
 
-- [Related Document](#related-document)
+- [IMPLEMENTATION_MILESTONES.md](./IMPLEMENTATION_MILESTONES.md) – Implementation milestones
+- [IMPLEMENTATION_ARCHITECTURE.md](./IMPLEMENTATION_ARCHITECTURE.md) – Architecture overview
+- [IMPLEMENTATION_SUMMARY.md](./IMPLEMENTATION_SUMMARY.md) – Implementation summary
+- [TESTING_IMPLEMENTATION.md](./TESTING_IMPLEMENTATION.md) – Testing implementation
+- [TESTING_STRATEGY.md](./TESTING_STRATEGY.md) – Testing strategy
+- [SECURITY_ARCHITECTURE.md](./SECURITY_ARCHITECTURE.md) – Security architecture
+- [PERFORMANCE_ARCHITECTURE.md](./PERFORMANCE_ARCHITECTURE.md) – Performance architecture
+
+## API Template & Stubbing Milestone
+
+- Q2 2025: All missing types/modules referenced in tests and binaries are now covered by minimal, compilable API templates (see [INDEX.md](./INDEX.md)).
+- All legacy/incomplete test modules and protocol binaries are stubbed or auto-fixed to unblock the build.
+- No open source drop-in replacements exist for these APIs; all stubs/templates are custom and will be replaced with real logic as features are prioritized.
+- See [TODO.md](./TODO.md) for implementation checklist and [INDEX.md](./INDEX.md) for template locations.
 
