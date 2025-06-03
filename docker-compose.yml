@@ -2,12 +2,12 @@ version: '3.8'
 
 services:
   anya-core:
-    image: anya-enterprise:latest
+    image: anya-enterprise:latest # Consider changing to a more specific local build tag if not pushing to a registry with this name
     build:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "8080:8080"
+      - "8080:8000" # Host port 8080 maps to container port 8000 (as per Dockerfile EXPOSE)
     environment:
       - BITCOIN_RPC_URL=http://bitcoin:8332
       - WEB5_DWN_URL=http://dwn:3000
@@ -17,6 +17,8 @@ services:
     depends_on:
       - bitcoin
       - dwn
+      # Add other services anya-core directly depends on for startup order
+      # - db # Example if you add a database service for anya-core
 
   dwn:
     image: web5/dwn:latest
@@ -37,6 +39,32 @@ services:
     volumes:
       - bitcoin-data:/bitcoin
 
+  bitcoin-exporter:
+    image: metalmatze/bitcoin-prometheus-exporter:latest
+    ports:
+      - "9332:9332"
+    command:
+      - "--bitcoin.rpc.host=bitcoin"
+      - "--bitcoin.rpc.port=8332"
+      # If your Bitcoin Core RPC requires authentication, uncomment and set these:
+      # - "--bitcoin.rpc.user=your_rpc_user"
+      # - "--bitcoin.rpc.password=your_rpc_password"
+    depends_on:
+      - bitcoin
+
+# Example of a database service if anya-core needs one
+#  db:
+#    image: postgres:15
+#    volumes:
+#      - postgres_data:/var/lib/postgresql/data
+#    environment:
+#      POSTGRES_DB: anya_core
+#      POSTGRES_USER: postgres
+#      POSTGRES_PASSWORD: anya_core_password # Ensure this matches DATABASE_URL in Dockerfile
+#    ports:
+#      - "5432:5432"
+
 volumes:
   web5-data:
   bitcoin-data:
+#  postgres_data: # Uncomment if db service is added
