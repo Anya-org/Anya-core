@@ -39,7 +39,7 @@ impl fmt::Display for AgentId {
 }
 
 /// Observation provided to an agent
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug)]
 pub enum Observation {
     /// Text-based observation
     Text(String),
@@ -93,7 +93,7 @@ pub enum SystemUpdateType {
 }
 
 /// System state observation
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug)]
 pub struct SystemState {
     /// Current system index snapshot
     pub index: Option<SystemIndex>,
@@ -205,8 +205,8 @@ pub trait Agent: Send + Sync {
     async fn read_system_state(&self) -> Result<SystemState, AgentError> {
         // Default implementation to fetch current system state
         Ok(SystemState {
-            index: Some(SystemIndex::global().read_index().await?),
-            map: Some(SystemMap::global().read_map().await?),
+            index: Some(SystemIndex().read_index().await?),
+            map: Some(SystemMap().read_map().await?),
             timestamp: std::time::SystemTime::now()
                 .duration_since(std::time::UNIX_EPOCH)
                 .unwrap_or_default()
@@ -219,10 +219,10 @@ pub trait Agent: Send + Sync {
         for update_type in updates {
             match update_type {
                 SystemUpdateType::IndexUpdate => {
-                    SystemIndex::global().update_index().await?;
+                    SystemIndex().update_index().await?;
                 }
                 SystemUpdateType::MapUpdate => {
-                    SystemMap::global().update_map().await?;
+                    SystemMap().update_map().await?;
                 }
                 _ => {} // Other updates handled elsewhere
             }
@@ -483,6 +483,12 @@ pub struct MLAgentCoordinator {
     resource_pool: ResourcePool,
     health_monitor: HealthMonitor,
 }
+
+// Stub for MLAgent trait
+pub trait MLAgent: Send + Sync {}
+// Stub for ResourcePool and HealthMonitor
+pub struct ResourcePool;
+pub struct HealthMonitor;
 
 #[cfg(test)]
 mod tests {

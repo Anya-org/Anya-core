@@ -10,9 +10,8 @@ use serde::{Serialize, Deserialize};
 use std::collections::HashMap;
 use chrono::Utc;
 
-use crate::ml::models::{Model, PredictionResult};
-use crate::ml::FederatedLearningManager;
-use crate::error::Error;
+use crate::ml::{service::MLModel, FederatedLearningManager};
+use crate::AnyaError;
 
 use super::{Agent, AgentId, Observation, Action, Feedback, AgentMetrics, AgentError};
 
@@ -230,7 +229,7 @@ impl FederatedAgent {
         &self,
         participant_id: &str,
         model_hash: &str,
-        model__data: &[u8],
+        model_data: &[u8],
         performance: HashMap<String, f64>
     ) -> Result<(), AgentError> {
         // Update participant state
@@ -238,7 +237,6 @@ impl FederatedAgent {
             let mut participant_state = self.participant_state.write().map_err(|_| {
                 AgentError::InternalError("Failed to acquire write lock on participant state".to_string())
             })?;
-            
             if let Some(state) = participant_state.get_mut(participant_id) {
                 state.last_active = Utc::now().timestamp() as u64;
                 state.model_hash = Some(model_hash.to_string());
