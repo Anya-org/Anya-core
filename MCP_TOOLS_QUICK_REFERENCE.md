@@ -87,8 +87,8 @@ export GITHUB_TOKEN="your_github_token"
 ### Optional
 ```bash
 export BRAVE_API_KEY="your_brave_api_key"
-export MCP_GITHUB_USERNAME="Bo_theBig"
-export MCP_GITHUB_EMAIL="botshelomokoka@gmail.com"
+export MCP_GITHUB_USERNAME="username"
+export MCP_GITHUB_EMAIL="email"
 ```
 
 ## 📋 Management Commands
