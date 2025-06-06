@@ -55,7 +55,7 @@ Anya Core is a modular, enterprise-ready platform for Bitcoin, Web5, and AI/ML a
 
 ### 1. Clone and Setup
 ```bash
-git clone https://github.com/anya/anya-core.git
+git clone https://github.com/anya-org/anya-core.git
 cd anya-core
 ./scripts/setup.sh
 cargo build --release
