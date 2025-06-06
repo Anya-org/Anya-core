@@ -77,7 +77,7 @@ ML_MODEL_PATH=/path/to/models
 ### 3. Install & Run
 ```bash
 # Standard install
-tsudo ./scripts/install.sh
+sudo ./scripts/install.sh
 # Minimal install
 sudo ./scripts/install.sh --type=minimal
 # Full install
