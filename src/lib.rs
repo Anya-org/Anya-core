@@ -383,3 +383,5 @@ pub mod prelude {
     // pub use crate::tools::markdown::DocumentationValidator;
     // pub use crate::security::hsm::TaprootValidator;
 }
+
+mod error;
