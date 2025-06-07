@@ -13,13 +13,11 @@
 
 use std::sync::{Arc, Mutex};
 use std::collections::HashMap;
-use std::time::{Duration, Instant};
 use std::sync::PoisonError;
 
 // Internal imports
-use bitcoin::{Address as BitcoinAddress, Transaction as BtcTransaction};
 use crate::core::performance::Metrics;
-use crate::security::validation::ValidationResult;
+use crate::layer2::framework::ProtocolConfig;
 
 /// Configuration for the RSK integration
 #[derive(Clone, Debug)]
@@ -51,6 +49,20 @@ impl Default for RskConfig {
             gas_price: 40_000_000_000, // 40 gwei
             gas_limit: 6_800_000,
         }
+    }
+}
+
+impl ProtocolConfig for RskConfig {
+    fn protocol_name(&self) -> &str {
+        "rsk"
+    }
+    
+    fn network_type(&self) -> &str {
+        "mainnet"
+    }
+    
+    fn clone_box(&self) -> Box<dyn ProtocolConfig> {
+        Box::new(self.clone())
     }
 }
 
@@ -189,7 +201,7 @@ impl NodeConnector {
     }
     
     /// Get the balance of an address
-    pub async fn get_balance(&self, address: &str) -> Result<f64, RskError> {
+    pub async fn get_balance(&self, _address: &str) -> Result<f64, RskError> {
         // Implementation would get balance from node
         // For now, return a mock value
         Ok(1.5)
@@ -647,11 +659,11 @@ pub enum RskError {
     
     /// Contract error
     #[error("Contract error: {0}")]
-    ContractError(String),
+    TransactionError(String),
     
     /// Transaction error
     #[error("Transaction error: {0}")]
-    TransactionError(String),
+    ContractError(String),
     
     /// Peg operation not found
     #[error("Peg operation not found: {0}")]

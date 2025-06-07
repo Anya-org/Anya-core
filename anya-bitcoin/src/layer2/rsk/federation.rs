@@ -4,7 +4,7 @@
 
 use std::collections::{HashMap, HashSet};
 use bitcoin::secp256k1::{Secp256k1, SecretKey, PublicKey, Message, ecdsa::Signature};
-use bitcoin::hashes::{sha256, Hash};
+use bitcoin::hashes::{sha256, Hash, HashEngine};
 
 /// Represents a federation member (e.g., a signer)
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -122,7 +122,13 @@ impl Federation {
 
     /// Collect a cryptographic signature for a proposal (simulated threshold signing)
     pub fn sign(&mut self, proposal_id: &str, member_id: &str, sk: &SecretKey) -> Result<Signature, String> {
-        let member = self.get_member(member_id).ok_or("Not a federation member")?;
+        // Check if member exists first
+        let member_exists = self.get_member(member_id).is_some();
+        if !member_exists {
+            return Err("Not a federation member".to_string());
+        }
+        
+        let member_id_clone = member_id.to_string(); // Clone the member ID for later use
         let proposal = self.proposals.get_mut(proposal_id).ok_or("Proposal not found")?;
         if proposal.executed {
             return Err("Proposal already executed".to_string());
@@ -136,9 +142,9 @@ impl Federation {
             hasher.input(v.as_bytes());
         }
         let msg_hash = sha256::Hash::from_engine(hasher);
-        let msg = Message::from_slice(&msg_hash[..]).map_err(|e| e.to_string())?;
+        let msg = Message::from_digest_slice(&msg_hash[..]).map_err(|e| e.to_string())?;
         let sig = self.secp.sign_ecdsa(&msg, sk);
-        proposal.signatures.insert(member.id.clone(), sig);
+        proposal.signatures.insert(member_id_clone, sig);
         Ok(sig)
     }
 

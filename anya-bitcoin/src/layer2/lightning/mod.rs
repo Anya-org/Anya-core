@@ -1,5 +1,6 @@
 use crate::layer2::traits::{Proposal, ContractExecutor, FederationMLHook};
 use crate::prelude::{AnyaError, AnyaResult, Layer2Protocol};
+use crate::layer2::framework::ProtocolConfig;
 use async_trait::async_trait;
 use tracing::info;
 
@@ -18,6 +19,20 @@ impl Default for LightningConfig {
             network: Some("testnet".to_string()),
             max_fee_rate: Some(1000),
         }
+    }
+}
+
+impl ProtocolConfig for LightningConfig {
+    fn protocol_name(&self) -> &str {
+        "lightning"
+    }
+    
+    fn network_type(&self) -> &str {
+        self.network.as_deref().unwrap_or("testnet")
+    }
+    
+    fn clone_box(&self) -> Box<dyn ProtocolConfig> {
+        Box::new(self.clone())
     }
 }
 

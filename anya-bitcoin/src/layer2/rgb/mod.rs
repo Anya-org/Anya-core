@@ -234,12 +234,12 @@ impl DefaultRGBManager {
 }
 
 impl RGBManager for DefaultRGBManager {
-    fn init(&self, config: RGBConfig) -> AnyaResult<()> {
+    fn init(&self, _config: RGBConfig) -> AnyaResult<()> {
         // Implementation goes here
         unimplemented!("RGB initialization not yet implemented")
     }
     
-    fn create_asset(&self, params: AssetCreationParams) -> AnyaResult<RGBAsset> {
+    fn create_asset(&self, _params: AssetCreationParams) -> AnyaResult<RGBAsset> {
         // Implementation goes here
         unimplemented!("Asset creation not yet implemented")
     }
@@ -249,37 +249,37 @@ impl RGBManager for DefaultRGBManager {
         unimplemented!("Asset listing not yet implemented")
     }
     
-    fn get_asset_balance(&self, asset_id: &str) -> AnyaResult<u64> {
+    fn get_asset_balance(&self, _asset_id: &str) -> AnyaResult<u64> {
         // Implementation goes here
         unimplemented!("Asset balance querying not yet implemented")
     }
     
-    fn create_invoice(&self, asset_id: &str, amount: u64) -> AnyaResult<String> {
+    fn create_invoice(&self, _asset_id: &str, _amount: u64) -> AnyaResult<String> {
         // Implementation goes here
         unimplemented!("Invoice creation not yet implemented")
     }
     
-    fn transfer_asset(&self, transfer: AssetTransfer) -> AnyaResult<String> {
+    fn transfer_asset(&self, _transfer: AssetTransfer) -> AnyaResult<String> {
         // Implementation goes here
         unimplemented!("Asset transfer not yet implemented")
     }
     
-    fn get_transfer_status(&self, transfer_id: &str) -> AnyaResult<TransferStatus> {
+    fn get_transfer_status(&self, _transfer_id: &str) -> AnyaResult<TransferStatus> {
         // Implementation goes here
         unimplemented!("Transfer status querying not yet implemented")
     }
     
-    fn validate_transfer(&self, transfer_id: &str) -> AnyaResult<bool> {
+    fn validate_transfer(&self, _transfer_id: &str) -> AnyaResult<bool> {
         // Implementation goes here
         unimplemented!("Transfer validation not yet implemented")
     }
     
-    fn get_asset_metadata(&self, asset_id: &str) -> AnyaResult<HashMap<String, String>> {
+    fn get_asset_metadata(&self, _asset_id: &str) -> AnyaResult<HashMap<String, String>> {
         // Implementation goes here
         unimplemented!("Asset metadata querying not yet implemented")
     }
     
-    fn get_asset_history(&self, asset_id: &str) -> AnyaResult<Vec<HistoryEntry>> {
+    fn get_asset_history(&self, _asset_id: &str) -> AnyaResult<Vec<HistoryEntry>> {
         // Implementation goes here
         unimplemented!("Asset history querying not yet implemented")
     }

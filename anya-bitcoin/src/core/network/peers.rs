@@ -5,13 +5,12 @@
 /// focusing on Taproot-compatible peer connections and maintaining
 /// network decentralization and privacy following Bitcoin Core principles.
 
-use std::sync::{Arc, Mutex, RwLock};
+use std::sync::{Arc, RwLock};
 use std::collections::{HashMap, HashSet};
-use std::net::{SocketAddr, IpAddr, Ipv4Addr, Ipv6Addr};
+use std::net::{SocketAddr, IpAddr};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use log::{debug, info, warn, error};
 use thiserror::Error;
-use bitcoin::Transaction;
 
 use crate::core::error::AnyaResult;
 use crate::core::error::AnyaError;
@@ -59,7 +58,7 @@ pub enum PeerError {
 
 impl From<PeerError> for AnyaError {
     fn from(err: PeerError) -> Self {
-        AnyaError::General(format!("Peer error: {}", err))
+        AnyaError::Peer(err.to_string())
     }
 }
 
@@ -251,12 +250,10 @@ impl PeerManager {
     
     /// Disconnect from a peer
     pub async fn disconnect(&self, peer_id: &str) -> AnyaResult<bool> {
-        let mut peer_found = false;
-        
-        {
+        let peer_found = {
             let mut peers = self.peers.write().unwrap();
-            peer_found = peers.remove(peer_id).is_some();
-        }
+            peers.remove(peer_id).is_some()
+        };
         
         if peer_found {
             info!("Disconnected from peer {}", peer_id);
@@ -268,7 +265,7 @@ impl PeerManager {
     }
     
     /// Ban a peer by IP address
-    pub async fn ban_peer(&self, ip: IpAddr, duration: Option<Duration>) -> AnyaResult<()> {
+    pub async fn ban_peer(&self, ip: IpAddr, _duration: Option<Duration>) -> AnyaResult<()> {
         {
             let mut banned = self.banned.write().unwrap();
             banned.insert(ip);
@@ -306,12 +303,10 @@ impl PeerManager {
     
     /// Unban a peer by IP address
     pub async fn unban_peer(&self, ip: IpAddr) -> AnyaResult<bool> {
-        let mut removed = false;
-        
-        {
+        let removed = {
             let mut banned = self.banned.write().unwrap();
-            removed = banned.remove(&ip);
-        }
+            banned.remove(&ip)
+        };
         
         if removed {
             info!("Unbanned peer with IP {}", ip);
@@ -345,7 +340,7 @@ impl PeerManager {
     }
     
     /// Broadcast a message to all connected peers
-    pub async fn broadcast(&self, data: &[u8]) -> AnyaResult<usize> {
+    pub async fn broadcast(&self, _data: &[u8]) -> AnyaResult<usize> {
         let peer_count = {
             let peers = self.peers.read().unwrap();
             peers.len()

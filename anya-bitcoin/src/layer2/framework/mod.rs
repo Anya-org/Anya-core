@@ -7,7 +7,6 @@ pub mod adapters;
 pub mod config;
 pub mod factory;
 
-use anyhow::{Result, anyhow};
 use std::collections::HashMap;
 use std::sync::{Arc, RwLock};
 use std::fmt;
@@ -88,10 +87,19 @@ impl Layer2Registry {
     
     /// Register a protocol
     pub fn register(&self, protocol_type: &str) -> AnyaResult<Arc<dyn Layer2Protocol>> {
-        let protocol = self.factory.create_protocol(protocol_type)?;
+        // Create a default config for the protocol type
+        let config = match protocol_type {
+            "bob" => Box::new(crate::layer2::bob::BobConfig::default()) as Box<dyn ProtocolConfig>,
+            "lightning" => Box::new(crate::layer2::lightning::LightningConfig::default()) as Box<dyn ProtocolConfig>,
+            "rsk" => Box::new(crate::layer2::rsk::RskConfig::default()) as Box<dyn ProtocolConfig>,
+            _ => return Err(AnyaError::Protocol(format!("Unknown protocol type: {}", protocol_type))),
+        };
+        
+        let protocol = self.factory.create_protocol(config)?;
+        let protocol_arc: Arc<dyn Layer2Protocol> = Arc::from(protocol);
         let mut protocols = self.protocols.write().unwrap();
-        protocols.insert(protocol_type.to_string(), protocol.clone());
-        Ok(protocol)
+        protocols.insert(protocol_type.to_string(), protocol_arc.clone());
+        Ok(protocol_arc)
     }
     
     /// Get a protocol

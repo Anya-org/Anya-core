@@ -6,7 +6,7 @@
 
 use std::collections::{HashMap, HashSet};
 use std::sync::{Arc, RwLock};
-use log::{debug, info, warn};
+use log::{debug, info};
 use bitcoin::{Transaction, Txid};
 use async_trait::async_trait;
 
@@ -143,7 +143,7 @@ impl MempoolImpl {
             tx_fees.sort_by(|a, b| a.1.partial_cmp(&b.1).unwrap());
             
             // Take lowest fee transactions until we've freed up enough space
-            let mut size_to_free = (*self.size.read().unwrap() / 4) as usize; // Free 25%
+            let size_to_free = (*self.size.read().unwrap() / 4) as usize; // Free 25%
             let mut freed = 0;
             
             for (txid, _) in tx_fees {
@@ -151,7 +151,7 @@ impl MempoolImpl {
                     break;
                 }
                 
-                txs_to_remove.push(**txid);
+                txs_to_remove.push(*txid);
                 
                 if let Some(tx) = txs_guard.get(txid) {
                     freed += u64::from(tx.weight()) as usize / 4; // Convert to vsize
@@ -180,7 +180,7 @@ impl MempoolImpl {
 #[async_trait]
 impl super::Mempool for MempoolImpl {
     async fn add_transaction(&self, tx: &Transaction) -> AnyaResult<AcceptanceResult> {
-        let txid = tx.txid();
+        let txid = tx.compute_txid();
         
         // Check if transaction is already in mempool
         {

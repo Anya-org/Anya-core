@@ -1,16 +1,10 @@
 // Taproot Assets Layer 2 implementation
 
-use crate::prelude::{AnyaError, AnyaResult};
-use crate::{
-    layer2::{
-        framework::{
-            Layer2Protocol, TransactionStatus,
-            // Import shared types from types.rs via framework
-            ProtocolState, AssetParams, AssetTransfer, TransferResult, Proof, VerificationResult, ValidationResult
-        },
+use crate::prelude::AnyaResult;
+use crate::layer2::{
+        framework::Layer2Protocol,
         traits::{Proposal, ContractExecutor, FederationMLHook},
-    },
-};
+    };
 use async_trait::async_trait;
 use serde::{Serialize, Deserialize};
 use std::collections::HashMap;
@@ -95,7 +89,7 @@ pub enum Network {
 }
 
 /// Issuance transaction
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct IssuanceTx {
     /// Transaction ID
     pub txid: String,
@@ -121,12 +115,12 @@ pub enum TaprootError {
 /// Create Taproot Asset according to BDF v2.5 Asset Management Standards
 pub async fn create_taproot_asset(
     metadata: &AssetMetadata,
-    network: &Network
+    _network: &Network
 ) -> Result<IssuanceTx, TaprootError> {
     // Implement as per BDF v2.5 requirements:
     
     // Use Taproot-enabled protocols with proper mobile integration support
-    let asset_metadata = serde_json::to_string(&metadata)
+    let _asset_metadata = serde_json::to_string(&metadata)
         .map_err(|e| TaprootError::SerializationError(e.to_string()))?;
     
     // Implement proper taproot tree structure as required by BDF v2.5

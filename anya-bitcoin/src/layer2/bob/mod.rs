@@ -9,7 +9,7 @@ use tracing::info;
 
 // Internal imports
 use crate::layer2::bob::cross_layer::BtcTransaction as BobBtcTransaction;
-use crate::layer2::framework::{Layer2Protocol, ValidationResult};
+use crate::layer2::framework::{Layer2Protocol, ValidationResult, ProtocolConfig};
 
 /// Configuration for the BOB Layer 2 integration
 #[derive(Clone, Debug)]
@@ -32,6 +32,20 @@ impl Default for BobConfig {
             max_retries: 3,
             validate_relay: true,
         }
+    }
+}
+
+impl ProtocolConfig for BobConfig {
+    fn protocol_name(&self) -> &str {
+        "bob"
+    }
+    
+    fn network_type(&self) -> &str {
+        "mainnet"
+    }
+    
+    fn clone_box(&self) -> Box<dyn ProtocolConfig> {
+        Box::new(self.clone())
     }
 }
 
@@ -132,7 +146,7 @@ impl EvmAdapter {
         Ok(true)
     }
 
-    pub async fn send_transaction(&self, transaction: EvmTransaction) -> Result<EvmTransactionReceipt, BobError> {
+    pub async fn send_transaction(&self, _transaction: EvmTransaction) -> Result<EvmTransactionReceipt, BobError> {
         Ok(EvmTransactionReceipt {
             tx_hash: "0x0000000000000000000000000000000000000000000000000000000000000000".to_string(),
             block_number: 1000000,
@@ -154,7 +168,7 @@ impl BitVMValidator {
         }
     }
 
-    pub async fn verify_proof(&self, proof: BitVMProof) -> Result<bool, BobError> {
+    pub async fn verify_proof(&self, _proof: BitVMProof) -> Result<bool, BobError> {
         Ok(true)
     }
 }
@@ -173,10 +187,10 @@ impl CrossLayerTransactionManager {
 
     pub async fn verify_transaction_pair(
         &self,
-        btc_tx: BobBtcTransaction,
-        l2_tx: EvmTransaction,
+        _btc_tx: BobBtcTransaction,
+        _l2_tx: EvmTransaction,
     ) -> Result<ValidationResult, BobError> {
-        Ok(ValidationResult::valid("Cross-layer transaction pair verified successfully".to_string()))
+        Ok(ValidationResult::Valid)
     }
 }
 
@@ -294,6 +308,7 @@ pub struct BobIntegration {
 // Add stubs for BitcoinRelay, StateManager, BobProtocol if not defined, or comment out their usage
 pub struct BitcoinRelay;
 pub struct StateManager;
+#[derive(Debug)]
 pub struct BobProtocol;
 
 #[async_trait]
@@ -321,11 +336,11 @@ impl Layer2Protocol for BobProtocol {
         Ok(())
     }
 
-    fn is_running(&self) -> bool {
+    async fn is_running(&self) -> bool {
         true
     }
 
-    async fn execute_command(&self, _command: &str) -> AnyaResult<String> {
+    async fn execute_command(&self, _command: &str, _args: &[&str]) -> AnyaResult<String> {
         Ok("Command executed".to_string())
     }
 }

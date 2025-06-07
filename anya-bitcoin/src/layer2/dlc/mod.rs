@@ -17,14 +17,8 @@ use bitcoin::hashes::{Hash, sha256};
 use std::collections::HashMap;
 use bitcoin::blockdata::opcodes::all;
 use crate::prelude::{AnyaError};
-use crate::{
-    layer2::{
-        framework::{
-            ProtocolState, AssetParams, AssetTransfer, TransferResult, Proof, VerificationResult, ValidationResult
-        },
-        traits::{Proposal, ContractExecutor, FederationMLHook},
-    },
-};
+use rand::RngCore;
+use crate::layer2::traits::{Proposal, ContractExecutor, FederationMLHook};
 use bitcoin::absolute::LockTime;
 use bitcoin::transaction::Version;
 
@@ -139,7 +133,10 @@ pub fn create_contract(
 /// Creates a new DLC oracle with the specified parameters.
 pub fn create_oracle(name: &str) -> Result<DLCOracle> {
     let secp = Secp256k1::new();
-    let secret_key = SecretKey::new(&mut rand::thread_rng());
+    let mut rng = rand::thread_rng();
+    let mut secret_bytes = [0u8; 32];
+    rng.fill_bytes(&mut secret_bytes);
+    let secret_key = SecretKey::from_slice(&secret_bytes)?;
     let pubkey = PublicKey::from_secret_key(&secp, &secret_key);
     
     Ok(DLCOracle {
@@ -406,11 +403,11 @@ pub fn sign_oracle_outcome(
 /// Execute a DLC contract with pre-signed signatures
 pub fn execute_contract_with_signatures(
     contract: &DLCContract,
-    outcome: &str,
+    _outcome: &str,
     party_a_sig: &Signature,
     party_b_sig: &Signature,
     oracle_signature: &Signature,
-    funding_tx: &Transaction,
+    _funding_tx: &Transaction,
     execution_tx: &mut Transaction,
 ) -> Result<()> {
     // Create the contract script
@@ -442,11 +439,11 @@ pub fn execute_contract_with_signatures(
 /// to execute the contract based on the oracle's signature.
 pub fn create_execution_transaction(
     contract: &DLCContract,
-    oracle_signature: &Signature,
+    _oracle_signature: &Signature,
     outcome: &str,
 ) -> Result<Transaction> {
     let funding_tx = contract.funding_tx.as_ref().ok_or(AnyaError::Layer2("Funding transaction not found".to_string()))?;
-    let secp = Secp256k1::new();
+    let _secp = Secp256k1::new();
     
     // Find the outcome in the contract
     let (party_a_payout, party_b_payout) = match contract.outcomes.get(outcome) {
@@ -580,7 +577,7 @@ pub fn verify_oracle_signature(
 fn create_contract_script(
     party_a_pubkey: &PublicKey,
     party_b_pubkey: &PublicKey,
-    oracle_pubkey: &PublicKey,
+    _oracle_pubkey: &PublicKey,
 ) -> bitcoin::blockdata::script::Builder {
     // Create a 2-of-2 multisig script with the oracle's public key
     bitcoin::blockdata::script::Builder::new()

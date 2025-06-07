@@ -1,4 +1,3 @@
-use crate::prelude::StdError;
 // Hybrid analytics module for BOB
 // Implements analytics for Bitcoin Optimistic Blockchain
 // as per official Bitcoin Improvement Proposals (BIPs) requirements

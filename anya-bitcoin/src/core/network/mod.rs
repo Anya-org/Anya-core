@@ -9,9 +9,6 @@ pub use peers::PeerManager;
 
 // Bitcoin network implementation
 //
-/// This module contains the P2P network implementation for Bitcoin.
-
-use std::sync::Arc;
 use async_trait::async_trait;
 use bitcoin::{Block, Transaction};
 use crate::core::error::AnyaResult;
