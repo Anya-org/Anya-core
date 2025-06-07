@@ -69,7 +69,7 @@ fn run_all_tests(verbose: bool, output_format: &str) -> Result<()> {
     }
     
     // Import test modules
-    let results = anya_core::tests::bitcoin::protocol::run_all_tests()?;
+    let results = crate::tests::bitcoin::protocol::run_all_tests()?;
     
     // Check overall success
     let success = results.values().all(|&success| success);
@@ -100,7 +100,7 @@ fn run_specific_tests(pattern: &str, verbose: bool, output_format: &str) -> Resu
     }
     
     // Import test modules
-    let all_results = anya_core::tests::bitcoin::protocol::run_all_tests()?;
+    let all_results = crate::tests::bitcoin::protocol::run_all_tests()?;
     
     // Filter tests based on pattern
     let filtered_results: std::collections::HashMap<String, bool> = all_results

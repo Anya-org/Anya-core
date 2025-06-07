@@ -1,4 +1,3 @@
-use crate::prelude::StdError;
 // Cross-layer transaction handling module for BOB
 // Implements cross-layer transaction handling for Bitcoin Optimistic Blockchain
 // as per official Bitcoin Improvement Proposals (BIPs) requirements
@@ -22,12 +21,12 @@ impl CrossLayerTransactionManager {
     /// Verify a cross-layer transaction pair
     pub async fn verify_transaction_pair(
         &self,
-        btc_tx: BtcTransaction,
-        l2_tx: EvmTransaction
+        _btc_tx: BtcTransaction,
+        _l2_tx: EvmTransaction
     ) -> Result<ValidationResult, BobError> {
         // In a real implementation, this would verify the cross-layer transaction pair
         // For now, we'll just return a dummy result
-        Ok(ValidationResult::new(true, "Transaction pair is valid".to_string()))
+        Ok(ValidationResult::success())
     }
 }
 

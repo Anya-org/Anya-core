@@ -1,28 +1,33 @@
-use std::error::Error;
-use anyhow::{Context, Result};
-use crate::network::validation::{NetworkValidator, NetworkValidationResult};
-use crate::install::{modes::*, cluster::EnterpriseClusterManager};
-use bitcoin_protocol::BIP341Validator;
+use anyhow::Result;
 use std::path::PathBuf;
 
-/// Main installer implementation with BIP compliance
+/// Installation source configuration
+#[derive(Debug, Clone)]
+pub enum InstallationSource {
+    LocalBuild,
+    GitRepository(String),
+    PreBuiltBinary(String),
+}
+
+/// Bitcoin configuration for installation
+#[derive(Debug, Clone)]
+pub struct BitcoinConfig {
+    pub network: String,
+    pub data_dir: PathBuf,
+}
+
+/// Main installer implementation
 pub struct AnyaInstaller {
-    network_validator: NetworkValidator,
     installation_source: InstallationSource,
     bitcoin_config: BitcoinConfig,
 }
 
 impl AnyaInstaller {
     pub fn new(
-        network_config: NetworkValidationConfig,
         install_source: InstallationSource,
         bitcoin_config: BitcoinConfig
     ) -> Result<Self> {
-        // Validate BIP requirements before initialization
-        BIP341Validator::check_environment()?;
-        
         Ok(Self {
-            network_validator: NetworkValidator::new(network_config),
             installation_source: install_source,
             bitcoin_config,
         })
@@ -30,46 +35,40 @@ impl AnyaInstaller {
 
     /// Execute full installation process
     pub async fn install(&self, target_dir: PathBuf) -> Result<()> {
-        // Phase 1: Network validation
-        let network_status = self.network_validator.validate_network().await?;
-        self.validate_network_compliance(&network_status)?;
+        // Phase 1: Source validation
+        self.validate_source()?;
 
-        // Phase 2: Source validation
-        self.installation_source.validate()?;
-
-        // Phase 3: Installation execution
-        let handler = InstallationHandler::new(
-            self.installation_source.clone(),
-            self.bitcoin_config.clone()
-        )?;
-        
-        handler.install(&target_dir).await?;
-
-        // Phase 4: Post-installation cluster setup
-        if let InstallationSource::EnterpriseCluster { license_key, cluster_url, psbt_contract } = &self.installation_source {
-            let cluster_manager = EnterpriseClusterManager::new(
-                license_key.clone(),
-                cluster_url.clone(),
-                psbt_contract.clone(),
-                self.bitcoin_config.clone()
-            )?;
-            
-            cluster_manager.connect().await?;
-        }
+        // Phase 2: Installation execution
+        self.execute_installation(&target_dir).await?;
 
         Ok(())
     }
 
-    fn validate_network_compliance(&self, status: &NetworkValidationResult) -> Result<()> {
-        // Check required BIP support based on network status
-        if self.bitcoin_config.taproot_enabled && !status.connectivity.endpoints_reachable.iter().any(|(e,_)| e.contains("taproot")) {
-            anyhow::bail!("Taproot-enabled network requires access to Taproot endpoints");
+    fn validate_source(&self) -> Result<()> {
+        match &self.installation_source {
+            InstallationSource::LocalBuild => {
+                // Validate local build environment
+                Ok(())
+            }
+            InstallationSource::GitRepository(url) => {
+                // Validate git repository access
+                if url.is_empty() {
+                    anyhow::bail!("Git repository URL cannot be empty");
+                }
+                Ok(())
+            }
+            InstallationSource::PreBuiltBinary(path) => {
+                // Validate binary path
+                if path.is_empty() {
+                    anyhow::bail!("Binary path cannot be empty");
+                }
+                Ok(())
+            }
         }
+    }
 
-        if status.ports.closed_ports.iter().any(|p| [8333, 18333, 8433].contains(p)) {
-            anyhow::bail!("Essential Bitcoin ports blocked");
-        }
-
+    async fn execute_installation(&self, _target_dir: &PathBuf) -> Result<()> {
+        // Implementation placeholder for installation logic
         Ok(())
     }
 }

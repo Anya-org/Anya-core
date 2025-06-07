@@ -48,13 +48,13 @@ impl StateValidator {
     }
     
     /// Validate a state transition
-    pub fn validate_transition(&self, transition: &StateTransition) -> AnyaResult<bool> {
+    pub fn validate_transition(&self, _transition: &StateTransition) -> AnyaResult<bool> {
         // Implementation would go here
         unimplemented!("State transition validation not yet implemented")
     }
     
     /// Validate a state transfer
-    pub fn validate_transfer(&self, transfer: &StateTransfer) -> AnyaResult<bool> {
+    pub fn validate_transfer(&self, _transfer: &StateTransfer) -> AnyaResult<bool> {
         // Implementation would go here
         unimplemented!("State transfer validation not yet implemented")
     }

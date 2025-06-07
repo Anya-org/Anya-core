@@ -2,7 +2,7 @@
 
 [AIR-3][AIS-3][AIT-3][RES-3] Professional-grade extensions designed for enterprise Bitcoin operations, Web5 infrastructure, ML at scale, and regulatory compliance.
 
-*Last updated: May 30, 2025*
+*Last updated: June 7, 2025*
 
 ## Table of Contents
 

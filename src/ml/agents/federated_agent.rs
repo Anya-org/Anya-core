@@ -10,9 +10,7 @@ use serde::{Serialize, Deserialize};
 use std::collections::HashMap;
 use chrono::Utc;
 
-use crate::ml::models::{Model, PredictionResult};
 use crate::ml::FederatedLearningManager;
-use crate::error::Error;
 
 use super::{Agent, AgentId, Observation, Action, Feedback, AgentMetrics, AgentError};
 
@@ -230,7 +228,7 @@ impl FederatedAgent {
         &self,
         participant_id: &str,
         model_hash: &str,
-        model__data: &[u8],
+        model_data: &[u8],
         performance: HashMap<String, f64>
     ) -> Result<(), AgentError> {
         // Update participant state
@@ -496,7 +494,7 @@ struct ModelUpdateSubmission {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    
     
     #[tokio::test]
     async fn test_federated_agent_round_lifecycle() {

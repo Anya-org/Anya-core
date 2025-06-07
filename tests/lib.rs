@@ -1,6 +1,6 @@
 use std::sync::Once;
 use tokio::runtime::Runtime;
-use tracing::{info, Level};
+use tracing::Level;
 use tracing_subscriber::FmtSubscriber;
 
 static INIT: Once = Once::new();
@@ -8,7 +8,7 @@ static INIT: Once = Once::new();
 pub fn setup_test_env() {
     INIT.call_once(|| {
         // Initialize logging for tests
-        let subscriber = FmtSubscriber::builder()
+        let _subscriber = FmtSubscriber::builder()
             .with_max_level(Level::DEBUG)
             .with_test_writer()
             .init();

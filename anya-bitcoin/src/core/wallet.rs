@@ -3,7 +3,7 @@
 //! This module contains wallet-related functionality for managing
 //! Bitcoin transactions and UTXOs.
 
-use bitcoin::{Address, Amount, Txid};
+use bitcoin::{Address, Txid};
 use std::collections::HashMap;
 
 /// Options for transaction creation

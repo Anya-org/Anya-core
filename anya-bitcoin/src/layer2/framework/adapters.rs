@@ -2,7 +2,7 @@
 // This file contains adapter implementations for the Layer 2 protocols
 
 use crate::core::error::AnyaResult;
-use crate::layer2::framework::{Layer2Protocol, TransactionStatus};
+use crate::layer2::framework::TransactionStatus;
 use async_trait::async_trait;
 use std::fmt;
 use std::sync::Arc;

@@ -2,7 +2,7 @@
 
 [AIR-3][AIS-3][AIT-3][RES-3] **Comprehensive guide for integrating Anya Core extensions with Bitcoin, Web5, ML systems, and third-party services.**
 
-*Last updated: May 30, 2025*
+*Last updated: June 7, 2025*
 
 ## Table of Contents
 

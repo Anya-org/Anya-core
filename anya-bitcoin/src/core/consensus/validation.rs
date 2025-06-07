@@ -1,10 +1,10 @@
-use std::error::Error;
-//! Bitcoin transaction validation [AIS-3][BPC-3][DAO-3]
+/// Bitcoin transaction validation [AIS-3][BPC-3][DAO-3]
 
-use bitcoin::{Transaction, Block, BlockHeader};
+use bitcoin::{Transaction, BlockHash};
 use thiserror::Error;
-use super::protocol::{BitcoinProtocol, BPCLevel, BitcoinError};
-use super::taproot::TaprootValidator;
+use crate::core::bitcoin::{BitcoinProtocol, BPCLevel};
+use crate::core::error::AnyaError;
+use crate::core::script::interpreter::TaprootValidator;
 
 #[derive(Debug, Error)]
 pub enum ValidationError {
@@ -12,7 +12,7 @@ pub enum ValidationError {
     Failed(String),
     
     #[error("Bitcoin protocol error: {0}")]
-    Protocol(#[from] BitcoinError),
+    Protocol(#[from] AnyaError),
     
     #[error("IO error: {0}")]
     IoError(#[from] std::io::Error),
@@ -31,22 +31,24 @@ impl TransactionValidator {
     /// Create a new transaction validator with BPC-3 level
     pub fn new() -> Self {
         Self {
-            protocol: BitcoinProtocol::new(BPCLevel::BPC3),
+            protocol: BitcoinProtocol::new("mainnet".to_string()),
             taproot: TaprootValidator::new(),
         }
     }
     
     /// Create a validator with specific protocol level
     pub fn with_level(level: BPCLevel) -> Self {
+        let mut protocol = BitcoinProtocol::new("mainnet".to_string());
+        protocol.compliance_level = level;
         Self {
-            protocol: BitcoinProtocol::new(level),
+            protocol,
             taproot: TaprootValidator::new(),
         }
     }
     
     /// Validate a transaction from a file
     pub fn validate_from_file(&self, path: &std::path::Path) -> Result<(), ValidationError> {
-        let data = std::fs::read(path)?;
+        let _data = std::fs::read(path)?;
         
         // This is simplified - in reality, we'd parse the transaction
         // from the file data using bitcoin::consensus::deserialize
@@ -111,6 +113,29 @@ impl TransactionValidator {
     }
 }
 
+/// Validate a block header
+pub fn validate_block_header(header: &BlockHash) -> Result<(), ValidationError> {
+    // Placeholder implementation for block header validation
+    // In a real implementation, this would check:
+    // - Proof of work
+    // - Timestamp validity
+    // - Version compatibility
+    // - Target difficulty
+    let _hash = *header;
+    Ok(())
+}
+
+/// Validate a block hash
+pub fn validate_block_hash(hash: &BlockHash) -> Result<(), ValidationError> {
+    // Placeholder implementation for block hash validation
+    // In a real implementation, this would check:
+    // - Hash format validity
+    // - Leading zeros for proof of work
+    // - Hash against known checkpoints
+    let _hash_bytes: &[u8] = hash.as_ref();
+    Ok(())
+}
+
 /// Extension to BitcoinProtocol to access level
 impl BitcoinProtocol {
     /// Get current protocol level
@@ -119,4 +144,4 @@ impl BitcoinProtocol {
         // This fixes the linter error from accessing a private field
         self.level()
     }
-} 
+}

@@ -8,7 +8,7 @@ pub mod vc;   // Verifiable Credentials
 pub mod adapter;
 
 // Re-export important types for easy access
-pub use identity::{Web5Error, Web5Result, DIDManager, DID, DIDDocument};
+pub use identity::{Web5Error, Web5Result, DIDManager, DID, DIDDocument, IdentityManager};
 pub use protocols::{ProtocolHandler, ProtocolManager, ProtocolDefinition};
 pub use adapter::Web5Adapter;
 

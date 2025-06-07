@@ -7,7 +7,7 @@
 use std::collections::HashMap;
 use std::sync::RwLock;
 use bitcoin::{Transaction, Txid};
-use log::{debug, info, warn};
+use log::{debug, info};
 
 use crate::core::error::AnyaResult;
 
@@ -81,8 +81,8 @@ impl FeeEstimator {
     }
     
     /// Add a transaction to the fee estimator
-    pub fn add_transaction(&self, tx: &Transaction, fee_rate: f64) -> AnyaResult<()> {
-        let txid = tx.txid();
+    pub fn add_transaction(&self, tx: &Transaction, fee_rate: f64    ) -> AnyaResult<()> {
+        let txid = tx.compute_txid();
         
         // Skip transactions with fee rate below minimum
         if fee_rate < self.min_fee_rate() {
@@ -96,7 +96,7 @@ impl FeeEstimator {
         }
         
         // Add to appropriate buckets
-        self.add_to_buckets(fee_rate, 1, fee_rate as u64 * (tx.weight() as u64 / 4))?;
+        self.add_to_buckets(fee_rate, 1, fee_rate as u64 * (u64::from(tx.weight()) / 4))?;
         
         debug!("Added transaction {} to fee estimator (fee rate: {:.2} sat/vB)", txid, fee_rate);
         Ok(())
@@ -225,7 +225,7 @@ impl FeeEstimator {
             
             // Remove confirmed transactions from tracking
             for tx in recent_txs {
-                let txid = tx.txid();
+                let txid = tx.compute_txid();
                 if tracked.remove(&txid).is_some() {
                     confirmed_count += 1;
                 }

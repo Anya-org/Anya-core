@@ -774,4 +774,4 @@ impl DeprecationChecklist {
 - [Version Control Guide](./version-control.md)
 - [Maintenance Overview](./README.md)
 
-*Last updated: May 30, 2025*
+*Last updated: June 7, 2025*

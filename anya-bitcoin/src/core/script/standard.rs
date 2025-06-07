@@ -6,10 +6,8 @@
 
 use std::fmt;
 use thiserror::Error;
-use log::{debug, info, warn};
-use bitcoin::{Script, ScriptBuf, Address, Network, TxOut, PublicKey, BlockHash, Transaction};
+use bitcoin::{Script, ScriptBuf};
 
-use crate::core::error::AnyaResult;
 
 /// Maximum number of public keys in a multisig script
 pub const MAX_PUBKEYS_PER_MULTISIG: usize = 16;
@@ -149,7 +147,7 @@ impl StandardScripts {
     }
     
     /// Create a P2PKH script from a public key hash
-    pub fn create_p2pkh(pubkey_hash: &[u8]) -> Result<Script, ScriptClassifyError> {
+    pub fn create_p2pkh(pubkey_hash: &[u8]) -> Result<ScriptBuf, ScriptClassifyError> {
         if pubkey_hash.len() != 20 {
             return Err(ScriptClassifyError::InvalidFormat(
                 "P2PKH requires a 20-byte pubkey hash".to_string()
@@ -165,11 +163,11 @@ impl StandardScripts {
         script.push(0x88); // OP_EQUALVERIFY
         script.push(0xac); // OP_CHECKSIG
         
-        Ok(Script::from(script))
+        Ok(ScriptBuf::from(script))
     }
     
     /// Create a P2SH script from a script hash
-    pub fn create_p2sh(script_hash: &[u8]) -> Result<Script, ScriptClassifyError> {
+    pub fn create_p2sh(script_hash: &[u8]) -> Result<ScriptBuf, ScriptClassifyError> {
         if script_hash.len() != 20 {
             return Err(ScriptClassifyError::InvalidFormat(
                 "P2SH requires a 20-byte script hash".to_string()
@@ -183,11 +181,11 @@ impl StandardScripts {
         script.extend_from_slice(script_hash);
         script.push(0x87); // OP_EQUAL
         
-        Ok(Script::from(script))
+        Ok(ScriptBuf::from(script))
     }
     
     /// Create a P2WPKH script from a public key hash
-    pub fn create_p2wpkh(pubkey_hash: &[u8]) -> Result<Script, ScriptClassifyError> {
+    pub fn create_p2wpkh(pubkey_hash: &[u8]) -> Result<ScriptBuf, ScriptClassifyError> {
         if pubkey_hash.len() != 20 {
             return Err(ScriptClassifyError::InvalidFormat(
                 "P2WPKH requires a 20-byte pubkey hash".to_string()
@@ -200,11 +198,11 @@ impl StandardScripts {
         script.push(0x14); // Push 20 bytes
         script.extend_from_slice(pubkey_hash);
         
-        Ok(Script::from(script))
+        Ok(ScriptBuf::from(script))
     }
     
     /// Create a P2WSH script from a witness script hash
-    pub fn create_p2wsh(witness_script_hash: &[u8]) -> Result<Script, ScriptClassifyError> {
+    pub fn create_p2wsh(witness_script_hash: &[u8]) -> Result<ScriptBuf, ScriptClassifyError> {
         if witness_script_hash.len() != 32 {
             return Err(ScriptClassifyError::InvalidFormat(
                 "P2WSH requires a 32-byte witness script hash".to_string()
@@ -217,11 +215,11 @@ impl StandardScripts {
         script.push(0x20); // Push 32 bytes
         script.extend_from_slice(witness_script_hash);
         
-        Ok(Script::from(script))
+        Ok(ScriptBuf::from(script))
     }
     
     /// Create a P2TR (Taproot) script from an x-only public key
-    pub fn create_p2tr(x_only_pubkey: &[u8]) -> Result<Script, ScriptClassifyError> {
+    pub fn create_p2tr(x_only_pubkey: &[u8]) -> Result<ScriptBuf, ScriptClassifyError> {
         if x_only_pubkey.len() != 32 {
             return Err(ScriptClassifyError::InvalidFormat(
                 "P2TR requires a 32-byte x-only pubkey".to_string()
@@ -234,11 +232,11 @@ impl StandardScripts {
         script.push(0x20); // Push 32 bytes
         script.extend_from_slice(x_only_pubkey);
         
-        Ok(Script::from(script))
+        Ok(ScriptBuf::from(script))
     }
     
     /// Create an OP_RETURN script with data
-    pub fn create_op_return(data: &[u8]) -> Result<Script, ScriptClassifyError> {
+    pub fn create_op_return(data: &[u8]) -> Result<ScriptBuf, ScriptClassifyError> {
         if data.len() > 80 {
             return Err(ScriptClassifyError::ScriptTooLarge);
         }
@@ -257,11 +255,11 @@ impl StandardScripts {
         
         script.extend_from_slice(data);
         
-        Ok(Script::from(script))
+        Ok(ScriptBuf::from(script))
     }
     
     /// Create a multisig script
-    pub fn create_multisig(required: usize, pubkeys: &[&[u8]]) -> Result<Script, ScriptClassifyError> {
+    pub fn create_multisig(required: usize, pubkeys: &[&[u8]]) -> Result<ScriptBuf, ScriptClassifyError> {
         if required == 0 || required > pubkeys.len() || pubkeys.len() > MAX_PUBKEYS_PER_MULTISIG {
             return Err(ScriptClassifyError::InvalidFormat(format!(
                 "Multisig requires 1-{} signatures from 1-{} keys",
@@ -289,7 +287,7 @@ impl StandardScripts {
         script.push(0x50 + pubkeys.len() as u8); // OP_1 through OP_16
         script.push(0xae); // OP_CHECKMULTISIG
         
-        Ok(Script::from(script))
+        Ok(ScriptBuf::from(script))
     }
     
     /// Check if a script is a multisig script
@@ -502,7 +500,7 @@ impl WitnessProgram {
     }
     
     /// Create a witness program script
-    pub fn create(version: u8, program: &[u8]) -> Result<Script, ScriptClassifyError> {
+    pub fn create(version: u8, program: &[u8]) -> Result<ScriptBuf, ScriptClassifyError> {
         if version > 16 {
             return Err(ScriptClassifyError::InvalidFormat(
                 "Witness version must be 0-16".to_string()
@@ -531,7 +529,7 @@ impl WitnessProgram {
         script.push(program.len() as u8);
         script.extend_from_slice(program);
         
-        Ok(Script::from(script))
+        Ok(ScriptBuf::from(script))
     }
     
     /// Check if a script is a witness program

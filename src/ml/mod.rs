@@ -241,6 +241,7 @@ pub fn is_ready_for_stage(health: f64, stage: SystemStage) -> bool {
 pub mod agents;
 pub use agents::*;
 
+pub mod models;
 #[cfg(test)]
 mod tests {
     use super::*;

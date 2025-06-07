@@ -4,7 +4,7 @@
 use crate::core::error::{AnyaResult, AnyaError};
 use crate::layer2::framework::{Layer2Protocol, ProtocolConfig};
 use std::collections::HashMap;
-use std::sync::{Arc, RwLock};
+use std::sync::RwLock;
 
 /// Factory function type for creating Layer 2 protocols
 pub type ProtocolFactoryFn = Box<dyn Fn(Box<dyn ProtocolConfig>) -> AnyaResult<Box<dyn Layer2Protocol>> + Send + Sync>;

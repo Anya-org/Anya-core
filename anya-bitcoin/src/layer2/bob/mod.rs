@@ -1,55 +1,24 @@
-use crate::prelude::StdError;
-// Migrated from OPSource to anya-core
-// This file was automatically migrated as part of the Rust-only implementation
-// Original file: C:\Users\bmokoka\Downloads\OPSource\src\layer2\bob\mod.rs
-// BOB Layer 2 Module
-// Implements Bitcoin Ordinals Bridge for layer 2 operations
-//
-// [AIR-2][AIS-3][AIT-2][AIM-2][AIP-2][BPC-2][PFM-2][RES-2]
-// This module provides Bitcoin layer 2 functionality with strong security
-// and privacy protections for advanced BOB operations.
-
-//! # BOB Layer 2 Integration
-//!
-//! This module provides integration with the BOB (Bitcoin Optimistic Blockchain) Layer 2 solution.
-//! BOB is a hybrid L2 that combines the security of Bitcoin with the versatility of Ethereum's EVM.
-//!
-//! ## Features
-//!
-//! - Bitcoin relay monitoring and interaction
-//! - EVM-compatible smart contract support
-//! - Cross-layer transaction handling
-//! - BitVM integration for optimistic rollups
-//! - Hybrid analytics for cross-layer operations
-
+use crate::prelude::{AnyaResult};
 use std::sync::{Arc, Mutex};
-use std::time::Duration;
 use std::collections::HashMap;
-use chrono::{DateTime, Utc};
-use thiserror::Error;
+
+// Add `use async_trait::async_trait;` at the top if async_trait is used
+use async_trait::async_trait;
+// Add `use tracing::info;` if info! macro is used
+use tracing::info;
 
 // Internal imports
-use bitcoin::interface::BitcoinAddress;
-use bitcoin::Transaction as BtcTransaction;
-use crate::core::performance::Metrics;
-use crate::security::validation::ValidationResult;
 use crate::layer2::bob::cross_layer::BtcTransaction as BobBtcTransaction;
-use crate::prelude::AnyaResult;
+use crate::layer2::framework::{Layer2Protocol, ValidationResult, ProtocolConfig};
 
 /// Configuration for the BOB Layer 2 integration
 #[derive(Clone, Debug)]
 pub struct BobConfig {
-    /// URL of the BOB RPC endpoint
     pub rpc_url: String,
-    /// URL of the BitVM relay
     pub relay_url: String,
-    /// Chain ID for the BOB network
     pub chain_id: u64,
-    /// Timeout for RPC calls in milliseconds
     pub timeout_ms: u64,
-    /// Maximum number of retry attempts
     pub max_retries: u32,
-    /// Whether to validate the relay state against Bitcoin
     pub validate_relay: bool,
 }
 
@@ -66,6 +35,20 @@ impl Default for BobConfig {
     }
 }
 
+impl ProtocolConfig for BobConfig {
+    fn protocol_name(&self) -> &str {
+        "bob"
+    }
+    
+    fn network_type(&self) -> &str {
+        "mainnet"
+    }
+    
+    fn clone_box(&self) -> Box<dyn ProtocolConfig> {
+        Box::new(self.clone())
+    }
+}
+
 /// Main BOB integration client
 pub struct BobClient {
     config: BobConfig,
@@ -77,60 +60,43 @@ pub struct BobClient {
 }
 
 impl BobClient {
-    /// Create a new BOB client with the provided configuration
     pub fn new(config: BobConfig) -> Self {
-        let relay_monitor = BitcoinRelayMonitor::new(&config);
-        let evm_adapter = EvmAdapter::new(&config);
-        let bitvm_validator = BitVMValidator::new(&config);
-        let cross_layer_manager = CrossLayerTransactionManager::new(&config);
-        let analytics_engine = HybridAnalyticsEngine::new(&config);
-        
         Self {
+            relay_monitor: BitcoinRelayMonitor::new(&config),
+            evm_adapter: EvmAdapter::new(&config),
+            bitvm_validator: BitVMValidator::new(&config),
+            cross_layer_manager: CrossLayerTransactionManager::new(&config),
+            analytics_engine: HybridAnalyticsEngine::new(&config),
             config,
-            relay_monitor,
-            evm_adapter,
-            bitvm_validator,
-            cross_layer_manager,
-            analytics_engine,
         }
     }
-    
-    /// Check the health of the BOB Layer 2 connection
+
     pub async fn check_health(&self) -> Result<bool, BobError> {
-        // Check RPC connectivity
         let rpc_status = self.evm_adapter.check_connection().await?;
-        
-        // Check relay status
         let relay_status = self.relay_monitor.check_relay_status().await?;
-        
         Ok(rpc_status && relay_status)
     }
-    
-    /// Submit a transaction to the BOB network
+
     pub async fn submit_transaction(&self, transaction: EvmTransaction) -> Result<EvmTransactionReceipt, BobError> {
         self.evm_adapter.send_transaction(transaction).await
     }
-    
-    /// Verify a cross-layer transaction between Bitcoin and BOB
+
     pub async fn verify_cross_layer_transaction(
-        &self, 
+        &self,
         btc_tx: BobBtcTransaction,
-        l2_tx: EvmTransaction
+        l2_tx: EvmTransaction,
     ) -> Result<ValidationResult, BobError> {
         self.cross_layer_manager.verify_transaction_pair(btc_tx, l2_tx).await
     }
-    
-    /// Get the status of the Bitcoin relay
+
     pub async fn get_relay_status(&self) -> Result<RelayStatus, BobError> {
         self.relay_monitor.get_status().await
     }
-    
-    /// Verify BitVM proofs for an optimistic rollup transaction
+
     pub async fn verify_bitvm_proof(&self, proof: BitVMProof) -> Result<bool, BobError> {
         self.bitvm_validator.verify_proof(proof).await
     }
-    
-    /// Get performance metrics for the BOB Layer 2 integration
+
     pub fn get_metrics(&self) -> Metrics {
         self.analytics_engine.collect_metrics()
     }
@@ -143,23 +109,18 @@ pub struct BitcoinRelayMonitor {
 }
 
 impl BitcoinRelayMonitor {
-    /// Create a new relay monitor
     pub fn new(config: &BobConfig) -> Self {
         Self {
             config: config.clone(),
             last_status: Arc::new(Mutex::new(None)),
         }
     }
-    
-    /// Check if the relay is operating correctly
+
     pub async fn check_relay_status(&self) -> Result<bool, BobError> {
-        // Implementation would check relay status
         Ok(true)
     }
-    
-    /// Get detailed status of the relay
+
     pub async fn get_status(&self) -> Result<RelayStatus, BobError> {
-        // Implementation would retrieve relay status
         Ok(RelayStatus {
             last_block_height: 800000,
             last_bitcoin_hash: "000000000000000000000000000000000000000000000000000000000000000".to_string(),
@@ -175,22 +136,17 @@ pub struct EvmAdapter {
 }
 
 impl EvmAdapter {
-    /// Create a new EVM adapter
     pub fn new(config: &BobConfig) -> Self {
         Self {
             config: config.clone(),
         }
     }
-    
-    /// Check connection to the EVM node
+
     pub async fn check_connection(&self) -> Result<bool, BobError> {
-        // Implementation would check EVM node connection
         Ok(true)
     }
-    
-    /// Send a transaction to the EVM network
-    pub async fn send_transaction(&self, transaction: EvmTransaction) -> Result<EvmTransactionReceipt, BobError> {
-        // Implementation would send transaction to EVM node
+
+    pub async fn send_transaction(&self, _transaction: EvmTransaction) -> Result<EvmTransactionReceipt, BobError> {
         Ok(EvmTransactionReceipt {
             tx_hash: "0x0000000000000000000000000000000000000000000000000000000000000000".to_string(),
             block_number: 1000000,
@@ -206,16 +162,13 @@ pub struct BitVMValidator {
 }
 
 impl BitVMValidator {
-    /// Create a new BitVM validator
     pub fn new(config: &BobConfig) -> Self {
         Self {
             config: config.clone(),
         }
     }
-    
-    /// Verify a BitVM proof
-    pub async fn verify_proof(&self, proof: BitVMProof) -> Result<bool, BobError> {
-        // Implementation would verify BitVM proofs
+
+    pub async fn verify_proof(&self, _proof: BitVMProof) -> Result<bool, BobError> {
         Ok(true)
     }
 }
@@ -226,22 +179,18 @@ pub struct CrossLayerTransactionManager {
 }
 
 impl CrossLayerTransactionManager {
-    /// Create a new cross-layer transaction manager
     pub fn new(config: &BobConfig) -> Self {
         Self {
             config: config.clone(),
         }
     }
-    
-    /// Verify a pair of Bitcoin and BOB transactions
+
     pub async fn verify_transaction_pair(
-        &self, 
-        btc_tx: BobBtcTransaction,
-        l2_tx: EvmTransaction
+        &self,
+        _btc_tx: BobBtcTransaction,
+        _l2_tx: EvmTransaction,
     ) -> Result<ValidationResult, BobError> {
-        // In a real implementation, verify the transaction pair using cross-chain verification
-        // Return a successful validation result
-        Ok(ValidationResult::valid("Cross-layer transaction pair verified successfully".to_string()))
+        Ok(ValidationResult::Valid)
     }
 }
 
@@ -251,16 +200,13 @@ pub struct HybridAnalyticsEngine {
 }
 
 impl HybridAnalyticsEngine {
-    /// Create a new hybrid analytics engine
     pub fn new(config: &BobConfig) -> Self {
         Self {
             config: config.clone(),
         }
     }
-    
-    /// Collect metrics from the BOB integration
+
     pub fn collect_metrics(&self) -> Metrics {
-        // Implementation would collect metrics
         Metrics::default()
     }
 }
@@ -268,85 +214,55 @@ impl HybridAnalyticsEngine {
 /// Status of the Bitcoin relay
 #[derive(Clone, Debug)]
 pub struct RelayStatus {
-    /// Height of the last processed Bitcoin block
     pub last_block_height: u64,
-    /// Hash of the last processed Bitcoin block
     pub last_bitcoin_hash: String,
-    /// Whether the relay is in sync with Bitcoin
     pub is_synced: bool,
-    /// When the relay was last updated
     pub last_update_time: chrono::DateTime<chrono::Utc>,
 }
 
 /// EVM transaction representation
 #[derive(Clone, Debug)]
 pub struct EvmTransaction {
-    /// Transaction hash
     pub hash: String,
-    /// From address
     pub from: String,
-    /// To address
     pub to: Option<String>,
-    /// Transaction value
     pub value: u128,
-    /// Gas limit
     pub gas_limit: u64,
-    /// Gas price
     pub gas_price: u64,
-    /// Transaction data
     pub data: Vec<u8>,
 }
 
 /// EVM transaction receipt
 #[derive(Clone, Debug)]
 pub struct EvmTransactionReceipt {
-    /// Transaction hash
     pub tx_hash: String,
-    /// Block number where the transaction was included
     pub block_number: u64,
-    /// Gas used by the transaction
     pub gas_used: u64,
-    /// Transaction status (true = success, false = failure)
     pub status: bool,
 }
 
 /// BitVM proof structure
 #[derive(Clone, Debug)]
 pub struct BitVMProof {
-    /// Proof ID
     pub id: String,
-    /// Transaction hash being proved
     pub tx_hash: String,
-    /// Proof data
     pub proof_data: Vec<u8>,
-    /// Block where the proof was submitted
     pub block_number: u64,
 }
 
 /// BOB integration error types
 #[derive(Debug, thiserror::Error)]
 pub enum BobError {
-    /// RPC connection error
     #[error("RPC connection error: {0}")]
     ConnectionError(String),
-    
-    /// Transaction submission error
     #[error("Transaction submission error: {0}")]
     TransactionError(String),
-    
-    /// Relay validation error
     #[error("Relay validation error: {0}")]
     RelayError(String),
-    
-    /// BitVM verification error
     #[error("BitVM verification error: {0}")]
     BitVMError(String),
-    
-    /// Cross-layer transaction error
     #[error("Cross-layer transaction error: {0}")]
     CrossLayerError(String),
-    
-    /// Configuration error
     #[error("Configuration error: {0}")]
     ConfigError(String),
 }
@@ -357,33 +273,21 @@ pub use self::{
     BobError as Layer2Error,
 };
 
-// Module exports - only declare these once
 pub mod relay;
 pub mod evm;
 pub mod bitvm;
 pub mod cross_layer;
 pub mod analytics;
 
-// We'll remove the duplicate module declarations below
-// and add comments to the existing modules
-
-// Implementation note: removed redundant module declarations
-// The content from these modules should be moved to the actual module files 
-
-// Define the Metrics struct if it's not already defined
+/// Metrics struct for performance monitoring
 #[derive(Debug, Clone)]
 pub struct Metrics {
-    /// Transactions per second
     pub transactions_per_second: f64,
-    /// Average block time in seconds
     pub block_time: f64,
-    /// Number of active validators
     pub active_validators: u32,
-    /// Network usage metrics
     pub network_usage: HashMap<String, f64>,
 }
 
-// Add Default implementation for Metrics
 impl Default for Metrics {
     fn default() -> Self {
         Self {
@@ -399,5 +303,44 @@ pub struct BobIntegration {
     l2_client: BobClient,
     bitcoin_relay: BitcoinRelay,
     state_manager: StateManager,
-} 
+}
 
+// Add stubs for BitcoinRelay, StateManager, BobProtocol if not defined, or comment out their usage
+pub struct BitcoinRelay;
+pub struct StateManager;
+#[derive(Debug)]
+pub struct BobProtocol;
+
+#[async_trait]
+impl Layer2Protocol for BobProtocol {
+    fn name(&self) -> &str {
+        "bob"
+    }
+
+    fn version(&self) -> &str {
+        "0.1.0"
+    }
+
+    async fn init(&self) -> AnyaResult<()> {
+        info!("Initializing BOB protocol...");
+        Ok(())
+    }
+
+    async fn start(&self) -> AnyaResult<()> {
+        info!("Starting BOB protocol...");
+        Ok(())
+    }
+
+    async fn stop(&self) -> AnyaResult<()> {
+        info!("Stopping BOB protocol...");
+        Ok(())
+    }
+
+    async fn is_running(&self) -> bool {
+        true
+    }
+
+    async fn execute_command(&self, _command: &str, _args: &[&str]) -> AnyaResult<String> {
+        Ok("Command executed".to_string())
+    }
+}

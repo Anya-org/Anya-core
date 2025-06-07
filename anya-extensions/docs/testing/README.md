@@ -270,4 +270,4 @@ cargo test --features memory-profiling
 - [Bitcoin Test Networks](https://developer.bitcoin.org/examples/testing.html)
 - [Web5 Testing Best Practices](https://developer.tbd.website/docs/web5/build/test/)
 
-*Last updated: May 30, 2025*
+*Last updated: June 7, 2025*

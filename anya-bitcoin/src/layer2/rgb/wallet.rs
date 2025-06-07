@@ -67,13 +67,13 @@ impl RGBWallet {
     }
     
     /// Transfer an asset
-    pub fn transfer_asset(&self, asset_id: &str, amount: u64, recipient: &str) -> AnyaResult<Txid> {
+    pub fn transfer_asset(&self, _asset_id: &str, _amount: u64, _recipient: &str) -> AnyaResult<Txid> {
         // Implementation would go here
         unimplemented!("Asset transfer not yet implemented")
     }
     
     /// Receive an asset
-    pub fn receive_asset(&mut self, asset_id: &str, amount: u64, txid: Txid) -> AnyaResult<()> {
+    pub fn receive_asset(&mut self, _asset_id: &str, _amount: u64, _txid: Txid) -> AnyaResult<()> {
         // Implementation would go here
         unimplemented!("Asset receipt not yet implemented")
     }

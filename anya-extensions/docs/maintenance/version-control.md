@@ -2,7 +2,7 @@
 
 [AIR-3][AIS-3][AIT-3][RES-3] **Comprehensive version control guide for Anya Core extension development with Git workflows, branching strategies, and collaborative development practices.**
 
-*Last updated: May 30, 2025*
+*Last updated: June 7, 2025*
 
 ## Table of Contents
 

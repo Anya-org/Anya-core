@@ -2,7 +2,7 @@
 
 # ML System Architecture
 
-*Last Updated: May 30, 2025*
+*Last Updated: June 7, 2025*
 
 ## Overview
 

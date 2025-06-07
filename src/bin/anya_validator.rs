@@ -1,8 +1,9 @@
 use anya_bitcoin::protocol::core_protocol::{BPCLevel, BitcoinProtocol};
 use anya_bitcoin::core::script::taproot::TaprootValidator;
-use anya_core::ml::agent_checker::{ComponentStatus, SecurityPosture};
-use anya_core::dao::governance::{DaoGovernance, DaoLevel};
-use anya_core::tools::markdown::{DocError, DocumentationValidator};
+use crate::ml::agent_checker::{ComponentStatus, SecurityPosture};
+use crate::dao::governance::{DaoGovernance, DaoLevel};
+use crate::tools::markdown::{DocError, DocumentationValidator};
+use crate::install::AnyaInstaller;
 use clap::{Parser, Subcommand};
 use serde::{Deserialize, Serialize};
 use std::error::Error;

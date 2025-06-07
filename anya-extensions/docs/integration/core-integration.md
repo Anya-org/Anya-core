@@ -2,7 +2,7 @@
 
 [AIR-3][AIS-3][AIT-3][RES-3] Essential integration patterns for connecting Bitcoin, Web5, and ML systems within the Anya core platform.
 
-*Last updated: May 30, 2025*
+*Last updated: June 7, 2025*
 
 ## Table of Contents
 

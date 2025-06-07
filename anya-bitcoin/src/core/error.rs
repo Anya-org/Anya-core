@@ -9,6 +9,10 @@ pub type AnyaResult<T> = Result<T, AnyaError>;
 /// Error types for Bitcoin implementation
 #[derive(Error, Debug)]
 pub enum AnyaError {
+    /// General error
+    #[error("General error: {0}")]
+    General(String),
+    
     /// Error during Bitcoin network operations
     #[error("Network error: {0}")]
     Network(String),
@@ -29,6 +33,18 @@ pub enum AnyaError {
     #[error("Layer 2 error: {0}")]
     Layer2(String),
     
+    /// Peer network error
+    #[error("Peer error: {0}")]
+    Peer(String),
+    
+    /// Protocol error
+    #[error("Protocol error: {0}")]
+    Protocol(String),
+    
+    /// P2P error
+    #[error("P2P error: {0}")]
+    P2P(String),
+    
     /// IO error
     #[error("IO error: {0}")]
     Io(#[from] io::Error),
@@ -48,4 +64,10 @@ pub enum AnyaError {
     /// Feature not implemented
     #[error("Not implemented: {0}")]
     NotImplemented(String),
-} 
+}
+
+impl From<secp256k1::Error> for AnyaError {
+    fn from(err: secp256k1::Error) -> Self {
+        AnyaError::General(err.to_string())
+    }
+}

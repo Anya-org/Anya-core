@@ -2,7 +2,7 @@
 
 [AIR-3][AIS-3][AIT-3][RES-3] **Complete guide for publishing Anya Core extensions to official, community, and enterprise registries.**
 
-*Last updated: May 30, 2025*
+*Last updated: June 7, 2025*
 
 ## Table of Contents
 
