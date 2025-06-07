@@ -1,3 +1,35 @@
+use bitcoin::{Transaction};
+use crate::core::error::AnyaError as BitcoinError;
+use crate::core::bitcoin::BitcoinProtocol;
+
+/// Protocol adherence rules for Bitcoin standards
+#[derive(Debug, Clone, Default)]
+pub struct ProtocolRules {
+    pub enforce_bip341: bool,
+    pub enforce_taproot: bool,
+    pub enforce_segwit: bool,
+}
+
+impl ProtocolRules {
+    /// Check BIP-341 compliance
+    pub fn check_bip341(&self, tx: &Transaction) -> Result<(), BitcoinError> {
+        if !self.enforce_bip341 {
+            return Ok(());
+        }
+        // BIP-341 validation logic would go here
+        Ok(())
+    }
+
+    /// Check Taproot commitment compliance
+    pub fn check_taproot_commitment(&self, tx: &Transaction) -> Result<(), BitcoinError> {
+        if !self.enforce_taproot {
+            return Ok(());
+        }
+        // Taproot commitment validation logic would go here
+        Ok(())
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct BitcoinProtocolEnforcer {
     inner: BitcoinProtocol,
@@ -25,4 +57,4 @@ impl BitcoinProtocolEnforcer {
         // Maintain SPV verification
         self.inner.verify_spv_proof(tx)
     }
-} 
+}

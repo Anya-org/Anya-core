@@ -14,6 +14,10 @@ use std::fmt;
 use async_trait::async_trait;
 use crate::core::error::{AnyaResult, AnyaError};
 
+pub use crate::layer2::types::{
+    ProtocolState, AssetParams, AssetTransfer, TransferResult, Proof, VerificationResult, ValidationResult
+};
+
 /// Transaction status for Layer 2 protocols
 #[derive(Debug, Clone, PartialEq)]
 pub enum TransactionStatus {
@@ -64,24 +68,8 @@ pub trait Layer2Protocol: Send + Sync + fmt::Debug {
     async fn execute_command(&self, command: &str, args: &[&str]) -> AnyaResult<String>;
 }
 
-/// Factory for creating Layer 2 protocols
-pub struct Layer2Factory;
-
-impl Layer2Factory {
-    /// Create a new Layer 2 protocol instance
-    pub fn create_protocol(&self, protocol_type: &str) -> AnyaResult<Arc<dyn Layer2Protocol>> {
-        match protocol_type {
-            // In a real implementation, we would create actual protocol instances
-            "rgb" => Ok(Arc::new(NoopLayer2Protocol::new("rgb", "0.1.0"))),
-            "lightning" => Ok(Arc::new(NoopLayer2Protocol::new("lightning", "0.1.0"))),
-            "dlc" => Ok(Arc::new(NoopLayer2Protocol::new("dlc", "0.1.0"))),
-            "bob" => Ok(Arc::new(NoopLayer2Protocol::new("bob", "0.1.0"))),
-            "rsk" => Ok(Arc::new(NoopLayer2Protocol::new("rsk", "0.1.0"))),
-            "taproot_assets" => Ok(Arc::new(NoopLayer2Protocol::new("taproot_assets", "0.1.0"))),
-            _ => Err(AnyaError::NotImplemented(format!("Protocol type not supported: {}", protocol_type))),
-        }
-    }
-}
+// Re-export Layer2Factory from factory module
+pub use factory::Layer2Factory;
 
 /// Registry for Layer 2 protocols
 pub struct Layer2Registry {
@@ -267,4 +255,4 @@ mod tests {
         // We'll just check that we got a protocol with the right name
         assert_eq!(protocol.name(), "test");
     }
-} 
+}

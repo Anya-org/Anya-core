@@ -96,7 +96,7 @@ impl FeeEstimator {
         }
         
         // Add to appropriate buckets
-        self.add_to_buckets(fee_rate, 1, fee_rate as u64 * (tx.weight() as u64 / 4))?;
+        self.add_to_buckets(fee_rate, 1, fee_rate as u64 * (u64::from(tx.weight()) / 4))?;
         
         debug!("Added transaction {} to fee estimator (fee rate: {:.2} sat/vB)", txid, fee_rate);
         Ok(())

@@ -4,12 +4,12 @@
 //! transaction scripts, with support for Taproot and related BIPs.
 //! It follows Bitcoin Core principles of security, decentralization, and privacy.
 
-use std::collections::HashMap;
+use bitflags::bitflags;
+use bitcoin::{Script, Transaction};
+use log::info;
 use thiserror::Error;
-use log::{debug, info, trace, warn};
-use bitcoin::{Script, Transaction, TxOut};
 
-use crate::core::error::AnyaResult;
+use crate::core::error::{AnyaError, AnyaResult};
 
 /// Maximum number of operations allowed in a script
 pub const MAX_OPS_PER_SCRIPT: usize = 201;
@@ -32,14 +32,12 @@ pub const MAX_SCRIPT_INTEGER: i64 = 0x7fffffff;
 pub enum Opcode {
     // Constants
     OP_0 = 0x00,
-    OP_FALSE = 0x00,
     OP_PUSHDATA1 = 0x4c,
     OP_PUSHDATA2 = 0x4d,
     OP_PUSHDATA4 = 0x4e,
     OP_1NEGATE = 0x4f,
     OP_RESERVED = 0x50,
     OP_1 = 0x51,
-    OP_TRUE = 0x51,
     OP_2 = 0x52,
     OP_3 = 0x53,
     OP_4 = 0x54,
@@ -150,9 +148,7 @@ pub enum Opcode {
     // Expansion
     OP_NOP1 = 0xb0,
     OP_CHECKLOCKTIMEVERIFY = 0xb1,
-    OP_NOP2 = 0xb1,
     OP_CHECKSEQUENCEVERIFY = 0xb2,
-    OP_NOP3 = 0xb2,
     OP_NOP4 = 0xb3,
     OP_NOP5 = 0xb4,
     OP_NOP6 = 0xb5,
@@ -168,8 +164,14 @@ pub enum Opcode {
     OP_INVALIDOPCODE = 0xff,
 }
 
+// Aliases for opcode values
+pub const OP_FALSE: Opcode = Opcode::OP_0;
+pub const OP_TRUE: Opcode = Opcode::OP_1;
+pub const OP_NOP2: Opcode = Opcode::OP_CHECKLOCKTIMEVERIFY;
+pub const OP_NOP3: Opcode = Opcode::OP_CHECKSEQUENCEVERIFY;
+
 /// Script verification flags
-bitflags::bitflags! {
+bitflags! {
     /// Script verification flags
     pub struct VerifyFlags: u32 {
         /// No special validation
@@ -193,9 +195,9 @@ bitflags::bitflags! {
         /// Enable Miniscript validation
         const MINISCRIPT = 1 << 8;
         /// Enable all deployed script validation rules
-        const STANDARD = Self::P2SH.bits | Self::STRICTENC.bits | Self::CHECKLOCKTIMEVERIFY.bits |
-                      Self::CHECKSEQUENCEVERIFY.bits | Self::WITNESS.bits | Self::SCHNORR.bits |
-                      Self::TAPROOT.bits;
+        const STANDARD = Self::P2SH.bits() | Self::STRICTENC.bits() | Self::CHECKLOCKTIMEVERIFY.bits() |
+                      Self::CHECKSEQUENCEVERIFY.bits() | Self::WITNESS.bits() | Self::SCHNORR.bits() |
+                      Self::TAPROOT.bits();
     }
 }
 
@@ -350,7 +352,7 @@ impl Stack {
         for (i, &b) in item.iter().enumerate() {
             if i == item.len() - 1 && b & 0x80 != 0 {
                 negative = true;
-                result |= (b & 0x7f) as i64 << (8 * i);
+                result |= ((b & 0x7f) as i64) << (8 * i);
             } else {
                 result |= (b as i64) << (8 * i);
             }
@@ -658,6 +660,23 @@ impl ScriptInterpreter {
 pub struct TaprootValidator;
 
 impl TaprootValidator {
+    /// Create a new TaprootValidator
+    pub fn new() -> Self {
+        Self
+    }
+    
+    /// Verify Taproot commitment
+    pub fn verify_taproot_commitment(&self, _tx: &Transaction) -> Result<bool, ScriptError> {
+        // TODO: Implement proper Taproot commitment verification
+        Ok(true)
+    }
+    
+    /// Verify Schnorr signatures in transaction
+    pub fn verify_schnorr_signatures(&self, _tx: &Transaction) -> Result<bool, ScriptError> {
+        // TODO: Implement proper Schnorr signature verification
+        Ok(true)
+    }
+    
     /// Verify a Taproot (SegWit v1) output spend
     pub fn verify_taproot_spend(
         tx: &Transaction,

@@ -31,33 +31,8 @@ pub const MAX_INBOUND_CONNECTIONS: usize = 125;
 /// Duration after which a peer is considered disconnected if no message received
 pub const PEER_TIMEOUT_SECONDS: u64 = 90;
 
-/// Error variants that can occur during P2P network operations
-#[derive(Debug, Error)]
-pub enum P2PError {
-    #[error("Failed to connect to peer: {0}")]
-    ConnectionFailed(String),
-    
-    #[error("Peer {0} disconnected: {1}")]
-    PeerDisconnected(String, String),
-    
-    #[error("Message validation failed: {0}")]
-    MessageValidationFailed(String),
-    
-    #[error("Network error: {0}")]
-    NetworkError(String),
-    
-    #[error("Peer limit reached")]
-    PeerLimitReached,
-    
-    #[error("I/O error: {0}")]
-    IoError(#[from] std::io::Error),
-    
-    #[error("Bitcoin serialization error: {0}")]
-    SerializationError(String),
-    
-    #[error("General error: {0}")]
-    General(String),
-}
+// Use the centralized error type
+use crate::error::P2PError;
 
 /// Connection status with a peer
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -343,9 +318,6 @@ impl P2PNetwork {
         self.local_address
     }
 }
-
-/// Re-export for the P2P trait interface
-pub type P2PNetwork as super::P2P;
 
 #[cfg(test)]
 mod tests {

@@ -1,15 +1,11 @@
-use crate::prelude::StdError;
-// RSK (Rootstock) Integration Module
-// Last Updated: 2025-05-30
-
-//! # RSK (Rootstock) Integration
-//!
-//! This module provides integration with RSK (Rootstock), a smart contract platform
-//! with a two-way peg to Bitcoin that enables smart contracts, near-instant payments,
-//! and higher scalability.
-//!
-//! ## Features
-//!
+// # RSK (Rootstock) Integration
+//
+// This module provides integration with RSK (Rootstock), a smart contract platform
+// with a two-way peg to Bitcoin that enables smart contracts, near-instant payments,
+// and higher scalability.
+//
+// ## Features
+//
 // - Two-way peg with Bitcoin (peg-in and peg-out)
 // - Smart contract execution
 // - RBTC token management
@@ -18,9 +14,10 @@ use crate::prelude::StdError;
 use std::sync::{Arc, Mutex};
 use std::collections::HashMap;
 use std::time::{Duration, Instant};
+use std::sync::PoisonError;
 
 // Internal imports
-use bitcoin::types::{BitcoinAddress, Transaction as BtcTransaction};
+use bitcoin::{Address as BitcoinAddress, Transaction as BtcTransaction};
 use crate::core::performance::Metrics;
 use crate::security::validation::ValidationResult;
 
@@ -677,6 +674,12 @@ pub enum RskError {
     ConfigError(String),
 }
 
+impl<T> From<PoisonError<T>> for RskError {
+    fn from(_err: PoisonError<T>) -> Self {
+        RskError::ConfigError("Lock poisoned".to_string())
+    }
+}
+
 // Module exports
 pub mod bridge;
 pub mod contracts;
@@ -768,5 +771,5 @@ pub mod tests {
         assert_eq!(block.number, 1000000);
         assert!(!block.hash.is_empty());
     }
-} 
+}
 

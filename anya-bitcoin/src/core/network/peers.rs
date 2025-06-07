@@ -14,6 +14,7 @@ use thiserror::Error;
 use bitcoin::Transaction;
 
 use crate::core::error::AnyaResult;
+use crate::core::error::AnyaError;
 use super::PeerInfo;
 
 /// Default maximum number of connected peers
@@ -56,6 +57,12 @@ pub enum PeerError {
     General(String),
 }
 
+impl From<PeerError> for AnyaError {
+    fn from(err: PeerError) -> Self {
+        AnyaError::General(format!("Peer error: {}", err))
+    }
+}
+
 /// Peer connection type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ConnectionType {
@@ -72,6 +79,7 @@ pub enum ConnectionType {
 /// Peer service flags
 bitflags::bitflags! {
     /// Services offered by a peer
+    #[derive(Copy, Clone)]
     pub struct ServiceFlags: u64 {
         /// NODE_NETWORK = (1 << 0)
         const NETWORK = 1;

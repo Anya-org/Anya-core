@@ -169,7 +169,7 @@ impl MempoolPolicy {
     
     /// Check if transaction size is within limits
     fn check_tx_size(&self, tx: &Transaction) -> Result<(), PolicyError> {
-        let tx_size = tx.weight() as usize / 4; // Convert to vsize
+        let tx_size = u64::from(tx.weight()) as usize / 4; // Convert to vsize
         let max_size = self.max_tx_size();
         
         if tx_size > max_size {
@@ -222,7 +222,7 @@ impl MempoolPolicy {
     /// Calculate the minimum fee for a transaction
     pub fn calculate_min_fee(&self, tx: &Transaction) -> u64 {
         let min_relay_fee = self.min_relay_fee();
-        let tx_size = tx.weight() as u64 / 4; // Convert to vsize
+        let tx_size = u64::from(tx.weight()) / 4; // Convert to vsize
         
         // Calculate minimum fee: min_relay_fee * tx_size / 1000
         (min_relay_fee * tx_size + 999) / 1000

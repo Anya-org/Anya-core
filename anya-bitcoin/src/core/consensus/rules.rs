@@ -4,13 +4,11 @@
 //! transaction validation rules, and other consensus-critical checks.
 //! Follows BIP standards for full compliance with Bitcoin Core principles.
 
-use bitcoin::{Block, BlockHash, Transaction, Txid, BlockHeader};
+use bitcoin::{Block, BlockHash, Transaction};
 use log::{debug, info};
 
 // Use our own Uint256 from the params module
 use super::params::Uint256;
-
-use crate::core::error::AnyaResult;
 
 /// Error types for consensus rule violations
 #[derive(Debug, thiserror::Error)]
@@ -35,9 +33,9 @@ pub enum ConsensusError {
 }
 
 /// Check if a block header meets the proof of work requirement
-pub fn verify_pow(header: &BlockHeader, target: Uint256) -> Result<(), ConsensusError> {
+pub fn verify_pow(block: &Block, target: Uint256) -> Result<(), ConsensusError> {
     // Convert block hash to Uint256 to compare with target
-    let hash = Uint256::from_be_bytes(header.block_hash().to_byte_array());
+    let hash = Uint256::from_be_bytes(block.block_hash().as_byte_array());
     
     if hash <= target {
         Ok(())
@@ -53,7 +51,7 @@ pub fn verify_merkle_root(block: &Block) -> Result<(), ConsensusError> {
     // but for now we'll just do a direct comparison to avoid bitcoin crate compatibility issues
     
     // Simple check for now - in a real implementation we'd calculate the merkle root
-    let txids: Vec<_> = block.txdata.iter().map(|tx| tx.txid()).collect();
+    let txids: Vec<_> = block.txdata.iter().map(|tx| tx.compute_txid()).collect();
     
     if !txids.is_empty() {
         // Just verify the block has at least one transaction
@@ -102,7 +100,7 @@ pub fn verify_transaction(tx: &Transaction) -> Result<(), ConsensusError> {
     
     // Example: Verify transaction isn't too large
     // Use serialized size as a proxy for weight until we have proper Weight implementation
-    let tx_size = tx.size();
+    let tx_size = tx.total_size();
     let max_size = 400_000; // 400K weight units
     
     if tx_size > max_size {
