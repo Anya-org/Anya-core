@@ -67,7 +67,7 @@ impl From<&str> for Web5Error {
 /// 
 /// Core component responsible for decentralized identity management.
 /// Implements the ports and adapters pattern for extensibility.
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct DIDManager {
     /// DIDs managed by this instance
     dids: Arc<Mutex<HashMap<String, DID>>>,
@@ -80,7 +80,7 @@ pub struct DIDManager {
 /// Decentralized Identifier
 /// 
 /// Represents a DID with its document and private keys.
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct DID {
     /// DID URI (e.g., "did:ion:123...")
     pub id: String,
@@ -95,7 +95,7 @@ pub struct DID {
 /// 
 /// The public representation of a DID, containing verification methods
 /// and service endpoints as defined in the DID Core specification.
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct DIDDocument {
     /// DID context
     #[serde(rename = "@context")]
@@ -120,7 +120,7 @@ pub struct DIDDocument {
 /// 
 /// A cryptographic mechanism used for authentication and
 /// digital signatures within a DID.
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct VerificationMethod {
     /// ID of the verification method
     pub id: String,
@@ -137,7 +137,7 @@ pub struct VerificationMethod {
 /// JSON Web Key
 /// 
 /// A cryptographic key representation in JSON format.
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct JWK {
     /// Key type
     pub kty: String,
@@ -158,7 +158,7 @@ pub struct JWK {
 /// Service
 /// 
 /// A service endpoint for a DID.
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Service {
     /// ID of the service
     pub id: String,
@@ -259,6 +259,44 @@ impl DIDManager {
     pub fn dids(&self) -> Result<Vec<String>, Box<dyn Error>> {
         let dids = self.dids.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         Ok(dids.keys().cloned().collect())
+    }
+
+    /// Get a DID by ID
+    pub fn get_did(&self, did_id: &str) -> Web5Result<Option<DID>> {
+        let dids = self.dids.lock().map_err(|e| Web5Error::Storage(format!("Mutex lock error: {}", e)))?;
+        Ok(dids.get(did_id).cloned())
+    }
+
+    /// List all DIDs
+    pub fn list_dids(&self) -> Vec<DID> {
+        let dids = self.dids.lock().unwrap_or_else(|_| panic!("Failed to lock mutex"));
+        dids.values().cloned().collect()
+    }
+}
+
+/// Identity manager for Web5 DID operations
+#[derive(Debug, Clone)]
+pub struct IdentityManager {
+    did_manager: DIDManager,
+}
+
+impl IdentityManager {
+    pub fn new(namespace: &str) -> Self {
+        Self {
+            did_manager: DIDManager::new(namespace),
+        }
+    }
+
+    pub fn create_identity(&mut self) -> Web5Result<DID> {
+        self.did_manager.create_did()
+    }
+
+    pub fn get_identity(&self, did_id: &str) -> Web5Result<Option<DID>> {
+        self.did_manager.get_did(did_id)
+    }
+
+    pub fn list_identities(&self) -> Vec<DID> {
+        self.did_manager.list_dids()
     }
 }
 

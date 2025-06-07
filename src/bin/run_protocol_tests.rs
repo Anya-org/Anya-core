@@ -1,4 +1,4 @@
-use anya_core::tests::layer2::protocol_tests::ProtocolTestSuite;
+use crate::tests::layer2::protocol_tests::ProtocolTestSuite;
 use serde::{Deserialize, Serialize};
 use std::error::Error;
 use std::fs;

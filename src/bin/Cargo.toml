@@ -1,11 +1,21 @@
+[workspace]
+members = [
+    "anya-bitcoin",
+    "anya-extensions" # Add this for better workspace organization
+]
+
 [package]
 name = "anya-core"
-version = "0.3.0-rc.1"
+version = "1.1.0"
 edition = "2021"
+rust-version = "1.63.0" # Explicit MSRV following rust-bitcoin standards
 description = "Enterprise-grade Bitcoin Infrastructure Platform"
 authors = ["botshelomokoka@gmail.com"]
 license = "MIT"
 repository = "https://github.com/anya-org/anya-core"
+readme = "README.md" # Following API guidelines for discoverability
+keywords = ["bitcoin", "cryptocurrency", "blockchain", "enterprise", "hexagonal"]
+categories = ["api-bindings", "cryptography::cryptocurrencies"] # Improve crates.io discoverability
 
 [features]
 default = ["std", "rust-bitcoin"]
@@ -19,6 +29,8 @@ bitcoin_integration = []
 rust-bitcoin = ["bitcoin", "bdk"]
 # RSK integration for Bitcoin verification
 rsk = []
+# Add alignment-focused feature for system optimization
+system-alignment = ["bitcoin_integration", "hsm"] # New feature for enhanced alignment
 
 [dependencies]
 # API dependencies
@@ -51,10 +63,10 @@ toml = "0.8.12"
 
 # Error handling
 anyhow = "1.0.98"
-thiserror = "=2.0.12"
+thiserror = "2.0.12"
 
 # Logging
-tracing = "=0.1.41"
+tracing = "0.1.41"
 tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }
 
 # Utilities and common dependencies
@@ -65,7 +77,7 @@ uuid = { version = "1.17.0", features = ["v4", "serde"] }
 chrono = { version = "0.4.41", features = ["serde"] }
 rand = "0.8.5"
 argon2 = "=0.5.3"
-hex = "=0.4.3"
+hex = "0.4.3"
 log = "0.4.27"
 reqwest = { version = "0.12.19", features = ["json", "blocking"] }
 clap_derive = "=4.5.32"
@@ -100,6 +112,7 @@ syn = { version = "2.0.101", features = ["full", "parsing"] }
 
 colored = "2.1.0"
 anya-bitcoin = { path = "./anya-bitcoin" }
+bitflags = "2.5.0"
 
 [dev-dependencies]
 mockall = "=0.13.1"
@@ -109,5 +122,41 @@ tower-test = "=0.4.0"
 # [patch.crates-io]
 # rand = "0.9.1"
 # rand_core = "0.9.3"
+
+[workspace.package]
+version = "1.1.0"
+edition = "2021"
+authors = ["botshelomokoka@gmail.com"]
+license = "MIT"
+description = "Enterprise-grade Bitcoin Infrastructure Platform"
+repository = "https://github.com/anya-org/anya-core"
+
+[workspace.dependencies]
+bdk = { version = "0.30" }
+secp256k1 = { version = "0.29", features = ["rand-std", "global-context"] }
+anyhow = "1.0.98"
+thiserror = "2.0.12"
+async-trait = "0.1.88"
+serde = { version = "1.0.219", features = ["derive"] }
+serde_json = "1.0.140"
+tokio = { version = "1.45.1", features = ["full"] }
+tracing = "0.1.41"
+tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }
+hex = "0.4.3"
+log = "0.4.27"
+futures = "0.3.31"
+rand = "0.8.5"
+bitcoincore-rpc = "0.17.0"
+web5 = { git = "https://github.com/TBD54566975/web5-rs" }
+
+[lib]
+name = "anya"
+path = "src/lib.rs"
+
+[[bin]]
+name = "anya"
+path = "src/main.rs"
+
+# ...other binary definitions as needed...
 
 

@@ -5,7 +5,7 @@
 /// channel management, and payment processing.
 use std::error::Error;
 
-use anya_core::{AnyaCore, AnyaResult, AnyaError};
+use crate::{AnyaCore, AnyaResult, AnyaError};
 use std::sync::Arc;
 use std::thread;
 use std::time::Duration;
@@ -16,7 +16,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     println!("===================================================");
     
     // Initialize with Lightning enabled
-    let mut config = anya_core::config::Config::default();
+    let mut config = crate::config::Config::default();
     config.bitcoin_config.lightning_enabled = true;
     
     // Create the Anya Core instance
@@ -60,7 +60,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     // Step 4: Create a Bitcoin-Lightning bridge
     println!("\n4. Creating Bitcoin-Lightning bridge...");
     let lightning_node_arc = Arc::new(lightning_node.clone());
-    let bridge = match anya_core::layer2::lightning::BitcoinLightningBridge::new(lightning_node_arc) {
+    let bridge = match crate::layer2::lightning::BitcoinLightningBridge::new(lightning_node_arc) {
         Ok(bridge) => {
             println!("   Bridge created successfully");
             bridge

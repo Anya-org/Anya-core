@@ -1,6 +1,6 @@
 [package]
 name = "anya-bitcoin"
-version = "0.1.0"
+version = "1.1.0"
 edition = "2021"
 description = "Bitcoin implementation following hexagonal architecture principles"
 authors = ["bo_thebig <botshelomokokoka@gmail.com>"]
@@ -11,7 +11,7 @@ anyhow = "1.0.98"
 async-trait = "0.1.88"
 bitcoin = "0.32"
 tokio = "1.45.1"
-serde = "1.0.219"
+serde = { version = "1.0.219", features = ["derive"] }
 thiserror = "2.0.12"
 tracing = "0.1.41"
 tracing-subscriber = "0.3.19"
@@ -24,6 +24,8 @@ uuid = { version = "1.6.1", features = ["v4", "serde"] }
 rand = "0.8.5"
 bitflags = "2.5.0"
 serde_json = "1.0"
+futures-io = "0.3"
+bitcoin_hashes = "0.16.0"
 
 [dev-dependencies]
 mockall = "0.11.3"
