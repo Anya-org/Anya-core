@@ -9,7 +9,6 @@ use bitcoin::{Script, Transaction};
 use log::info;
 use thiserror::Error;
 
-use crate::core::error::{AnyaError, AnyaResult};
 
 /// Maximum number of operations allowed in a script
 pub const MAX_OPS_PER_SCRIPT: usize = 201;
@@ -18,7 +17,7 @@ pub const MAX_OPS_PER_SCRIPT: usize = 201;
 pub const MAX_SCRIPT_SIZE: usize = 10000;
 
 /// Maximum number of elements on the stack
-pub const MAX_STACK_SIZE: usize = 1000;
+pub const MAX_STACK_SIZE: usize = 100;
 
 /// Maximum script element size in bytes
 pub const MAX_SCRIPT_ELEMENT_SIZE: usize = 520;
@@ -593,7 +592,7 @@ impl ScriptInterpreter {
             // OP_HASH160 - hash the top stack item with RIPEMD160(SHA256)
             0xa9 => {
                 // In a real implementation, this would perform the actual hash
-                let item = context.stack.pop()?;
+                let _item = context.stack.pop()?;
                 // Placeholder for hash160 result
                 let hash = vec![0; 20]; // 20-byte hash result
                 context.stack.push(hash)?;
@@ -618,8 +617,8 @@ impl ScriptInterpreter {
                     return Err(ScriptError::StackUnderflow);
                 }
                 
-                let pubkey = context.stack.pop()?;
-                let sig = context.stack.pop()?;
+                let _pubkey = context.stack.pop()?;
+                let _sig = context.stack.pop()?;
                 
                 // In a real implementation, this would verify the signature
                 // For now, we'll just push a success value
@@ -639,9 +638,9 @@ impl ScriptInterpreter {
                 
                 // In a real implementation, this would perform Schnorr signature verification
                 // and add the result to the top stack item
-                let pubkey = context.stack.pop()?;
-                let sig = context.stack.pop()?;
-                let num = context.stack.pop()?;
+                let _pubkey = context.stack.pop()?;
+                let _sig = context.stack.pop()?;
+                let _num = context.stack.pop()?;
                 
                 // Push 1 (simulated success) + original value
                 context.stack.push(vec![1])?;
@@ -679,10 +678,10 @@ impl TaprootValidator {
     
     /// Verify a Taproot (SegWit v1) output spend
     pub fn verify_taproot_spend(
-        tx: &Transaction,
-        input_index: usize,
-        witness_program: &[u8],
-        amount: u64,
+        _tx: &Transaction,
+        _input_index: usize,
+        _witness_program: &[u8],
+        _amount: u64,
         flags: VerifyFlags,
     ) -> Result<bool, ScriptError> {
         if !flags.contains(VerifyFlags::TAPROOT) {

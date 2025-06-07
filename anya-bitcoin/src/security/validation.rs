@@ -3,7 +3,6 @@
 //! This module provides validation functions for security-critical operations
 //! in the Bitcoin implementation.
 
-use crate::core::error::{AnyaError, AnyaResult};
 
 /// Result of a validation operation
 #[derive(Debug, Clone, PartialEq)]

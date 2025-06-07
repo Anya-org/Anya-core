@@ -5,6 +5,7 @@
 //! Follows BIP standards for full compliance with Bitcoin Core principles.
 
 use bitcoin::{Block, BlockHash, Transaction};
+use bitcoin::hashes::Hash;
 use log::{debug, info};
 
 // Use our own Uint256 from the params module
@@ -35,7 +36,7 @@ pub enum ConsensusError {
 /// Check if a block header meets the proof of work requirement
 pub fn verify_pow(block: &Block, target: Uint256) -> Result<(), ConsensusError> {
     // Convert block hash to Uint256 to compare with target
-    let hash = Uint256::from_be_bytes(block.block_hash().as_byte_array());
+    let hash = Uint256::from_be_bytes(block.block_hash().to_byte_array());
     
     if hash <= target {
         Ok(())

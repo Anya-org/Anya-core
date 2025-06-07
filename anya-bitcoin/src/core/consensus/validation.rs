@@ -48,7 +48,7 @@ impl TransactionValidator {
     
     /// Validate a transaction from a file
     pub fn validate_from_file(&self, path: &std::path::Path) -> Result<(), ValidationError> {
-        let data = std::fs::read(path)?;
+        let _data = std::fs::read(path)?;
         
         // This is simplified - in reality, we'd parse the transaction
         // from the file data using bitcoin::consensus::deserialize
@@ -132,7 +132,7 @@ pub fn validate_block_hash(hash: &BlockHash) -> Result<(), ValidationError> {
     // - Hash format validity
     // - Leading zeros for proof of work
     // - Hash against known checkpoints
-    let _hash_bytes = hash.as_byte_array();
+    let _hash_bytes: &[u8] = hash.as_ref();
     Ok(())
 }
 

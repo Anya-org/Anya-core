@@ -3,7 +3,7 @@
 //! This module provides validation functions for Taproot-specific operations.
 
 use bitcoin::{Transaction, Script};
-use crate::core::error::{AnyaError, AnyaResult};
+use crate::core::error::AnyaResult;
 
 /// Taproot validator for transaction scripts and signatures
 #[derive(Debug, Clone, Default)]

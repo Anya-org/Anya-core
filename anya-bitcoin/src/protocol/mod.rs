@@ -12,7 +12,7 @@ pub struct ProtocolRules {
 
 impl ProtocolRules {
     /// Check BIP-341 compliance
-    pub fn check_bip341(&self, tx: &Transaction) -> Result<(), BitcoinError> {
+    pub fn check_bip341(&self, _tx: &Transaction) -> Result<(), BitcoinError> {
         if !self.enforce_bip341 {
             return Ok(());
         }
@@ -21,7 +21,7 @@ impl ProtocolRules {
     }
 
     /// Check Taproot commitment compliance
-    pub fn check_taproot_commitment(&self, tx: &Transaction) -> Result<(), BitcoinError> {
+    pub fn check_taproot_commitment(&self, _tx: &Transaction) -> Result<(), BitcoinError> {
         if !self.enforce_taproot {
             return Ok(());
         }

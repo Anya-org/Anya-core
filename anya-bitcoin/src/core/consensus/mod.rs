@@ -14,9 +14,6 @@ pub use bitcoin::{Block, BlockHash, Transaction, Txid};
 
 // Bitcoin consensus implementation
 //
-/// This module contains the consensus rules and validation logic for Bitcoin.
-
-use std::sync::Arc;
 use async_trait::async_trait;
 use crate::core::error::AnyaResult;
 

@@ -31,10 +31,13 @@ pub enum AnyaError {
     P2P(#[from] P2PError),
     
     #[error("Futures IO error: {0}")]
-    FuturesIo(#[from] futures_io::Error),
+    FuturesIo(String),
     
     #[error("General error: {0}")]
     General(String),
+    
+    #[error("Not implemented: {0}")]
+    NotImplemented(String),
     
     #[error("Serialization error: {0}")]
     Serialization(#[from] serde_json::Error),

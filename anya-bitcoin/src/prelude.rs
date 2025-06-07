@@ -40,7 +40,7 @@ pub use std::error::Error as StdError;
 
 // Re-export async utilities
 pub use async_trait::async_trait;
-pub use tokio::time;
+pub use std::time;
 
 // Re-export serde
 pub use serde::{Serialize, Deserialize};

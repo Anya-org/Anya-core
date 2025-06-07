@@ -47,12 +47,18 @@ pub mod ml;
 pub mod web5;
 pub mod dao;
 pub mod extensions;
+pub mod api;
+pub mod install;
+pub mod types;
 
 // Re-export key types for crate-wide visibility
 // [AIR-3][BPC-3] Following official Bitcoin Improvement Proposals (BIPs)
 pub use crate::dao::DaoLevel;
 pub use crate::bitcoin::interface::BitcoinInterface;
 pub use crate::bitcoin::adapters::BitcoinAdapter;
+pub use crate::types::compliance::*;
+
+// Export core types will be defined below
 pub mod config;
 pub mod core;
 

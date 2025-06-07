@@ -6,10 +6,8 @@
 
 use std::fmt;
 use thiserror::Error;
-use log::{debug, info, warn};
-use bitcoin::{Script, ScriptBuf, Address, Network, TxOut, PublicKey, BlockHash, Transaction};
+use bitcoin::{Script, ScriptBuf};
 
-use crate::core::error::AnyaResult;
 
 /// Maximum number of public keys in a multisig script
 pub const MAX_PUBKEYS_PER_MULTISIG: usize = 16;
