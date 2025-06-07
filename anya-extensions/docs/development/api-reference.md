@@ -4,7 +4,7 @@
 
 Complete API reference for Anya Core extension development, covering all interfaces, traits, and utilities available to extension developers.
 
-*Last updated: May 30, 2025*
+*Last updated: June 7, 2025*
 
 ## Core Extension Traits
 

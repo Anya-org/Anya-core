@@ -2,7 +2,7 @@
 
 [AIR-3][AIS-3][AIT-3][RES-3] Comprehensive guide to Anya's extension architecture patterns, design principles, and implementation strategies.
 
-*Last updated: May 30, 2025*
+*Last updated: June 7, 2025*
 
 ## Table of Contents
 

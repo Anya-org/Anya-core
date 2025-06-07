@@ -4,7 +4,7 @@
 
 Comprehensive guide for maintaining extensions in the Anya Core ecosystem, covering updates, versioning, deprecation policies, and long-term support strategies.
 
-*Last updated: May 30, 2025*
+*Last updated: June 7, 2025*
 
 ## Overview
 

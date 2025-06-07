@@ -12,8 +12,8 @@ A powerful platform combining Bitcoin/crypto functionality, ML-based analytics, 
 [![PSBT-v2](https://img.shields.io/badge/PSBT_v2-100%25-brightgreen)](https://bips.xyz/370)
 [![BIP-Standards](https://img.shields.io/badge/BIP-Standards_Compliant-green)](https://bips.xyz)
 
-*Last Updated: May 30, 2025*  
-**Latest Release: v0.3.0-rc2**
+*Last Updated: June 7, 2025*  
+**Latest Release: v1.1.0**
 
 > **Note:** This release includes comprehensive Taproot updates, enhanced HSM security, and a refactored installation system following official BIPs.
 
