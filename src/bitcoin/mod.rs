@@ -14,6 +14,7 @@ pub mod layer2; // Export layer2 module for Layer2Protocol trait
 pub mod protocol; // Bitcoin protocol compliance module
 pub mod node; // Bitcoin node management
 pub mod wallet; // Bitcoin wallet management
+pub mod validation_new; // Transaction validation module
 
 // Re-export key interfaces for easier access
 pub use interface::BitcoinInterface;

@@ -121,19 +121,9 @@ pub struct HistoricalBlock {
 pub static VERIFICATION_HISTORY: RwLock<HistoricalTransactionDB> = RwLock::new(HistoricalTransactionDB::new());
 
 /// Validates Bitcoin transactions according to BPC-3 standard
-/// Optimized for minimum hardware requirements (Intel i3-7020U)
-#[derive(Clone)]
+/// Simplified for core library compatibility
+#[derive(Debug)]
 pub struct TransactionValidator {
-    protocol: BitcoinProtocol,
-    taproot: TaprootValidator,
-    /// Hardware optimization manager for transaction validation
-    hw_manager: Arc<HardwareOptimizationManager>,
-    /// Batch verification queue for signature validation
-    batch_queue: Arc<Mutex<VecDeque<Transaction>>>,
-    /// Maximum batch size based on hardware capabilities
-    max_batch_size: usize,
-    /// Current optimization policy
-    optimization_active: bool,
     /// Flag explicitly indicating consensus maintenance
     /// Used by tests and integration scripts to verify alignment with Bitcoin principles
     pub maintains_consensus: bool,

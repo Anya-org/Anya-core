@@ -21,7 +21,7 @@ pub use crate::bitcoin::error::{BitcoinError, BitcoinResult};
 
 // [AIR-3][AIS-3][BPC-3][RES-3] Import Bitcoin configuration
 // This follows official Bitcoin Improvement Proposals (BIPs) standards for configuration management
-use crate::config::BitcoinConfig as ConfigBitcoinConfig;
+use crate::bitcoin::config::BitcoinConfig as ConfigBitcoinConfig;
 use crate::bitcoin::config::BitcoinConfig as BitcoinInternalConfig;
 // Use fully qualified paths to avoid type conflicts
 
@@ -234,8 +234,8 @@ pub fn create_bitcoin_interface(
     let _internal_config = BitcoinInternalConfig {
         enabled: true,
         network: config.network.clone(),
-        rpc_url: Some(config.rpc_url.clone()),
-        auth: config.username.clone().zip(config.password.clone()),
+        rpc_url: Some(config.rpc_url.clone().unwrap_or_else(|| "http://127.0.0.1:18332".to_string())),
+        auth: config.auth.clone(),
         min_confirmations: 6,
         default_fee_rate: 10,
         wallet_path: None,
@@ -284,8 +284,8 @@ pub fn get_current_bitcoin_interface(config: &ConfigBitcoinConfig) -> Result<Arc
     let _internal_config = BitcoinInternalConfig {
         enabled: true,
         network: config.network.clone(),
-        rpc_url: Some(config.rpc_url.clone()),
-        auth: config.username.clone().zip(config.password.clone()),
+        rpc_url: Some(config.rpc_url.clone().unwrap_or_else(|| "http://127.0.0.1:18332".to_string())),
+        auth: config.auth.clone(),
         min_confirmations: 6,
         default_fee_rate: 10,
         wallet_path: None,
