@@ -200,3 +200,22 @@ pub enum ResourceType {
     Storage,
     Custom(i32),
 }
+
+// BIP Compliance Report structures that are expected by the installer
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct BipComplianceReport {
+    pub bip341: ComplianceStatus,
+    pub bip342: ComplianceStatus,
+    pub bip174: ComplianceStatus,
+    pub bip370: ComplianceStatus,
+    pub overall_status: String,
+    pub timestamp: u64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub enum ComplianceStatus {
+    #[default]
+    Full,
+    Partial,
+    Missing,
+}

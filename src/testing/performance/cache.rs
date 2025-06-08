@@ -5,7 +5,6 @@ use crate::testing::performance::{
 };
 use std::collections::{HashMap, VecDeque};
 use rand::{thread_rng, Rng};
-use std::time::Instant;
 use rand_distr::{Distribution, Zipf};
 
 /// Cache algorithm

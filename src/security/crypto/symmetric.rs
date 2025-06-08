@@ -1,12 +1,14 @@
-use std::error::Error;
 // Symmetric Encryption Module
 // [AIR-2][AIS-2][BPC-2][AIT-2][RES-2]
 //
 // This module provides symmetric encryption utilities using modern algorithms.
 /// Supports AES-256 (GCM, CBC, CTR modes) and ChaCha20-Poly1305.
 
-use chacha20poly1305::{ChaCha20Poly1305, Key, KeyInit as ChaChaKeyInit};
-use rand::{Rng, rngs::OsRng};
+use chacha20poly1305::{
+    aead::{Aead, KeyInit, Payload},
+    ChaCha20Poly1305, Key
+};
+use aes_gcm::{Aes256Gcm, aead::Aead as AesAead};
 use thiserror::Error;
 
 use crate::security::crypto::random;
@@ -151,13 +153,13 @@ impl SymmetricCrypto {
             .map_err(|e| SymmetricError::EncryptionError(e.to_string()))?;
         
         // Create nonce
-        let nonce = Nonce::from_slice(nonce);
+        let nonce = aes_gcm::Nonce::from_slice(nonce);
         
         // Encrypt
         let payload = if let Some(aad_data) = aad {
-            Payload { msg: plaintext, aad: aad_data }
+            aes_gcm::aead::Payload { msg: plaintext, aad: aad_data }
         } else {
-            Payload { msg: plaintext, aad: &[] }
+            aes_gcm::aead::Payload { msg: plaintext, aad: &[] }
         };
         
         cipher.encrypt(nonce, payload)
@@ -184,13 +186,13 @@ impl SymmetricCrypto {
             .map_err(|e| SymmetricError::DecryptionError(e.to_string()))?;
         
         // Create nonce
-        let nonce = Nonce::from_slice(nonce);
+        let nonce = aes_gcm::Nonce::from_slice(nonce);
         
         // Decrypt
         let payload = if let Some(aad_data) = aad {
-            Payload { msg: ciphertext, aad: aad_data }
+            aes_gcm::aead::Payload { msg: ciphertext, aad: aad_data }
         } else {
-            Payload { msg: ciphertext, aad: &[] }
+            aes_gcm::aead::Payload { msg: ciphertext, aad: &[] }
         };
         
         cipher.decrypt(nonce, payload)
@@ -219,10 +221,14 @@ impl SymmetricCrypto {
         // Create nonce
         let nonce = chacha20poly1305::Nonce::from_slice(nonce);
         
-        // Encrypt
-        let aad_data = aad.unwrap_or(&[]);
+        // Encrypt with payload
+        let payload = if let Some(aad_data) = aad {
+            Payload { msg: plaintext, aad: aad_data }
+        } else {
+            Payload { msg: plaintext, aad: &[] }
+        };
         
-        cipher.encrypt(nonce, plaintext.as_ref())
+        cipher.encrypt(nonce, payload)
             .map_err(|e| SymmetricError::EncryptionError(e.to_string()))
     }
     
@@ -248,10 +254,14 @@ impl SymmetricCrypto {
         // Create nonce
         let nonce = chacha20poly1305::Nonce::from_slice(nonce);
         
-        // Decrypt
-        let aad_data = aad.unwrap_or(&[]);
+        // Decrypt with payload
+        let payload = if let Some(aad_data) = aad {
+            Payload { msg: ciphertext, aad: aad_data }
+        } else {
+            Payload { msg: ciphertext, aad: &[] }
+        };
         
-        cipher.decrypt(nonce, ciphertext.as_ref())
+        cipher.decrypt(nonce, payload)
             .map_err(|e| SymmetricError::DecryptionError(e.to_string()))
     }
 }
@@ -271,7 +281,7 @@ mod tests {
     use super::*;
     
     #[test]
-    fn test_aes_gcm() {
+    fn test_aes_gcm() -> Result<(), Box<dyn std::error::Error>> {
         let crypto = SymmetricCrypto::new(SymmetricAlgorithm::Aes256Gcm);
         
         // Generate key and nonce
@@ -300,10 +310,12 @@ mod tests {
         let wrong_aad = b"Wrong additional data";
         let result = crypto.decrypt(&key, &nonce, &ciphertext, Some(wrong_aad));
         assert!(result.is_err());
+        
+        Ok(())
     }
     
     #[test]
-    fn test_chacha20_poly1305() {
+    fn test_chacha20_poly1305() -> Result<(), Box<dyn std::error::Error>> {
         let crypto = SymmetricCrypto::new(SymmetricAlgorithm::ChaCha20Poly1305);
         
         // Generate key and nonce
@@ -326,6 +338,8 @@ mod tests {
         
         // Verify decrypted matches original
         assert_eq!(&decrypted, plaintext);
+        
+        Ok(())
     }
     
     #[test]

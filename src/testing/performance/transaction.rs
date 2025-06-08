@@ -1,7 +1,7 @@
 /// Transaction performance testing
 
 use crate::testing::performance::{
-    PerformanceTestable, TestConfig, TestResult, PerfTestError, Result, Timer, MetricType
+    PerformanceTestable, TestConfig, TestResult, Result, Timer, MetricType
 };
 use std::collections::HashMap;
 use rand::{thread_rng, Rng};

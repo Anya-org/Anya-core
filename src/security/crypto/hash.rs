@@ -2,7 +2,6 @@
 //! 
 //! This module provides cryptographic hash function implementations for Bitcoin security.
 
-use std::error::Error;
 
 /// Supported hash algorithms
 #[derive(Debug, Clone, Copy, PartialEq)]

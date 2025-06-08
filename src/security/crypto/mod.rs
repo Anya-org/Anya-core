@@ -3,7 +3,6 @@
 //!
 //! This module provides cryptographic utilities for the Bitcoin security framework.
 
-use std::error::Error;
 
 pub mod random;
 
