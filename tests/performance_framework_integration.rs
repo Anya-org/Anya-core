@@ -2,10 +2,10 @@
 
 #[cfg(test)]
 mod tests {
-    use anya::testing::performance::cache::{
+    use anya_core::testing::performance::cache::{
         AccessPattern, CacheAlgorithm, CacheConfig, CachePerformanceTest,
     };
-    use anya::testing::performance::{PerformanceTestRunner, TestConfig};
+    use anya_core::testing::performance::{PerformanceTestRunner, TestConfig};
     use std::collections::HashMap;
 
     #[test]

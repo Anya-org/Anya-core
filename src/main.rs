@@ -1,5 +1,4 @@
-use anya::{AnyaCore, AnyaConfig, AnyaResult};
-use std::sync::Arc;
+use anya_core::{AnyaCore, AnyaConfig, AnyaResult, AnyaError};
 use tokio::net::TcpListener;
 use tracing::{info, Level};
 use tracing_subscriber::FmtSubscriber;
@@ -11,7 +10,7 @@ async fn main() -> AnyaResult<()> {
         .with_max_level(Level::DEBUG)
         .finish();
     tracing::subscriber::set_global_default(subscriber)
-        .map_err(|e| anya::AnyaError::System(e.to_string()))?;
+        .map_err(|e| AnyaError::System(e.to_string()))?;
 
     info!("Starting Anya Core system...");
 
@@ -29,7 +28,7 @@ async fn main() -> AnyaResult<()> {
     info!("Starting API server on {}", addr);
     let listener = TcpListener::bind(&addr)
         .await
-        .map_err(|e| anya::AnyaError::System(e.to_string()))?;
+        .map_err(|e| AnyaError::System(e.to_string()))?;
 
     // For now, just keep the server running
     info!("Anya Core is running. Press Ctrl+C to stop.");
