@@ -50,6 +50,7 @@ pub mod extensions;
 pub mod api;
 pub mod install;
 pub mod types;
+pub mod testing;
 
 // Re-export key types for crate-wide visibility
 // [AIR-3][BPC-3] Following official Bitcoin Improvement Proposals (BIPs)

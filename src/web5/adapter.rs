@@ -5,8 +5,7 @@ use std::sync::Arc;
 // [AIR-3][AIS-3][BPC-3][RES-3] Removed unused imports: Web5Error, Web5Result
 // [AIR-3][AIS-3][BPC-3][RES-3] Removed unused Web5Error and Web5Result imports
 use crate::web5::{Web5Config, Web5Manager};
-use crate::AnyaResult;
-use crate::AnyaError;
+use crate::{AnyaResult, AnyaError};
 
 /// Web5 adapter for the Anya Core system
 pub struct Web5Adapter {

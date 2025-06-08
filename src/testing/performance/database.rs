@@ -1,5 +1,4 @@
-use std::error::Error;
-//! Database access pattern performance testing
+/// Database access pattern performance testing
 
 use crate::testing::performance::{
     PerformanceTestable, TestConfig, TestResult, PerfTestError, Result, Timer, MetricType
@@ -341,9 +340,12 @@ impl PerformanceTestable for DatabaseAccessTest {
         let mut metrics = HashMap::new();
         let mut metric_types = HashMap::new();
         
-        for operation in &test.operations {
+        // Clone the operations to avoid borrow checker issues
+        let operations = test.operations.clone();
+        
+        for operation in &operations {
             println!("Testing {:?} operations...", operation);
-            let ops_per_second = test.run_operation_test(*operation, iterations / test.operations.len())?;
+            let ops_per_second = test.run_operation_test(*operation, iterations / operations.len())?;
             
             let metric_name = match operation {
                 DbOperation::Read => "read_ops_per_second",

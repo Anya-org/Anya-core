@@ -1,9 +1,9 @@
 use std::error::Error;
-//! Performance Testing Framework [BPC-3]
-//! 
-//! This module provides tools for performance testing of the Bitcoin
-//! implementation, including transaction throughput benchmarking,
-//! database access pattern analysis, and cache optimization.
+/// Performance Testing Framework [BPC-3]
+/// 
+/// This module provides tools for performance testing of the Bitcoin
+/// implementation, including transaction throughput benchmarking,
+/// database access pattern analysis, and cache optimization.
 
 use thiserror::Error;
 use serde::{Serialize, Deserialize};

@@ -1,5 +1,25 @@
 # Changelog for Anya Core
 
+## [2.0.1] - 2025-06-08 🔧 COMPILATION FIXES
+
+### 🔧 Critical Compilation Fixes
+- **Performance Testing Framework:** Fixed 10 compilation errors in performance testing modules
+- **Dependencies:** Added `rand_distr` for Zipf distribution support
+- **Timer Implementation:** Fixed Timer API usage in performance tests
+- **TestResult Structure:** Corrected field mismatches in test result reporting
+- **Import Cleanup:** Resolved unused imports and dead code warnings
+
+### 📊 Technical Improvements
+- **Transaction Performance Tests:** Implemented comprehensive mock transaction validation
+- **Cache Performance Tests:** Added Zipf distribution for realistic access patterns
+- **Database Performance Tests:** Enhanced database access pattern testing
+- **Error Handling:** Improved error propagation in performance test framework
+
+### 🎯 Documentation Updates
+- **System Status:** Updated documentation to reflect accurate compilation status
+- **TODO Tracking:** Corrected compilation error counts and progress tracking
+- **SYSTEM_MAP:** Added transparency about recent fixes and current state
+
 ## [2.0.0] - 2025-06-07 🎉 PRODUCTION MILESTONE
 
 ### 🚀 Major Production Release
@@ -12,7 +32,7 @@
 - **Privacy:** 5.0/5.0 ✅ Complete privacy preservation and zero-knowledge support
 
 ### ✅ Critical Fixes & Achievements
-- **Bitcoin Core Compilation:** Fixed 58+ compilation errors → 0 errors
+- **Bitcoin Core Compilation:** Previously fixed major compilation errors 
 - **Layer2 Protocols:** All protocols now fully operational and production-ready
 - **Hexagonal Architecture:** Complete implementation with proper port/adapter separation
 - **Enterprise Dependencies:** Precise version pinning with workspace optimization

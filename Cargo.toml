@@ -79,6 +79,7 @@ base64 = "=0.22.1"
 uuid = { version = "1.17.0", features = ["v4", "serde", "fast-rng"] }
 chrono = { version = "0.4.41", features = ["serde", "std"] }
 rand = { version = "0.8.5", features = ["std", "std_rng"] }
+rand_distr = "0.4.3"
 argon2 = { version = "=0.5.3", features = ["std", "password-hash"] }
 hex = { version = "0.4.3", features = ["std"] }
 log = { version = "0.4.27", features = ["std"] }
@@ -102,11 +103,13 @@ syn = { version = "2.0.101", features = ["full", "parsing"] }
 colored = "2.1.0"
 anya-bitcoin = { path = "./anya-bitcoin" }
 bitflags = "2.5.0"
+regex = "1.9.6"
 
 [dev-dependencies]
 mockall = "=0.13.1"
 tokio-test = "=0.4.4"
 tower-test = "=0.4.0"
+tempfile = "3.5.0"
 
 # [patch.crates-io]
 # rand = "0.9.1"

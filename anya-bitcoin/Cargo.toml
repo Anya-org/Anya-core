@@ -10,7 +10,7 @@ license = "MIT"
 anyhow = "1.0.98"
 async-trait = "0.1.88"
 bitcoin = "0.32"
-tokio = "1.45.1"
+tokio = { version = "1.45.1", features = ["full", "test-util"] }
 serde = { version = "1.0.219", features = ["derive"] }
 thiserror = "2.0.12"
 tracing = "0.1.41"

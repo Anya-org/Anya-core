@@ -704,7 +704,7 @@ pub mod tests {
     use super::*;
     
     #[tokio::test]
-    async fn test_peg_in() {
+    async fn test_peg_in() -> Result<(), Box<dyn std::error::Error>> {
         let config = RskConfig::default();
         let client = RskClient::new(config);
         
@@ -715,10 +715,11 @@ pub mod tests {
         assert_eq!(peg_in.status, PegStatus::Pending);
         assert!(peg_in.btc_tx_hash.is_none());
         assert!(peg_in.rsk_tx_hash.is_none());
+        Ok(())
     }
     
     #[tokio::test]
-    async fn test_peg_out() {
+    async fn test_peg_out() -> Result<(), Box<dyn std::error::Error>> {
         let config = RskConfig::default();
         let client = RskClient::new(config);
         
@@ -729,10 +730,11 @@ pub mod tests {
         assert_eq!(peg_out.status, PegStatus::Pending);
         assert!(peg_out.btc_tx_hash.is_none());
         assert!(peg_out.rsk_tx_hash.is_none());
+        Ok(())
     }
     
     #[tokio::test]
-    async fn test_call_contract() {
+    async fn test_call_contract() -> Result<(), Box<dyn std::error::Error>> {
         let config = RskConfig::default();
         let client = RskClient::new(config);
         
@@ -745,10 +747,11 @@ pub mod tests {
         assert_eq!(result.method, "balanceOf");
         assert_eq!(result.status, CallStatus::Success);
         assert!(result.transaction_hash.is_some());
+        Ok(())
     }
     
     #[tokio::test]
-    async fn test_deploy_contract() {
+    async fn test_deploy_contract() -> Result<(), Box<dyn std::error::Error>> {
         let config = RskConfig::default();
         let client = RskClient::new(config);
         
@@ -759,10 +762,11 @@ pub mod tests {
         assert!(!result.contract_address.is_empty());
         assert!(!result.transaction_hash.is_empty());
         assert!(result.gas_used > 0);
+        Ok(())
     }
     
     #[tokio::test]
-    async fn test_transfer_rbtc() {
+    async fn test_transfer_rbtc() -> Result<(), Box<dyn std::error::Error>> {
         let config = RskConfig::default();
         let client = RskClient::new(config);
         
@@ -771,10 +775,11 @@ pub mod tests {
         assert_eq!(tx.to, "0x1234567890123456789012345678901234567890");
         assert_eq!(tx.value, 0.1);
         assert_eq!(tx.status, TransactionStatus::Pending);
+        Ok(())
     }
     
     #[tokio::test]
-    async fn test_get_block() {
+    async fn test_get_block() -> Result<(), Box<dyn std::error::Error>> {
         let config = RskConfig::default();
         let client = RskClient::new(config);
         
@@ -782,6 +787,7 @@ pub mod tests {
         
         assert_eq!(block.number, 1000000);
         assert!(!block.hash.is_empty());
+        Ok(())
     }
 }
 
