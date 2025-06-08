@@ -8,12 +8,13 @@
 use std::sync::{Arc, Mutex};
 use std::collections::HashMap;
 use std::net::{SocketAddr, IpAddr};
-use std::time::{Duration, SystemTime, UNIX_EPOCH};
+use std::time::{SystemTime, UNIX_EPOCH};
 use bitcoin::{Block, Transaction};
-use log::{debug, info, warn, error};
+use log::{info, error};
 use thiserror::Error;
 
 use crate::core::error::AnyaResult;
+use crate::core::error::AnyaError;
 use super::{PeerInfo, NetworkStats};
 
 /// Bitcoin Core default port
@@ -31,32 +32,23 @@ pub const MAX_INBOUND_CONNECTIONS: usize = 125;
 /// Duration after which a peer is considered disconnected if no message received
 pub const PEER_TIMEOUT_SECONDS: u64 = 90;
 
-/// Error variants that can occur during P2P network operations
+/// P2P network errors
 #[derive(Debug, Error)]
 pub enum P2PError {
-    #[error("Failed to connect to peer: {0}")]
-    ConnectionFailed(String),
-    
-    #[error("Peer {0} disconnected: {1}")]
-    PeerDisconnected(String, String),
-    
-    #[error("Message validation failed: {0}")]
-    MessageValidationFailed(String),
-    
-    #[error("Network error: {0}")]
-    NetworkError(String),
-    
-    #[error("Peer limit reached")]
-    PeerLimitReached,
-    
-    #[error("I/O error: {0}")]
-    IoError(#[from] std::io::Error),
-    
-    #[error("Bitcoin serialization error: {0}")]
-    SerializationError(String),
-    
-    #[error("General error: {0}")]
+    #[error("General P2P error: {0}")]
     General(String),
+    
+    #[error("Connection failed: {0}")]
+    Connection(String),
+    
+    #[error("Message handling error: {0}")]
+    Message(String),
+}
+
+impl From<P2PError> for AnyaError {
+    fn from(err: P2PError) -> Self {
+        AnyaError::P2P(err.to_string())
+    }
 }
 
 /// Connection status with a peer
@@ -182,7 +174,7 @@ impl P2PNetwork {
             return Err(P2PError::General("P2P network not running".to_string()).into());
         }
         
-        info!("Broadcasting transaction {}", tx.txid());
+        info!("Broadcasting transaction {}", tx.compute_txid());
         
         // In a real implementation, this would encode the transaction
         // and send it to all connected peers
@@ -286,7 +278,7 @@ impl P2PNetwork {
     
     /// Connect to seed nodes
     fn connect_to_seeds(&self) -> AnyaResult<()> {
-        let port = if self.is_testnet {
+        let _port = if self.is_testnet {
             TESTNET_PORT
         } else {
             DEFAULT_PORT
@@ -343,9 +335,6 @@ impl P2PNetwork {
         self.local_address
     }
 }
-
-/// Re-export for the P2P trait interface
-pub type P2PNetwork as super::P2P;
 
 #[cfg(test)]
 mod tests {

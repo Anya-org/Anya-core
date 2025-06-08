@@ -60,21 +60,23 @@ impl SystemHardening {
                               level: SecurityLevel, 
                               settings: HashMap<String, String>,
                               auto_save: bool) -> Result<(), String> {
-        let mut configs = self.configs.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
-        
-        let config = HardeningConfig {
-            name: name.to_string(),
-            status: ConfigStatus::NotApplied,
-            level,
-            settings,
-            last_modified: Instant::now(),
-            auto_save_enabled: auto_save,
-        };
-        
-        configs.insert(name.to_string(), config);
+        {
+            let mut configs = self.configs.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
+            
+            let config = HardeningConfig {
+                name: name.to_string(),
+                status: ConfigStatus::NotApplied,
+                level,
+                settings,
+                last_modified: Instant::now(),
+                auto_save_enabled: auto_save,
+            };
+            
+            configs.insert(name.to_string(), config);
+        } // Release the lock before calling auto-save
         
         // Update input counter and check for auto-save
-let _ =         self.record_input_and_check_save();
+        let _ = self.record_input_and_check_save();
         
         Ok(())
     }
@@ -108,43 +110,48 @@ let _ =         self.record_input_and_check_save();
     
     /// Apply security hardening configuration for a component
     pub fn apply_hardening(&self, component_name: &str) -> Result<ConfigStatus, String> {
-        let mut configs = self.configs.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
-        
-        let config = match configs.get_mut(component_name) {
-            Some(config) => config,
-            None => return Err(format!("No configuration found for component {}", component_name)),
-        };
-        
-        // For demonstration purposes, we're just simulating the application
-        // In a real implementation, this would apply actual security settings
-        println!("Applying security configuration for {}: {:?}", component_name, config.level);
-        
-        // Update status
-        config.status = ConfigStatus::Applied;
-        config.last_modified = Instant::now();
+        let status = {
+            let mut configs = self.configs.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
+            
+            let config = match configs.get_mut(component_name) {
+                Some(config) => config,
+                None => return Err(format!("No configuration found for component {}", component_name)),
+            };
+            
+            // For demonstration purposes, we're just simulating the application
+            // In a real implementation, this would apply actual security settings
+            println!("Applying security configuration for {}: {:?}", component_name, config.level);
+            
+            // Update status
+            config.status = ConfigStatus::Applied;
+            config.last_modified = Instant::now();
+            config.status.clone()
+        }; // Release the lock before calling auto-save
         
         // Record this input and potentially auto-save
-let _ =         self.record_input_and_check_save();
+        let _ = self.record_input_and_check_save();
         
-        Ok(config.status.clone())
+        Ok(status)
     }
     
     /// Set a specific security setting
     pub fn set_security_setting(&self, component_name: &str, key: &str, value: &str) -> Result<(), String> {
-        let mut configs = self.configs.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
-        
-        let config = match configs.get_mut(component_name) {
-            Some(config) => config,
-            None => return Err(format!("No configuration found for component {}", component_name)),
-        };
-        
-        // Update the setting
-        config.settings.insert(key.to_string(), value.to_string());
-        config.status = ConfigStatus::Pending;  // Changed but not applied
-        config.last_modified = Instant::now();
+        {
+            let mut configs = self.configs.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
+            
+            let config = match configs.get_mut(component_name) {
+                Some(config) => config,
+                None => return Err(format!("No configuration found for component {}", component_name)),
+            };
+            
+            // Update the setting
+            config.settings.insert(key.to_string(), value.to_string());
+            config.status = ConfigStatus::Pending;  // Changed but not applied
+            config.last_modified = Instant::now();
+        } // Release the lock before calling auto-save
         
         // Auto-save if needed
-let _ =         self.record_input_and_check_save();
+        let _ = self.record_input_and_check_save();
         
         Ok(())
     }

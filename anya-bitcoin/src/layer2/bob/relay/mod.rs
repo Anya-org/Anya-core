@@ -1,4 +1,3 @@
-use crate::prelude::StdError;
 // Bitcoin relay interaction module
 // Placeholder for future implementation
 

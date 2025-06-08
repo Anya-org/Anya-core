@@ -16,6 +16,9 @@ tokio = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
 anyhow = { workspace = true }
+log = "0.4"
+metrics = "0.23"
+thiserror = "2.0"
 
 # Blockchain Integration
 bitcoin = { workspace = true, features = ["rand"] }
@@ -24,7 +27,7 @@ bitcoin = { workspace = true, features = ["rand"] }
 web5 = { workspace = true }
 
 # Internal Dependencies
-anya-core = { path = ".." }
+anya_core = { path = ".." }
 
 # Correct workspace inheritance
 secp256k1 = { workspace = true }

@@ -8,14 +8,14 @@
 use std::sync::{Arc, Mutex};
 use std::collections::HashMap;
 use std::io;
-use log::{debug, info, warn, error};
+use log::{debug, warn, error};
 use thiserror::Error;
 use bitcoin::{Block, Transaction};
 
 use crate::core::error::AnyaResult;
 
 /// Bitcoin protocol message types
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum MessageType {
     /// Version handshake
     Version,
@@ -297,10 +297,10 @@ impl MessageHandler {
     }
     
     /// Create a "version" message
-    pub fn create_version_message(&self, version: u32, services: u64, timestamp: i64,
-                                 recv_services: u64, recv_addr: &[u8], from_addr: &[u8],
-                                 nonce: u64, user_agent: &str, start_height: i32,
-                                 relay: bool) -> Result<Message, MessageError> {
+    pub fn create_version_message(&self, version: u32, _services: u64, _timestamp: i64,
+                                 _recv_services: u64, _recv_addr: &[u8], _from_addr: &[u8],
+                                 _nonce: u64, _user_agent: &str, _start_height: i32,
+                                 _relay: bool) -> Result<Message, MessageError> {
         // In a real implementation, this would properly serialize the version message
         // For now, we'll just create a placeholder
         
@@ -431,14 +431,14 @@ impl MessageFactory {
     }
     
     /// Create a transaction message
-    pub fn create_tx(&self, tx: &Transaction) -> Result<Message, MessageError> {
+    pub fn create_tx(&self, _tx: &Transaction) -> Result<Message, MessageError> {
         // In a real implementation, this would serialize the transaction
         // For now, we'll return a placeholder error
         Err(MessageError::General("Not implemented".to_string()))
     }
     
     /// Create a block message
-    pub fn create_block(&self, block: &Block) -> Result<Message, MessageError> {
+    pub fn create_block(&self, _block: &Block) -> Result<Message, MessageError> {
         // In a real implementation, this would serialize the block
         // For now, we'll return a placeholder error
         Err(MessageError::General("Not implemented".to_string()))

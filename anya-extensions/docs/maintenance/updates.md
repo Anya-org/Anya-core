@@ -762,4 +762,4 @@ impl DependencyGraph {
 - [Maintenance Overview](./README.md)
 - [Deprecation Guide](./deprecation.md)
 
-*Last updated: May 30, 2025*
+*Last updated: June 7, 2025*

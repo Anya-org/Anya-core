@@ -39,7 +39,7 @@ impl IntoResponse for ApiError {
             ApiError::BitcoinError(e) => match e {
                 BitcoinError::WalletNotFound(_) => (StatusCode::NOT_FOUND, e.to_string()),
                 BitcoinError::InvalidAddress(_) => (StatusCode::BAD_REQUEST, e.to_string()),
-                BitcoinError::InsufficientFunds(_) => (StatusCode::BAD_REQUEST, e.to_string()),
+                BitcoinError::InsufficientFunds => (StatusCode::BAD_REQUEST, e.to_string()),
                 _ => (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()),
             },
             ApiError::InternalError(msg) => (StatusCode::INTERNAL_SERVER_ERROR, msg),

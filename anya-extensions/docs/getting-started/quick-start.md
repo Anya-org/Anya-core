@@ -2,7 +2,7 @@
 
 [AIR-3][AIS-3][AIT-3][RES-3] **Get up and running with Anya Core extensions in 15 minutes. Complete guide for Bitcoin, Web5, and ML integration.**
 
-*Last updated: May 30, 2025*
+*Last updated: June 7, 2025*
 
 ## Table of Contents
 

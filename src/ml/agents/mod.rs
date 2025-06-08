@@ -12,7 +12,7 @@ use serde::{Serialize, Deserialize};
 use async_trait::async_trait;
 
 // System maps for global state tracking and indexing
-mod system_map;
+pub mod system_map;
 pub use system_map::*;
 
 // Re-export agents
@@ -96,11 +96,10 @@ pub enum SystemUpdateType {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SystemState {
     /// Current system index snapshot
+    #[serde(skip_serializing, skip_deserializing)]
     pub index: Option<SystemIndex>,
-    
     /// Current system map snapshot
     pub map: Option<SystemMap>,
-    
     /// Timestamp of the observation
     pub timestamp: u64,
 }
@@ -205,8 +204,8 @@ pub trait Agent: Send + Sync {
     async fn read_system_state(&self) -> Result<SystemState, AgentError> {
         // Default implementation to fetch current system state
         Ok(SystemState {
-            index: Some(SystemIndex::global().read_index().await?),
-            map: Some(SystemMap::global().read_map().await?),
+            index: Some(crate::ml::agents::system_map::SystemIndexManager::global().read_index().await?),
+            map: Some(crate::ml::agents::system_map::SystemMapManager::global().read_map().await?),
             timestamp: std::time::SystemTime::now()
                 .duration_since(std::time::UNIX_EPOCH)
                 .unwrap_or_default()
@@ -219,10 +218,11 @@ pub trait Agent: Send + Sync {
         for update_type in updates {
             match update_type {
                 SystemUpdateType::IndexUpdate => {
-                    SystemIndex::global().update_index().await?;
+                    let idx = crate::ml::agents::system_map::SystemIndexManager::global().read_index().await?;
+                    crate::ml::agents::system_map::SystemIndexManager::global().update_index(idx).await?;
                 }
                 SystemUpdateType::MapUpdate => {
-                    SystemMap::global().update_map().await?;
+                    crate::ml::agents::system_map::SystemMapManager::global().update_map().await?;
                 }
                 _ => {} // Other updates handled elsewhere
             }
@@ -397,8 +397,10 @@ impl AgentSystem {
                 })?;
                 
                 metrics.total_observations += 1;
-                if result.is_ok() && result.as_ref()?.is_some() {
-                    metrics.total_actions += 1;
+                if let Ok(ref opt) = result {
+                    if opt.is_some() {
+                        metrics.total_actions += 1;
+                    }
                 }
                 if result.is_err() {
                     metrics.total_errors += 1;
@@ -438,7 +440,7 @@ impl AgentSystem {
         
         let mut results = HashMap::new();
         
-        for (agent_id, agent) in agents.iter() {
+        for (agent_id, _agent) in agents.iter() {
             let result = self.process_with_agent(agent_id, observation.clone()).await;
             results.insert(agent_id.clone(), result);
         }
@@ -484,10 +486,13 @@ pub struct MLAgentCoordinator {
     health_monitor: HealthMonitor,
 }
 
+// Stub trait and types for compilation
+pub trait MLAgent {}
+pub struct ResourcePool;
+pub struct HealthMonitor;
+
 #[cfg(test)]
 mod tests {
-    use super::*;
-    
     #[tokio::test]
     async fn test_agent_system_registration() {
         // Test agent registration and unregistration

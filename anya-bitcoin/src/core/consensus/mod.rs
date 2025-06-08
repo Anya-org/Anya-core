@@ -1,19 +1,20 @@
 pub mod validation;
 pub mod rules;
 pub mod params;
+pub mod types;
 
 // Re-export commonly used items
 pub use validation::{validate_block_header, validate_block_hash};
 pub use rules::{check_consensus_rules, verify_pow};
 pub use params::ConsensusParams;
+pub use types::{VerifyFlags, TransactionId, Proof};
 
-//! Bitcoin consensus implementation
-//!
-//! This module contains the consensus rules and validation logic for Bitcoin.
+// Re-export Bitcoin types for convenience
+pub use bitcoin::{Block, BlockHash, Transaction, Txid};
 
-use std::sync::Arc;
+// Bitcoin consensus implementation
+//
 use async_trait::async_trait;
-use bitcoin::{Block, BlockHash, Transaction, Txid};
 use crate::core::error::AnyaResult;
 
 /// Block validation result
@@ -60,4 +61,4 @@ impl Validator for NoopValidator {
     async fn is_transaction_in_utxo(&self, _txid: &Txid) -> AnyaResult<bool> {
         Ok(false)
     }
-} 
+}

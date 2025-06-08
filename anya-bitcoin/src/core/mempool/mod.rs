@@ -3,15 +3,9 @@ pub mod policy;
 pub mod fees;
 
 // Re-export commonly used items
-pub use pool::Mempool;
 pub use policy::MempoolPolicy;
 pub use fees::FeeEstimator;
 
-//! Bitcoin mempool implementation
-//!
-//! This module contains the memory pool implementation for Bitcoin transactions.
-
-use std::sync::Arc;
 use async_trait::async_trait;
 use bitcoin::{Transaction, Txid};
 use crate::core::error::AnyaResult;
@@ -65,7 +59,7 @@ impl Mempool for NoopMempool {
         Ok(AcceptanceResult {
             accepted: true,
             reason: None,
-            txid: tx.txid(),
+            txid: tx.compute_txid(),
             fee: 0,
             fee_rate: 0.0,
         })
@@ -94,4 +88,4 @@ impl Mempool for NoopMempool {
     async fn clear(&self) -> AnyaResult<()> {
         Ok(())
     }
-} 
+}

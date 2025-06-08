@@ -1,7 +1,7 @@
 // Bitcoin Manager Implementation
 use std::sync::{Arc, Mutex};
 use crate::bitcoin::adapters::BitcoinAdapter;
-use crate::AnyaResult;
+use crate::{AnyaResult};
 
 /// Configuration for the Bitcoin manager
 #[derive(Clone, Debug)]

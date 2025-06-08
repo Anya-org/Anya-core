@@ -13,6 +13,7 @@ pub mod riscv;
 pub mod security;
 pub mod testing;
 pub mod prelude;
+pub mod error;
 
 /// Configuration for Bitcoin node
 #[derive(Debug, Clone)]
@@ -54,7 +55,7 @@ pub struct BitcoinNode {
 
 impl BitcoinNode {
     /// Create a new Bitcoin node with the given configuration
-    pub fn new(config: Config) -> Result<Self, bitcoin::Error> {
+    pub fn new(config: Config) -> Result<Self, error::AnyaError> {
         // These would normally be instantiated with concrete implementations
         let consensus = Arc::new(core::consensus::NoopValidator {});
         let mempool = Arc::new(core::mempool::NoopMempool {});
@@ -70,7 +71,7 @@ impl BitcoinNode {
     }
 
     /// Start the Bitcoin node
-    pub fn start(&mut self) -> Result<(), bitcoin::Error> {
+    pub fn start(&mut self) -> Result<(), error::AnyaError> {
         // Initialize Layer 2 factory and registry
         let factory = Arc::new(layer2::framework::factory::Layer2Factory::new());
         let registry = Arc::new(layer2::framework::Layer2Registry::new(factory));

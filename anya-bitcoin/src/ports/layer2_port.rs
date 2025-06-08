@@ -5,7 +5,6 @@ use async_trait::async_trait;
 use crate::core::error::AnyaResult;
 
 // Import the TransactionStatus from framework
-use crate::layer2::framework::TransactionStatus;
 
 #[async_trait]
 pub trait ProtocolPort {

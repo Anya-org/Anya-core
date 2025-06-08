@@ -5,6 +5,7 @@ use anya_core::{
     web5::advanced_integration::AdvancedWeb5Integration,
 };
 use bitcoin::Network;
+use std::sync::Arc;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {

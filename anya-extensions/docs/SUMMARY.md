@@ -30,4 +30,4 @@
   * [Updates](maintenance/updates.md)
   * [Deprecation](maintenance/deprecation.md)
 
-*Last updated: May 30, 2025*
+*Last updated: June 7, 2025*

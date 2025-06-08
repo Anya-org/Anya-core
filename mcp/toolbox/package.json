@@ -1,6 +1,6 @@
 {
   "name": "anya-mcp-toolbox",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "MCP servers for Anya Core development",
   "private": true,
   "dependencies": {

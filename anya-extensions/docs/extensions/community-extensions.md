@@ -2,7 +2,7 @@
 
 [AIR-3][AIS-3][AIT-3][RES-3] Discover and contribute to the vibrant ecosystem of community-developed extensions for Bitcoin, Web5, ML, and specialized use cases.
 
-*Last updated: May 30, 2025*
+*Last updated: June 7, 2025*
 
 ## Table of Contents
 

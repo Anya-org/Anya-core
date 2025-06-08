@@ -1,16 +1,26 @@
+[workspace]
+members = [
+    "anya-bitcoin",
+    "anya-extensions" # Add this for better workspace organization
+]
+
 [package]
-name = "anya-core"
-version = "0.3.0-rc.1"
+name = "anya_core"
+version = "0.9.0-dev"
 edition = "2021"
+rust-version = "1.63.0" # Explicit MSRV following rust-bitcoin standards
 description = "Enterprise-grade Bitcoin Infrastructure Platform"
 authors = ["botshelomokoka@gmail.com"]
 license = "MIT"
 repository = "https://github.com/anya-org/anya-core"
+readme = "README.md" # Following API guidelines for discoverability
+keywords = ["bitcoin", "cryptocurrency", "blockchain", "enterprise", "hexagonal"]
+categories = ["api-bindings", "cryptography::cryptocurrencies"] # Improve crates.io discoverability
 
 [features]
 default = ["std", "rust-bitcoin"]
 # Feature flag for HSM functionality
-hsm = ["dep:sha2", "dep:hmac"]
+hsm = []
 # Feature flag for complete system (including HSM)
 complete = ["hsm"]
 std = []
@@ -19,74 +29,70 @@ bitcoin_integration = []
 rust-bitcoin = ["bitcoin", "bdk"]
 # RSK integration for Bitcoin verification
 rsk = []
+# Add alignment-focused feature for system optimization
+system-alignment = ["bitcoin_integration", "hsm"] # New feature for enhanced alignment
 
 [dependencies]
 # API dependencies
 axum = "=0.8.4"
 tower = "=0.5.2"
-tower-http = { version = "=0.6.4", features = ["cors", "trace"] }
+tower-http = { version = "=0.6.6", features = ["cors", "trace"] }
 hyper = { version = "=1.6.0", features = ["full"] }
 tokio = { version = "=1.45.1", features = ["full"] }
 
-# Bitcoin dependencies
-bitcoin = { version = "0.32", features = ["std", "serde", "rand", "bitcoinconsensus", "secp-recovery", "base64", "rand-std", "bitcoinconsensus-std"], optional = true }
-secp256k1 = { version = "0.29", features = ["rand-std", "global-context"] }
-bdk = { version = "0.30", optional = true }
-miniscript = "12.3"
-bip39 = "2.0"
+# Bitcoin dependencies with enhanced consensus safety
+bitcoin = { version = "0.32", features = [
+    "std", "serde", "rand", "secp-recovery", 
+    "base64", "rand-std"
+], optional = true }
+secp256k1 = { version = "0.29", features = ["rand-std", "global-context", "recovery"] }
+bdk = { version = "0.30", optional = true, features = ["std", "compiler"] }
+miniscript = { version = "12.3", features = ["std", "compiler"] } # Enhanced for better policy compilation
+bip39 = { version = "2.0", features = ["std"] }
 
-# Web5/DID dependencies 
+# Enhanced Web5/DID dependencies for better alignment
 web5 = { git = "https://github.com/TBD54566975/web5-rs", rev = "310d79c9" }
-jsonwebtoken = "=9.3.1"
-multibase = "=0.9.1"
-multihash = "=0.19.3"
+jsonwebtoken = { version = "=9.3.1", features = ["use_pem"] } # Enhanced JWT support
+multibase = { version = "=0.9.1", features = ["std"] }
+multihash = { version = "=0.19.3", features = ["std"] }
 
-# Serialization/Deserialization
-serde = { version = "=1.0.214", features = ["derive"] }
-serde_json = "=1.0.133"
+# Serialization with enhanced features for system alignment
+serde = { version = "1.0.219", features = ["derive", "rc"] } # Add rc for reference counting
+serde_json = { version = "1.0.140", features = ["std", "preserve_order"] } # Maintain order for consensus
 humantime-serde = "=1.1.1"
-getrandom = "=0.3.3"
-url = "=2.5.4"
+getrandom = { version = "=0.3.3", features = ["std"] }
+url = { version = "=2.5.4", features = ["serde"] }
+toml = { version = "0.8.12", features = ["preserve_order"] } # Maintain configuration order
 
-# Error handling
-anyhow = "=1.0.93"
-thiserror = "=2.0.12"
+# Enhanced error handling for better system alignment
+anyhow = { version = "1.0.98", features = ["std", "backtrace"] } # Better error tracking
+thiserror = { version = "2.0.12", features = ["std"] }
 
-# Logging
-tracing = "=0.1.41"
-tracing-subscriber = { version = "=0.3.18", features = ["env-filter"] }
+# Enhanced logging for system monitoring
+tracing = { version = "0.1.41", features = ["std", "attributes"] }
+tracing-subscriber = { version = "0.3.19", features = ["env-filter", "json", "fmt"] }
+log = "0.4"
 
-# Utilities and common dependencies
-async-trait = "=0.1.84"
-clap = { version = "=4.5.39", features = ["derive"] }
+# System alignment focused utilities
+async-trait = "0.1.88"
+clap = { version = "=4.5.39", features = ["derive", "env", "color"] } # Enhanced CLI
 base64 = "=0.22.1"
-uuid = { version = "=1.11.0", features = ["v4", "serde"] }
-chrono = { version = "=0.4.38", features = ["serde"] }
-rand = "=0.8.5"
-argon2 = "=0.5.3"
-hex = "=0.4.3"
-log = "=0.4.22"
-reqwest = { version = "=0.12.9", features = ["json", "blocking"] }
-clap_derive = "=4.5.32"
-actix-web = "=4.11.0"
-actix-cors = "=0.7.1"
-env_logger = "=0.11.8"
-jwt = "=0.16.0"
-ring = "=0.17.8"
-sysinfo = "=0.32.1"
-dialoguer = "=0.11.0"
-warp = "=0.3.7"
-cargo_metadata = "=0.20.0"
-maplit = "=1.0.2"
-systemstat = "=0.2.3"
-regex = "=1.11.1"
-toml = "=0.8.19"
-serde_yaml = "=0.9.34"
-tokio-tungstenite = "=0.24.0"
+uuid = { version = "1.17.0", features = ["v4", "serde", "fast-rng"] }
+chrono = { version = "0.4.41", features = ["serde", "std"] }
+rand = { version = "0.8.5", features = ["std", "std_rng"] }
+rand_distr = "0.4"
+
+# Additional dependencies for installer and other bins
+ring = "0.17"
+sysinfo = "0.32"
+dialoguer = "0.11"
+warp = "0.3"
+maplit = "1.0"
+hex = "0.4"
 
 # Conditionally required dependencies (HSM feature and general codebase)
-sha2 = { version = "=0.10.8", optional = true }
-hmac = { version = "=0.12.1", optional = true }
+sha2 = "0.10.9"
+hmac = "0.12.1"
 zeroize = "=1.8.1"
 criterion = "0.6.0"
 walkdir = "2.5.0"
@@ -95,11 +101,68 @@ dashmap = "6.1.0"
 rayon = "1.10.0"
 blake3 = "1.8.2"
 semver = "1.0.26"
-syn = "2.0.101"
+syn = { version = "2.0.101", features = ["full", "parsing"] }
+
+colored = "2.1.0"
+anya-bitcoin = { path = "./anya-bitcoin" }
+bitflags = "2.5.0"
+regex = "1.9.6"
+trust-dns-resolver = "0.23"
+chacha20poly1305 = "0.10.1"
+rand_chacha = "0.3"
+lazy_static = "1.5.0"
+aes-gcm = "0.10"
 
 [dev-dependencies]
 mockall = "=0.13.1"
 tokio-test = "=0.4.4"
 tower-test = "=0.4.0"
+tempfile = "3.5.0"
+
+# [patch.crates-io]
+# rand = "0.9.1"
+# rand_core = "0.9.3"
+
+[workspace.package]
+version = "1.1.0"
+edition = "2021"
+authors = ["botshelomokoka@gmail.com"]
+license = "MIT"
+description = "Enterprise-grade Bitcoin Infrastructure Platform"
+repository = "https://github.com/anya-org/anya-core"
+
+[workspace.dependencies]
+bitcoin = { version = "0.32", features = ["std", "serde", "rand", "secp-recovery", "base64", "rand-std"] }
+bdk = { version = "0.30" }
+secp256k1 = { version = "0.29", features = ["rand-std", "global-context"] }
+anyhow = "1.0.98"
+thiserror = "2.0.12"
+async-trait = "0.1.88"
+serde = { version = "1.0.219", features = ["derive"] }
+serde_json = "1.0.140"
+tokio = { version = "1.45.1", features = ["full"] }
+tracing = "0.1.41"
+tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }
+hex = "0.4.3"
+log = "0.4.27"
+futures = "0.3.31"
+rand = "0.8.5"
+bitcoincore-rpc = "0.17.0"
+web5 = { git = "https://github.com/TBD54566975/web5-rs", rev = "310d79c9" }
+
+[lib]
+name = "anya_core"
+path = "src/lib.rs"
+
+[[bin]]
+name = "anya"
+path = "src/main.rs"
+
+[[bin]]
+name = "anya_installer"
+path = "src/bin/anya_installer.rs"
+required-features = ["std"]
+
+# ...other binary definitions as needed...
 
 

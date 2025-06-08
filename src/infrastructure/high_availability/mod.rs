@@ -1,4 +1,5 @@
-use std::error::Error;
+use serde::{Deserialize, Serialize};
+
 pub mod cluster;
 pub mod failover;
 pub mod health_check;
@@ -171,7 +172,7 @@ pub enum ClusterStatus {
 }
 
 /// Phase of the failover process
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum FailoverPhase {
     /// Detecting failure
     Detection,
@@ -209,7 +210,7 @@ pub struct HealthStatus {
 }
 
 /// General health state
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum HealthState {
     Healthy,
     Degraded,

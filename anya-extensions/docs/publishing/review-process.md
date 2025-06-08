@@ -408,4 +408,4 @@ impl ReviewMetrics {
 - **Expert Consultation**: Access to specialized expertise for complex reviews
 - **Community Coordination**: Tools for coordinating with community reviewers
 
-*Last updated: May 30, 2025*
+*Last updated: June 7, 2025*

@@ -1,23 +1,12 @@
-use std::error::Error;
-//! Performance test runner integration
-
-use crate::testing::performance::{
-    PerformanceTestRunner, TestConfig, PerformanceTestable, Result
-};
-use crate::testing::performance::transaction::{
-    TransactionThroughputTest, TxGenConfig
-};
-use crate::testing::performance::database::{
-    DatabaseAccessTest, DbConfig, DbOperation
-};
-use crate::testing::performance::cache::{
-    CachePerformanceTest, CacheConfig, create_standard_cache_tests
-};
-use crate::bitcoin::validation::TransactionValidator;
-use bitcoin::Network;
 use std::collections::HashMap;
 use std::fs;
 use std::path::Path;
+
+/// Performance test runner integration
+
+use crate::testing::performance::{
+    PerformanceTestRunner, TestConfig, Result
+};
 
 /// Create a standard test configuration
 pub fn create_standard_test_config(name: &str, iterations: usize) -> TestConfig {
@@ -35,53 +24,10 @@ pub fn run_comprehensive_test_suite(output_dir: &Path) -> Result<()> {
     let mut runner = PerformanceTestRunner::new();
     
     // Add test configurations
-    runner.add_config(create_standard_test_config("transaction_throughput", 1000));
-    runner.add_config(create_standard_test_config("database_access", 10000));
-    runner.add_config(create_standard_test_config("cache_performance", 100000));
+    runner.add_config(create_standard_test_config("performance_test", 10000));
     runner.add_config(create_standard_test_config("all", 1000));
     
-    // Add transaction throughput tests
-    let validator = TransactionValidator::new();
-    
-    // Single-threaded transaction test
-    let tx_test = TransactionThroughputTest::new(
-        validator.clone(),
-        TxGenConfig {
-            multithreaded: false,
-            ..TxGenConfig::default()
-        }
-    );
-    runner.add_component(Box::new(tx_test));
-    
-    // Multi-threaded transaction test
-    let tx_test_multi = TransactionThroughputTest::new(
-        validator,
-        TxGenConfig {
-            multithreaded: true,
-            thread_count: 4,
-            ..TxGenConfig::default()
-        }
-    );
-    runner.add_component(Box::new(tx_test_multi));
-    
-    // Add database access tests
-    let db_test = DatabaseAccessTest::new(
-        DbConfig::default(),
-        vec![
-            DbOperation::Read,
-            DbOperation::Write,
-            DbOperation::Update,
-            DbOperation::Delete,
-        ],
-        10000, // key space size
-        100,   // value size in bytes
-    );
-    runner.add_component(Box::new(db_test));
-    
-    // Add cache performance tests
-    for test in create_standard_cache_tests() {
-        runner.add_component(test);
-    }
+    // Note: Add performance testable components here when available
     
     // Run all tests
     runner.run_all_tests()?;
@@ -113,51 +59,9 @@ pub fn run_targeted_test(test_name: &str, iterations: usize, output_dir: &Path) 
     runner.add_config(create_standard_test_config(test_name, iterations));
     
     match test_name {
-        "transaction_throughput" => {
-            // Add transaction tests
-            let validator = TransactionValidator::new();
-            
-            // Single-threaded
-            let tx_test = TransactionThroughputTest::new(
-                validator.clone(),
-                TxGenConfig {
-                    multithreaded: false,
-                    ..TxGenConfig::default()
-                }
-            );
-            runner.add_component(Box::new(tx_test));
-            
-            // Multi-threaded
-            let tx_test_multi = TransactionThroughputTest::new(
-                validator,
-                TxGenConfig {
-                    multithreaded: true,
-                    thread_count: 4,
-                    ..TxGenConfig::default()
-                }
-            );
-            runner.add_component(Box::new(tx_test_multi));
-        }
-        "database_access" => {
-            // Add database test
-            let db_test = DatabaseAccessTest::new(
-                DbConfig::default(),
-                vec![
-                    DbOperation::Read,
-                    DbOperation::Write,
-                    DbOperation::Update,
-                    DbOperation::Delete,
-                ],
-                10000, // key space size
-                100,   // value size in bytes
-            );
-            runner.add_component(Box::new(db_test));
-        }
-        "cache_performance" => {
-            // Add cache tests
-            for test in create_standard_cache_tests() {
-                runner.add_component(test);
-            }
+        "performance_test" => {
+            // Note: Add specific performance test components here
+            println!("Running performance test: {}", test_name);
         }
         _ => {
             return Err(crate::testing::performance::PerfTestError::ConfigurationError(

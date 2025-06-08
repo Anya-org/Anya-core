@@ -7,11 +7,8 @@ pub use p2p::P2PNetwork;
 pub use messages::MessageHandler;
 pub use peers::PeerManager;
 
-//! Bitcoin network implementation
-//!
-//! This module contains the P2P network implementation for Bitcoin.
-
-use std::sync::Arc;
+// Bitcoin network implementation
+//
 use async_trait::async_trait;
 use bitcoin::{Block, Transaction};
 use crate::core::error::AnyaResult;
@@ -37,6 +34,15 @@ pub struct PeerInfo {
     pub bytes_sent: u64,
     /// Number of bytes received
     pub bytes_recv: u64,
+}
+
+impl PeerInfo {
+    /// Returns true if the peer is an outbound connection
+    pub fn is_outbound(&self) -> bool {
+        // Assuming outbound peers have a specific service flag or user agent marker
+        // Adjust logic as needed for your implementation
+        self.user_agent.contains("outbound") || (self.services & 1) != 0
+    }
 }
 
 /// Network statistics
@@ -127,4 +133,4 @@ impl P2P for NoopP2P {
     async fn remove_peer(&self, _id: &str) -> AnyaResult<bool> {
         Ok(true)
     }
-} 
+}

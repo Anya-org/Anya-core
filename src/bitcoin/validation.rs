@@ -1,20 +1,16 @@
 //! Bitcoin transaction validation [AIS-3][BPC-3][DAO-3][PFM-3]
 
-use bitcoin::{Transaction, Block, BlockHeader};
+use bitcoin::Transaction;
 use thiserror::Error;
 use std::collections::{VecDeque, HashMap};
 use std::sync::{Arc, Mutex, RwLock};
 use std::time::{SystemTime, UNIX_EPOCH};
-use crate::hardware_optimization::{HardwareOptimizationManager, OptimizableOperation, HardwareType};
-use crate::hardware_optimization::intel::{IntelOptimizer, BatchVerificationConfig};
-use super::protocol::{BitcoinProtocol, BPCLevel, BitcoinError};
-use super::taproot::TaprootValidator;
-use lazy_static::lazy_static;
+use super::protocol::{BitcoinProtocol, BPCLevel};
 use std::fmt;
 
-lazy_static! {
-    pub static ref VERIFICATION_HISTORY: RwLock<HistoricalTransactionDB> = RwLock::new(HistoricalTransactionDB::new());
-}
+// Global verification history - using RwLock::new() directly
+use std::sync::OnceLock;
+static VERIFICATION_HISTORY: OnceLock<RwLock<HistoricalTransactionDB>> = OnceLock::new();
 
 /// Record of a transaction verification operation for historical testing
 #[derive(Debug, Clone)]

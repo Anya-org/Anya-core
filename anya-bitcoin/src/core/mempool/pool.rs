@@ -6,12 +6,12 @@
 
 use std::collections::{HashMap, HashSet};
 use std::sync::{Arc, RwLock};
-use log::{debug, info, warn};
+use log::{debug, info};
 use bitcoin::{Transaction, Txid};
 use async_trait::async_trait;
 
 use crate::core::error::AnyaResult;
-use super::{AcceptanceResult, Mempool, policy::MempoolPolicy, fees::FeeEstimator};
+use super::{AcceptanceResult, policy::MempoolPolicy, fees::FeeEstimator};
 
 /// Default maximum size of the mempool in bytes
 pub const DEFAULT_MEMPOOL_SIZE: usize = 300_000_000; // 300 MB
@@ -98,13 +98,13 @@ impl MempoolImpl {
         // In a real implementation, this would calculate the fee
         // by comparing inputs and outputs
         // For simplicity, we'll return a placeholder value
-        let weight = tx.weight() as u64;
+        let weight = u64::from(tx.weight());
         weight * 10 // Simple fee calculation
     }
     
     /// Calculate fee rate (satoshis per byte)
     fn calculate_fee_rate(&self, tx: &Transaction, fee: u64) -> f64 {
-        let weight = tx.weight() as f64;
+        let weight = u64::from(tx.weight()) as f64;
         let vsize = weight / 4.0; // Convert weight units to virtual size
         if vsize > 0.0 {
             fee as f64 / vsize
@@ -143,7 +143,7 @@ impl MempoolImpl {
             tx_fees.sort_by(|a, b| a.1.partial_cmp(&b.1).unwrap());
             
             // Take lowest fee transactions until we've freed up enough space
-            let mut size_to_free = (*self.size.read().unwrap() / 4) as usize; // Free 25%
+            let size_to_free = (*self.size.read().unwrap() / 4) as usize; // Free 25%
             let mut freed = 0;
             
             for (txid, _) in tx_fees {
@@ -151,10 +151,10 @@ impl MempoolImpl {
                     break;
                 }
                 
-                txs_to_remove.push(**txid);
+                txs_to_remove.push(*txid);
                 
                 if let Some(tx) = txs_guard.get(txid) {
-                    freed += tx.weight() as usize / 4; // Convert to vsize
+                    freed += u64::from(tx.weight()) as usize / 4; // Convert to vsize
                 }
             }
         }
@@ -167,7 +167,7 @@ impl MempoolImpl {
             
             for txid in txs_to_remove {
                 if let Some(tx) = txs_guard.remove(&txid) {
-                    *size_guard -= tx.weight() as usize / 4;
+                    *size_guard -= u64::from(tx.weight()) as usize / 4;
                 }
             }
         }
@@ -178,9 +178,9 @@ impl MempoolImpl {
 }
 
 #[async_trait]
-impl Mempool for MempoolImpl {
+impl super::Mempool for MempoolImpl {
     async fn add_transaction(&self, tx: &Transaction) -> AnyaResult<AcceptanceResult> {
-        let txid = tx.txid();
+        let txid = tx.compute_txid();
         
         // Check if transaction is already in mempool
         {
@@ -247,7 +247,7 @@ impl Mempool for MempoolImpl {
         
         // Add to mempool
         {
-            let tx_size = tx.weight() as usize / 4; // vsize
+            let tx_size = u64::from(tx.weight()) as usize / 4; // vsize
             let mut txs_guard = self.transactions.write().unwrap();
             let mut size_guard = self.size.write().unwrap();
             
@@ -277,7 +277,7 @@ impl Mempool for MempoolImpl {
             let mut size_guard = self.size.write().unwrap();
             
             if let Some(tx) = txs_guard.remove(txid) {
-                let tx_size = tx.weight() as usize / 4; // vsize
+                let tx_size = u64::from(tx.weight()) as usize / 4; // vsize
                 *size_guard -= tx_size;
                 removed = true;
                 

@@ -80,23 +80,25 @@ impl PerformanceOptimizer {
                              target_utilization: f64,
                              target_throughput: f64,
                              target_latency: Duration) -> Result<(), String> {
-        let mut resources = self.resources.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
-        
-        let config = OptimizationConfig {
-            resource_type,
-            name: resource_name.to_string(),
-            status: OptimizationStatus::NotOptimized,
-            settings,
-            target_utilization,
-            target_throughput,
-            target_latency,
-            last_modified: Instant::now(),
-        };
-        
-        resources.insert(resource_name.to_string(), config);
+        {
+            let mut resources = self.resources.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
+            
+            let config = OptimizationConfig {
+                resource_type,
+                name: resource_name.to_string(),
+                status: OptimizationStatus::NotOptimized,
+                settings,
+                target_utilization,
+                target_throughput,
+                target_latency,
+                last_modified: Instant::now(),
+            };
+            
+            resources.insert(resource_name.to_string(), config);
+        } // Release the lock before calling auto-save
         
         // Record input and potentially auto-save
-let _ =         self.record_input_and_check_save();
+        let _ = self.record_input_and_check_save();
         
         Ok(())
     }
@@ -108,34 +110,33 @@ let _ =         self.record_input_and_check_save();
                          throughput: f64,
                          latency: Duration,
                          additional_metrics: HashMap<String, f64>) -> Result<(), String> {
-        // Check if resource exists
-        {
+        // Check if resource exists and get resource type
+        let resource_type = {
             let resources = self.resources.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
             if !resources.contains_key(resource_name) {
                 return Err(format!("Resource not found: {}", resource_name));
             }
-        }
-        
-        // Update metrics
-        let mut metrics_map = self.metrics.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
-        let resource_type = {
-            let resources = self.resources.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
             resources.get(resource_name).ok_or(format!("Resource not found: {}", resource_name))?.resource_type
         };
         
-        let metrics = PerformanceMetrics {
-            resource_type,
-            utilization,
-            throughput,
-            latency,
-            metrics: additional_metrics,
-            last_updated: Instant::now(),
-        };
-        
-        metrics_map.insert(resource_name.to_string(), metrics);
+        // Update metrics
+        {
+            let mut metrics_map = self.metrics.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
+            
+            let metrics = PerformanceMetrics {
+                resource_type,
+                utilization,
+                throughput,
+                latency,
+                metrics: additional_metrics,
+                last_updated: Instant::now(),
+            };
+            
+            metrics_map.insert(resource_name.to_string(), metrics);
+        } // Release the lock before calling auto-save
         
         // Record input and potentially auto-save
-let _ =         self.record_input_and_check_save();
+        let _ = self.record_input_and_check_save();
         
         Ok(())
     }
@@ -172,62 +173,65 @@ let _ =         self.record_input_and_check_save();
     
     /// Optimize a specific resource
     pub fn optimize_resource(&self, resource_name: &str) -> Result<OptimizationStatus, String> {
-        // Get resource configuration
-        let mut resources = self.resources.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
-        
-        let config = match resources.get_mut(resource_name) {
-            Some(config) => config,
-            None => return Err(format!("Resource not found: {}", resource_name)),
-        };
-        
-        // Check if metrics exist
-        let metrics = {
-            let metrics_map = self.metrics.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
-            match metrics_map.get(resource_name) {
-                Some(metrics) => metrics.clone(),
-                None => return Err(format!("No metrics available for resource: {}", resource_name)),
+        // Get resource configuration and update status
+        let status = {
+            let mut resources = self.resources.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
+            
+            let config = match resources.get_mut(resource_name) {
+                Some(config) => config,
+                None => return Err(format!("Resource not found: {}", resource_name)),
+            };
+            
+            // Check if metrics exist
+            let metrics = {
+                let metrics_map = self.metrics.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
+                match metrics_map.get(resource_name) {
+                    Some(metrics) => metrics.clone(),
+                    None => return Err(format!("No metrics available for resource: {}", resource_name)),
+                }
+            };
+            
+            // For demonstration purposes, we're just simulating optimization
+            println!("Optimizing resource {}: {:?}", resource_name, config.resource_type);
+            
+            // Simulate optimization logic
+            let mut optimized = true;
+            
+            if metrics.utilization > config.target_utilization {
+                println!("  - High utilization: {:.2}% (target: {:.2}%)", 
+                        metrics.utilization * 100.0, config.target_utilization * 100.0);
+                optimized = false;
             }
-        };
-        
-        // For demonstration purposes, we're just simulating optimization
-        println!("Optimizing resource {}: {:?}", resource_name, config.resource_type);
-        
-        // Simulate optimization logic
-        let mut optimized = true;
-        
-        if metrics.utilization > config.target_utilization {
-            println!("  - High utilization: {:.2}% (target: {:.2}%)", 
-                    metrics.utilization * 100.0, config.target_utilization * 100.0);
-            optimized = false;
-        }
-        
-        if metrics.throughput < config.target_throughput {
-            println!("  - Low throughput: {:.2} (target: {:.2})", 
-                    metrics.throughput, config.target_throughput);
-            optimized = false;
-        }
-        
-        if metrics.latency > config.target_latency {
-            println!("  - High latency: {:?} (target: {:?})", 
-                    metrics.latency, config.target_latency);
-            optimized = false;
-        }
-        
-        // Update status
-        config.status = if optimized {
-            OptimizationStatus::Optimized
-        } else {
-            // Apply optimizations (simulated here)
-            println!("  - Applying optimizations...");
-            OptimizationStatus::Optimized
-        };
-        
-        config.last_modified = Instant::now();
+            
+            if metrics.throughput < config.target_throughput {
+                println!("  - Low throughput: {:.2} (target: {:.2})", 
+                        metrics.throughput, config.target_throughput);
+                optimized = false;
+            }
+            
+            if metrics.latency > config.target_latency {
+                println!("  - High latency: {:?} (target: {:?})", 
+                        metrics.latency, config.target_latency);
+                optimized = false;
+            }
+            
+            // Update status
+            config.status = if optimized {
+                OptimizationStatus::Optimized
+            } else {
+                // Apply optimizations (simulated here)
+                println!("  - Applying optimizations...");
+                OptimizationStatus::Optimized
+            };
+            
+            config.last_modified = Instant::now();
+            config.status.clone()
+        }; // Release the lock before calling auto-save
         
         // Record input and potentially auto-save
-let _ =         self.record_input_and_check_save();
+        let _ = self.record_input_and_check_save();
         
-        Ok(config.status.clone())
+        Ok(status)
     }
     
     /// Optimize all resources

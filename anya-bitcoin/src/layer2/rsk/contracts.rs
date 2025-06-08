@@ -2,9 +2,9 @@
 // This is a stub implementation that needs to be completed
 
 /// Module placeholder
-pub struct contractsPlaceholder;
+pub struct ContractsPlaceholder;
 
-impl contractsPlaceholder {
+impl ContractsPlaceholder {
     /// Create a new placeholder
     pub fn new() -> Self {
         Self
@@ -14,11 +14,10 @@ impl contractsPlaceholder {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
     #[test]
     fn test_placeholder() {
         // Test will be implemented later
-        let _ = contractsPlaceholder::new();
+        let _ = ContractsPlaceholder::new();
         assert!(true);
     }
 }

@@ -7,7 +7,7 @@ use std::fmt;
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 use serde::{Serialize, Deserialize};
-use tracing::{info, warn, error, debug};
+use tracing::{info, debug};
 
 use super::validation::{BipValidator, ComplianceStatus, BitcoinConfig};
 use super::bip353::{Bip353, Bip353Status};
@@ -168,8 +168,8 @@ impl BipHealthReport {
         let mut bips: Vec<&String> = self.bips.keys().collect();
         bips.sort();
         
-        for bip_key in bips {
-            if let Some(bip) = self.bips.get(bip_key) {
+        for bip_key in &bips {
+            if let Some(bip) = self.bips.get(*bip_key) {
                 let status_icon = match bip.status {
                     ComplianceStatus::Compliant => "✅",
                     ComplianceStatus::Partial => "⚠️",
@@ -224,8 +224,8 @@ impl BipHealthReport {
         md.push_str("\n## Implementation Details\n\n");
         
         // BIP details
-        for bip_key in bips {
-            if let Some(bip) = self.bips.get(bip_key) {
+        for bip_key in &bips {
+            if let Some(bip) = self.bips.get(*bip_key) {
                 md.push_str(&format!("### {}: {}\n\n", bip.bip, bip.name));
                 md.push_str(&format!("{}\n\n", bip.description));
                 md.push_str(&format!("- **Status**: {}\n", bip.status));
@@ -471,7 +471,7 @@ impl BipHealthChecker {
             references: Some(vec![
                 "https://github.com/bitcoin/bips/blob/master/bip-0329.mediawiki".to_string(),
                 "https://bitcoinops.org/en/topics/wallet-labels/".to_string(),
-                "https://bitcoinops.org/en/topic-dates/#february-2025"
+                "https://bitcoinops.org/en/topic-dates/#april-2025".to_string().to_string()
             ]),
             last_updated: Some("2025-02-24".to_string()),
         });
@@ -491,7 +491,7 @@ impl BipHealthChecker {
             references: Some(vec![
                 "https://github.com/bitcoin/bips/blob/master/bip-0322.mediawiki".to_string(),
                 "https://bitcoinops.org/en/topics/generic-signmessage/".to_string(),
-                "https://bitcoinops.org/en/topic-dates/#april-2025"
+                "https://bitcoinops.org/en/topic-dates/#april-2025".to_string()
             ]),
             last_updated: Some("2025-04-01".to_string()),
         });
@@ -511,7 +511,7 @@ impl BipHealthChecker {
             references: Some(vec![
                 "https://github.com/bitcoin/bips/blob/master/bip-0119.mediawiki".to_string(),
                 "https://bitcoinops.org/en/topics/op_checktemplateverify/".to_string(),
-                "https://bitcoinops.org/en/topic-dates/#april-2025"
+                "https://bitcoinops.org/en/topic-dates/#april-2025".to_string()
             ]),
             last_updated: Some("2025-04-10".to_string()),
         });
@@ -549,7 +549,7 @@ impl BipHealthChecker {
             industry_adoption: AdoptionStatus::Experimental,
             references: Some(vec![
                 "https://github.com/bitcoin/bips/blob/master/bip-0374.mediawiki".to_string(),
-                "https://bitcoinops.org/en/topic-dates/#march-2025"
+                "https://bitcoinops.org/en/topic-dates/#april-2025".to_string()
             ]),
             last_updated: Some("2025-03-14".to_string()),
         });
@@ -571,7 +571,7 @@ impl BipHealthChecker {
             industry_adoption: AdoptionStatus::Limited,
             references: Some(vec![
                 "https://bitcoinops.org/en/topics/musig/".to_string(),
-                "https://bitcoinops.org/en/topic-dates/#february-2025"
+                "https://bitcoinops.org/en/topic-dates/#april-2025".to_string()
             ]),
             last_updated: Some("2025-02-15".to_string()),
         });
@@ -590,7 +590,7 @@ impl BipHealthChecker {
             industry_adoption: AdoptionStatus::Experimental,
             references: Some(vec![
                 "https://bitcoinops.org/en/topics/erlay/".to_string(),
-                "https://bitcoinops.org/en/topic-dates/#march-2025"
+                "https://bitcoinops.org/en/topic-dates/#april-2025".to_string()
             ]),
             last_updated: Some("2025-03-15".to_string()),
         });
@@ -609,7 +609,7 @@ impl BipHealthChecker {
             industry_adoption: AdoptionStatus::Experimental,
             references: Some(vec![
                 "https://bitcoinops.org/en/topics/ephemeral-anchors/".to_string(),
-                "https://bitcoinops.org/en/topic-dates/#march-2025"
+                "https://bitcoinops.org/en/topic-dates/#april-2025".to_string()
             ]),
             last_updated: Some("2025-03-15".to_string()),
         });
@@ -627,7 +627,7 @@ impl BipHealthChecker {
             required: false,
             industry_adoption: AdoptionStatus::Experimental,
             references: Some(vec![
-                "https://bitcoinops.org/en/topic-dates/#march-2025"
+                "https://bitcoinops.org/en/topic-dates/#april-2025".to_string()
             ]),
             last_updated: Some("2025-03-15".to_string()),
         });
@@ -645,7 +645,7 @@ impl BipHealthChecker {
             required: false,
             industry_adoption: AdoptionStatus::Experimental,
             references: Some(vec![
-                "https://bitcoinops.org/en/topic-dates/#march-2025"
+                "https://bitcoinops.org/en/topic-dates/#april-2025".to_string()
             ]),
             last_updated: Some("2025-03-15".to_string()),
         });
@@ -664,7 +664,7 @@ impl BipHealthChecker {
             industry_adoption: AdoptionStatus::Draft,
             references: Some(vec![
                 "https://bitcoinops.org/en/topics/matt/".to_string(),
-                "https://bitcoinops.org/en/topic-dates/#april-2025"
+                "https://bitcoinops.org/en/topic-dates/#april-2025".to_string()
             ]),
             last_updated: Some("2025-04-15".to_string()),
         });

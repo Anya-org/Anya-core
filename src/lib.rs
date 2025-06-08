@@ -47,12 +47,74 @@ pub mod ml;
 pub mod web5;
 pub mod dao;
 pub mod extensions;
+pub mod api;
+pub mod install;
+pub mod types;
+pub mod testing;
+pub mod compliance;
+pub mod bip;
+
+// Add missing modules to fix compilation errors
+
+pub mod auth {
+    //! Authentication module
+    //!
+    //! This module provides authentication functionality by re-exporting
+    //! authentication capabilities from security module and specialized
+    //! authentication implementations.
+    //!
+    //! # Features
+    //!
+    //! - BIP353 authentication support
+    //! - API authentication handlers
+    //! - Re-exports from the security module
+    //!
+    //! # Usage
+    //!
+    //! ```rust
+    //! use anya_core::auth;
+    //!
+    //! // BIP353 authentication
+    //! let auth_result = auth::bip353_auth::authenticate(...);
+    //!
+    //! // API authentication handlers
+    //! auth::handlers::auth::login(...);
+    //! ```
+    pub use crate::security::*;
+    pub use crate::bip::bip353_auth::*;
+    pub use crate::api::handlers::auth::*;
+}
+
+pub mod hardware_optimization {
+    //! Hardware optimization module
+    //!
+    //! This module provides hardware optimization functionality by re-exporting
+    //! the core hardware optimization framework.
+    //!
+    //! # Features
+    //!
+    //! - Integration with the core hardware optimization framework
+    //!
+    //! # Usage
+    //!
+    //! ```rust
+    //! use anya_core::hardware_optimization;
+    //!
+    //! // Optimize for specific hardware
+    //! hardware_optimization::optimize(...);
+    //! ```
+    // Note: hardware_optimization module not yet implemented in anya_bitcoin
+    // pub use anya_bitcoin::core::hardware_optimization::*;
+}
 
 // Re-export key types for crate-wide visibility
 // [AIR-3][BPC-3] Following official Bitcoin Improvement Proposals (BIPs)
 pub use crate::dao::DaoLevel;
 pub use crate::bitcoin::interface::BitcoinInterface;
 pub use crate::bitcoin::adapters::BitcoinAdapter;
+pub use crate::types::compliance::*;
+
+// Export core types will be defined below
 pub mod config;
 pub mod core;
 
@@ -383,3 +445,5 @@ pub mod prelude {
     // pub use crate::tools::markdown::DocumentationValidator;
     // pub use crate::security::hsm::TaprootValidator;
 }
+
+mod error;

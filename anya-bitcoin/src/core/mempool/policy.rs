@@ -5,12 +5,10 @@
 /// based on Bitcoin Core principles including security, decentralization, and minimalism.
 
 use std::sync::RwLock;
-use std::time::{Duration, SystemTime, UNIX_EPOCH};
-use bitcoin::{Transaction, TxOut};
-use log::{debug, info, warn};
+use bitcoin::{Transaction, TxOut, Amount};
+use log::debug;
 use thiserror::Error;
 
-use crate::core::error::AnyaResult;
 
 /// Default minimum relay fee (satoshis per kilobyte)
 pub const DEFAULT_MIN_RELAY_FEE: u64 = 1000; // 1 sat/byte
@@ -169,7 +167,7 @@ impl MempoolPolicy {
     
     /// Check if transaction size is within limits
     fn check_tx_size(&self, tx: &Transaction) -> Result<(), PolicyError> {
-        let tx_size = tx.weight() as usize / 4; // Convert to vsize
+        let tx_size = u64::from(tx.weight()) as usize / 4; // Convert to vsize
         let max_size = self.max_tx_size();
         
         if tx_size > max_size {
@@ -222,7 +220,7 @@ impl MempoolPolicy {
     /// Calculate the minimum fee for a transaction
     pub fn calculate_min_fee(&self, tx: &Transaction) -> u64 {
         let min_relay_fee = self.min_relay_fee();
-        let tx_size = tx.weight() as u64 / 4; // Convert to vsize
+        let tx_size = u64::from(tx.weight()) / 4; // Convert to vsize
         
         // Calculate minimum fee: min_relay_fee * tx_size / 1000
         (min_relay_fee * tx_size + 999) / 1000
@@ -232,11 +230,11 @@ impl MempoolPolicy {
     fn is_dust_output(output: &TxOut, dust_limit: u64) -> bool {
         // For simplicity, we'll just compare against the dust limit
         // In reality, this would take the script type into account
-        output.value < dust_limit
+        output.value < Amount::from_sat(dust_limit)
     }
     
     /// Check if a transaction follows standard format
-    fn is_standard_transaction(tx: &Transaction) -> bool {
+    fn is_standard_transaction(_tx: &Transaction) -> bool {
         // For simplicity, we'll always return true in this placeholder
         // In a real implementation, this would check script types, etc.
         true

@@ -1,12 +1,11 @@
-use std::error::Error;
-//! Cache performance testing
+/// Cache performance testing
 
 use crate::testing::performance::{
     PerformanceTestable, TestConfig, TestResult, PerfTestError, Result, Timer, MetricType
 };
 use std::collections::{HashMap, VecDeque};
-use rand::{thread_rng, Rng, distributions::{Distribution, Zipf}};
-use std::time::Duration;
+use rand::{thread_rng, Rng};
+use rand_distr::{Distribution, Zipf};
 
 /// Cache algorithm
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -301,8 +300,8 @@ impl CachePerformanceTest {
     }
     
     /// Generate a key based on the access pattern
-    fn generate_key(&self, iteration: usize) -> String {
-        match self.config.access_pattern {
+    fn generate_key(&self, iteration: usize) -> Result<String> {
+        Ok(match self.config.access_pattern {
             AccessPattern::Uniform => {
                 let mut rng = thread_rng();
                 let idx = rng.gen_range(0..self.config.key_space_size);
@@ -311,7 +310,7 @@ impl CachePerformanceTest {
             AccessPattern::Zipfian => {
                 let mut rng = thread_rng();
                 let zipf = Zipf::new(self.config.key_space_size as u64, self.config.zipf_param)
-                    ?;
+                    .map_err(|_| PerfTestError::ConfigurationError("Failed to create Zipf distribution".to_string()))?;
                 let idx = zipf.sample(&mut rng) as usize - 1;
                 self.keys[idx].clone()
             }
@@ -325,7 +324,7 @@ impl CachePerformanceTest {
                 let idx = rng.gen_range(0..set_size);
                 self.keys[idx].clone()
             }
-        }
+        })
     }
     
     /// Generate a random value
@@ -351,7 +350,7 @@ impl CachePerformanceTest {
         
         // Run test iterations
         for i in 0..iterations {
-            let key = self.generate_key(i);
+            let key = self.generate_key(i)?;
             
             // 80% of operations are reads, 20% are writes
             let mut rng = thread_rng();
@@ -469,58 +468,58 @@ impl PerformanceTestable for CachePerformanceTest {
 
 /// Create a standard set of cache performance tests
 pub fn create_standard_cache_tests() -> Vec<Box<dyn PerformanceTestable>> {
-    let mut tests = Vec::new();
+    let mut tests: Vec<Box<dyn PerformanceTestable>> = Vec::new();
     
     // LRU tests with different access patterns
     tests.push(Box::new(CachePerformanceTest::new(CacheConfig {
         algorithm: CacheAlgorithm::LRU,
         access_pattern: AccessPattern::Uniform,
         ..CacheConfig::default()
-    })));
+    })) as Box<dyn PerformanceTestable>);
     
     tests.push(Box::new(CachePerformanceTest::new(CacheConfig {
         algorithm: CacheAlgorithm::LRU,
         access_pattern: AccessPattern::Zipfian,
         ..CacheConfig::default()
-    })));
+    })) as Box<dyn PerformanceTestable>);
     
     tests.push(Box::new(CachePerformanceTest::new(CacheConfig {
         algorithm: CacheAlgorithm::LRU,
         access_pattern: AccessPattern::Sequential,
         ..CacheConfig::default()
-    })));
+    })) as Box<dyn PerformanceTestable>);
     
     tests.push(Box::new(CachePerformanceTest::new(CacheConfig {
         algorithm: CacheAlgorithm::LRU,
         access_pattern: AccessPattern::Repeated,
         ..CacheConfig::default()
-    })));
+    })) as Box<dyn PerformanceTestable>);
     
     // FIFO tests with different access patterns
     tests.push(Box::new(CachePerformanceTest::new(CacheConfig {
         algorithm: CacheAlgorithm::FIFO,
         access_pattern: AccessPattern::Uniform,
         ..CacheConfig::default()
-    })));
+    })) as Box<dyn PerformanceTestable>);
     
     tests.push(Box::new(CachePerformanceTest::new(CacheConfig {
         algorithm: CacheAlgorithm::FIFO,
         access_pattern: AccessPattern::Zipfian,
         ..CacheConfig::default()
-    })));
+    })) as Box<dyn PerformanceTestable>);
     
     // Random tests with different access patterns
     tests.push(Box::new(CachePerformanceTest::new(CacheConfig {
         algorithm: CacheAlgorithm::Random,
         access_pattern: AccessPattern::Uniform,
         ..CacheConfig::default()
-    })));
+    })) as Box<dyn PerformanceTestable>);
     
     tests.push(Box::new(CachePerformanceTest::new(CacheConfig {
         algorithm: CacheAlgorithm::Random,
         access_pattern: AccessPattern::Zipfian,
         ..CacheConfig::default()
-    })));
+    })) as Box<dyn PerformanceTestable>);
     
     tests
 } 

@@ -1,4 +1,3 @@
-use std::error::Error;
 use crate::infrastructure::high_availability::{ClusterStatus, HaError, FailoverPhase};
 use crate::infrastructure::high_availability::config::HighAvailabilityConfig;
 use std::collections::HashMap;
@@ -186,7 +185,7 @@ impl ClusterManager {
         let new_leader = active_nodes.iter()
             .min_by_key(|n| &n.id)
             .map(|n| n.id.clone())
-            ?;
+            .ok_or_else(|| HaError::ClusterError("No active nodes available for leader election".to_string()))?;
             
         // Update leader
         let mut leader = self.current_leader.write().await;
@@ -299,20 +298,21 @@ impl ClusterManager {
             if let Some(leader_id) = leader.as_ref() {
                 if failures.contains(leader_id) {
                     // Leader failed, initiate failover
+                    let leader_id_clone = leader_id.clone();
                     drop(leader);
                     drop(status);
                     
                     // Update status to failover
                     let mut status = self.status.write().await;
                     *status = ClusterStatus::Failover {
-                        primary_node: leader_id.clone(),
-                        failing_node: Some(leader_id.clone()),
+                        primary_node: leader_id_clone.clone(),
+                        failing_node: Some(leader_id_clone.clone()),
                         failover_phase: FailoverPhase::Detection,
                     };
                     
                     // We don't trigger the failover directly here,
                     // the failover manager will handle this
-                    info!("Leader node {} failed, cluster entering failover state", leader_id);
+                    info!("Leader node {} failed, cluster entering failover state", leader_id_clone);
                 }
             }
         } else if active_count == total_count {
