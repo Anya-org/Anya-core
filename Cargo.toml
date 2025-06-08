@@ -5,8 +5,8 @@ members = [
 ]
 
 [package]
-name = "anya-core"
-version = "1.1.0"
+name = "anya_core"
+version = "0.9.0-dev"
 edition = "2021"
 rust-version = "1.63.0" # Explicit MSRV following rust-bitcoin standards
 description = "Enterprise-grade Bitcoin Infrastructure Platform"
@@ -20,7 +20,7 @@ categories = ["api-bindings", "cryptography::cryptocurrencies"] # Improve crates
 [features]
 default = ["std", "rust-bitcoin"]
 # Feature flag for HSM functionality
-hsm = ["dep:sha2", "dep:hmac"]
+hsm = []
 # Feature flag for complete system (including HSM)
 complete = ["hsm"]
 std = []
@@ -71,6 +71,7 @@ thiserror = { version = "2.0.12", features = ["std"] }
 # Enhanced logging for system monitoring
 tracing = { version = "0.1.41", features = ["std", "attributes"] }
 tracing-subscriber = { version = "0.3.19", features = ["env-filter", "json", "fmt"] }
+log = "0.4"
 
 # System alignment focused utilities
 async-trait = "0.1.88"
@@ -79,17 +80,19 @@ base64 = "=0.22.1"
 uuid = { version = "1.17.0", features = ["v4", "serde", "fast-rng"] }
 chrono = { version = "0.4.41", features = ["serde", "std"] }
 rand = { version = "0.8.5", features = ["std", "std_rng"] }
-rand_distr = "0.4.3"
-argon2 = { version = "=0.5.3", features = ["std", "password-hash"] }
-hex = { version = "0.4.3", features = ["std"] }
-log = { version = "0.4.27", features = ["std"] }
-reqwest = { version = "0.12.19", features = ["json", "blocking", "rustls-tls"] } # Enhanced security
+rand_distr = "0.4"
 
-# ...existing code...
+# Additional dependencies for installer and other bins
+ring = "0.17"
+sysinfo = "0.32"
+dialoguer = "0.11"
+warp = "0.3"
+maplit = "1.0"
+hex = "0.4"
 
 # Conditionally required dependencies (HSM feature and general codebase)
-sha2 = { version = "0.10.9", optional = true }
-hmac = { version = "=0.12.1", optional = true }
+sha2 = "0.10.9"
+hmac = "0.12.1"
 zeroize = "=1.8.1"
 criterion = "0.6.0"
 walkdir = "2.5.0"
@@ -104,6 +107,11 @@ colored = "2.1.0"
 anya-bitcoin = { path = "./anya-bitcoin" }
 bitflags = "2.5.0"
 regex = "1.9.6"
+trust-dns-resolver = "0.23"
+chacha20poly1305 = "0.10.1"
+rand_chacha = "0.3"
+lazy_static = "1.5.0"
+aes-gcm = "0.10"
 
 [dev-dependencies]
 mockall = "=0.13.1"
@@ -143,12 +151,17 @@ bitcoincore-rpc = "0.17.0"
 web5 = { git = "https://github.com/TBD54566975/web5-rs", rev = "310d79c9" }
 
 [lib]
-name = "anya"
+name = "anya_core"
 path = "src/lib.rs"
 
 [[bin]]
 name = "anya"
 path = "src/main.rs"
+
+[[bin]]
+name = "anya_installer"
+path = "src/bin/anya_installer.rs"
+required-features = ["std"]
 
 # ...other binary definitions as needed...
 

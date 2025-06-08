@@ -27,7 +27,7 @@ bitcoin = { workspace = true, features = ["rand"] }
 web5 = { workspace = true }
 
 # Internal Dependencies
-anya-core = { path = ".." }
+anya_core = { path = ".." }
 
 # Correct workspace inheritance
 secp256k1 = { workspace = true }

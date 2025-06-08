@@ -5,7 +5,6 @@ use std::error::Error;
 use std::fmt;
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
-use std::time::{Duration, Instant};
 use serde::{Serialize, Deserialize};
 use base64::{Engine as _, engine::general_purpose};
 use sha2::{Sha256, Digest};
@@ -13,7 +12,6 @@ use uuid::Uuid;
 use secp256k1::{Secp256k1, Message};
 use secp256k1::ecdsa::{RecoverableSignature, RecoveryId};
 
-use super::bip353::{Bip353Status};
 
 /// LNURL authentication for BIP353 Beta access
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -196,7 +194,7 @@ impl BetaAccessManager {
         hasher.update(session.k1.as_bytes());
         let message_hash = hasher.finalize();
         
-        let message = match Message::from_slice(&message_hash) {
+        let message = match Message::from_digest_slice(&message_hash) {
             Ok(msg) => msg,
             Err(e) => return Err(BetaAccessError::AuthError(format!("Invalid message: {}", e))),
         };
@@ -217,8 +215,9 @@ impl BetaAccessManager {
             Err(e) => return Err(BetaAccessError::AuthError(format!("Invalid signature: {}", e))),
         };
         
-        // Verify the signature
-        match self.secp.verify_ecdsa_recoverable(&message, &signature, &pubkey) {
+        // Verify the signature using standard ECDSA verification
+        let standard_signature = signature.to_standard();
+        match self.secp.verify_ecdsa(&message, &standard_signature, &pubkey) {
             Ok(_) => {
                 // Check if pubkey is authorized
                 if !self.is_authorized(pubkey.to_string()) {
