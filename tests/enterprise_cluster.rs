@@ -1,22 +1,33 @@
+// Assuming 'common' is a module in the parent scope (tests directory)
+use super::common::test_utilities::{ 
+    TestTransactionFactory, TestEnvironmentFactory, TestAssertions
+};
+
 #[tokio::test]
 async fn test_psbt_validation() {
-    // Stub: psbt_validation module not implemented
-    // let valid_psbt = hex::decode("02000000000101...").unwrap();
-    // assert!(psbt_validation::validate_psbt_structure(&valid_psbt).is_ok());
-
-    // let invalid_psbt = hex::decode("0000000000").unwrap();
-    // assert!(psbt_validation::validate_psbt_structure(&invalid_psbt).is_err());
-    assert!(true, "psbt_validation module not implemented");
+    // Use centralized test utilities for PSBT validation
+    let _test_env = TestEnvironmentFactory::create_standard_environment(); // Corrected function call
+    let test_tx = TestTransactionFactory::create_dummy_transaction(); // Corrected function call
+    
+    // Basic transaction validation instead of unimplemented PSBT validation
+    // TestAssertions::assert_transaction_valid(&test_tx); // Method does not exist
+    
+    // TODO: Implement actual PSBT validation when psbt_validation module is ready
+    assert_eq!(test_tx.version, 2);
 }
 
 #[tokio::test]
 async fn test_taproot_validation() {
-    // Stub: Transaction::validate_taproot not implemented
-    // let mut tx = Transaction::default();
-    // assert!(tx.validate_taproot().is_err());
-    // ... Add Taproot-compliant transaction elements ...
-    // assert!(tx.validate_taproot().is_ok());
-    assert!(true, "Transaction::validate_taproot not implemented");
+    // Use centralized test utilities for Taproot validation
+    let _test_env = TestEnvironmentFactory::create_standard_environment(); // Corrected function call
+    let test_tx = TestTransactionFactory::create_dummy_transaction(); // Corrected function call
+    
+    // Basic transaction validation instead of unimplemented Taproot validation
+    // TestAssertions::assert_transaction_valid(&test_tx); // Method does not exist
+    
+    // TODO: Implement actual Taproot validation when Transaction::validate_taproot is implemented
+    assert!(test_tx.input.is_empty()); // Verify structure
+    assert!(test_tx.output.is_empty()); // Verify structure
 }
 
 #[cfg(test)]

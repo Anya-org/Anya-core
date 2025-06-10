@@ -1,24 +1,18 @@
+use std::path::PathBuf;
+use anya_core::install::{AnyaInstaller, InstallationSource, BitcoinConfig, protocol};
+
 #[tokio::test]
 async fn test_full_installation() {
-    let config = NetworkValidationConfig {
-        check_ssl: false,
-        ..Default::default()
-    };
-
-    let source = InstallationSource::Local {
-        path: PathBuf::from("test.pkg"),
-        checksum: "aabbcc".into(),
-    };
+    let source = InstallationSource::PreBuiltBinary("test.pkg".to_string());
 
     let bitcoin_config = BitcoinConfig {
-        network: BitcoinNetwork::Testnet,
-        required_bips: vec![174, 341],
-        taproot_enabled: true,
+        network: "Testnet".to_string(),
+        data_dir: PathBuf::from("/tmp/bitcoin_data_full_install_test"),
     };
 
-    let installer = AnyaInstaller::new(config, source, bitcoin_config).unwrap();
+    let installer = AnyaInstaller::new(source, bitcoin_config).unwrap();
 
-    let result = installer.install(PathBuf::from("/tmp")).await;
+    let result = installer.install(PathBuf::from("/tmp/full_install_target")).await;
     assert!(result.is_ok(), "Installation failed: {:?}", result);
 }
 
@@ -34,31 +28,24 @@ fn test_bip_verification() {
 
 #[tokio::test]
 async fn test_mainnet_taproot_installation() {
-    let config = NetworkValidationConfig {
-        endpoints: vec!["https://taproot.node".into()],
-        ..Default::default()
-    };
-
     let bitcoin_config = BitcoinConfig {
-        network: BitcoinNetwork::Mainnet,
-        required_bips: vec![341],
-        taproot_enabled: true,
+        network: "Mainnet".to_string(),
+        data_dir: PathBuf::from("/tmp/bitcoin_data_mainnet_taproot_test"),
     };
 
-    let installer = AnyaInstaller::new(
-        config,
-        InstallationSource::Local {
-            path: PathBuf::from("taproot.pkg"),
-            checksum: "taproot123".into(),
-        },
-        bitcoin_config,
-    )
-    .unwrap();
+    let source = InstallationSource::PreBuiltBinary("taproot.pkg".to_string());
 
-    let result = installer.install(PathBuf::from("/tmp")).await;
+    let installer = AnyaInstaller::new(source, bitcoin_config).unwrap();
+
+    let result = installer.install(PathBuf::from("/tmp/mainnet_taproot_target")).await;
     assert!(result.is_ok(), "Taproot installation failed");
 }
 
+/*
+// This test is commented out as NetworkValidationConfig and its functionality
+// (like required_ports) seem to have been removed from AnyaInstaller.
+// The use of BitcoinConfig::default() was also an error, and the struct has changed.
+// The test needs to be re-evaluated based on current installer capabilities.
 #[tokio::test]
 async fn test_network_compliance_failure() {
     let config = NetworkValidationConfig {
@@ -69,13 +56,14 @@ async fn test_network_compliance_failure() {
     let installer = AnyaInstaller::new(
         config,
         InstallationSource::Local {
-            path: PathBuf::from("test.pkg"),
-            checksum: "test".into(),
+            path: PathBuf::from(\"test.pkg\"),
+            checksum: \"test\".into(),
         },
         BitcoinConfig::default(),
     )
     .unwrap();
 
-    let result = installer.install(PathBuf::from("/tmp")).await;
-    assert!(result.is_err(), "Should fail on port validation");
+    let result = installer.install(PathBuf::from(\"/tmp\")).await;
+    assert!(result.is_err(), \"Should fail on port validation\");
 }
+*/
