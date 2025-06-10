@@ -481,7 +481,7 @@ impl LightningNode {
     }
     
     /// Close a channel
-    pub fn close_channel(&self, channel_id: &str, _force: bool) -> AnyaResult<LightningTxid> {
+    pub fn close_channel(&self, channel_id: &str) -> AnyaResult<LightningTxid> {
         let mut state = self.state.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         
         // Find channel
