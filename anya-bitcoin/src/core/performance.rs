@@ -119,7 +119,7 @@ static PERF_METRICS_INIT: Once = Once::new();
 
 // Acquires a lock on the global metrics. Initializes metrics on the first call.
 // Returns a MutexGuard to the Option<Metrics>. After initialization, the Option will be Some.
-pub fn lock_global_metrics() -> MutexGuard<'static, Option<Metrics>> {
+pub fn lock_global_metrics() -> MutexGuard<'static, Metrics> {
     PERF_METRICS_INIT.call_once(|| {
         // This block runs only once across all threads.
         let mut guard = PERF_METRICS_DATA.lock().unwrap();
