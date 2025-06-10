@@ -37,7 +37,7 @@ for category in "${TEST_CATEGORIES[@]}"; do
     if [ -d "$path" ]; then
         echo -e "${YELLOW}📂 Running $name${NC}"
         
-        if cargo test --test-threads=1 -- --test-path="$path" 2>/dev/null; then
+        if cargo test --test-threads=1 --manifest-path="$path/Cargo.toml" 2>/dev/null; then
             echo -e "${GREEN}✅ $name - PASSED${NC}"
             ((TOTAL_PASSED++))
         else
