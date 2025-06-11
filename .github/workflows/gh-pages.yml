@@ -31,30 +31,21 @@ jobs:
           fetch-depth: 0
           submodules: recursive
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - name: Setup Ruby
+        uses: actions/setup-ruby@v1
         with:
-          python-version: '3.11'
-          cache: 'pip'
-          cache-dependency-path: '**/requirements*.txt'
+          ruby-version: '3.x'
+          bundler-cache: true
 
-      - name: Install dependencies
+      - name: Build Jekyll site
         run: |
-          python -m pip install --upgrade pip
-          pip install mkdocs-material mkdocs-git-revision-date-localized-plugin mkdocs-git-committers-plugin-2 mkdocs-include-markdown-plugin
+          bundle install
+          bundle exec jekyll build --source docs --destination public
 
       - name: Setup Pages
-        id: pages
         uses: actions/configure-pages@v4
         with:
-          static_site_generator: mkdocs
-
-      - name: Build documentation
-        env:
-          GIT_COMMITTER_NAME: github-actions
-          GIT_COMMITTER_EMAIL: github-actions@github.com
-        run: |
-          mkdocs build --site-dir public --strict
+          static_site_generator: jekyll
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
