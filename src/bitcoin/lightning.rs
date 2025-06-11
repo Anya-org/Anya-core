@@ -1,19 +1,16 @@
-use std::error::Error;
 // Lightning Network Implementation for Bitcoin Module
 // Implements Lightning Network functionality for Bitcoin operations
 // as per official Bitcoin Improvement Proposals (BIPs) requirements
 
 use crate::AnyaError;
 use crate::AnyaResult;
-use bitcoin::{BlockHash, Network, Transaction, Txid as BitcoinTxid};
-use secp256k1::{PublicKey as Secp256k1PublicKey, SecretKey as Secp256k1SecretKey, Secp256k1 as Secp256k1Context};
+use secp256k1::{PublicKey as Secp256k1PublicKey, SecretKey as Secp256k1SecretKey};
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use std::fmt;
 
 // Import BitcoinConfig from a module we know exists
-use crate::bitcoin::interface::BitcoinImplementationType;
 
 // Define custom Lightning-specific key types to avoid conflicts with secp256k1 types
 #[derive(Clone)]
@@ -85,6 +82,12 @@ impl LightningSecp256k1<All> {
 #[derive(Debug)]
 pub struct LightningTxid {
     pub bytes: [u8; 32],
+}
+
+impl std::fmt::Display for LightningTxid {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", hex::encode(&self.bytes))
+    }
 }
 
 // Define BitcoinConfig as a struct that matches the interface needs
@@ -478,7 +481,7 @@ impl LightningNode {
     }
     
     /// Close a channel
-    pub fn close_channel(&self, channel_id: &str, force: bool) -> AnyaResult<LightningTxid> {
+    pub fn close_channel(&self, channel_id: &str) -> AnyaResult<LightningTxid> {
         let mut state = self.state.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
         
         // Find channel
@@ -765,7 +768,7 @@ fn current_time() -> u64 {
 
 // Add a method to create LightningTxid from slice
 impl LightningTxid {
-    pub fn from_slice(_data: &[u8]) -> Result<Self, String> {
+    pub fn from_slice(data: &[u8]) -> Result<Self, String> {
         if data.len() != 32 {
             return Err("Invalid txid length".to_string());
         }

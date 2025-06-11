@@ -54,6 +54,12 @@ pub mod testing;
 pub mod compliance;
 pub mod bip;
 
+// Infrastructure module
+pub mod infrastructure;
+
+// Monitoring module
+pub mod monitoring;
+
 // Add missing modules to fix compilation errors
 
 pub mod auth {

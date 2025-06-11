@@ -1,1 +1,1 @@
-/home/anya/anyachainlabs/projects/anya-core/anya-bitcoin/src/testing/./layer2/mod.rs
+../../../anya-bitcoin/testing/layer2/mod.rs

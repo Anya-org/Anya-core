@@ -1,63 +1,91 @@
-# Test Plan
+# Anya Core Testing Guide
 
-## Feature: Bitcoin Core Integration
+## Test Organization
 
-- Test Case 1: Node synchronization
-  - Steps: ...
-  - Expected Result: ...
+The test suite has been reorganized to eliminate duplicates and provide centralized utilities:
 
-## Feature: Lightning Network
+### Test Structure
 
-- Test Case 1: Channel creation
-  - Steps: ...
-  - Expected Result: ...
+```
+tests/
+├── common/
+│   ├── mod.rs              # Common module exports
+│   └── test_utilities.rs   # Centralized test utilities
+├── bitcoin/                # Bitcoin protocol tests
+├── hardware/               # Hardware optimization tests
+├── dao/                    # DAO functionality tests
+├── layer2/                 # Layer 2 protocol tests
+├── web5/                   # Web5 integration tests
+├── unit_tests/             # Unit tests
+└── mod.rs                  # Main test module
+```
 
-## Feature: Discreet Log Contracts (DLC)
+### Centralized Test Utilities
 
-- Test Case 1: Contract creation
-  - Steps: ...
-  - Expected Result: ...
+All tests now use centralized utilities from `tests/common/test_utilities.rs`:
 
-## Feature: Stacks Integration
+#### TestTransactionFactory
+- `create_simple()` - Creates basic test transactions
+- `create_dummy_transaction()` - Legacy compatibility wrapper
+- `create_dummy_transaction_batch(size)` - Batch transaction creation
 
-- Test Case 1: Transaction processing
-  - Steps: ...
-  - Expected Result: ...
+#### TestEnvironmentFactory
+- `new_basic()` - Basic test environment
+- `new_with_config(config)` - Custom configuration
 
-## Feature: Machine Learning Logic
+#### MockFactory
+- `create_bitcoin_keys()` - Mock Bitcoin key pairs
+- `create_oracle_data()` - Mock DLC oracle data
+- `create_secp256k1_context()` - Mock secp256k1 context
 
-- Test Case 1: Model training
-  - Steps: ...
-  - Expected Result: ...
+#### TestAssertions
+- `assert_transaction_valid(tx)` - Transaction validation
+- `assert_consensus_compliant(data)` - Consensus compliance
+- `assert_performance_acceptable(metrics)` - Performance validation
 
-## Feature: Network Discovery
+## Running Tests
 
-- Test Case 1: Peer discovery
-  - Steps: ...
-  - Expected Result: ...
-
-## Compliance Testing [AIT-3][RES-3]
-
-### BIP Validation Suite
+### Quick Test Run
 ```bash
-anya test-bip --bip=341,342,174
+cargo test
 ```
 
-### Security Validation
+### Organized Test Execution
 ```bash
-anya validate-security --level=bpc3
+./scripts/run-all-tests.sh
 ```
 
-### Audit Requirements
-```javascript
-// Sample audit configuration
-const auditConfig = {
-  bip341: {
-    silentLeaf: true,
-    merkleValidation: 'constant-time'
-  },
-  rng: 'secure'
-};
+### Category-Specific Tests
+```bash
+cargo test --test bitcoin_tests
+cargo test --test hardware_tests
+cargo test --test dao_tests
 ```
 
-*Last updated: 2025-06-02*
+## Test Cleanup Completed
+
+✅ **Eliminated Duplicates:**
+- Removed duplicate `create_dummy_transaction()` functions
+- Consolidated `TestEnvironment::new()` patterns
+- Merged duplicate test directories
+- Removed RISC-V test file duplicates
+
+✅ **Standardized Patterns:**
+- Centralized test utilities
+- Consistent import structure
+- Unified assertion helpers
+- Common mock data creation
+
+✅ **Improved Organization:**
+- Clear test categorization
+- Proper module structure
+- Centralized re-exports
+- Backward compatibility maintained
+
+## Best Practices
+
+1. **Use Centralized Utilities**: Always import from `crate::common::test_utilities`
+2. **Follow Naming Conventions**: Use descriptive test function names
+3. **Categorize Tests**: Place tests in appropriate directories
+4. **Mock External Dependencies**: Use MockFactory for external resources
+5. **Validate Results**: Use TestAssertions for consistent validation

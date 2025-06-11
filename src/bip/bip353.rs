@@ -61,6 +61,17 @@ pub struct BetaFeatures {
     pub enhanced_privacy: bool,
 }
 
+impl Default for BetaFeatures {
+    fn default() -> Self {
+        Self {
+            non_ascii_identifiers: false,
+            wildcard_records: false,
+            oob_notifications: false,
+            enhanced_privacy: false,
+        }
+    }
+}
+
 impl Default for Bip353Config {
     fn default() -> Self {
         Self {

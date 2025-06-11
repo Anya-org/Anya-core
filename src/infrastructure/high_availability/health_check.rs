@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use std::sync::Arc;
+use std::time::Duration;
 use tokio::sync::RwLock;
 use tokio::time::Instant;
 use tracing::{debug, error, info, instrument, warn};
@@ -261,6 +262,7 @@ fn instant_to_datetime(_instant: Instant) -> chrono::DateTime<chrono::Utc> {
 mod tests {
     use super::*;
     use crate::infrastructure::high_availability::config::HealthCheckConfig;
+    use std::time::Duration;
 
     fn create_test_config() -> HighAvailabilityConfig {
         HighAvailabilityConfig {

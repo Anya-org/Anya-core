@@ -9,6 +9,14 @@ pub mod system_hardening;
 
 pub mod constant_time;
 
+// Cryptographic operations module
+pub mod crypto;
+
+// Add encryption sub-module for easier access
+pub mod encryption {
+    pub use super::crypto::symmetric::*;
+}
+
 // Hardware Security Module (conditionally included)
 #[cfg(feature = "hsm")]
 pub mod hsm;

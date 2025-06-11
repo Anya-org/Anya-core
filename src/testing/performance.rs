@@ -1,4 +1,3 @@
-use std::error::Error;
 /// Performance Testing Framework [BPC-3]
 /// 
 /// This module provides tools for performance testing of the Bitcoin
@@ -8,8 +7,7 @@ use std::error::Error;
 use thiserror::Error;
 use serde::{Serialize, Deserialize};
 use std::collections::HashMap;
-use std::time::{Duration, Instant};
-use bitcoin::{Transaction, Block};
+use std::time::Instant;
 
 // Module exports
 pub mod transaction;

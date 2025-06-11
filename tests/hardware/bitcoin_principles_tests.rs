@@ -21,6 +21,11 @@ use std::path::Path;
 use std::fs::File;
 use std::io::Read;
 
+// Import centralized test utilities
+use crate::common::test_utilities::{
+    TestTransactionFactory, TestEnvironmentFactory, MockFactory, TestAssertions
+};
+
 /// Test that validates complete 100% alignment with all Bitcoin Core principles
 #[tokio::test]
 async fn test_bitcoin_core_principles_full_alignment() {
@@ -542,12 +547,7 @@ fn test_transaction_privacy(hw_manager: &Arc<HardwareOptimizationManager>) -> bo
 // Helper functions
 //
 
+// Create a simple dummy transaction for testing
 fn create_dummy_transaction() -> Transaction {
-    // Create a simple dummy transaction for testing
-    Transaction {
-        version: 2,
-        lock_time: bitcoin::LockTime::ZERO,
-        input: vec![],
-        output: vec![],
-    }
+    TestTransactionFactory::create_simple()
 }

@@ -17,6 +17,11 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use std::sync::Arc;
 use std::collections::HashMap;
 
+// Import centralized test utilities
+use crate::common::test_utilities::{
+    TestTransactionFactory, TestEnvironmentFactory, MockFactory, TestAssertions
+};
+
 /// Test that demonstrates full alignment with Bitcoin's Immutability principle
 /// by verifying that hardware optimizations maintain consistent historical validation results
 #[tokio::test]
@@ -380,11 +385,5 @@ fn create_test_validation_configs() -> Vec<(String, TransactionValidator)> {
 
 /// Create a dummy transaction for testing
 fn create_dummy_transaction() -> Transaction {
-    // Create a simple dummy transaction for testing
-    Transaction {
-        version: 2,
-        lock_time: bitcoin::LockTime::ZERO,
-        input: vec![],
-        output: vec![],
-    }
+    TestTransactionFactory::create_simple()
 }

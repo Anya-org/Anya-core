@@ -112,6 +112,7 @@ chacha20poly1305 = "0.10.1"
 rand_chacha = "0.3"
 lazy_static = "1.5.0"
 aes-gcm = "0.10"
+lightning = "0.1.4"
 
 [dev-dependencies]
 mockall = "=0.13.1"
@@ -163,6 +164,31 @@ name = "anya_installer"
 path = "src/bin/anya_installer.rs"
 required-features = ["std"]
 
-# ...other binary definitions as needed...
+[[bin]]
+name = "bip_health"
+path = "src/bin/bip_health.rs"
+required-features = ["std"]
+
+[[bin]]
+name = "anya_validator"
+path = "src/bin/anya_validator.rs"
+required-features = ["std"]
+
+[[bin]]
+name = "verify_bip_modules"
+path = "src/bin/verify_bip_modules.rs"
+required-features = ["std"]
+
+[[bin]]
+name = "lightning_demo"
+path = "src/bin/lightning_demo.rs"
+required-features = ["std"]
 
 
+
+# Test profile configuration
+[profile.test]
+opt-level = 1
+debug = true
+debug-assertions = true
+overflow-checks = true

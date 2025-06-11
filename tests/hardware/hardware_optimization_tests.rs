@@ -302,19 +302,15 @@ async fn test_bitcoin_consensus_compliance(hw_manager: &HardwareOptimizationMana
 
 // Helper functions
 
+// Use centralized test utilities instead of duplicates
+use crate::common::test_utilities::TestTransactionFactory;
+
 fn create_dummy_transaction() -> Transaction {
-    // Create a simple dummy transaction for testing
-    Transaction {
-        version: 2,
-        lock_time: bitcoin::LockTime::ZERO,
-        input: vec![],
-        output: vec![],
-    }
+    TestTransactionFactory::create_dummy_transaction()
 }
 
 fn create_dummy_transaction_batch(size: usize) -> Vec<Transaction> {
-    // Create a batch of dummy transactions
-    (0..size).map(|_| create_dummy_transaction()).collect()
+    TestTransactionFactory::create_dummy_transaction_batch(size)
 }
 
 fn validate_transaction_batch(

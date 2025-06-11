@@ -5,6 +5,7 @@
 
 use std::collections::HashMap;
 use std::time::{Duration, Instant};
+use std::sync::{Mutex, MutexGuard, Once}; // Added Mutex, MutexGuard, Once
 
 /// Performance metrics collection
 #[derive(Debug, Clone, Default)]
@@ -111,16 +112,20 @@ impl Metrics {
     }
 }
 
-/// Global metrics instance
-static mut GLOBAL_METRICS: Option<Metrics> = None;
-static INIT: std::sync::Once = std::sync::Once::new();
+// Manages access to the singleton Metrics instance using a Mutex for thread-safety.
+// PERF_METRICS_DATA holds the optional Metrics, initialized once by PERF_METRICS_INIT.
+static PERF_METRICS_DATA: Mutex<Option<Metrics>> = Mutex::new(None);
+static PERF_METRICS_INIT: Once = Once::new();
 
-/// Get the global metrics instance
-pub fn global_metrics() -> &'static mut Metrics {
-    unsafe {
-        INIT.call_once(|| {
-            GLOBAL_METRICS = Some(Metrics::new());
-        });
-        GLOBAL_METRICS.as_mut().unwrap()
-    }
+// Acquires a lock on the global metrics. Initializes metrics on the first call.
+// Returns a MutexGuard to the Option<Metrics>. After initialization, the Option will be Some.
+pub fn lock_global_metrics() -> MutexGuard<'static, Metrics> {
+    PERF_METRICS_INIT.call_once(|| {
+        // This block runs only once across all threads.
+        let mut guard = PERF_METRICS_DATA.lock().unwrap();
+        // Initialize the metrics data.
+        *guard = Some(Metrics::new());
+    });
+    // Subsequent calls will find PERF_METRICS_DATA initialized.
+    PERF_METRICS_DATA.lock().unwrap()
 }

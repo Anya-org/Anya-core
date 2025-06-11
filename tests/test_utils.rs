@@ -1,7 +1,17 @@
 // Test utilities for standalone tests
 use std::fs;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
+#[path = "common/mod.rs"] // Added path attribute for the common module
+mod common;
+
+// Re-export from centralized utilities to eliminate duplicates
+pub use common::test_utilities::{
+    TestTransactionFactory, MockFactory, TestAssertions,
+    TestConfig as CentralizedTestConfig
+};
+
+// Legacy TestEnvironment for file-based tests
 pub struct TestEnvironment {
     pub test_dir: PathBuf,
 }
@@ -68,4 +78,16 @@ pub fn simulate_rgb_asset_id() -> String {
         .as_secs();
 
     format!("rgb1{:x}", timestamp)
+}
+
+/// Create a dummy Bitcoin transaction using centralized utilities
+/// This replaces duplicate transaction creation logic
+pub fn create_test_transaction() -> bitcoin::Transaction {
+    TestTransactionFactory::create_dummy_transaction()
+}
+
+/// Create a batch of test transactions using centralized utilities  
+/// This replaces duplicate batch creation logic
+pub fn create_test_transaction_batch(size: usize) -> Vec<bitcoin::Transaction> {
+    TestTransactionFactory::create_dummy_transaction_batch(size)
 }
