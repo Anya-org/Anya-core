@@ -1,6 +1,6 @@
 [package]
 name = "anya-core"
-version = "0.3.0-rc.1"
+version = "0.3.0-rc.2"
 edition = "2021"
 description = "Enterprise-grade Bitcoin Infrastructure Platform"
 authors = ["botshelomokoka@gmail.com"]
@@ -95,11 +95,9 @@ dashmap = "6.1.0"
 rayon = "1.10.0"
 blake3 = "1.8.2"
 semver = "1.0.26"
-syn = "2.0.101"
+syn = { version = "2.0.101", features = ["full"] }
 
 [dev-dependencies]
 mockall = "=0.13.1"
 tokio-test = "=0.4.4"
 tower-test = "=0.4.0"
-
-

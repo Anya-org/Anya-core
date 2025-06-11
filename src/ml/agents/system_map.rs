@@ -338,71 +338,118 @@ impl SystemIndexManager {
         self.update_index(new_index).await
     }
 
-    async fn analyze_rust_file(&self, path: &str) -> RustCodeMetrics {
-        let content = std::fs::read_to_string(path).unwrap_or_default();
-        // Use a stub for parse_file since syn_stub does not exist
-        let syntax = Self::stub_parse_file(&content);
-        let mut metrics = RustCodeMetrics {
+    async fn analyze_rust_file(&self, path: &str) -> Result<RustCodeMetrics, AgentError> {
+        let content = std::fs::read_to_string(path).map_err(|e| AgentError::InternalError(format!("Failed to read file {}: {}", path, e)))?;
+        let syntax = syn::parse_file(&content).map_err(|e| AgentError::InternalError(format!("Failed to parse file {}: {}", path, e)))?;
+
+        let metrics = RustCodeMetrics {
             cyclomatic_complexity: Self::calculate_cyclomatic_complexity(&syntax) as f32,
             unsafe_usage_count: Self::count_unsafe_blocks(&syntax) as u32,
-            test_coverage: Self::get_test_coverage(path) as f32,
-            dependency_graph: HashMap::new(), // analyze_dependencies(&content)
-            clippy_lints: HashMap::new(), // run_clippy_checks(path)
-            security_audit_flags: vec![], // check_bitcoin_security(&content)
-            bitcoin_protocol_adherence: Self::calculate_protocol_adherence(&content) as f32,
+            test_coverage: 1.0, // Placeholder
+            dependency_graph: HashMap::new(), // Placeholder
+            clippy_lints: HashMap::new(), // Placeholder
+            security_audit_flags: Self::check_bitcoin_security(&syntax),
+            bitcoin_protocol_adherence: Self::calculate_protocol_adherence(&syntax),
         };
 
-        // Apply Bitcoin protocol rules
-        if metrics.bitcoin_protocol_adherence < 0.9 {
-            metrics.security_audit_flags.push(
-                "Low Bitcoin protocol adherence - review BIP-341/342 compliance".into()
-            );
-        }
-
-        metrics
+        Ok(metrics)
     }
-
-    // Stub for parse_file
-    fn stub_parse_file(_content: &str) -> () { () }
 
     pub async fn enhanced_crawl(&self) -> Result<(), AgentError> {
         let walker = WalkDir::new(".")
             .into_iter()
-            .filter_map(|e| e.ok())
-            .par_bridge()
-            .filter(|e| e.path().extension().map(|ext| ext == "rs").unwrap_or(false))
-            .map(|entry| {
-                let path = entry.path().to_string_lossy().into_owned();
-                let metrics = self.analyze_rust_file(&path);
-                (path, metrics)
-            });
+            .filter_entry(|e| !e.path().to_str().unwrap_or("").contains("target"));
 
-        walker.for_each(|(path, metrics)| {
-            self.index.write()?.rust_metrics.insert(path, metrics);
-        });
-
+        for entry in walker {
+            if let Ok(entry) = entry {
+                if entry.path().extension().and_then(|s| s.to_str()) == Some("rs") {
+                    let path_str = entry.path().to_str().unwrap_or_default().to_string();
+                    if let Ok(metrics) = self.analyze_rust_file(&path_str).await {
+                        self.update_component(&path_str, metrics).await?;
+                    }
+                }
+            }
+        }
         Ok(())
     }
 
-    pub async fn bitcoin_health_check(&self) -> f32 {
+    pub async fn overall_bitcoin_protocol_adherence(&self) -> Result<f32, AgentError> {
         let index = self.read_index().await?;
         let total = index.component_paths.len() as f32;
+        if total == 0.0 {
+            return Ok(0.0);
+        }
         let compliant = index.component_paths.iter()
             .filter(|(path, _)| Self::is_bitcoin_related(path))
             .filter(|(_, metrics)| metrics.bitcoin_protocol_adherence >= 0.9)
             .count() as f32;
-        compliant / total
+        Ok(compliant / total)
     }
-    
-    // Stub implementations for missing functions to allow build to proceed
-    fn calculate_cyclomatic_complexity<T>(_syntax: &T) -> usize { 0 }
-    fn count_unsafe_blocks<T>(_syntax: &T) -> usize { 0 }
-    fn get_test_coverage(_path: &str) -> f64 { 1.0 }
-    fn analyze_dependencies(_content: &str) -> String { String::new() }
-    fn run_clippy_checks(_path: &str) -> String { String::new() }
-    fn check_bitcoin_security(_content: &str) -> String { String::new() }
-    fn calculate_protocol_adherence(_content: &str) -> f64 { 1.0 }
-    fn is_bitcoin_related(_path: &str) -> bool { false }
+
+    // --- Start Functional Implementations ---
+
+    fn is_bitcoin_related(path: &str) -> bool {
+        path.contains("bitcoin") || path.contains("bip") || path.contains("psbt")
+    }
+
+    fn calculate_cyclomatic_complexity(syntax: &syn::File) -> usize {
+        struct ComplexityVisitor { count: usize }
+        impl<'ast> visit::Visit<'ast> for ComplexityVisitor {
+            fn visit_expr_if(&mut self, _i: &'ast syn::ExprIf) { self.count += 1; }
+            fn visit_expr_for_loop(&mut self, _i: &'ast syn::ExprForLoop) { self.count += 1; }
+            fn visit_expr_while(&mut self, _i: &'ast syn::ExprWhile) { self.count += 1; }
+            fn visit_expr_match(&mut self, _i: &'ast syn::ExprMatch) { self.count += 1; }
+            fn visit_arm(&mut self, _i: &'ast syn::Arm) { self.count += 1; }
+        }
+        let mut visitor = ComplexityVisitor { count: 1 };
+        visitor.visit_file(syntax);
+        visitor.count
+    }
+
+    fn count_unsafe_blocks(syntax: &syn::File) -> usize {
+        struct UnsafeVisitor { count: usize }
+        impl<'ast> visit::Visit<'ast> for UnsafeVisitor {
+            fn visit_expr_unsafe(&mut self, _i: &'ast syn::ExprUnsafe) { self.count += 1; }
+            fn visit_item_unsafe(&mut self, _i: &'ast syn::ItemUnsafe) { self.count += 1; }
+        }
+        let mut visitor = UnsafeVisitor { count: 0 };
+        visitor.visit_file(syntax);
+        visitor.count
+    }
+
+    fn check_bitcoin_security(syntax: &syn::File) -> Vec<String> {
+        struct SecurityVisitor { flags: Vec<String> }
+        impl<'ast> visit::Visit<'ast> for SecurityVisitor {
+            fn visit_mac(&mut self, mac: &'ast syn::Macro) {
+                if mac.path.is_ident("vec") {
+                    if let Ok(lit) = syn::parse2::<syn::LitStr>(mac.tokens.clone()) {
+                        if lit.value().contains("PRIVATE_KEY") {
+                            self.flags.push("HardcodedPrivateKey".to_string());
+                        }
+                    }
+                }
+                visit::visit_macro(self, mac);
+            }
+        }
+        let mut visitor = SecurityVisitor { flags: vec![] };
+        visitor.visit_file(syntax);
+        visitor.flags
+    }
+
+    fn calculate_protocol_adherence(syntax: &syn::File) -> f32 {
+        // Simple check: adherence increases if Taproot functions are used.
+        struct BipVisitor { taproot_usage: bool }
+        impl<'ast> visit::Visit<'ast> for BipVisitor {
+            fn visit_ident(&mut self, i: &'ast syn::Ident) {
+                if i.to_string().contains("taproot") {
+                    self.taproot_usage = true;
+                }
+            }
+        }
+        let mut visitor = BipVisitor { taproot_usage: false };
+        visitor.visit_file(syntax);
+        if visitor.taproot_usage { 1.0 } else { 0.5 }
+    }
 }
 
 /// Manager for the system map

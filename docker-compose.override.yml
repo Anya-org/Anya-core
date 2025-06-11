@@ -1,0 +1,24 @@
+services:
+  anya-core:
+    ports:
+      - "9229:9229"  # Debug port
+    environment:
+      - RUST_LOG=debug
+      - RUST_BACKTRACE=full
+    volumes:
+      - .:/app
+    command: ["cargo", "run"]
+
+  dwn:
+    ports:
+      - "9230:9229"  # Debug port
+    volumes:
+      - .:/app
+    environment:
+      - NODE_ENV=development
+      - DEBUG=true
+
+  bitcoin:
+    command: bitcoind -printtoconsole -server -rpcallowip=::/0 -rpcbind=0.0.0.0 -debug=1
+    volumes:
+      - .:/app/bitcoin

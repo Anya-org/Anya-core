@@ -113,7 +113,6 @@ This component provides... \[AIT-2\]
 
 ```markdown
 <!-- markdownlint-disable MD013 line-length -->
-<!-- TODO: Add more examples to this section -->
 ```
 
 ## Frontmatter

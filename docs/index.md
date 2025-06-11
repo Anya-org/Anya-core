@@ -107,7 +107,6 @@ The following README files provide documentation for specific modules:
 | MobileSDK | [src/mobile/sdk.rs](../src/mobile/sdk.rs) | Mobile wallet and network | Stub/Template |
 | TenantManager, TenantConfig, RateLimits, ResourceUsage, Tenant, TenantSecurity, AccessPolicy, RateLimit | [src/tenant/manager.rs](../src/tenant/manager.rs) | Multi-tenant management | Stub/Template |
 
-All above modules are minimal, compilable stubs/templates to unblock the build and tests. Real logic will be implemented as features are prioritized. See [TODO.md](./TODO.md) and [ROADMAP.md](./ROADMAP.md) for status and plans.
 
 ## AI Labeling
 

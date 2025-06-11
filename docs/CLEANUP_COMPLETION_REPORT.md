@@ -141,7 +141,6 @@ tar -xzf docs-backup-20250602-011740.tar.gz
 ### Documentation
 - **Cleanup Plan**: `DOCUMENTATION_CLEANUP_PLAN.md`
 - **Organization Guide**: `WORKSPACE_MANAGEMENT.md`
-- **Task Management**: `TODO.md`
 
 ---
 

@@ -39,7 +39,7 @@ impl fmt::Display for AgentId {
 }
 
 /// Observation provided to an agent
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Observation {
     /// Text-based observation
     Text(String),
@@ -151,7 +151,7 @@ pub struct AgentMetrics {
 }
 
 /// Error from agent operations
-#[derive(Debug, thiserror::Error)]
+#[derive(Debug, Clone, thiserror::Error)]
 pub enum AgentError {
     /// Invalid observation format
     #[error("Invalid observation: {0}")]
@@ -383,7 +383,7 @@ impl AgentSystem {
             // Then process with the original observation plus system state
             let combined_observation = match observation {
                 Observation::SystemState(_) => observation,
-                _ => Observation::SystemState(system_state),
+                _ => Observation::SystemState(current_system_state),
             };
             
             let start_time = std::time::Instant::now();
@@ -397,7 +397,7 @@ impl AgentSystem {
                 })?;
                 
                 metrics.total_observations += 1;
-                if result.is_ok() && result.as_ref()?.is_some() {
+                if result.is_ok() && result.as_ref().map_err(|e| e.clone())?.is_some() {
                     metrics.total_actions += 1;
                 }
                 if result.is_err() {
