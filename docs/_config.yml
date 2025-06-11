@@ -6,7 +6,7 @@ show_downloads: true
 
 # GitHub Pages settings
 baseurl: "/anya-core"
-url: "https://botshelomokoka.github.io/anya-core/"
+url: "https://anya-org.github.io/anya-core/"
 
 # Build settings
 markdown: kramdown
@@ -23,8 +23,8 @@ github:
   is_project_page: true
   repository_url: https://github.com/anya-org/anya-core
   repository_name: anya-core
-  owner_url: https://github.com/botshelomokoka
-  owner_name: Botshelo Mokoka
+  owner_url: https://github.com/anya-org
+  owner_name: Anya Org
 
 # Theme customization
 colors:
@@ -54,7 +54,7 @@ nav_links:
     url: /roadmap
 
 # Anya Specific Settings
-repository: botshelomokoka/OPSource/anya
+repository: anya-org/anya-core
 version: "1.0.0"
 release_date: "December 2024"
 support:
@@ -77,4 +77,3 @@ exclude:
   - CONTRIBUTING.md
   - LICENSE
   - CNAME
-
