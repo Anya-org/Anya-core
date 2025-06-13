@@ -27,6 +27,7 @@
         "gitlens.views.searchAndCompare.enabled": true,
         "rust-analyzer.checkOnSave": true,
         "rust-tests-bin.display.showCodeLens": true,
-        "github.copilot.nextEditSuggestions.enabled": true
+        "github.copilot.nextEditSuggestions.enabled": true,
+        "markdown.validate.enabled": true
     }
 }

@@ -383,7 +383,7 @@ impl AgentSystem {
             // Then process with the original observation plus system state
             let combined_observation = match observation {
                 Observation::SystemState(_) => observation,
-                _ => Observation::SystemState(current_system_state),
+                _ => Observation::SystemState(system_state),
             };
             
             let start_time = std::time::Instant::now();

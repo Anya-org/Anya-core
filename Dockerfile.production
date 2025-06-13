@@ -1,0 +1,80 @@
+# Multi-stage Docker build for production deployment
+# Version: 0.3.0-rc.2 (Source: Cargo.toml line 4)
+# Port: 8080 (Source: src/main.rs line 36)
+# Binary: anya (Source: Cargo.toml [[bin]] section)
+
+FROM rust:1.70-alpine AS builder
+
+# Install build dependencies (no PostgreSQL for decentralized architecture)
+RUN apk add --no-cache \
+    musl-dev \
+    openssl-dev \
+    pkgconfig
+
+WORKDIR /build
+
+# Copy dependency files first for better caching
+COPY Cargo.toml Cargo.lock ./
+
+# Create dummy source to cache dependencies
+RUN mkdir -p src && \
+    echo "fn main() {}" > src/main.rs
+
+# Build dependencies (cached layer)
+RUN cargo build --release
+
+# Copy actual source code
+COPY . .
+
+# Build the actual application with correct binary name
+RUN touch src/main.rs && \
+    cargo build --release
+
+# Runtime stage - minimal Alpine image
+FROM alpine:3.18
+
+# Install runtime dependencies (removed PostgreSQL for decentralized operation)
+RUN apk add --no-cache \
+    ca-certificates \
+    libssl3 \
+    libcrypto3 \
+    curl && \
+    rm -rf /var/cache/apk/*
+
+# Create non-root user
+RUN addgroup -g 1000 anya && \
+    adduser -D -s /bin/sh -u 1000 -G anya anya && \
+    mkdir -p /app/data /app/logs && \
+    chown -R anya:anya /app
+
+# Copy binary from builder stage (correct binary name: anya)
+COPY --from=builder /build/target/release/anya /usr/local/bin/anya
+RUN chmod +x /usr/local/bin/anya
+
+# Switch to non-root user
+USER anya
+WORKDIR /app
+
+# Health check (correct port: 8080)
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD curl -f http://localhost:8080/health || exit 1
+
+# Production labels with version from source
+LABEL maintainer="Anya Core Team" \
+      version="0.3.0-rc.2" \
+      description="Anya Decentralized Core - Production" \
+      architecture="decentralized" \
+      port="8080"
+
+# Expose correct port
+EXPOSE 8080
+
+# Set production environment for decentralized operation
+ENV RUST_LOG=info \
+    RUST_BACKTRACE=1 \
+    ANYA_MODE=decentralized \
+    ANYA_DATA_DIR=/app/data \
+    ANYA_LOG_DIR=/app/logs
+
+# Run the application with correct binary name
+CMD ["anya"]
