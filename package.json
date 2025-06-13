@@ -23,7 +23,8 @@
     "crypto-js": "^4.2.0",
     "mem0ai": "^1.0.39",
     "node-fetch": "^2.7.0",
-    "zod": "^3.23.8"
+    "zod": "^3.23.8",
+    "mocha": "^10.7.3"
   },
   "directories": {
     "doc": "docs",

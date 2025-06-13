@@ -1,5 +1,25 @@
 # Changelog for Anya Core
 
+## [1.0.0] - 2025-06-13
+
+### Fixed
+- Updated Noble curves dependency from @noble/secp256k1 to @noble/curves/secp256k1
+- Fixed MCP server JSON-RPC protocol implementation
+- Corrected logging to use stderr instead of stdout for MCP communication
+- Updated all Bitcoin-related dependencies to latest versions
+
+### Added
+- Proper MCP protocol v2024-11-05 compliance
+- JSON-RPC 2.0 communication over stdin/stdout
+- 6 Bitcoin development tools with proper input schemas
+- Comprehensive error handling and validation
+
+### Changed
+- MCP server now implements full JSON-RPC protocol
+- Logging moved to stderr to avoid stdout conflicts
+- Updated package dependencies to latest versions
+
+
 ## [Unreleased] - Development Branch
 
 ### 🔧 Current Development Work (v0.9.0-dev)

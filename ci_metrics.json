@@ -1,48 +1,28 @@
 {
-  "generated_at": "2025-06-13T13:13:22Z",
-  "pipeline_version": "2025.1",
-  "report_type": "comprehensive",
-  "rust": {
-  "test_artifacts": 0,
-  "benchmark_data": "",
-  "dependency_count": 0,
-  "build_time_seconds": 1,
-  "workspace_members": 0
-},
-  "git": {
-  "total_commits": 1004,
-  "contributors": 7,
-  "files_changed_last_commit": 151,
-  "latest_tag": "v0.2.0-rc1",
-  "current_branch": "main",
-  "repository_age_days": "282
-0"
-},
-  "security": {
-  "cargo_audit_status": "not_installed",
-  "clippy_warnings": 0
-0,
-  "sensitive_files_with_weak_permissions": 3,
-  "last_security_scan": "2025-06-13T13:13:30Z"
-},
-  "performance": {
-  "system": {
-    "cpu_cores": 2,
-    "memory_mb": 7938,
-    "disk_usage_percent": 18
+  "pipeline": {
+    "version": "2025.1",
+    "timestamp": "2025-06-13T14:06:40Z",
+    "duration_seconds": 0,
+    "phases_completed": 1,
+    "total_phases": 8,
+    "success_rate": "12%",
+    "status": "failed"
   },
-  "build": {
-    "target_directory_size_kb": 0,
-    "parallel_jobs": 2
-  }
-},
-  "summary": {
-    "overall_health": "excellent",
-    "recommendations": [
-      "Keep dependencies updated",
-      "Run security audits regularly",
-      "Monitor performance benchmarks",
-      "Maintain test coverage above 80%"
-    ]
+  "metrics": {
+    "performance_score": "N/A",
+    "test_coverage": "N/A",
+    "security_audit": "pending",
+    "compliance_score": "100%"
+  },
+  "environment": {
+    "os": "Linux",
+    "arch": "x86_64",
+    "rust_version": "rustc 1.87.0 (17067e9ac 2025-05-09)",
+    "cargo_version": "cargo 1.87.0 (99624be96 2025-05-06)"
+  },
+  "repository": {
+    "commit": "8e147e13eb051d6e8f99938984bee9433f7d37ae",
+    "branch": "main",
+    "last_modified": "2025-06-13 13:22:14 +0000"
   }
 }
