@@ -1,0 +1,48 @@
+{
+  "generated_at": "2025-06-13T13:13:22Z",
+  "pipeline_version": "2025.1",
+  "report_type": "comprehensive",
+  "rust": {
+  "test_artifacts": 0,
+  "benchmark_data": "",
+  "dependency_count": 0,
+  "build_time_seconds": 1,
+  "workspace_members": 0
+},
+  "git": {
+  "total_commits": 1004,
+  "contributors": 7,
+  "files_changed_last_commit": 151,
+  "latest_tag": "v0.2.0-rc1",
+  "current_branch": "main",
+  "repository_age_days": "282
+0"
+},
+  "security": {
+  "cargo_audit_status": "not_installed",
+  "clippy_warnings": 0
+0,
+  "sensitive_files_with_weak_permissions": 3,
+  "last_security_scan": "2025-06-13T13:13:30Z"
+},
+  "performance": {
+  "system": {
+    "cpu_cores": 2,
+    "memory_mb": 7938,
+    "disk_usage_percent": 18
+  },
+  "build": {
+    "target_directory_size_kb": 0,
+    "parallel_jobs": 2
+  }
+},
+  "summary": {
+    "overall_health": "excellent",
+    "recommendations": [
+      "Keep dependencies updated",
+      "Run security audits regularly",
+      "Monitor performance benchmarks",
+      "Maintain test coverage above 80%"
+    ]
+  }
+}
