@@ -26,6 +26,10 @@ INSTALL_TYPE="standard"
 NETWORK="testnet"
 DRY_RUN=false
 MONITORING=false
+INSTALL_DEPS=false
+AUTO_RUN=false
+YES_ALL=false
+INSTALL_DIR="${INSTALL_DIR:-$HOME/.anya-core}"
 MONITORING_AVAILABLE=${MONITORING_AVAILABLE:-false}
 
 # Parse command line arguments
@@ -49,6 +53,21 @@ while [[ $# -gt 0 ]]; do
             ;;
         --dry-run)
             DRY_RUN=true
+            shift
+            ;;
+        --auto-run)
+            echo "[INFO] Auto-run enabled: installing dependencies automatically"
+            AUTO_RUN=true
+            INSTALL_DEPS=true
+            shift
+            ;;
+        --yes-all)
+            echo "[INFO] Yes-all flag detected"
+            YES_ALL=true
+            shift
+            ;;
+        --install-deps)
+            INSTALL_DEPS=true
             shift
             ;;
         *)
