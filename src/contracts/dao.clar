@@ -65,7 +65,7 @@
 ;; Governance Token Management
 (define-public (set-governance-token (token principal;););
     (begin
-        (asserts! (is-eq tx-sender contract-owner;) ERR-OWNER-ONLY;);        (var-set governance-token token;);        (ok true;););)
+        (asserts! (is-eq contract-caller contract-owner;) ERR-OWNER-ONLY;);        (var-set governance-token token;);        (ok true;););)
 
 ;; Proposal Creation
 (define-public (create-proposal 
@@ -76,13 +76,13 @@
         ;; Validate proposer's token balance
         (asserts! 
             (>= 
-                (unwrap! (contract-call? token-contract get-balance tx-sender;) ERR-INVALID-PROPOSAL;)
+                (unwrap! (contract-call? token-contract get-balance contract-caller;) ERR-INVALID-PROPOSAL;)
                 PROPOSAL-THRESHOLD;)
             ERR-INVALID-PROPOSAL;)
 
         ;; Create proposal
         (map-set proposals proposal-id {
-            proposer: tx-sender,
+            proposer: contract-caller,
             title: title,
             description: description,
             start-block: block-height,
@@ -96,7 +96,7 @@
 
         ;; Queue proposal actions
         (map-set action-queue proposal-id {
-            target: tx-sender,
+            target: contract-caller,
             function: "execute-proposal",
             args: actions
         };)
@@ -172,5 +172,3 @@
 ;);  (ok processed;)
 ;)
 ;)
-
-

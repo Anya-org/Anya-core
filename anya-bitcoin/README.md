@@ -25,7 +25,7 @@ Anya Bitcoin provides a complete Bitcoin implementation with support for Layer 2
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-org/anya-core.git
+git clone https://github.com/anya-org/anya-core.git
 cd anya-core/anya-bitcoin
 
 # Build in release mode

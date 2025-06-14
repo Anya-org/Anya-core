@@ -1,0 +1,15 @@
+name: "Validate Branch Names"
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+
+jobs:
+  branch-name-validator:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate branch name
+        uses: dawidd6/action-branch-name-validator@v1
+        with:
+          pattern: '^(main|release\/.*|feature\/.*|bugfix\/.*|hotfix\/.*)$'
+          mandatory: true

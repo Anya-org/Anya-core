@@ -213,5 +213,4 @@ journey
 - Q2 2025: All missing types/modules referenced in tests and binaries are now covered by minimal, compilable API templates (see [INDEX.md](./INDEX.md)).
 - All legacy/incomplete test modules and protocol binaries are stubbed or auto-fixed to unblock the build.
 - No open source drop-in replacements exist for these APIs; all stubs/templates are custom and will be replaced with real logic as features are prioritized.
-- See [TODO.md](./TODO.md) for implementation checklist and [INDEX.md](./INDEX.md) for template locations.
 

@@ -1,0 +1,45 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  - "alert_rules.yml"
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          - alertmanager:9093
+
+scrape_configs:
+  # Anya Bitcoin Core metrics
+  - job_name: 'anya-bitcoin'
+    static_configs:
+      - targets: ['anya-core:8000']
+    metrics_path: '/metrics'
+    scrape_interval: 5s
+    scrape_timeout: 10s
+
+  # Bitcoin Core node metrics
+  - job_name: 'bitcoin-core'
+    static_configs:
+      - targets: ['bitcoin:8332']
+    metrics_path: '/metrics'
+    scrape_interval: 10s
+
+  # Web5 DWN metrics
+  - job_name: 'web5-dwn'
+    static_configs:
+      - targets: ['dwn:3000']
+    metrics_path: '/metrics'
+    scrape_interval: 15s
+
+  # Container metrics
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']
+
+  # Self-monitoring
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
