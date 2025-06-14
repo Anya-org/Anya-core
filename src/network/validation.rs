@@ -582,7 +582,7 @@ impl NetworkValidator {
                     continue;
                 }
                 
-                if let Some(host) = url.host_str() {
+                if let Some(_host) = url.host_str() {
                     // Simple check using reqwest to validate HTTPS
                     let client = reqwest::Client::builder()
                         .danger_accept_invalid_certs(true)
@@ -1033,7 +1033,7 @@ impl NetworkValidator {
     }
 
     /// BIP-341 specific port validation
-    async fn validate_taproot_port(&self, port: u16) -> bool  {
+    async fn validate_taproot_port(&self, _port: u16) -> bool  {
         // Implement Taproot-specific validation logic
         let taproot_check = Command::new("bitcoin-cli")
             .args(&["getnetworkinfo"])

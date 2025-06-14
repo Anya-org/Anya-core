@@ -16,7 +16,7 @@ async fn main() -> AnyaResult<()> {
 
     // Initialize Anya with default configuration
     let config = AnyaConfig::default();
-    let anya_core = AnyaCore::new(config)?;
+    let _anya_core = AnyaCore::new(config)?;
 
     info!("Anya Core system initialized successfully");
 

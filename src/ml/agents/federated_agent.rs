@@ -10,9 +10,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::sync::{Arc, RwLock};
 
-use crate::ml::models::{Model, PredictionResult};
 use crate::ml::FederatedLearningManager;
-use crate::error::Error;
 
 use super::{Action, Agent, AgentError, AgentId, AgentMetrics, Feedback, Observation};
 
@@ -237,7 +235,7 @@ impl FederatedAgent {
         &self,
         participant_id: &str,
         model_hash: &str,
-        model__data: &[u8],
+        model_data: &[u8],
         performance: HashMap<String, f64>
     ) -> Result<(), AgentError> {
         // Update participant state
@@ -276,10 +274,10 @@ impl FederatedAgent {
         }
 
         // Validate model data
-        if model__data.len() > self.config.max_model_size {
+        if model_data.len() > self.config.max_model_size {
             return Err(AgentError::ProcessingError(format!(
                 "Model size exceeds maximum: {} > {}",
-                model__data.len(),
+                model_data.len(),
                 self.config.max_model_size
             )));
         }

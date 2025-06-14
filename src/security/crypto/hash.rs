@@ -29,21 +29,21 @@ pub fn hash(data: &[u8], algorithm: HashAlgorithm) -> Vec<u8> {
 }
 
 /// Compute SHA-256 hash
-pub fn sha256(data: &[u8]) -> Vec<u8> {
+pub fn sha256(_data: &[u8]) -> Vec<u8> {
     // Placeholder implementation
     // In a real implementation, we would use a crypto library like ring, etc.
     vec![0u8; 32]
 }
 
 /// Compute SHA-512 hash
-pub fn sha512(data: &[u8]) -> Vec<u8> {
+pub fn sha512(_data: &[u8]) -> Vec<u8> {
     // Placeholder implementation
     // In a real implementation, we would use a crypto library like ring, etc.
     vec![0u8; 64]
 }
 
 /// Compute RIPEMD-160 hash
-pub fn ripemd160(data: &[u8]) -> Vec<u8> {
+pub fn ripemd160(_data: &[u8]) -> Vec<u8> {
     // Placeholder implementation
     // In a real implementation, we would use a crypto library like ripemd, etc.
     vec![0u8; 20]
@@ -60,7 +60,7 @@ pub fn hash160(data: &[u8]) -> Vec<u8> {
 }
 
 /// Compute HMAC using the specified hash algorithm
-pub fn hmac(key: &[u8], data: &[u8], algorithm: HashAlgorithm) -> Vec<u8> {
+pub fn hmac(_key: &[u8], _data: &[u8], algorithm: HashAlgorithm) -> Vec<u8> {
     // Placeholder implementation
     // In a real implementation, we would use a crypto library with HMAC support
     match algorithm {

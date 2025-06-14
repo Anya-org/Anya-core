@@ -93,28 +93,28 @@ impl Default for ScryptParams {
 }
 
 /// Derive a key from a password or passphrase using PBKDF2
-pub fn pbkdf2(password: &[u8], params: &Pbkdf2Params) -> Vec<u8> {
+pub fn pbkdf2(_password: &[u8], params: &Pbkdf2Params) -> Vec<u8> {
     // Placeholder implementation
     // In a real implementation, we would use a crypto library with PBKDF2 support
     vec![0u8; params.key_length]
 }
 
 /// Derive a key from a password or passphrase using Argon2id
-pub fn argon2id(password: &[u8], params: &Argon2Params) -> Vec<u8> {
+pub fn argon2id(_password: &[u8], params: &Argon2Params) -> Vec<u8> {
     // Placeholder implementation
     // In a real implementation, we would use a crypto library with Argon2 support
     vec![0u8; params.key_length]
 }
 
 /// Derive a key from a password or passphrase using scrypt
-pub fn scrypt(password: &[u8], params: &ScryptParams) -> Vec<u8> {
+pub fn scrypt(_password: &[u8], params: &ScryptParams) -> Vec<u8> {
     // Placeholder implementation
     // In a real implementation, we would use a crypto library with scrypt support
     vec![0u8; params.key_length]
 }
 
 /// Derive a key using HKDF (HMAC-based Key Derivation Function)
-pub fn hkdf(ikm: &[u8], salt: &[u8], info: &[u8], key_length: usize) -> Vec<u8> {
+pub fn hkdf(_ikm: &[u8], _salt: &[u8], _info: &[u8], key_length: usize) -> Vec<u8> {
     // Placeholder implementation
     // In a real implementation, we would use a crypto library with HKDF support
     vec![0u8; key_length]
@@ -124,7 +124,7 @@ pub fn hkdf(ikm: &[u8], salt: &[u8], info: &[u8], key_length: usize) -> Vec<u8> 
 pub fn derive_key(
     password: &[u8],
     algorithm: KdfAlgorithm,
-    params: &[u8],
+    _params: &[u8],
 ) -> Result<Vec<u8>, Box<dyn Error>> {
     match algorithm {
         KdfAlgorithm::Pbkdf2 => {

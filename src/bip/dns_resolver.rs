@@ -47,6 +47,7 @@ pub type DnsResult<T> = Result<T, DnsResolverError>;
 struct CacheEntry {
     pub txt_records: Vec<String>,
     pub expires_at: u64,
+    #[allow(dead_code)]
     pub is_secure: bool,
 }
 

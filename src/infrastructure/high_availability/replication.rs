@@ -154,7 +154,7 @@ impl ReplicationManager {
         &self,
         operation: WriteOperation,
     ) -> Result<ReplicationResult, HaError> {
-        let start_time = Instant::now();
+        let _start_time = Instant::now();
 
         // Add to write-ahead log first (durability)
         self.append_to_wal(&operation).await?;
@@ -457,7 +457,7 @@ impl ReplicationManager {
     async fn replication_loop(
         pending_writes: Arc<Mutex<Vec<WriteOperation>>>,
         replication_active: Arc<RwLock<bool>>,
-        config: Arc<HighAvailabilityConfig>,
+        _config: Arc<HighAvailabilityConfig>,
     ) {
         info!("Starting replication background loop");
 

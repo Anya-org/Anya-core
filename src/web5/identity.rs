@@ -4,7 +4,6 @@ use std::error::Error;
 // as part of the Web5 integration - [AIR-012] Operational Reliability
 
 use serde::{Deserialize, Serialize};
-use sha2::Digest;
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use std::time::{SystemTime, UNIX_EPOCH};
@@ -290,7 +289,7 @@ impl DIDManager {
             };
             
             // Create message from hash
-            let message = secp256k1::Message::from_slice(&hash)
+            let message = secp256k1::Message::from_digest_slice(&hash)
                 .map_err(|e| format!("Failed to create message: {}", e))?;
             
             // Sign the message

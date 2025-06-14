@@ -415,14 +415,14 @@ impl Bip341Taproot {
     }
     
     /// Verify a Taproot spend
-    pub fn verify_spend(&self, spend: &TaprootSpend, message: &[u8]) -> Result<bool, Bip341Error> {
+    pub fn verify_spend(&self, spend: &TaprootSpend, _message: &[u8]) -> Result<bool, Bip341Error> {
         match spend {
-            TaprootSpend::KeyPath { output_key, signature } => {
+            TaprootSpend::KeyPath { output_key: _, signature: _ } => {
                 // Verify key path spending using secp256k1
                 // In a real implementation, use proper Schnorr verification
                 Ok(true) // Simplified for now
             },
-            TaprootSpend::ScriptPath { leaf, control_block, witness_stack } => {
+            TaprootSpend::ScriptPath { leaf: _, control_block: _, witness_stack: _ } => {
                 // Verify script path spending
                 // In a real implementation, this would:
                 // 1. Extract the internal key from control block
@@ -582,7 +582,7 @@ impl Bip341Taproot {
         // Create output
         let output = TaprootOutput {
             internal_key: self.internal_key,
-            output_key: spend_info.output_key().to_inner(),
+            output_key: spend_info.output_key().to_x_only_public_key(),
             merkle_root: spend_info.merkle_root().map(|root| {
                 let mut bytes = [0u8; 32];
                 bytes.copy_from_slice(root.as_ref());
@@ -596,8 +596,8 @@ impl Bip341Taproot {
     /// Create a Taproot script spend
     pub fn create_script_spend(
         &self,
-        tx: &mut Transaction,
-        input_index: usize,
+        _tx: &mut Transaction,
+        _input_index: usize,
         script_index: usize,
     ) -> BitcoinResult<()> {
         // Ensure we have spend info
@@ -616,7 +616,7 @@ impl Bip341Taproot {
         let version: u8 = leaf.version.into();
         
         // Create control block info needed for spending
-        let control_block = spend_info.control_block(&(script_buf, bitcoin::taproot::LeafVersion::from_consensus(version).map_err(|_| BitcoinError::TaprootError("Invalid leaf version".to_string()))?))
+        let _control_block = spend_info.control_block(&(script_buf, bitcoin::taproot::LeafVersion::from_consensus(version).map_err(|_| BitcoinError::TaprootError("Invalid leaf version".to_string()))?))
             .ok_or_else(|| BitcoinError::TaprootError("Failed to create control block".to_string()))?;
         
         // In a real implementation, we would construct the witness for script path spending
@@ -644,7 +644,7 @@ impl Bip341Taproot {
         }
         
         // Get output key from spend info
-        let output_key = self.spend_info.as_ref().unwrap().output_key().to_inner();
+        let output_key = self.spend_info.as_ref().unwrap().output_key().to_x_only_public_key();
         
         // Create P2TR address
         let address = Address::p2tr(&self.secp, output_key, None, network);

@@ -401,7 +401,7 @@ impl AgentSystem {
         // Enforce read-first principle if configured
         if config.enforce_read_first {
             // First read the current system state
-            let system_state = agent.read_system_state().await?;
+            let _system_state = agent.read_system_state().await?;
 
             // Then process with the original observation plus system state
             let combined_observation =            match observation {

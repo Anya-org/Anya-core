@@ -69,22 +69,22 @@ pub fn generate_ec_keypair(curve: &EcCurve) -> Result<KeyPair, Box<dyn Error>> {
 }
 
 /// RSA encryption with PKCS1 padding
-pub fn rsa_encrypt(public_key: &[u8], data: &[u8]) -> Result<Vec<u8>, Box<dyn Error>> {
+pub fn rsa_encrypt(_public_key: &[u8], data: &[u8]) -> Result<Vec<u8>, Box<dyn Error>> {
     // Placeholder implementation
     Ok(data.to_vec())
 }
 
 /// RSA decryption with PKCS1 padding
-pub fn rsa_decrypt(private_key: &[u8], data: &[u8]) -> Result<Vec<u8>, Box<dyn Error>> {
+pub fn rsa_decrypt(_private_key: &[u8], data: &[u8]) -> Result<Vec<u8>, Box<dyn Error>> {
     // Placeholder implementation
     Ok(data.to_vec())
 }
 
 /// ECDH key agreement - derive a shared secret
 pub fn ecdh_derive_secret(
-    private_key: &[u8],
-    peer_public_key: &[u8],
-    curve: &EcCurve,
+    _private_key: &[u8],
+    _peer_public_key: &[u8],
+    _curve: &EcCurve,
 ) -> Result<Vec<u8>, Box<dyn Error>> {
     // Placeholder implementation
     Ok(vec![0u8; 32])

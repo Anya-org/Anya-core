@@ -151,7 +151,7 @@ impl Bip353 {
     /// Create a new BIP353 implementation
     pub fn new(config: Bip353Config) -> Result<Self, Bip353Error> {
         // Configure DNS resolver
-        let resolver_ip: std::net::IpAddr = match config.default_resolver.parse() {
+        let _resolver_ip: std::net::IpAddr = match config.default_resolver.parse() {
             Ok(ip) => ip,
             Err(_) => {
                 return Err(Bip353Error::ResolutionError(
@@ -355,7 +355,7 @@ impl Bip353 {
         if self.config.default_resolver != config.default_resolver
             || self.config.validate_dnssec != config.validate_dnssec
         {
-            let resolver_ip: std::net::IpAddr = match config.default_resolver.parse() {
+            let _resolver_ip: std::net::IpAddr = match config.default_resolver.parse() {
                 Ok(ip) => ip,
                 Err(_) => {
                     return Err(Bip353Error::ResolutionError(
@@ -416,7 +416,7 @@ impl Bip353Monitor {
         }
 
         // Check resolution
-        let test_recipient = match bip353.parse_address("test@example.com") {
+        let _test_recipient = match bip353.parse_address("test@example.com") {
             Ok(recipient) => recipient,
             Err(_) => {
                 self.health_status = false;

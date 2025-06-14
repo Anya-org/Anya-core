@@ -45,7 +45,7 @@ impl NostrUserProfile {
     /// Subscribe with an existing key
     pub async fn subscribe_with_key(
         private_key: &str,
-        relays: Option<Vec<String>>,
+        _relays: Option<Vec<String>>,
     ) -> Result<Self, Box<dyn Error>> {
         // TODO: Implement actual Nostr key derivation
         let public_key = format!("npub{}", &private_key[4..]);

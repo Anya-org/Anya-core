@@ -26,8 +26,8 @@ pub struct Signature {
 
 /// Sign a message with the provided private key
 pub fn sign(
-    message: &[u8],
-    private_key: &[u8],
+    _message: &[u8],
+    _private_key: &[u8],
     algorithm: SignatureAlgorithm,
 ) -> Result<Signature, Box<dyn Error>> {
     // Placeholder implementation
@@ -46,9 +46,9 @@ pub fn sign(
 
 /// Verify a signature against a message and public key
 pub fn verify(
-    message: &[u8],
-    signature: &Signature,
-    public_key: &[u8],
+    _message: &[u8],
+    _signature: &Signature,
+    _public_key: &[u8],
 ) -> Result<bool, Box<dyn Error>> {
     // Placeholder implementation
     // In a real implementation, we would use a crypto library like secp256k1, etc.

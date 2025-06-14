@@ -8,7 +8,7 @@ use async_trait::async_trait;
 use blake3;
 use dashmap::{DashMap, DashSet};
 use once_cell::sync::Lazy;
-use rayon::iter::{ParallelBridge, ParallelIterator, IntoParallelIterator};
+use rayon::iter::{ParallelBridge, ParallelIterator};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::sync::{Arc, RwLock, atomic::{AtomicU64, AtomicU32, Ordering}};
@@ -218,7 +218,7 @@ impl SystemIndexManager {
             .map_err(|_| AgentError::InternalError("Failed to acquire read lock on system index".to_string()))?;
         
         // Create a new SystemIndex with the current data
-        let mut new_index = SystemIndex::default();
+        let new_index = SystemIndex::default();
         for entry in index.component_paths.iter() {
             new_index.component_paths.insert(entry.key().clone(), entry.value().clone());
         }

@@ -5,7 +5,7 @@
 use aes_gcm::{aead::Aead as AesAead, Aes256Gcm};
 /// Supports AES-256 (GCM, CBC, CTR modes) and ChaCha20-Poly1305.
 use chacha20poly1305::{
-    aead::{Aead, KeyInit, Payload},
+    aead::{KeyInit, Payload},
     ChaCha20Poly1305, Key,
 };
 use thiserror::Error;
