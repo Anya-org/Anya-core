@@ -1,6 +1,6 @@
 [package]
 name = "anya-extensions"
-version = "1.1.0"
+version = "1.2.0"
 edition = "2021"
 authors = ["Anya Extensions Contributors"]
 description = "Core extensions for Anya Platform"
@@ -12,6 +12,6 @@ name = "anya_extensions"
 path = "src/lib.rs"
 
 [dependencies]
-anya-core = { path = "../../../anya-core", version = "1.1.0" }
+anya-core = { path = "../../../anya-core", version = "1.2.0" }
 tokio = { workspace = true }
 serde = { workspace = true }

@@ -4,9 +4,16 @@ members = [
     "anya-extensions" # Add this for better workspace organization
 ]
 
+[workspace.package]
+version = "1.2.0"
+edition = "2021"
+authors = ["botshelomokoka@gmail.com"]
+license = "MIT"
+repository = "https://github.com/anya-org/anya-core"
+
 [package]
 name = "anya-core"
-version = "0.3.0-rc.1"
+version = "1.2.0"
 edition = "2021"
 rust-version = "1.63.0" # Explicit MSRV following rust-bitcoin standards
 description = "Enterprise-grade Bitcoin Infrastructure Platform"
@@ -62,7 +69,7 @@ serde_json = { version = "1.0.140", features = ["std", "preserve_order"] } # Mai
 humantime-serde = "=1.1.1"
 getrandom = { version = "=0.3.3", features = ["std"] }
 url = { version = "=2.5.4", features = ["serde"] }
-toml = { version = "0.8.12", features = ["preserve_order"] } # Maintain configuration order
+toml = { version = "0.8.23", features = ["preserve_order"] } # Maintain configuration order
 
 # Enhanced error handling for better system alignment
 anyhow = { version = "1.0.98", features = ["std", "backtrace"] } # Better error tracking
