@@ -1,6 +1,6 @@
-use rand::{Rng, RngCore, distributions::Distribution, seq::SliceRandom};
-use rand::rngs::OsRng;
 use rand::distributions::Standard;
+use rand::rngs::OsRng;
+use rand::{distributions::Distribution, seq::SliceRandom, Rng, RngCore};
 use std::fmt;
 
 /// Error type for random number generation
@@ -56,7 +56,7 @@ pub fn random_f64() -> f64 {
 }
 
 /// Generate a random number in the given range
-pub fn random_in_range<T>(min: T, max: T) -> T 
+pub fn random_in_range<T>(min: T, max: T) -> T
 where
     T: PartialOrd + Copy,
     Standard: Distribution<T>,
@@ -105,7 +105,7 @@ mod tests {
         let num1 = random_u64();
         let num2 = random_u64();
         assert_ne!(num1, num2); // Very unlikely to be equal
-        
+
         let num3 = random_u32();
         let num4 = random_u32();
         assert_ne!(num3, num4);

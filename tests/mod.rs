@@ -1,5 +1,5 @@
 //! Main test module for Anya Core
-//! 
+//!
 //! This module organizes all test categories and provides utility functions
 //! for testing the entire Anya Core system.
 
@@ -19,6 +19,6 @@ pub mod security;
 /// Test utilities (legacy compatibility)
 pub mod test_utils;
 
+pub use common::*;
 /// Re-export important test functionality
 pub use test_utils::*;
-pub use common::*;

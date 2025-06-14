@@ -10,14 +10,14 @@ use std::sync::Arc;
 // Integrates all Priority 1 implementations with auto-save functionality
 
 // Modules
-pub mod performance_optimization;
 pub mod metrics;
+pub mod performance_optimization;
 
 // Re-exports
+pub use metrics::PrometheusMetrics;
+pub use performance_optimization::OptimizationStatus;
 pub use performance_optimization::PerformanceOptimizer;
 pub use performance_optimization::ResourceType;
-pub use performance_optimization::OptimizationStatus;
-pub use metrics::PrometheusMetrics;
 
 // ML agent checker module is in src/ml/agent_checker.rs
 // Re-export from ml module
@@ -25,16 +25,16 @@ pub use crate::ml::agent_checker::AgentChecker;
 pub use crate::ml::agent_checker::SystemStage;
 
 // System hardening module is in src/security/system_hardening.rs
-// Re-export from security module  
-pub use crate::security::system_hardening::SystemHardening;
-pub use crate::security::system_hardening::SecurityLevel;
+// Re-export from security module
 pub use crate::security::system_hardening::ConfigStatus;
+pub use crate::security::system_hardening::SecurityLevel;
+pub use crate::security::system_hardening::SystemHardening;
 
 /// Core functionality with auto-save capabilities
 pub struct CoreSystem {
     // Component managers with auto-save functionality
     agent_checker: AgentChecker,
-    system_hardening: SystemHardening, 
+    system_hardening: SystemHardening,
     performance_optimizer: PerformanceOptimizer,
 }
 
@@ -47,39 +47,39 @@ impl CoreSystem {
             performance_optimizer: PerformanceOptimizer::new(auto_save_frequency),
         }
     }
-    
+
     /// Get access to the agent checker
     pub fn agent_checker(&self) -> &AgentChecker {
         &self.agent_checker
     }
-    
+
     /// Get access to the system hardening manager
     pub fn system_hardening(&self) -> &SystemHardening {
         &self.system_hardening
     }
-    
+
     /// Get access to the performance optimizer
     pub fn performance_optimizer(&self) -> &PerformanceOptimizer {
         &self.performance_optimizer
     }
-    
+
     /// Process input across all components
     pub fn process_input(&self, input: &str) -> Result<(), String> {
         // Process input in the agent checker
         self.agent_checker.process_input(input)?;
-        
+
         // Additional processing could be done with other components
         // depending on the input type
-        
+
         Ok(())
     }
-    
+
     /// Get stats about the auto-save state of all components
     pub fn get_auto_save_stats(&self) -> (usize, usize, usize) {
         let (agent_inputs, _, _) = self.agent_checker.get_input_stats();
         let (hardening_changes, _) = self.system_hardening.get_stats();
         let (performance_changes, _, _) = self.performance_optimizer.get_stats();
-        
+
         (agent_inputs, hardening_changes, performance_changes)
     }
 }
@@ -87,15 +87,15 @@ impl CoreSystem {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::core::ResourceType;
     use std::collections::HashMap;
-    use std::time::Duration;
-    use crate::core::ResourceType; // Fix: Import ResourceType from core
-    
+    use std::time::Duration; // Fix: Import ResourceType from core
+
     #[test]
     fn test_core_system_integration() -> Result<(), Box<dyn std::error::Error>> {
         // Create core system with auto-save every 20 inputs
         let core = CoreSystem::new(20);
-        
+
         // Process some inputs through the agent checker
         for i in 0..25 {
             let input = if i % 5 == 0 {
@@ -103,14 +103,14 @@ mod tests {
             } else {
                 format!("normal message {}", i)
             };
-            
+
             core.process_input(&input).map_err(|e| e.to_string())?;
         }
-        
+
         // Set up a resource in the performance optimizer
         let mut settings = HashMap::new();
         settings.insert("cache_size".to_string(), "1024".to_string());
-        
+
         core.performance_optimizer().configure_resource(
             "database",
             ResourceType::Database,
@@ -119,27 +119,27 @@ mod tests {
             500.0,
             Duration::from_millis(50),
         )?;
-        
+
         // Set up a component in the system hardening
         use crate::security::system_hardening::SecurityLevel;
         let mut security_settings = HashMap::new();
         security_settings.insert("firewall".to_string(), "enabled".to_string());
-        
+
         core.system_hardening().configure_component(
             "network",
             SecurityLevel::Enhanced,
             security_settings,
-            true
+            true,
         )?;
-        
+
         // Get stats
         let (agent_inputs, hardening_changes, performance_changes) = core.get_auto_save_stats();
-        
+
         // Verify all components registered inputs
         assert_eq!(agent_inputs, 25);
         assert_eq!(hardening_changes, 1);
         assert_eq!(performance_changes, 1);
-        
+
         Ok(())
     }
 }
@@ -193,9 +193,9 @@ pub mod ports {
     // Additional ports from BDF v2.5
 }
 
-use crate::web5::Web5Adapter;
 use crate::ml::agent_system::MLAgentSystem;
-use crate::tokenomics::{TokenomicsEngine, engine::TokenomicsConfig};
+use crate::tokenomics::{engine::TokenomicsConfig, TokenomicsEngine};
+use crate::web5::Web5Adapter;
 
 // Configuration types
 #[derive(Debug, Clone)]
@@ -240,50 +240,51 @@ impl AnyaCore {
             enabled: true, // Assuming enabled by default since core config doesn't have this field
             network: config.bitcoin.network.clone(),
             rpc_url: config.bitcoin.rpc_url.clone(),
-            auth: None, // No auth in core config
-            min_confirmations: 6, // Default value
+            auth: None,                                           // No auth in core config
+            min_confirmations: 6,                                 // Default value
             default_fee_rate: 1, // [AIR-3][AIS-3][BPC-3][RES-3] Default value for fee rate as u64
             wallet_path: Some("/tmp/bitcoin-wallet".to_string()), // Default wallet path as Option<String>
         };
-        
+
         // Properly wrap BitcoinInterface trait object to comply with BDF v2.5 hexagonal architecture
         let bitcoin_adapter = crate::bitcoin::BitcoinAdapter::new(bitcoin_config).await?;
-        let bitcoin: Arc<dyn crate::bitcoin::interface::BitcoinInterface + Send + Sync> = Arc::new(bitcoin_adapter);
-        
+        let bitcoin: Arc<dyn crate::bitcoin::interface::BitcoinInterface + Send + Sync> =
+            Arc::new(bitcoin_adapter);
+
         // Convert config.web5 to web5::Web5Config with all required fields
         // [AIR-3][AIS-3][BPC-3][RES-3]
         let web5_config = crate::web5::Web5Config {
-            enabled: true, // Default to enabled
-            did_method: "ion".to_string(), // Default DID method
+            enabled: true,                               // Default to enabled
+            did_method: "ion".to_string(),               // Default DID method
             dwn_url: Some(config.web5.endpoint.clone()), // Use endpoint as DWN URL
-            use_local_storage: true, // Default to using local storage
+            use_local_storage: true,                     // Default to using local storage
         };
         let web5 = Arc::new(Web5Adapter::build(web5_config).await?);
-        
+
         // Convert config.ml to MLConfig with all required fields
         // [AIR-3][AIS-3][BPC-3][RES-3]
         let ml_config = crate::ml::MLConfig {
-            enabled: true, // Default to enabled
+            enabled: true,                                  // Default to enabled
             model_path: Some(config.ml.model_path.clone()), // model_path is Option<String> in MLConfig
-            use_gpu: true, // Default to using GPU
-            federated_learning: true, // Default to using federated learning
-            max_model_size: 100 * 1024 * 1024, // Default to 100MB
+            use_gpu: true,                                  // Default to using GPU
+            federated_learning: true,                       // Default to using federated learning
+            max_model_size: 100 * 1024 * 1024,              // Default to 100MB
         };
         let agents = Arc::new(MLAgentSystem::init(ml_config).await?);
-        
+
         // Create a default DaoGovernance since we can't import it
         let dao = Arc::new(crate::dao::DaoGovernance::default());
-        
+
         // [AIR-3][AIS-3][BPC-3][RES-3]
         // TokenomicsEngine::setup already returns Arc<TokenomicsEngine>, so we don't need to wrap it again
         let tokens = TokenomicsEngine::setup(config.tokenomics).await?;
-        
+
         // Assign tokens directly to the AnyaCore struct
         Ok(Self {
             bitcoin_adapter: bitcoin,
             web5_adapter: web5,
             ml_agent_system: agents,
-            dao_governance: dao, 
+            dao_governance: dao,
             tokenomics: tokens,
         })
     }
@@ -293,21 +294,35 @@ impl AnyaCore {
 pub mod rpc_ports {
     // [AIR-3][AIS-3][BPC-3][RES-3] Import necessary synchronization primitives
     // This follows official Bitcoin Improvement Proposals (BIPs) standards for clean code
-    use std::sync::{Arc, Mutex};
-    use serde_json::Value as JsonValue;
     use crate::core::metrics::PrometheusMetrics;
     use async_trait::async_trait;
+    use serde_json::Value as JsonValue;
+    use std::sync::{Arc, Mutex};
 
     #[async_trait]
     pub trait BitcoinRpc {
-        async fn call_method(&self, method: &str, params: JsonValue) -> Result<JsonValue, Box<dyn std::error::Error + Send + Sync>>;
-        async fn validate_response(&self, response: JsonValue) -> Result<(), Box<dyn std::error::Error + Send + Sync>>;
+        async fn call_method(
+            &self,
+            method: &str,
+            params: JsonValue,
+        ) -> Result<JsonValue, Box<dyn std::error::Error + Send + Sync>>;
+        async fn validate_response(
+            &self,
+            response: JsonValue,
+        ) -> Result<(), Box<dyn std::error::Error + Send + Sync>>;
     }
 
     #[async_trait]
     pub trait LightningRpc {
-        async fn create_invoice(&self, amount_msat: u64, description: &str) -> Result<String, Box<dyn std::error::Error + Send + Sync>>;
-        async fn verify_payment(&self, payment_hash: &str) -> Result<bool, Box<dyn std::error::Error + Send + Sync>>;
+        async fn create_invoice(
+            &self,
+            amount_msat: u64,
+            description: &str,
+        ) -> Result<String, Box<dyn std::error::Error + Send + Sync>>;
+        async fn verify_payment(
+            &self,
+            payment_hash: &str,
+        ) -> Result<bool, Box<dyn std::error::Error + Send + Sync>>;
     }
 
     // BDF v2.5 compliant adapter
@@ -317,6 +332,6 @@ pub mod rpc_ports {
         lightning: Arc<dyn LightningRpc + Send + Sync>,
         // [AIR-3][AIS-3][BPC-3][RES-3] Using imported Mutex
         // This follows official Bitcoin Improvement Proposals (BIPs) standards for clean code
-        metrics: Arc<Mutex<PrometheusMetrics>>
+        metrics: Arc<Mutex<PrometheusMetrics>>,
     }
 }

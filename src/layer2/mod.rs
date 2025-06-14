@@ -6,8 +6,8 @@
 
 // [AIR-3][AIS-3][BPC-3][RES-3] Import necessary dependencies for Layer2 implementation
 // This follows official Bitcoin Improvement Proposals (BIPs) for Layer2 protocols
+use serde::{Deserialize, Serialize};
 use std::error::Error;
-use serde::{Serialize, Deserialize};
 
 /// Layer2 protocol types supported by the implementation
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -20,6 +20,16 @@ pub enum Layer2Protocol {
     RGB,
     /// Discrete Log Contracts
     DLC,
+    /// BOB (Bitcoin Optimistic Blockchain) Layer 2
+    BOB,
+    /// Liquid Network (Elements-based sidechain)
+    Liquid,
+    /// RSK (Rootstock) sidechain
+    RSK,
+    /// Stacks blockchain
+    Stacks,
+    /// Taproot Assets
+    TaprootAssets,
 }
 
 /// Transaction status in a Layer2 protocol
@@ -128,28 +138,28 @@ pub struct ValidationResult {
 pub trait Layer2ProtocolTrait {
     /// Initialize the Layer2 protocol
     fn initialize(&self) -> Result<(), Box<dyn Error>>;
-    
+
     /// Get the current state of the protocol
     fn get_state(&self) -> Result<ProtocolState, Box<dyn Error>>;
-    
+
     /// Submit a transaction
     fn submit_transaction(&self, tx_data: &[u8]) -> Result<String, Box<dyn Error>>;
-    
+
     /// Check transaction status
     fn check_transaction_status(&self, tx_id: &str) -> Result<TransactionStatus, Box<dyn Error>>;
-    
+
     /// Synchronize state
     fn sync_state(&mut self) -> Result<(), Box<dyn Error>>;
-    
+
     /// Issue an asset
     fn issue_asset(&self, params: AssetParams) -> Result<String, Box<dyn Error>>;
-    
+
     /// Transfer an asset
     fn transfer_asset(&self, transfer: AssetTransfer) -> Result<TransferResult, Box<dyn Error>>;
-    
+
     /// Verify a proof
     fn verify_proof(&self, proof: Proof) -> Result<VerificationResult, Box<dyn Error>>;
-    
+
     /// Validate a state update
     fn validate_state(&self, state_data: &[u8]) -> Result<ValidationResult, Box<dyn Error>>;
 }
@@ -166,11 +176,38 @@ pub mod rgb;
 /// DLC (Discrete Log Contracts) implementation
 pub mod dlc;
 
+/// BOB (Bitcoin Optimistic Blockchain) implementation
+pub mod bob;
+
+/// Liquid Network implementation
+pub mod liquid;
+
+/// RSK (Rootstock) implementation
+pub mod rsk;
+
+/// Stacks blockchain implementation
+pub mod stacks;
+
+/// Taproot Assets implementation
+pub mod taproot_assets;
+
+/// Layer 2 integration manager
+pub mod manager;
+
+#[cfg(test)]
+pub mod comprehensive_tests;
+
 // Re-export key components
 pub use lightning::LightningNetwork;
 // [AIR-3][AIS-3][BPC-3][RES-3] Re-export Layer2 protocol implementations
 // This follows official Bitcoin Improvement Proposals (BIPs) for Layer2 protocols
 pub use state_channels::StateChannel;
+pub use bob::BobClient;
+pub use liquid::LiquidModule;
+pub use rsk::RskClient;
+pub use stacks::StacksClient;
+pub use taproot_assets::TaprootAssetsProtocol;
+pub use manager::Layer2Manager;
 
 // Define the RGB Protocol trait implementation
 // [AIR-3][AIS-3][BPC-3][RES-3]

@@ -4,8 +4,8 @@
 //! across the Bitcoin implementation.
 
 use std::collections::HashMap;
-use std::time::{Duration, Instant};
-use std::sync::{Mutex, MutexGuard, Once}; // Added Mutex, MutexGuard, Once
+use std::sync::{Mutex, MutexGuard, Once};
+use std::time::{Duration, Instant}; // Added Mutex, MutexGuard, Once
 
 /// Performance metrics collection
 #[derive(Debug, Clone, Default)]
@@ -86,28 +86,28 @@ impl Metrics {
     /// Get summary of all metrics
     pub fn summary(&self) -> String {
         let mut summary = String::new();
-        
+
         if !self.timings.is_empty() {
             summary.push_str("Timings:\n");
             for (name, duration) in &self.timings {
                 summary.push_str(&format!("  {}: {:?}\n", name, duration));
             }
         }
-        
+
         if !self.counters.is_empty() {
             summary.push_str("Counters:\n");
             for (name, count) in &self.counters {
                 summary.push_str(&format!("  {}: {}\n", name, count));
             }
         }
-        
+
         if !self.gauges.is_empty() {
             summary.push_str("Gauges:\n");
             for (name, value) in &self.gauges {
                 summary.push_str(&format!("  {}: {:.2}\n", name, value));
             }
         }
-        
+
         summary
     }
 }
@@ -119,7 +119,7 @@ static PERF_METRICS_INIT: Once = Once::new();
 
 // Acquires a lock on the global metrics. Initializes metrics on the first call.
 // Returns a MutexGuard to the Option<Metrics>. After initialization, the Option will be Some.
-pub fn lock_global_metrics() -> MutexGuard<'static, Metrics> {
+pub fn lock_global_metrics() -> MutexGuard<'static, Option<Metrics>> {
     PERF_METRICS_INIT.call_once(|| {
         // This block runs only once across all threads.
         let mut guard = PERF_METRICS_DATA.lock().unwrap();

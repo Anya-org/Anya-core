@@ -6,14 +6,14 @@
 use std::error::Error;
 // [AIR-3][AIS-3][BPC-3][RES-3] Import necessary dependencies for ML module
 // This follows official Bitcoin Improvement Proposals (BIPs) standards for ML operations
-use crate::{AnyaResult, AnyaError};
+use crate::{AnyaError, AnyaResult};
 // Re-export these types to make them public
 pub use crate::dao::{Proposal, ProposalMetrics, RiskMetrics};
 // Import MLModel trait from service module
 pub use crate::ml::service::MLModel;
 use std::collections::HashMap;
-use std::sync::{Arc, Mutex};
 use std::path::Path;
+use std::sync::{Arc, Mutex};
 
 mod service;
 pub use service::MLService;
@@ -92,7 +92,8 @@ impl MLSystem {
 
     /// Register a model with the ML system
     pub fn register_model<M: MLModel + 'static>(&mut self, name: &str, model: M) -> AnyaResult<()> {
-        self.models.insert(name.to_string(), Arc::new(Mutex::new(model)));
+        self.models
+            .insert(name.to_string(), Arc::new(Mutex::new(model)));
         Ok(())
     }
 
@@ -105,9 +106,19 @@ impl MLSystem {
     pub fn get_health_metrics(&self) -> HashMap<String, f64> {
         let mut metrics = HashMap::new();
         metrics.insert("model_count".to_string(), self.models.len() as f64);
-        metrics.insert("enabled".to_string(), if self.config.enabled { 1.0 } else { 0.0 });
-        metrics.insert("federated_learning".to_string(), if self.config.federated_learning { 1.0 } else { 0.0 });
-        
+        metrics.insert(
+            "enabled".to_string(),
+            if self.config.enabled { 1.0 } else { 0.0 },
+        );
+        metrics.insert(
+            "federated_learning".to_string(),
+            if self.config.federated_learning {
+                1.0
+            } else {
+                0.0
+            },
+        );
+
         // Add more detailed metrics here if needed
         metrics
     }
@@ -120,17 +131,17 @@ impl MLSystem {
     /// Get health metrics for all models
     pub fn get_model_health_metrics(&self) -> HashMap<String, HashMap<String, f64>> {
         let mut metrics = HashMap::new();
-        
+
         // Add service metrics
         metrics.insert("service".to_string(), self.service.get_health_metrics());
-        
+
         // Add model-specific metrics
         for (name, model) in &self.models {
             if let Ok(model_lock) = model.lock() {
                 metrics.insert(name.clone(), model_lock.get_health_metrics());
             }
         }
-        
+
         metrics
     }
 }
@@ -188,18 +199,18 @@ impl FederatedLearningManager {
             aggregation_method: "average".to_string(),
         }
     }
-    
+
     /// Add a node to the federation
     pub fn add_node(&mut self, node: FederatedNode) {
         self.nodes.push(node);
     }
-    
+
     /// Remove a node from the federation
-    pub fn remove_node(&mut self, node_id: &str)  -> Result<(), Box<dyn Error>> {
+    pub fn remove_node(&mut self, node_id: &str) -> Result<(), Box<dyn Error>> {
         self.nodes.retain(|n| n.id != node_id);
         Ok(())
     }
-    
+
     /// List all nodes in the federation
     pub fn list_nodes(&self) -> &[FederatedNode] {
         &self.nodes
@@ -214,9 +225,9 @@ pub mod agent_checker;
 
 // Re-exports for convenience
 pub use agent_checker::AgentChecker;
-pub use agent_checker::SystemStage;
 pub use agent_checker::ComponentStatus;
 pub use agent_checker::SystemHealth;
+pub use agent_checker::SystemStage;
 
 // Development, Production, and Release thresholds
 pub const DEV_THRESHOLD: f64 = 0.60;
@@ -245,7 +256,7 @@ pub mod models;
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_stage_readiness() -> Result<(), Box<dyn Error>> {
         assert_eq!(is_ready_for_stage(0.55, SystemStage::Development), false);
@@ -255,4 +266,3 @@ mod tests {
         Ok(())
     }
 }
-

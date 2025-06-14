@@ -3,17 +3,17 @@ use serde::{Deserialize, Serialize};
 pub mod cluster;
 pub mod failover;
 pub mod health_check;
-pub mod replication;
 pub mod load_balancing;
+pub mod replication;
 
 mod config;
 
-pub use config::HighAvailabilityConfig;
-pub use health_check::HealthChecker;
-pub use failover::FailoverManager;
 pub use cluster::ClusterManager;
-pub use replication::ReplicationManager;
+pub use config::HighAvailabilityConfig;
+pub use failover::FailoverManager;
+pub use health_check::HealthChecker;
 pub use load_balancing::LoadBalancer;
+pub use replication::ReplicationManager;
 
 /// High Availability module for Anya Core
 /// [AIR-3][AIS-3][AIT-3][PFM-3][SCL-3][RES-3]
@@ -62,7 +62,7 @@ impl HighAvailabilityManager {
         self.replication_manager.initialize().await?;
         self.load_balancer.initialize().await?;
         self.failover_manager.initialize().await?;
-        
+
         Ok(())
     }
 
@@ -73,7 +73,7 @@ impl HighAvailabilityManager {
         self.replication_manager.start_replication().await?;
         self.load_balancer.start().await?;
         self.failover_manager.enable().await?;
-        
+
         Ok(())
     }
 
@@ -84,7 +84,7 @@ impl HighAvailabilityManager {
         self.replication_manager.stop_replication().await?;
         self.health_checker.stop_monitoring().await?;
         self.cluster_manager.leave_cluster().await?;
-        
+
         Ok(())
     }
 
@@ -111,7 +111,7 @@ impl HighAvailabilityManager {
         self.health_checker.update_config(&config).await?;
         self.replication_manager.update_config(&config).await?;
         self.load_balancer.update_config(&config).await?;
-        
+
         Ok(())
     }
 }
@@ -121,25 +121,25 @@ impl HighAvailabilityManager {
 pub enum HaError {
     #[error("Cluster operation failed: {0}")]
     ClusterError(String),
-    
+
     #[error("Failover operation failed: {0}")]
     FailoverError(String),
-    
+
     #[error("Health check failed: {0}")]
     HealthCheckError(String),
-    
+
     #[error("Replication error: {0}")]
     ReplicationError(String),
-    
+
     #[error("Load balancing error: {0}")]
     LoadBalancerError(String),
-    
+
     #[error("Configuration error: {0}")]
     ConfigError(String),
-    
+
     #[error("Network error: {0}")]
     NetworkError(String),
-    
+
     #[error("I/O error: {0}")]
     IoError(#[from] std::io::Error),
 }
@@ -149,24 +149,24 @@ pub enum HaError {
 pub enum ClusterStatus {
     /// Cluster is healthy with all nodes operating
     Healthy,
-    
+
     /// Cluster is operating with degraded service
-    Degraded { 
+    Degraded {
         active_nodes: usize,
         total_nodes: usize,
         details: String,
     },
-    
+
     /// Cluster is in failover state
     Failover {
         primary_node: String,
         failing_node: Option<String>,
         failover_phase: FailoverPhase,
     },
-    
+
     /// Cluster is initializing
     Initializing,
-    
+
     /// Cluster is down
     Down { reason: String },
 }
@@ -176,19 +176,19 @@ pub enum ClusterStatus {
 pub enum FailoverPhase {
     /// Detecting failure
     Detection,
-    
+
     /// Electing new primary
     Election,
-    
+
     /// Promoting standby to primary
     Promotion,
-    
+
     /// Redirecting clients
     Redirection,
-    
+
     /// Recovering failed node
     Recovery,
-    
+
     /// Completed failover
     Completed,
 }
@@ -198,13 +198,13 @@ pub enum FailoverPhase {
 pub struct HealthStatus {
     /// Overall status
     pub status: HealthState,
-    
+
     /// Component-specific health
     pub components: std::collections::HashMap<String, ComponentHealth>,
-    
+
     /// Last check timestamp
     pub last_check: chrono::DateTime<chrono::Utc>,
-    
+
     /// Status message
     pub message: Option<String>,
 }
@@ -225,4 +225,4 @@ pub struct ComponentHealth {
     pub status: HealthState,
     pub details: Option<String>,
     pub last_check: chrono::DateTime<chrono::Utc>,
-} 
+}

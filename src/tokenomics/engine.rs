@@ -1,6 +1,6 @@
 // Tokenomics Engine implementation
-use std::sync::Arc;
 use crate::AnyaResult;
+use std::sync::Arc;
 
 /// Configuration for the tokenomics engine
 #[derive(Clone, Debug)]
@@ -33,24 +33,24 @@ impl TokenomicsEngine {
     pub fn new(config: TokenomicsConfig) -> AnyaResult<Arc<Self>> {
         Ok(Arc::new(Self { config }))
     }
-    
+
     /// Setup the tokenomics engine with configuration - async variant for core integration
     pub async fn setup(config: TokenomicsConfig) -> AnyaResult<Arc<Self>> {
         // In a real implementation, this would perform more complex initialization
         // such as loading historical data, initializing pricing oracles, etc.
         Ok(Arc::new(Self { config }))
     }
-    
+
     /// Calculate rewards based on stake amount and time
     pub fn calculate_rewards(&self, stake_amount: u64, days: u32) -> f64 {
         if !self.config.enabled || stake_amount < self.config.minimum_stake {
             return 0.0;
         }
-        
+
         let reward_rate = self.config.base_reward_rate;
         let stake = stake_amount as f64;
         let time = days as f64 / 365.0;
-        
+
         stake * reward_rate * time
     }
 }

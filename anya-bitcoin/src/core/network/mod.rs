@@ -1,17 +1,17 @@
-pub mod p2p;
 pub mod messages;
+pub mod p2p;
 pub mod peers;
 
 // Re-export commonly used items
-pub use p2p::P2PNetwork;
 pub use messages::MessageHandler;
+pub use p2p::P2PNetwork;
 pub use peers::PeerManager;
 
 // Bitcoin network implementation
 //
+use crate::core::error::AnyaResult;
 use async_trait::async_trait;
 use bitcoin::{Block, Transaction};
-use crate::core::error::AnyaResult;
 
 /// Peer information
 #[derive(Debug, Clone)]
@@ -67,25 +67,25 @@ pub struct NetworkStats {
 pub trait P2P: Send + Sync {
     /// Start the P2P network
     async fn start(&self) -> AnyaResult<()>;
-    
+
     /// Stop the P2P network
     async fn stop(&self) -> AnyaResult<()>;
-    
+
     /// Broadcast a transaction to the network
     async fn broadcast_transaction(&self, tx: &Transaction) -> AnyaResult<()>;
-    
+
     /// Broadcast a block to the network
     async fn broadcast_block(&self, block: &Block) -> AnyaResult<()>;
-    
+
     /// Get information about connected peers
     async fn get_peers(&self) -> AnyaResult<Vec<PeerInfo>>;
-    
+
     /// Get network statistics
     async fn get_network_stats(&self) -> AnyaResult<NetworkStats>;
-    
+
     /// Add a peer to the network
     async fn add_peer(&self, address: &str) -> AnyaResult<bool>;
-    
+
     /// Remove a peer from the network
     async fn remove_peer(&self, id: &str) -> AnyaResult<bool>;
 }
@@ -98,23 +98,23 @@ impl P2P for NoopP2P {
     async fn start(&self) -> AnyaResult<()> {
         Ok(())
     }
-    
+
     async fn stop(&self) -> AnyaResult<()> {
         Ok(())
     }
-    
+
     async fn broadcast_transaction(&self, _tx: &Transaction) -> AnyaResult<()> {
         Ok(())
     }
-    
+
     async fn broadcast_block(&self, _block: &Block) -> AnyaResult<()> {
         Ok(())
     }
-    
+
     async fn get_peers(&self) -> AnyaResult<Vec<PeerInfo>> {
         Ok(Vec::new())
     }
-    
+
     async fn get_network_stats(&self) -> AnyaResult<NetworkStats> {
         Ok(NetworkStats {
             peer_count: 0,
@@ -125,11 +125,11 @@ impl P2P for NoopP2P {
             uptime: 0,
         })
     }
-    
+
     async fn add_peer(&self, _address: &str) -> AnyaResult<bool> {
         Ok(true)
     }
-    
+
     async fn remove_peer(&self, _id: &str) -> AnyaResult<bool> {
         Ok(true)
     }

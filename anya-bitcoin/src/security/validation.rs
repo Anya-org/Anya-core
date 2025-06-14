@@ -3,7 +3,6 @@
 //! This module provides validation functions for security-critical operations
 //! in the Bitcoin implementation.
 
-
 /// Result of a validation operation
 #[derive(Debug, Clone, PartialEq)]
 pub struct ValidationResult {
@@ -53,7 +52,7 @@ pub fn validate_signature(data: &[u8], signature: &[u8], public_key: &[u8]) -> V
     if data.is_empty() || signature.is_empty() || public_key.is_empty() {
         return ValidationResult::failure("Invalid input data".to_string());
     }
-    
+
     // For now, return success - real implementation would verify the signature
     ValidationResult::success()
 }
@@ -63,13 +62,13 @@ pub fn validate_transaction_inputs(inputs: &[Vec<u8>]) -> ValidationResult {
     if inputs.is_empty() {
         return ValidationResult::failure("Transaction must have at least one input".to_string());
     }
-    
+
     for input in inputs {
         if input.is_empty() {
             return ValidationResult::failure("Transaction input cannot be empty".to_string());
         }
     }
-    
+
     ValidationResult::success()
 }
 
@@ -78,12 +77,12 @@ pub fn validate_transaction_outputs(outputs: &[Vec<u8>]) -> ValidationResult {
     if outputs.is_empty() {
         return ValidationResult::failure("Transaction must have at least one output".to_string());
     }
-    
+
     for output in outputs {
         if output.is_empty() {
             return ValidationResult::failure("Transaction output cannot be empty".to_string());
         }
     }
-    
+
     ValidationResult::success()
 }

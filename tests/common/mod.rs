@@ -1,13 +1,12 @@
 //! Common test utilities module
-//! 
+//!
 //! This module provides centralized test utilities to eliminate duplicates
 
 pub mod test_utilities;
 
 // Re-export the most commonly used items
 pub use test_utilities::{
-    TestEnvironment, TestConfig, TestTransactionFactory, 
-    MockFactory, TestAssertions
+    MockFactory, TestAssertions, TestConfig, TestEnvironment, TestTransactionFactory,
 };
 
 // The following sub-modules are commented out because their corresponding files are missing

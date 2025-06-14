@@ -1,17 +1,21 @@
 //! Centralized test utilities for Anya Core
-//! 
+//!
 //! This module provides common test utilities to eliminate duplicates across test files.
 
 use bitcoin::{
-    absolute::LockTime, // For transaction lock times
+    absolute::LockTime,               // For transaction lock times
     hashes::Hash as BitcoinHashTrait, // Trait for .hash() method, aliased to avoid conflict if Hash struct exists
-    transaction::Version, // For Transaction.version
-    Amount,             // For TxOut.value
-    OutPoint, ScriptBuf, // ScriptBuf for script_pubkey, script_sig
-    Sequence,           // For TxIn.sequence
-    Transaction, TxIn, TxOut, Witness, // Core types
+    transaction::Version,             // For Transaction.version
+    Amount,                           // For TxOut.value
+    OutPoint,
+    ScriptBuf, // ScriptBuf for script_pubkey, script_sig
+    Sequence,  // For TxIn.sequence
+    Transaction,
+    TxIn,
+    TxOut,
+    Witness, // Core types
 };
-use secp256k1::{Secp256k1, SecretKey, PublicKey, Message};
+use secp256k1::{Message, PublicKey, Secp256k1, SecretKey};
 use std::collections::HashMap;
 
 /// Common test transaction factory
@@ -22,37 +26,43 @@ impl TestTransactionFactory {
     /// This replaces all duplicate `create_dummy_transaction()` functions
     pub fn create_dummy_transaction() -> Transaction {
         Transaction {
-            version: Version(2), // Corrected type
+            version: Version(2),       // Corrected type
             lock_time: LockTime::ZERO, // Should resolve to absolute::LockTime::ZERO
             input: vec![],
             output: vec![],
         }
     }
-    
+
     /// Create a batch of dummy transactions
     /// This replaces duplicate batch creation logic
     pub fn create_dummy_transaction_batch(size: usize) -> Vec<Transaction> {
-        (0..size).map(|_| Self::create_dummy_transaction()).collect()
+        (0..size)
+            .map(|_| Self::create_dummy_transaction())
+            .collect()
     }
-    
+
     /// Create a transaction with specific properties for testing
     pub fn create_test_transaction_with_properties(
         version: i32,
         input_count: usize,
         output_count: usize,
     ) -> Transaction {
-        let inputs = (0..input_count).map(|_| TxIn {
-            previous_output: OutPoint::null(),
-            script_sig: ScriptBuf::new(), // Corrected type
-            sequence: Sequence(0), // Corrected type
-            witness: Witness::new(), // Corrected type for empty witness
-        }).collect();
-        
-        let outputs = (0..output_count).map(|i| TxOut {
-            value: Amount::from_sat((i + 1) as u64 * 1000), // Corrected type
-            script_pubkey: ScriptBuf::new(), // Corrected type
-        }).collect();
-        
+        let inputs = (0..input_count)
+            .map(|_| TxIn {
+                previous_output: OutPoint::null(),
+                script_sig: ScriptBuf::new(), // Corrected type
+                sequence: Sequence(0),        // Corrected type
+                witness: Witness::new(),      // Corrected type for empty witness
+            })
+            .collect();
+
+        let outputs = (0..output_count)
+            .map(|i| TxOut {
+                value: Amount::from_sat((i + 1) as u64 * 1000), // Corrected type
+                script_pubkey: ScriptBuf::new(),                // Corrected type
+            })
+            .collect();
+
         Transaction {
             version: Version(version), // Corrected type
             lock_time: LockTime::ZERO, // Should resolve to absolute::LockTime::ZERO
@@ -74,7 +84,7 @@ impl TestEnvironmentFactory {
             state: Default::default(),
         }
     }
-    
+
     /// Create a test environment with specific configuration
     pub fn create_environment_with_config(config: TestConfig) -> TestEnvironment {
         TestEnvironment {
@@ -104,7 +114,7 @@ impl TestEnvironment {
     pub fn new() -> Self {
         TestEnvironmentFactory::create_standard_environment()
     }
-    
+
     pub fn with_config(config: TestConfig) -> Self {
         TestEnvironmentFactory::create_environment_with_config(config)
     }
@@ -118,7 +128,7 @@ impl MockFactory {
     pub fn create_mock_secp_context() -> Secp256k1<secp256k1::All> {
         Secp256k1::new()
     }
-    
+
     /// Create mock key pair for testing
     pub fn create_mock_keypair() -> (SecretKey, PublicKey) {
         let secp = Self::create_mock_secp_context();
@@ -126,20 +136,24 @@ impl MockFactory {
         let public_key = PublicKey::from_secret_key(&secp, &secret_key);
         (secret_key, public_key)
     }
-    
+
     /// Create mock Oracle data for DLC testing
-    pub fn create_mock_oracle_data(count: usize) -> Vec<(String, secp256k1::ecdsa::Signature, PublicKey)> {
+    pub fn create_mock_oracle_data(
+        count: usize,
+    ) -> Vec<(String, secp256k1::ecdsa::Signature, PublicKey)> {
         let secp = Self::create_mock_secp_context();
         let (secret_key, public_key) = Self::create_mock_keypair();
-        
-        (0..count).map(|i| {
-            let outcome = format!("outcome-{}", i);
-            // Use the imported BitcoinHashTrait for the .hash() method
-            let outcome_hash = bitcoin::hashes::sha256::Hash::hash(outcome.as_bytes());
-            let message = Message::from_digest_slice(&outcome_hash[..]).expect("Valid message");
-            let signature = secp.sign_ecdsa(&message, &secret_key);
-            (outcome, signature, public_key)
-        }).collect()
+
+        (0..count)
+            .map(|i| {
+                let outcome = format!("outcome-{}", i);
+                // Use the imported BitcoinHashTrait for the .hash() method
+                let outcome_hash = bitcoin::hashes::sha256::Hash::hash(outcome.as_bytes());
+                let message = Message::from_digest_slice(&outcome_hash[..]).expect("Valid message");
+                let signature = secp.sign_ecdsa(&message, &secret_key);
+                (outcome, signature, public_key)
+            })
+            .collect()
     }
 }
 
@@ -156,13 +170,15 @@ impl TestAssertions {
         E: std::fmt::Debug,
     {
         assert_eq!(
-            standard_result.is_ok(), 
+            standard_result.is_ok(),
             optimized_result.is_ok(),
             "Consensus compliance failed for {}: standard={:?}, optimized={:?}",
-            context, standard_result.is_err(), optimized_result.is_err()
+            context,
+            standard_result.is_err(),
+            optimized_result.is_err()
         );
     }
-    
+
     /// Assert performance improvement while maintaining correctness
     pub fn assert_performance_improvement(
         baseline_duration: std::time::Duration,
@@ -170,13 +186,16 @@ impl TestAssertions {
         min_improvement_percent: f64,
         context: &str,
     ) {
-        let improvement = (baseline_duration.as_secs_f64() - optimized_duration.as_secs_f64()) 
-            / baseline_duration.as_secs_f64() * 100.0;
-        
+        let improvement = (baseline_duration.as_secs_f64() - optimized_duration.as_secs_f64())
+            / baseline_duration.as_secs_f64()
+            * 100.0;
+
         assert!(
             improvement >= min_improvement_percent,
             "Performance improvement insufficient for {}: got {:.2}%, expected >= {:.2}%",
-            context, improvement, min_improvement_percent
+            context,
+            improvement,
+            min_improvement_percent
         );
     }
 }
@@ -186,7 +205,7 @@ pub use std::time::{Duration, Instant};
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_transaction_factory() {
         let tx = TestTransactionFactory::create_dummy_transaction();
@@ -194,18 +213,18 @@ mod tests {
         assert_eq!(tx.input.len(), 0);
         assert_eq!(tx.output.len(), 0);
     }
-    
+
     #[test]
     fn test_batch_creation() {
         let batch = TestTransactionFactory::create_dummy_transaction_batch(5);
         assert_eq!(batch.len(), 5);
     }
-    
+
     #[test]
     fn test_environment_factory() {
         let env = TestEnvironment::new();
         assert!(!env.config.enable_hardware_optimization);
-        
+
         let config = TestConfig {
             enable_hardware_optimization: true,
             batch_size: 256,

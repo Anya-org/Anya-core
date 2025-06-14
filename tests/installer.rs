@@ -1,5 +1,5 @@
+use anya_core::install::{protocol, AnyaInstaller, BitcoinConfig, InstallationSource};
 use std::path::PathBuf;
-use anya_core::install::{AnyaInstaller, InstallationSource, BitcoinConfig, protocol};
 
 #[tokio::test]
 async fn test_full_installation() {
@@ -12,7 +12,9 @@ async fn test_full_installation() {
 
     let installer = AnyaInstaller::new(source, bitcoin_config).unwrap();
 
-    let result = installer.install(PathBuf::from("/tmp/full_install_target")).await;
+    let result = installer
+        .install(PathBuf::from("/tmp/full_install_target"))
+        .await;
     assert!(result.is_ok(), "Installation failed: {:?}", result);
 }
 
@@ -37,7 +39,9 @@ async fn test_mainnet_taproot_installation() {
 
     let installer = AnyaInstaller::new(source, bitcoin_config).unwrap();
 
-    let result = installer.install(PathBuf::from("/tmp/mainnet_taproot_target")).await;
+    let result = installer
+        .install(PathBuf::from("/tmp/mainnet_taproot_target"))
+        .await;
     assert!(result.is_ok(), "Taproot installation failed");
 }
 

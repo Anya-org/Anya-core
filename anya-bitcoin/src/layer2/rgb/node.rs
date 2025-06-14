@@ -65,7 +65,7 @@ impl RGBNode {
             status: NodeStatus::Uninitialized,
         }
     }
-    
+
     /// Create a new node with custom configuration
     pub fn with_config(config: NodeConfig) -> Self {
         Self {
@@ -73,30 +73,30 @@ impl RGBNode {
             status: NodeStatus::Uninitialized,
         }
     }
-    
+
     /// Initialize the node
     pub fn init(&mut self) -> AnyaResult<()> {
         // Implementation would go here
         self.status = NodeStatus::Initialized;
         Ok(())
     }
-    
+
     /// Start the node
     pub fn start(&mut self) -> AnyaResult<()> {
         // Implementation would go here
         self.status = NodeStatus::Running;
         Ok(())
     }
-    
+
     /// Stop the node
     pub fn stop(&mut self) -> AnyaResult<()> {
         // Implementation would go here
         self.status = NodeStatus::Stopped;
         Ok(())
     }
-    
+
     /// Get the node status
     pub fn status(&self) -> NodeStatus {
         self.status.clone()
     }
-} 
+}

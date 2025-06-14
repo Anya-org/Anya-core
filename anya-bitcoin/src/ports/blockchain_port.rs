@@ -1,9 +1,9 @@
 // Generated blockchain_port.rs
 // Hexagonal Architecture - Primary Port
 
-use async_trait::async_trait;
-use crate::core::consensus::{Block, BlockHash, Transaction, Proof};
+use crate::core::consensus::{Block, BlockHash, Proof, Transaction};
 use crate::error::Result;
+use async_trait::async_trait;
 
 #[async_trait]
 pub trait BlockchainPort {
@@ -27,4 +27,3 @@ pub struct VerificationResult {
     pub is_valid: bool,
     pub reason: Option<String>,
 }
-

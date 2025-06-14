@@ -1,1 +1,0 @@
-/home/anya/anyachainlabs/projects/anya-core/scripts/install.sh

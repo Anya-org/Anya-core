@@ -2,9 +2,9 @@
 // Implements a robust, production-grade federation model for cross-chain pegs (PowPeg style)
 // Inspired by RSK, Bitcoin multisig, and open source bridge best practices
 
-use std::collections::{HashMap, HashSet};
-use bitcoin::secp256k1::{Secp256k1, SecretKey, PublicKey, Message, ecdsa::Signature};
 use bitcoin::hashes::{sha256, Hash, HashEngine};
+use bitcoin::secp256k1::{ecdsa::Signature, Message, PublicKey, Secp256k1, SecretKey};
+use std::collections::{HashMap, HashSet};
 
 /// Represents a federation member (e.g., a signer)
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -17,13 +17,13 @@ pub struct FederationMember {
 /// Represents a proposal for a federated action (e.g., peg-in, peg-out, rotation)
 #[derive(Debug, Clone)]
 pub struct FederationProposal {
-    pub id: String,                  // Unique proposal ID
-    pub action: String,              // Action type (e.g., "peg-in", "peg-out", "rotate")
-    pub data: HashMap<String, String>, // Arbitrary action data
-    pub approvals: HashSet<String>,  // Set of member IDs who have approved
+    pub id: String,                             // Unique proposal ID
+    pub action: String,                         // Action type (e.g., "peg-in", "peg-out", "rotate")
+    pub data: HashMap<String, String>,          // Arbitrary action data
+    pub approvals: HashSet<String>,             // Set of member IDs who have approved
     pub signatures: HashMap<String, Signature>, // Collected signatures (member id -> sig)
-    pub executed: bool,              // Whether the proposal has been executed
-    pub onchain_txid: Option<String>,// On-chain txid if executed
+    pub executed: bool,                         // Whether the proposal has been executed
+    pub onchain_txid: Option<String>,           // On-chain txid if executed
 }
 
 /// Trait for multi-layer contract execution (e.g., BitVM, RSK, etc.)
@@ -108,7 +108,10 @@ impl Federation {
         if !self.is_member(member_id) {
             return Err("Not a federation member".to_string());
         }
-        let proposal = self.proposals.get_mut(proposal_id).ok_or("Proposal not found")?;
+        let proposal = self
+            .proposals
+            .get_mut(proposal_id)
+            .ok_or("Proposal not found")?;
         if proposal.executed {
             return Err("Proposal already executed".to_string());
         }
@@ -121,15 +124,23 @@ impl Federation {
     }
 
     /// Collect a cryptographic signature for a proposal (simulated threshold signing)
-    pub fn sign(&mut self, proposal_id: &str, member_id: &str, sk: &SecretKey) -> Result<Signature, String> {
+    pub fn sign(
+        &mut self,
+        proposal_id: &str,
+        member_id: &str,
+        sk: &SecretKey,
+    ) -> Result<Signature, String> {
         // Check if member exists first
         let member_exists = self.get_member(member_id).is_some();
         if !member_exists {
             return Err("Not a federation member".to_string());
         }
-        
+
         let member_id_clone = member_id.to_string(); // Clone the member ID for later use
-        let proposal = self.proposals.get_mut(proposal_id).ok_or("Proposal not found")?;
+        let proposal = self
+            .proposals
+            .get_mut(proposal_id)
+            .ok_or("Proposal not found")?;
         if proposal.executed {
             return Err("Proposal already executed".to_string());
         }
@@ -150,7 +161,8 @@ impl Federation {
 
     /// Check if a proposal has enough valid signatures
     pub fn has_threshold_signatures(&self, proposal_id: &str) -> bool {
-        self.proposals.get(proposal_id)
+        self.proposals
+            .get(proposal_id)
             .map(|p| p.signatures.len() >= self.threshold)
             .unwrap_or(false)
     }
@@ -159,7 +171,10 @@ impl Federation {
     /// Simulates on-chain execution and returns a fake txid
     /// Calls ML hook and contract executor if present (Anya-core: top-layer enhancement)
     pub fn execute(&mut self, proposal_id: &str) -> Result<String, String> {
-        let proposal = self.proposals.get_mut(proposal_id).ok_or("Proposal not found")?;
+        let proposal = self
+            .proposals
+            .get_mut(proposal_id)
+            .ok_or("Proposal not found")?;
         if proposal.executed {
             return Ok(proposal.onchain_txid.clone().unwrap_or_default());
         }
@@ -198,8 +213,14 @@ impl std::fmt::Debug for Federation {
             .field("threshold", &self.threshold)
             .field("proposals", &self.proposals)
             .field("secp", &"Secp256k1<All>")
-            .field("contract_executor", &self.contract_executor.as_ref().map(|_| "ContractExecutor"))
-            .field("ml_hook", &self.ml_hook.as_ref().map(|_| "FederationMLHook"))
+            .field(
+                "contract_executor",
+                &self.contract_executor.as_ref().map(|_| "ContractExecutor"),
+            )
+            .field(
+                "ml_hook",
+                &self.ml_hook.as_ref().map(|_| "FederationMLHook"),
+            )
             .finish()
     }
 }
@@ -212,7 +233,7 @@ impl Clone for Federation {
             proposals: self.proposals.clone(),
             secp: Secp256k1::new(),
             contract_executor: None, // Note: trait objects can't be cloned generically
-            ml_hook: None, // Note: trait objects can't be cloned generically
+            ml_hook: None,           // Note: trait objects can't be cloned generically
         }
     }
 }
@@ -220,8 +241,8 @@ impl Clone for Federation {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::iter::FromIterator;
     use bitcoin::secp256k1::{Secp256k1, SecretKey};
+    use std::iter::FromIterator;
 
     #[test]
     fn test_federation_signing_flow() {
@@ -231,8 +252,16 @@ mod tests {
         let pk_a = secp256k1::PublicKey::from_secret_key(&secp, &sk_a);
         let pk_b = secp256k1::PublicKey::from_secret_key(&secp, &sk_b);
         let members = HashSet::from_iter(vec![
-            FederationMember { id: "A".to_string(), name: Some("Alice".to_string()), pubkey: pk_a },
-            FederationMember { id: "B".to_string(), name: Some("Bob".to_string()), pubkey: pk_b },
+            FederationMember {
+                id: "A".to_string(),
+                name: Some("Alice".to_string()),
+                pubkey: pk_a,
+            },
+            FederationMember {
+                id: "B".to_string(),
+                name: Some("Bob".to_string()),
+                pubkey: pk_b,
+            },
         ]);
         let mut fed = Federation::new(members, 2);
         let mut data = HashMap::new();
@@ -253,4 +282,3 @@ mod tests {
 // - Extensibility for ML and multi-layer contracts is provided via traits/hooks
 // - No core Bitcoin logic is replaced, only enhanced
 // - Ready for integration with BitVM, RSK, and ML-driven federation logic
-

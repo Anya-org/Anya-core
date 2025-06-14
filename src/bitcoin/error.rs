@@ -93,22 +93,22 @@ pub enum BitcoinError {
 
     #[error("IO error: {0}")]
     IOError(String),
-    
+
     #[error("Key error: {0}")]
     KeyError(String),
 
     #[error("Invalid transaction: {0}")]
     InvalidTransaction(String),
-    
+
     #[error("Validation error: {0}")]
     ValidationError(String),
 
     #[error("Invalid signature: {0}")]
     InvalidSignature(String),
-    
+
     #[error("Encoding error: {0}")]
     EncodingError(String),
-    
+
     #[error("Script error: {0}")]
     ScriptError(String),
 
@@ -146,7 +146,7 @@ pub enum BitcoinError {
 
     #[error("Internal error: {0}")]
     InternalError(String),
-    
+
     // [AIR-3][AIS-3][BPC-3][RES-3] Configuration error handling
     // This follows official Bitcoin Improvement Proposals (BIPs) standards for error handling
     #[error("Configuration error: {0}")]

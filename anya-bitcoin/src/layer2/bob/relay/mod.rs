@@ -10,5 +10,4 @@ pub struct RelayStatus {
     pub last_block_hash: String,
     /// Synchronization status
     pub is_synced: bool,
-} 
-
+}

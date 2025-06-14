@@ -1,14 +1,12 @@
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::sync::Arc;
-use std::time::Duration;
 use tokio::sync::RwLock;
 use tokio::time::Instant;
 use tracing::{debug, error, info, instrument, warn};
-use serde::{Deserialize, Serialize};
 
 use crate::infrastructure::high_availability::{
-    HealthStatus, HealthState, ComponentHealth, HaError,
-    config::HighAvailabilityConfig,
+    config::HighAvailabilityConfig, ComponentHealth, HaError, HealthState, HealthStatus,
 };
 
 /// Health checker for monitoring system components
@@ -58,12 +56,15 @@ impl HealthChecker {
         // Initialize component states
         let mut states = self.component_states.write().await;
         for component in &self.config.health_check.components {
-            states.insert(component.clone(), ComponentHealth {
-                name: component.clone(),
-                status: HealthState::Unknown,
-                details: Some("Initializing".to_string()),
-                last_check: chrono::Utc::now(),
-            });
+            states.insert(
+                component.clone(),
+                ComponentHealth {
+                    name: component.clone(),
+                    status: HealthState::Unknown,
+                    details: Some("Initializing".to_string()),
+                    last_check: chrono::Utc::now(),
+                },
+            );
         }
         drop(states);
 
@@ -103,9 +104,13 @@ impl HealthChecker {
         let overall_status = if components.is_empty() {
             HealthState::Unknown
         } else {
-            let has_critical = components.values().any(|c| c.status == HealthState::Critical);
-            let has_degraded = components.values().any(|c| c.status == HealthState::Degraded);
-            
+            let has_critical = components
+                .values()
+                .any(|c| c.status == HealthState::Critical);
+            let has_degraded = components
+                .values()
+                .any(|c| c.status == HealthState::Degraded);
+
             if has_critical {
                 HealthState::Critical
             } else if has_degraded {
@@ -135,7 +140,7 @@ impl HealthChecker {
     #[instrument(skip(self))]
     pub async fn check_component(&self, component: &str) -> Result<HealthCheckResult, HaError> {
         let start_time = Instant::now();
-        
+
         debug!("Checking health of component: {}", component);
 
         // Simulate component-specific health checks
@@ -162,14 +167,20 @@ impl HealthChecker {
 
         // Update component state
         let mut states = self.component_states.write().await;
-        states.insert(component.to_string(), ComponentHealth {
-            name: component.to_string(),
-            status,
-            details: result.details.clone(),
-            last_check: result.timestamp,
-        });
+        states.insert(
+            component.to_string(),
+            ComponentHealth {
+                name: component.to_string(),
+                status,
+                details: result.details.clone(),
+                last_check: result.timestamp,
+            },
+        );
 
-        debug!("Health check completed for {}: {:?} ({}ms)", component, status, latency);
+        debug!(
+            "Health check completed for {}: {:?} ({}ms)",
+            component, status, latency
+        );
         Ok(result)
     }
 
@@ -181,7 +192,7 @@ impl HealthChecker {
         monitoring_active: Arc<RwLock<bool>>,
     ) {
         let mut interval = tokio::time::interval(config.health_check.check_interval);
-        
+
         while *monitoring_active.read().await {
             interval.tick().await;
 
@@ -213,8 +224,11 @@ impl HealthChecker {
         // - Leader election status
         // - Quorum availability
         // - Network partitions
-        
-        (HealthState::Healthy, Some("Cluster operational".to_string()))
+
+        (
+            HealthState::Healthy,
+            Some("Cluster operational".to_string()),
+        )
     }
 
     /// Check storage health
@@ -224,8 +238,11 @@ impl HealthChecker {
         // - I/O latency
         // - Data consistency
         // - Backup status
-        
-        (HealthState::Healthy, Some("Storage operational".to_string()))
+
+        (
+            HealthState::Healthy,
+            Some("Storage operational".to_string()),
+        )
     }
 
     /// Check network health
@@ -235,8 +252,11 @@ impl HealthChecker {
         // - Latency between nodes
         // - Bandwidth utilization
         // - Packet loss
-        
-        (HealthState::Healthy, Some("Network operational".to_string()))
+
+        (
+            HealthState::Healthy,
+            Some("Network operational".to_string()),
+        )
     }
 
     /// Check API health
@@ -246,7 +266,7 @@ impl HealthChecker {
         // - Response times
         // - Error rates
         // - Authentication services
-        
+
         (HealthState::Healthy, Some("API operational".to_string()))
     }
 }
@@ -282,7 +302,7 @@ mod tests {
     async fn test_health_checker_creation() {
         let config = create_test_config();
         let checker = HealthChecker::new(&config);
-        
+
         assert!(!*checker.monitoring_active.read().await);
     }
 
@@ -290,7 +310,7 @@ mod tests {
     async fn test_component_health_check() {
         let config = create_test_config();
         let checker = HealthChecker::new(&config);
-        
+
         let result = checker.check_component("cluster").await.unwrap();
         assert_eq!(result.component, "cluster");
         assert_eq!(result.status, HealthState::Healthy);
@@ -300,10 +320,10 @@ mod tests {
     async fn test_start_stop_monitoring() {
         let config = create_test_config();
         let mut checker = HealthChecker::new(&config);
-        
+
         checker.start_monitoring().await.unwrap();
         assert!(*checker.monitoring_active.read().await);
-        
+
         checker.stop_monitoring().await.unwrap();
         assert!(!*checker.monitoring_active.read().await);
     }

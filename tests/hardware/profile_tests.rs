@@ -13,8 +13,11 @@ mod hardware_tests {
         };
 
         let config = BitcoinConfig::from_hardware_profile(&hw);
-        
-        assert!(!config.taproot_enabled, "Taproot should be disabled on minimal");
+
+        assert!(
+            !config.taproot_enabled,
+            "Taproot should be disabled on minimal"
+        );
         assert_eq!(config.psbt_version, 1, "PSBT v1 expected for minimal");
         assert_eq!(config.rpc_threads, 2, "2 RPC threads for 2 cores");
     }
@@ -29,7 +32,7 @@ mod hardware_tests {
         };
 
         let config = BitcoinConfig::from_hardware_profile(&hw);
-        
+
         assert!(config.taproot_enabled, "Taproot should be enabled");
         assert_eq!(config.psbt_version, 2, "PSBT v2 required");
         assert!(config.dlc_support, "DLC support required");
@@ -39,15 +42,15 @@ mod hardware_tests {
     #[test]
     fn test_edge_case_profiles() {
         let hw = HardwareProfile {
-            cpu_cores: 3, // Odd core count
-            memory_gb: 7, // Between tiers
+            cpu_cores: 3,      // Odd core count
+            memory_gb: 7,      // Between tiers
             disk_space_gb: 99, // Just below threshold
             network_mbps: 99.9,
         };
 
         let config = BitcoinConfig::from_hardware_profile(&hw);
-        
+
         assert!(!config.rgb_support, "RGB should be disabled under 100GB");
         assert_eq!(config.psbt_version, 1, "PSBT v1 for <8GB RAM");
     }
-} 
+}

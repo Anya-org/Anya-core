@@ -1,0 +1,42 @@
+name: BPC-3 Compliance
+on: 
+  push:
+    paths:
+      - 'docs/**'
+      - 'scripts/bitcoin/**'
+
+jobs:
+  full-compliance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Core Validation
+        run: |
+          ./scripts/bitcoin/validate-bip-compliance.js \
+            --bip all \
+            --security ais3 \
+            --output compliance-report.sarif
+        env:
+          RUST_LOG: info
+          MIN_FEE_RATE: 1000
+
+      - name: Documentation Audit
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const report = require('./reports/bip-compliance-report.json')
+            if(report.overallCompliance !== true) {
+              core.setFailed('Documentation compliance check failed')
+            }
+
+      - name: Security Audit
+        run: |
+          ./scripts/bitcoin/validate-bip-compliance.js \
+            --security ais3 \
+            --output security-audit.json
+
+      - name: Hardware Validation
+        run: ./scripts/hardware/fpga-test.sh
+        env:
+          MIN_FEE_RATE: ${{ vars.MIN_FEE_RATE }}

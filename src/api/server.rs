@@ -1,4 +1,3 @@
-
 pub struct ApiServer;
 
 impl ApiServer {

@@ -1,7 +1,6 @@
 //! Hash Function Module
-//! 
+//!
 //! This module provides cryptographic hash function implementations for Bitcoin security.
-
 
 /// Supported hash algorithms
 #[derive(Debug, Clone, Copy, PartialEq)]

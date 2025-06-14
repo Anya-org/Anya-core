@@ -1,19 +1,19 @@
 //! Bitcoin Core Implementation
 //! Following hexagonal architecture principles and official Bitcoin Improvement Proposals (BIPs)
 
-use std::{sync::Arc, path::PathBuf};
+use std::{path::PathBuf, sync::Arc};
 
 // Re-export core modules
+pub mod adapters;
 pub mod core;
+pub mod error;
 pub mod layer2;
 pub mod ports;
-pub mod adapters;
+pub mod prelude;
 pub mod protocol;
 pub mod riscv;
 pub mod security;
 pub mod testing;
-pub mod prelude;
-pub mod error;
 
 /// Configuration for Bitcoin node
 #[derive(Debug, Clone)]
@@ -23,9 +23,9 @@ pub struct Config {
     /// Data directory for Bitcoin data
     pub datadir: PathBuf,
     /// Maximum number of peers
-    pub max_peers: u32,      // Default: 125
+    pub max_peers: u32, // Default: 125
     /// Minimum number of peers
-    pub min_peers: u32,      // Default: 8
+    pub min_peers: u32, // Default: 8
 }
 
 impl Default for Config {
@@ -60,7 +60,7 @@ impl BitcoinNode {
         let consensus = Arc::new(core::consensus::NoopValidator {});
         let mempool = Arc::new(core::mempool::NoopMempool {});
         let network = Arc::new(core::network::NoopP2P {});
-        
+
         Ok(Self {
             config,
             consensus,
@@ -76,10 +76,10 @@ impl BitcoinNode {
         let factory = Arc::new(layer2::framework::factory::Layer2Factory::new());
         let registry = Arc::new(layer2::framework::Layer2Registry::new(factory));
         self.layer2_registry = Some(registry);
-        
+
         Ok(())
     }
-    
+
     /// Get the Layer 2 protocol registry
     pub fn layer2_registry(&self) -> Option<Arc<layer2::framework::Layer2Registry>> {
         self.layer2_registry.clone()

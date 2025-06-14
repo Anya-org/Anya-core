@@ -10,16 +10,18 @@ use std::sync::Arc;
 
 // External crates
 use async_trait::async_trait;
-use bitcoin::{Network};
+use bitcoin::Network;
 use uuid::Uuid;
 
 // [AIR-3][AIS-3][BPC-3][RES-3] Import HSM module types following BDF v2.5 standards
-use crate::security::hsm::provider::{HsmProvider, KeyGenParams, KeyInfo, KeyPair, SigningAlgorithm};
-use crate::security::hsm::types::{HsmRequest, HsmResponse};
-use crate::security::hsm::provider::HsmProviderStatus;
-use crate::security::hsm::error::HsmError;
-use std::collections::HashMap;
 use crate::security::hsm::audit::AuditLogger;
+use crate::security::hsm::error::HsmError;
+use crate::security::hsm::provider::HsmProviderStatus;
+use crate::security::hsm::provider::{
+    HsmProvider, KeyGenParams, KeyInfo, KeyPair, SigningAlgorithm,
+};
+use crate::security::hsm::types::{HsmRequest, HsmResponse};
+use std::collections::HashMap;
 
 /// Configuration for Ledger devices
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -54,7 +56,7 @@ impl LedgerHsmProvider {
             audit_logger,
         })
     }
-    
+
     /// Generate a unique key ID
     fn generate_key_id(&self) -> String {
         Uuid::new_v4().to_string()
@@ -72,58 +74,75 @@ impl HsmProvider for LedgerHsmProvider {
             "Ledger provider initialized (stub implementation)",
             crate::security::hsm::error::AuditEventResult::Success,
         )?;
-        
+
         Ok(())
     }
-    
+
     async fn generate_key(&self, _params: KeyGenParams) -> Result<(KeyPair, KeyInfo), HsmError> {
         // Ledger devices don't generate keys on demand - they use BIP32 derivation
         // Instead, we would store the derivation path as the "key ID"
         Err(HsmError::UnsupportedOperation(
-            "Ledger devices use BIP32 derivation rather than generating isolated keys".to_string()
+            "Ledger devices use BIP32 derivation rather than generating isolated keys".to_string(),
         ))
     }
-    
-    async fn sign(&self, _key_id: &str, _algorithm: SigningAlgorithm, _data: &[u8]) -> Result<Vec<u8>, HsmError> {
+
+    async fn sign(
+        &self,
+        _key_id: &str,
+        _algorithm: SigningAlgorithm,
+        _data: &[u8],
+    ) -> Result<Vec<u8>, HsmError> {
         // Implementation will be added when Ledger libraries are integrated
-        Err(HsmError::UnsupportedOperation("Not implemented yet. Will be available in future versions.".to_string()))
+        Err(HsmError::UnsupportedOperation(
+            "Not implemented yet. Will be available in future versions.".to_string(),
+        ))
     }
-    
-    async fn verify(&self, _key_id: &str, _algorithm: SigningAlgorithm, _data: &[u8], _signature: &[u8]) -> Result<bool, HsmError> {
+
+    async fn verify(
+        &self,
+        _key_id: &str,
+        _algorithm: SigningAlgorithm,
+        _data: &[u8],
+        _signature: &[u8],
+    ) -> Result<bool, HsmError> {
         // Implementation will be added when Ledger libraries are integrated
-        Err(HsmError::UnsupportedOperation("Not implemented yet. Will be available in future versions.".to_string()))
+        Err(HsmError::UnsupportedOperation(
+            "Not implemented yet. Will be available in future versions.".to_string(),
+        ))
     }
-    
+
     async fn export_public_key(&self, _key_id: &str) -> Result<Vec<u8>, HsmError> {
         // Implementation will be added when Ledger libraries are integrated
-        Err(HsmError::UnsupportedOperation("Not implemented yet. Will be available in future versions.".to_string()))
+        Err(HsmError::UnsupportedOperation(
+            "Not implemented yet. Will be available in future versions.".to_string(),
+        ))
     }
-    
+
     async fn list_keys(&self) -> Result<Vec<KeyInfo>, HsmError> {
         // Implementation will be added when Ledger libraries are integrated
         Ok(vec![])
     }
-    
+
     async fn delete_key(&self, _key_id: &str) -> Result<(), HsmError> {
         // We can't delete keys from a Ledger - just remove our reference to the BIP32 path
         let mut keys = self.keys.lock().await;
         if keys.remove(_key_id).is_none() {
             return Err(HsmError::KeyNotFound(_key_id.to_string()));
         }
-        
+
         Ok(())
     }
-    
+
     async fn get_status(&self) -> Result<HsmProviderStatus, HsmError> {
         // Implementation will be added when Ledger libraries are integrated
         Ok(HsmProviderStatus::Unavailable)
     }
-    
+
     async fn close(&self) -> Result<(), HsmError> {
         // Implementation will be added when Ledger libraries are integrated
         Ok(())
     }
-    
+
     async fn execute_operation(&self, request: HsmRequest) -> Result<HsmResponse, HsmError> {
         // Just return an unsupported operation error for now
         let request_id = request.id.clone();

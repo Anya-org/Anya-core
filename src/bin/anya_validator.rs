@@ -1,9 +1,9 @@
 use anya_core::tools::markdown::{DocError, DocumentationValidator};
 use anyhow::Result;
+use chrono;
 use clap::{Parser, Subcommand};
 use std::fs;
 use std::path::PathBuf;
-use chrono;
 
 #[derive(Parser)]
 #[clap(
@@ -80,15 +80,19 @@ fn update_system_map(map_path: &PathBuf, adherence: f64) -> Result<(), DocError>
     if !map_path.exists() {
         return Ok(());
     }
-    
+
     let content = fs::read_to_string(map_path)?;
-    
+
     // Simple string replacement for demonstration
     let updated = content.replace(
-        "Bitcoin Protocol Adherence: ", 
-        &format!("Bitcoin Protocol Adherence: {:.2}% (Updated: {})\nPrevious: ", adherence, chrono::Utc::now().format("%Y-%m-%d"))
+        "Bitcoin Protocol Adherence: ",
+        &format!(
+            "Bitcoin Protocol Adherence: {:.2}% (Updated: {})\nPrevious: ",
+            adherence,
+            chrono::Utc::now().format("%Y-%m-%d")
+        ),
     );
-    
+
     fs::write(map_path, updated)?;
     Ok(())
 }

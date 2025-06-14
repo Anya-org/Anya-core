@@ -1,44 +1,40 @@
 //! Bitcoin Protocol Testing Module [AIR-3][AIS-3][BPC-3][AIT-3]
-//! 
+//!
 //! This module provides testing utilities for Bitcoin protocol operations,
 //! following official Bitcoin Improvement Proposals (BIPs) standards.
 
 #[cfg(test)]
 pub mod mock {
+    use base64::{engine::general_purpose::STANDARD, Engine as _};
     use bitcoin::Transaction;
     use std::error::Error;
-    use base64::{engine::general_purpose::STANDARD, Engine as _};
-    
+
     /// Mock Bitcoin transaction verification that doesn't require a local node
-    /// [BPC-3] BIP-341 Taproot transaction verification 
+    /// [BPC-3] BIP-341 Taproot transaction verification
     pub fn verify_transaction(tx_hex: &str) -> Result<bool, Box<dyn Error>> {
         // Parse transaction from hex
         match hex::decode(tx_hex) {
-            Ok(bytes) => {
-                match bitcoin::consensus::deserialize::<Transaction>(&bytes) {
-                    Ok(_) => Ok(true),
-                    Err(e) => Err(Box::new(e))
-                }
+            Ok(bytes) => match bitcoin::consensus::deserialize::<Transaction>(&bytes) {
+                Ok(_) => Ok(true),
+                Err(e) => Err(Box::new(e)),
             },
-            Err(e) => Err(Box::new(e))
+            Err(e) => Err(Box::new(e)),
         }
     }
-    
+
     /// Mock PSBT verification that doesn't require a local node
     /// [BPC-3] BIP-174 PSBT validation
     pub fn verify_psbt(psbt_base64: &str) -> Result<bool, Box<dyn Error>> {
         // Parse PSBT from base64
         match STANDARD.decode(psbt_base64) {
-            Ok(bytes) => {
-                match bitcoin::psbt::Psbt::deserialize(&bytes) {
-                    Ok(_) => Ok(true),
-                    Err(e) => Err(Box::new(e))
-                }
+            Ok(bytes) => match bitcoin::psbt::Psbt::deserialize(&bytes) {
+                Ok(_) => Ok(true),
+                Err(e) => Err(Box::new(e)),
             },
-            Err(e) => Err(Box::new(e))
+            Err(e) => Err(Box::new(e)),
         }
     }
-    
+
     /// Test data provider for Bitcoin tests
     /// [AIT-3] Comprehensive test data for BIP compliance
     pub fn get_test_transactions() -> Vec<(&'static str, bool)> {

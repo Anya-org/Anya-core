@@ -3,13 +3,13 @@
 // [AIR-012] Operational Reliability and [AIP-002] Modular Architecture
 
 // Import std::error::Error for use in trait bounds
+use crate::web5::identity::{DIDManager, Web5Error, Web5Result};
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use serde::{Serialize, Deserialize};
-use crate::web5::identity::{Web5Result, Web5Error, DIDManager};
 use std::fmt::{Display, Formatter, Result as FmtResult};
 
 /// Verifiable Credential
-/// 
+///
 /// Represents a W3C Verifiable Credential.
 #[derive(Clone, Serialize, Deserialize)]
 pub struct VerifiableCredential {
@@ -32,7 +32,7 @@ pub struct VerifiableCredential {
 }
 
 /// Credential Subject
-/// 
+///
 /// Contains the claims about the subject in a Verifiable Credential.
 #[derive(Clone, Serialize, Deserialize)]
 pub struct CredentialSubject {
@@ -44,7 +44,7 @@ pub struct CredentialSubject {
 }
 
 /// Credential Proof
-/// 
+///
 /// Cryptographic proof of the Verifiable Credential.
 #[derive(Clone, Serialize, Deserialize)]
 pub struct CredentialProof {
@@ -62,7 +62,7 @@ pub struct CredentialProof {
 }
 
 /// Credential Manager
-/// 
+///
 /// Manages Verifiable Credentials.
 pub struct CredentialManager {
     /// DID Manager for identity operations
@@ -79,7 +79,7 @@ impl CredentialManager {
             credentials: HashMap::new(),
         }
     }
-    
+
     /// Issue a new Verifiable Credential
     pub fn issue_credential(
         &mut self,
@@ -90,13 +90,13 @@ impl CredentialManager {
     ) -> Web5Result<VerifiableCredential> {
         // Create credential ID
         let id = format!("urn:uuid:{}", generate_uuid());
-        
+
         // Create credential subject
         let credential_subject = CredentialSubject {
             id: subject_did.to_string(),
             claims,
         };
-        
+
         // Create credential without proof
         let mut credential = VerifiableCredential {
             context: vec![
@@ -113,17 +113,18 @@ impl CredentialManager {
             credential_subject: credential_subject,
             proof: None,
         };
-        
+
         // Sign credential (create proof)
         let proof = self.create_proof(&credential, issuer_did)?;
         credential.proof = Some(proof);
-        
+
         // Store credential
-        self.credentials.insert(credential.id.clone(), credential.clone());
-        
+        self.credentials
+            .insert(credential.id.clone(), credential.clone());
+
         Ok(credential)
     }
-    
+
     /// Verify a credential
     pub fn verify_credential(&self, credential: &VerifiableCredential) -> Web5Result<bool> {
         // Check if proof exists
@@ -131,12 +132,12 @@ impl CredentialManager {
             Some(p) => p,
             None => return Err(Web5Error::Credential("No proof in credential".to_string())),
         };
-        
+
         // In a real implementation, we would verify the signature here
         // For now, just return true for simplicity
         Ok(true)
     }
-    
+
     /// Store a credential
     pub fn store_credential(&mut self, credential: VerifiableCredential) -> Web5Result<()> {
         // In a real implementation, this would store the credential securely
@@ -149,32 +150,38 @@ impl CredentialManager {
         self.credentials.insert(id, credential);
         Ok(())
     }
-    
+
     /// Get a credential by ID
     pub fn get_credential(&self, id: &str) -> Web5Result<VerifiableCredential> {
-        self.credentials.get(id).cloned().ok_or_else(|| {
-            Web5Error::Credential(format!("Credential not found: {}", id))
-        })
+        self.credentials
+            .get(id)
+            .cloned()
+            .ok_or_else(|| Web5Error::Credential(format!("Credential not found: {}", id)))
     }
-    
+
     /// List all credentials
     pub fn list_credentials(&self) -> Vec<&VerifiableCredential> {
         self.credentials.values().collect()
     }
-    
+
     /// Create a proof for a credential
-    fn create_proof(&self, credential: &VerifiableCredential, issuer_did: &str) -> Web5Result<CredentialProof> {
+    fn create_proof(
+        &self,
+        credential: &VerifiableCredential,
+        issuer_did: &str,
+    ) -> Web5Result<CredentialProof> {
         // In a real implementation, this would sign the credential
         // For this example, we create a placeholder proof
-        
+
         // Serialize credential without proof
-        let credential_json = serde_json::to_string(&credential).map_err(|e| {
-            Web5Error::Credential(format!("Failed to serialize credential: {}", e))
-        })?;
-        
+        let credential_json = serde_json::to_string(&credential)
+            .map_err(|e| Web5Error::Credential(format!("Failed to serialize credential: {}", e)))?;
+
         // Sign with issuer DID
-        let signature = self.did_manager.sign(issuer_did, credential_json.as_bytes())?;
-        
+        let signature = self
+            .did_manager
+            .sign(issuer_did, credential_json.as_bytes())?;
+
         // Create proof
         let proof = CredentialProof {
             proof_type: "Ed25519Signature2020".to_string(),
@@ -183,7 +190,7 @@ impl CredentialManager {
             proof_purpose: "assertionMethod".to_string(),
             jws: hex::encode(signature),
         };
-        
+
         Ok(proof)
     }
 }
@@ -191,18 +198,20 @@ impl CredentialManager {
 /// Generate a UUID
 fn generate_uuid() -> String {
     use std::time::{SystemTime, UNIX_EPOCH};
-    
+
     let now = SystemTime::now()
         .duration_since(UNIX_EPOCH)
         .unwrap_or_default()
         .as_secs();
-    
-    format!("{:x}-{:x}-{:x}-{:x}-{:x}", 
-        now & 0xFFFF, 
-        (now >> 16) & 0xFFFF, 
-        (now >> 32) & 0xFFFF, 
+
+    format!(
+        "{:x}-{:x}-{:x}-{:x}-{:x}",
+        now & 0xFFFF,
+        (now >> 16) & 0xFFFF,
+        (now >> 32) & 0xFFFF,
         (now >> 48) & 0xFFFF,
-        now % 1000)
+        now % 1000
+    )
 }
 
 /// Get current date in ISO 8601 format
@@ -235,19 +244,25 @@ mod tests {
     // [AIR-3][AIS-3][BPC-3][RES-3] Error trait is already imported in the parent module
     use super::*;
     use crate::web5::identity::DIDManager;
-    
+
     #[test]
-    fn test_issue_credential()  -> Result<(), Box<dyn std::error::Error>> {
+    fn test_issue_credential() -> Result<(), Box<dyn std::error::Error>> {
         let did_manager = DIDManager::new("ion");
         let mut credential_manager = CredentialManager::new(did_manager);
-        
+
         let issuer_did = "did:ion:issuer123";
         let subject_did = "did:ion:subject456";
-        
+
         let mut claims = HashMap::new();
-        claims.insert("name".to_string(), serde_json::Value::String("John Doe".to_string()));
-        claims.insert("age".to_string(), serde_json::Value::Number(serde_json::Number::from(25)));
-        
+        claims.insert(
+            "name".to_string(),
+            serde_json::Value::String("John Doe".to_string()),
+        );
+        claims.insert(
+            "age".to_string(),
+            serde_json::Value::Number(serde_json::Number::from(25)),
+        );
+
         // Issue credential
         let credential = credential_manager.issue_credential(
             issuer_did,
@@ -255,13 +270,15 @@ mod tests {
             "ExampleCredential",
             claims,
         )?;
-        
+
         // Verify basic properties
         assert_eq!(credential.issuer, issuer_did);
         assert_eq!(credential.credential_subject.id, subject_did);
-        assert!(credential.credential_type.contains(&"ExampleCredential".to_string()));
+        assert!(credential
+            .credential_type
+            .contains(&"ExampleCredential".to_string()));
         assert!(credential.proof.is_some());
-        
+
         Ok(())
     }
-} 
+}

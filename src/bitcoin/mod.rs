@@ -3,34 +3,34 @@
 // This follows official Bitcoin Improvement Proposals (BIPs) standards for hexagonal architecture
 
 // Core modules for Bitcoin functionality
-pub mod interface;
-pub mod error;
-pub mod manager;
 pub mod adapters;
 pub mod config;
-pub mod taproot;
-pub mod rust;
+pub mod error;
+pub mod interface;
 pub mod layer2; // Export layer2 module for Layer2Protocol trait
-pub mod protocol; // Bitcoin protocol compliance module
+pub mod lightning;
+pub mod manager;
 pub mod node; // Bitcoin node management
-pub mod wallet; // Bitcoin wallet management
+pub mod protocol; // Bitcoin protocol compliance module
+pub mod rust;
+pub mod taproot;
 pub mod validation_new; // Transaction validation module
-pub mod lightning; // Lightning Network implementation
+pub mod wallet; // Bitcoin wallet management // Lightning Network implementation
 
 // Re-export key interfaces for easier access
-pub use interface::BitcoinInterface;
 pub use adapters::BitcoinAdapter;
-pub use protocol::{BitcoinProtocol, BPCLevel};
+pub use interface::BitcoinInterface;
 pub use node::BitcoinNode;
-pub use wallet::{BitcoinWallet, WalletConfig, AddressInfo};
+pub use protocol::{BPCLevel, BitcoinProtocol};
+pub use wallet::{AddressInfo, BitcoinWallet, WalletConfig};
 
 // [AIR-3][AIS-3][BPC-3][RES-3] Re-export Bitcoin types for convenience
 // This follows official Bitcoin Improvement Proposals (BIPs) standards for type consistency
 pub use bitcoin::{Address, Block, BlockHash, Network, Transaction, Txid};
 
 // Export our manager and config for easier access
-pub use manager::BitcoinManager;
 pub use config::BitcoinConfig;
+pub use manager::BitcoinManager;
 
 #[cfg(test)]
 mod tests;

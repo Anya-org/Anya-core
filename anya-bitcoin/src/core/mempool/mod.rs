@@ -1,14 +1,14 @@
-pub mod pool;
-pub mod policy;
 pub mod fees;
+pub mod policy;
+pub mod pool;
 
 // Re-export commonly used items
-pub use policy::MempoolPolicy;
 pub use fees::FeeEstimator;
+pub use policy::MempoolPolicy;
 
+use crate::core::error::AnyaResult;
 use async_trait::async_trait;
 use bitcoin::{Transaction, Txid};
-use crate::core::error::AnyaResult;
 
 /// Transaction acceptance result
 #[derive(Debug, Clone)]
@@ -30,22 +30,22 @@ pub struct AcceptanceResult {
 pub trait Mempool: Send + Sync {
     /// Add a transaction to the mempool
     async fn add_transaction(&self, tx: &Transaction) -> AnyaResult<AcceptanceResult>;
-    
+
     /// Remove a transaction from the mempool
     async fn remove_transaction(&self, txid: &Txid) -> AnyaResult<bool>;
-    
+
     /// Check if a transaction is in the mempool
     async fn has_transaction(&self, txid: &Txid) -> AnyaResult<bool>;
-    
+
     /// Get a transaction from the mempool
     async fn get_transaction(&self, txid: &Txid) -> AnyaResult<Option<Transaction>>;
-    
+
     /// Get all transactions in the mempool
     async fn get_all_transactions(&self) -> AnyaResult<Vec<Transaction>>;
-    
+
     /// Get the number of transactions in the mempool
     async fn get_transaction_count(&self) -> AnyaResult<usize>;
-    
+
     /// Clear the mempool
     async fn clear(&self) -> AnyaResult<()>;
 }
@@ -64,27 +64,27 @@ impl Mempool for NoopMempool {
             fee_rate: 0.0,
         })
     }
-    
+
     async fn remove_transaction(&self, _txid: &Txid) -> AnyaResult<bool> {
         Ok(true)
     }
-    
+
     async fn has_transaction(&self, _txid: &Txid) -> AnyaResult<bool> {
         Ok(false)
     }
-    
+
     async fn get_transaction(&self, _txid: &Txid) -> AnyaResult<Option<Transaction>> {
         Ok(None)
     }
-    
+
     async fn get_all_transactions(&self) -> AnyaResult<Vec<Transaction>> {
         Ok(Vec::new())
     }
-    
+
     async fn get_transaction_count(&self) -> AnyaResult<usize> {
         Ok(0)
     }
-    
+
     async fn clear(&self) -> AnyaResult<()> {
         Ok(())
     }

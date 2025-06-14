@@ -1,6 +1,6 @@
-use crate::prelude::{AnyaResult};
-use std::sync::{Arc, Mutex};
+use crate::prelude::AnyaResult;
 use std::collections::HashMap;
+use std::sync::{Arc, Mutex};
 
 // Add `use async_trait::async_trait;` at the top if async_trait is used
 use async_trait::async_trait;
@@ -9,7 +9,7 @@ use tracing::info;
 
 // Internal imports
 use crate::layer2::bob::cross_layer::BtcTransaction as BobBtcTransaction;
-use crate::layer2::framework::{Layer2Protocol, ValidationResult, ProtocolConfig};
+use crate::layer2::framework::{Layer2Protocol, ProtocolConfig, ValidationResult};
 
 /// Configuration for the BOB Layer 2 integration
 #[derive(Clone, Debug)]
@@ -39,11 +39,11 @@ impl ProtocolConfig for BobConfig {
     fn protocol_name(&self) -> &str {
         "bob"
     }
-    
+
     fn network_type(&self) -> &str {
         "mainnet"
     }
-    
+
     fn clone_box(&self) -> Box<dyn ProtocolConfig> {
         Box::new(self.clone())
     }
@@ -77,7 +77,10 @@ impl BobClient {
         Ok(rpc_status && relay_status)
     }
 
-    pub async fn submit_transaction(&self, transaction: EvmTransaction) -> Result<EvmTransactionReceipt, BobError> {
+    pub async fn submit_transaction(
+        &self,
+        transaction: EvmTransaction,
+    ) -> Result<EvmTransactionReceipt, BobError> {
         self.evm_adapter.send_transaction(transaction).await
     }
 
@@ -86,7 +89,9 @@ impl BobClient {
         btc_tx: BobBtcTransaction,
         l2_tx: EvmTransaction,
     ) -> Result<ValidationResult, BobError> {
-        self.cross_layer_manager.verify_transaction_pair(btc_tx, l2_tx).await
+        self.cross_layer_manager
+            .verify_transaction_pair(btc_tx, l2_tx)
+            .await
     }
 
     pub async fn get_relay_status(&self) -> Result<RelayStatus, BobError> {
@@ -123,7 +128,8 @@ impl BitcoinRelayMonitor {
     pub async fn get_status(&self) -> Result<RelayStatus, BobError> {
         Ok(RelayStatus {
             last_block_height: 800000,
-            last_bitcoin_hash: "000000000000000000000000000000000000000000000000000000000000000".to_string(),
+            last_bitcoin_hash: "000000000000000000000000000000000000000000000000000000000000000"
+                .to_string(),
             is_synced: true,
             last_update_time: chrono::Utc::now(),
         })
@@ -146,9 +152,13 @@ impl EvmAdapter {
         Ok(true)
     }
 
-    pub async fn send_transaction(&self, _transaction: EvmTransaction) -> Result<EvmTransactionReceipt, BobError> {
+    pub async fn send_transaction(
+        &self,
+        _transaction: EvmTransaction,
+    ) -> Result<EvmTransactionReceipt, BobError> {
         Ok(EvmTransactionReceipt {
-            tx_hash: "0x0000000000000000000000000000000000000000000000000000000000000000".to_string(),
+            tx_hash: "0x0000000000000000000000000000000000000000000000000000000000000000"
+                .to_string(),
             block_number: 1000000,
             gas_used: 21000,
             status: true,
@@ -267,17 +277,13 @@ pub enum BobError {
     ConfigError(String),
 }
 
-pub use self::{
-    BobClient as Layer2Client,
-    BobConfig as Layer2Config,
-    BobError as Layer2Error,
-};
+pub use self::{BobClient as Layer2Client, BobConfig as Layer2Config, BobError as Layer2Error};
 
-pub mod relay;
-pub mod evm;
+pub mod analytics;
 pub mod bitvm;
 pub mod cross_layer;
-pub mod analytics;
+pub mod evm;
+pub mod relay;
 
 /// Metrics struct for performance monitoring
 #[derive(Debug, Clone)]

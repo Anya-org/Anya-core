@@ -1,8 +1,8 @@
 use anyhow::Result;
 
-pub mod research;
 pub mod analysis;
 pub mod bip_monitor;
+pub mod research;
 
 pub struct MLManager {
     research: research::ResearchManager,

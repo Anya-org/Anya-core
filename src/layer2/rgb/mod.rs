@@ -5,10 +5,10 @@
 
 // [AIR-3][AIS-3][BPC-3][RES-3] Import necessary dependencies for RGB implementation
 // This follows official Bitcoin Improvement Proposals (BIPs) standards for Taproot-enabled protocols
+use chrono;
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use uuid::Uuid;
-use chrono;
 // [AIR-3][AIS-3][BPC-3][RES-3] Removed unused import: async_trait::async_trait
 use bitcoin::hashes::{Hash, HashEngine};
 use bitcoin::secp256k1::Secp256k1;
@@ -17,7 +17,7 @@ use bitcoin::secp256k1::Secp256k1;
 use bitcoin::hashes::sha256;
 // [AIR-3][AIS-3][BPC-3][RES-3] Import hex for encoding/decoding
 use hex;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
 // [AIR-3][AIS-3][BPC-3][RES-3] Asset Registry implementation
@@ -49,7 +49,7 @@ impl AssetRegistry {
             transfers: Arc::new(Mutex::new(HashMap::new())),
         }
     }
-    
+
     /// Register an asset
     /// [AIR-3][AIS-3][BPC-3][RES-3]
     pub async fn register_asset(&self, asset: &RgbAsset) -> RgbResult<()> {
@@ -57,7 +57,7 @@ impl AssetRegistry {
         assets.insert(asset.id.clone(), asset.clone());
         Ok(())
     }
-    
+
     /// Update issuance information
     /// [AIR-3][AIS-3][BPC-3][RES-3]
     pub async fn update_issuance(&self, issuance: &RgbIssuance) -> RgbResult<()> {
@@ -65,10 +65,14 @@ impl AssetRegistry {
         issuances.insert(issuance.asset_id.clone(), issuance.clone());
         Ok(())
     }
-    
+
     /// Update asset from transfer information
     /// [AIR-3][AIS-3][BPC-3][RES-3]
-    pub fn update_asset_from_transfer(&mut self, asset_id: &str, transfer: &RgbTransfer) -> RgbResult<()> {
+    pub fn update_asset_from_transfer(
+        &mut self,
+        asset_id: &str,
+        transfer: &RgbTransfer,
+    ) -> RgbResult<()> {
         let mut assets = self.assets.lock().unwrap();
         if let Some(asset) = assets.get_mut(asset_id) {
             asset.issued_supply += transfer.amount;
@@ -78,7 +82,7 @@ impl AssetRegistry {
             Err(RgbError::AssetNotFound)
         }
     }
-    
+
     /// Update transfer information
     /// [AIR-3][AIS-3][BPC-3][RES-3]
     pub async fn update_transfer(&self, transfer: &RgbTransfer) -> RgbResult<()> {
@@ -97,31 +101,36 @@ pub struct ContractManager {
 impl ContractManager {
     /// [AIR-3][AIS-3][BPC-3][RES-3] Generate a unique asset ID using Taproot-compatible hashing
     /// This follows official Bitcoin Improvement Proposals (BIPs) standards for asset ID generation
-    fn generate_asset_id(issuer_address: &str, total_supply: u64, precision: u8, metadata: &str) -> RgbResult<String> {
+    fn generate_asset_id(
+        issuer_address: &str,
+        total_supply: u64,
+        precision: u8,
+        metadata: &str,
+    ) -> RgbResult<String> {
         // [AIR-3][AIS-3][BPC-3][RES-3] Create a Taproot-compatible hash by combining all asset parameters
         // This follows official Bitcoin Improvement Proposals (BIPs) standards for asset ID generation
         let mut engine = sha256::HashEngine::default();
-        
+
         // Add all components to the hash
         engine.input(issuer_address.as_bytes());
         engine.input(&total_supply.to_le_bytes());
         engine.input(&[precision]);
         engine.input(metadata.as_bytes());
-        
+
         // [AIR-3][AIS-3][BPC-3][RES-3] Add current timestamp for uniqueness
         // This follows official Bitcoin Improvement Proposals (BIPs) standards for asset ID generation
         let timestamp = chrono::Utc::now().timestamp();
         engine.input(&timestamp.to_le_bytes());
-        
+
         // [AIR-3][AIS-3][BPC-3][RES-3] Generate the hash from the engine
         let hash = sha256::Hash::from_engine(engine);
-        
+
         // [AIR-3][AIS-3][BPC-3][RES-3] Convert to hex string with RGB prefix
         // This follows official Bitcoin Improvement Proposals (BIPs) standards for asset ID generation
         // [AIR-3][AIS-3][BPC-3][RES-3] Specify type for hex::encode to resolve ambiguity
         let hex_string = hex::encode::<&[u8]>(hash.as_ref());
         let asset_id = format!("rgb1{}", hex_string);
-        
+
         Ok(asset_id)
     }
     /// Create a new Contract Manager
@@ -131,7 +140,7 @@ impl ContractManager {
             secp: Secp256k1::new(),
         }
     }
-    
+
     /// Create an RGB asset
     /// [AIR-3][AIS-3][BPC-3][RES-3]
     pub fn create_asset(
@@ -143,12 +152,15 @@ impl ContractManager {
     ) -> RgbResult<RgbAsset> {
         // Generate a unique asset ID using Taproot-compatible approach
         let asset_id = Self::generate_asset_id(issuer_address, total_supply, precision, metadata)?;
-        
+
         // Create the asset
         let mut metadata_map = HashMap::new();
         metadata_map.insert("description".to_string(), metadata.to_string());
-        metadata_map.insert("tr_pattern".to_string(), "tr(KEY,{SILENT_LEAF})".to_string());
-        
+        metadata_map.insert(
+            "tr_pattern".to_string(),
+            "tr(KEY,{SILENT_LEAF})".to_string(),
+        );
+
         // [AIR-3][AIS-3][BPC-3][RES-3] Create RGB asset with proper ID fields
         // This follows official Bitcoin Improvement Proposals (BIPs) standards for asset creation
         Ok(RgbAsset {
@@ -164,14 +176,10 @@ impl ContractManager {
             updated_at: None,
         })
     }
-    
+
     /// Issue an RGB asset
     /// [AIR-3][AIS-3][BPC-3][RES-3]
-    pub fn issue_asset(
-        &self,
-        issuance_address: &str,
-        amount: u64,
-    ) -> RgbResult<RgbIssuance> {
+    pub fn issue_asset(&self, issuance_address: &str, amount: u64) -> RgbResult<RgbIssuance> {
         // Create the issuance
         Ok(RgbIssuance {
             asset_id: "asset_placeholder".to_string(), // Would be set by the caller
@@ -181,7 +189,7 @@ impl ContractManager {
             status: IssuanceStatus::Pending,
         })
     }
-    
+
     /// Transfer an RGB asset
     /// [AIR-3][AIS-3][BPC-3][RES-3]
     pub fn transfer_asset(
@@ -205,11 +213,10 @@ impl ContractManager {
             signature: None,
             metadata: HashMap::new(),
             version: "1.0".to_string(),
-            network: "bitcoin".to_string()
+            network: "bitcoin".to_string(),
         })
     }
 }
-
 
 /// RGB Error types
 /// [AIR-3][AIS-3][BPC-3][RES-3] Error handling following official Bitcoin Improvement Proposals (BIPs)
@@ -247,45 +254,50 @@ pub type RgbResult<T> = Result<T, RgbError>;
 
 /// [AIR-3][AIS-3][BPC-3][RES-3] Generate a unique asset ID using Taproot-compatible approach
 /// This follows official Bitcoin Improvement Proposals (BIPs) standards for asset identification
-pub fn generate_asset_id(issuer_address: &str, total_supply: u64, precision: u8, metadata: &str) -> RgbResult<String> {
+pub fn generate_asset_id(
+    issuer_address: &str,
+    total_supply: u64,
+    precision: u8,
+    metadata: &str,
+) -> RgbResult<String> {
     // [AIR-3][AIS-3][BPC-3][RES-3] Create a Taproot-compatible hash by combining all asset parameters
     // This follows official Bitcoin Improvement Proposals (BIPs) standards for asset ID generation
     let mut engine = sha256::HashEngine::default();
-    
+
     // Add all components to the hash
     engine.input(issuer_address.as_bytes());
     engine.input(&total_supply.to_le_bytes());
     engine.input(&[precision]);
     engine.input(metadata.as_bytes());
-    
+
     // [AIR-3][AIS-3][BPC-3][RES-3] Add current timestamp for uniqueness
     // This follows official Bitcoin Improvement Proposals (BIPs) standards for asset ID generation
     let timestamp = chrono::Utc::now().timestamp();
     engine.input(&timestamp.to_le_bytes());
-    
+
     // [AIR-3][AIS-3][BPC-3][RES-3] Generate the hash from the engine
     let hash = sha256::Hash::from_engine(engine);
-    
+
     // [AIR-3][AIS-3][BPC-3][RES-3] Convert to hex string with RGB prefix
     // This follows official Bitcoin Improvement Proposals (BIPs) standards for asset ID generation
     // [AIR-3][AIS-3][BPC-3][RES-3] Specify type for hex::encode to resolve ambiguity
     let hex_string = hex::encode::<&[u8]>(hash.as_ref());
     let asset_id = format!("rgb1{}", hex_string);
-    
+
     Ok(asset_id)
 }
 
 /// [AIR-3][AIS-3][BPC-3][RES-3] RGB Asset structure following BDF v2.5 standards
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct RgbAsset {
-    pub id: String,  // Unique asset identifier using Taproot-compatible format
-    pub asset_id: String,  // Unique asset identifier using Taproot-compatible format
-    pub ticker: String,    // Short symbol for the asset
-    pub name: String,      // Full name of the asset
-    pub precision: u8,     // Decimal precision (usually 8 for Bitcoin compatibility)
+    pub id: String,         // Unique asset identifier using Taproot-compatible format
+    pub asset_id: String,   // Unique asset identifier using Taproot-compatible format
+    pub ticker: String,     // Short symbol for the asset
+    pub name: String,       // Full name of the asset
+    pub precision: u8,      // Decimal precision (usually 8 for Bitcoin compatibility)
     pub issued_supply: u64, // Current issued supply
-    pub owner: String,     // Address of the asset owner/issuer
-    pub created_at: u64,   // Creation timestamp
+    pub owner: String,      // Address of the asset owner/issuer
+    pub created_at: u64,    // Creation timestamp
     pub metadata: HashMap<String, String>, // Additional asset metadata
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<u64>, // Last update timestamp

@@ -1,22 +1,21 @@
-/// Bitcoin transaction validation [AIS-3][BPC-3][DAO-3]
-
-use bitcoin::{Transaction, BlockHash};
-use thiserror::Error;
-use crate::core::bitcoin::{BitcoinProtocol, BPCLevel};
+use crate::core::bitcoin::{BPCLevel, BitcoinProtocol};
 use crate::core::error::AnyaError;
 use crate::core::script::interpreter::TaprootValidator;
+/// Bitcoin transaction validation [AIS-3][BPC-3][DAO-3]
+use bitcoin::{BlockHash, Transaction};
+use thiserror::Error;
 
 #[derive(Debug, Error)]
 pub enum ValidationError {
     #[error("Validation failed: {0}")]
     Failed(String),
-    
+
     #[error("Bitcoin protocol error: {0}")]
     Protocol(#[from] AnyaError),
-    
+
     #[error("IO error: {0}")]
     IoError(#[from] std::io::Error),
-    
+
     #[error("BIP-341 error: {0}")]
     Taproot(String),
 }
@@ -35,7 +34,7 @@ impl TransactionValidator {
             taproot: TaprootValidator::new(),
         }
     }
-    
+
     /// Create a validator with specific protocol level
     pub fn with_level(level: BPCLevel) -> Self {
         let mut protocol = BitcoinProtocol::new("mainnet".to_string());
@@ -45,38 +44,40 @@ impl TransactionValidator {
             taproot: TaprootValidator::new(),
         }
     }
-    
+
     /// Validate a transaction from a file
     pub fn validate_from_file(&self, path: &std::path::Path) -> Result<(), ValidationError> {
         let _data = std::fs::read(path)?;
-        
+
         // This is simplified - in reality, we'd parse the transaction
         // from the file data using bitcoin::consensus::deserialize
-        
+
         // For now, simulate transaction validation
         println!("Validating transaction from file: {}", path.display());
         println!("✅ Transaction structure valid");
         println!("✅ Taproot support verified");
         println!("✅ SPV proof valid");
-        
+
         Ok(())
     }
-    
+
     /// Validate a transaction with all BPC-3 requirements
     pub fn validate(&self, tx: &Transaction) -> Result<(), ValidationError> {
         // Validate protocol requirements
-        self.protocol.verify_with_policy(tx)
+        self.protocol
+            .verify_with_policy(tx)
             .map_err(ValidationError::Protocol)?;
-        
+
         // Validate Taproot (BIP-341/342) specifically for BPC-3
         if self.protocol.get_level() == BPCLevel::BPC3 {
-            self.taproot.verify_taproot_commitment(tx)
+            self.taproot
+                .verify_taproot_commitment(tx)
                 .map_err(|e| ValidationError::Failed(e.to_string()))?;
         }
-        
+
         Ok(())
     }
-    
+
     /// BIP-341 Taproot validation according to BDF v2.5
     pub fn validate_taproot_transaction(&self, tx: &Transaction) -> Result<(), ValidationError> {
         // Implement validation logic according to BIP-341 requirements
@@ -85,22 +86,23 @@ impl TransactionValidator {
         if !has_witness {
             return Err(ValidationError::Taproot("SegWit required".to_string()));
         }
-        
+
         // Check signature validity using BIP-340 schnorr validation
-        self.taproot.verify_schnorr_signatures(tx)
+        self.taproot
+            .verify_schnorr_signatures(tx)
             .map_err(|e| ValidationError::Taproot(e.to_string()))?;
-        
+
         // Check BIP-341 compliance
         self.check_taproot_conditions(tx)?;
-        
+
         Ok(())
     }
-    
+
     /// Check Taproot specific conditions according to BIP-341
     fn check_taproot_conditions(&self, tx: &Transaction) -> Result<(), ValidationError> {
         // Implementation of BIP-341 specific checks
         // This is a placeholder for the actual implementation
-        
+
         // Check Taproot witness structure
         for input in &tx.input {
             if !input.witness.is_empty() {
@@ -108,7 +110,7 @@ impl TransactionValidator {
                 // This would validate the control block format, etc.
             }
         }
-        
+
         Ok(())
     }
 }

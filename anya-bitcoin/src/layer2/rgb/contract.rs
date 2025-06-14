@@ -2,8 +2,8 @@
 //!
 //! This module provides contract functionality for the RGB protocol.
 
-use std::collections::HashMap;
 use bitcoin::Txid;
+use std::collections::HashMap;
 
 /// RGB contract type
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -66,25 +66,25 @@ impl ContractBuilder {
             witnesses: Vec::new(),
         }
     }
-    
+
     /// Add data to the contract
     pub fn with_data(mut self, key: &str, value: Vec<u8>) -> Self {
         self.data.insert(key.to_string(), value);
         self
     }
-    
+
     /// Add metadata to the contract
     pub fn with_metadata(mut self, key: &str, value: &str) -> Self {
         self.metadata.insert(key.to_string(), value.to_string());
         self
     }
-    
+
     /// Add a witness to the contract
     pub fn with_witness(mut self, witness: Witness) -> Self {
         self.witnesses.push(witness);
         self
     }
-    
+
     /// Build the contract
     pub fn build(self, issuance_txid: Txid) -> Contract {
         Contract {
@@ -97,4 +97,4 @@ impl ContractBuilder {
             witnesses: self.witnesses,
         }
     }
-} 
+}

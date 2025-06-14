@@ -1,0 +1,42 @@
+name: Mobile Compliance
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20.x
+      
+      - name: Install Modern Stack
+        run: |
+          corepack enable
+          pnpm install -g react-native@0.74
+          cd mobile-sdk/android && ./gradlew clean assembleRelease
+
+  web5-compliance:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify Standards
+        run: |
+          cargo run --bin web5-validator \
+            --features "mobile,web5" \
+            check \
+            --bip 341 174 275 370 \
+            --strict
+      - name: Validate SILENT_LEAF
+        run: |
+          cargo run --bin verify-silent-leaf \
+            --features mobile \
+            -- taproot-verify
+      - name: Check Fee Rate Compliance
+        run: |
+          cargo run --bin fee-validator \
+            --features mobile \
+            -- check \
+            --min-rate 1

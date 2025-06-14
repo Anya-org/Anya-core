@@ -1,0 +1,21 @@
+name: BDF Chaos Engineering
+
+on: [workflow_dispatch]
+
+jobs:
+  network-simulation:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/anya-core/chaos:2.5
+      
+    steps:
+      - name: Simulate Network Conditions
+        run: |
+          chaos-tool simulate \
+            --scenario=partition \
+            --duration=300s \
+            --nodes=10 \
+            --bip-compliance-check
+          
+      - name: Verify Consensus Integrity
+        run: cargo test --test chaos_engineering -- --test-threads=1 

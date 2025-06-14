@@ -17,15 +17,18 @@ pub use test_runner::run_all_tests;
 mod tests {
     use super::*;
     use anyhow::Result;
-    
+
     /// Run all Bitcoin protocol tests
     #[test]
     fn test_all_protocol_tests() -> Result<()> {
         let results = test_runner::run_all_tests()?;
-        
+
         // Assert that all tests passed
-        assert!(results.values().all(|&success| success), "Some protocol tests failed");
-        
+        assert!(
+            results.values().all(|&success| success),
+            "Some protocol tests failed"
+        );
+
         Ok(())
     }
-} 
+}

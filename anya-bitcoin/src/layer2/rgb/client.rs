@@ -2,9 +2,9 @@
 //!
 //! This module provides client functionality for interacting with the RGB protocol.
 
-use std::path::PathBuf;
-use std::collections::HashMap;
 use crate::core::error::AnyaResult;
+use std::collections::HashMap;
+use std::path::PathBuf;
 
 /// RGB client configuration
 #[derive(Debug, Clone)]
@@ -74,43 +74,45 @@ impl RGBClientBuilder {
             config: ClientConfig::default(),
         }
     }
-    
+
     /// Set the data directory
     pub fn with_data_dir(mut self, data_dir: PathBuf) -> Self {
         self.config.data_dir = data_dir;
         self
     }
-    
+
     /// Set the network
     pub fn with_network(mut self, network: &str) -> Self {
         self.config.network = network.to_string();
         self
     }
-    
+
     /// Set the Electrum server URL
     pub fn with_electrum_url(mut self, electrum_url: &str) -> Self {
         self.config.electrum_url = electrum_url.to_string();
         self
     }
-    
+
     /// Set the storage type
     pub fn with_storage_type(mut self, storage_type: &str) -> Self {
         self.config.storage_type = storage_type.to_string();
         self
     }
-    
+
     /// Set the fee rate
     pub fn with_fee_rate(mut self, fee_rate: f64) -> Self {
         self.config.fee_rate = fee_rate;
         self
     }
-    
+
     /// Set a parameter
     pub fn with_param(mut self, key: &str, value: &str) -> Self {
-        self.config.params.insert(key.to_string(), value.to_string());
+        self.config
+            .params
+            .insert(key.to_string(), value.to_string());
         self
     }
-    
+
     /// Build the client
     pub fn build(self) -> RGBClient {
         RGBClient {
@@ -125,7 +127,7 @@ impl RGBClient {
     pub fn new() -> Self {
         RGBClientBuilder::new().build()
     }
-    
+
     /// Create a new client with custom configuration
     pub fn with_config(config: ClientConfig) -> Self {
         Self {
@@ -133,23 +135,23 @@ impl RGBClient {
             status: ClientStatus::Uninitialized,
         }
     }
-    
+
     /// Initialize the client
     pub fn init(&mut self) -> AnyaResult<()> {
         // Implementation would go here
         self.status = ClientStatus::Initialized;
         Ok(())
     }
-    
+
     /// Connect the client
     pub fn connect(&mut self) -> AnyaResult<()> {
         // Implementation would go here
         self.status = ClientStatus::Connected;
         Ok(())
     }
-    
+
     /// Get the client status
     pub fn status(&self) -> ClientStatus {
         self.status.clone()
     }
-} 
+}

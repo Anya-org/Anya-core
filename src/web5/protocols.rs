@@ -3,27 +3,27 @@
 // Provides protocol handlers for Web5 interactions
 // [AIR-012] Operational Reliability and [AIP-002] Modular Architecture
 
+use crate::web5::identity::{Web5Error, Web5Result};
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use serde::{Serialize, Deserialize};
-use crate::web5::identity::{Web5Result, Web5Error};
 
 /// Protocol Handler trait
-/// 
+///
 /// Defines the interface for protocol handlers in the Web5 system,
 /// following the Hexagonal Architecture principles.
 pub trait ProtocolHandler: Send + Sync {
     /// Get the protocol ID
     fn protocol_id(&self) -> &str;
-    
+
     /// Handle a protocol message
     fn handle_message(&self, message: &[u8]) -> Web5Result<Vec<u8>>;
-    
+
     /// Get protocol definition
     fn get_definition(&self) -> ProtocolDefinition;
 }
 
 /// Protocol Definition
-/// 
+///
 /// Describes a protocol's capabilities and structure.
 #[derive(Clone, Serialize, Deserialize)]
 pub struct ProtocolDefinition {
@@ -38,7 +38,7 @@ pub struct ProtocolDefinition {
 }
 
 /// Type Definition
-/// 
+///
 /// Describes a data type within a protocol.
 #[derive(Clone, Serialize, Deserialize)]
 pub struct TypeDefinition {
@@ -49,7 +49,7 @@ pub struct TypeDefinition {
 }
 
 /// Action Definition
-/// 
+///
 /// Describes an action within a protocol.
 #[derive(Clone, Serialize, Deserialize)]
 pub struct ActionDefinition {
@@ -64,7 +64,7 @@ pub struct ActionDefinition {
 }
 
 /// Protocol Manager
-/// 
+///
 /// Manages protocol handlers and facilitates protocol-based interactions.
 pub struct ProtocolManager {
     /// Registered protocols
@@ -81,39 +81,39 @@ impl ProtocolManager {
             handlers: HashMap::new(),
         }
     }
-    
+
     /// Register a protocol handler
     pub fn register_protocol(&mut self, handler: Box<dyn ProtocolHandler>) -> Web5Result<()> {
         let protocol_id = handler.protocol_id().to_string();
         let definition = handler.get_definition();
-        
+
         self.protocols.insert(protocol_id.clone(), definition);
         self.handlers.insert(protocol_id, handler);
-        
+
         Ok(())
     }
-    
+
     /// Get a protocol definition by ID
     pub fn get_protocol(&self, protocol_id: &str) -> Web5Result<&ProtocolDefinition> {
-        self.protocols.get(protocol_id).ok_or_else(|| {
-            Web5Error::Protocol(format!("Protocol not found: {}", protocol_id))
-        })
+        self.protocols
+            .get(protocol_id)
+            .ok_or_else(|| Web5Error::Protocol(format!("Protocol not found: {}", protocol_id)))
     }
-    
+
     /// Handle a message for a specific protocol
     pub fn handle_message(&self, protocol_id: &str, message: &[u8]) -> Web5Result<Vec<u8>> {
         let handler = self.handlers.get(protocol_id).ok_or_else(|| {
             Web5Error::Protocol(format!("No handler found for protocol: {}", protocol_id))
         })?;
-        
+
         handler.handle_message(message)
     }
-    
+
     /// Check if a protocol is registered
     pub fn has_protocol(&self, protocol_id: &str) -> bool {
         self.protocols.contains_key(protocol_id)
     }
-    
+
     /// Get all registered protocol definitions
     pub fn get_all_protocols(&self) -> Vec<&ProtocolDefinition> {
         self.protocols.values().collect()
@@ -121,7 +121,7 @@ impl ProtocolManager {
 }
 
 /// Profile Protocol Handler
-/// 
+///
 /// Handles the standard profile protocol for Web5.
 pub struct ProfileProtocolHandler;
 
@@ -136,12 +136,12 @@ impl ProtocolHandler for ProfileProtocolHandler {
     fn protocol_id(&self) -> &str {
         "https://identity.foundation/schemas/profile"
     }
-    
+
     fn handle_message(&self, message: &[u8]) -> Web5Result<Vec<u8>> {
         // Simple echo implementation for demonstration
         Ok(message.to_vec())
     }
-    
+
     fn get_definition(&self) -> ProtocolDefinition {
         let mut types = HashMap::new();
         types.insert(
@@ -154,11 +154,12 @@ impl ProtocolHandler for ProfileProtocolHandler {
                         "image": { "type": "string", "format": "uri" },
                         "description": { "type": "string" }
                     }
-                }"#.to_string(),
+                }"#
+                .to_string(),
                 description: "A user profile".to_string(),
             },
         );
-        
+
         let actions = vec![
             ActionDefinition {
                 name: "get".to_string(),
@@ -173,7 +174,7 @@ impl ProtocolHandler for ProfileProtocolHandler {
                 output: Some("profile".to_string()),
             },
         ];
-        
+
         ProtocolDefinition {
             protocol: self.protocol_id().to_string(),
             version: "1.0".to_string(),
@@ -184,7 +185,7 @@ impl ProtocolHandler for ProfileProtocolHandler {
 }
 
 /// Credentials Protocol Handler
-/// 
+///
 /// Handles the standard credentials protocol for Web5.
 pub struct CredentialProtocolHandler;
 
@@ -199,12 +200,12 @@ impl ProtocolHandler for CredentialProtocolHandler {
     fn protocol_id(&self) -> &str {
         "https://identity.foundation/schemas/credentials"
     }
-    
+
     fn handle_message(&self, message: &[u8]) -> Web5Result<Vec<u8>> {
         // Simple echo implementation for demonstration
         Ok(message.to_vec())
     }
-    
+
     fn get_definition(&self) -> ProtocolDefinition {
         let mut types = HashMap::new();
         types.insert(
@@ -219,11 +220,12 @@ impl ProtocolHandler for CredentialProtocolHandler {
                         "issuanceDate": { "type": "string", "format": "date-time" },
                         "credentialSubject": { "type": "object" }
                     }
-                }"#.to_string(),
+                }"#
+                .to_string(),
                 description: "A verifiable credential".to_string(),
             },
         );
-        
+
         let actions = vec![
             ActionDefinition {
                 name: "issue".to_string(),
@@ -238,7 +240,7 @@ impl ProtocolHandler for CredentialProtocolHandler {
                 output: None,
             },
         ];
-        
+
         ProtocolDefinition {
             protocol: self.protocol_id().to_string(),
             version: "1.0".to_string(),
@@ -252,59 +254,59 @@ impl ProtocolHandler for CredentialProtocolHandler {
 mod tests {
     use super::*;
     use std::error::Error;
-    
+
     #[tokio::test]
     async fn test_protocol_manager() -> Result<(), Box<dyn Error>> {
         let mut manager = ProtocolManager::new();
-        
+
         // Test registering a protocol
         let profile_handler = Box::new(ProfileProtocolHandler::new());
         manager.register_protocol(profile_handler)?;
-        
+
         // Test protocol lookup
         assert!(manager.has_protocol("https://identity.foundation/schemas/profile"));
-        
+
         // Test getting all protocols
         let protocols = manager.get_all_protocols();
         assert_eq!(protocols.len(), 1);
-        
+
         // Test getting protocol definition
         let _def = manager.get_protocol("https://identity.foundation/schemas/profile")?;
-        
+
         Ok(())
     }
-    
+
     #[tokio::test]
     async fn test_profile_protocol_handler() -> Result<(), Box<dyn Error>> {
         let handler = ProfileProtocolHandler::new();
-        
+
         // Test protocol ID
         assert_eq!(
             handler.protocol_id(),
             "https://identity.foundation/schemas/profile"
         );
-        
+
         // Test message handling
         let response = handler.handle_message(b"test")?;
         assert_eq!(response, b"test");
-        
+
         Ok(())
     }
-    
+
     #[tokio::test]
     async fn test_credential_protocol_handler() -> Result<(), Box<dyn Error>> {
         let handler = CredentialProtocolHandler::new();
-        
+
         // Test protocol ID
         assert_eq!(
             handler.protocol_id(),
             "https://identity.foundation/schemas/credentials"
         );
-        
+
         // Test message handling
         let response = handler.handle_message(b"test")?;
         assert_eq!(response, b"test");
-        
+
         Ok(())
     }
 }

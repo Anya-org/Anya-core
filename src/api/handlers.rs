@@ -1,9 +1,8 @@
-
 pub mod auth;
+pub mod dlc;
+pub mod identity;
 pub mod system;
 pub mod wallet;
-pub mod identity;
-pub mod dlc;
 
 pub struct ApiHandlers;
 

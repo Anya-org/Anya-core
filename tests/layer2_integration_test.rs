@@ -9,13 +9,23 @@
 #[cfg(test)]
 mod tests {
     use anya_bitcoin::layer2::{
+        bob::{
+            BitVMProof, BobClient, BobConfig, BobError, EvmTransaction, EvmTransactionReceipt,
+            RelayStatus,
+        }, // BOB specific types
         ports::{Layer2Protocol, TransactionStatus}, // Common port traits
-        bob::{BobClient, BobConfig, BobError, EvmTransaction, EvmTransactionReceipt, RelayStatus, BitVMProof}, // BOB specific types
-        rgb::{RGBClient, RGBConfig, RGBAsset, AssetTransfer, TransferStatus as RGBTransferStatus, RGBError}, // RGB specific types
-        rsk::{RskClient, RskConfig, BitcoinSPVProof, PegInInfo, PegOutInfo, ContractCallResult, ContractDeployResult, TransactionInfo as RskTransactionInfo, BlockInfo as RskBlockInfo, RskError}, // RSK specific types
+        rgb::{
+            AssetTransfer, RGBAsset, RGBClient, RGBConfig, RGBError,
+            TransferStatus as RGBTransferStatus,
+        }, // RGB specific types
+        rsk::{
+            BitcoinSPVProof, BlockInfo as RskBlockInfo, ContractCallResult, ContractDeployResult,
+            PegInInfo, PegOutInfo, RskClient, RskConfig, RskError,
+            TransactionInfo as RskTransactionInfo,
+        }, // RSK specific types
     };
-    use std::sync::Arc;
-    use std::path::PathBuf; // For RGBConfig data_dir
+    use std::path::PathBuf;
+    use std::sync::Arc; // For RGBConfig data_dir
 
     // BOB Protocol tests
     #[test]
@@ -24,10 +34,10 @@ mod tests {
         let config = BobConfig {
             rpc_url: "https://bob-node.example.com".to_string(),
             relay_url: "https://relay.gobob.xyz".to_string(), // Default or example
-            chain_id: 60808, // Default or example
-            timeout_ms: 30000, // Default
-            max_retries: 3, // Default
-            validate_relay: true, // Default
+            chain_id: 60808,                                  // Default or example
+            timeout_ms: 30000,                                // Default
+            max_retries: 3,                                   // Default
+            validate_relay: true,                             // Default
         };
 
         let client = BobClient::new(config);
@@ -68,10 +78,10 @@ mod tests {
             data_dir: PathBuf::from("/tmp/rgb-test"),
             network: "testnet".to_string(),
             electrum_url: "electrum.blockstream.info:60002".to_string(), // Default
-            storage_type: "sqlite".to_string(), // Default
-            fee_rate: 1.0, // Default
+            storage_type: "sqlite".to_string(),                          // Default
+            fee_rate: 1.0,                                               // Default
         };
-        
+
         // RGBClient::new() does not take config. It's usually built with RGBClientBuilder or similar.
         // For now, let's assume a simplified constructor or a builder pattern.
         // This part needs to be adjusted based on the actual RGBClient API.
@@ -101,7 +111,7 @@ mod tests {
         // Test Layer2Protocol trait implementation (assuming RskClient implements it)
         // assert!(client.initialize().is_ok()); // initialize might not be part of RskClient directly
         // assert!(client.connect().is_ok()); // connect might not be part of RskClient directly
-        
+
         // Example: Use a method from RskClient, e.g., check_health
         // let health = futures::executor::block_on(client.check_health());
         // assert!(health.is_ok());
@@ -110,12 +120,12 @@ mod tests {
         let proof = BitcoinSPVProof {
             tx_hash: "0000000000000000000000000000000000000000000000000000000000000000".to_string(),
             block_header: vec![0; 80], // Simplified
-            merkle_proof: vec![], // Simplified
-            block_height: 1, // Simplified
-            // These fields might be needed based on actual BitcoinSPVProof struct definition
-            // transaction: vec![], 
-            // tx_index_in_block: 0,
-            // bitcoin_block_hash_le: vec![],
+            merkle_proof: vec![],      // Simplified
+            block_height: 1,           // Simplified
+                                       // These fields might be needed based on actual BitcoinSPVProof struct definition
+                                       // transaction: vec![],
+                                       // tx_index_in_block: 0,
+                                       // bitcoin_block_hash_le: vec![],
         };
 
         // let verification_result = futures::executor::block_on(client.verify_bitcoin_payment(proof)); // verify_bitcoin_payment might not exist

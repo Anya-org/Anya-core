@@ -1,5 +1,5 @@
 //! Asymmetric Cryptography Module
-//! 
+//!
 //! This module provides RSA and ECC implementations for the Bitcoin security framework.
 
 use std::error::Error;
@@ -61,7 +61,7 @@ pub fn generate_ec_keypair(curve: &EcCurve) -> Result<KeyPair, Box<dyn Error>> {
         EcCurve::P256 => 32,
         EcCurve::Curve25519 => 32,
     };
-    
+
     Ok(KeyPair {
         private_key: vec![0u8; key_size],
         public_key: vec![0u8; key_size * 2],
@@ -81,7 +81,11 @@ pub fn rsa_decrypt(private_key: &[u8], data: &[u8]) -> Result<Vec<u8>, Box<dyn E
 }
 
 /// ECDH key agreement - derive a shared secret
-pub fn ecdh_derive_secret(private_key: &[u8], peer_public_key: &[u8], curve: &EcCurve) -> Result<Vec<u8>, Box<dyn Error>> {
+pub fn ecdh_derive_secret(
+    private_key: &[u8],
+    peer_public_key: &[u8],
+    curve: &EcCurve,
+) -> Result<Vec<u8>, Box<dyn Error>> {
     // Placeholder implementation
     Ok(vec![0u8; 32])
 }

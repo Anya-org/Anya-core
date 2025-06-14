@@ -1,0 +1,4 @@
+  - name: Build Enterprise
+    run: |
+      cargo build --package anya-enterprise \
+        --features "bip341,ais3,enterprise"

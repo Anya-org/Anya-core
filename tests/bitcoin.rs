@@ -1,5 +1,5 @@
 //! Bitcoin-related tests module
-//! 
+//!
 //! This module organizes all Bitcoin protocol, transaction, and layer tests.
 
 // Individual test files

@@ -37,22 +37,22 @@
 //! # }
 //! ```
 
+use std::collections::HashMap;
 use std::error::Error;
 use std::fmt;
-use std::collections::HashMap;
 // [AIR-3][AIS-3][BPC-3][RES-3] Removed unused import: std::sync::Arc
 
+pub mod api;
+pub mod bip;
 pub mod bitcoin;
-pub mod ml;
-pub mod web5;
+pub mod compliance;
 pub mod dao;
 pub mod extensions;
-pub mod api;
 pub mod install;
-pub mod types;
+pub mod ml;
 pub mod testing;
-pub mod compliance;
-pub mod bip;
+pub mod types;
+pub mod web5;
 
 // Infrastructure module
 pub mod infrastructure;
@@ -86,9 +86,9 @@ pub mod auth {
     //! // API authentication handlers
     //! auth::handlers::auth::login(...);
     //! ```
-    pub use crate::security::*;
-    pub use crate::bip::bip353_auth::*;
     pub use crate::api::handlers::auth::*;
+    pub use crate::bip::bip353_auth::*;
+    pub use crate::security::*;
 }
 
 pub mod hardware_optimization {
@@ -115,9 +115,9 @@ pub mod hardware_optimization {
 
 // Re-export key types for crate-wide visibility
 // [AIR-3][BPC-3] Following official Bitcoin Improvement Proposals (BIPs)
-pub use crate::dao::DaoLevel;
-pub use crate::bitcoin::interface::BitcoinInterface;
 pub use crate::bitcoin::adapters::BitcoinAdapter;
+pub use crate::bitcoin::interface::BitcoinInterface;
+pub use crate::dao::DaoLevel;
 pub use crate::types::compliance::*;
 
 // Export core types will be defined below
@@ -133,8 +133,8 @@ pub use security::hsm;
 #[cfg(not(feature = "hsm"))]
 pub use security::hsm_shim as hsm;
 pub mod layer2;
-pub mod tools;
 pub mod tokenomics;
+pub mod tools;
 
 /// Core error type for the Anya system
 /// [AIR-3][AIS-3][BPC-3][RES-3]
@@ -252,7 +252,7 @@ impl AnyaCore {
         let web5_manager = if config.web5_config.enabled {
             match web5::Web5Manager::new(config.web5_config) {
                 Ok(manager) => Some(manager),
-                Err(e) => return Err(AnyaError::Web5(e.to_string()))
+                Err(e) => return Err(AnyaError::Web5(e.to_string())),
             }
         } else {
             None
@@ -261,7 +261,12 @@ impl AnyaCore {
         let dao_manager = if config.dao_config.enabled {
             match dao::DAOManager::new(config.dao_config) {
                 Ok(manager) => Some(manager),
-                Err(e) => return Err(AnyaError::Custom(format!("Failed to initialize DAO manager: {}", e)))
+                Err(e) => {
+                    return Err(AnyaError::Custom(format!(
+                        "Failed to initialize DAO manager: {}",
+                        e
+                    )))
+                }
             }
         } else {
             None
@@ -299,7 +304,9 @@ impl AnyaCore {
 
         // Add component-specific status
         if let Some(ml_system) = &self.ml_system {
-            status.metrics.insert("ml".to_string(), ml_system.get_model_health_metrics());
+            status
+                .metrics
+                .insert("ml".to_string(), ml_system.get_model_health_metrics());
         }
 
         // Add status for each component
@@ -312,9 +319,12 @@ impl AnyaCore {
         status.component_status.push(ComponentStatus {
             name: "web5".to_string(),
             operational: self.web5_manager.is_some(),
-            health_score: if self.web5_manager.is_some() { 1.0 } else { 0.0 },
+            health_score: if self.web5_manager.is_some() {
+                1.0
+            } else {
+                0.0
+            },
         });
-
 
         status.component_status.push(ComponentStatus {
             name: "dao".to_string(),
@@ -448,8 +458,8 @@ pub mod prelude {
     // pub use crate::dao::DaoLevel; // Now re-exported at crate root
     // pub use crate::bitcoin::interface::BitcoinInterface;
     pub use crate::bitcoin::adapters::BitcoinAdapter; // Now re-exported at crate root
-    // pub use crate::tools::markdown::DocumentationValidator;
-    // pub use crate::security::hsm::TaprootValidator;
+                                                      // pub use crate::tools::markdown::DocumentationValidator;
+                                                      // pub use crate::security::hsm::TaprootValidator;
 }
 
 mod error;

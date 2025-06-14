@@ -2,7 +2,7 @@
 // Implements BitVM integration for Bitcoin Optimistic Blockchain
 // as per official Bitcoin Improvement Proposals (BIPs) requirements
 
-use crate::layer2::bob::{BobConfig, BobError, BitVMProof};
+use crate::layer2::bob::{BitVMProof, BobConfig, BobError};
 
 /// BitVM validator for BOB
 pub struct BitVMValidator {
@@ -16,12 +16,11 @@ impl BitVMValidator {
             config: config.clone(),
         }
     }
-    
+
     /// Verify a BitVM proof
     pub async fn verify_proof(&self, _proof: BitVMProof) -> Result<bool, BobError> {
         // In a real implementation, this would verify the BitVM proof
         // For now, we'll just return true
         Ok(true)
     }
-} 
-
+}

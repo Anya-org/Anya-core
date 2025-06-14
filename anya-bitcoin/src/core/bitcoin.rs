@@ -2,8 +2,8 @@
 //!
 //! This module provides the main Bitcoin protocol interface and validation logic.
 
-use bitcoin::{Transaction, Block};
 use crate::core::error::AnyaError;
+use bitcoin::{Block, Transaction};
 
 /// Bitcoin Protocol Compliance Level
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -101,25 +101,25 @@ impl BitcoinProtocol {
     pub fn verify_with_policy(&self, tx: &Transaction) -> Result<(), AnyaError> {
         // First run standard verification
         self.verify_tx(tx)?;
-        
+
         // Then apply compliance-level specific checks
         match self.compliance_level {
             BPCLevel::Basic => {
                 // Basic compliance checks
                 Ok(())
-            },
+            }
             BPCLevel::BPC1 => {
                 // BPC-1 compliance checks
                 Ok(())
-            },
+            }
             BPCLevel::BPC2 => {
-                // BPC-2 compliance checks  
+                // BPC-2 compliance checks
                 Ok(())
-            },
+            }
             BPCLevel::BPC3 => {
                 // BPC-3 compliance checks (most strict)
                 Ok(())
-            },
+            }
         }
     }
 }

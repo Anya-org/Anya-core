@@ -1,5 +1,5 @@
 //! Digital Signature Module
-//! 
+//!
 //! This module provides cryptographic signature functionality for Bitcoin security.
 
 use std::error::Error;
@@ -25,7 +25,11 @@ pub struct Signature {
 }
 
 /// Sign a message with the provided private key
-pub fn sign(message: &[u8], private_key: &[u8], algorithm: SignatureAlgorithm) -> Result<Signature, Box<dyn Error>> {
+pub fn sign(
+    message: &[u8],
+    private_key: &[u8],
+    algorithm: SignatureAlgorithm,
+) -> Result<Signature, Box<dyn Error>> {
     // Placeholder implementation
     // In a real implementation, we would use a crypto library like secp256k1, etc.
     let sig_len = match algorithm {
@@ -33,7 +37,7 @@ pub fn sign(message: &[u8], private_key: &[u8], algorithm: SignatureAlgorithm) -
         SignatureAlgorithm::SchnorrSecp256k1 => 64,
         SignatureAlgorithm::Ed25519 => 64,
     };
-    
+
     Ok(Signature {
         bytes: vec![0u8; sig_len],
         algorithm,
@@ -41,19 +45,30 @@ pub fn sign(message: &[u8], private_key: &[u8], algorithm: SignatureAlgorithm) -
 }
 
 /// Verify a signature against a message and public key
-pub fn verify(message: &[u8], signature: &Signature, public_key: &[u8]) -> Result<bool, Box<dyn Error>> {
+pub fn verify(
+    message: &[u8],
+    signature: &Signature,
+    public_key: &[u8],
+) -> Result<bool, Box<dyn Error>> {
     // Placeholder implementation
     // In a real implementation, we would use a crypto library like secp256k1, etc.
     Ok(true)
 }
 
 /// Sign a message with ECDSA using the secp256k1 curve (Bitcoin standard)
-pub fn ecdsa_sign_secp256k1(message: &[u8], private_key: &[u8]) -> Result<Signature, Box<dyn Error>> {
+pub fn ecdsa_sign_secp256k1(
+    message: &[u8],
+    private_key: &[u8],
+) -> Result<Signature, Box<dyn Error>> {
     sign(message, private_key, SignatureAlgorithm::EcdsaSecp256k1)
 }
 
 /// Verify an ECDSA signature using the secp256k1 curve (Bitcoin standard)
-pub fn ecdsa_verify_secp256k1(message: &[u8], signature: &[u8], public_key: &[u8]) -> Result<bool, Box<dyn Error>> {
+pub fn ecdsa_verify_secp256k1(
+    message: &[u8],
+    signature: &[u8],
+    public_key: &[u8],
+) -> Result<bool, Box<dyn Error>> {
     let sig = Signature {
         bytes: signature.to_vec(),
         algorithm: SignatureAlgorithm::EcdsaSecp256k1,
@@ -62,12 +77,19 @@ pub fn ecdsa_verify_secp256k1(message: &[u8], signature: &[u8], public_key: &[u8
 }
 
 /// Sign a message with Schnorr using the secp256k1 curve (Bitcoin Taproot)
-pub fn schnorr_sign_secp256k1(message: &[u8], private_key: &[u8]) -> Result<Signature, Box<dyn Error>> {
+pub fn schnorr_sign_secp256k1(
+    message: &[u8],
+    private_key: &[u8],
+) -> Result<Signature, Box<dyn Error>> {
     sign(message, private_key, SignatureAlgorithm::SchnorrSecp256k1)
 }
 
 /// Verify a Schnorr signature using the secp256k1 curve (Bitcoin Taproot)
-pub fn schnorr_verify_secp256k1(message: &[u8], signature: &[u8], public_key: &[u8]) -> Result<bool, Box<dyn Error>> {
+pub fn schnorr_verify_secp256k1(
+    message: &[u8],
+    signature: &[u8],
+    public_key: &[u8],
+) -> Result<bool, Box<dyn Error>> {
     let sig = Signature {
         bytes: signature.to_vec(),
         algorithm: SignatureAlgorithm::SchnorrSecp256k1,

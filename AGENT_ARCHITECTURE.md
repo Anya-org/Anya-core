@@ -16,8 +16,8 @@ Anya is a next-generation, multi-dimensional intelligent agent system designed t
   - Cross-chain operations
   - Zero-knowledge proofs
 
-- **Dart Mobile Integration**
-  - Flutter-based UI components
+- **React Mobile Integration**
+  - React-based UI components
   - Mobile-optimized ML models
   - Secure key management
   - Real-time analytics display

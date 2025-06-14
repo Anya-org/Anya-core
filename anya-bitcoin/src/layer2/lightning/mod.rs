@@ -1,6 +1,6 @@
-use crate::layer2::traits::{Proposal, ContractExecutor, FederationMLHook};
-use crate::prelude::{AnyaError, AnyaResult, Layer2Protocol};
 use crate::layer2::framework::ProtocolConfig;
+use crate::layer2::traits::{ContractExecutor, FederationMLHook, Proposal};
+use crate::prelude::{AnyaError, AnyaResult, Layer2Protocol};
 use async_trait::async_trait;
 use tracing::info;
 
@@ -26,11 +26,11 @@ impl ProtocolConfig for LightningConfig {
     fn protocol_name(&self) -> &str {
         "lightning"
     }
-    
+
     fn network_type(&self) -> &str {
         self.network.as_deref().unwrap_or("testnet")
     }
-    
+
     fn clone_box(&self) -> Box<dyn ProtocolConfig> {
         Box::new(self.clone())
     }
@@ -54,7 +54,9 @@ impl LightningClient {
         if let Some(protocol) = &self.protocol {
             protocol.init().await
         } else {
-            Err(AnyaError::NotImplemented("Lightning protocol not initialized".to_string()))
+            Err(AnyaError::NotImplemented(
+                "Lightning protocol not initialized".to_string(),
+            ))
         }
     }
 }
@@ -98,7 +100,10 @@ impl Layer2Protocol for LightningProtocol {
         self.initialized && self.connected
     }
     async fn execute_command(&self, command: &str, _args: &[&str]) -> AnyaResult<String> {
-        Ok(format!("Executed command '{}' on Lightning protocol", command))
+        Ok(format!(
+            "Executed command '{}' on Lightning protocol",
+            command
+        ))
     }
 }
 
@@ -111,9 +116,15 @@ pub struct LightningProposal {
 }
 
 impl Proposal for LightningProposal {
-    fn id(&self) -> &str { &self.id }
-    fn action(&self) -> &str { &self.action }
-    fn data(&self) -> &std::collections::HashMap<String, String> { &self.data }
+    fn id(&self) -> &str {
+        &self.id
+    }
+    fn action(&self) -> &str {
+        &self.action
+    }
+    fn data(&self) -> &std::collections::HashMap<String, String> {
+        &self.data
+    }
 }
 
 /// LightningManagerExt: Extensible manager for Lightning flows (top-layer, advanced)
@@ -129,11 +140,17 @@ impl LightningManagerExt {
             ml_hook: None,
         }
     }
-    pub fn with_contract_executor(mut self, exec: Box<dyn ContractExecutor<LightningProposal> + Send + Sync>) -> Self {
+    pub fn with_contract_executor(
+        mut self,
+        exec: Box<dyn ContractExecutor<LightningProposal> + Send + Sync>,
+    ) -> Self {
         self.contract_executor = Some(exec);
         self
     }
-    pub fn with_ml_hook(mut self, hook: Box<dyn FederationMLHook<LightningProposal> + Send + Sync>) -> Self {
+    pub fn with_ml_hook(
+        mut self,
+        hook: Box<dyn FederationMLHook<LightningProposal> + Send + Sync>,
+    ) -> Self {
         self.ml_hook = Some(hook);
         self
     }
@@ -159,5 +176,3 @@ impl LightningManagerExt {
 
 // --- Anya-core: Lightning module now supports top-layer extensibility for contract execution and ML hooks ---
 // --- Use LightningManagerExt for advanced, production-grade flows ---
-
-

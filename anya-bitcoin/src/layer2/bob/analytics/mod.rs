@@ -17,7 +17,7 @@ impl HybridAnalyticsEngine {
             config: config.clone(),
         })
     }
-    
+
     /// Collect metrics from the BOB network
     pub fn collect_metrics(&self) -> Result<Metrics, Box<dyn std::error::Error>> {
         // In a real implementation, this would collect metrics from the BOB network
@@ -43,4 +43,3 @@ pub struct Metrics {
     /// Network usage metrics
     pub network_usage: HashMap<String, f64>,
 }
-

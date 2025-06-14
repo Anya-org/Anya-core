@@ -3,18 +3,18 @@ use std::error::Error;
 impl DaoGovernance {
     // #[dao_label(DaoLabel::DAO3)]
     pub fn verify_dao3_compliance(&self) -> bool {
-        self.quadratic_voting_enabled &&
-        self.delegated_authority.active &&
-        self.cross_chain_governance.is_some() &&
-        self.legal_wrappers.is_implemented()
+        self.quadratic_voting_enabled
+            && self.delegated_authority.active
+            && self.cross_chain_governance.is_some()
+            && self.legal_wrappers.is_implemented()
     }
 }
 
+use anyhow::Result;
+use chrono::prelude::*;
 /// Implement DAO governance according to BDF v2.5
 use std::collections::HashMap;
 use std::sync::Arc;
-use anyhow::Result;
-use chrono::prelude::*;
 
 #[allow(dead_code)]
 pub struct DaoGovernance {
@@ -31,8 +31,7 @@ pub struct DaoGovernance {
 }
 
 #[derive(Debug)]
-pub struct DaoConfig {
-}
+pub struct DaoConfig {}
 
 #[allow(dead_code)]
 pub struct Proposal {
@@ -79,7 +78,9 @@ pub struct LegalWrappers {
 
 impl LegalWrappers {
     pub fn is_implemented(&self) -> bool {
-        !self.jurisdiction.is_empty() && !self.legal_entity_type.is_empty() && self.is_dao_recognized
+        !self.jurisdiction.is_empty()
+            && !self.legal_entity_type.is_empty()
+            && self.is_dao_recognized
     }
 }
 
@@ -131,7 +132,7 @@ impl CrossChainBridge for DefaultCrossChainBridge {
         // Simple implementation - just succeed for now
         Ok(())
     }
-    
+
     fn execute_impact(&self, _impact: &CrossChainImpact) -> Result<()> {
         // Simple implementation - just succeed for now
         Ok(())
@@ -151,13 +152,17 @@ impl DaoGovernance {
     pub async fn initialize(config: DaoConfig) -> Result<Arc<Self>> {
         // Create default dependencies
         let security_audit = Arc::new(SecurityAudit::new());
-        
+
         // Create a default cross-chain bridge
         let cross_chain_bridge = Arc::new(DefaultCrossChainBridge {});
-        
-        Ok(Arc::new(Self::new(config, cross_chain_bridge, security_audit)))
+
+        Ok(Arc::new(Self::new(
+            config,
+            cross_chain_bridge,
+            security_audit,
+        )))
     }
-    
+
     pub fn new(
         config: DaoConfig,
         cross_chain_bridge: Arc<dyn CrossChainBridge>,
@@ -265,7 +270,7 @@ impl DaoGovernance {
             message: "Proposal executed successfully".to_string(),
         })
     }
-    
+
     // Additional required methods
 }
 
@@ -284,7 +289,7 @@ impl Default for DaoGovernance {
     fn default() -> Self {
         let security_audit = Arc::new(SecurityAudit::new());
         let cross_chain_bridge = Arc::new(DefaultCrossChainBridge {});
-        
+
         Self {
             proposals: HashMap::new(),
             voters: HashMap::new(),

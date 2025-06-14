@@ -5,34 +5,34 @@
 // This module provides comprehensive wallet functionality with high security,
 // privacy, and protocol compliance ratings.
 
-use std::collections::HashMap;
-use std::sync::{Arc, Mutex};
-use std::str::FromStr;
-use bitcoin::secp256k1::{Secp256k1, SecretKey};
-use bitcoin::{Network, Address, Transaction, TxOut, OutPoint, Txid};
-use bitcoin::absolute::LockTime;
-use bitcoin::hashes::Hash;
 use crate::bitcoin::error::BitcoinError;
-use crate::{AnyaResult, AnyaError};
 use crate::bitcoin::interface::BitcoinInterface;
-use bitcoin::{ScriptBuf, Amount};
-use std::path::{Path, PathBuf};
-use bitcoin::bip32::DerivationPath;
-use bitcoin::psbt::Psbt as PSBT;
-use thiserror::Error;
-use log::{error};
-use serde::{Serialize, Deserialize};
+use crate::{AnyaError, AnyaResult};
 use async_trait::async_trait;
+use bitcoin::absolute::LockTime;
+use bitcoin::bip32::DerivationPath;
+use bitcoin::hashes::Hash;
+use bitcoin::psbt::Psbt as PSBT;
+use bitcoin::secp256k1::{Secp256k1, SecretKey};
+use bitcoin::{Address, Network, OutPoint, Transaction, TxOut, Txid};
+use bitcoin::{Amount, ScriptBuf};
+use log::error;
+use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
+use std::path::{Path, PathBuf};
+use std::str::FromStr;
+use std::sync::{Arc, Mutex};
+use thiserror::Error;
 
 pub mod bip32;
 pub mod transactions;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum WalletType {
-    Standard,          // Basic Bitcoin wallet
-    Taproot,           // Bitcoin with Taproot support
-    LightningEnabled,  // Bitcoin with Lightning support
-    MultiChain,        // Support for multiple chains
+    Standard,         // Basic Bitcoin wallet
+    Taproot,          // Bitcoin with Taproot support
+    LightningEnabled, // Bitcoin with Lightning support
+    MultiChain,       // Support for multiple chains
 }
 
 pub struct WalletConfig {
@@ -68,10 +68,10 @@ pub trait AddressManager {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum AddressType {
-    Legacy,    // P2PKH
-    SegWit,    // P2WPKH
+    Legacy,       // P2PKH
+    SegWit,       // P2WPKH
     NestedSegWit, // P2SH-P2WPKH
-    Taproot,   // P2TR
+    Taproot,      // P2TR
 }
 
 pub trait TransactionManager {
@@ -81,7 +81,7 @@ pub trait TransactionManager {
         _fee_rate: f64,
         _options: transactions::TxOptions,
     ) -> AnyaResult<Transaction>;
-    
+
     fn sign_transaction(&self, tx: &mut Transaction) -> AnyaResult<()>;
     fn broadcast_transaction(&self, tx: &Transaction) -> AnyaResult<String>;
     fn get_transaction(&self, txid: &str) -> AnyaResult<Option<Transaction>>;
@@ -99,21 +99,21 @@ pub trait UnifiedWallet: KeyManager + AddressManager + TransactionManager + Bala
     fn name(&self) -> &str;
     fn wallet_type(&self) -> WalletType;
     fn network(&self) -> Network;
-    
+
     // Chain-specific operations
     fn get_stacks_address(&self) -> AnyaResult<String>;
     fn get_rsk_address(&self) -> AnyaResult<String>;
     fn get_liquid_address(&self) -> AnyaResult<String>;
-    
+
     // Asset management
     fn add_asset(&self, asset_id: &str, name: &str, asset_type: &str) -> AnyaResult<()>;
     fn remove_asset(&self, asset_id: &str) -> AnyaResult<()>;
     fn get_assets(&self) -> AnyaResult<Vec<Asset>>;
-    
+
     // Key export/import
     fn export_xpriv(&self, password: &str) -> AnyaResult<String>;
     fn import_xpriv(&self, xpriv: &str, password: &str) -> AnyaResult<()>;
-    
+
     // Backup management
     fn backup(&self, path: &str, password: &str) -> AnyaResult<()>;
     fn restore(&self, path: &str, password: &str) -> AnyaResult<()>;
@@ -152,7 +152,7 @@ impl Wallet {
             bitcoin_client,
         }
     }
-    
+
     pub fn initialize(&self, seed_phrase: Option<&str>, password: Option<&str>) -> AnyaResult<()> {
         // Generate or recover seed
         let seed = if let Some(phrase) = seed_phrase {
@@ -160,28 +160,36 @@ impl Wallet {
         } else {
             bip32::generate_seed(password.unwrap_or(""))?
         };
-        
-        let mut seed_guard = self.seed.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
+
+        let mut seed_guard = self
+            .seed
+            .lock()
+            .map_err(|e| format!("Mutex lock error: {}", e))?;
         *seed_guard = Some(seed);
-        
+
         // Generate initial addresses
         self.init_addresses()?;
-        
+
         Ok(())
     }
-    
+
     fn init_addresses(&self) -> AnyaResult<()> {
-        let mut addresses = self.addresses.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
-        
+        let mut addresses = self
+            .addresses
+            .lock()
+            .map_err(|e| format!("Mutex lock error: {}", e))?;
+
         // Generate 20 addresses of each type
         for address_type in [
             AddressType::Legacy,
             AddressType::SegWit,
             AddressType::NestedSegWit,
             AddressType::Taproot,
-        ].iter() {
+        ]
+        .iter()
+        {
             let mut type_addresses = Vec::new();
-            
+
             for i in 0..20 {
                 let path = match address_type {
                     AddressType::Legacy => format!("m/44'/0'/0'/0/{}", i),
@@ -189,100 +197,115 @@ impl Wallet {
                     AddressType::NestedSegWit => format!("m/49'/0'/0'/0/{}", i),
                     AddressType::Taproot => format!("m/86'/0'/0'/0/{}", i),
                 };
-                
+
                 let secret_key = self.derive_key(&path)?;
-                let public_key = bitcoin::secp256k1::PublicKey::from_secret_key(&self.secp, &secret_key);
-                
+                let public_key =
+                    bitcoin::secp256k1::PublicKey::from_secret_key(&self.secp, &secret_key);
+
                 // Convert to bitcoin::PublicKey
                 let bitcoin_pubkey = bitcoin::PublicKey::new(public_key);
                 // Get compressed public key for p2wpkh and p2shwpkh
-                let compressed_pubkey = bitcoin::key::CompressedPublicKey::from_slice(&bitcoin_pubkey.inner.serialize())?;
-                
+                let compressed_pubkey = bitcoin::key::CompressedPublicKey::from_slice(
+                    &bitcoin_pubkey.inner.serialize(),
+                )?;
+
                 let address = match address_type {
                     AddressType::Legacy => Address::p2pkh(&bitcoin_pubkey, self.config.network),
                     AddressType::SegWit => Address::p2wpkh(&compressed_pubkey, self.config.network),
-                    AddressType::NestedSegWit => Address::p2shwpkh(&compressed_pubkey, self.config.network),
+                    AddressType::NestedSegWit => {
+                        Address::p2shwpkh(&compressed_pubkey, self.config.network)
+                    }
                     AddressType::Taproot => {
                         let xonly = bitcoin::secp256k1::XOnlyPublicKey::from(public_key);
                         Address::p2tr(&self.secp, xonly, None, self.config.network)
-                    },
+                    }
                 };
-                
+
                 type_addresses.push(address);
             }
-            
+
             addresses.insert(*address_type, type_addresses);
         }
-        
+
         Ok(())
     }
 }
 
 impl KeyManager for Wallet {
     fn derive_key(&self, path: &str) -> AnyaResult<SecretKey> {
-        let seed_guard = self.seed.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
-        let seed = seed_guard.as_ref()
+        let seed_guard = self
+            .seed
+            .lock()
+            .map_err(|e| format!("Mutex lock error: {}", e))?;
+        let seed = seed_guard
+            .as_ref()
             .ok_or_else(|| BitcoinError::Wallet("Wallet not initialized".to_string()))?;
-        
+
         Ok(bip32::derive_key_from_seed(seed, path)
             .map_err(|e| AnyaError::Bitcoin(e.to_string()))?)
     }
-    
+
     fn get_public_key(&self, path: &str) -> AnyaResult<bitcoin::secp256k1::PublicKey> {
         let private_key = self.derive_key(path)?;
         let public_key = bitcoin::secp256k1::PublicKey::from_secret_key(&self.secp, &private_key);
         Ok(public_key)
     }
-    
+
     fn sign_message(&self, message: &[u8], path: &str) -> AnyaResult<Vec<u8>> {
         let private_key = self.derive_key(path)?;
-        
+
         // Hash the message with SHA256
         let hash = bitcoin::hashes::sha256::Hash::hash(message);
         let message_hash = bitcoin::secp256k1::Message::from_digest(hash.to_byte_array());
-        
+
         let signature = self.secp.sign_ecdsa(&message_hash, &private_key);
         Ok(signature.serialize_der().to_vec())
     }
-    
+
     fn verify_message(&self, message: &[u8], signature: &[u8], path: &str) -> AnyaResult<bool> {
         let public_key = self.get_public_key(path)?;
-        
+
         // Hash the message with SHA256
         let hash = bitcoin::hashes::sha256::Hash::hash(message);
         let message_hash = bitcoin::secp256k1::Message::from_digest(hash.to_byte_array());
-        
+
         let signature = bitcoin::secp256k1::ecdsa::Signature::from_der(signature)
             .map_err(|e| BitcoinError::Wallet(format!("Invalid signature: {}", e)))?;
-        
-        Ok(self.secp.verify_ecdsa(&message_hash, &signature, &public_key).is_ok())
+
+        Ok(self
+            .secp
+            .verify_ecdsa(&message_hash, &signature, &public_key)
+            .is_ok())
     }
 }
 
 impl AddressManager for Wallet {
     fn get_new_address(&self, address_type: AddressType) -> AnyaResult<Address> {
-        let mut addresses = self.addresses.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
-        
-        let type_addresses = addresses.entry(address_type)
-            .or_insert_with(Vec::new);
-        
+        let mut addresses = self
+            .addresses
+            .lock()
+            .map_err(|e| format!("Mutex lock error: {}", e))?;
+
+        let type_addresses = addresses.entry(address_type).or_insert_with(Vec::new);
+
         let index = type_addresses.len() as u32;
-        
+
         let path = match address_type {
             AddressType::Legacy => format!("m/44'/0'/0'/0/{}", index),
             AddressType::SegWit => format!("m/84'/0'/0'/0/{}", index),
             AddressType::NestedSegWit => format!("m/49'/0'/0'/0/{}", index),
             AddressType::Taproot => format!("m/86'/0'/0'/0/{}", index),
         };
-        
+
         let secret_key = self.derive_key(&path)?;
         let public_key = bitcoin::secp256k1::PublicKey::from_secret_key(&self.secp, &secret_key);
-        
+
         // Convert to bitcoin::PublicKey
         let bitcoin_pubkey = bitcoin::PublicKey::new(public_key);
         // Get compressed public key for p2wpkh and p2shwpkh
-        let compressed_pubkey = bitcoin::key::CompressedPublicKey::from_slice(&bitcoin_pubkey.inner.serialize())?;
-        
+        let compressed_pubkey =
+            bitcoin::key::CompressedPublicKey::from_slice(&bitcoin_pubkey.inner.serialize())?;
+
         let address = match address_type {
             AddressType::Legacy => Address::p2pkh(&bitcoin_pubkey, self.config.network),
             AddressType::SegWit => Address::p2wpkh(&compressed_pubkey, self.config.network),
@@ -290,23 +313,26 @@ impl AddressManager for Wallet {
             AddressType::Taproot => {
                 let xonly = bitcoin::secp256k1::XOnlyPublicKey::from(public_key);
                 Address::p2tr(&self.secp, xonly, None, self.config.network)
-            },
+            }
         };
-        
+
         type_addresses.push(address.clone());
-        
+
         Ok(address)
     }
-    
+
     fn get_address(&self, index: u32, address_type: AddressType) -> AnyaResult<Address> {
-        let addresses = self.addresses.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
-        
+        let addresses = self
+            .addresses
+            .lock()
+            .map_err(|e| format!("Mutex lock error: {}", e))?;
+
         if let Some(type_addresses) = addresses.get(&address_type) {
             if let Some(address) = type_addresses.get(index as usize) {
                 return Ok(address.clone());
             }
         }
-        
+
         // Address not found, derive it
         let path = match address_type {
             AddressType::Legacy => format!("m/44'/0'/0'/0/{}", index),
@@ -314,15 +340,16 @@ impl AddressManager for Wallet {
             AddressType::NestedSegWit => format!("m/49'/0'/0'/0/{}", index),
             AddressType::Taproot => format!("m/86'/0'/0'/0/{}", index),
         };
-        
+
         let secret_key = self.derive_key(&path)?;
         let public_key = bitcoin::secp256k1::PublicKey::from_secret_key(&self.secp, &secret_key);
-        
+
         // Convert to bitcoin::PublicKey
         let bitcoin_pubkey = bitcoin::PublicKey::new(public_key);
         // Get compressed public key for p2wpkh and p2shwpkh
-        let compressed_pubkey = bitcoin::key::CompressedPublicKey::from_slice(&bitcoin_pubkey.inner.serialize())?;
-        
+        let compressed_pubkey =
+            bitcoin::key::CompressedPublicKey::from_slice(&bitcoin_pubkey.inner.serialize())?;
+
         let address = match address_type {
             AddressType::Legacy => Address::p2pkh(&bitcoin_pubkey, self.config.network),
             AddressType::SegWit => Address::p2wpkh(&compressed_pubkey, self.config.network),
@@ -330,15 +357,18 @@ impl AddressManager for Wallet {
             AddressType::Taproot => {
                 let xonly = bitcoin::secp256k1::XOnlyPublicKey::from(public_key);
                 Address::p2tr(&self.secp, xonly, None, self.config.network)
-            },
+            }
         };
-        
+
         Ok(address)
     }
-    
+
     fn is_address_mine(&self, address: &str) -> AnyaResult<bool> {
-        let addresses = self.addresses.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
-        
+        let addresses = self
+            .addresses
+            .lock()
+            .map_err(|e| format!("Mutex lock error: {}", e))?;
+
         for type_addresses in addresses.values() {
             for addr in type_addresses {
                 if addr.to_string() == address {
@@ -346,18 +376,21 @@ impl AddressManager for Wallet {
                 }
             }
         }
-        
+
         Ok(false)
     }
-    
+
     fn get_all_addresses(&self) -> AnyaResult<Vec<Address>> {
-        let addresses = self.addresses.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
-        
+        let addresses = self
+            .addresses
+            .lock()
+            .map_err(|e| format!("Mutex lock error: {}", e))?;
+
         let mut result = Vec::new();
         for type_addresses in addresses.values() {
             result.extend(type_addresses.clone());
         }
-        
+
         Ok(result)
     }
 }
@@ -371,20 +404,20 @@ impl TransactionManager for Wallet {
     ) -> AnyaResult<Transaction> {
         // Simplified implementation
         let mut tx_outs = Vec::new();
-        
+
         for (addr, amount) in outputs {
             let script_pubkey = Address::from_str(&addr)
                 .map_err(|e| BitcoinError::Wallet(format!("Invalid address: {}", e)))?
                 .require_network(self.config.network)
                 .map_err(|e| BitcoinError::Wallet(format!("Network mismatch: {}", e)))?
                 .script_pubkey();
-            
+
             tx_outs.push(TxOut {
                 value: Amount::from_sat(amount),
                 script_pubkey,
             });
         }
-        
+
         // In a real implementation, we would select UTXOs, create inputs, etc.
         // For simplicity, we're returning a dummy transaction
         Ok(Transaction {
@@ -394,22 +427,22 @@ impl TransactionManager for Wallet {
             output: tx_outs,
         })
     }
-    
+
     fn sign_transaction(&self, _tx: &mut Transaction) -> AnyaResult<()> {
         // Simplified implementation
         Ok(())
     }
-    
+
     fn broadcast_transaction(&self, tx: &Transaction) -> AnyaResult<String> {
         // Simplified implementation
         Ok(tx.compute_txid().to_string())
     }
-    
+
     fn get_transaction(&self, _txid: &str) -> AnyaResult<Option<Transaction>> {
         // Simplified implementation
         Ok(None)
     }
-    
+
     fn get_transactions(&self, _limit: usize, _offset: usize) -> AnyaResult<Vec<Transaction>> {
         // Simplified implementation
         Ok(vec![])
@@ -421,30 +454,36 @@ impl BalanceManager for Wallet {
         // Simplified implementation
         Ok(0)
     }
-    
+
     fn get_unconfirmed_balance(&self) -> AnyaResult<u64> {
         // Simplified implementation
         Ok(0)
     }
-    
+
     fn get_asset_balance(&self, asset_id: &str) -> AnyaResult<u64> {
-        let assets = self.assets.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
-        
+        let assets = self
+            .assets
+            .lock()
+            .map_err(|e| format!("Mutex lock error: {}", e))?;
+
         if let Some(asset) = assets.get(asset_id) {
             Ok(asset.balance)
         } else {
             Err(BitcoinError::Wallet(format!("Asset not found: {}", asset_id)).into())
         }
     }
-    
+
     fn get_all_asset_balances(&self) -> AnyaResult<HashMap<String, u64>> {
-        let assets = self.assets.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
-        
+        let assets = self
+            .assets
+            .lock()
+            .map_err(|e| format!("Mutex lock error: {}", e))?;
+
         let mut balances = HashMap::new();
         for (id, asset) in assets.iter() {
             balances.insert(id.clone(), asset.balance);
         }
-        
+
         Ok(balances)
     }
 }
@@ -453,49 +492,52 @@ impl UnifiedWallet for Wallet {
     fn name(&self) -> &str {
         &self.config.name
     }
-    
+
     fn wallet_type(&self) -> WalletType {
         self.config.wallet_type.clone()
     }
-    
+
     fn network(&self) -> Network {
         self.config.network
     }
-    
+
     fn get_stacks_address(&self) -> AnyaResult<String> {
         // Derive a Stacks address from the same seed
         let _secret_key = self.derive_key("m/44'/5757'/0'/0/0")?;
-        
+
         // In a real implementation, this would convert the key to a Stacks address
         // For simplicity, we're returning a dummy address
         Ok("ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG".to_string())
     }
-    
+
     fn get_rsk_address(&self) -> AnyaResult<String> {
         // Derive an RSK address from the same seed
         let _secret_key = self.derive_key("m/44'/137'/0'/0/0")?;
-        
+
         // In a real implementation, this would convert the key to an RSK address
         // For simplicity, we're returning a dummy address
         Ok("0x931D387731bBbC988B312206c74F77D004D6B84b".to_string())
     }
-    
+
     fn get_liquid_address(&self) -> AnyaResult<String> {
         // Derive a Liquid address from the same seed
         let _secret_key = self.derive_key("m/44'/2'/0'/0/0")?;
-        
+
         // In a real implementation, this would convert the key to a Liquid address
         // For simplicity, we're returning a dummy address
         Ok("VTpz1bNuQpB1yTwLRwvSEcFGN72vutq4K98EeU2hKaQNBfiNYRWs".to_string())
     }
-    
+
     fn add_asset(&self, asset_id: &str, name: &str, asset_type: &str) -> AnyaResult<()> {
-        let mut assets = self.assets.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
-        
+        let mut assets = self
+            .assets
+            .lock()
+            .map_err(|e| format!("Mutex lock error: {}", e))?;
+
         if assets.contains_key(asset_id) {
             return Err(BitcoinError::Wallet(format!("Asset already exists: {}", asset_id)).into());
         }
-        
+
         let asset = Asset {
             id: asset_id.to_string(),
             name: name.to_string(),
@@ -504,42 +546,48 @@ impl UnifiedWallet for Wallet {
             balance: 0,
             metadata: HashMap::new(),
         };
-        
+
         assets.insert(asset_id.to_string(), asset);
-        
+
         Ok(())
     }
-    
+
     fn remove_asset(&self, asset_id: &str) -> AnyaResult<()> {
-        let mut assets = self.assets.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
-        
+        let mut assets = self
+            .assets
+            .lock()
+            .map_err(|e| format!("Mutex lock error: {}", e))?;
+
         if assets.remove(asset_id).is_none() {
             return Err(BitcoinError::Wallet(format!("Asset not found: {}", asset_id)).into());
         }
-        
+
         Ok(())
     }
-    
+
     fn get_assets(&self) -> AnyaResult<Vec<Asset>> {
-        let assets = self.assets.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
+        let assets = self
+            .assets
+            .lock()
+            .map_err(|e| format!("Mutex lock error: {}", e))?;
         Ok(assets.values().cloned().collect())
     }
-    
+
     fn export_xpriv(&self, _password: &str) -> AnyaResult<String> {
         // Simplified implementation
         Err(BitcoinError::Wallet("Not implemented".to_string()).into())
     }
-    
+
     fn import_xpriv(&self, _xpriv: &str, _password: &str) -> AnyaResult<()> {
         // Simplified implementation
         Err(BitcoinError::Wallet("Not implemented".to_string()).into())
     }
-    
+
     fn backup(&self, _path: &str, _password: &str) -> AnyaResult<()> {
         // Simplified implementation
         Err(BitcoinError::Wallet("Not implemented".to_string()).into())
     }
-    
+
     fn restore(&self, _path: &str, _password: &str) -> AnyaResult<()> {
         // Simplified implementation
         Err(BitcoinError::Wallet("Not implemented".to_string()).into())
@@ -566,71 +614,71 @@ pub enum WalletError {
     /// Error related to the Bitcoin library
     #[error("Bitcoin error: {0}")]
     BitcoinError(String),
-    
+
     /// Error related to secp256k1
     #[error("Secp256k1 error: {0}")]
     Secp256k1Error(#[from] secp256k1::Error),
-    
+
     /// Error related to the BIP39 library
     #[error("BIP39 error: {0}")]
     Bip39Error(String),
-    
+
     /// Error related to descriptors
     #[error("Descriptor error: {0}")]
     DescriptorError(String),
-    
+
     /// Error related to wallet storage
     #[error("Wallet storage error: {0}")]
     StorageError(String),
-    
+
     /// Error related to wallet configuration
     #[error("Wallet configuration error: {0}")]
     ConfigError(String),
-    
+
     /// Error related to transaction creation
     #[error("Transaction creation error: {0}")]
     TransactionError(String),
-    
+
     /// Error related to PSBT operations
     #[error("PSBT error: {0}")]
     PsbtError(String),
-    
+
     /// Error related to signing operations
     #[error("Signing error: {0}")]
     SigningError(String),
-    
+
     /// Error related to blockchain synchronization
     #[error("Synchronization error: {0}")]
     SyncError(String),
-    
+
     /// Error related to address generation
     #[error("Address generation error: {0}")]
     AddressError(String),
-    
+
     /// Error related to fee estimation
     #[error("Fee estimation error: {0}")]
     FeeEstimationError(String),
-    
+
     /// RPC error
     #[error("RPC error: {0}")]
     RpcError(String),
-    
+
     /// Invalid parameters
     #[error("Invalid parameters: {0}")]
     InvalidParameters(String),
-    
+
     /// Insufficient funds
     #[error("Insufficient funds: {0}")]
     InsufficientFunds(String),
-    
+
     /// IO error
     #[error("IO error: {0}")]
     IoError(#[from] std::io::Error),
-    
+
     /// Serialization error
     #[error("Serialization error: {0}")]
     SerializationError(String),
-    
+
     /// UTXO management error
     #[error("UTXO management error: {0}")]
     UtxoError(String),
@@ -641,22 +689,22 @@ pub enum WalletError {
 pub struct Utxo {
     /// The outpoint of this UTXO
     pub outpoint: OutPoint,
-    
+
     /// The TxOut data
     pub txout: TxOut,
-    
+
     /// The redeem script (if available)
     pub redeem_script: Option<ScriptBuf>,
-    
+
     /// The witness script (if available)
     pub witness_script: Option<ScriptBuf>,
-    
+
     /// Confirmations (0 for unconfirmed)
     pub confirmations: u32,
-    
+
     /// Is this UTXO spendable (not locked or reserved)
     pub spendable: bool,
-    
+
     /// Is this UTXO coming from the wallet (vs a watch-only address)
     pub from_wallet: bool,
 }
@@ -666,28 +714,28 @@ pub struct Utxo {
 pub struct TransactionInfo {
     /// Transaction ID
     pub txid: Txid,
-    
+
     /// Complete transaction
     pub transaction: Transaction,
-    
+
     /// Block height (None if unconfirmed)
     pub block_height: Option<u32>,
-    
+
     /// Confirmations (0 for unconfirmed)
     pub confirmations: u32,
-    
+
     /// Fee in satoshis
     pub fee: Option<u64>,
-    
+
     /// Transaction time (from block)
     pub timestamp: Option<u64>,
-    
+
     /// Our inputs value (sum of wallet inputs)
     pub sent: u64,
-    
+
     /// Our outputs value (sum of wallet outputs)
     pub received: u64,
-    
+
     /// Labels associated with this transaction
     pub labels: Vec<String>,
 }
@@ -697,7 +745,7 @@ pub struct TransactionInfo {
 pub enum FeeRate {
     /// Satoshis per kilobyte
     SatPerKb(u64),
-    
+
     /// Satoshis per virtual byte
     SatPerVb(u64),
 }
@@ -710,7 +758,7 @@ impl FeeRate {
             FeeRate::SatPerVb(fee) => *fee,
         }
     }
-    
+
     /// Convert to satoshis per kilobyte
     pub fn to_sat_per_kb(&self) -> u64 {
         match self {
@@ -725,16 +773,16 @@ impl FeeRate {
 pub struct SyncState {
     /// Latest known block height
     pub block_height: u32,
-    
+
     /// Latest known block hash
     pub block_hash: String,
-    
+
     /// Latest scan time
     pub last_scan: u64,
-    
+
     /// Sync progress (0.0 to 1.0)
     pub progress: f64,
-    
+
     /// Is initial block download still in progress
     pub ibd: bool,
 }
@@ -744,64 +792,64 @@ pub struct SyncState {
 pub trait WalletTrait: Send + Sync {
     /// Initialize the wallet
     async fn init(&self) -> Result<(), WalletError>;
-    
+
     /// Generate a new receiving address
     async fn get_new_address(&self) -> Result<Address, WalletError>;
-    
+
     /// Get the current receiving address (without incrementing)
     async fn get_current_address(&self) -> Result<Address, WalletError>;
-    
+
     /// Get a change address
     async fn get_change_address(&self) -> Result<Address, WalletError>;
-    
+
     /// Check if an address belongs to this wallet
     async fn is_mine(&self, address: &Address) -> Result<bool, WalletError>;
-    
+
     /// Get all wallet addresses
     async fn list_addresses(&self) -> Result<Vec<Address>, WalletError>;
-    
+
     /// Get wallet balance
     async fn get_balance(&self) -> Result<u64, WalletError>;
-    
+
     /// Get wallet balance with details
     async fn get_detailed_balance(&self) -> Result<(u64, u64, u64), WalletError>;
-    
+
     /// List unspent UTXOs
     async fn list_utxos(&self) -> Result<Vec<Utxo>, WalletError>;
-    
+
     /// Get transaction history
     async fn get_transactions(&self) -> Result<Vec<TransactionInfo>, WalletError>;
-    
+
     /// Get transaction by ID
     async fn get_transaction(&self, txid: &Txid) -> Result<Option<TransactionInfo>, WalletError>;
-    
+
     /// Create a transaction
     async fn create_transaction(&self, params: TransactionParams) -> Result<PSBT, WalletError>;
-    
+
     /// Sign a transaction
     async fn sign_transaction(&self, psbt: &mut PSBT) -> Result<bool, WalletError>;
-    
+
     /// Broadcast a transaction
     async fn broadcast_transaction(&self, transaction: &Transaction) -> Result<Txid, WalletError>;
-    
+
     /// Get fee estimate for the given strategy
     async fn get_fee_rate(&self, strategy: FeeStrategy) -> Result<FeeRate, WalletError>;
-    
+
     /// Calculate fee for a transaction
     async fn calculate_fee(&self, psbt: &PSBT) -> Result<u64, WalletError>;
-    
+
     /// Synchronize the wallet with the blockchain
     async fn sync(&self) -> Result<SyncState, WalletError>;
-    
+
     /// Export wallet data
     async fn export(&self, path: &Path) -> Result<(), WalletError>;
-    
+
     /// Import wallet data
     async fn import(&self, path: &Path) -> Result<(), WalletError>;
-    
+
     /// Create backup
     async fn backup(&self, path: &Path) -> Result<(), WalletError>;
-    
+
     /// Get wallet information
     async fn get_info(&self) -> Result<WalletInfo, WalletError>;
 }
@@ -811,52 +859,52 @@ pub trait WalletTrait: Send + Sync {
 pub struct WalletInfo {
     /// Wallet name
     pub name: String,
-    
+
     /// Wallet version
     pub version: String,
-    
+
     /// Wallet format
     pub format: String,
-    
+
     /// Network
     pub network: Network,
-    
+
     /// Current balance
     pub balance: u64,
-    
+
     /// Unconfirmed balance
     pub unconfirmed_balance: u64,
-    
+
     /// Immature balance
     pub immature_balance: u64,
-    
+
     /// Number of keys
     pub keypools: u32,
-    
+
     /// Number of transactions
     pub tx_count: u32,
-    
+
     /// Keypool oldest
     pub keypool_oldest: u64,
-    
+
     /// Keypool size
     pub keypool_size: u32,
-    
+
     /// Payee requires witness
     pub private_keys_enabled: bool,
-    
+
     /// Unlocked until
     pub unlocked_until: Option<u64>,
-    
+
     /// HD seed version
     pub hdseedid: Option<String>,
-    
+
     /// Is the wallet avoiding reuse
     pub avoid_reuse: bool,
-    
+
     /// Scanning status
     pub scanning: bool,
-    
+
     /// Descriptors enabled
     pub descriptors: bool,
 }
@@ -865,10 +913,10 @@ pub struct WalletInfo {
 pub struct BitcoinWallet {
     /// Wallet configuration
     config: WalletConfig,
-    
+
     /// Wallet data storage
     storage: Arc<Mutex<WalletStorage>>,
-    
+
     /// Secp256k1 context
     secp: Secp256k1<bitcoin::secp256k1::All>,
 }
@@ -878,16 +926,16 @@ pub struct BitcoinWallet {
 struct WalletStorage {
     /// Wallet metadata
     metadata: WalletMetadata,
-    
+
     /// UTXOs
     utxos: HashMap<OutPoint, Utxo>,
-    
+
     /// Transactions
     transactions: HashMap<Txid, TransactionInfo>,
-    
+
     /// Address index mapping
     addresses: HashMap<String, AddressInfo>,
-    
+
     /// Current indexes
     indexes: WalletIndexes,
 }
@@ -897,19 +945,19 @@ struct WalletStorage {
 struct WalletMetadata {
     /// Wallet creation time
     created_at: u64,
-    
+
     /// Wallet last updated
     updated_at: u64,
-    
+
     /// Wallet version
     version: String,
-    
+
     /// Wallet network
     network: Network,
-    
+
     /// Wallet master fingerprint
     master_fingerprint: Option<[u8; 4]>,
-    
+
     /// Labels
     labels: HashMap<String, String>,
 }
@@ -938,13 +986,13 @@ pub struct AddressInfo {
 struct WalletIndexes {
     /// Next receive address index
     receive_index: u32,
-    
+
     /// Next change address index
     change_index: u32,
-    
+
     /// Last synced block
     last_block: Option<u32>,
-    
+
     /// Last sync time
     last_sync: Option<u64>,
 }
@@ -954,19 +1002,19 @@ struct WalletIndexes {
 pub enum FeeStrategy {
     /// Very low fee (might take long to confirm)
     VeryLow,
-    
+
     /// Low fee
     Low,
-    
+
     /// Medium fee (good balance)
     Medium,
-    
+
     /// High fee
     High,
-    
+
     /// Very high fee (for urgent transactions)
     VeryHigh,
-    
+
     /// Custom fee rate
     Custom(FeeRate),
 }
@@ -976,25 +1024,25 @@ pub enum FeeStrategy {
 pub struct TransactionParams {
     /// List of recipients with amounts
     pub recipients: Vec<(String, u64)>,
-    
+
     /// Optional coin selection (use specific UTXOs)
     pub utxos: Option<Vec<OutPoint>>,
-    
+
     /// Fee strategy
     pub fee_strategy: Option<FeeStrategy>,
-    
+
     /// Lock time
     pub lock_time: Option<u32>,
-    
+
     /// Enable RBF (Replace-By-Fee)
     pub enable_rbf: bool,
-    
+
     /// Optional change address (if not using the default)
     pub change_address: Option<String>,
-    
+
     /// Include metadata in an OP_RETURN output
     pub op_return_data: Option<Vec<u8>>,
-    
+
     /// Allow spending unconfirmed UTXOs
     pub allow_unconfirmed: bool,
 }
@@ -1004,22 +1052,22 @@ pub struct TransactionParams {
 pub enum CoinSelectionStrategy {
     /// Select largest UTXOs first
     LargestFirst,
-    
+
     /// Select smallest UTXOs first
     SmallestFirst,
-    
+
     /// Use oldest confirmed first
     OldestFirst,
-    
+
     /// Use random selection
     Random,
-    
+
     /// Optimize for privacy (avoid change)
     PrivacyOptimized,
-    
+
     /// Branch and bound algorithm
     BranchAndBound,
 }
 
-// Copyright (C) 2023-2025 Anya Project Contributors  
+// Copyright (C) 2023-2025 Anya Project Contributors
 // Last Modified: 2025-05-30

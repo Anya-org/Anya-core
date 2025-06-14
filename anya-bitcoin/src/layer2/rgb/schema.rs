@@ -71,4 +71,4 @@ pub struct Schema {
     pub fields: Vec<Field>,
     /// Schema metadata
     pub metadata: HashMap<String, String>,
-} 
+}

@@ -11,19 +11,19 @@ use std::collections::HashMap;
 pub struct TxOptions {
     /// Fee rate in satoshis per byte
     pub fee_rate: f64,
-    
+
     /// Replace-by-fee flag
     pub rbf: bool,
-    
+
     /// Transaction locktime
     pub locktime: Option<u32>,
-    
+
     /// Custom transaction inputs
     pub inputs: Option<Vec<Txid>>,
-    
+
     /// Custom change address
     pub change_address: Option<Address>,
-    
+
     /// Additional metadata
     pub metadata: HashMap<String, String>,
 }
@@ -39,4 +39,4 @@ impl Default for TxOptions {
             metadata: HashMap::new(),
         }
     }
-} 
+}

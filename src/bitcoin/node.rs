@@ -58,7 +58,7 @@ impl BitcoinNode {
     /// [AIR-3][AIS-3][BPC-3] Start the Bitcoin node connection
     pub async fn start(&self) -> AnyaResult<()> {
         let mut status = self.status.write().await;
-        
+
         // Simulate connection logic - in real implementation this would connect to Bitcoin Core
         status.connected = true;
         status.last_connection = Some(Utc::now());
@@ -91,9 +91,9 @@ impl BitcoinNode {
     /// [AIR-3][AIS-3][BPC-3] Get current block height
     pub async fn get_block_height(&self) -> AnyaResult<u64> {
         let status = self.status.read().await;
-        status.block_height.ok_or_else(|| {
-            AnyaError::Bitcoin("Block height not available".to_string())
-        })
+        status
+            .block_height
+            .ok_or_else(|| AnyaError::Bitcoin("Block height not available".to_string()))
     }
 
     /// [AIR-3][AIS-3][BPC-3] Get network information

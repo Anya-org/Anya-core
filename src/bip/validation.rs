@@ -1,8 +1,8 @@
 // [AIR-3][AIS-3][BPC-3][AIT-3] BIP Validation Implementation
 
+use serde::{Deserialize, Serialize};
 use std::error::Error;
 use std::fmt;
-use serde::{Serialize, Deserialize};
 
 /// Result type for BIP validation
 pub type Result<T> = std::result::Result<T, Box<dyn Error>>;
@@ -78,7 +78,7 @@ impl BipValidator for BitcoinConfig {
                 super::bip353::Bip353Status::Stable => Ok(ComplianceStatus::Compliant),
                 super::bip353::Bip353Status::Beta => Ok(ComplianceStatus::Partial),
             },
-            _ => Ok(ComplianceStatus::Missing)
+            _ => Ok(ComplianceStatus::Missing),
         }
     }
-} 
+}

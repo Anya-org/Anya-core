@@ -31,7 +31,7 @@ impl AIMetricCollector {
 
 pub struct TestReport {
     pub bitcoin: String,
-    pub dao: String, 
+    pub dao: String,
     pub ai: String,
     pub system: String,
 }
@@ -53,7 +53,7 @@ impl UnifiedTester {
         let bitcoin_health = self.bitcoin_validator.run_checks()?;
         let dao_compliance = self.dao_verifier.verify_dao3_rules()?;
         let ai_perf = self.ai_monitor.collect_metrics()?;
-        
+
         Ok(TestReport {
             bitcoin: bitcoin_health,
             dao: dao_compliance,
@@ -65,4 +65,4 @@ impl UnifiedTester {
     fn check_interconnections(&self) -> Result<String, Box<dyn Error>> {
         Ok("System interconnections verified".to_string())
     }
-} 
+}

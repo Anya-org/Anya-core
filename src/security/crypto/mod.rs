@@ -3,12 +3,13 @@
 //!
 //! This module provides cryptographic utilities for the Bitcoin security framework.
 
-
 pub mod random;
 
 // Re-export random number generator functions
-pub use random::{random_bytes, random_u64, random_u32, random_usize, 
-                 random_f64, random_in_range, random_bool, shuffle, reseed};
+pub use random::{
+    random_bool, random_bytes, random_f64, random_in_range, random_u32, random_u64, random_usize,
+    reseed, shuffle,
+};
 
 // Module for symmetric encryption (AES, ChaCha20)
 pub mod symmetric;
@@ -38,4 +39,4 @@ pub fn generate_iv(length_bytes: usize) -> Vec<u8> {
 /// Helper function to generate a secure nonce
 pub fn generate_nonce(length_bytes: usize) -> Vec<u8> {
     random_bytes(length_bytes)
-} 
+}

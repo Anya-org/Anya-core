@@ -23,10 +23,7 @@ pub struct AnyaInstaller {
 }
 
 impl AnyaInstaller {
-    pub fn new(
-        install_source: InstallationSource,
-        bitcoin_config: BitcoinConfig
-    ) -> Result<Self> {
+    pub fn new(install_source: InstallationSource, bitcoin_config: BitcoinConfig) -> Result<Self> {
         Ok(Self {
             installation_source: install_source,
             bitcoin_config,
@@ -76,7 +73,7 @@ impl AnyaInstaller {
 /// Protocol version checker
 pub mod protocol {
     use super::*;
-    
+
     pub fn verify_bip_support(required_bips: &[u32], installed_bips: &[u32]) -> Result<()> {
         let missing: Vec<_> = required_bips
             .iter()
@@ -86,17 +83,20 @@ pub mod protocol {
         if !missing.is_empty() {
             anyhow::bail!("Missing required BIPs: {:?}", missing);
         }
-        
+
         Ok(())
     }
 
     pub fn check_taproot_activation(height: u64) -> Result<()> {
-        const TAPROOT_ACTIVATION_HEIGHT: u64 = 709632;  // Mainnet activation
-        
+        const TAPROOT_ACTIVATION_HEIGHT: u64 = 709632; // Mainnet activation
+
         if height < TAPROOT_ACTIVATION_HEIGHT {
-            anyhow::bail!("Taproot not active until block {}", TAPROOT_ACTIVATION_HEIGHT);
+            anyhow::bail!(
+                "Taproot not active until block {}",
+                TAPROOT_ACTIVATION_HEIGHT
+            );
         }
-        
+
         Ok(())
     }
-} 
+}

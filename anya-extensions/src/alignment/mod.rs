@@ -1,7 +1,7 @@
 use anyhow::Result;
-use std::sync::Arc;
-use log::{info, error};
+use log::{error, info};
 use metrics::{counter, gauge, Counter, Gauge};
+use std::sync::Arc;
 use thiserror::Error;
 
 /// ML Registry for managing machine learning models and algorithms
@@ -12,9 +12,7 @@ pub struct MLRegistry {
 
 impl MLRegistry {
     pub fn new() -> Self {
-        Self {
-            models: Vec::new(),
-        }
+        Self { models: Vec::new() }
     }
 
     pub async fn get_components(&self) -> Result<Vec<String>> {
@@ -48,9 +46,7 @@ pub struct PostQuantumVerifier {
 
 impl PostQuantumVerifier {
     pub fn new() -> Self {
-        Self {
-            enabled: true,
-        }
+        Self { enabled: true }
     }
 
     pub async fn verify_signatures(&self) -> Result<()> {
@@ -72,9 +68,7 @@ pub struct AuditLogger {
 
 impl AuditLogger {
     pub fn new() -> Self {
-        Self {
-            events: Vec::new(),
-        }
+        Self { events: Vec::new() }
     }
 
     pub async fn log_event(&self, event: &str) -> Result<()> {
@@ -83,7 +77,10 @@ impl AuditLogger {
     }
 
     pub async fn log_alignment_plan(&self, plan: &AlignmentPlan) -> Result<()> {
-        log::info!("Alignment plan logged with {} recommendations", plan.recommendations.len());
+        log::info!(
+            "Alignment plan logged with {} recommendations",
+            plan.recommendations.len()
+        );
         Ok(())
     }
 }
@@ -120,7 +117,7 @@ impl SystemAnalysis {
     pub fn new() -> Self {
         Self {
             ml_components: Vec::new(),
-            active_protocols: Vec::new(), 
+            active_protocols: Vec::new(),
             system_metrics: std::collections::HashMap::new(),
             security_score: 92.0,
             bitcoin_compatibility: 95.0,
@@ -208,10 +205,12 @@ impl AlignmentManager {
 
         // Record metrics
         self.metrics.record_analysis(&analysis);
-        
+
         // Log analysis completion
-        self.audit_logger.log_event("system_analysis_complete").await?;
-        
+        self.audit_logger
+            .log_event("system_analysis_complete")
+            .await?;
+
         Ok(analysis)
     }
 
@@ -219,16 +218,16 @@ impl AlignmentManager {
     pub async fn propose_alignment(&self, analysis: SystemAnalysis) -> Result<AlignmentPlan> {
         // Create initial plan
         let plan = AlignmentPlan::new(analysis);
-        
+
         // Validate against Bitcoin Core requirements
         self.validate_bitcoin_core_alignment(&plan).await?;
-        
+
         // Validate security requirements including post-quantum
         self.validate_security_requirements(&plan).await?;
-        
+
         // Log proposed plan
         self.audit_logger.log_alignment_plan(&plan).await?;
-        
+
         Ok(plan)
     }
 
@@ -292,7 +291,8 @@ impl AlignmentMetrics {
 
     fn record_analysis(&self, analysis: &SystemAnalysis) {
         self.security_score.set(analysis.security_score);
-        self.bitcoin_compatibility.set(analysis.bitcoin_compatibility);
+        self.bitcoin_compatibility
+            .set(analysis.bitcoin_compatibility);
         self.alignment_operations.increment(1);
     }
 }

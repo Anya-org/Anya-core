@@ -3,43 +3,39 @@
 //! This module contains tests for the Bitcoin functionality.
 
 // [AIR-3][AIS-3][BPC-3][RES-3] Import only what's needed for tests
+use log::{error, info};
 use std::error::Error;
-use log::{info, error};
 // Empty bitcoin import removed as it's not used
 // use bitcoin::{};
-
-
-
-
 
 /// Runs all Bitcoin protocol tests to verify BPC-3 compliance
 pub fn run_all() -> Result<(), Box<dyn Error>> {
     info!("Running all Bitcoin tests...");
-    
+
     // Test Bitcoin Core connection
     match test_bitcoin_core_connection() {
         Ok(_) => info!("✅ Bitcoin Core connection test passed"),
         Err(e) => error!("❌ Bitcoin Core connection test failed: {}", e),
     }
-    
+
     // Test Taproot support (BIP-341)
     match test_taproot_support() {
         Ok(_) => info!("✅ Taproot support test passed"),
         Err(e) => error!("❌ Taproot support test failed: {}", e),
     }
-    
+
     // Test transaction validation
     match test_transaction_validation() {
         Ok(_) => info!("✅ Transaction validation test passed"),
         Err(e) => error!("❌ Transaction validation test failed: {}", e),
     }
-    
+
     // Test PSBT handling (BIP-174)
     match test_psbt_handling() {
         Ok(_) => info!("✅ PSBT handling test passed"),
         Err(e) => error!("❌ PSBT handling test failed: {}", e),
     }
-    
+
     info!("Bitcoin tests completed");
     Ok(())
 }
@@ -71,7 +67,7 @@ fn test_psbt_handling() -> Result<(), String> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_run_all() {
         // Test that run_all completes without panicking

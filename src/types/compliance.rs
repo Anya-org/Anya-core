@@ -55,10 +55,7 @@ impl Default for ProtocolCompliance {
 }
 
 impl ProtocolCompliance {
-    pub fn new(
-        support_level: BipSupportLevel,
-        verification_status: VerificationStatus,
-    ) -> Self {
+    pub fn new(support_level: BipSupportLevel, verification_status: VerificationStatus) -> Self {
         Self {
             support_level,
             verification_status,
@@ -67,10 +64,13 @@ impl ProtocolCompliance {
             missing_features: Vec::new(),
         }
     }
-    
+
     pub fn is_compliant(&self) -> bool {
-        matches!(self.verification_status, VerificationStatus::Passed) &&
-        matches!(self.support_level, BipSupportLevel::Full | BipSupportLevel::Partial)
+        matches!(self.verification_status, VerificationStatus::Passed)
+            && matches!(
+                self.support_level,
+                BipSupportLevel::Full | BipSupportLevel::Partial
+            )
     }
 }
 

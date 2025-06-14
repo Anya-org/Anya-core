@@ -2,8 +2,8 @@
 //!
 //! This module provides validation functions for Taproot-specific operations.
 
-use bitcoin::{Transaction, Script};
 use crate::core::error::AnyaResult;
+use bitcoin::{Script, Transaction};
 
 /// Taproot validator for transaction scripts and signatures
 #[derive(Debug, Clone, Default)]
@@ -20,9 +20,7 @@ impl TaprootValidator {
 
     /// Create a new Taproot validator with strict mode
     pub fn new_strict() -> Self {
-        Self {
-            strict_mode: true,
-        }
+        Self { strict_mode: true }
     }
 
     /// Validate a Taproot transaction

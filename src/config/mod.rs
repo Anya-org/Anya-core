@@ -1,5 +1,5 @@
-use std::path::{Path, PathBuf};
 use std::fs;
+use std::path::{Path, PathBuf};
 use std::result::Result;
 
 // Create our own BitcoinConfig since the import is not available
@@ -47,28 +47,30 @@ impl ConfigManager {
 
     pub fn validate_bips(&self) -> Result<BIPCompliance, std::io::Error> {
         let content = fs::read_to_string(&self.path)?;
-        
+
         // Parse configuration and check for BIP compliance
         let taproot_enabled = content.contains("taproot=1");
         let schnorr_enabled = content.contains("schnorr=1") || taproot_enabled; // Taproot implies Schnorr
-        
+
         // Extract PSBT version
         let psbt_version = if content.contains("psbt_version=") {
-            let line = content.lines()
+            let line = content
+                .lines()
                 .find(|line| line.starts_with("psbt_version="))
                 .unwrap_or("psbt_version=0");
-            
-            line.split('=').nth(1)
+
+            line.split('=')
+                .nth(1)
                 .and_then(|v| v.parse::<u8>().ok())
                 .unwrap_or(0)
         } else {
             0 // Default version
         };
-        
+
         Ok(BIPCompliance {
             taproot_enabled,
             schnorr_enabled,
             psbt_version,
         })
     }
-} 
+}

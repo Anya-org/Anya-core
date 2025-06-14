@@ -3,10 +3,10 @@ use std::error::Error;
 // Provides DID (Decentralized Identity) functionality
 // as part of the Web5 integration - [AIR-012] Operational Reliability
 
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use std::time::{SystemTime, UNIX_EPOCH};
-use serde::{Serialize, Deserialize};
 
 // Define Result type for Web5
 pub type Web5Result<T> = Result<T, Web5Error>;
@@ -16,25 +16,25 @@ pub type Web5Result<T> = Result<T, Web5Error>;
 pub enum Web5Error {
     #[error("Identity error: {0}")]
     Identity(String),
-    
+
     #[error("Protocol error: {0}")]
     Protocol(String),
-    
+
     #[error("Communication error: {0}")]
     Communication(String),
-    
+
     #[error("Storage error: {0}")]
     Storage(String),
-    
+
     #[error("Credential error: {0}")]
     Credential(String),
-    
+
     #[error("Not found: {0}")]
     NotFound(String),
-    
+
     #[error("DWN error: {0}")]
     DWNError(String),
-    
+
     #[error("Serialization error: {0}")]
     SerializationError(String),
 }
@@ -64,7 +64,7 @@ impl From<&str> for Web5Error {
 }
 
 /// DID Manager
-/// 
+///
 /// Core component responsible for decentralized identity management.
 /// Implements the ports and adapters pattern for extensibility.
 #[derive(Clone, Debug)]
@@ -78,7 +78,7 @@ pub struct DIDManager {
 }
 
 /// Decentralized Identifier
-/// 
+///
 /// Represents a DID with its document and private keys.
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct DID {
@@ -92,7 +92,7 @@ pub struct DID {
 }
 
 /// DID Document
-/// 
+///
 /// The public representation of a DID, containing verification methods
 /// and service endpoints as defined in the DID Core specification.
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -117,7 +117,7 @@ pub struct DIDDocument {
 }
 
 /// Verification Method
-/// 
+///
 /// A cryptographic mechanism used for authentication and
 /// digital signatures within a DID.
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -135,7 +135,7 @@ pub struct VerificationMethod {
 }
 
 /// JSON Web Key
-/// 
+///
 /// A cryptographic key representation in JSON format.
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct JWK {
@@ -156,7 +156,7 @@ pub struct JWK {
 }
 
 /// Service
-/// 
+///
 /// A service endpoint for a DID.
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Service {
@@ -178,12 +178,12 @@ impl DIDManager {
             method: method.to_string(),
         }
     }
-    
+
     /// Create a new DID with the configured method
     pub fn create_did(&self) -> Web5Result<DID> {
         // Generate a random ID for the DID
         let id = format!("did:{}:{}", self.method, generate_random_id());
-        
+
         // Create a basic DID document
         let document = DIDDocument {
             context: vec!["https://www.w3.org/ns/did/v1".to_string()],
@@ -193,38 +193,47 @@ impl DIDManager {
             assertion_method: Vec::new(),
             service: Vec::new(),
         };
-        
+
         // Create the DID
         let did = DID {
             id: id.clone(),
             document,
             private_keys: HashMap::new(),
         };
-        
+
         // Store the DID
         {
-            let mut dids = self.dids.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
+            let mut dids = self
+                .dids
+                .lock()
+                .map_err(|e| format!("Mutex lock error: {}", e))?;
             dids.insert(id.clone(), did.clone());
         }
-        
+
         Ok(did)
     }
-    
+
     /// Resolve a DID to its document
     pub fn resolve_did(&self, did: &str) -> Result<DIDDocument, Box<dyn Error>> {
         // First, check if we have the DID locally
-        let dids = self.dids.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
+        let dids = self
+            .dids
+            .lock()
+            .map_err(|e| format!("Mutex lock error: {}", e))?;
         if let Some(did_obj) = dids.get(did) {
             return Ok(did_obj.document.clone());
         }
-        
+
         // If not found locally, return an error (future: implement remote resolution)
         Err(format!("DID not found: {}", did).into())
     }
-    
+
     /// Set the default DID
     pub fn set_default_did(&mut self, did: &str) -> Result<(), Box<dyn Error>> {
-        let dids = self.dids.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
+        let dids = self
+            .dids
+            .lock()
+            .map_err(|e| format!("Mutex lock error: {}", e))?;
         if dids.contains_key(did) {
             self.default_did = Some(did.to_string());
             Ok(())
@@ -232,44 +241,56 @@ impl DIDManager {
             Err(format!("DID {} not found", did).into())
         }
     }
-    
+
     /// Get the default DID
     pub fn get_default_did(&self) -> Result<Option<String>, Box<dyn Error>> {
         Ok(self.default_did.clone())
     }
-    
+
     /// Sign data with a DID's private key
     pub fn sign(&self, did: &str, _data: &[u8]) -> Result<Vec<u8>, Box<dyn Error>> {
         // This is a simplified implementation
         // In a real implementation, this would use the DID's private key
-        
+
         // Get the DID
-        let dids = self.dids.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
+        let dids = self
+            .dids
+            .lock()
+            .map_err(|e| format!("Mutex lock error: {}", e))?;
         if !dids.contains_key(did) {
             return Err(format!("DID not found: {}", did).into());
         }
-        
+
         // For now, just return a placeholder signature
         // In a real implementation, this would use the appropriate
         // cryptographic algorithm based on the DID's verification method
         Ok(vec![0u8; 64])
     }
-    
+
     /// Get a list of all DIDs
     pub fn dids(&self) -> Result<Vec<String>, Box<dyn Error>> {
-        let dids = self.dids.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
+        let dids = self
+            .dids
+            .lock()
+            .map_err(|e| format!("Mutex lock error: {}", e))?;
         Ok(dids.keys().cloned().collect())
     }
 
     /// Get a DID by ID
     pub fn get_did(&self, did_id: &str) -> Web5Result<Option<DID>> {
-        let dids = self.dids.lock().map_err(|e| Web5Error::Storage(format!("Mutex lock error: {}", e)))?;
+        let dids = self
+            .dids
+            .lock()
+            .map_err(|e| Web5Error::Storage(format!("Mutex lock error: {}", e)))?;
         Ok(dids.get(did_id).cloned())
     }
 
     /// List all DIDs
     pub fn list_dids(&self) -> Vec<DID> {
-        let dids = self.dids.lock().unwrap_or_else(|_| panic!("Failed to lock mutex"));
+        let dids = self
+            .dids
+            .lock()
+            .unwrap_or_else(|_| panic!("Failed to lock mutex"));
         dids.values().cloned().collect()
     }
 }
@@ -307,14 +328,14 @@ fn generate_random_id() -> String {
         .duration_since(UNIX_EPOCH)
         .unwrap_or_default()
         .as_secs();
-    
+
     format!("{:x}", now)
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_create_did() -> Result<(), Box<dyn Error>> {
         let manager = DIDManager::new("example");
@@ -324,18 +345,18 @@ mod tests {
         assert!(!did.private_keys.is_empty());
         Ok(())
     }
-    
+
     #[test]
     fn test_default_did() -> Result<(), Box<dyn Error>> {
         let mut manager = DIDManager::new("example");
         let did = manager.create_did()?;
-        
+
         // Initially no default DID
         assert!(manager.get_default_did()?.is_none());
-        
+
         // Set and get default DID
         manager.set_default_did(&did.id)?;
         assert_eq!(manager.get_default_did()?.unwrap(), did.id);
         Ok(())
     }
-} 
+}

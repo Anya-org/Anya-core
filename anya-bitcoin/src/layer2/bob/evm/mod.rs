@@ -16,16 +16,19 @@ impl EvmAdapter {
             config: config.clone(),
         }
     }
-    
+
     /// Check connection to the EVM network
     pub async fn check_connection(&self) -> Result<bool, BobError> {
         // In a real implementation, this would check the connection to the EVM network
         // For now, we'll just return true
         Ok(true)
     }
-    
+
     /// Send a transaction to the EVM network
-    pub async fn send_transaction(&self, transaction: EvmTransaction) -> Result<EvmTransactionReceipt, BobError> {
+    pub async fn send_transaction(
+        &self,
+        transaction: EvmTransaction,
+    ) -> Result<EvmTransactionReceipt, BobError> {
         // In a real implementation, this would send the transaction to the EVM network
         // For now, we'll just return a dummy receipt
         Ok(EvmTransactionReceipt {
@@ -35,5 +38,4 @@ impl EvmAdapter {
             status: true,
         })
     }
-} 
-
+}

@@ -11,9 +11,9 @@
 // - RBTC token management
 // - Federation interaction
 
-use std::sync::{Arc, Mutex};
 use std::collections::HashMap;
 use std::sync::PoisonError;
+use std::sync::{Arc, Mutex};
 
 // Internal imports
 use crate::core::performance::Metrics;
@@ -56,11 +56,11 @@ impl ProtocolConfig for RskConfig {
     fn protocol_name(&self) -> &str {
         "rsk"
     }
-    
+
     fn network_type(&self) -> &str {
         "mainnet"
     }
-    
+
     fn clone_box(&self) -> Box<dyn ProtocolConfig> {
         Box::new(self.clone())
     }
@@ -87,7 +87,7 @@ impl RskClient {
         let bridge_interface = BridgeInterface::new(&config);
         let smart_contract_caller = SmartContractCaller::new(&config);
         let transaction_manager = TransactionManager::new(&config);
-        
+
         Self {
             config,
             node_connector,
@@ -96,30 +96,22 @@ impl RskClient {
             transaction_manager,
         }
     }
-    
+
     /// Check the health of the RSK node connection
     pub async fn check_health(&self) -> Result<bool, RskError> {
         self.node_connector.check_connection().await
     }
-    
+
     /// Perform a peg-in operation (lock BTC to get RBTC)
-    pub async fn peg_in(
-        &self,
-        btc_address: &str,
-        amount: f64,
-    ) -> Result<PegInInfo, RskError> {
+    pub async fn peg_in(&self, btc_address: &str, amount: f64) -> Result<PegInInfo, RskError> {
         self.bridge_interface.peg_in(btc_address, amount).await
     }
-    
+
     /// Perform a peg-out operation (release BTC from RBTC)
-    pub async fn peg_out(
-        &self,
-        btc_address: &str,
-        amount: f64,
-    ) -> Result<PegOutInfo, RskError> {
+    pub async fn peg_out(&self, btc_address: &str, amount: f64) -> Result<PegOutInfo, RskError> {
         self.bridge_interface.peg_out(btc_address, amount).await
     }
-    
+
     /// Call a smart contract method
     pub async fn call_contract(
         &self,
@@ -127,51 +119,48 @@ impl RskClient {
         method: &str,
         params: Vec<String>,
     ) -> Result<ContractCallResult, RskError> {
-        self.smart_contract_caller.call_contract(contract_address, method, params).await
+        self.smart_contract_caller
+            .call_contract(contract_address, method, params)
+            .await
     }
-    
+
     /// Deploy a smart contract
     pub async fn deploy_contract(
         &self,
         bytecode: &str,
         constructor_params: Vec<String>,
     ) -> Result<ContractDeployResult, RskError> {
-        self.smart_contract_caller.deploy_contract(bytecode, constructor_params).await
+        self.smart_contract_caller
+            .deploy_contract(bytecode, constructor_params)
+            .await
     }
-    
+
     /// Get the RBTC balance of an address
-    pub async fn get_rbtc_balance(
-        &self,
-        address: &str,
-    ) -> Result<f64, RskError> {
+    pub async fn get_rbtc_balance(&self, address: &str) -> Result<f64, RskError> {
         self.node_connector.get_balance(address).await
     }
-    
+
     /// Transfer RBTC to an address
     pub async fn transfer_rbtc(
         &self,
         to_address: &str,
         amount: f64,
     ) -> Result<TransactionInfo, RskError> {
-        self.transaction_manager.transfer_rbtc(to_address, amount).await
+        self.transaction_manager
+            .transfer_rbtc(to_address, amount)
+            .await
     }
-    
+
     /// Get transaction information
-    pub async fn get_transaction(
-        &self,
-        tx_hash: &str,
-    ) -> Result<TransactionInfo, RskError> {
+    pub async fn get_transaction(&self, tx_hash: &str) -> Result<TransactionInfo, RskError> {
         self.transaction_manager.get_transaction(tx_hash).await
     }
-    
+
     /// Get block information
-    pub async fn get_block(
-        &self,
-        block_number: u64,
-    ) -> Result<BlockInfo, RskError> {
+    pub async fn get_block(&self, block_number: u64) -> Result<BlockInfo, RskError> {
         self.node_connector.get_block(block_number).await
     }
-    
+
     /// Get metrics about the RSK client
     pub fn get_metrics(&self) -> Metrics {
         // Implementation would collect metrics from various components
@@ -193,20 +182,20 @@ impl NodeConnector {
             last_block: Arc::new(Mutex::new(None)),
         }
     }
-    
+
     /// Check if the node is connected
     pub async fn check_connection(&self) -> Result<bool, RskError> {
         // Implementation would check node connection
         Ok(true)
     }
-    
+
     /// Get the balance of an address
     pub async fn get_balance(&self, _address: &str) -> Result<f64, RskError> {
         // Implementation would get balance from node
         // For now, return a mock value
         Ok(1.5)
     }
-    
+
     /// Get block information
     pub async fn get_block(&self, block_number: u64) -> Result<BlockInfo, RskError> {
         // Implementation would get block info from node
@@ -219,13 +208,13 @@ impl NodeConnector {
             parent_hash: format!("0x{:064x}", block_number - 1),
             size: 1000,
         };
-        
+
         let mut last_block = self.last_block.lock()?;
         *last_block = Some(block.clone());
-        
+
         Ok(block)
     }
-    
+
     /// Get the latest block number
     pub async fn get_latest_block_number(&self) -> Result<u64, RskError> {
         // Implementation would get latest block number from node
@@ -250,13 +239,13 @@ impl BridgeInterface {
             peg_outs: Arc::new(Mutex::new(HashMap::new())),
         }
     }
-    
+
     /// Perform a peg-in operation
     pub async fn peg_in(&self, btc_address: &str, amount: f64) -> Result<PegInInfo, RskError> {
         // Implementation would perform peg-in
         // For now, return a mock peg-in info
         let peg_in_id = format!("peg_in:{}", uuid::Uuid::new_v4());
-        
+
         let peg_in = PegInInfo {
             id: peg_in_id.clone(),
             btc_address: btc_address.to_string(),
@@ -268,19 +257,19 @@ impl BridgeInterface {
             btc_tx_hash: None,
             rsk_tx_hash: None,
         };
-        
+
         let mut peg_ins = self.peg_ins.lock()?;
         peg_ins.insert(peg_in_id, peg_in.clone());
-        
+
         Ok(peg_in)
     }
-    
+
     /// Perform a peg-out operation
     pub async fn peg_out(&self, btc_address: &str, amount: f64) -> Result<PegOutInfo, RskError> {
         // Implementation would perform peg-out
         // For now, return a mock peg-out info
         let peg_out_id = format!("peg_out:{}", uuid::Uuid::new_v4());
-        
+
         let peg_out = PegOutInfo {
             id: peg_out_id.clone(),
             btc_address: btc_address.to_string(),
@@ -292,28 +281,28 @@ impl BridgeInterface {
             btc_tx_hash: None,
             rsk_tx_hash: None,
         };
-        
+
         let mut peg_outs = self.peg_outs.lock()?;
         peg_outs.insert(peg_out_id, peg_out.clone());
-        
+
         Ok(peg_out)
     }
-    
+
     /// Get peg-in information
     pub async fn get_peg_in_info(&self, peg_in_id: &str) -> Result<PegInInfo, RskError> {
         let peg_ins = self.peg_ins.lock()?;
-        
+
         if let Some(peg_in) = peg_ins.get(peg_in_id) {
             Ok(peg_in.clone())
         } else {
             Err(RskError::PegOperationNotFound(peg_in_id.to_string()))
         }
     }
-    
+
     /// Get peg-out information
     pub async fn get_peg_out_info(&self, peg_out_id: &str) -> Result<PegOutInfo, RskError> {
         let peg_outs = self.peg_outs.lock()?;
-        
+
         if let Some(peg_out) = peg_outs.get(peg_out_id) {
             Ok(peg_out.clone())
         } else {
@@ -338,7 +327,7 @@ impl SmartContractCaller {
             contract_calls: Arc::new(Mutex::new(HashMap::new())),
         }
     }
-    
+
     /// Call a smart contract
     pub async fn call_contract(
         &self,
@@ -349,26 +338,27 @@ impl SmartContractCaller {
         // Implementation would call smart contract
         // For now, return a mock result
         let call_id = format!("call:{}", uuid::Uuid::new_v4());
-        
+
         let result = ContractCallResult {
             id: call_id.clone(),
             contract_address: contract_address.to_string(),
             method: method.to_string(),
             params: params.clone(),
-            result: "0x0000000000000000000000000000000000000000000000000000000000000001".to_string(),
+            result: "0x0000000000000000000000000000000000000000000000000000000000000001"
+                .to_string(),
             gas_used: 50000,
             status: CallStatus::Success,
             transaction_hash: Some(format!("0x{}", uuid::Uuid::new_v4())),
             block_number: Some(1000000),
             timestamp: chrono::Utc::now(),
         };
-        
+
         let mut contract_calls = self.contract_calls.lock()?;
         contract_calls.insert(call_id, result.clone());
-        
+
         Ok(result)
     }
-    
+
     /// Deploy a smart contract
     pub async fn deploy_contract(
         &self,
@@ -378,7 +368,7 @@ impl SmartContractCaller {
         // Implementation would deploy smart contract
         // For now, return a mock result
         let contract_address = format!("0x{}", uuid::Uuid::new_v4());
-        
+
         let contract_info = ContractInfo {
             address: contract_address.clone(),
             bytecode: bytecode.to_string(),
@@ -386,10 +376,10 @@ impl SmartContractCaller {
             deployed_at: chrono::Utc::now(),
             deploy_tx_hash: format!("0x{}", uuid::Uuid::new_v4()),
         };
-        
+
         let mut deployed_contracts = self.deployed_contracts.lock()?;
         deployed_contracts.insert(contract_address.clone(), contract_info);
-        
+
         let result = ContractDeployResult {
             contract_address,
             transaction_hash: format!("0x{}", uuid::Uuid::new_v4()),
@@ -397,14 +387,14 @@ impl SmartContractCaller {
             block_number: 1000000,
             timestamp: chrono::Utc::now(),
         };
-        
+
         Ok(result)
     }
-    
+
     /// Get contract information
     pub fn get_contract_info(&self, contract_address: &str) -> Result<ContractInfo, RskError> {
         let deployed_contracts = self.deployed_contracts.lock()?;
-        
+
         if let Some(contract) = deployed_contracts.get(contract_address) {
             Ok(contract.clone())
         } else {
@@ -427,7 +417,7 @@ impl TransactionManager {
             transactions: Arc::new(Mutex::new(HashMap::new())),
         }
     }
-    
+
     /// Transfer RBTC to an address
     pub async fn transfer_rbtc(
         &self,
@@ -437,7 +427,7 @@ impl TransactionManager {
         // Implementation would transfer RBTC
         // For now, return a mock transaction
         let tx_hash = format!("0x{}", uuid::Uuid::new_v4());
-        
+
         let transaction = TransactionInfo {
             hash: tx_hash.clone(),
             from: "0x1234567890123456789012345678901234567890".to_string(),
@@ -451,17 +441,17 @@ impl TransactionManager {
             block_number: None,
             timestamp: chrono::Utc::now(),
         };
-        
+
         let mut transactions = self.transactions.lock()?;
         transactions.insert(tx_hash.clone(), transaction.clone());
-        
+
         Ok(transaction)
     }
-    
+
     /// Get transaction information
     pub async fn get_transaction(&self, tx_hash: &str) -> Result<TransactionInfo, RskError> {
         let transactions = self.transactions.lock()?;
-        
+
         if let Some(transaction) = transactions.get(tx_hash) {
             Ok(transaction.clone())
         } else {
@@ -652,35 +642,35 @@ pub enum RskError {
     /// Node connection error
     #[error("Node connection error: {0}")]
     ConnectionError(String),
-    
+
     /// Bridge error
     #[error("Bridge error: {0}")]
     BridgeError(String),
-    
+
     /// Contract error
     #[error("Contract error: {0}")]
     TransactionError(String),
-    
+
     /// Transaction error
     #[error("Transaction error: {0}")]
     ContractError(String),
-    
+
     /// Peg operation not found
     #[error("Peg operation not found: {0}")]
     PegOperationNotFound(String),
-    
+
     /// Contract not found
     #[error("Contract not found: {0}")]
     ContractNotFound(String),
-    
+
     /// Transaction not found
     #[error("Transaction not found: {0}")]
     TransactionNotFound(String),
-    
+
     /// Invalid amount
     #[error("Invalid amount: {0}")]
     InvalidAmount(String),
-    
+
     /// Configuration error
     #[error("Configuration error: {0}")]
     ConfigError(String),
@@ -695,21 +685,23 @@ impl<T> From<PoisonError<T>> for RskError {
 // Module exports
 pub mod bridge;
 pub mod contracts;
-pub mod transactions;
 pub mod federation;
+pub mod transactions;
 
 // Tests module
 #[cfg(test)]
 pub mod tests {
     use super::*;
-    
+
     #[tokio::test]
     async fn test_peg_in() -> Result<(), Box<dyn std::error::Error>> {
         let config = RskConfig::default();
         let client = RskClient::new(config);
-        
-        let peg_in = client.peg_in("1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa", 0.1).await?;
-        
+
+        let peg_in = client
+            .peg_in("1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa", 0.1)
+            .await?;
+
         assert_eq!(peg_in.btc_address, "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa");
         assert_eq!(peg_in.amount, 0.1);
         assert_eq!(peg_in.status, PegStatus::Pending);
@@ -717,14 +709,16 @@ pub mod tests {
         assert!(peg_in.rsk_tx_hash.is_none());
         Ok(())
     }
-    
+
     #[tokio::test]
     async fn test_peg_out() -> Result<(), Box<dyn std::error::Error>> {
         let config = RskConfig::default();
         let client = RskClient::new(config);
-        
-        let peg_out = client.peg_out("1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa", 0.1).await?;
-        
+
+        let peg_out = client
+            .peg_out("1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa", 0.1)
+            .await?;
+
         assert_eq!(peg_out.btc_address, "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa");
         assert_eq!(peg_out.amount, 0.1);
         assert_eq!(peg_out.status, PegStatus::Pending);
@@ -732,62 +726,65 @@ pub mod tests {
         assert!(peg_out.rsk_tx_hash.is_none());
         Ok(())
     }
-    
+
     #[tokio::test]
     async fn test_call_contract() -> Result<(), Box<dyn std::error::Error>> {
         let config = RskConfig::default();
         let client = RskClient::new(config);
-        
-        let result = client.call_contract(
-            "0x1234567890123456789012345678901234567890",
-            "balanceOf",
-            vec!["0x1234567890123456789012345678901234567890".to_string()]
-        ).await?;
-        
+
+        let result = client
+            .call_contract(
+                "0x1234567890123456789012345678901234567890",
+                "balanceOf",
+                vec!["0x1234567890123456789012345678901234567890".to_string()],
+            )
+            .await?;
+
         assert_eq!(result.method, "balanceOf");
         assert_eq!(result.status, CallStatus::Success);
         assert!(result.transaction_hash.is_some());
         Ok(())
     }
-    
+
     #[tokio::test]
     async fn test_deploy_contract() -> Result<(), Box<dyn std::error::Error>> {
         let config = RskConfig::default();
         let client = RskClient::new(config);
-        
+
         let bytecode = "0x60806040526000805534801561001457600080fd5b5060cc806100236000396000f3fe6080604052348015600f57600080fd5b506004361060325760003560e01c806306661abd1460375780634f2be91f146053575b600080fd5b603d605b565b6040518082815260200191505060405180910390f35b60596061565b005b60005481565b6000808154809291906001019190505550560000000000000000000000000000000000000000000000000000000000";
-        
+
         let result = client.deploy_contract(bytecode, vec![]).await?;
-        
+
         assert!(!result.contract_address.is_empty());
         assert!(!result.transaction_hash.is_empty());
         assert!(result.gas_used > 0);
         Ok(())
     }
-    
+
     #[tokio::test]
     async fn test_transfer_rbtc() -> Result<(), Box<dyn std::error::Error>> {
         let config = RskConfig::default();
         let client = RskClient::new(config);
-        
-        let tx = client.transfer_rbtc("0x1234567890123456789012345678901234567890", 0.1).await?;
-        
+
+        let tx = client
+            .transfer_rbtc("0x1234567890123456789012345678901234567890", 0.1)
+            .await?;
+
         assert_eq!(tx.to, "0x1234567890123456789012345678901234567890");
         assert_eq!(tx.value, 0.1);
         assert_eq!(tx.status, TransactionStatus::Pending);
         Ok(())
     }
-    
+
     #[tokio::test]
     async fn test_get_block() -> Result<(), Box<dyn std::error::Error>> {
         let config = RskConfig::default();
         let client = RskClient::new(config);
-        
+
         let block = client.get_block(1000000).await?;
-        
+
         assert_eq!(block.number, 1000000);
         assert!(!block.hash.is_empty());
         Ok(())
     }
 }
-

@@ -1,10 +1,10 @@
 #![cfg(test)]
 
 use anyhow::Result;
-use std::sync::Arc;
-use tokio::sync::RwLock;
 use std::collections::HashMap;
+use std::sync::Arc;
 use std::time::{Duration, Instant};
+use tokio::sync::RwLock;
 
 // RISC-V VM layer manager
 pub struct RiscVmManager {
@@ -270,21 +270,45 @@ mod tests {
     #[test]
     fn test_layer_configs() {
         let manager = RiscVmManager::new().unwrap();
-        assert_eq!(manager.config.layer_configs.l1_config.vm_type, VmType::BareMetal);
-        assert_eq!(manager.config.layer_configs.l2_config.vm_type, VmType::Containerized);
-        assert_eq!(manager.config.layer_configs.l3_config.vm_type, VmType::Hypervisor);
-        assert_eq!(manager.config.layer_configs.zk_config.vm_type, VmType::Hypervisor);
+        assert_eq!(
+            manager.config.layer_configs.l1_config.vm_type,
+            VmType::BareMetal
+        );
+        assert_eq!(
+            manager.config.layer_configs.l2_config.vm_type,
+            VmType::Containerized
+        );
+        assert_eq!(
+            manager.config.layer_configs.l3_config.vm_type,
+            VmType::Hypervisor
+        );
+        assert_eq!(
+            manager.config.layer_configs.zk_config.vm_type,
+            VmType::Hypervisor
+        );
     }
 
     #[test]
     fn test_resource_allocation() {
         let manager = RiscVmManager::new().unwrap();
         // Test memory allocation
-        assert_eq!(manager.config.resource_config.memory_allocation.l1_memory, 4 * 1024 * 1024 * 1024);
-        assert_eq!(manager.config.resource_config.memory_allocation.l2_memory, 8 * 1024 * 1024 * 1024);
-        assert_eq!(manager.config.resource_config.memory_allocation.l3_memory, 16 * 1024 * 1024 * 1024);
-        assert_eq!(manager.config.resource_config.memory_allocation.zk_memory, 32 * 1024 * 1024 * 1024);
-        
+        assert_eq!(
+            manager.config.resource_config.memory_allocation.l1_memory,
+            4 * 1024 * 1024 * 1024
+        );
+        assert_eq!(
+            manager.config.resource_config.memory_allocation.l2_memory,
+            8 * 1024 * 1024 * 1024
+        );
+        assert_eq!(
+            manager.config.resource_config.memory_allocation.l3_memory,
+            16 * 1024 * 1024 * 1024
+        );
+        assert_eq!(
+            manager.config.resource_config.memory_allocation.zk_memory,
+            32 * 1024 * 1024 * 1024
+        );
+
         // Test CPU allocation
         assert_eq!(manager.config.resource_config.cpu_allocation.l1_cores, 4);
         assert_eq!(manager.config.resource_config.cpu_allocation.l2_cores, 4);
@@ -306,6 +330,9 @@ mod tests {
         let manager = RiscVmManager::new().unwrap();
         assert!(manager.config.resource_config.io_config.direct_io);
         assert!(manager.config.resource_config.io_config.async_io);
-        assert_eq!(manager.config.resource_config.io_config.io_priority, Priority::High);
+        assert_eq!(
+            manager.config.resource_config.io_config.io_priority,
+            Priority::High
+        );
     }
-} 
+}

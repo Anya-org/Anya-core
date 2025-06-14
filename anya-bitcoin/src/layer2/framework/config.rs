@@ -1,24 +1,24 @@
 // Layer 2 Protocol Configuration
 // This file contains configuration structures for Layer 2 protocols
 
+use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
-use serde::{Serialize, Deserialize};
 
 /// Base configuration for all Layer 2 protocols
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Layer2Config {
     /// Protocol name
     pub protocol_name: String,
-    
+
     /// Network type (mainnet, testnet, etc.)
     pub network: String,
-    
+
     /// Data directory for protocol data
     pub data_dir: PathBuf,
-    
+
     /// Enable debug mode
     pub debug: bool,
-    
+
     /// Timeout in seconds for operations
     pub timeout_seconds: u64,
 }
@@ -40,7 +40,7 @@ impl Default for Layer2Config {
 pub struct RGBConfig {
     /// Base configuration
     pub base: Layer2Config,
-    
+
     /// Schema ID to use
     pub schema_id: Option<String>,
 }
@@ -65,13 +65,13 @@ impl Default for RGBConfig {
 pub struct LightningConfig {
     /// Base configuration
     pub base: Layer2Config,
-    
+
     /// RPC address for lnd
     pub rpc_address: String,
-    
+
     /// Certificate path
     pub cert_path: PathBuf,
-    
+
     /// Macaroon path
     pub macaroon_path: PathBuf,
 }
@@ -91,4 +91,4 @@ impl Default for LightningConfig {
             macaroon_path: PathBuf::from("./certs/admin.macaroon"),
         }
     }
-} 
+}

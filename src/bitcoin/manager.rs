@@ -1,7 +1,7 @@
 // Bitcoin Manager Implementation
-use std::sync::{Arc, Mutex};
 use crate::bitcoin::adapters::BitcoinAdapter;
-use crate::{AnyaResult};
+use crate::AnyaResult;
+use std::sync::{Arc, Mutex};
 
 /// Configuration for the Bitcoin manager
 #[derive(Clone, Debug)]
@@ -37,9 +37,9 @@ pub struct BitcoinManager {
 impl BitcoinManager {
     /// Create a new Bitcoin manager
     pub fn new(
-        config: BitcoinManagerConfig, 
-        adapter: Arc<BitcoinAdapter>, 
-        metrics: Arc<Mutex<crate::core::PrometheusMetrics>>
+        config: BitcoinManagerConfig,
+        adapter: Arc<BitcoinAdapter>,
+        metrics: Arc<Mutex<crate::core::PrometheusMetrics>>,
     ) -> Self {
         Self {
             config,
@@ -47,22 +47,22 @@ impl BitcoinManager {
             metrics,
         }
     }
-    
+
     /// Check if Bitcoin functionality is enabled
     pub fn is_enabled(&self) -> bool {
         self.config.enabled
     }
-    
+
     /// Get the current Bitcoin network
     pub fn get_network(&self) -> &str {
         &self.config.network
     }
-    
+
     /// Get the underlying Bitcoin adapter
     pub fn get_adapter(&self) -> Arc<BitcoinAdapter> {
         self.adapter.clone()
     }
-    
+
     /// Get the current block height
     pub async fn get_block_height(&self) -> AnyaResult<u32> {
         // Increment metrics counter
@@ -70,7 +70,7 @@ impl BitcoinManager {
             let mut metrics = self.metrics.lock().unwrap();
             metrics.increment_counter("bitcoin_api_calls", "method", "get_block_height");
         }
-        
+
         // Forward to adapter
         Ok(32) // Placeholder - should be implemented with actual adapter call
     }

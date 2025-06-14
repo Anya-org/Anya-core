@@ -15,11 +15,18 @@ async fn test_model_training() -> Result<(), Box<dyn Error>> {
     let test_input = vec![0.1, 0.2, 0.3, 0.4, 0.5];
 
     // Register participant
-    fl.register_participant(user_id, 1.0, test_input.len() as u64).await?;
+    fl.register_participant(user_id, 1.0, test_input.len() as u64)
+        .await?;
     // Start federation round
     let round_id = fl.start_federation_round().await?;
     // Simulate model update
-    fl.process_model_update(user_id, "dummy_hash", &[0u8; 10], std::collections::HashMap::new()).await?;
+    fl.process_model_update(
+        user_id,
+        "dummy_hash",
+        &[0u8; 10],
+        std::collections::HashMap::new(),
+    )
+    .await?;
     // Aggregate models - No longer takes round_id directly based on FederatedAgent implementation
     // Assuming aggregate_models now internally handles the current round or this needs to be called on FederatedLearningManager
     // For now, let's assume the agent handles it or this test needs a deeper refactor if methods moved to manager.
@@ -86,7 +93,7 @@ async fn test_model_versioning() -> Result<(), Box<dyn Error>> {
 #[tokio::test]
 async fn test_performance_benchmarks() -> Result<(), Box<dyn Error>> {
     let fl = setup_test_environment().await?;
-    
+
     // This test expects train_local_model and get_convergence_rate, which are missing. Commenting out for now.
     /*
     // Benchmark training time

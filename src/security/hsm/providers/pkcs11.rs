@@ -6,19 +6,21 @@
 
 // [AIR-3][AIS-3][BPC-3][RES-3] Import necessary dependencies for PKCS#11 HSM provider
 // This follows official Bitcoin Improvement Proposals (BIPs) standards for secure HSM implementation
-use std::sync::Arc;
 use async_trait::async_trait;
-use tokio::sync::Mutex;
 use std::collections::HashMap;
+use std::sync::Arc;
+use tokio::sync::Mutex;
 
 // [AIR-3][AIS-3][BPC-3][RES-3] Import HSM module types following BDF v2.5 standards
-use crate::security::hsm::config::Pkcs11Config;
-use crate::security::hsm::provider::{HsmProvider, KeyGenParams, KeyInfo, KeyPair, SigningAlgorithm};
-use crate::security::hsm::types::{HsmRequest, HsmResponse};
-use crate::security::hsm::provider::HsmProviderStatus;
-use crate::security::hsm::error::HsmError;
-use uuid::Uuid;
 use crate::security::hsm::audit::AuditLogger;
+use crate::security::hsm::config::Pkcs11Config;
+use crate::security::hsm::error::HsmError;
+use crate::security::hsm::provider::HsmProviderStatus;
+use crate::security::hsm::provider::{
+    HsmProvider, KeyGenParams, KeyInfo, KeyPair, SigningAlgorithm,
+};
+use crate::security::hsm::types::{HsmRequest, HsmResponse};
+use uuid::Uuid;
 
 /// PKCS#11 HSM Provider for hardware security devices
 #[derive(Debug)]
@@ -40,7 +42,7 @@ impl Pkcs11HsmProvider {
             audit_logger,
         })
     }
-    
+
     /// Generate a key ID
     fn generate_key_id(&self) -> String {
         Uuid::new_v4().to_string()
@@ -59,50 +61,71 @@ impl HsmProvider for Pkcs11HsmProvider {
             "PKCS#11 provider initialized (stub implementation)",
             crate::security::hsm::error::AuditEventResult::Success,
         )?;
-        
+
         Ok(())
     }
-    
+
     async fn generate_key(&self, params: KeyGenParams) -> Result<(KeyPair, KeyInfo), HsmError> {
         // Implementation will be added when PKCS#11 libraries are integrated
-        Err(HsmError::UnsupportedOperation("Not implemented yet. Will be available in future versions.".to_string()))
+        Err(HsmError::UnsupportedOperation(
+            "Not implemented yet. Will be available in future versions.".to_string(),
+        ))
     }
-    
-    async fn sign(&self, key_id: &str, algorithm: SigningAlgorithm, data: &[u8]) -> Result<Vec<u8>, HsmError> {
+
+    async fn sign(
+        &self,
+        key_id: &str,
+        algorithm: SigningAlgorithm,
+        data: &[u8],
+    ) -> Result<Vec<u8>, HsmError> {
         // Implementation will be added when PKCS#11 libraries are integrated
-        Err(HsmError::UnsupportedOperation("Not implemented yet. Will be available in future versions.".to_string()))
+        Err(HsmError::UnsupportedOperation(
+            "Not implemented yet. Will be available in future versions.".to_string(),
+        ))
     }
-    
-    async fn verify(&self, key_id: &str, algorithm: SigningAlgorithm, data: &[u8], signature: &[u8]) -> Result<bool, HsmError> {
+
+    async fn verify(
+        &self,
+        key_id: &str,
+        algorithm: SigningAlgorithm,
+        data: &[u8],
+        signature: &[u8],
+    ) -> Result<bool, HsmError> {
         // Implementation will be added when PKCS#11 libraries are integrated
-        Err(HsmError::UnsupportedOperation("Not implemented yet. Will be available in future versions.".to_string()))
+        Err(HsmError::UnsupportedOperation(
+            "Not implemented yet. Will be available in future versions.".to_string(),
+        ))
     }
-    
+
     async fn export_public_key(&self, key_id: &str) -> Result<Vec<u8>, HsmError> {
         // Implementation will be added when PKCS#11 libraries are integrated
-        Err(HsmError::UnsupportedOperation("Not implemented yet. Will be available in future versions.".to_string()))
+        Err(HsmError::UnsupportedOperation(
+            "Not implemented yet. Will be available in future versions.".to_string(),
+        ))
     }
-    
+
     async fn list_keys(&self) -> Result<Vec<KeyInfo>, HsmError> {
         // Implementation will be added when PKCS#11 libraries are integrated
         Ok(vec![])
     }
-    
+
     async fn delete_key(&self, key_id: &str) -> Result<(), HsmError> {
         // Implementation will be added when PKCS#11 libraries are integrated
-        Err(HsmError::UnsupportedOperation("Not implemented yet. Will be available in future versions.".to_string()))
+        Err(HsmError::UnsupportedOperation(
+            "Not implemented yet. Will be available in future versions.".to_string(),
+        ))
     }
-    
+
     async fn get_status(&self) -> Result<HsmProviderStatus, HsmError> {
         // Implementation will be added when PKCS#11 libraries are integrated
         Ok(HsmProviderStatus::Unavailable)
     }
-    
+
     async fn close(&self) -> Result<(), HsmError> {
         // Implementation will be added when PKCS#11 libraries are integrated
         Ok(())
     }
-    
+
     async fn execute_operation(&self, request: HsmRequest) -> Result<HsmResponse, HsmError> {
         // Just return an unsupported operation error for now
         let request_id = request.id.clone();

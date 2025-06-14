@@ -1,16 +1,16 @@
 //! Web5 Implementation Core [AIR-3][AIS-3][BPC-3][RES-3]
 
 // Re-export modules
+pub mod adapter;
+pub mod dwn; // Decentralized Web Node
 pub mod identity;
 pub mod protocols;
-pub mod dwn;  // Decentralized Web Node
-pub mod vc;   // Verifiable Credentials
-pub mod adapter;
+pub mod vc; // Verifiable Credentials
 
 // Re-export important types for easy access
-pub use identity::{Web5Error, Web5Result, DIDManager, DID, DIDDocument, IdentityManager};
-pub use protocols::{ProtocolHandler, ProtocolManager, ProtocolDefinition};
 pub use adapter::Web5Adapter;
+pub use identity::{DIDDocument, DIDManager, IdentityManager, Web5Error, Web5Result, DID};
+pub use protocols::{ProtocolDefinition, ProtocolHandler, ProtocolManager};
 
 use std::collections::HashMap;
 
@@ -45,7 +45,7 @@ pub struct Web5Manager {
     config: Web5Config,
     /// DID manager - Core identity functionality
     did_manager: identity::DIDManager,
-    /// Protocol manager - Core protocol functionality 
+    /// Protocol manager - Core protocol functionality
     protocol_manager: protocols::ProtocolManager,
 }
 
@@ -54,44 +54,45 @@ impl Web5Manager {
     pub fn new(config: Web5Config) -> Web5Result<Self> {
         let did_manager = identity::DIDManager::new(&config.did_method);
         let protocol_manager = protocols::ProtocolManager::new();
-        
+
         Ok(Self {
             config,
             did_manager,
             protocol_manager,
         })
     }
-    
+
     /// Access the DID manager component
     pub fn did_manager(&self) -> &identity::DIDManager {
         &self.did_manager
     }
-    
+
     /// Access the protocol manager component
     pub fn protocol_manager(&self) -> &protocols::ProtocolManager {
         &self.protocol_manager
     }
-    
+
     /// Initialize the Web5 subsystem with default protocols
     pub fn initialize(&mut self) -> Web5Result<()> {
         // Register standard protocols
         let profile_handler = protocols::ProfileProtocolHandler::new();
-        self.protocol_manager.register_protocol(Box::new(profile_handler))?;
-        
+        self.protocol_manager
+            .register_protocol(Box::new(profile_handler))?;
+
         // Create default identity if none exists
         if self.config.use_local_storage && self.did_manager.get_default_did()?.is_none() {
             let did = self.did_manager.create_did()?;
             self.did_manager.set_default_did(&did.id)?
         }
-        
+
         Ok(())
     }
-    
+
     /// Get the system status
     pub fn status(&self) -> Web5Result<Web5Status> {
         let did_count = self.did_manager.dids()?.len();
         let protocol_count = self.protocol_manager.get_all_protocols().len();
-        
+
         Ok(Web5Status {
             enabled: self.config.enabled,
             did_count,
@@ -103,10 +104,19 @@ impl Web5Manager {
     /// Get metrics for the Web5 system
     pub fn get_metrics(&self) -> Web5Result<HashMap<String, String>> {
         let mut metrics = HashMap::new();
-        metrics.insert("dids".to_string(), self.did_manager.dids()?.len().to_string());
-        metrics.insert("protocols".to_string(), self.protocol_manager.get_all_protocols().len().to_string());
-        metrics.insert("dwn_connected".to_string(), self.config.dwn_url.is_some().to_string());
-        
+        metrics.insert(
+            "dids".to_string(),
+            self.did_manager.dids()?.len().to_string(),
+        );
+        metrics.insert(
+            "protocols".to_string(),
+            self.protocol_manager.get_all_protocols().len().to_string(),
+        );
+        metrics.insert(
+            "dwn_connected".to_string(),
+            self.config.dwn_url.is_some().to_string(),
+        );
+
         Ok(metrics)
     }
 }
@@ -128,22 +138,22 @@ pub struct Web5Status {
 mod tests {
     // [AIR-3][AIS-3][BPC-3][RES-3] Proper error handling organization
     use super::*;
-    
+
     #[test]
-    fn test_web5_manager_creation()  -> Result<(), Box<dyn std::error::Error>> {
+    fn test_web5_manager_creation() -> Result<(), Box<dyn std::error::Error>> {
         let config = Web5Config::default();
         let manager = Web5Manager::new(config)?;
-        
+
         assert!(manager.config.enabled);
         assert_eq!(manager.config.did_method, "ion");
         Ok(())
     }
-    
+
     #[test]
-    fn test_web5_status()  -> Result<(), Box<dyn std::error::Error>> {
+    fn test_web5_status() -> Result<(), Box<dyn std::error::Error>> {
         let config = Web5Config::default();
         let manager = Web5Manager::new(config)?;
-        
+
         let status = manager.status()?;
         assert!(status.enabled);
         assert_eq!(status.did_count, 0);

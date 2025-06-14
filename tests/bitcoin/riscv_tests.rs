@@ -1,15 +1,11 @@
 #![feature(test)]
 extern crate test;
 
-use test::Bencher;
-use anyhow::Result;
 use anya_bitcoin::riscv::{
-    RiscVOptimizer,
-    RiscVExtensions,
-    RiscVCapabilities,
-    OptimizationControls,
-    VerificationLevel,
+    OptimizationControls, RiscVCapabilities, RiscVExtensions, RiscVOptimizer, VerificationLevel,
 };
+use anyhow::Result;
+use test::Bencher;
 
 /// Test suite for RISC-V optimizations
 mod optimizer_tests {
@@ -38,7 +34,10 @@ mod optimizer_tests {
         let optimizer = RiscVOptimizer::new().unwrap();
         assert!(optimizer.controls.consensus_critical);
         assert!(optimizer.controls.allow_hardware_acceleration);
-        assert_eq!(optimizer.controls.verification_level, VerificationLevel::Enhanced);
+        assert_eq!(
+            optimizer.controls.verification_level,
+            VerificationLevel::Enhanced
+        );
     }
 }
 
@@ -132,10 +131,10 @@ mod integration_tests {
     #[test]
     fn test_full_optimization_pipeline() {
         let optimizer = RiscVOptimizer::new().unwrap();
-        
+
         // Test consensus operations
         assert!(optimizer.optimize_consensus_operations().is_ok());
-        
+
         // Test Layer 2 operations
         assert!(optimizer.optimize_layer2_operations().is_ok());
     }
@@ -149,9 +148,13 @@ mod integration_tests {
         };
 
         // Test with different verification levels
-        for level in [VerificationLevel::Standard, 
-                     VerificationLevel::Enhanced, 
-                     VerificationLevel::Maximum].iter() {
+        for level in [
+            VerificationLevel::Standard,
+            VerificationLevel::Enhanced,
+            VerificationLevel::Maximum,
+        ]
+        .iter()
+        {
             controls.verification_level = level.clone();
             // Verify optimization behavior with different levels
             assert!(true); // Replace with actual verification
@@ -202,7 +205,7 @@ mod stress_tests {
     #[test]
     fn test_concurrent_optimization() {
         let optimizer = RiscVOptimizer::new().unwrap();
-        
+
         // Simulate concurrent optimization requests
         for _ in 0..1000 {
             assert!(optimizer.optimize_consensus_operations().is_ok());
@@ -213,7 +216,7 @@ mod stress_tests {
     #[test]
     fn test_resource_exhaustion() {
         let optimizer = RiscVOptimizer::new().unwrap();
-        
+
         // Test behavior under resource pressure
         for _ in 0..10000 {
             assert!(optimizer.optimize_consensus_operations().is_ok());
@@ -234,8 +237,9 @@ mod compliance_tests {
     #[test]
     fn test_verification_level_compliance() {
         let optimizer = RiscVOptimizer::new().unwrap();
-        assert!(matches!(optimizer.controls.verification_level, 
-                        VerificationLevel::Enhanced | 
-                        VerificationLevel::Maximum));
+        assert!(matches!(
+            optimizer.controls.verification_level,
+            VerificationLevel::Enhanced | VerificationLevel::Maximum
+        ));
     }
-} 
+}

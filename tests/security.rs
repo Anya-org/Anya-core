@@ -1,5 +1,5 @@
 //! Security tests module
-//! 
+//!
 //! This module contains tests for security features including cryptography, compliance, and memory safety.
 
 #[path = "security/compliance_test.rs"]

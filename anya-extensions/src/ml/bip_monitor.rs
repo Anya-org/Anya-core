@@ -1,5 +1,5 @@
 //! BIP Monitor Module
-//! 
+//!
 //! This module provides monitoring capabilities for Bitcoin Improvement Proposals
 //! and their implementation status within the Anya ecosystem.
 

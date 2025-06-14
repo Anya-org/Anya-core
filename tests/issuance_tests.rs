@@ -6,9 +6,8 @@
 mod sectional_test_utils;
 
 use crate::sectional_test_utils::sectional;
-use sectional_test_utils::sectional::{measure_memory_usage, Section};
 
-// Import the modules being tested
+use sectional::{measure_memory_usage, Section};
 // In a real implementation, these would be actual project imports
 // For this example, we'll mock the functionality
 mod mocks {

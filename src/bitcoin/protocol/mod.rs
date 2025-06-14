@@ -1,5 +1,5 @@
 //! Bitcoin Protocol Implementation [AIR-3][AIS-3][BPC-3][AIT-3]
-//! 
+//!
 //! This module implements Bitcoin protocol compliance following the
 //! official Bitcoin Improvement Proposals (BIPs) standards.
 
@@ -60,13 +60,13 @@ impl BitcoinProtocol {
     pub fn validate_compliance(&self) -> Result<bool, Box<dyn std::error::Error>> {
         // Basic validation that required BIPs are supported
         let required_bips = vec![341, 342, 174, 340]; // Essential BIPs for BDF v2.5
-        
+
         for bip in required_bips {
             if !self.supported_bips.contains(&bip) {
                 return Err(format!("Missing required BIP-{}", bip).into());
             }
         }
-        
+
         Ok(true)
     }
 

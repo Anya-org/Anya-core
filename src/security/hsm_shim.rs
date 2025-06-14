@@ -36,7 +36,7 @@ impl std::error::Error for HsmStubError {}
 /// Create an HSM stub error
 pub fn hsm_stub_error(msg: &str) -> HsmStubError {
     HsmStubError {
-        message: format!("HSM support disabled: {}", msg)
+        message: format!("HSM support disabled: {}", msg),
     }
 }
 
@@ -47,14 +47,16 @@ pub struct HsmManager;
 impl HsmManager {
     /// Create a new stub HSM manager
     pub fn new(_config: HashMap<String, String>) -> Result<Self, HsmStubError> {
-        Err(hsm_stub_error("Cannot create HsmManager when HSM feature is disabled"))
+        Err(hsm_stub_error(
+            "Cannot create HsmManager when HSM feature is disabled",
+        ))
     }
-    
+
     /// Initialize the HSM (not available in stub)
     pub async fn initialize(&self) -> Result<(), HsmStubError> {
         Err(hsm_stub_error("HSM functionality is disabled"))
     }
-    
+
     /// Get the status of the HSM (always returns an error in stub)
     pub async fn get_status(&self) -> Result<HsmStatus, HsmStubError> {
         Err(hsm_stub_error("HSM functionality is disabled"))
@@ -105,7 +107,9 @@ pub struct SoftwareHsmProvider;
 
 impl SoftwareHsmProvider {
     pub fn new(_config: &impl std::fmt::Debug) -> Result<Self, HsmStubError> {
-        Err(hsm_stub_error("SoftwareHsmProvider is disabled in this build"))
+        Err(hsm_stub_error(
+            "SoftwareHsmProvider is disabled in this build",
+        ))
     }
 }
 
@@ -116,7 +120,9 @@ pub struct SimulatorHsmProvider;
 
 impl SimulatorHsmProvider {
     pub fn new(_config: &impl std::fmt::Debug) -> Result<Self, HsmStubError> {
-        Err(hsm_stub_error("SimulatorHsmProvider is disabled in this build"))
+        Err(hsm_stub_error(
+            "SimulatorHsmProvider is disabled in this build",
+        ))
     }
 }
 
@@ -127,7 +133,9 @@ pub struct HardwareHsmProvider;
 
 impl HardwareHsmProvider {
     pub fn new(_config: &impl std::fmt::Debug) -> Result<Self, HsmStubError> {
-        Err(hsm_stub_error("HardwareHsmProvider is disabled in this build"))
+        Err(hsm_stub_error(
+            "HardwareHsmProvider is disabled in this build",
+        ))
     }
 }
 
@@ -138,7 +146,9 @@ pub struct Pkcs11HsmProvider;
 
 impl Pkcs11HsmProvider {
     pub fn new(_config: &impl std::fmt::Debug) -> Result<Self, HsmStubError> {
-        Err(hsm_stub_error("Pkcs11HsmProvider is disabled in this build"))
+        Err(hsm_stub_error(
+            "Pkcs11HsmProvider is disabled in this build",
+        ))
     }
 }
 
@@ -160,7 +170,9 @@ pub struct LedgerHsmProvider;
 
 impl LedgerHsmProvider {
     pub fn new(_config: &impl std::fmt::Debug) -> Result<Self, HsmStubError> {
-        Err(hsm_stub_error("LedgerHsmProvider is disabled in this build"))
+        Err(hsm_stub_error(
+            "LedgerHsmProvider is disabled in this build",
+        ))
     }
 }
 

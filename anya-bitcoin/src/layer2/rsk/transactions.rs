@@ -14,7 +14,7 @@ impl TransactionsPlaceholder {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_placeholder() {
         // Test will be implemented later
@@ -22,4 +22,3 @@ mod tests {
         assert!(true);
     }
 }
-

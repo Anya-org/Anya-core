@@ -1,7 +1,7 @@
 // Tokenomics rewards module for Anya Core
 
+use crate::tokenomics::models::{EconomicEvent, StakingTier};
 use crate::AnyaResult;
-use crate::tokenomics::models::{StakingTier, EconomicEvent};
 
 /// Rewards manager for the tokenomics system
 pub struct RewardsManager {
@@ -49,23 +49,25 @@ impl RewardsManager {
     /// Calculate rewards for a given stake amount and duration
     pub fn calculate_rewards(&self, stake_amount: u64, days: u32) -> AnyaResult<f64> {
         // Find applicable tier
-        let tier = self.tiers.iter()
+        let tier = self
+            .tiers
+            .iter()
             .filter(|t| stake_amount >= t.minimum_stake)
             .max_by_key(|t| t.minimum_stake)
             .unwrap_or(&self.tiers[0]);
-        
+
         // Calculate base rewards
         let annual_rate = self.base_apy * tier.reward_multiplier;
         let daily_rate = annual_rate / 365.0;
         let rewards = (stake_amount as f64) * (daily_rate * days as f64);
-        
+
         Ok(rewards)
     }
-    
+
     /// Record a staking event
     pub fn record_stake(&mut self, account: &str, amount: u64) -> AnyaResult<EconomicEvent> {
         self.total_staked += amount;
-        
+
         let event = EconomicEvent {
             timestamp: std::time::SystemTime::now()
                 .duration_since(std::time::UNIX_EPOCH)
@@ -75,10 +77,10 @@ impl RewardsManager {
             amount,
             account: account.to_string(),
         };
-        
+
         Ok(event)
     }
-    
+
     /// Get the total amount staked in the system
     pub fn get_total_staked(&self) -> u64 {
         self.total_staked

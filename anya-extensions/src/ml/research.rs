@@ -1,5 +1,5 @@
 //! Machine Learning Research Module
-//! 
+//!
 //! This module provides research capabilities for ML algorithms
 //! and model development within the Anya ecosystem.
 
@@ -21,9 +21,7 @@ pub struct ResearchEngine {
 
 impl ResearchEngine {
     pub fn new() -> Self {
-        Self {
-            models: Vec::new(),
-        }
+        Self { models: Vec::new() }
     }
 
     pub fn add_model(&mut self, model: ResearchModel) {

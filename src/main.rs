@@ -1,4 +1,4 @@
-use anya_core::{AnyaCore, AnyaConfig, AnyaResult, AnyaError};
+use anya_core::{AnyaConfig, AnyaCore, AnyaError, AnyaResult};
 use tokio::net::TcpListener;
 use tracing::{info, Level};
 use tracing_subscriber::FmtSubscriber;
@@ -32,7 +32,7 @@ async fn main() -> AnyaResult<()> {
 
     // For now, just keep the server running
     info!("Anya Core is running. Press Ctrl+C to stop.");
-    
+
     // Simple server loop - in a real implementation, this would handle requests
     loop {
         match listener.accept().await {
@@ -47,4 +47,3 @@ async fn main() -> AnyaResult<()> {
         }
     }
 }
-

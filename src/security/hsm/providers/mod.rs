@@ -12,6 +12,6 @@ pub mod tpm;
 
 // Re-export provider structs for use by other modules
 pub use self::bitcoin::BitcoinHsmProvider;
-pub use self::software::SoftwareHsmProvider;
-pub use self::simulator::SimulatorHsmProvider;
 pub use self::hardware::HardwareHsmProvider;
+pub use self::simulator::SimulatorHsmProvider;
+pub use self::software::SoftwareHsmProvider;

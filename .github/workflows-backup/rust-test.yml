@@ -1,0 +1,152 @@
+name: Rust Test Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+  RUSTFLAGS: "-D warnings"
+
+jobs:
+  rust-test:
+    name: Rust Tests
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        rust: [stable]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      
+      # Rust Setup
+      - name: Install Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: ${{ matrix.rust }}
+          components: rustfmt, clippy
+          override: true
+          
+      # Caching
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
+          
+      # Code Quality Checks
+      - name: Check formatting
+        if: matrix.os == 'ubuntu-latest'
+        run: cargo fmt -- --check
+        
+      - name: Run clippy
+        run: cargo clippy --all-targets --all-features -- -D warnings
+        
+      # Run tests with different configurations
+      - name: Run core tests
+        run: cargo test --workspace
+        
+      - name: Run tests with enterprise feature
+        run: cargo test --workspace --features enterprise
+        
+      # Specific module tests
+      - name: Test Bitcoin modules
+        run: cargo test bitcoin
+        
+      - name: Test Web5 modules
+        run: cargo test web5
+
+  coverage:
+    name: Test Coverage
+    needs: [rust-test]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+          
+      - name: Install cargo-tarpaulin
+        run: cargo install cargo-tarpaulin
+        
+      - name: Run tarpaulin
+        run: cargo tarpaulin --out Xml --verbose --workspace --timeout 120
+        
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          fail_ci_if_error: false
+          verbose: true
+
+  architecture-check:
+    name: Architecture Compliance
+    needs: [rust-test]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Hexagonal Architecture Check
+        run: |
+          echo "Verifying hexagonal architecture compliance..."
+          find src -name "*.rs" | xargs grep -l "use crate::web5" | grep -v "mod.rs\|lib.rs" || echo "Architecture looks good"
+          
+      - name: Bitcoin Framework Compliance
+        run: |
+          echo "Verifying Bitcoin Development Framework compliance..."
+          find src -name "*.rs" | xargs grep -l "verify_bitcoin_payment" || echo "No direct Bitcoin payment verification found"
+      
+      - name: Dependency Audit
+        run: |
+          cargo install cargo-audit
+          cargo audit
+
+  notify:
+    name: Notification
+    needs: [rust-test, coverage, architecture-check]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify on success
+        if: success()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const message = "✅ Rust Test Pipeline completed successfully!";
+            if (context.issue && context.issue.number) {
+              github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: message
+              });
+            }
+            
+      - name: Notify on failure
+        if: failure()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const message = "❌ Rust Test Pipeline failed. Please check the logs for details.";
+            if (context.issue && context.issue.number) {
+              github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: message
+              });
+            }

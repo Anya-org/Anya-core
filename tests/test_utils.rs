@@ -7,8 +7,7 @@ mod common;
 
 // Re-export from centralized utilities to eliminate duplicates
 pub use common::test_utilities::{
-    TestTransactionFactory, MockFactory, TestAssertions,
-    TestConfig as CentralizedTestConfig
+    MockFactory, TestAssertions, TestConfig as CentralizedTestConfig, TestTransactionFactory,
 };
 
 // Legacy TestEnvironment for file-based tests

@@ -1,21 +1,21 @@
 //! DAO module
-//! 
+//!
 //! This module provides decentralized autonomous organization functionality,
 //! including governance, voting, and proposal management.
 
-use std::error::Error;
-use std::collections::HashMap;
-use chrono::Utc;
 use crate::AnyaError;
-use serde_json::json as serde_json;
+use chrono::Utc;
 use rand::random;
+use serde_json::json as serde_json;
+use std::collections::HashMap;
+use std::error::Error;
 
 // DAO Module for Anya Core
 // Implements governance and voting mechanisms
 
-pub mod voting;
-pub mod legal;
 pub mod governance;
+pub mod legal;
+pub mod voting;
 pub use governance::DaoLevel;
 
 // Re-export main components
@@ -50,7 +50,7 @@ pub struct ProposalMetrics {
     pub passed_count: usize,
     pub rejected_count: usize,
     pub active_count: usize,
-    
+
     // ML analysis metrics
     pub sentiment_score: f64,
     pub risk_assessment: RiskMetrics,
@@ -89,9 +89,9 @@ impl Default for DAOConfig {
         Self {
             enabled: true,
             contract_address: None,
-            proposal_threshold: 100_000_000,  // 1 token with 8 decimals
-            voting_period_blocks: 1008,       // ~1 week
-            time_lock_blocks: 144,            // ~1 day
+            proposal_threshold: 100_000_000, // 1 token with 8 decimals
+            voting_period_blocks: 1008,      // ~1 week
+            time_lock_blocks: 144,           // ~1 day
         }
     }
 }
@@ -119,7 +119,12 @@ impl DAOManager {
     }
 
     /// Create a new proposal
-    pub fn create_proposal(&mut self, title: &str, description: &str, amount: u64) -> Result<Proposal, Box<dyn Error>> {
+    pub fn create_proposal(
+        &mut self,
+        title: &str,
+        description: &str,
+        amount: u64,
+    ) -> Result<Proposal, Box<dyn Error>> {
         if amount < self.config.proposal_threshold {
             return Err(Box::new(AnyaError::DAO(format!(
                 "Proposal amount ({}) is below the threshold ({})",
@@ -128,7 +133,7 @@ impl DAOManager {
         }
 
         let proposal_id = format!("proposal:{:x}", random::<u64>());
-        
+
         let proposal = Proposal {
             id: proposal_id.clone(),
             title: title.to_string(),
@@ -144,40 +149,52 @@ impl DAOManager {
             updated_at: Utc::now(),
             execution_time: None,
         };
-        
+
         self.proposals.insert(proposal_id.clone(), proposal.clone());
-        
+
         Ok(proposal)
     }
 
     /// Vote on a proposal
-    pub fn vote(&mut self, proposal_id: &str, vote_for: bool, amount: u64) -> Result<(), Box<dyn Error>> {
-        let proposal = self.proposals.get_mut(proposal_id)
-            .ok_or_else(|| Box::new(AnyaError::DAO(format!("Proposal not found: {}", proposal_id))))?;
-        
+    pub fn vote(
+        &mut self,
+        proposal_id: &str,
+        vote_for: bool,
+        amount: u64,
+    ) -> Result<(), Box<dyn Error>> {
+        let proposal = self.proposals.get_mut(proposal_id).ok_or_else(|| {
+            Box::new(AnyaError::DAO(format!(
+                "Proposal not found: {}",
+                proposal_id
+            )))
+        })?;
+
         if proposal.status != ProposalStatus::Active {
             return Err(Box::new(AnyaError::DAO(format!(
-                "Proposal is not active: {:?}", proposal.status
+                "Proposal is not active: {:?}",
+                proposal.status
             ))));
         }
-        
+
         if vote_for {
             proposal.votes_for += amount;
         } else {
             proposal.votes_against += amount;
         }
-        
+
         proposal.updated_at = Utc::now();
-        
+
         Ok(())
     }
 
     /// Get a proposal by ID
     pub fn get_proposal(&self, proposal_id: &str) -> Result<Proposal, Box<dyn Error>> {
-        Ok(self.proposals.get(proposal_id)
-            .cloned()
-            .ok_or_else(|| Box::new(AnyaError::DAO(format!("Proposal not found: {}", proposal_id))))?
-        )
+        Ok(self.proposals.get(proposal_id).cloned().ok_or_else(|| {
+            Box::new(AnyaError::DAO(format!(
+                "Proposal not found: {}",
+                proposal_id
+            )))
+        })?)
     }
 
     /// List all proposals
@@ -187,27 +204,32 @@ impl DAOManager {
 
     /// Execute a proposal
     pub fn execute_proposal(&mut self, proposal_id: &str) -> Result<(), Box<dyn Error>> {
-        let proposal = self.proposals.get_mut(proposal_id)
-            .ok_or_else(|| Box::new(AnyaError::DAO(format!("Proposal not found: {}", proposal_id))))?;
-        
+        let proposal = self.proposals.get_mut(proposal_id).ok_or_else(|| {
+            Box::new(AnyaError::DAO(format!(
+                "Proposal not found: {}",
+                proposal_id
+            )))
+        })?;
+
         if proposal.status != ProposalStatus::Active {
             return Err(Box::new(AnyaError::DAO(format!(
-                "Proposal is not active: {:?}", proposal.status
+                "Proposal is not active: {:?}",
+                proposal.status
             ))));
         }
-        
+
         if proposal.votes_for <= proposal.votes_against {
             return Err(Box::new(AnyaError::DAO(format!(
                 "Proposal does not have enough votes: {} vs {}",
                 proposal.votes_for, proposal.votes_against
             ))));
         }
-        
+
         // In a real implementation, this would execute the proposal
         proposal.status = ProposalStatus::Executed;
         proposal.execution_time = Some(Utc::now());
         proposal.updated_at = Utc::now();
-        
+
         Ok(())
     }
 
@@ -224,40 +246,67 @@ impl DAOManager {
         } else {
             0
         };
-        
+
         (operational, health)
     }
-    
+
     /// Get system metrics
     pub fn get_metrics(&self) -> HashMap<String, serde_json::Value> {
         let mut metrics = HashMap::new();
-        
+
         // Add basic metrics
-        metrics.insert("enabled".to_string(), serde_json::json!(self.config.enabled));
-        metrics.insert("proposal_count".to_string(), serde_json::json!(self.proposals.len()));
-        metrics.insert("proposal_threshold".to_string(), serde_json::json!(self.config.proposal_threshold));
-        metrics.insert("voting_period_blocks".to_string(), serde_json::json!(self.config.voting_period_blocks));
-        
+        metrics.insert(
+            "enabled".to_string(),
+            serde_json::json!(self.config.enabled),
+        );
+        metrics.insert(
+            "proposal_count".to_string(),
+            serde_json::json!(self.proposals.len()),
+        );
+        metrics.insert(
+            "proposal_threshold".to_string(),
+            serde_json::json!(self.config.proposal_threshold),
+        );
+        metrics.insert(
+            "voting_period_blocks".to_string(),
+            serde_json::json!(self.config.voting_period_blocks),
+        );
+
         // Add contract address if available
         if let Some(address) = &self.config.contract_address {
             metrics.insert("contract_address".to_string(), serde_json::json!(address));
         }
-        
+
         // Add proposal status counts
-        let active_proposals = self.proposals.values()
+        let active_proposals = self
+            .proposals
+            .values()
             .filter(|p| p.status == ProposalStatus::Active)
             .count();
-        let passed_proposals = self.proposals.values()
+        let passed_proposals = self
+            .proposals
+            .values()
             .filter(|p| p.status == ProposalStatus::Passed)
             .count();
-        let executed_proposals = self.proposals.values()
+        let executed_proposals = self
+            .proposals
+            .values()
             .filter(|p| p.status == ProposalStatus::Executed)
             .count();
-        
-        metrics.insert("active_proposals".to_string(), serde_json::json!(active_proposals));
-        metrics.insert("passed_proposals".to_string(), serde_json!(passed_proposals));
-        metrics.insert("executed_proposals".to_string(), serde_json!(executed_proposals));
-        
+
+        metrics.insert(
+            "active_proposals".to_string(),
+            serde_json::json!(active_proposals),
+        );
+        metrics.insert(
+            "passed_proposals".to_string(),
+            serde_json!(passed_proposals),
+        );
+        metrics.insert(
+            "executed_proposals".to_string(),
+            serde_json!(executed_proposals),
+        );
+
         metrics
     }
 }

@@ -53,16 +53,21 @@ impl SystemHardening {
             auto_save_frequency,
         }
     }
-    
+
     /// Add or update a component configuration
-    pub fn configure_component(&self, 
-                              name: &str, 
-                              level: SecurityLevel, 
-                              settings: HashMap<String, String>,
-                              auto_save: bool) -> Result<(), String> {
+    pub fn configure_component(
+        &self,
+        name: &str,
+        level: SecurityLevel,
+        settings: HashMap<String, String>,
+        auto_save: bool,
+    ) -> Result<(), String> {
         {
-            let mut configs = self.configs.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
-            
+            let mut configs = self
+                .configs
+                .lock()
+                .map_err(|e| format!("Mutex lock error: {}", e))?;
+
             let config = HardeningConfig {
                 name: name.to_string(),
                 status: ConfigStatus::NotApplied,
@@ -71,91 +76,127 @@ impl SystemHardening {
                 last_modified: Instant::now(),
                 auto_save_enabled: auto_save,
             };
-            
+
             configs.insert(name.to_string(), config);
         } // Release the lock before calling auto-save
-        
+
         // Update input counter and check for auto-save
         let _ = self.record_input_and_check_save();
-        
+
         Ok(())
     }
-    
+
     /// Record an input and check if auto-save is needed
     fn record_input_and_check_save(&self) -> Result<(), String> {
-        let mut counter = self.input_counter.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
+        let mut counter = self
+            .input_counter
+            .lock()
+            .map_err(|e| format!("Mutex lock error: {}", e))?;
         *counter += 1;
-        
+
         // Auto-save every Nth input (e.g., every 20th input)
         if *counter % self.auto_save_frequency == 0 {
             match self.save_state_to_memory() {
-                Ok(_) => println!("Auto-saved security configuration after {} changes", *counter),
+                Ok(_) => println!(
+                    "Auto-saved security configuration after {} changes",
+                    *counter
+                ),
                 Err(e) => eprintln!("Failed to auto-save security configuration: {}", e),
             }
         }
-        
+
         Ok(())
     }
-    
+
     /// Save the current state to memory (no file writing)
     fn save_state_to_memory(&self) -> Result<(), String> {
         // In a real implementation, this would create a backup of security configurations
         // For this implementation, we're just keeping everything in memory
-        let configs = self.configs.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
-        println!("In-memory security configuration snapshot created: {} components", configs.len());
-        
+        let configs = self
+            .configs
+            .lock()
+            .map_err(|e| format!("Mutex lock error: {}", e))?;
+        println!(
+            "In-memory security configuration snapshot created: {} components",
+            configs.len()
+        );
+
         // Here you would normally serialize the state and store it
         Ok(())
     }
-    
+
     /// Apply security hardening configuration for a component
     pub fn apply_hardening(&self, component_name: &str) -> Result<ConfigStatus, String> {
         let status = {
-            let mut configs = self.configs.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
-            
+            let mut configs = self
+                .configs
+                .lock()
+                .map_err(|e| format!("Mutex lock error: {}", e))?;
+
             let config = match configs.get_mut(component_name) {
                 Some(config) => config,
-                None => return Err(format!("No configuration found for component {}", component_name)),
+                None => {
+                    return Err(format!(
+                        "No configuration found for component {}",
+                        component_name
+                    ))
+                }
             };
-            
+
             // For demonstration purposes, we're just simulating the application
             // In a real implementation, this would apply actual security settings
-            println!("Applying security configuration for {}: {:?}", component_name, config.level);
-            
+            println!(
+                "Applying security configuration for {}: {:?}",
+                component_name, config.level
+            );
+
             // Update status
             config.status = ConfigStatus::Applied;
             config.last_modified = Instant::now();
             config.status.clone()
         }; // Release the lock before calling auto-save
-        
+
         // Record this input and potentially auto-save
         let _ = self.record_input_and_check_save();
-        
+
         Ok(status)
     }
-    
+
     /// Set a specific security setting
-    pub fn set_security_setting(&self, component_name: &str, key: &str, value: &str) -> Result<(), String> {
+    pub fn set_security_setting(
+        &self,
+        component_name: &str,
+        key: &str,
+        value: &str,
+    ) -> Result<(), String> {
         {
-            let mut configs = self.configs.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
-            
+            let mut configs = self
+                .configs
+                .lock()
+                .map_err(|e| format!("Mutex lock error: {}", e))?;
+
             let config = match configs.get_mut(component_name) {
                 Some(config) => config,
-                None => return Err(format!("No configuration found for component {}", component_name)),
+                None => {
+                    return Err(format!(
+                        "No configuration found for component {}",
+                        component_name
+                    ))
+                }
             };
-            
+
             // Update the setting
             config.settings.insert(key.to_string(), value.to_string());
-            config.status = ConfigStatus::Pending;  // Changed but not applied
+            config.status = ConfigStatus::Pending; // Changed but not applied
             config.last_modified = Instant::now();
         } // Release the lock before calling auto-save
-        
+
         // Auto-save if needed
         let _ = self.record_input_and_check_save();
-        
+
         Ok(())
     }
-    
+
     /// Get the configuration for a component
     pub fn get_component_config(&self, component_name: &str) -> Option<HardeningConfig> {
         match self.configs.lock() {
@@ -166,7 +207,7 @@ impl SystemHardening {
             }
         }
     }
-    
+
     /// Get all component configurations
     pub fn get_all_configs(&self) -> Vec<HardeningConfig> {
         match self.configs.lock() {
@@ -177,7 +218,7 @@ impl SystemHardening {
             }
         }
     }
-    
+
     /// Get number of changes and configs
     pub fn get_stats(&self) -> (usize, usize) {
         let counter = match self.input_counter.lock() {
@@ -187,7 +228,7 @@ impl SystemHardening {
                 0
             }
         };
-        
+
         let config_count = match self.configs.lock() {
             Ok(configs) => configs.len(),
             Err(e) => {
@@ -195,10 +236,10 @@ impl SystemHardening {
                 0
             }
         };
-        
+
         (counter, config_count)
     }
-    
+
     /// Apply all pending configurations
     pub fn apply_all_pending(&self) -> Vec<(String, Result<ConfigStatus, String>)> {
         let pending_components = match self.configs.lock() {
@@ -210,7 +251,7 @@ impl SystemHardening {
                     .collect();
                 drop(configs); // Release the lock
                 components
-            },
+            }
             Err(e) => {
                 // Return an empty vec with the error if we can't get the lock
                 let error_msg = format!("Mutex lock error: {}", e);
@@ -219,13 +260,16 @@ impl SystemHardening {
                 return results;
             }
         };
-        
+
         // Apply each pending config
         let mut results = Vec::new();
         for component_name in pending_components {
-            results.push((component_name.clone(), self.apply_hardening(&component_name)));
+            results.push((
+                component_name.clone(),
+                self.apply_hardening(&component_name),
+            ));
         }
-        
+
         results
     }
 }
@@ -234,53 +278,53 @@ impl SystemHardening {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_configuration_and_auto_save() -> Result<(), Box<dyn std::error::Error>> {
         let hardening = SystemHardening::new(20); // Auto-save every 20th change
-        
+
         // Create 25 configurations to trigger auto-save
         for i in 0..25 {
             let mut settings = HashMap::new();
             settings.insert("firewall".to_string(), "enabled".to_string());
             settings.insert("port_scanning".to_string(), "block".to_string());
-            
+
             hardening.configure_component(
                 &format!("component_{}", i),
                 SecurityLevel::Enhanced,
                 settings,
-                true
+                true,
             )?;
         }
-        
+
         // Check stats
         let (changes, configs) = hardening.get_stats();
         assert_eq!(changes, 25);
         assert_eq!(configs, 25);
-        
+
         Ok(())
     }
-    
+
     #[test]
     fn test_apply_hardening() -> Result<(), Box<dyn std::error::Error>> {
         let hardening = SystemHardening::new(10);
-        
+
         // Create a configuration
         let mut settings = HashMap::new();
         settings.insert("firewall".to_string(), "enabled".to_string());
         hardening.configure_component("network", SecurityLevel::Strict, settings, true)?;
-        
+
         // Apply the hardening
         let result = hardening.apply_hardening("network")?;
         assert_eq!(result, ConfigStatus::Applied);
-        
+
         // Verify the status
         if let Some(config) = hardening.get_component_config("network") {
             assert_eq!(config.status, ConfigStatus::Applied);
         } else {
             return Err("Component config not found".into());
         }
-        
+
         Ok(())
     }
 }

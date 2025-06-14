@@ -1,6 +1,5 @@
 use anya_core::layer2::taproot_assets::{
-    create_taproot_asset, create_taproot_asset_mobile,
-    AssetMetadata, Network, IssuanceTx, Error
+    create_taproot_asset, create_taproot_asset_mobile, AssetMetadata, Error, IssuanceTx, Network,
 };
 use std::collections::HashMap;
 use tokio;
@@ -15,16 +14,28 @@ async fn test_create_taproot_asset() {
         issuer: "TestIssuer".to_string(),
         additional_fields: HashMap::new(),
     };
-    
+
     // Test asset creation
     let result = create_taproot_asset(&metadata, &Network::Testnet).await;
     assert!(result.is_ok(), "Asset creation failed");
-    
+
     let issuance_tx = result.unwrap();
-    assert!(!issuance_tx.txid.is_empty(), "Transaction ID should not be empty");
-    assert!(!issuance_tx.asset_id.is_empty(), "Asset ID should not be empty");
-    assert!(!issuance_tx.taproot_script.is_empty(), "Taproot script should not be empty");
-    assert_eq!(issuance_tx.taproot_script, "tr(KEY,{SILENT_LEAF})", "Script should match BDF v2.5 format");
+    assert!(
+        !issuance_tx.txid.is_empty(),
+        "Transaction ID should not be empty"
+    );
+    assert!(
+        !issuance_tx.asset_id.is_empty(),
+        "Asset ID should not be empty"
+    );
+    assert!(
+        !issuance_tx.taproot_script.is_empty(),
+        "Taproot script should not be empty"
+    );
+    assert_eq!(
+        issuance_tx.taproot_script, "tr(KEY,{SILENT_LEAF})",
+        "Script should match BDF v2.5 format"
+    );
 }
 
 #[tokio::test]
@@ -37,12 +48,21 @@ async fn test_create_taproot_asset_mobile() {
         "issuer": "MobileIssuer",
         "additional_fields": {}
     }"#;
-    
+
     let result = create_taproot_asset_mobile(metadata_json, "testnet").await;
     assert!(result.is_ok(), "Mobile asset creation failed");
-    
+
     let json_result = result.unwrap();
-    assert!(json_result.contains("txid"), "JSON result should contain txid");
-    assert!(json_result.contains("asset_id"), "JSON result should contain asset_id");
-    assert!(json_result.contains("taproot_script"), "JSON result should contain taproot_script");
-} 
+    assert!(
+        json_result.contains("txid"),
+        "JSON result should contain txid"
+    );
+    assert!(
+        json_result.contains("asset_id"),
+        "JSON result should contain asset_id"
+    );
+    assert!(
+        json_result.contains("taproot_script"),
+        "JSON result should contain taproot_script"
+    );
+}

@@ -4,8 +4,8 @@
 
 use bitflags::bitflags;
 
-/// Script verification flags
 bitflags! {
+    /// Script verification flags
     /// Flags controlling script verification behavior
     #[derive(Copy, Clone)]
     pub struct VerifyFlags: u32 {

@@ -14,15 +14,18 @@ use tracing::{debug, error, info, warn};
 use uuid::Uuid;
 
 use bitcoin::{
+    bip32::{ChildNumber, ExtendedPrivKey, ExtendedPubKey},
     hashes::{sha256, Hash},
     secp256k1::{Message, PublicKey as SepcPublicKey, Secp256k1, SecretKey},
-    bip32::{ChildNumber, ExtendedPrivKey, ExtendedPubKey},
     Network,
 };
 
 use crate::security::hsm::config::BitcoinConfig;
 use crate::security::hsm::error::HsmError;
-use crate::security::hsm::provider::{HsmProvider, KeyGenParams, KeyInfo, KeyPair, KeyType, SigningAlgorithm, HsmProviderStatus, HsmRequest, HsmResponse, HsmOperation};
+use crate::security::hsm::provider::{
+    HsmOperation, HsmProvider, HsmProviderStatus, HsmRequest, HsmResponse, KeyGenParams, KeyInfo,
+    KeyPair, KeyType, SigningAlgorithm,
+};
 
 /// Bitcoin HSM Provider
 #[derive(Debug)]
@@ -490,7 +493,8 @@ impl HsmProvider for BitcoinHsmProvider {
 
                 // [AIR-3][AIS-3][BPC-3][RES-3] Use base64 Engine for encoding/decoding
                 // This follows official Bitcoin Improvement Proposals (BIPs) standards for secure data handling
-                let data = base64::engine::general_purpose::STANDARD.decode(&params.data)
+                let data = base64::engine::general_purpose::STANDARD
+                    .decode(&params.data)
                     .map_err(|e| HsmError::InvalidParameters(format!("Invalid data: {}", e)))?;
 
                 let signature = self.sign(&params.key_name, params.algorithm, &data).await?;
@@ -510,12 +514,15 @@ impl HsmProvider for BitcoinHsmProvider {
 
                 // [AIR-3][AIS-3][BPC-3][RES-3] Use base64 Engine for encoding/decoding
                 // This follows official Bitcoin Improvement Proposals (BIPs) standards for secure data handling
-                let data = base64::engine::general_purpose::STANDARD.decode(&params.data)
+                let data = base64::engine::general_purpose::STANDARD
+                    .decode(&params.data)
                     .map_err(|e| HsmError::InvalidParameters(format!("Invalid data: {}", e)))?;
 
-                let signature = base64::engine::general_purpose::STANDARD.decode(&params.signature).map_err(|e| {
-                    HsmError::InvalidParameters(format!("Invalid signature: {}", e))
-                })?;
+                let signature = base64::engine::general_purpose::STANDARD
+                    .decode(&params.signature)
+                    .map_err(|e| {
+                        HsmError::InvalidParameters(format!("Invalid signature: {}", e))
+                    })?;
 
                 let valid = self
                     .verify(&params.key_name, params.algorithm, &data, &signature)

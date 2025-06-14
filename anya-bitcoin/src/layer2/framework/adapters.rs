@@ -12,13 +12,13 @@ use std::sync::Arc;
 pub trait ProtocolAdapter: Send + Sync + fmt::Debug {
     /// Get the protocol name
     fn protocol_name(&self) -> &str;
-    
+
     /// Submit a transaction to the protocol
     async fn submit_transaction(&self, tx_data: &[u8]) -> AnyaResult<String>;
-    
+
     /// Get the status of a transaction
     async fn get_transaction_status(&self, tx_id: &str) -> AnyaResult<TransactionStatus>;
-    
+
     /// Verify a transaction
     async fn verify_transaction(&self, tx_id: &str) -> AnyaResult<bool>;
 }
@@ -31,7 +31,7 @@ impl AdapterFactory {
     pub fn new() -> Self {
         Self
     }
-    
+
     /// Create an adapter for the given protocol
     pub fn create_adapter(&self, protocol_name: &str) -> AnyaResult<Arc<dyn ProtocolAdapter>> {
         match protocol_name {
@@ -61,16 +61,16 @@ impl ProtocolAdapter for NoopAdapter {
     fn protocol_name(&self) -> &str {
         &self.protocol_name
     }
-    
+
     async fn submit_transaction(&self, _tx_data: &[u8]) -> AnyaResult<String> {
         Ok("mock_tx_id".to_string())
     }
-    
+
     async fn get_transaction_status(&self, _tx_id: &str) -> AnyaResult<TransactionStatus> {
         Ok(TransactionStatus::Confirmed)
     }
-    
+
     async fn verify_transaction(&self, _tx_id: &str) -> AnyaResult<bool> {
         Ok(true)
     }
-} 
+}

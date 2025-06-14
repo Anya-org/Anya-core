@@ -1,10 +1,10 @@
-use crate::infrastructure::high_availability::{ClusterStatus, HaError, FailoverPhase};
 use crate::infrastructure::high_availability::config::HighAvailabilityConfig;
+use crate::infrastructure::high_availability::{ClusterStatus, FailoverPhase, HaError};
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::RwLock;
-use tracing::{debug, info, error, warn};
-use serde::{Serialize, Deserialize};
+use tracing::{debug, error, info, warn};
 use uuid::Uuid;
 
 /// Manager for cluster operations and coordination
@@ -25,7 +25,7 @@ impl ClusterManager {
         let node_id = Uuid::new_v4().to_string();
         let discovery_service = create_discovery_service(&config);
         let membership_service = create_membership_service(&config);
-        
+
         Self {
             config: Arc::new(config.clone()),
             nodes: Arc::new(RwLock::new(HashMap::new())),
@@ -36,15 +36,18 @@ impl ClusterManager {
             membership_service,
         }
     }
-    
+
     /// Initializes the cluster manager
     pub async fn initialize(&mut self) -> Result<(), HaError> {
         info!("Initializing cluster manager");
-        
+
         // Discover initial nodes
-        let discovered_nodes = self.discovery_service.discover_nodes().await
+        let discovered_nodes = self
+            .discovery_service
+            .discover_nodes()
+            .await
             .map_err(|e| HaError::ClusterError(format!("Failed to discover nodes: {}", e)))?;
-            
+
         // Initialize node list
         let mut nodes = self.nodes.write().await;
         for node_addr in discovered_nodes {
@@ -58,43 +61,47 @@ impl ClusterManager {
             };
             nodes.insert(node_info.id.clone(), node_info);
         }
-        
+
         // Add self node
         let self_node = NodeInfo {
             id: self.node_id.clone(),
-            address: self.membership_service.get_local_address()
-                .map_err(|e| HaError::ClusterError(format!("Failed to get local address: {}", e)))?,
+            address: self.membership_service.get_local_address().map_err(|e| {
+                HaError::ClusterError(format!("Failed to get local address: {}", e))
+            })?,
             status: NodeStatus::Starting,
             role: NodeRole::Follower, // Start as follower
             last_heartbeat: Some(chrono::Utc::now()),
             metadata: HashMap::new(),
         };
         nodes.insert(self.node_id.clone(), self_node);
-        
+
         // Initialize membership service
-        self.membership_service.initialize().await
-            .map_err(|e| HaError::ClusterError(format!("Failed to initialize membership service: {}", e)))?;
-            
+        self.membership_service.initialize().await.map_err(|e| {
+            HaError::ClusterError(format!("Failed to initialize membership service: {}", e))
+        })?;
+
         *self.status.write().await = ClusterStatus::Initializing;
-        
+
         debug!("Cluster manager initialized with {} nodes", nodes.len());
         Ok(())
     }
-    
+
     /// Joins the cluster
     pub async fn join_cluster(&mut self) -> Result<(), HaError> {
         info!("Joining cluster {}", self.config.cluster.cluster_name);
-        
+
         // Register with the membership service
-        self.membership_service.join(self.node_id.clone()).await
+        self.membership_service
+            .join(self.node_id.clone())
+            .await
             .map_err(|e| HaError::ClusterError(format!("Failed to join cluster: {}", e)))?;
-            
+
         // Update node status
         let mut nodes = self.nodes.write().await;
         if let Some(node) = nodes.get_mut(&self.node_id) {
             node.status = NodeStatus::Active;
         }
-        
+
         // Start leader election if needed
         let leader = self.current_leader.read().await;
         if leader.is_none() {
@@ -102,100 +109,128 @@ impl ClusterManager {
             drop(nodes);
             self.elect_leader().await?;
         }
-        
+
         // Update cluster status
         let mut status = self.status.write().await;
         *status = ClusterStatus::Healthy;
-        
-        info!("Successfully joined cluster {}", self.config.cluster.cluster_name);
+
+        info!(
+            "Successfully joined cluster {}",
+            self.config.cluster.cluster_name
+        );
         Ok(())
     }
-    
+
     /// Leaves the cluster
     pub async fn leave_cluster(&mut self) -> Result<(), HaError> {
         info!("Leaving cluster {}", self.config.cluster.cluster_name);
-        
+
         // Unregister from the membership service
-        self.membership_service.leave(self.node_id.clone()).await
+        self.membership_service
+            .leave(self.node_id.clone())
+            .await
             .map_err(|e| HaError::ClusterError(format!("Failed to leave cluster: {}", e)))?;
-            
+
         // Update node status
         let mut nodes = self.nodes.write().await;
         if let Some(node) = nodes.get_mut(&self.node_id) {
             node.status = NodeStatus::Leaving;
         }
-        
+
         // Update cluster status
         let mut status = self.status.write().await;
-        *status = ClusterStatus::Down { reason: "Node left the cluster".to_string() };
-        
-        info!("Successfully left cluster {}", self.config.cluster.cluster_name);
+        *status = ClusterStatus::Down {
+            reason: "Node left the cluster".to_string(),
+        };
+
+        info!(
+            "Successfully left cluster {}",
+            self.config.cluster.cluster_name
+        );
         Ok(())
     }
-    
+
     /// Gets the current cluster status
     pub async fn get_status(&self) -> Result<ClusterStatus, HaError> {
         let status = self.status.read().await;
         Ok(status.clone())
     }
-    
+
     /// Updates the cluster configuration
     pub async fn update_config(&mut self, config: &HighAvailabilityConfig) -> Result<(), HaError> {
         info!("Updating cluster configuration");
         self.config = Arc::new(config.clone());
-        
+
         // Update discovery service if needed
         if self.discovery_service.needs_update(&config) {
             self.discovery_service = create_discovery_service(&config);
         }
-        
+
         // Update membership service if needed
         if self.membership_service.needs_update(&config) {
-            let old_membership = std::mem::replace(&mut self.membership_service, create_membership_service(&config));
-            old_membership.leave(self.node_id.clone()).await
-                .map_err(|e| HaError::ClusterError(format!("Failed to leave old membership: {}", e)))?;
-                
-            self.membership_service.initialize().await
-                .map_err(|e| HaError::ClusterError(format!("Failed to initialize new membership: {}", e)))?;
-                
-            self.membership_service.join(self.node_id.clone()).await
-                .map_err(|e| HaError::ClusterError(format!("Failed to join with new membership: {}", e)))?;
+            let old_membership = std::mem::replace(
+                &mut self.membership_service,
+                create_membership_service(&config),
+            );
+            old_membership
+                .leave(self.node_id.clone())
+                .await
+                .map_err(|e| {
+                    HaError::ClusterError(format!("Failed to leave old membership: {}", e))
+                })?;
+
+            self.membership_service.initialize().await.map_err(|e| {
+                HaError::ClusterError(format!("Failed to initialize new membership: {}", e))
+            })?;
+
+            self.membership_service
+                .join(self.node_id.clone())
+                .await
+                .map_err(|e| {
+                    HaError::ClusterError(format!("Failed to join with new membership: {}", e))
+                })?;
         }
-        
+
         Ok(())
     }
-    
+
     /// Elects a new leader for the cluster
     async fn elect_leader(&mut self) -> Result<(), HaError> {
         info!("Starting leader election");
-        
+
         // Simple leader election strategy - pick the node with the lowest ID
         let nodes = self.nodes.read().await;
-        
+
         // Filter to only include active nodes
-        let active_nodes: Vec<&NodeInfo> = nodes.values()
+        let active_nodes: Vec<&NodeInfo> = nodes
+            .values()
             .filter(|n| n.status == NodeStatus::Active)
             .collect();
-            
+
         if active_nodes.is_empty() {
-            return Err(HaError::ClusterError("No active nodes for leader election".to_string()));
+            return Err(HaError::ClusterError(
+                "No active nodes for leader election".to_string(),
+            ));
         }
-        
+
         // Pick the node with the lowest ID as leader
-        let new_leader = active_nodes.iter()
+        let new_leader = active_nodes
+            .iter()
             .min_by_key(|n| &n.id)
             .map(|n| n.id.clone())
-            .ok_or_else(|| HaError::ClusterError("No active nodes available for leader election".to_string()))?;
-            
+            .ok_or_else(|| {
+                HaError::ClusterError("No active nodes available for leader election".to_string())
+            })?;
+
         // Update leader
         let mut leader = self.current_leader.write().await;
         *leader = Some(new_leader.clone());
-        
+
         // Update node roles
         drop(leader);
         drop(nodes);
         let mut nodes = self.nodes.write().await;
-        
+
         for (id, node) in nodes.iter_mut() {
             if node.status == NodeStatus::Active {
                 if *id == new_leader {
@@ -205,15 +240,15 @@ impl ClusterManager {
                 }
             }
         }
-        
+
         info!("Leader election completed, new leader: {}", new_leader);
         Ok(())
     }
-    
+
     /// Processes a heartbeat from a node
     pub async fn process_heartbeat(&mut self, node_id: &str) -> Result<(), HaError> {
         let mut nodes = self.nodes.write().await;
-        
+
         if let Some(node) = nodes.get_mut(node_id) {
             node.last_heartbeat = Some(chrono::Utc::now());
             if node.status == NodeStatus::Unknown || node.status == NodeStatus::Suspected {
@@ -231,38 +266,41 @@ impl ClusterManager {
             };
             nodes.insert(node_id.to_string(), node_info);
         }
-        
+
         Ok(())
     }
-    
+
     /// Checks and updates node health based on heartbeats
     pub async fn check_node_health(&mut self) -> Result<(), HaError> {
         debug!("Checking node health");
-        
+
         let now = chrono::Utc::now();
         let node_timeout = chrono::Duration::from_std(self.config.cluster.node_timeout)
             .map_err(|_| HaError::ClusterError("Invalid node timeout duration".to_string()))?;
-            
+
         let mut nodes = self.nodes.write().await;
         let mut active_count = 0;
         let mut total_count = 0;
         let mut failures = Vec::new();
-        
+
         for (id, node) in nodes.iter_mut() {
             if id == &self.node_id {
                 // Skip self
                 continue;
             }
-            
+
             total_count += 1;
-            
+
             if let Some(last_heartbeat) = node.last_heartbeat {
                 let elapsed = now - last_heartbeat;
-                
+
                 if elapsed > node_timeout {
                     // Node timeout
                     if node.status == NodeStatus::Active {
-                        warn!("Node {} has not sent heartbeat in {:?}, marking as suspected", id, elapsed);
+                        warn!(
+                            "Node {} has not sent heartbeat in {:?}, marking as suspected",
+                            id, elapsed
+                        );
                         node.status = NodeStatus::Suspected;
                     } else if node.status == NodeStatus::Suspected {
                         error!("Node {} has not recovered, marking as failed", id);
@@ -274,10 +312,10 @@ impl ClusterManager {
                 }
             }
         }
-        
+
         // Update cluster status based on node health
         drop(nodes);
-        
+
         let mut status = self.status.write().await;
         if !failures.is_empty() {
             // We have node failures, update status
@@ -292,7 +330,7 @@ impl ClusterManager {
                     reason: "All nodes failed".to_string(),
                 };
             }
-            
+
             // Check if we need to trigger failover
             let leader = self.current_leader.read().await;
             if let Some(leader_id) = leader.as_ref() {
@@ -301,7 +339,7 @@ impl ClusterManager {
                     let leader_id_clone = leader_id.clone();
                     drop(leader);
                     drop(status);
-                    
+
                     // Update status to failover
                     let mut status = self.status.write().await;
                     *status = ClusterStatus::Failover {
@@ -309,32 +347,35 @@ impl ClusterManager {
                         failing_node: Some(leader_id_clone.clone()),
                         failover_phase: FailoverPhase::Detection,
                     };
-                    
+
                     // We don't trigger the failover directly here,
                     // the failover manager will handle this
-                    info!("Leader node {} failed, cluster entering failover state", leader_id_clone);
+                    info!(
+                        "Leader node {} failed, cluster entering failover state",
+                        leader_id_clone
+                    );
                 }
             }
         } else if active_count == total_count {
             // All nodes are healthy
             *status = ClusterStatus::Healthy;
         }
-        
+
         Ok(())
     }
-    
+
     /// Gets the list of current nodes
     pub async fn get_nodes(&self) -> Result<Vec<NodeInfo>, HaError> {
         let nodes = self.nodes.read().await;
         Ok(nodes.values().cloned().collect())
     }
-    
+
     /// Gets the current leader node
     pub async fn get_leader(&self) -> Result<Option<String>, HaError> {
         let leader = self.current_leader.read().await;
         Ok(leader.clone())
     }
-    
+
     /// Checks if this node is the current leader
     pub async fn is_leader(&self) -> Result<bool, HaError> {
         let leader = self.current_leader.read().await;
@@ -343,11 +384,13 @@ impl ClusterManager {
 }
 
 /// Creates an appropriate discovery service based on configuration
-fn create_discovery_service(config: &HighAvailabilityConfig) -> Box<dyn NodeDiscovery + Send + Sync> {
+fn create_discovery_service(
+    config: &HighAvailabilityConfig,
+) -> Box<dyn NodeDiscovery + Send + Sync> {
     match config.cluster.discovery_method {
         crate::infrastructure::high_availability::config::DiscoveryMethod::Static => {
             Box::new(StaticDiscovery::new(config.cluster.static_nodes.clone()))
-        },
+        }
         crate::infrastructure::high_availability::config::DiscoveryMethod::Dns => {
             if let Some(ref dns_url) = config.cluster.dns_discovery_url {
                 Box::new(DnsDiscovery::new(dns_url.clone()))
@@ -355,7 +398,7 @@ fn create_discovery_service(config: &HighAvailabilityConfig) -> Box<dyn NodeDisc
                 // Fallback to static if DNS URL is not provided
                 Box::new(StaticDiscovery::new(config.cluster.static_nodes.clone()))
             }
-        },
+        }
         crate::infrastructure::high_availability::config::DiscoveryMethod::Kubernetes => {
             if let Some(ref service_name) = config.cluster.k8s_service_name {
                 Box::new(KubernetesDiscovery::new(service_name.clone()))
@@ -363,7 +406,7 @@ fn create_discovery_service(config: &HighAvailabilityConfig) -> Box<dyn NodeDisc
                 // Fallback to static if K8s service name is not provided
                 Box::new(StaticDiscovery::new(config.cluster.static_nodes.clone()))
             }
-        },
+        }
         _ => {
             // Fallback to static for other methods
             Box::new(StaticDiscovery::new(config.cluster.static_nodes.clone()))
@@ -372,7 +415,9 @@ fn create_discovery_service(config: &HighAvailabilityConfig) -> Box<dyn NodeDisc
 }
 
 /// Creates an appropriate membership service based on configuration
-fn create_membership_service(config: &HighAvailabilityConfig) -> Box<dyn ClusterMembership + Send + Sync> {
+fn create_membership_service(
+    config: &HighAvailabilityConfig,
+) -> Box<dyn ClusterMembership + Send + Sync> {
     // For simplicity, always use the basic membership service
     Box::new(BasicMembership::new(config))
 }
@@ -382,19 +427,19 @@ fn create_membership_service(config: &HighAvailabilityConfig) -> Box<dyn Cluster
 pub struct NodeInfo {
     /// Unique identifier for the node
     pub id: String,
-    
+
     /// Network address of the node
     pub address: String,
-    
+
     /// Current status of the node
     pub status: NodeStatus,
-    
+
     /// Role of the node in the cluster
     pub role: NodeRole,
-    
+
     /// Time of last heartbeat received
     pub last_heartbeat: Option<chrono::DateTime<chrono::Utc>>,
-    
+
     /// Additional metadata about the node
     pub metadata: HashMap<String, String>,
 }
@@ -404,19 +449,19 @@ pub struct NodeInfo {
 pub enum NodeStatus {
     /// Node status is unknown
     Unknown,
-    
+
     /// Node is starting up
     Starting,
-    
+
     /// Node is active and healthy
     Active,
-    
+
     /// Node is suspected of being down
     Suspected,
-    
+
     /// Node has failed
     Failed,
-    
+
     /// Node is leaving the cluster
     Leaving,
 }
@@ -426,13 +471,13 @@ pub enum NodeStatus {
 pub enum NodeRole {
     /// Role is unknown
     Unknown,
-    
+
     /// Node is a leader/primary
     Leader,
-    
+
     /// Node is a follower/replica
     Follower,
-    
+
     /// Node is an observer (non-voting)
     Observer,
 }
@@ -442,7 +487,7 @@ pub enum NodeRole {
 pub trait NodeDiscovery {
     /// Discovers nodes in the cluster
     async fn discover_nodes(&self) -> Result<Vec<String>, String>;
-    
+
     /// Checks if this discovery service needs to be updated
     fn needs_update(&self, config: &HighAvailabilityConfig) -> bool;
 }
@@ -463,7 +508,7 @@ impl NodeDiscovery for StaticDiscovery {
     async fn discover_nodes(&self) -> Result<Vec<String>, String> {
         Ok(self.nodes.clone())
     }
-    
+
     fn needs_update(&self, config: &HighAvailabilityConfig) -> bool {
         self.nodes != config.cluster.static_nodes
     }
@@ -491,7 +536,7 @@ impl NodeDiscovery for DnsDiscovery {
             format!("node3.{}", self.dns_url),
         ])
     }
-    
+
     fn needs_update(&self, config: &HighAvailabilityConfig) -> bool {
         if let Some(ref dns_url) = config.cluster.dns_discovery_url {
             self.dns_url != *dns_url
@@ -523,7 +568,7 @@ impl NodeDiscovery for KubernetesDiscovery {
             format!("{}-2.{}", self.service_name, self.service_name),
         ])
     }
-    
+
     fn needs_update(&self, config: &HighAvailabilityConfig) -> bool {
         if let Some(ref service_name) = config.cluster.k8s_service_name {
             self.service_name != *service_name
@@ -538,16 +583,16 @@ impl NodeDiscovery for KubernetesDiscovery {
 pub trait ClusterMembership {
     /// Initializes the membership service
     async fn initialize(&mut self) -> Result<(), String>;
-    
+
     /// Joins the cluster
     async fn join(&self, node_id: String) -> Result<(), String>;
-    
+
     /// Leaves the cluster
     async fn leave(&self, node_id: String) -> Result<(), String>;
-    
+
     /// Gets the local node address
     fn get_local_address(&self) -> Result<String, String>;
-    
+
     /// Checks if this membership service needs to be updated
     fn needs_update(&self, _config: &HighAvailabilityConfig) -> bool {
         false
@@ -564,7 +609,7 @@ impl BasicMembership {
     pub fn new(config: &HighAvailabilityConfig) -> Self {
         // In a real implementation, this would determine the local address dynamically
         let local_address = "127.0.0.1:5001".to_string();
-        
+
         Self {
             config: config.clone(),
             local_address,
@@ -578,20 +623,26 @@ impl ClusterMembership for BasicMembership {
         // In a real implementation, this would set up network connections
         Ok(())
     }
-    
+
     async fn join(&self, node_id: String) -> Result<(), String> {
-        info!("Node {} joining cluster {}", node_id, self.config.cluster.cluster_name);
+        info!(
+            "Node {} joining cluster {}",
+            node_id, self.config.cluster.cluster_name
+        );
         // In a real implementation, this would register with other nodes
         Ok(())
     }
-    
+
     async fn leave(&self, node_id: String) -> Result<(), String> {
-        info!("Node {} leaving cluster {}", node_id, self.config.cluster.cluster_name);
+        info!(
+            "Node {} leaving cluster {}",
+            node_id, self.config.cluster.cluster_name
+        );
         // In a real implementation, this would deregister from other nodes
         Ok(())
     }
-    
+
     fn get_local_address(&self) -> Result<String, String> {
         Ok(self.local_address.clone())
     }
-} 
+}

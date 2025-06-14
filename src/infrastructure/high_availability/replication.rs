@@ -1,12 +1,12 @@
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::sync::Arc;
 use std::time::{Duration, Instant};
-use tokio::sync::{RwLock, Mutex};
-use tracing::{debug, info, warn, instrument};
-use serde::{Serialize, Deserialize};
+use tokio::sync::{Mutex, RwLock};
+use tracing::{debug, info, instrument, warn};
 
-use crate::infrastructure::high_availability::HaError;
 use crate::infrastructure::high_availability::config::{HighAvailabilityConfig, ReplicationMode};
+use crate::infrastructure::high_availability::HaError;
 
 /// Manager for data replication across cluster nodes
 /// Implements Write-Ahead Log pattern and Leader-Follower replication
@@ -150,22 +150,19 @@ impl ReplicationManager {
 
     /// Replicates a write operation
     #[instrument(skip(self, operation))]
-    pub async fn replicate_write(&self, operation: WriteOperation) -> Result<ReplicationResult, HaError> {
+    pub async fn replicate_write(
+        &self,
+        operation: WriteOperation,
+    ) -> Result<ReplicationResult, HaError> {
         let start_time = Instant::now();
-        
+
         // Add to write-ahead log first (durability)
         self.append_to_wal(&operation).await?;
 
         match self.config.replication.mode {
-            ReplicationMode::Synchronous => {
-                self.replicate_synchronously(operation).await
-            }
-            ReplicationMode::SemiSynchronous => {
-                self.replicate_semi_synchronously(operation).await
-            }
-            ReplicationMode::Asynchronous => {
-                self.replicate_asynchronously(operation).await
-            }
+            ReplicationMode::Synchronous => self.replicate_synchronously(operation).await,
+            ReplicationMode::SemiSynchronous => self.replicate_semi_synchronously(operation).await,
+            ReplicationMode::Asynchronous => self.replicate_asynchronously(operation).await,
         }
     }
 
@@ -225,23 +222,23 @@ impl ReplicationManager {
 
     async fn initialize_wal(&self) -> Result<(), HaError> {
         debug!("Initializing write-ahead log");
-        
+
         // In a real implementation, this would:
         // 1. Load existing WAL from disk
         // 2. Replay uncommitted entries
         // 3. Initialize log rotation
-        
+
         Ok(())
     }
 
     async fn setup_replication_topology(&self) -> Result<(), HaError> {
         debug!("Setting up replication topology");
-        
+
         // In a real implementation, this would:
         // 1. Discover other nodes in cluster
         // 2. Establish replication connections
         // 3. Negotiate replication parameters
-        
+
         Ok(())
     }
 
@@ -282,7 +279,7 @@ impl ReplicationManager {
     async fn append_to_wal(&self, operation: &WriteOperation) -> Result<(), HaError> {
         let mut wal = self.write_ahead_log.lock().await;
         let index = wal.len() as u64 + 1;
-        
+
         let entry = LogEntry {
             index,
             term: 1, // In real implementation, use current term
@@ -291,17 +288,26 @@ impl ReplicationManager {
         };
 
         wal.push(entry);
-        debug!("Appended operation {} to WAL at index {}", operation.id, index);
-        
+        debug!(
+            "Appended operation {} to WAL at index {}",
+            operation.id, index
+        );
+
         Ok(())
     }
 
-    async fn replicate_synchronously(&self, operation: WriteOperation) -> Result<ReplicationResult, HaError> {
+    async fn replicate_synchronously(
+        &self,
+        operation: WriteOperation,
+    ) -> Result<ReplicationResult, HaError> {
         let start_time = Instant::now();
-        
+
         // In synchronous replication, all followers must acknowledge before returning
-        debug!("Performing synchronous replication for operation {}", operation.id);
-        
+        debug!(
+            "Performing synchronous replication for operation {}",
+            operation.id
+        );
+
         // Simulate replication to followers
         let followers = self.get_follower_nodes().await;
         let mut replicated_nodes = Vec::new();
@@ -316,7 +322,7 @@ impl ReplicationManager {
 
         // Synchronous mode requires all nodes to succeed
         let success = failed_nodes.is_empty();
-        
+
         Ok(ReplicationResult {
             success,
             replicated_nodes,
@@ -325,11 +331,17 @@ impl ReplicationManager {
         })
     }
 
-    async fn replicate_semi_synchronously(&self, operation: WriteOperation) -> Result<ReplicationResult, HaError> {
+    async fn replicate_semi_synchronously(
+        &self,
+        operation: WriteOperation,
+    ) -> Result<ReplicationResult, HaError> {
         let start_time = Instant::now();
-        
-        debug!("Performing semi-synchronous replication for operation {}", operation.id);
-        
+
+        debug!(
+            "Performing semi-synchronous replication for operation {}",
+            operation.id
+        );
+
         let followers = self.get_follower_nodes().await;
         let required_acks = self.config.replication.ack_count.unwrap_or(1);
         let mut replicated_nodes = Vec::new();
@@ -348,7 +360,7 @@ impl ReplicationManager {
         }
 
         let success = replicated_nodes.len() >= required_acks;
-        
+
         Ok(ReplicationResult {
             success,
             replicated_nodes,
@@ -357,15 +369,21 @@ impl ReplicationManager {
         })
     }
 
-    async fn replicate_asynchronously(&self, operation: WriteOperation) -> Result<ReplicationResult, HaError> {
+    async fn replicate_asynchronously(
+        &self,
+        operation: WriteOperation,
+    ) -> Result<ReplicationResult, HaError> {
         let start_time = Instant::now();
-        
-        debug!("Performing asynchronous replication for operation {}", operation.id);
-        
+
+        debug!(
+            "Performing asynchronous replication for operation {}",
+            operation.id
+        );
+
         // Add to pending writes for background processing
         let mut pending = self.pending_writes.lock().await;
         pending.push(operation.clone());
-        
+
         Ok(ReplicationResult {
             success: true,
             replicated_nodes: vec!["pending".to_string()],
@@ -374,17 +392,21 @@ impl ReplicationManager {
         })
     }
 
-    async fn replicate_to_node(&self, node: &str, operation: &WriteOperation) -> Result<(), HaError> {
+    async fn replicate_to_node(
+        &self,
+        node: &str,
+        operation: &WriteOperation,
+    ) -> Result<(), HaError> {
         debug!("Replicating operation {} to node {}", operation.id, node);
-        
+
         // In a real implementation, this would:
         // 1. Send the operation over the network
         // 2. Wait for acknowledgment
         // 3. Handle timeouts and retries
-        
+
         // Simulate network delay
         tokio::time::sleep(Duration::from_millis(10)).await;
-        
+
         Ok(())
     }
 
@@ -395,27 +417,27 @@ impl ReplicationManager {
 
     async fn flush_pending_writes(&self) -> Result<(), HaError> {
         debug!("Flushing pending writes");
-        
+
         let mut pending = self.pending_writes.lock().await;
         let operations = std::mem::take(&mut *pending);
-        
+
         for operation in operations {
             // Process each pending operation
             self.replicate_to_all_followers(&operation).await?;
         }
-        
+
         Ok(())
     }
 
     async fn replicate_to_all_followers(&self, operation: &WriteOperation) -> Result<(), HaError> {
         let followers = self.get_follower_nodes().await;
-        
+
         for follower in followers {
             if let Err(e) = self.replicate_to_node(&follower, operation).await {
                 warn!("Failed to replicate to {}: {}", follower, e);
             }
         }
-        
+
         Ok(())
     }
 
@@ -438,7 +460,7 @@ impl ReplicationManager {
         config: Arc<HighAvailabilityConfig>,
     ) {
         info!("Starting replication background loop");
-        
+
         while *replication_active.read().await {
             // Process pending writes
             let mut pending = pending_writes.lock().await;
@@ -451,7 +473,7 @@ impl ReplicationManager {
 
             tokio::time::sleep(Duration::from_millis(100)).await;
         }
-        
+
         info!("Replication background loop ended");
     }
 
@@ -460,12 +482,12 @@ impl ReplicationManager {
         replication_active: Arc<RwLock<bool>>,
     ) {
         info!("Starting heartbeat monitoring loop");
-        
+
         while *replication_active.read().await {
             // Check heartbeats from all nodes
             let mut status_map = node_status.write().await;
             let now = Instant::now();
-            
+
             for (node_id, status) in status_map.iter_mut() {
                 if let Some(last_heartbeat) = status.last_heartbeat {
                     if now.duration_since(last_heartbeat) > Duration::from_secs(30) {
@@ -478,7 +500,7 @@ impl ReplicationManager {
 
             tokio::time::sleep(Duration::from_secs(5)).await;
         }
-        
+
         info!("Heartbeat monitoring loop ended");
     }
 
@@ -487,18 +509,18 @@ impl ReplicationManager {
         replication_active: Arc<RwLock<bool>>,
     ) {
         info!("Starting lag monitoring loop");
-        
+
         while *replication_active.read().await {
             // Monitor replication lag
             let mut state = replication_state.write().await;
-            
+
             // In real implementation: calculate actual lag metrics
             state.last_sync_time = Some(Instant::now());
             drop(state);
 
             tokio::time::sleep(Duration::from_secs(10)).await;
         }
-        
+
         info!("Lag monitoring loop ended");
     }
 }
@@ -527,7 +549,7 @@ mod tests {
     async fn test_replication_manager_creation() {
         let config = create_test_config();
         let manager = ReplicationManager::new(&config);
-        
+
         assert!(!*manager.replication_active.read().await);
     }
 
@@ -535,7 +557,7 @@ mod tests {
     async fn test_replication_initialization() {
         let config = create_test_config();
         let mut manager = ReplicationManager::new(&config);
-        
+
         let result = manager.initialize().await;
         assert!(result.is_ok());
     }
@@ -551,7 +573,7 @@ mod tests {
             timestamp: 123456789,
             checksum: "abc123".to_string(),
         };
-        
+
         assert_eq!(operation.data, b"test_data");
     }
 
@@ -559,9 +581,9 @@ mod tests {
     async fn test_leader_promotion() {
         let config = create_test_config();
         let mut manager = ReplicationManager::new(&config);
-        
+
         manager.promote_to_leader().await.unwrap();
-        
+
         let state = manager.get_replication_status().await.unwrap();
         assert!(state.is_leader);
     }

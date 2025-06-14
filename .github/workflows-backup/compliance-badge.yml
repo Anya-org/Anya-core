@@ -1,0 +1,24 @@
+name: Compliance Badge Verification
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+jobs:
+  verify-badge:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Verify Compliance
+        run: |
+          cargo install --path cli
+          anya-cli compliance-badge --format json > badge.json
+          anya-cli verify-badge badge.json
+          
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: compliance-badge
+          path: badge.json 

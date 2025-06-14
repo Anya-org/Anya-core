@@ -17,12 +17,12 @@ impl CrossLayerTransactionManager {
             config: config.clone(),
         }
     }
-    
+
     /// Verify a cross-layer transaction pair
     pub async fn verify_transaction_pair(
         &self,
         _btc_tx: BtcTransaction,
-        _l2_tx: EvmTransaction
+        _l2_tx: EvmTransaction,
     ) -> Result<ValidationResult, BobError> {
         // In a real implementation, this would verify the cross-layer transaction pair
         // For now, we'll just return a dummy result
@@ -37,5 +37,4 @@ pub struct BtcTransaction {
     pub hash: String,
     /// Transaction data
     pub data: Vec<u8>,
-} 
-
+}

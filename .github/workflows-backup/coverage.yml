@@ -1,0 +1,78 @@
+name: Test Coverage
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main, develop ]
+
+jobs:
+  coverage:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+          
+      - name: Install cargo-tarpaulin
+        run: cargo install cargo-tarpaulin
+        
+      - name: Run tarpaulin
+        run: cargo tarpaulin --out Xml --verbose --workspace --timeout 120
+        
+      - name: Upload to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          fail_ci_if_error: false
+          
+      - name: Generate Report
+        if: github.event_name == 'pull_request'
+        run: |
+          cargo tarpaulin --out Html --verbose --workspace
+          
+      - name: Upload Report Artifact
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-report
+          path: tarpaulin-report.html
+          
+      - name: Comment on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+            try {
+              const coverageOutput = fs.readFileSync('tarpaulin-report.html', 'utf8');
+              const regex = /Total coverage: (\d+\.\d+)%/;
+              const match = coverageOutput.match(regex);
+              const coverage = match ? match[1] : 'unknown';
+              
+              const body = `## Coverage Report
+              
+              Total coverage: ${coverage}%
+              
+              <details>
+              <summary>See Details</summary>
+              
+              Download the artifact from this workflow run to see the full report.
+              </details>`;
+              
+              github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: body
+              });
+            } catch (error) {
+              console.error('Error generating coverage comment:', error);
+            }

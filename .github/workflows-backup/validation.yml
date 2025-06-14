@@ -1,0 +1,34 @@
+name: BIP Compliance Validation
+on: [push, pull_request]
+
+jobs:
+  hybrid-validation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          components: rustfmt, clippy
+      
+      - name: Build WASM
+        run: |
+          cd core
+          wasm-pack build --target web --release
+          
+      - name: PowerShell Validation
+        shell: pwsh
+        run: |
+          ./scripts/security/validate-bip.ps1 -Path ./tests/fixtures/valid.psbt
+          
+      - name: Node.js Tests
+        run: |
+          deno test -A tests/web5/validation.test.js
+          
+      - name: Rust WASM Tests
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --features wasm -- --nocapture 

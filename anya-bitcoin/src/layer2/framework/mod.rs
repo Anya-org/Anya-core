@@ -1,5 +1,5 @@
 // Layer 2 Framework for Bitcoin implementations
-// 
+//
 // Modular framework for implementing future Layer 2 solutions
 // This module follows hexagonal architecture principles
 
@@ -7,14 +7,15 @@ pub mod adapters;
 pub mod config;
 pub mod factory;
 
-use std::collections::HashMap;
-use std::sync::{Arc, RwLock};
-use std::fmt;
+use crate::core::error::{AnyaError, AnyaResult};
 use async_trait::async_trait;
-use crate::core::error::{AnyaResult, AnyaError};
+use std::collections::HashMap;
+use std::fmt;
+use std::sync::{Arc, RwLock};
 
 pub use crate::layer2::types::{
-    ProtocolState, AssetParams, AssetTransfer, TransferResult, Proof, VerificationResult, ValidationResult
+    AssetParams, AssetTransfer, Proof, ProtocolState, TransferResult, ValidationResult,
+    VerificationResult,
 };
 
 /// Transaction status for Layer 2 protocols
@@ -34,10 +35,10 @@ pub enum TransactionStatus {
 pub trait ProtocolConfig: Send + Sync + std::fmt::Debug {
     /// Get protocol name
     fn protocol_name(&self) -> &str;
-    
+
     /// Get network type
     fn network_type(&self) -> &str;
-    
+
     /// Clone configuration
     fn clone_box(&self) -> Box<dyn ProtocolConfig>;
 }
@@ -47,22 +48,22 @@ pub trait ProtocolConfig: Send + Sync + std::fmt::Debug {
 pub trait Layer2Protocol: Send + Sync + fmt::Debug {
     /// Get the protocol name
     fn name(&self) -> &str;
-    
+
     /// Get the protocol version
     fn version(&self) -> &str;
-    
+
     /// Initialize the protocol
     async fn init(&self) -> AnyaResult<()>;
-    
+
     /// Start the protocol
     async fn start(&self) -> AnyaResult<()>;
-    
+
     /// Stop the protocol
     async fn stop(&self) -> AnyaResult<()>;
-    
+
     /// Check if the protocol is running
     async fn is_running(&self) -> bool;
-    
+
     /// Execute a protocol-specific command
     async fn execute_command(&self, command: &str, args: &[&str]) -> AnyaResult<String>;
 }
@@ -84,24 +85,30 @@ impl Layer2Registry {
             protocols: RwLock::new(HashMap::new()),
         }
     }
-    
+
     /// Register a protocol
     pub fn register(&self, protocol_type: &str) -> AnyaResult<Arc<dyn Layer2Protocol>> {
         // Create a default config for the protocol type
         let config = match protocol_type {
             "bob" => Box::new(crate::layer2::bob::BobConfig::default()) as Box<dyn ProtocolConfig>,
-            "lightning" => Box::new(crate::layer2::lightning::LightningConfig::default()) as Box<dyn ProtocolConfig>,
+            "lightning" => Box::new(crate::layer2::lightning::LightningConfig::default())
+                as Box<dyn ProtocolConfig>,
             "rsk" => Box::new(crate::layer2::rsk::RskConfig::default()) as Box<dyn ProtocolConfig>,
-            _ => return Err(AnyaError::Protocol(format!("Unknown protocol type: {}", protocol_type))),
+            _ => {
+                return Err(AnyaError::Protocol(format!(
+                    "Unknown protocol type: {}",
+                    protocol_type
+                )))
+            }
         };
-        
+
         let protocol = self.factory.create_protocol(config)?;
         let protocol_arc: Arc<dyn Layer2Protocol> = Arc::from(protocol);
         let mut protocols = self.protocols.write().unwrap();
         protocols.insert(protocol_type.to_string(), protocol_arc.clone());
         Ok(protocol_arc)
     }
-    
+
     /// Get a protocol
     pub fn get_protocol(&self, protocol_type: &str) -> AnyaResult<Arc<dyn Layer2Protocol>> {
         // Check if protocol is already registered
@@ -111,11 +118,11 @@ impl Layer2Registry {
                 return Ok(protocol.clone());
             }
         }
-        
+
         // If not, register it
         self.register(protocol_type)
     }
-    
+
     /// Get all registered protocols
     pub fn get_all_protocols(&self) -> Vec<Arc<dyn Layer2Protocol>> {
         let protocols = self.protocols.read().unwrap();
@@ -147,100 +154,103 @@ impl Layer2Protocol for NoopLayer2Protocol {
     fn name(&self) -> &str {
         &self.name
     }
-    
+
     fn version(&self) -> &str {
         &self.version
     }
-    
+
     async fn init(&self) -> AnyaResult<()> {
         Ok(())
     }
-    
+
     async fn start(&self) -> AnyaResult<()> {
         // In a real implementation, this would actually start the protocol
         Ok(())
     }
-    
+
     async fn stop(&self) -> AnyaResult<()> {
         // In a real implementation, this would actually stop the protocol
         Ok(())
     }
-    
+
     async fn is_running(&self) -> bool {
         self.running
     }
-    
+
     async fn execute_command(&self, command: &str, _args: &[&str]) -> AnyaResult<String> {
-        Ok(format!("Executed command '{}' on protocol '{}'", command, self.name))
+        Ok(format!(
+            "Executed command '{}' on protocol '{}'",
+            command, self.name
+        ))
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[derive(Debug, Clone)]
     struct TestConfig {
         name: String,
         network: String,
     }
-    
+
     impl ProtocolConfig for TestConfig {
         fn protocol_name(&self) -> &str {
             &self.name
         }
-        
+
         fn network_type(&self) -> &str {
             &self.network
         }
-        
+
         fn clone_box(&self) -> Box<dyn ProtocolConfig> {
             Box::new(self.clone())
         }
     }
-    
+
     #[derive(Debug)]
     struct TestProtocol {
         name: String,
         version: String,
         running: bool,
     }
-    
+
     #[async_trait]
     impl Layer2Protocol for TestProtocol {
         fn name(&self) -> &str {
             &self.name
         }
-        
+
         fn version(&self) -> &str {
             &self.version
         }
-        
+
         async fn init(&self) -> AnyaResult<()> {
             Ok(())
         }
-        
+
         async fn start(&self) -> AnyaResult<()> {
             Ok(())
         }
-        
+
         async fn stop(&self) -> AnyaResult<()> {
             Ok(())
         }
-        
+
         async fn is_running(&self) -> bool {
             self.running
         }
-        
+
         async fn execute_command(&self, command: &str, _args: &[&str]) -> AnyaResult<String> {
             Ok(format!("Test protocol executed: {}", command))
         }
     }
-    
+
     #[test]
     fn test_layer2_factory() {
         let factory = factory::Layer2Factory::new();
-        
+
         factory.register_protocol("test", |config| {
             let test_config = config.protocol_name();
             match test_config {
@@ -252,14 +262,14 @@ mod tests {
                 _ => Err(AnyaError::NotImplemented("Invalid protocol".to_string())),
             }
         });
-        
+
         let config = Box::new(TestConfig {
             name: "test".to_string(),
             network: "testnet".to_string(),
         });
-        
+
         let protocol = factory.create_protocol(config).unwrap();
-        
+
         // We'll just check that we got a protocol with the right name
         assert_eq!(protocol.name(), "test");
     }

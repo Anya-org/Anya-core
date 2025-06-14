@@ -6,9 +6,9 @@ use crate::AnyaError;
 use crate::AnyaResult;
 use secp256k1::{PublicKey as Secp256k1PublicKey, SecretKey as Secp256k1SecretKey};
 use std::collections::HashMap;
+use std::fmt;
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
-use std::fmt;
 
 // Import BitcoinConfig from a module we know exists
 
@@ -29,25 +29,28 @@ impl LightningPublicKey {
         if s.len() != 66 {
             return Err("Invalid public key length".to_string());
         }
-        
+
         // Remove 0x prefix if present
         let hex_str = if s.starts_with("0x") { &s[2..] } else { s };
-        
+
         // Parse hex string to bytes
         let mut bytes = [0u8; 33];
         hex::decode_to_slice(hex_str, &mut bytes)
             .map_err(|e| format!("Invalid hex format: {}", e))?;
-        
+
         Ok(LightningPublicKey { bytes })
     }
-    
+
     // Add a method to create from secp256k1 secret key
-    pub fn from_secret_key(_secp: &LightningSecp256k1<All>, _secret_key: &Secp256k1SecretKey) -> Self {
+    pub fn from_secret_key(
+        _secp: &LightningSecp256k1<All>,
+        _secret_key: &Secp256k1SecretKey,
+    ) -> Self {
         // In a real implementation, this would use the secp256k1 context to derive the public key
         // For now, we'll just return a dummy key
         LightningPublicKey { bytes: [0x03; 33] }
     }
-    
+
     // Add a method to create from another PublicKey
     pub fn from_secp256k1(pubkey: &Secp256k1PublicKey) -> Self {
         let mut bytes = [0u8; 33];
@@ -75,7 +78,9 @@ pub struct All;
 
 impl LightningSecp256k1<All> {
     pub fn new() -> Self {
-        Self { _marker: std::marker::PhantomData }
+        Self {
+            _marker: std::marker::PhantomData,
+        }
     }
 }
 
@@ -103,13 +108,13 @@ pub struct BitcoinConfig {
 pub struct LightningNode {
     /// Network configuration
     config: BitcoinConfig,
-    
+
     /// Node state
     state: Mutex<LightningState>,
-    
+
     /// Secp256k1 context
     secp: LightningSecp256k1<All>,
-    
+
     /// Node public key
     pub node_id: LightningPublicKey,
 }
@@ -118,16 +123,16 @@ pub struct LightningNode {
 struct LightningState {
     /// Channels managed by this node
     channels: HashMap<String, Channel>,
-    
+
     /// Active peers
     peers: HashMap<String, PeerInfo>,
-    
+
     /// Invoices managed by this node
     invoices: HashMap<String, Invoice>,
-    
+
     /// Payments made by this node
     payments: HashMap<String, Payment>,
-    
+
     /// Last updated timestamp
     last_updated: u64,
 }
@@ -137,31 +142,31 @@ struct LightningState {
 pub struct Channel {
     /// Channel ID
     pub channel_id: String,
-    
+
     /// Funding transaction ID
     pub funding_txid: LightningTxid,
-    
+
     /// Funding transaction output index
     pub funding_output_idx: u32,
-    
+
     /// Channel capacity in satoshis
     pub capacity: u64,
-    
+
     /// Local balance in satoshis
     pub local_balance: u64,
-    
+
     /// Remote balance in satoshis
     pub remote_balance: u64,
-    
+
     /// Remote node public key
     pub remote_pubkey: LightningPublicKey,
-    
+
     /// Whether the channel is active
     pub is_active: bool,
-    
+
     /// Whether the channel is public
     pub is_public: bool,
-    
+
     /// Short channel ID (once confirmed)
     pub short_channel_id: Option<String>,
 }
@@ -171,19 +176,19 @@ pub struct Channel {
 pub struct PeerInfo {
     /// Peer node public key
     pub pubkey: LightningPublicKey,
-    
+
     /// Network addresses (host:port)
     pub addresses: Vec<String>,
-    
+
     /// Node alias (name)
     pub alias: Option<String>,
-    
+
     /// Color of the node (hex)
     pub color: Option<String>,
-    
+
     /// Whether the peer is connected
     pub is_connected: bool,
-    
+
     /// Connection timestamp
     pub connected_since: Option<u64>,
 }
@@ -193,25 +198,25 @@ pub struct PeerInfo {
 pub struct Invoice {
     /// BOLT-11 invoice string
     pub bolt11: String,
-    
+
     /// Payment hash
     pub payment_hash: String,
-    
+
     /// Description
     pub description: String,
-    
+
     /// Amount in millisatoshis
     pub amount_msat: Option<u64>,
-    
+
     /// Expiry time in seconds from creation
     pub expiry: u32,
-    
+
     /// Creation timestamp
     pub timestamp: u64,
-    
+
     /// Whether the invoice has been paid
     pub is_paid: bool,
-    
+
     /// Payment timestamp (if paid)
     pub paid_at: Option<u64>,
 }
@@ -221,28 +226,28 @@ pub struct Invoice {
 pub struct Payment {
     /// Payment ID
     pub payment_id: String,
-    
+
     /// Payment hash
     pub payment_hash: String,
-    
+
     /// Payment preimage (if payment is complete)
     pub preimage: Option<String>,
-    
+
     /// Amount in millisatoshis
     pub amount_msat: u64,
-    
+
     /// Fee paid in millisatoshis
     pub fee_msat: u64,
-    
+
     /// Payment status
     pub status: PaymentStatus,
-    
+
     /// Creation timestamp
     pub created_at: u64,
-    
+
     /// Resolved timestamp (if complete or failed)
     pub resolved_at: Option<u64>,
-    
+
     /// Payment description or purpose
     pub description: Option<String>,
 }
@@ -252,10 +257,10 @@ pub struct Payment {
 pub enum PaymentStatus {
     /// Payment is in progress
     Pending,
-    
+
     /// Payment succeeded
     Succeeded,
-    
+
     /// Payment failed
     Failed,
 }
@@ -264,13 +269,13 @@ pub enum PaymentStatus {
 pub struct BitcoinLightningBridge {
     /// Lightning node reference
     lightning_node: Arc<LightningNode>,
-    
+
     /// Channel transactions
     channel_transactions: Mutex<HashMap<String, ChannelTransaction>>,
-    
+
     /// Address records for channel funding
     funding_addresses: Mutex<HashMap<String, FundingAddress>>,
-    
+
     /// Last scanned block height
     last_scanned_height: Mutex<u32>,
 }
@@ -280,28 +285,28 @@ pub struct BitcoinLightningBridge {
 pub struct ChannelTransaction {
     /// Channel ID
     pub channel_id: String,
-    
+
     /// Funding transaction ID
     pub funding_txid: LightningTxid,
-    
+
     /// Funding output index
     pub funding_output_idx: u32,
-    
+
     /// Funding amount in satoshis
     pub funding_amount: u64,
-    
+
     /// Current status
     pub status: ChannelTransactionStatus,
-    
+
     /// Confirmation height (if confirmed)
     pub confirmation_height: Option<u32>,
-    
+
     /// Closing transaction ID (if closed)
     pub closing_txid: Option<LightningTxid>,
-    
+
     /// Created timestamp
     pub created_at: u64,
-    
+
     /// Updated timestamp
     pub updated_at: u64,
 }
@@ -311,10 +316,10 @@ pub struct ChannelTransaction {
 pub enum ChannelTransactionStatus {
     /// Funding transaction is pending
     Pending,
-    
+
     /// Funding transaction is confirmed
     Confirmed,
-    
+
     /// Channel is closed
     Closed,
 }
@@ -324,13 +329,13 @@ pub enum ChannelTransactionStatus {
 pub struct FundingAddress {
     /// Bitcoin address string
     pub address: String,
-    
+
     /// Required amount in satoshis
     pub required_amount: u64,
-    
+
     /// Channel parameters to use when funded
     pub channel_params: ChannelParameters,
-    
+
     /// Created timestamp
     pub created_at: u64,
 }
@@ -340,10 +345,10 @@ pub struct FundingAddress {
 pub struct ChannelParameters {
     /// Peer node public key
     pub peer_pubkey: LightningPublicKey,
-    
+
     /// Push amount in millisatoshis (initial balance for peer)
     pub push_msat: Option<u64>,
-    
+
     /// Whether the channel is private
     pub is_private: bool,
 }
@@ -352,12 +357,13 @@ impl LightningNode {
     /// Create a new Lightning node
     pub fn new(config: &BitcoinConfig) -> AnyaResult<Self> {
         let secp = LightningSecp256k1::new();
-        
+
         // Generate a node key (in a real implementation this would be read from storage)
-        let node_secret = Secp256k1SecretKey::from_slice(&[0x42; 32])
-            .map_err(|e| AnyaError::Bitcoin(format!("Failed to create Lightning node key: {}", e)))?;
+        let node_secret = Secp256k1SecretKey::from_slice(&[0x42; 32]).map_err(|e| {
+            AnyaError::Bitcoin(format!("Failed to create Lightning node key: {}", e))
+        })?;
         let node_id = LightningPublicKey::from_secret_key(&secp, &node_secret);
-        
+
         // Create initial state
         let state = LightningState {
             channels: HashMap::new(),
@@ -366,7 +372,7 @@ impl LightningNode {
             payments: HashMap::new(),
             last_updated: current_time(),
         };
-        
+
         Ok(Self {
             config: config.clone(),
             state: Mutex::new(state),
@@ -374,7 +380,7 @@ impl LightningNode {
             node_id,
         })
     }
-    
+
     /// Get information about the local node
     pub fn get_node_info(&self) -> AnyaResult<NodeInfo> {
         Ok(NodeInfo {
@@ -389,19 +395,25 @@ impl LightningNode {
             ],
         })
     }
-    
+
     /// Connect to a remote node
     pub fn connect_peer(&self, node_pubkey: &str, host: &str, port: u16) -> AnyaResult<()> {
         let pubkey = LightningPublicKey::from_str(node_pubkey)
             .map_err(|e| AnyaError::Bitcoin(format!("Invalid node pubkey: {}", e)))?;
-            
-        let mut state = self.state.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
-        
+
+        let mut state = self
+            .state
+            .lock()
+            .map_err(|e| format!("Mutex lock error: {}", e))?;
+
         // Check if already connected
         if state.peers.contains_key(node_pubkey) {
-            return Err(AnyaError::Bitcoin(format!("Already connected to {}", node_pubkey)));
+            return Err(AnyaError::Bitcoin(format!(
+                "Already connected to {}",
+                node_pubkey
+            )));
         }
-        
+
         // Add peer
         let peer_info = PeerInfo {
             pubkey,
@@ -411,19 +423,22 @@ impl LightningNode {
             is_connected: true,
             connected_since: Some(current_time()),
         };
-        
+
         state.peers.insert(node_pubkey.to_string(), peer_info);
         state.last_updated = current_time();
-        
+
         Ok(())
     }
-    
+
     /// List connected peers
     pub fn list_peers(&self) -> AnyaResult<Vec<PeerInfo>> {
-        let state = self.state.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
+        let state = self
+            .state
+            .lock()
+            .map_err(|e| format!("Mutex lock error: {}", e))?;
         Ok(state.peers.values().cloned().collect())
     }
-    
+
     /// Open a channel with a peer
     pub fn open_channel(
         &self,
@@ -434,26 +449,32 @@ impl LightningNode {
     ) -> AnyaResult<Channel> {
         let pubkey = LightningPublicKey::from_str(node_pubkey)
             .map_err(|e| AnyaError::Bitcoin(format!("Invalid node pubkey: {}", e)))?;
-            
-        let mut state = self.state.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
-        
+
+        let mut state = self
+            .state
+            .lock()
+            .map_err(|e| format!("Mutex lock error: {}", e))?;
+
         // Check if connected to peer
         if !state.peers.contains_key(node_pubkey) {
-            return Err(AnyaError::Bitcoin(format!("Not connected to peer {}", node_pubkey)));
+            return Err(AnyaError::Bitcoin(format!(
+                "Not connected to peer {}",
+                node_pubkey
+            )));
         }
-        
+
         // Generate channel ID
         let channel_id = format!("channel_{:x}", rand::random::<u64>());
-        
+
         // Generate funding transaction ID
         let funding_txid = LightningTxid::from_slice(&[0x42; 32])
             .map_err(|e| AnyaError::Bitcoin(format!("Failed to create txid: {}", e)))?;
-        
+
         // Calculate balance split
         let push_amount = push_msat.unwrap_or(0) / 1000; // Convert to sats
         let local_balance = capacity - push_amount;
         let remote_balance = push_amount;
-        
+
         // Create channel
         let channel = Channel {
             channel_id: channel_id.clone(),
@@ -467,39 +488,47 @@ impl LightningNode {
             is_public: !is_private,
             short_channel_id: None,
         };
-        
+
         state.channels.insert(channel_id, channel.clone());
         state.last_updated = current_time();
-        
+
         Ok(channel)
     }
-    
+
     /// List all channels
     pub fn list_channels(&self) -> AnyaResult<Vec<Channel>> {
-        let state = self.state.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
+        let state = self
+            .state
+            .lock()
+            .map_err(|e| format!("Mutex lock error: {}", e))?;
         Ok(state.channels.values().cloned().collect())
     }
-    
+
     /// Close a channel
     pub fn close_channel(&self, channel_id: &str) -> AnyaResult<LightningTxid> {
-        let mut state = self.state.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
-        
+        let mut state = self
+            .state
+            .lock()
+            .map_err(|e| format!("Mutex lock error: {}", e))?;
+
         // Find channel
-        let channel = state.channels.get_mut(channel_id)
+        let channel = state
+            .channels
+            .get_mut(channel_id)
             .ok_or_else(|| AnyaError::Bitcoin(format!("Channel not found: {}", channel_id)))?;
-        
+
         // Generate closing transaction ID
         let closing_txid = LightningTxid::from_slice(&[0x24; 32])
             .map_err(|e| AnyaError::Bitcoin(format!("Failed to create closing txid: {}", e)))?;
-        
+
         // Update channel state
         channel.is_active = false;
-        
+
         state.last_updated = current_time();
-        
+
         Ok(closing_txid)
     }
-    
+
     /// Create an invoice
     pub fn create_invoice(
         &self,
@@ -507,12 +536,15 @@ impl LightningNode {
         description: &str,
         expiry: Option<u32>,
     ) -> AnyaResult<Invoice> {
-        let mut state = self.state.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
+        let mut state = self
+            .state
+            .lock()
+            .map_err(|e| format!("Mutex lock error: {}", e))?;
         let now = current_time();
-        
+
         // Generate payment hash
         let payment_hash = format!("hash_{:x}", rand::random::<u64>());
-        
+
         // Fix the network matching
         let network_prefix = match self.config.network.as_str() {
             "bitcoin" => "lnbc",
@@ -521,19 +553,20 @@ impl LightningNode {
             "signet" => "lnsb",
             _ => "lnbc", // Default to mainnet
         };
-        
+
         let amount_part = match amount_msat {
             Some(amt) => format!("{}", amt / 1000), // Convert to satoshis
             None => "any".to_string(),
         };
-        
-        let bolt11 = format!("{}{}{}{}", 
-            network_prefix, 
-            amount_part, 
-            description.chars().take(10).collect::<String>(), 
+
+        let bolt11 = format!(
+            "{}{}{}{}",
+            network_prefix,
+            amount_part,
+            description.chars().take(10).collect::<String>(),
             now % 1000000
         );
-        
+
         // Create invoice
         let invoice = Invoice {
             bolt11,
@@ -545,53 +578,56 @@ impl LightningNode {
             is_paid: false,
             paid_at: None,
         };
-        
+
         state.invoices.insert(payment_hash, invoice.clone());
         state.last_updated = now;
-        
+
         Ok(invoice)
     }
-    
+
     /// Pay an invoice
     pub fn pay_invoice(&self, bolt11: &str, amount_msat: Option<u64>) -> AnyaResult<Payment> {
-        let mut state = self.state.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
+        let mut state = self
+            .state
+            .lock()
+            .map_err(|e| format!("Mutex lock error: {}", e))?;
         let now = current_time();
-        
+
         // Parse invoice (simplified)
         let payment_hash = format!("hash_{:x}", rand::random::<u64>());
         let payment_id = format!("pay_{:x}", rand::random::<u64>());
-        
+
         // Determine amount
         let invoice_amount = amount_msat.unwrap_or(10_000); // Default 10,000 msat for example
-        
+
         // Generate preimage
         let preimage = format!("preimage_{:x}", rand::random::<u64>());
-        
+
         // Create payment
         let payment = Payment {
             payment_id: payment_id.clone(),
             payment_hash: payment_hash.clone(),
             preimage: Some(preimage),
             amount_msat: invoice_amount,
-            fee_msat: invoice_amount / 100, // 1% fee for example
+            fee_msat: invoice_amount / 100,   // 1% fee for example
             status: PaymentStatus::Succeeded, // Simplified: always succeeds
             created_at: now,
             resolved_at: Some(now),
             description: Some(format!("Payment for invoice {}", bolt11)),
         };
-        
+
         state.payments.insert(payment_id, payment.clone());
         state.last_updated = now;
-        
+
         Ok(payment)
     }
-    
+
     /// Decode an invoice
     pub fn decode_invoice(&self, bolt11: &str) -> AnyaResult<Invoice> {
         // In a real implementation, this would parse the BOLT11 invoice
         // For this example, we'll create a dummy invoice
         let payment_hash = format!("hash_{:x}", rand::random::<u64>());
-        
+
         Ok(Invoice {
             bolt11: bolt11.to_string(),
             payment_hash,
@@ -603,22 +639,30 @@ impl LightningNode {
             paid_at: None,
         })
     }
-    
+
     /// Get a payment by hash
     pub fn get_payment(&self, payment_hash: &str) -> AnyaResult<Option<Payment>> {
-        let state = self.state.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
-        
+        let state = self
+            .state
+            .lock()
+            .map_err(|e| format!("Mutex lock error: {}", e))?;
+
         // Find payment by hash
-        let payment = state.payments.values()
+        let payment = state
+            .payments
+            .values()
             .find(|p| p.payment_hash == payment_hash)
             .cloned();
-            
+
         Ok(payment)
     }
-    
+
     /// List all payments
     pub fn list_payments(&self) -> AnyaResult<Vec<Payment>> {
-        let state = self.state.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
+        let state = self
+            .state
+            .lock()
+            .map_err(|e| format!("Mutex lock error: {}", e))?;
         Ok(state.payments.values().cloned().collect())
     }
 }
@@ -633,14 +677,17 @@ impl BitcoinLightningBridge {
             last_scanned_height: Mutex::new(0),
         })
     }
-    
+
     /// Initialize the bridge with the current block height
     pub fn init(&self, current_height: u32) -> AnyaResult<()> {
-        let mut last_height = self.last_scanned_height.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
+        let mut last_height = self
+            .last_scanned_height
+            .lock()
+            .map_err(|e| format!("Mutex lock error: {}", e))?;
         *last_height = current_height;
         Ok(())
     }
-    
+
     /// Create a funding address for a new channel
     pub fn create_funding_address(
         &self,
@@ -653,23 +700,26 @@ impl BitcoinLightningBridge {
         let peers = self.lightning_node.list_peers()?;
         let pubkey = LightningPublicKey::from_str(peer_pubkey)
             .map_err(|e| AnyaError::Bitcoin(format!("Invalid node pubkey: {}", e)))?;
-            
+
         let is_connected = peers.iter().any(|p| p.pubkey.to_string() == peer_pubkey);
-        
+
         if !is_connected {
-            return Err(AnyaError::Bitcoin(format!("Not connected to peer {}", peer_pubkey)));
+            return Err(AnyaError::Bitcoin(format!(
+                "Not connected to peer {}",
+                peer_pubkey
+            )));
         }
-        
+
         // Generate a Bitcoin address (simplified)
         let address = format!("bc1q{:x}", rand::random::<u64>());
-        
+
         // Create channel parameters
         let channel_params = ChannelParameters {
             peer_pubkey: pubkey,
             push_msat,
             is_private,
         };
-        
+
         // Store funding address
         let funding_address = FundingAddress {
             address: address.clone(),
@@ -677,13 +727,16 @@ impl BitcoinLightningBridge {
             channel_params,
             created_at: current_time(),
         };
-        
-        let mut funding_addresses = self.funding_addresses.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
+
+        let mut funding_addresses = self
+            .funding_addresses
+            .lock()
+            .map_err(|e| format!("Mutex lock error: {}", e))?;
         funding_addresses.insert(address.clone(), funding_address);
-        
+
         Ok(address)
     }
-    
+
     /// Register a channel transaction
     pub fn register_channel_transaction(
         &self,
@@ -706,15 +759,18 @@ impl BitcoinLightningBridge {
             updated_at: current_time(),
         })
     }
-    
+
     /// Register a channel closing
     pub fn register_channel_close(
         &self,
         channel_id: &str,
         closing_txid: LightningTxid,
     ) -> AnyaResult<()> {
-        let mut channel_txs = self.channel_transactions.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
-        
+        let mut channel_txs = self
+            .channel_transactions
+            .lock()
+            .map_err(|e| format!("Mutex lock error: {}", e))?;
+
         match channel_txs.get_mut(channel_id) {
             Some(tx_info) => {
                 tx_info.status = ChannelTransactionStatus::Closed;
@@ -722,19 +778,31 @@ impl BitcoinLightningBridge {
                 tx_info.updated_at = current_time();
                 Ok(())
             }
-            None => Err(AnyaError::Bitcoin(format!("Channel not found: {}", channel_id))),
+            None => Err(AnyaError::Bitcoin(format!(
+                "Channel not found: {}",
+                channel_id
+            ))),
         }
     }
-    
+
     /// Get a channel transaction by ID
-    pub fn get_channel_transaction(&self, channel_id: &str) -> AnyaResult<Option<ChannelTransaction>> {
-        let channel_txs = self.channel_transactions.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
+    pub fn get_channel_transaction(
+        &self,
+        channel_id: &str,
+    ) -> AnyaResult<Option<ChannelTransaction>> {
+        let channel_txs = self
+            .channel_transactions
+            .lock()
+            .map_err(|e| format!("Mutex lock error: {}", e))?;
         Ok(channel_txs.get(channel_id).cloned())
     }
-    
+
     /// List all channel transactions
     pub fn list_channel_transactions(&self) -> AnyaResult<Vec<ChannelTransaction>> {
-        let channel_txs = self.channel_transactions.lock().map_err(|e| format!("Mutex lock error: {}", e))?;
+        let channel_txs = self
+            .channel_transactions
+            .lock()
+            .map_err(|e| format!("Mutex lock error: {}", e))?;
         Ok(channel_txs.values().cloned().collect())
     }
 }
@@ -744,16 +812,16 @@ impl BitcoinLightningBridge {
 pub struct NodeInfo {
     /// Node public key
     pub pubkey: String,
-    
+
     /// Network addresses (host:port)
     pub addresses: Vec<String>,
-    
+
     /// Node alias (name)
     pub alias: Option<String>,
-    
+
     /// Color of the node (hex)
     pub color: Option<String>,
-    
+
     /// Node features
     pub features: Vec<String>,
 }
@@ -772,10 +840,10 @@ impl LightningTxid {
         if data.len() != 32 {
             return Err("Invalid txid length".to_string());
         }
-        
+
         let mut bytes = [0u8; 32];
         bytes.copy_from_slice(data);
-        
+
         Ok(LightningTxid { bytes })
     }
 }
@@ -783,8 +851,6 @@ impl LightningTxid {
 // Add Clone implementation for LightningTxid
 impl Clone for LightningTxid {
     fn clone(&self) -> Self {
-        Self {
-            bytes: self.bytes,
-        }
+        Self { bytes: self.bytes }
     }
-} 
+}

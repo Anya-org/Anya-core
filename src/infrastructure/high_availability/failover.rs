@@ -1,13 +1,12 @@
+use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 use std::time::Duration;
 use tokio::sync::RwLock;
 use tokio::time::Instant;
 use tracing::{debug, info, instrument, warn};
-use serde::{Deserialize, Serialize};
 
 use crate::infrastructure::high_availability::{
-    FailoverPhase, HaError,
-    config::HighAvailabilityConfig,
+    config::HighAvailabilityConfig, FailoverPhase, HaError,
 };
 
 /// Failover manager implementing automatic failover patterns
@@ -67,7 +66,7 @@ impl FailoverManager {
     #[instrument(skip(self))]
     pub async fn initialize(&mut self) -> Result<(), HaError> {
         info!("Initializing failover manager");
-        
+
         if !self.config.failover.enabled {
             warn!("Failover is disabled in configuration");
             *self.enabled.write().await = false;
@@ -100,7 +99,8 @@ impl FailoverManager {
     /// Triggers a manual failover
     #[instrument(skip(self))]
     pub async fn trigger_manual_failover(&mut self) -> Result<(), HaError> {
-        self.trigger_failover(FailoverTrigger::Manual, None, None).await
+        self.trigger_failover(FailoverTrigger::Manual, None, None)
+            .await
     }
 
     /// Triggers failover for a specific reason
@@ -131,12 +131,10 @@ impl FailoverManager {
         if let Some(last_attempt) = *self.last_failover_attempt.read().await {
             let elapsed = last_attempt.elapsed();
             let min_interval = Duration::from_secs(30); // Minimum 30 seconds between failovers
-            
+
             if elapsed < min_interval {
                 warn!("Failover rate limited, last attempt was {:?} ago", elapsed);
-                return Err(HaError::FailoverError(
-                    "Failover rate limited".to_string(),
-                ));
+                return Err(HaError::FailoverError("Failover rate limited".to_string()));
             }
         }
 
@@ -201,11 +199,16 @@ impl FailoverManager {
         // Phase 2: Election
         *self.current_phase.write().await = FailoverPhase::Election;
         info!("Failover {}: Election phase", event_id);
-        let new_leader = self.elect_new_leader(source_node.as_deref(), target_node.as_deref()).await?;
+        let new_leader = self
+            .elect_new_leader(source_node.as_deref(), target_node.as_deref())
+            .await?;
 
         // Phase 3: Promotion
         *self.current_phase.write().await = FailoverPhase::Promotion;
-        info!("Failover {}: Promotion phase - promoting {}", event_id, new_leader);
+        info!(
+            "Failover {}: Promotion phase - promoting {}",
+            event_id, new_leader
+        );
         self.promote_new_leader(&new_leader).await?;
 
         // Phase 4: Redirection
@@ -237,17 +240,19 @@ impl FailoverManager {
             FailoverTrigger::NodeFailure(node) => {
                 // Verify the node is actually down
                 if !self.verify_node_failure(node).await? {
-                    return Err(HaError::FailoverError(
-                        format!("Node {} appears to be healthy", node),
-                    ));
+                    return Err(HaError::FailoverError(format!(
+                        "Node {} appears to be healthy",
+                        node
+                    )));
                 }
             }
             FailoverTrigger::HealthCheckFailure(component) => {
                 // Verify health check failure is critical
                 if !self.verify_health_failure(component).await? {
-                    return Err(HaError::FailoverError(
-                        format!("Component {} health check not critical", component),
-                    ));
+                    return Err(HaError::FailoverError(format!(
+                        "Component {} health check not critical",
+                        component
+                    )));
                 }
             }
             FailoverTrigger::Manual => {
@@ -287,7 +292,7 @@ impl FailoverManager {
 
         // For now, simulate election
         let available_nodes = self.get_available_nodes(failed_node).await?;
-        
+
         if available_nodes.is_empty() {
             return Err(HaError::FailoverError(
                 "No available nodes for promotion".to_string(),
@@ -312,7 +317,7 @@ impl FailoverManager {
         // 4. Notify other nodes
 
         tokio::time::sleep(Duration::from_millis(100)).await; // Simulate promotion time
-        
+
         info!("Successfully promoted {} to leader", node);
         Ok(())
     }
@@ -328,7 +333,7 @@ impl FailoverManager {
         // 4. Update service discovery
 
         tokio::time::sleep(Duration::from_millis(50)).await; // Simulate redirection time
-        
+
         info!("Successfully redirected traffic to {}", new_leader);
         Ok(())
     }
@@ -350,13 +355,13 @@ impl FailoverManager {
     /// Verifies that a node has actually failed
     async fn verify_node_failure(&self, node: &str) -> Result<bool, HaError> {
         debug!("Verifying failure of node: {}", node);
-        
+
         // In a real implementation, this would:
         // 1. Try to ping the node
         // 2. Check heartbeat timestamps
         // 3. Verify with other nodes
         // 4. Check network connectivity
-        
+
         // For simulation, assume the node is indeed failed
         Ok(true)
     }
@@ -364,18 +369,21 @@ impl FailoverManager {
     /// Verifies that a health check failure is critical
     async fn verify_health_failure(&self, component: &str) -> Result<bool, HaError> {
         debug!("Verifying health failure of component: {}", component);
-        
+
         // In a real implementation, this would:
         // 1. Check the severity of the health failure
         // 2. Verify with multiple health checks
         // 3. Check if it affects critical functionality
-        
+
         // For simulation, assume it's critical
         Ok(true)
     }
 
     /// Gets list of available nodes for promotion
-    async fn get_available_nodes(&self, exclude_node: Option<&str>) -> Result<Vec<String>, HaError> {
+    async fn get_available_nodes(
+        &self,
+        exclude_node: Option<&str>,
+    ) -> Result<Vec<String>, HaError> {
         // In a real implementation, this would query the cluster manager
         let mut nodes = vec![
             "node-1".to_string(),
@@ -440,7 +448,7 @@ mod tests {
     async fn test_failover_manager_creation() {
         let config = create_test_config();
         let manager = FailoverManager::new(&config);
-        
+
         assert!(!manager.is_failover_active().await);
         assert_eq!(manager.get_current_phase().await, FailoverPhase::Completed);
     }
@@ -449,13 +457,13 @@ mod tests {
     async fn test_enable_disable() {
         let config = create_test_config();
         let mut manager = FailoverManager::new(&config);
-        
+
         manager.initialize().await.unwrap();
         assert!(*manager.enabled.read().await);
-        
+
         manager.disable().await.unwrap();
         assert!(!*manager.enabled.read().await);
-        
+
         manager.enable().await.unwrap();
         assert!(*manager.enabled.read().await);
     }
@@ -464,12 +472,12 @@ mod tests {
     async fn test_manual_failover() {
         let config = create_test_config();
         let mut manager = FailoverManager::new(&config);
-        
+
         manager.initialize().await.unwrap();
-        
+
         let result = manager.trigger_manual_failover().await;
         assert!(result.is_ok());
-        
+
         let history = manager.get_failover_history().await;
         assert_eq!(history.len(), 1);
         assert!(history[0].success);

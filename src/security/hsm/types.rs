@@ -1,10 +1,10 @@
 use bitcoin::hashes::*;
 // [AIR-3][AIS-3][BPC-3][RES-3] Import necessary dependencies for HSM types
 // This follows official Bitcoin Improvement Proposals (BIPs) standards for secure HSM implementation
-use secp256k1::ecdsa::Signature;
 use chrono::{DateTime, Utc};
-use serde::{Serialize, Deserialize};
+use secp256k1::ecdsa::Signature;
 use serde::ser::SerializeStruct;
+use serde::{Deserialize, Serialize};
 
 use std::error::Error;
 use std::fmt;
@@ -108,19 +108,19 @@ pub enum HsmOperation {
     GetKeyInfo,
     /// Rotate a key
     RotateKey,
-    
+
     /// Generate a key pair (alias for GenerateKey)
     GenerateKeyPair,
-    
+
     /// Sign data
     SignData,
-    
+
     /// Verify a signature
     VerifySignature,
-    
+
     /// Encrypt data
     EncryptData,
-    
+
     /// Decrypt data
     DecryptData,
 }
@@ -151,7 +151,7 @@ impl HsmRequest {
             timestamp: Utc::now(),
         }
     }
-    
+
     /// Set the user ID
     pub fn with_user_id(mut self, user_id: impl Into<String>) -> Self {
         self.user_id = Some(user_id.into());
@@ -196,7 +196,7 @@ impl HsmResponse {
             timestamp: Utc::now(),
         }
     }
-    
+
     /// Create a new failure HSM response
     pub fn failure(request_id: impl Into<String>, error: impl Into<String>) -> Self {
         Self {
@@ -207,7 +207,7 @@ impl HsmResponse {
             timestamp: Utc::now(),
         }
     }
-    
+
     /// Create a new in-progress HSM response
     pub fn in_progress(request_id: impl Into<String>) -> Self {
         Self {
@@ -402,43 +402,46 @@ impl HsmKeyPath {
     /// Create a new key path from components and hardened flags
     pub fn new(components: Vec<u32>, hardened: Vec<bool>) -> Self {
         assert_eq!(components.len(), hardened.len());
-        Self { components, hardened }
+        Self {
+            components,
+            hardened,
+        }
     }
-    
+
     /// Parse a key path string like "m/44'/0'/0'/0/0"
     pub fn from_string(s: &str) -> Result<Self, Box<dyn Error>> {
         if !s.starts_with("m/") {
             return Err(format!("Invalid key path: {}", s).into());
         }
-        
+
         let s = &s[2..]; // Skip the "m/"
         let mut components = Vec::new();
         let mut hardened = Vec::new();
-        
+
         for part in s.split('/') {
             if part.is_empty() {
                 continue;
             }
-            
+
             let is_hardened = part.ends_with('\'') || part.ends_with('h');
             let num_str = if is_hardened {
                 &part[..part.len() - 1]
             } else {
                 part
             };
-            
+
             let num = num_str.parse::<u32>()?;
             components.push(num);
             hardened.push(is_hardened);
         }
-        
+
         Ok(Self::new(components, hardened))
     }
-    
+
     /// Format the key path as a string
     pub fn to_string(&self) -> String {
         let mut result = String::from("m");
-        
+
         for i in 0..self.components.len() {
             result.push('/');
             result.push_str(&self.components[i].to_string());
@@ -446,7 +449,7 @@ impl HsmKeyPath {
                 result.push('\'');
             }
         }
-        
+
         result
     }
 }
@@ -513,7 +516,7 @@ pub struct KeyGenParams {
 #[derive(Debug, Clone)]
 pub struct CoreWrapper<T> {
     // Add fields as needed
-    pub data: Option<T>
+    pub data: Option<T>,
 }
 
 // Add conversion from provider::SigningAlgorithm to types::SignatureAlgorithm
@@ -553,9 +556,9 @@ impl From<SignatureAlgorithm> for crate::security::hsm::provider::SigningAlgorit
 }
 
 // Implement Serialize and Deserialize manually to avoid generic type parameter issues
-impl<T> Serialize for CoreWrapper<T> 
-where 
-    T: Serialize
+impl<T> Serialize for CoreWrapper<T>
+where
+    T: Serialize,
 {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
@@ -571,7 +574,7 @@ where
 
 impl<'de, T> Deserialize<'de> for CoreWrapper<T>
 where
-    T: Deserialize<'de>
+    T: Deserialize<'de>,
 {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
@@ -583,8 +586,6 @@ where
         }
 
         let helper = CoreWrapperHelper::deserialize(deserializer)?;
-        Ok(CoreWrapper {
-            data: helper.data,
-        })
+        Ok(CoreWrapper { data: helper.data })
     }
 }

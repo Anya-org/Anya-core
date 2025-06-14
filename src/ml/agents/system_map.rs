@@ -4,15 +4,15 @@
 // that enable the "read first always" principle. It maintains global
 // state about the system that agents can read before taking actions.
 
-use std::sync::{Arc, RwLock};
-use std::collections::HashMap;
-use once_cell::sync::Lazy;
-use serde::{Serialize, Deserialize};
 use async_trait::async_trait;
-use dashmap::{DashSet, DashMap};
-use std::time::{SystemTime, UNIX_EPOCH};
 use blake3;
-use rayon::iter::{ParallelIterator, ParallelBridge};
+use dashmap::{DashMap, DashSet};
+use once_cell::sync::Lazy;
+use rayon::iter::{ParallelBridge, ParallelIterator};
+use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
+use std::sync::{Arc, RwLock};
+use std::time::{SystemTime, UNIX_EPOCH};
 use walkdir::WalkDir;
 
 use super::AgentError;
@@ -41,19 +41,19 @@ pub struct SystemIndex {
 pub struct SystemMap {
     /// Agent relationships (dependencies)
     pub agent_relationships: HashMap<String, Vec<String>>,
-    
+
     /// Component states
     pub component_states: HashMap<String, ComponentState>,
-    
+
     /// Model states
     pub model_states: HashMap<String, ModelState>,
-    
+
     /// System health metrics
     pub health_metrics: HashMap<String, f64>,
-    
+
     /// Last update timestamp
     pub last_updated: u64,
-    
+
     /// Version of the map
     pub version: u32,
 }
@@ -63,16 +63,16 @@ pub struct SystemMap {
 pub struct ComponentState {
     /// Component ID
     pub id: String,
-    
+
     /// Current status
     pub status: ComponentStatus,
-    
+
     /// Health score (0.0 to 1.0)
     pub health: f32,
-    
+
     /// Last update timestamp
     pub last_updated: u64,
-    
+
     /// Additional properties
     pub properties: HashMap<String, serde_json::Value>,
 }
@@ -82,19 +82,19 @@ pub struct ComponentState {
 pub enum ComponentStatus {
     /// Component is active and working properly
     Active,
-    
+
     /// Component is initializing
     Initializing,
-    
+
     /// Component is degraded but still functioning
     Degraded,
-    
+
     /// Component is offline or not functioning
     Offline,
-    
+
     /// Component is in maintenance mode
     Maintenance,
-    
+
     /// Component status is unknown
     Unknown,
 }
@@ -110,19 +110,19 @@ impl Default for ComponentStatus {
 pub struct ModelState {
     /// Model ID
     pub id: String,
-    
+
     /// Model version
     pub version: String,
-    
+
     /// Current status
     pub status: ModelStatus,
-    
+
     /// Model accuracy or other primary metric
     pub accuracy: f32,
-    
+
     /// Last update timestamp
     pub last_updated: u64,
-    
+
     /// Model metadata
     pub metadata: HashMap<String, serde_json::Value>,
 }
@@ -132,19 +132,19 @@ pub struct ModelState {
 pub enum ModelStatus {
     /// Model is available and ready for inference
     Ready,
-    
+
     /// Model is being trained
     Training,
-    
+
     /// Model is being validated
     Validating,
-    
+
     /// Model failed validation
     Failed,
-    
+
     /// Model is being updated
     Updating,
-    
+
     /// Model is deprecated
     Deprecated,
 }
@@ -154,7 +154,7 @@ pub enum ModelStatus {
 pub enum LinkStatus {
     Valid,
     Broken,
-    Deprecated(String),  // Deprecation timestamp
+    Deprecated(String), // Deprecation timestamp
     External,
 }
 
@@ -171,14 +171,11 @@ pub struct RustCodeMetrics {
 }
 
 // Global instance of the system index
-static GLOBAL_INDEX: Lazy<Arc<SystemIndexManager>> = Lazy::new(|| {
-    Arc::new(SystemIndexManager::new())
-});
+static GLOBAL_INDEX: Lazy<Arc<SystemIndexManager>> =
+    Lazy::new(|| Arc::new(SystemIndexManager::new()));
 
 // Global instance of the system map
-static GLOBAL_MAP: Lazy<Arc<SystemMapManager>> = Lazy::new(|| {
-    Arc::new(SystemMapManager::new())
-});
+static GLOBAL_MAP: Lazy<Arc<SystemMapManager>> = Lazy::new(|| Arc::new(SystemMapManager::new()));
 
 /// Manager for the system index
 pub struct SystemIndexManager {
@@ -192,42 +189,44 @@ impl SystemIndexManager {
             index: RwLock::new(SystemIndex::default()),
         }
     }
-    
+
     /// Get the current index
     pub async fn read_index(&self) -> Result<SystemIndex, AgentError> {
-        self.index
-            .read()
-            .map(|guard| guard.clone())
-            .map_err(|_| AgentError::InternalError("Failed to acquire read lock on system index".to_string()))
+        self.index.read().map(|guard| guard.clone()).map_err(|_| {
+            AgentError::InternalError("Failed to acquire read lock on system index".to_string())
+        })
     }
-    
+
     /// Update the index
     pub async fn update_index(&self, index: SystemIndex) -> Result<(), AgentError> {
         let mut idx = self.index.write().map_err(|_| {
             AgentError::InternalError("Failed to acquire write lock on system index".to_string())
         })?;
-        
+
         idx.agent_ids = index.agent_ids;
         idx.component_paths = index.component_paths;
         idx.model_paths = index.model_paths;
         idx.documentation_links = index.documentation_links;
         idx.last_updated = index.last_updated;
         idx.version = index.version;
-        
+
         Ok(())
     }
-    
+
     /// Register an agent in the index
     pub async fn register_agent(&self, agent_id: String) -> Result<(), AgentError> {
         let mut index = self.index.write().map_err(|_| {
             AgentError::InternalError("Failed to acquire write lock on system index".to_string())
         })?;
         index.agent_ids.insert(agent_id);
-        index.last_updated = SystemTime::now().duration_since(UNIX_EPOCH).map(|d| d.as_nanos() as u64).unwrap_or(0);
+        index.last_updated = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .map(|d| d.as_nanos() as u64)
+            .unwrap_or(0);
         index.version += 1;
         Ok(())
     }
-    
+
     /// Register a component in the index
     pub async fn register_component(
         &self,
@@ -237,31 +236,39 @@ impl SystemIndexManager {
         let mut index = self.index.write().map_err(|_| {
             AgentError::InternalError("Failed to acquire write lock on system index".to_string())
         })?;
-        index.component_paths.insert(component_id, (path.clone(), blake3::hash(path.as_bytes()).into()));
-        index.last_updated = SystemTime::now().duration_since(UNIX_EPOCH).map(|d| d.as_nanos() as u64).unwrap_or(0);
+        index.component_paths.insert(
+            component_id,
+            (path.clone(), blake3::hash(path.as_bytes()).into()),
+        );
+        index.last_updated = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .map(|d| d.as_nanos() as u64)
+            .unwrap_or(0);
         index.version += 1;
         Ok(())
     }
-    
+
     /// Register a model in the index
-    pub async fn register_model(
-        &self,
-        model_id: String,
-        path: String,
-    ) -> Result<(), AgentError> {
+    pub async fn register_model(&self, model_id: String, path: String) -> Result<(), AgentError> {
         let mut index = self.index.write().map_err(|_| {
             AgentError::InternalError("Failed to acquire write lock on system index".to_string())
         })?;
-        let version = semver::Version::parse(path.split('.').last().unwrap_or("0.0.0")).unwrap_or_else(|_| semver::Version::new(0,0,0));
+        let version = semver::Version::parse(path.split('.').last().unwrap_or("0.0.0"))
+            .unwrap_or_else(|_| semver::Version::new(0, 0, 0));
         index.model_paths.insert(model_id, version);
-        index.last_updated = SystemTime::now().duration_since(UNIX_EPOCH).map(|d| d.as_nanos() as u64).unwrap_or(0);
+        index.last_updated = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .map(|d| d.as_nanos() as u64)
+            .unwrap_or(0);
         index.version += 1;
         Ok(())
     }
-    
+
     /// Parallel directory crawler using rayon
     pub async fn crawl_and_update(&self) -> Result<(), AgentError> {
-        let mut new_index = self.index.write().map_err(|_| AgentError::InternalError("Failed to acquire write lock on system index".to_string()))?;
+        let mut new_index = self.index.write().map_err(|_| {
+            AgentError::InternalError("Failed to acquire write lock on system index".to_string())
+        })?;
         let walker = WalkDir::new(".")
             .into_iter()
             .filter_map(|e| e.ok())
@@ -286,10 +293,13 @@ impl SystemIndexManager {
             };
             new_index.component_paths.insert(
                 path,
-                (file_type.to_string(), blake3::hash(hash.as_bytes()).into())
+                (file_type.to_string(), blake3::hash(hash.as_bytes()).into()),
             );
         });
-        new_index.last_updated = SystemTime::now().duration_since(UNIX_EPOCH).map(|d| d.as_nanos() as u64).unwrap_or(0);
+        new_index.last_updated = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .map(|d| d.as_nanos() as u64)
+            .unwrap_or(0);
         new_index.version += 1;
         Ok(())
     }
@@ -305,14 +315,16 @@ impl SystemIndexManager {
             bitcoin_protocol_adherence: calculate_protocol_adherence(&content),
         };
         if metrics.bitcoin_protocol_adherence < 0.9 {
-            metrics.security_audit_flags.push(
-                "Low Bitcoin protocol adherence - review BIP-341/342 compliance".into()
-            );
+            metrics
+                .security_audit_flags
+                .push("Low Bitcoin protocol adherence - review BIP-341/342 compliance".into());
         }
         metrics
     }
     pub fn enhanced_crawl(&self) -> Result<(), AgentError> {
-        let index = self.index.write().map_err(|_| AgentError::InternalError("Failed to acquire write lock on system index".to_string()))?;
+        let index = self.index.write().map_err(|_| {
+            AgentError::InternalError("Failed to acquire write lock on system index".to_string())
+        })?;
         let walker = WalkDir::new(".")
             .into_iter()
             .filter_map(|e| e.ok())
@@ -332,7 +344,9 @@ impl SystemIndexManager {
     pub async fn bitcoin_health_check(&self) -> f32 {
         let index = self.read_index().await.unwrap_or_default();
         let total = index.component_paths.len() as f32;
-        let compliant = index.component_paths.iter()
+        let compliant = index
+            .component_paths
+            .iter()
             .filter_map(|refmulti| {
                 let (path, (file_type, _)) = refmulti.pair();
                 if Self::is_bitcoin_related(path) && file_type == "Rust Source" {
@@ -342,12 +356,14 @@ impl SystemIndexManager {
                 }
             })
             .count() as f32;
-        if total == 0.0 { 0.0 } else { compliant / total }
+        if total == 0.0 {
+            0.0
+        } else {
+            compliant / total
+        }
     }
     fn is_bitcoin_related(path: &str) -> bool {
-        path.contains("bitcoin") || 
-        path.ends_with(".psbt") ||
-        path.contains("bip341")
+        path.contains("bitcoin") || path.ends_with(".psbt") || path.contains("bip341")
     }
 }
 
@@ -363,34 +379,34 @@ impl SystemMapManager {
             map: RwLock::new(SystemMap::default()),
         }
     }
-    
+
     /// Get the current map
     pub async fn read_map(&self) -> Result<SystemMap, AgentError> {
-        self.map.read()
-            .map(|m| m.clone())
-            .map_err(|_| AgentError::InternalError("Failed to acquire read lock on system map".to_string()))
+        self.map.read().map(|m| m.clone()).map_err(|_| {
+            AgentError::InternalError("Failed to acquire read lock on system map".to_string())
+        })
     }
-    
+
     /// Update the map
     pub async fn update_map(&self) -> Result<(), AgentError> {
         let mut map = self.map.write().map_err(|_| {
             AgentError::InternalError("Failed to acquire write lock on system map".to_string())
         })?;
-        
+
         // Update the timestamp
         map.last_updated = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
             .unwrap_or_default()
             .as_secs();
-        
+
         // Increment the version
         map.version += 1;
-        
+
         // TODO: Actual map update logic
-        
+
         Ok(())
     }
-    
+
     /// Update component state
     pub async fn update_component_state(
         &self,
@@ -400,19 +416,19 @@ impl SystemMapManager {
         let mut map = self.map.write().map_err(|_| {
             AgentError::InternalError("Failed to acquire write lock on system map".to_string())
         })?;
-        
+
         map.component_states.insert(component_id, state);
-        
+
         // Update metadata
         map.last_updated = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
             .unwrap_or_default()
             .as_secs();
         map.version += 1;
-        
+
         Ok(())
     }
-    
+
     /// Update model state
     pub async fn update_model_state(
         &self,
@@ -422,19 +438,19 @@ impl SystemMapManager {
         let mut map = self.map.write().map_err(|_| {
             AgentError::InternalError("Failed to acquire write lock on system map".to_string())
         })?;
-        
+
         map.model_states.insert(model_id, state);
-        
+
         // Update metadata
         map.last_updated = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
             .unwrap_or_default()
             .as_secs();
         map.version += 1;
-        
+
         Ok(())
     }
-    
+
     /// Update agent relationships
     pub async fn update_agent_relationships(
         &self,
@@ -444,19 +460,19 @@ impl SystemMapManager {
         let mut map = self.map.write().map_err(|_| {
             AgentError::InternalError("Failed to acquire write lock on system map".to_string())
         })?;
-        
+
         map.agent_relationships.insert(agent_id, relationships);
-        
+
         // Update metadata
         map.last_updated = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
             .unwrap_or_default()
             .as_secs();
         map.version += 1;
-        
+
         Ok(())
     }
-    
+
     /// Update system health metrics
     pub async fn update_health_metrics(
         &self,
@@ -465,19 +481,19 @@ impl SystemMapManager {
         let mut map = self.map.write().map_err(|_| {
             AgentError::InternalError("Failed to acquire write lock on system map".to_string())
         })?;
-        
+
         // Update or insert each metric
         for (key, value) in metrics {
             map.health_metrics.insert(key, value);
         }
-        
+
         // Update metadata
         map.last_updated = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
             .unwrap_or_default()
             .as_secs();
         map.version += 1;
-        
+
         Ok(())
     }
 }
@@ -497,10 +513,10 @@ pub fn system_map() -> Arc<SystemMapManager> {
 pub trait IndexProvider {
     /// Get the global system index
     fn global() -> Arc<SystemIndexManager>;
-    
+
     /// Read the current index
     async fn read_index(&self) -> Result<SystemIndex, AgentError>;
-    
+
     /// Update the index
     async fn update_index(&self, index: SystemIndex) -> Result<(), AgentError>;
 }
@@ -510,10 +526,10 @@ pub trait IndexProvider {
 pub trait MapProvider {
     /// Get the global system map
     fn global() -> Arc<SystemMapManager>;
-    
+
     /// Read the current map
     async fn read_map(&self) -> Result<SystemMap, AgentError>;
-    
+
     /// Update the map
     async fn update_map(&self) -> Result<(), AgentError>;
 }
@@ -523,11 +539,11 @@ impl IndexProvider for SystemIndexManager {
     fn global() -> Arc<SystemIndexManager> {
         GLOBAL_INDEX.clone()
     }
-    
+
     async fn read_index(&self) -> Result<SystemIndex, AgentError> {
         self.read_index().await
     }
-    
+
     async fn update_index(&self, index: SystemIndex) -> Result<(), AgentError> {
         self.update_index(index).await
     }
@@ -538,11 +554,11 @@ impl MapProvider for SystemMapManager {
     fn global() -> Arc<SystemMapManager> {
         GLOBAL_MAP.clone()
     }
-    
+
     async fn read_map(&self) -> Result<SystemMap, AgentError> {
         self.read_map().await
     }
-    
+
     async fn update_map(&self) -> Result<(), AgentError> {
         self.update_map().await
     }
@@ -550,13 +566,12 @@ impl MapProvider for SystemMapManager {
 
 #[cfg(test)]
 mod tests {
-    
-    
+
     #[tokio::test]
     async fn test_system_index_operations() {
         // Test index operations
     }
-    
+
     #[tokio::test]
     async fn test_system_map_operations() {
         // Test map operations
@@ -564,11 +579,24 @@ mod tests {
 }
 
 // Stub implementations for missing analysis functions
-fn calculate_cyclomatic_complexity(_content: &str) -> f32 { 0.0 }
-fn count_unsafe_blocks(_content: &str) -> u32 { 0 }
-fn get_test_coverage(_path: &str) -> f32 { 0.0 }
-fn analyze_dependencies(_content: &str) -> HashMap<String, Vec<String>> { HashMap::new() }
-fn run_clippy_checks(_path: &str) -> HashMap<String, u32> { HashMap::new() }
-fn check_bitcoin_security(_content: &str) -> Vec<String> { vec![] }
-fn calculate_protocol_adherence(_content: &str) -> f32 { 0.0 }
-
+fn calculate_cyclomatic_complexity(_content: &str) -> f32 {
+    0.0
+}
+fn count_unsafe_blocks(_content: &str) -> u32 {
+    0
+}
+fn get_test_coverage(_path: &str) -> f32 {
+    0.0
+}
+fn analyze_dependencies(_content: &str) -> HashMap<String, Vec<String>> {
+    HashMap::new()
+}
+fn run_clippy_checks(_path: &str) -> HashMap<String, u32> {
+    HashMap::new()
+}
+fn check_bitcoin_security(_content: &str) -> Vec<String> {
+    vec![]
+}
+fn calculate_protocol_adherence(_content: &str) -> f32 {
+    0.0
+}

@@ -2,9 +2,4 @@
 
 pub mod compliance;
 
-pub use compliance::{
-    ProtocolCompliance,
-    BipSupportLevel,
-    VerificationStatus,
-    MilestoneStatus,
-};
+pub use compliance::{BipSupportLevel, MilestoneStatus, ProtocolCompliance, VerificationStatus};

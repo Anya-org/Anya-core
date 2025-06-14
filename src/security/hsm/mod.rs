@@ -1,19 +1,21 @@
 //! Hardware Security Module (HSM) Implementation
-//! 
+//!
 //! This module provides a unified interface for hardware security operations
 //! with a focus on open-source solutions that align with Bitcoin's philosophy.
 
 // [AIR-3][AIS-3][BPC-3][RES-3] Import necessary dependencies for HSM module
 // This follows official Bitcoin Improvement Proposals (BIPs) standards for secure HSM implementation
-use std::sync::Arc;
-use std::error::Error;
-use crate::security::hsm::types::{
-    MerkleProof, SignatureAlgorithm, KeyInfo, SignParams, VerifyParams, EncryptionAlgorithm, EncryptParams, DecryptParams, GetKeyParams, DeleteKeyParams, RotateKeyParams, HsmRequest, KeyType, GenerateKeyParams
-};
-use crate::security::hsm::providers::simulator::SimulatorHsmProvider;
 use crate::security::hsm::providers::hardware::HardwareHsmProvider;
-use serde::{Serialize, Deserialize};
+use crate::security::hsm::providers::simulator::SimulatorHsmProvider;
+use crate::security::hsm::types::{
+    DecryptParams, DeleteKeyParams, EncryptParams, EncryptionAlgorithm, GenerateKeyParams,
+    GetKeyParams, HsmRequest, KeyInfo, KeyType, MerkleProof, RotateKeyParams, SignParams,
+    SignatureAlgorithm, VerifyParams,
+};
 use bitcoin::ScriptBuf;
+use serde::{Deserialize, Serialize};
+use std::error::Error;
+use std::sync::Arc;
 use uuid::Uuid;
 
 // Import the AuditLogger directly without re-importing types that will be re-exported
@@ -24,17 +26,15 @@ use crate::security::hsm::audit::AuditLogger;
 
 // Re-export types for easier access
 pub use providers::{
-    software::SoftwareHsmProvider,
+    ledger::LedgerHsmProvider, pkcs11::Pkcs11HsmProvider, software::SoftwareHsmProvider,
     tpm::TpmHsmProvider,
-    pkcs11::Pkcs11HsmProvider,
-    ledger::LedgerHsmProvider,
 };
 
 // Define a simple Sha256 hash type wrapper
 // Use our own wrapper to avoid conflicts with sha2::Sha256
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Sha256Hash {
-    pub hash: [u8; 32]
+    pub hash: [u8; 32],
 }
 
 impl Sha256Hash {
@@ -42,7 +42,6 @@ impl Sha256Hash {
         Self { hash }
     }
 }
-
 
 pub mod audit;
 pub mod config;
@@ -54,8 +53,8 @@ pub mod security;
 pub mod types;
 
 // Re-export types for easier access
-pub use types::{HsmAuditEvent, HsmOperation};
 pub use provider::HsmProviderStatus;
+pub use types::{HsmAuditEvent, HsmOperation};
 
 // Re-export security manager for easier access
 pub use security::SecurityManager;
@@ -72,19 +71,19 @@ pub mod tests;
 
 // [AIR-3][AIS-3][BPC-3][RES-3] Import Bitcoin types for HSM functionality
 // This follows official Bitcoin Improvement Proposals (BIPs) standards for HSM implementations
-use bitcoin::{Txid, Psbt, Script, XOnlyPublicKey};
-use bitcoin::taproot::TaprootBuilder;
+use base64::{engine::general_purpose::STANDARD as BASE64, Engine as _};
 use bitcoin::bip32::Xpriv;
+use bitcoin::block::Header as BlockHeader;
 use bitcoin::key::Secp256k1;
 use bitcoin::opcodes::{self, all as opcodes};
+use bitcoin::taproot::TaprootBuilder;
+use bitcoin::{Psbt, Script, Txid, XOnlyPublicKey};
 use chrono::{DateTime, Utc};
 use secp256k1::ecdsa::Signature;
-use base64::{Engine as _, engine::general_purpose::STANDARD as BASE64};
 use std::collections::HashMap;
-use tokio::sync::{Mutex, RwLock};
 use std::convert::TryInto;
+use tokio::sync::{Mutex, RwLock};
 use tracing::{debug, error, info};
-use bitcoin::block::Header as BlockHeader;
 // No need for debug import
 
 // Import HSM provider types
@@ -152,7 +151,7 @@ pub enum HsmStatus {
 
     /// HSM is shutting down
     ShuttingDown,
-    
+
     /// HSM is disabled (waiting for user to enable)
     Disabled,
 }
@@ -200,11 +199,11 @@ impl HsmManager {
             HsmProviderType::Simulator => Box::new(SimulatorHsmProvider::new(&config.simulator)?),
             HsmProviderType::SoftwareKeyStore => {
                 Box::new(SoftwareHsmProvider::new(&config.software)?)
-            },
+            }
             HsmProviderType::CloudHsm => Box::new(CloudHsmProvider::new(&config.cloud).await?),
             HsmProviderType::HardwareHsm => {
                 Box::new(HardwareHsmProvider::new(&config.hardware).await?)
-            },
+            }
             HsmProviderType::BitcoinHsm => {
                 Box::new(BitcoinHsmProvider::new(&config.bitcoin).await?)
             }
@@ -220,7 +219,7 @@ impl HsmManager {
             config,
             provider,
             stats,
-            enabled: false,  // HSM is disabled by default
+            enabled: false, // HSM is disabled by default
             audit_logger,
             operation_tracker: Arc::new(Mutex::new(HashMap::new())),
             status: Arc::new(RwLock::new(HsmStatus::Initializing)),
@@ -255,7 +254,9 @@ impl HsmManager {
                     id: Uuid::new_v4().to_string(),
                     user_id: None,
                     key_id: None,
-                    parameters: Some(serde_json::to_value(&self.config.provider_type).unwrap_or_default()),
+                    parameters: Some(
+                        serde_json::to_value(&self.config.provider_type).unwrap_or_default(),
+                    ),
                     error: None,
                     metadata: None,
                 },
@@ -263,7 +264,10 @@ impl HsmManager {
             .await?;
 
         // Initialize the provider
-        self.provider.initialize().await.map_err(|e| crate::security::hsm::error::HsmError::from(e))?;
+        self.provider
+            .initialize()
+            .await
+            .map_err(|e| crate::security::hsm::error::HsmError::from(e))?;
 
         // Update status
         {
@@ -283,7 +287,9 @@ impl HsmManager {
                     id: Uuid::new_v4().to_string(),
                     user_id: None,
                     key_id: None,
-                    parameters: Some(serde_json::to_value(&self.config.provider_type).unwrap_or_default()),
+                    parameters: Some(
+                        serde_json::to_value(&self.config.provider_type).unwrap_or_default(),
+                    ),
                     error: None,
                     metadata: None,
                 },
@@ -300,35 +306,39 @@ impl HsmManager {
     /// Checks if the HSM is due for a health check after a system upgrade
     pub async fn should_run_health_check(&self) -> bool {
         let health_status = self.health_status.read().await;
-        
+
         // If there was no last upgrade time recorded, don't trigger a check
         if health_status.last_upgrade_time.is_none() {
             return false;
         }
-        
+
         // If there was an upgrade but no check performed since then, return true
-        if let (Some(upgrade_time), Some(check_time)) = (health_status.last_upgrade_time, health_status.last_check_time) {
+        if let (Some(upgrade_time), Some(check_time)) = (
+            health_status.last_upgrade_time,
+            health_status.last_check_time,
+        ) {
             return upgrade_time > check_time;
         }
-        
+
         // If there is an upgrade time but no check time, definitely run a check
         if health_status.last_upgrade_time.is_some() && health_status.last_check_time.is_none() {
             return true;
         }
-        
+
         false
     }
-    
+
     /// Record a system upgrade occurred, which will trigger health check requirement
     pub async fn record_system_upgrade(&self) -> Result<(), HsmError> {
         let mut health_status = self.health_status.write().await;
         health_status.last_upgrade_time = Some(Utc::now());
-        health_status.disabled_reason = Some("System upgrade requires health check validation".to_string());
-        
+        health_status.disabled_reason =
+            Some("System upgrade requires health check validation".to_string());
+
         // Disable HSM until health check passes
         // Note: We're not updating self.enabled here directly as it would require &mut self
         // Instead, we'll check health_status.last_check_result in the is_enabled() method
-        
+
         // Log event
         self.audit_logger
             .log_event(
@@ -342,10 +352,10 @@ impl HsmManager {
                 },
             )
             .await?;
-            
+
         Ok(())
     }
-    
+
     /// Performs a comprehensive health check on the HSM
     pub async fn run_health_check(&mut self) -> Result<bool, HsmError> {
         // Update status during check
@@ -353,7 +363,7 @@ impl HsmManager {
             let mut status = self.status.write().await;
             *status = HsmStatus::Maintenance;
         }
-        
+
         // Log starting health check
         self.audit_logger
             .log_event(
@@ -367,41 +377,42 @@ impl HsmManager {
                 },
             )
             .await?;
-            
+
         // Perform the actual health check operations
         let check_result = self.provider.perform_health_check().await;
-        
+
         // Update health status
         {
             let mut health_status = self.health_status.write().await;
             health_status.last_check_time = Some(Utc::now());
-            
+
             match &check_result {
                 Ok(passed) => {
                     health_status.last_check_result = *passed;
-                    
+
                     if *passed {
                         // Only clear the reason if the check passed
                         if health_status.user_enabled {
                             health_status.disabled_reason = None;
                         } else {
-                            health_status.disabled_reason = Some("Waiting for user to enable HSM".to_string());
+                            health_status.disabled_reason =
+                                Some("Waiting for user to enable HSM".to_string());
                         }
                     } else {
                         health_status.disabled_reason = Some("Health check failed".to_string());
                     }
-                },
+                }
                 Err(e) => {
                     health_status.last_check_result = false;
                     health_status.disabled_reason = Some(format!("Health check error: {}", e));
                 }
             }
         }
-        
+
         // Update system status based on health check results
         {
             let mut status = self.status.write().await;
-            
+
             // If check passed and user has enabled HSM, set to Ready; otherwise set to Disabled
             if let Ok(true) = check_result {
                 let health_status = self.health_status.read().await;
@@ -417,14 +428,14 @@ impl HsmManager {
                 self.enabled = false;
             }
         }
-        
+
         // Log completed health check
         let result_str = match &check_result {
             Ok(true) => "passed",
             Ok(false) => "failed",
-            Err(_) => "error"
+            Err(_) => "error",
         };
-        
+
         self.audit_logger
             .log_event(
                 "hsm.health_check",
@@ -437,27 +448,29 @@ impl HsmManager {
                 },
             )
             .await?;
-            
+
         // Return the health check result
         check_result
     }
-    
+
     /// Enables the HSM with user confirmation
     pub async fn enable(&mut self) -> Result<(), HsmError> {
         // First check if a health check is needed
         if self.should_run_health_check().await {
             let health_check_result = self.run_health_check().await?;
             if !health_check_result {
-                return Err(HsmError::NotReady("HSM failed health check and cannot be enabled".to_string()));
+                return Err(HsmError::NotReady(
+                    "HSM failed health check and cannot be enabled".to_string(),
+                ));
             }
         }
-        
+
         // Update status
         {
             let mut status = self.status.write().await;
             *status = HsmStatus::Initializing;
         }
-        
+
         // Update health status to record user's intent
         {
             let mut health_status = self.health_status.write().await;
@@ -516,14 +529,14 @@ impl HsmManager {
             "Executing HSM operation: {:?}, operation_id: {}",
             operation, operation_id
         );
-        
+
         // Create the request object with serialized parameters
         let request = HsmRequest {
             id: operation_id.clone(),
             operation: operation.clone(),
             parameters: serde_json::to_value(&params)?,
             user_id: None,
-            timestamp: chrono::Utc::now()
+            timestamp: chrono::Utc::now(),
         };
 
         // Log operation start
@@ -581,7 +594,7 @@ impl HsmManager {
                 return Err(err);
             }
         }
-        
+
         // Request object already created above
 
         // Execute operation
@@ -594,7 +607,7 @@ impl HsmManager {
                         "provider": format!("{:?}", self.config.provider_type),
                         "action": "EXECUTE_OPERATION_SUCCESS"
                     }))?;
-                
+
                 self.audit_logger
                     .log_event(
                         AuditEventType::HsmOperation,
@@ -603,14 +616,14 @@ impl HsmManager {
                         event.to_hsm_audit_event(),
                     )
                     .await?;
-                
+
                 Ok(result)
             }
             Err(err) => {
                 // Log operation failure
                 let event = HsmAuditEvent::failure(
                     AuditEventType::HsmOperation,
-                    format!("Operation failed: {}", err)
+                    format!("Operation failed: {}", err),
                 )
                 .with_operation_id(operation_id)
                 .with_metadata(&serde_json::json!({
@@ -618,7 +631,7 @@ impl HsmManager {
                     "error": format!("{:?}", err),
                     "action": "EXECUTE_OPERATION_FAILED"
                 }))?;
-                
+
                 self.audit_logger
                     .log_event(
                         AuditEventType::HsmOperation,
@@ -627,7 +640,7 @@ impl HsmManager {
                         event.to_hsm_audit_event(),
                     )
                     .await?;
-                    
+
                 Err(err)
             }
         }
@@ -679,10 +692,11 @@ impl HsmManager {
         let result = self.execute(HsmOperation::SignData, params).await?;
 
         // Convert result to signature bytes
-        let signature = BASE64.decode(result.data.as_str().ok_or_else(|| {
-            HsmError::DeserializationError("Expected string for signature".to_string())
-        })?)
-        .map_err(|e| HsmError::DeserializationError(e.to_string()))?;
+        let signature = BASE64
+            .decode(result.data.as_str().ok_or_else(|| {
+                HsmError::DeserializationError("Expected string for signature".to_string())
+            })?)
+            .map_err(|e| HsmError::DeserializationError(e.to_string()))?;
 
         Ok(signature)
     }
@@ -750,10 +764,11 @@ impl HsmManager {
         let result = self.execute(HsmOperation::EncryptData, params).await?;
 
         // Convert result to encrypted bytes
-        let encrypted = BASE64.decode(result.data.as_str().ok_or_else(|| {
-            HsmError::DeserializationError("Expected string for encrypted data".to_string())
-        })?)
-        .map_err(|e| HsmError::DeserializationError(e.to_string()))?;
+        let encrypted = BASE64
+            .decode(result.data.as_str().ok_or_else(|| {
+                HsmError::DeserializationError("Expected string for encrypted data".to_string())
+            })?)
+            .map_err(|e| HsmError::DeserializationError(e.to_string()))?;
 
         Ok(encrypted)
     }
@@ -785,10 +800,11 @@ impl HsmManager {
         let result = self.execute(HsmOperation::DecryptData, params).await?;
 
         // Convert result to decrypted bytes
-        let decrypted = BASE64.decode(result.data.as_str().ok_or_else(|| {
-            HsmError::DeserializationError("Expected string for decrypted data".to_string())
-        })?)
-        .map_err(|e| HsmError::DeserializationError(e.to_string()))?;
+        let decrypted = BASE64
+            .decode(result.data.as_str().ok_or_else(|| {
+                HsmError::DeserializationError("Expected string for decrypted data".to_string())
+            })?)
+            .map_err(|e| HsmError::DeserializationError(e.to_string()))?;
 
         Ok(decrypted)
     }
@@ -913,12 +929,12 @@ impl HsmManager {
     pub async fn enable(&mut self) -> Result<(), HsmError> {
         // Check if the HSM provider is available and working
         let status = self.provider.get_status().await?;
-        
+
         match status {
             HsmProviderStatus::Ready => {
                 self.enabled = true;
                 *self.status.write().await = HsmStatus::Ready;
-                
+
                 // Log the HSM enable event
                 self.audit_logger.log_event(
                     AuditEventType::HsmOperation,
@@ -926,40 +942,44 @@ impl HsmManager {
                     AuditEventSeverity::Info,
                     serde_json::json!({ "action": "ENABLE_HSM", "message": "HSM enabled by user" })
                 ).await?;
-                
+
                 Ok(())
-            },
+            }
             _ => {
                 // Log the failed enable attempt
                 let error_msg = format!("Cannot enable HSM, provider status: {:?}", status);
-                self.audit_logger.log_event(
-                    AuditEventType::HsmOperation,
-                    AuditEventResult::Failure,
-                    AuditEventSeverity::Error,
-                    serde_json::json!({ "action": "ENABLE_HSM_FAILED", "error": error_msg })
-                ).await?;
-                
+                self.audit_logger
+                    .log_event(
+                        AuditEventType::HsmOperation,
+                        AuditEventResult::Failure,
+                        AuditEventSeverity::Error,
+                        serde_json::json!({ "action": "ENABLE_HSM_FAILED", "error": error_msg }),
+                    )
+                    .await?;
+
                 Err(HsmError::NotReady(error_msg))
             }
         }
     }
-    
+
     /// Disable the HSM module
     pub async fn disable(&mut self) -> Result<(), HsmError> {
         self.enabled = false;
         *self.status.write().await = HsmStatus::Disabled;
-        
+
         // Log the HSM disable event
-        self.audit_logger.log_event(
-            AuditEventType::HsmOperation,
-            AuditEventResult::Success,
-            AuditEventSeverity::Info,
-            serde_json::json!({ "action": "DISABLE_HSM", "message": "HSM disabled by user" })
-        ).await?;
-        
+        self.audit_logger
+            .log_event(
+                AuditEventType::HsmOperation,
+                AuditEventResult::Success,
+                AuditEventSeverity::Info,
+                serde_json::json!({ "action": "DISABLE_HSM", "message": "HSM disabled by user" }),
+            )
+            .await?;
+
         Ok(())
     }
-    
+
     /// Check if HSM is enabled
     pub fn is_enabled(&self) -> bool {
         self.enabled
@@ -976,23 +996,29 @@ pub struct AtomicSwap {
 }
 
 impl NetworkManager {
-    pub async fn initiate_swap(&self, amount: u64, counterparty: &str) -> Result<AtomicSwap, Box<dyn std::error::Error>> {
+    pub async fn initiate_swap(
+        &self,
+        amount: u64,
+        counterparty: &str,
+    ) -> Result<AtomicSwap, Box<dyn std::error::Error>> {
         use bitcoin::blockdata::script::Builder;
         use bitcoin::opcodes;
-        use sha2::{Sha256, Digest};
+        use sha2::{Digest, Sha256};
         use std::convert::TryInto;
-        
+
         // Generate a random preimage and hash it
         let preimage = [0u8; 32]; // In a real implementation, this would be random
         let mut hasher = Sha256::new();
         hasher.update(&preimage);
         let hash = hasher.finalize();
-        
+
         // Convert to our custom Sha256Hash type
-        let hash_array: [u8; 32] = hash.as_slice().try_into()
+        let hash_array: [u8; 32] = hash
+            .as_slice()
+            .try_into()
             .map_err(|_| "Invalid hash length")?;
         let hash_wrapper = Sha256Hash { hash: hash_array };
-        
+
         // Create a script builder
         let mut builder = Builder::new()
             .push_opcode(opcodes::all::OP_IF)
@@ -1001,7 +1027,7 @@ impl NetworkManager {
             .push_opcode(opcodes::all::OP_ELSE)
             .push_int(0) // Placeholder for block height
             .push_opcode(opcodes::all::OP_VERIFY);
-            
+
         // Add counterparty public key (must be a valid public key)
         // For now, we'll use a placeholder
         let counterparty_key = [0u8; 33]; // Compressed public key
@@ -1009,7 +1035,7 @@ impl NetworkManager {
             .push_slice(&counterparty_key)
             .push_opcode(opcodes::all::OP_ENDIF)
             .push_opcode(opcodes::all::OP_CHECKSIG);
-            
+
         let script = builder.into_script();
 
         Ok(AtomicSwap {
@@ -1052,18 +1078,23 @@ impl SecurityManager {
     pub fn gpu_resistant_derive(&self, mnemonic: &str) -> Result<Xpriv, Box<dyn Error>> {
         use argon2::{Algorithm, Argon2, Params, Version};
         use bitcoin::Network;
-        
+
         let salt = "ANYA_CORE_SALT_V2";
-        
-        let params = Params::new(15000, 2, 1, Some(32))
-            .map_err(|e| -> Box<dyn std::error::Error> { Box::new(Argon2Error::Error(e.to_string())) })?;
-            
+
+        let params =
+            Params::new(15000, 2, 1, Some(32)).map_err(|e| -> Box<dyn std::error::Error> {
+                Box::new(Argon2Error::Error(e.to_string()))
+            })?;
+
         let argon2 = Argon2::new(Algorithm::Argon2id, Version::V0x13, params);
-        
+
         let mut output_key = [0u8; 32]; // 32-byte key for BIP32
-        argon2.hash_password_into(mnemonic.as_bytes(), salt.as_bytes(), &mut output_key)
-            .map_err(|e| -> Box<dyn std::error::Error> { Box::new(Argon2Error::Error(e.to_string())) })?;
-            
+        argon2
+            .hash_password_into(mnemonic.as_bytes(), salt.as_bytes(), &mut output_key)
+            .map_err(|e| -> Box<dyn std::error::Error> {
+                Box::new(Argon2Error::Error(e.to_string()))
+            })?;
+
         Xpriv::new_master(Network::Bitcoin, &output_key)
             .map_err(|e| -> Box<dyn std::error::Error> { Box::new(e) })
     }
@@ -1094,11 +1125,9 @@ pub struct NetworkManager {
 impl NetworkManager {
     /// Create a new network manager
     pub fn new() -> Self {
-        Self {
-            connected: false,
-        }
+        Self { connected: false }
     }
-    
+
     /// Get merkle proof for a transaction
     pub async fn get_merkle_proof(&self, _txid: &Txid) -> Result<MerkleProof, Box<dyn Error>> {
         // This would normally fetch the proof from a blockchain node
@@ -1113,19 +1142,27 @@ impl NetworkManager {
 impl MobileSDK {
     pub fn generate_repudiation_proof(&self, txid: &Txid) -> Result<RepudiationProof> {
         use rand::RngCore;
-        
+
         let mut nonce = [0u8; 32];
         rand::thread_rng().fill_bytes(&mut nonce);
-        
-        let partial_sig = self.hsm.sign("repudiation_key", SignatureAlgorithm::EcdsaSecp256k1Sha256, &nonce)
+
+        let partial_sig = self
+            .hsm
+            .sign(
+                "repudiation_key",
+                SignatureAlgorithm::EcdsaSecp256k1Sha256,
+                &nonce,
+            )
             .map_err(|e| Box::new(e) as Box<dyn std::error::Error>)?;
-            
-        let merkle_proof = self.network.get_merkle_proof(txid)
+
+        let merkle_proof = self
+            .network
+            .get_merkle_proof(txid)
             .map_err(|e| Box::new(e) as Box<dyn std::error::Error>)?;
-        
+
         let partial_sig = Signature::from_der(&partial_sig)
             .map_err(|e| Box::new(e) as Box<dyn std::error::Error>)?;
-        
+
         Ok(RepudiationProof {
             nonce,
             partial_sig,
@@ -1168,7 +1205,9 @@ impl<T: serde::Serialize + serde::de::DeserializeOwned> serde::Serialize for Cor
     }
 }
 
-impl<'de, T: serde::Serialize + serde::de::DeserializeOwned> serde::Deserialize<'de> for CoreWrapper<T> {
+impl<'de, T: serde::Serialize + serde::de::DeserializeOwned> serde::Deserialize<'de>
+    for CoreWrapper<T>
+{
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,

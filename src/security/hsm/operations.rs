@@ -39,7 +39,11 @@ impl OperationProcessor {
     }
 
     /// Register a new operation
-    pub fn register_operation(&mut self, name: &str, handler: fn(Vec<u8>) -> Result<Vec<u8>, HsmError>) {
+    pub fn register_operation(
+        &mut self,
+        name: &str,
+        handler: fn(Vec<u8>) -> Result<Vec<u8>, HsmError>,
+    ) {
         self.supported_operations.insert(name.to_string(), handler);
     }
 
@@ -59,7 +63,7 @@ pub fn perform_key_generation(params: KeyGenParams) -> Result<KeyPair, HsmError>
     Ok(KeyPair {
         id: uuid::Uuid::new_v4().to_string(),
         key_type: params.key_type,
-        public_key: vec![],  // Empty public key for placeholder
+        public_key: vec![], // Empty public key for placeholder
         private_key_handle: format!("handle-{}", uuid::Uuid::new_v4()),
     })
 }
@@ -68,5 +72,7 @@ pub fn perform_key_generation(params: KeyGenParams) -> Result<KeyPair, HsmError>
 pub fn perform_signing(_key_id: &str, _data: &[u8]) -> Result<Vec<u8>, HsmError> {
     // This is a placeholder implementation
     // In a real HSM implementation, this would call into the HSM hardware or software
-    Err(HsmError::NotImplemented("Signing not implemented yet".to_string()))
+    Err(HsmError::NotImplemented(
+        "Signing not implemented yet".to_string(),
+    ))
 }

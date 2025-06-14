@@ -1,8 +1,8 @@
 // Generated layer2_port.rs
 // Hexagonal Architecture - Secondary Port
 
-use async_trait::async_trait;
 use crate::core::error::AnyaResult;
+use async_trait::async_trait;
 
 // Import the TransactionStatus from framework
 
@@ -31,4 +31,3 @@ pub struct AssetId;
 pub struct AssetTransfer;
 pub struct TransferResult;
 pub struct AssetState;
-

@@ -1,7 +1,7 @@
 // Shared Layer 2 types for all protocols
 // This file centralizes ProtocolState, AssetParams, AssetTransfer, TransferResult, Proof, VerificationResult, ValidationResult
 // so all Layer 2 modules can import from one place.
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
@@ -55,7 +55,9 @@ pub enum VerificationResult {
 }
 
 impl Default for VerificationResult {
-    fn default() -> Self { Self::Valid }
+    fn default() -> Self {
+        Self::Valid
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -66,5 +68,7 @@ pub enum ValidationResult {
 }
 
 impl Default for ValidationResult {
-    fn default() -> Self { Self::Valid }
+    fn default() -> Self {
+        Self::Valid
+    }
 }

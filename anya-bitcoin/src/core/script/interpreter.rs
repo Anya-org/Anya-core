@@ -4,11 +4,10 @@
 //! transaction scripts, with support for Taproot and related BIPs.
 //! It follows Bitcoin Core principles of security, decentralization, and privacy.
 
-use bitflags::bitflags;
 use bitcoin::{Script, Transaction};
+use bitflags::bitflags;
 use log::info;
 use thiserror::Error;
-
 
 /// Maximum number of operations allowed in a script
 pub const MAX_OPS_PER_SCRIPT: usize = 201;
@@ -52,7 +51,7 @@ pub enum Opcode {
     OP_14 = 0x5e,
     OP_15 = 0x5f,
     OP_16 = 0x60,
-    
+
     // Flow control
     OP_NOP = 0x61,
     OP_VER = 0x62,
@@ -64,7 +63,7 @@ pub enum Opcode {
     OP_ENDIF = 0x68,
     OP_VERIFY = 0x69,
     OP_RETURN = 0x6a,
-    
+
     // Stack operations
     OP_TOALTSTACK = 0x6b,
     OP_FROMALTSTACK = 0x6c,
@@ -85,14 +84,14 @@ pub enum Opcode {
     OP_ROT = 0x7b,
     OP_SWAP = 0x7c,
     OP_TUCK = 0x7d,
-    
+
     // Splice operations
     OP_CAT = 0x7e,
     OP_SUBSTR = 0x7f,
     OP_LEFT = 0x80,
     OP_RIGHT = 0x81,
     OP_SIZE = 0x82,
-    
+
     // Bitwise logic
     OP_INVERT = 0x83,
     OP_AND = 0x84,
@@ -102,7 +101,7 @@ pub enum Opcode {
     OP_EQUALVERIFY = 0x88,
     OP_RESERVED1 = 0x89,
     OP_RESERVED2 = 0x8a,
-    
+
     // Arithmetic
     OP_1ADD = 0x8b,
     OP_1SUB = 0x8c,
@@ -131,7 +130,7 @@ pub enum Opcode {
     OP_MIN = 0xa3,
     OP_MAX = 0xa4,
     OP_WITHIN = 0xa5,
-    
+
     // Crypto
     OP_RIPEMD160 = 0xa6,
     OP_SHA1 = 0xa7,
@@ -143,7 +142,7 @@ pub enum Opcode {
     OP_CHECKSIGVERIFY = 0xad,
     OP_CHECKMULTISIG = 0xae,
     OP_CHECKMULTISIGVERIFY = 0xaf,
-    
+
     // Expansion
     OP_NOP1 = 0xb0,
     OP_CHECKLOCKTIMEVERIFY = 0xb1,
@@ -155,10 +154,10 @@ pub enum Opcode {
     OP_NOP8 = 0xb7,
     OP_NOP9 = 0xb8,
     OP_NOP10 = 0xb9,
-    
+
     // Taproot (BIP-341, BIP-342)
     OP_CHECKSIGADD = 0xba,
-    
+
     // Invalid opcodes
     OP_INVALIDOPCODE = 0xff,
 }
@@ -169,7 +168,6 @@ pub const OP_TRUE: Opcode = Opcode::OP_1;
 pub const OP_NOP2: Opcode = Opcode::OP_CHECKLOCKTIMEVERIFY;
 pub const OP_NOP3: Opcode = Opcode::OP_CHECKSEQUENCEVERIFY;
 
-/// Script verification flags
 bitflags! {
     /// Script verification flags
     pub struct VerifyFlags: u32 {
@@ -205,46 +203,46 @@ bitflags! {
 pub enum ScriptError {
     #[error("Script execution error: {0}")]
     ExecutionError(String),
-    
+
     #[error("Invalid opcode: {0:x}")]
     InvalidOpcode(u8),
-    
+
     #[error("Stack overflow")]
     StackOverflow,
-    
+
     #[error("Stack underflow")]
     StackUnderflow,
-    
+
     #[error("Unbalanced conditional")]
     UnbalancedConditional,
-    
+
     #[error("Op count exceeded")]
     OpCountExceeded,
-    
+
     #[error("Script size exceeded")]
     ScriptSizeExceeded,
-    
+
     #[error("Element size exceeded")]
     ElementSizeExceeded,
-    
+
     #[error("Verification failed")]
     VerificationFailed,
-    
+
     #[error("Signature verification failed")]
     SignatureVerificationFailed,
-    
+
     #[error("Division by zero")]
     DivisionByZero,
-    
+
     #[error("Invalid altstack operation")]
     InvalidAltStackOperation,
-    
+
     #[error("Invalid stack value")]
     InvalidStackValue,
-    
+
     #[error("Taproot verification failed: {0}")]
     TaprootVerificationFailed(String),
-    
+
     #[error("General error: {0}")]
     General(String),
 }
@@ -265,7 +263,7 @@ impl Stack {
             alt_stack: Vec::new(),
         }
     }
-    
+
     /// Push an item onto the stack
     pub fn push(&mut self, item: Vec<u8>) -> Result<(), ScriptError> {
         if self.items.len() >= MAX_STACK_SIZE {
@@ -277,17 +275,17 @@ impl Stack {
         self.items.push(item);
         Ok(())
     }
-    
+
     /// Pop an item from the stack
     pub fn pop(&mut self) -> Result<Vec<u8>, ScriptError> {
         self.items.pop().ok_or(ScriptError::StackUnderflow)
     }
-    
+
     /// Peek at the top item on the stack without removing it
     pub fn peek(&self) -> Result<&Vec<u8>, ScriptError> {
         self.items.last().ok_or(ScriptError::StackUnderflow)
     }
-    
+
     /// Push an item onto the alternative stack
     pub fn push_alt(&mut self, item: Vec<u8>) -> Result<(), ScriptError> {
         if self.alt_stack.len() >= MAX_STACK_SIZE {
@@ -296,31 +294,33 @@ impl Stack {
         self.alt_stack.push(item);
         Ok(())
     }
-    
+
     /// Pop an item from the alternative stack
     pub fn pop_alt(&mut self) -> Result<Vec<u8>, ScriptError> {
-        self.alt_stack.pop().ok_or(ScriptError::InvalidAltStackOperation)
+        self.alt_stack
+            .pop()
+            .ok_or(ScriptError::InvalidAltStackOperation)
     }
-    
+
     /// Get the current stack size
     pub fn size(&self) -> usize {
         self.items.len()
     }
-    
+
     /// Get the current alternative stack size
     pub fn alt_size(&self) -> usize {
         self.alt_stack.len()
     }
-    
+
     /// Convert the top stack item to a boolean
     pub fn top_bool(&self) -> Result<bool, ScriptError> {
         let item = self.peek()?;
-        
+
         // Empty stack item is false
         if item.is_empty() {
             return Ok(false);
         }
-        
+
         // Check all bytes for non-zero value
         for &b in item.iter().rev() {
             if b != 0 {
@@ -331,23 +331,23 @@ impl Stack {
                 return Ok(true);
             }
         }
-        
+
         Ok(false)
     }
-    
+
     /// Convert the top stack item to an integer
     pub fn top_int(&self) -> Result<i64, ScriptError> {
         let item = self.peek()?;
-        
+
         // Empty stack item is 0
         if item.is_empty() {
             return Ok(0);
         }
-        
+
         // Decode as little-endian signed integer
         let mut result: i64 = 0;
         let mut negative = false;
-        
+
         for (i, &b) in item.iter().enumerate() {
             if i == item.len() - 1 && b & 0x80 != 0 {
                 negative = true;
@@ -355,20 +355,20 @@ impl Stack {
             } else {
                 result |= (b as i64) << (8 * i);
             }
-            
+
             // Check for overflow
             if i >= 8 {
                 break;
             }
         }
-        
+
         if negative {
             result = -result;
         }
-        
+
         Ok(result)
     }
-    
+
     /// Clear the stack
     pub fn clear(&mut self) {
         self.items.clear();
@@ -427,14 +427,14 @@ impl ScriptContext {
             taproot_leaf_version: None,
         }
     }
-    
+
     /// Set the transaction and input index for signature checking
     pub fn set_transaction(&mut self, tx: Transaction, input_index: usize, amount: u64) {
         self.tx = Some(tx);
         self.input_index = input_index;
         self.amount = amount;
     }
-    
+
     /// Reset the context for a new script execution
     pub fn reset(&mut self) {
         self.stack.clear();
@@ -442,27 +442,27 @@ impl ScriptContext {
         self.code_separator_pos = -1;
         self.pc = 0;
     }
-    
+
     /// Check if Taproot validation is enabled
     pub fn is_taproot_enabled(&self) -> bool {
         self.flags.contains(VerifyFlags::TAPROOT)
     }
-    
+
     /// Check if P2SH is enabled
     pub fn is_p2sh_enabled(&self) -> bool {
         self.flags.contains(VerifyFlags::P2SH)
     }
-    
+
     /// Check if SegWit validation is enabled
     pub fn is_witness_enabled(&self) -> bool {
         self.flags.contains(VerifyFlags::WITNESS)
     }
-    
+
     /// Check if strict encoding is required for signatures
     pub fn requires_strict_encoding(&self) -> bool {
         self.flags.contains(VerifyFlags::STRICTENC)
     }
-    
+
     /// Check if Schnorr signatures are enabled
     pub fn is_schnorr_enabled(&self) -> bool {
         self.flags.contains(VerifyFlags::SCHNORR)
@@ -484,111 +484,121 @@ impl ScriptInterpreter {
     ) -> Result<bool, ScriptError> {
         let mut context = ScriptContext::new(flags);
         context.set_transaction(tx.clone(), input_index, amount);
-        
+
         // Execute the signature script
         Self::execute_script(script_sig, &mut context)?;
-        
+
         // Execute the public key script
         Self::execute_script(script_pubkey, &mut context)?;
-        
+
         // Verify that the stack has at least one element
         if context.stack.size() == 0 {
             return Err(ScriptError::VerificationFailed);
         }
-        
+
         // Success is determined by the top stack item being true
         let result = context.stack.top_bool()?;
-        
+
         if result {
             Ok(true)
         } else {
             Err(ScriptError::VerificationFailed)
         }
     }
-    
+
     /// Execute a script in the given context
     pub fn execute_script(script: &Script, context: &mut ScriptContext) -> Result<(), ScriptError> {
         let script_bytes = script.as_bytes();
-        
+
         // Check script size
         if script_bytes.len() > MAX_SCRIPT_SIZE {
             return Err(ScriptError::ScriptSizeExceeded);
         }
-        
+
         context.pc = 0;
-        
+
         while context.pc < script_bytes.len() {
             let opcode = script_bytes[context.pc];
             context.pc += 1;
-            
+
             // Count executed operations
             context.op_count += 1;
             if context.op_count > MAX_OPS_PER_SCRIPT {
                 return Err(ScriptError::OpCountExceeded);
             }
-            
+
             // Execute the opcode
             Self::execute_opcode(opcode as u8, script_bytes, context)?;
         }
-        
+
         Ok(())
     }
-    
+
     /// Execute a single opcode
-    fn execute_opcode(opcode: u8, script: &[u8], context: &mut ScriptContext) -> Result<(), ScriptError> {
+    fn execute_opcode(
+        opcode: u8,
+        script: &[u8],
+        context: &mut ScriptContext,
+    ) -> Result<(), ScriptError> {
         // Handle data push opcodes
         if opcode <= 0x4b {
             // Direct push of N bytes
             let n = opcode as usize;
             if context.pc + n > script.len() {
-                return Err(ScriptError::ExecutionError("Push past end of script".to_string()));
+                return Err(ScriptError::ExecutionError(
+                    "Push past end of script".to_string(),
+                ));
             }
-            
+
             let data = script[context.pc..context.pc + n].to_vec();
             context.pc += n;
             context.stack.push(data)?;
             return Ok(());
         }
-        
+
         match opcode {
             // Implement opcode execution logic here
             // This would be a very long match statement in a real implementation
             // For now, we'll just handle a few common opcodes as examples
-            
+
             // OP_PUSHDATA1 - next byte contains N, followed by N bytes of data
             0x4c => {
                 if context.pc >= script.len() {
-                    return Err(ScriptError::ExecutionError("OP_PUSHDATA1: no length byte".to_string()));
+                    return Err(ScriptError::ExecutionError(
+                        "OP_PUSHDATA1: no length byte".to_string(),
+                    ));
                 }
                 let n = script[context.pc] as usize;
                 context.pc += 1;
-                
+
                 if context.pc + n > script.len() {
-                    return Err(ScriptError::ExecutionError("OP_PUSHDATA1: push past end of script".to_string()));
+                    return Err(ScriptError::ExecutionError(
+                        "OP_PUSHDATA1: push past end of script".to_string(),
+                    ));
                 }
-                
+
                 let data = script[context.pc..context.pc + n].to_vec();
                 context.pc += n;
                 context.stack.push(data)?;
             }
-            
+
             // OP_0, OP_FALSE - push empty array
             0x00 => {
                 context.stack.push(vec![])?;
             }
-            
+
             // OP_1 through OP_16 - push value onto stack
             0x51..=0x60 => {
                 let n = (opcode - 0x50) as u8;
                 context.stack.push(vec![n])?;
             }
-            
+
             // OP_DUP - duplicate the top stack item
             0x76 => {
                 let item = context.stack.peek()?.clone();
                 context.stack.push(item)?;
             }
-            
+
             // OP_HASH160 - hash the top stack item with RIPEMD160(SHA256)
             0xa9 => {
                 // In a real implementation, this would perform the actual hash
@@ -597,7 +607,7 @@ impl ScriptInterpreter {
                 let hash = vec![0; 20]; // 20-byte hash result
                 context.stack.push(hash)?;
             }
-            
+
             // OP_EQUALVERIFY - check if top two stack items are equal
             0x88 => {
                 if context.stack.size() < 2 {
@@ -605,52 +615,54 @@ impl ScriptInterpreter {
                 }
                 let a = context.stack.pop()?;
                 let b = context.stack.pop()?;
-                
+
                 if a != b {
                     return Err(ScriptError::VerificationFailed);
                 }
             }
-            
+
             // OP_CHECKSIG - validate a signature
             0xac => {
                 if context.stack.size() < 2 {
                     return Err(ScriptError::StackUnderflow);
                 }
-                
+
                 let _pubkey = context.stack.pop()?;
                 let _sig = context.stack.pop()?;
-                
+
                 // In a real implementation, this would verify the signature
                 // For now, we'll just push a success value
                 context.stack.push(vec![1])?;
             }
-            
+
             // Handle Taproot-specific opcodes if enabled
             0xba if context.is_taproot_enabled() => {
                 // OP_CHECKSIGADD
                 if context.sig_version != SigVersion::Taproot {
-                    return Err(ScriptError::ExecutionError("OP_CHECKSIGADD only valid in Taproot".to_string()));
+                    return Err(ScriptError::ExecutionError(
+                        "OP_CHECKSIGADD only valid in Taproot".to_string(),
+                    ));
                 }
-                
+
                 if context.stack.size() < 3 {
                     return Err(ScriptError::StackUnderflow);
                 }
-                
+
                 // In a real implementation, this would perform Schnorr signature verification
                 // and add the result to the top stack item
                 let _pubkey = context.stack.pop()?;
                 let _sig = context.stack.pop()?;
                 let _num = context.stack.pop()?;
-                
+
                 // Push 1 (simulated success) + original value
                 context.stack.push(vec![1])?;
             }
-            
+
             _ => {
                 return Err(ScriptError::InvalidOpcode(opcode));
             }
         }
-        
+
         Ok(())
     }
 }
@@ -663,19 +675,19 @@ impl TaprootValidator {
     pub fn new() -> Self {
         Self
     }
-    
+
     /// Verify Taproot commitment
     pub fn verify_taproot_commitment(&self, _tx: &Transaction) -> Result<bool, ScriptError> {
         // TODO: Implement proper Taproot commitment verification
         Ok(true)
     }
-    
+
     /// Verify Schnorr signatures in transaction
     pub fn verify_schnorr_signatures(&self, _tx: &Transaction) -> Result<bool, ScriptError> {
         // TODO: Implement proper Schnorr signature verification
         Ok(true)
     }
-    
+
     /// Verify a Taproot (SegWit v1) output spend
     pub fn verify_taproot_spend(
         _tx: &Transaction,
@@ -685,13 +697,15 @@ impl TaprootValidator {
         flags: VerifyFlags,
     ) -> Result<bool, ScriptError> {
         if !flags.contains(VerifyFlags::TAPROOT) {
-            return Err(ScriptError::General("Taproot validation not enabled".to_string()));
+            return Err(ScriptError::General(
+                "Taproot validation not enabled".to_string(),
+            ));
         }
-        
+
         // This would be a full Taproot verification implementation
         // For now, it's a placeholder that assumes success
         info!("Taproot validation would be performed here");
-        
+
         Ok(true)
     }
 }
@@ -699,39 +713,39 @@ impl TaprootValidator {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_stack_operations() {
         let mut stack = Stack::new();
-        
+
         // Test basic push/pop
         stack.push(vec![1, 2, 3]).unwrap();
         stack.push(vec![4, 5, 6]).unwrap();
-        
+
         assert_eq!(stack.size(), 2);
-        
+
         let item = stack.pop().unwrap();
         assert_eq!(item, vec![4, 5, 6]);
-        
+
         let item = stack.pop().unwrap();
         assert_eq!(item, vec![1, 2, 3]);
-        
+
         // Test stack underflow
         assert!(stack.pop().is_err());
     }
-    
+
     #[test]
     fn test_script_context() {
         let flags = VerifyFlags::STANDARD;
         let mut ctx = ScriptContext::new(flags);
-        
+
         assert!(ctx.is_taproot_enabled());
         assert!(ctx.is_p2sh_enabled());
         assert!(ctx.is_witness_enabled());
-        
+
         ctx.stack.push(vec![1]).unwrap();
         assert_eq!(ctx.stack.size(), 1);
-        
+
         ctx.reset();
         assert_eq!(ctx.stack.size(), 0);
     }

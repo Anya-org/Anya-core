@@ -6,10 +6,10 @@
 
 pub mod bitcoin;
 pub mod consensus;
+pub mod error;
 pub mod mempool;
 pub mod network;
-pub mod script;
-pub mod error;
-pub mod wallet;
 pub mod performance;
+pub mod script;
 pub mod taproot;
+pub mod wallet;

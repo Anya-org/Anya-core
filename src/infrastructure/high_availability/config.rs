@@ -7,22 +7,22 @@ use std::time::Duration;
 pub struct HighAvailabilityConfig {
     /// General high availability settings
     pub general: GeneralConfig,
-    
+
     /// Cluster management configuration
     pub cluster: ClusterConfig,
-    
+
     /// Health check configuration
     pub health_check: HealthCheckConfig,
-    
+
     /// Failover configuration
     pub failover: FailoverConfig,
-    
+
     /// Replication configuration
     pub replication: ReplicationConfig,
-    
+
     /// Load balancing configuration
     pub load_balancing: LoadBalancingConfig,
-    
+
     /// Disaster recovery configuration
     pub disaster_recovery: DisasterRecoveryConfig,
 }
@@ -117,10 +117,10 @@ impl HighAvailabilityConfig {
 pub struct GeneralConfig {
     /// Whether high availability is enabled
     pub enabled: bool,
-    
+
     /// Environment type
     pub environment: Environment,
-    
+
     /// Log level
     pub log_level: LogLevel,
 }
@@ -158,31 +158,31 @@ pub enum LogLevel {
 pub struct ClusterConfig {
     /// Number of nodes in the cluster
     pub node_count: usize,
-    
+
     /// Cluster name
     pub cluster_name: String,
-    
+
     /// Method used for node discovery
     pub discovery_method: DiscoveryMethod,
-    
+
     /// List of static nodes (for static discovery)
     #[serde(default)]
     pub static_nodes: Vec<String>,
-    
+
     /// DNS address for DNS discovery
     pub dns_discovery_url: Option<String>,
-    
+
     /// Kubernetes service name for K8s discovery
     pub k8s_service_name: Option<String>,
-    
+
     /// Heartbeat interval
     #[serde(with = "humantime_serde")]
     pub heartbeat_interval: Duration,
-    
+
     /// Node timeout
     #[serde(with = "humantime_serde")]
     pub node_timeout: Duration,
-    
+
     /// Gossip interval
     #[serde(with = "humantime_serde")]
     pub gossip_interval: Duration,
@@ -219,21 +219,21 @@ pub enum DiscoveryMethod {
 pub struct HealthCheckConfig {
     /// Whether health checking is enabled
     pub enabled: bool,
-    
+
     /// Health check interval
     #[serde(with = "humantime_serde")]
     pub check_interval: Duration,
-    
+
     /// Number of failed checks to trigger warning
     pub warning_threshold: u32,
-    
+
     /// Number of failed checks to trigger critical
     pub critical_threshold: u32,
-    
+
     /// Timeout for health checks
     #[serde(with = "humantime_serde")]
     pub check_timeout: Duration,
-    
+
     /// Components to check
     #[serde(default)]
     pub components: Vec<String>,
@@ -261,24 +261,24 @@ impl Default for HealthCheckConfig {
 pub struct FailoverConfig {
     /// Whether failover is enabled
     pub enabled: bool,
-    
+
     /// Whether automatic failover is enabled
     pub auto_failover: bool,
-    
+
     /// Timeout before triggering failover
     #[serde(with = "humantime_serde")]
     pub failover_timeout: Duration,
-    
+
     /// Minimum number of nodes required for failover
     pub min_nodes_for_failover: usize,
-    
+
     /// Maximum number of automatic failovers per period
     pub max_auto_failovers: Option<u32>,
-    
+
     /// Period for auto failover limits
     #[serde(with = "humantime_serde")]
     pub auto_failover_period: Duration,
-    
+
     /// Fencing enabled
     pub fencing_enabled: bool,
 }
@@ -302,21 +302,21 @@ impl Default for FailoverConfig {
 pub struct ReplicationConfig {
     /// Replication mode
     pub mode: ReplicationMode,
-    
+
     /// Timeout for synchronous replication
     #[serde(with = "humantime_serde")]
     pub sync_timeout: Duration,
-    
+
     /// Maximum lag for semi-sync replication
     #[serde(with = "humantime_serde")]
     pub max_lag: Duration,
-    
+
     /// Number of acknowledgments required (for semi-sync)
     pub ack_count: Option<usize>,
-    
+
     /// Compression enabled
     pub compression_enabled: bool,
-    
+
     /// Encryption enabled
     pub encryption_enabled: bool,
 }
@@ -347,25 +347,25 @@ pub enum ReplicationMode {
 pub struct LoadBalancingConfig {
     /// Load balancing algorithm
     pub algorithm: LoadBalancingAlgorithm,
-    
+
     /// Whether to check health for load balancing
     pub health_check_enabled: bool,
-    
+
     /// Whether to use sticky sessions
     pub sticky_sessions: bool,
-    
+
     /// Whether to enable auto scaling
     pub auto_scaling: bool,
-    
+
     /// Minimum number of nodes
     pub min_nodes: Option<usize>,
-    
+
     /// Maximum number of nodes
     pub max_nodes: Option<usize>,
-    
+
     /// Scale up threshold (load percentage)
     pub scale_up_threshold: Option<f32>,
-    
+
     /// Scale down threshold (load percentage)
     pub scale_down_threshold: Option<f32>,
 }
@@ -401,16 +401,16 @@ pub struct DisasterRecoveryConfig {
     /// Backup interval
     #[serde(with = "humantime_serde")]
     pub backup_interval: Duration,
-    
+
     /// Backup retention days
     pub backup_retention: u32,
-    
+
     /// Whether auto restore is enabled
     pub auto_restore: bool,
-    
+
     /// Remote backup location
     pub remote_backup_location: Option<String>,
-    
+
     /// Encryption key for backups
     pub backup_encryption_key: Option<String>,
 }
@@ -419,7 +419,7 @@ impl Default for DisasterRecoveryConfig {
     fn default() -> Self {
         Self {
             backup_interval: Duration::from_secs(3600), // 1 hour
-            backup_retention: 30, // 30 days
+            backup_retention: 30,                       // 30 days
             auto_restore: false,
             remote_backup_location: None,
             backup_encryption_key: None,

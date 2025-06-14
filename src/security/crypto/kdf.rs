@@ -1,5 +1,5 @@
 //! Key Derivation Function Module
-//! 
+//!
 //! This module provides key derivation functions for Bitcoin security.
 
 use std::error::Error;
@@ -121,26 +121,30 @@ pub fn hkdf(ikm: &[u8], salt: &[u8], info: &[u8], key_length: usize) -> Vec<u8> 
 }
 
 /// Derive a key using the specified KDF algorithm
-pub fn derive_key(password: &[u8], algorithm: KdfAlgorithm, params: &[u8]) -> Result<Vec<u8>, Box<dyn Error>> {
+pub fn derive_key(
+    password: &[u8],
+    algorithm: KdfAlgorithm,
+    params: &[u8],
+) -> Result<Vec<u8>, Box<dyn Error>> {
     match algorithm {
         KdfAlgorithm::Pbkdf2 => {
             // Parse params as Pbkdf2Params
             let default_params = Pbkdf2Params::default();
             Ok(pbkdf2(password, &default_params))
-        },
+        }
         KdfAlgorithm::Argon2id => {
             // Parse params as Argon2Params
             let default_params = Argon2Params::default();
             Ok(argon2id(password, &default_params))
-        },
+        }
         KdfAlgorithm::Scrypt => {
             // Parse params as ScryptParams
             let default_params = ScryptParams::default();
             Ok(scrypt(password, &default_params))
-        },
+        }
         KdfAlgorithm::Hkdf => {
             // Parse params as salt and info
             Ok(hkdf(password, &[], &[], 32))
-        },
+        }
     }
 }

@@ -1,15 +1,11 @@
 #![feature(test)]
 extern crate test;
 
-use test::Bencher;
-use anyhow::Result;
 use anya_bitcoin::riscv::layer3::{
-    Layer3Optimizer,
-    Layer3Extensions,
-    ZkCapabilities,
-    Layer3Controls,
-    VerificationLevel,
+    Layer3Controls, Layer3Extensions, Layer3Optimizer, VerificationLevel, ZkCapabilities,
 };
+use anyhow::Result;
+use test::Bencher;
 
 /// Test suite for Layer 3+ optimizations
 mod layer3_tests {
@@ -38,7 +34,10 @@ mod layer3_tests {
         let optimizer = Layer3Optimizer::new().unwrap();
         assert!(optimizer.controls.optimize_proofs);
         assert!(optimizer.controls.parallel_processing);
-        assert_eq!(optimizer.controls.verification_level, VerificationLevel::Enhanced);
+        assert_eq!(
+            optimizer.controls.verification_level,
+            VerificationLevel::Enhanced
+        );
     }
 }
 
@@ -101,13 +100,13 @@ mod integration_tests {
     #[test]
     fn test_full_zk_pipeline() {
         let optimizer = Layer3Optimizer::new().unwrap();
-        
+
         // Test proof generation
         assert!(optimizer.optimize_proof_generation().is_ok());
-        
+
         // Test proof verification
         assert!(optimizer.optimize_proof_verification().is_ok());
-        
+
         // Test Layer 3 protocols
         assert!(optimizer.optimize_layer3_protocols().is_ok());
     }
@@ -121,9 +120,13 @@ mod integration_tests {
         };
 
         // Test with different verification levels
-        for level in [VerificationLevel::Standard, 
-                     VerificationLevel::Enhanced, 
-                     VerificationLevel::Maximum].iter() {
+        for level in [
+            VerificationLevel::Standard,
+            VerificationLevel::Enhanced,
+            VerificationLevel::Maximum,
+        ]
+        .iter()
+        {
             controls.verification_level = level.clone();
             // Verify optimization behavior with different levels
             assert!(true); // Replace with actual verification
@@ -155,7 +158,7 @@ mod stress_tests {
     #[test]
     fn test_concurrent_proof_generation() {
         let optimizer = Layer3Optimizer::new().unwrap();
-        
+
         // Simulate concurrent proof generation
         for _ in 0..1000 {
             assert!(optimizer.optimize_proof_generation().is_ok());
@@ -166,7 +169,7 @@ mod stress_tests {
     #[test]
     fn test_resource_exhaustion() {
         let optimizer = Layer3Optimizer::new().unwrap();
-        
+
         // Test behavior under resource pressure
         for _ in 0..10000 {
             assert!(optimizer.optimize_layer3_protocols().is_ok());
@@ -204,8 +207,9 @@ mod compliance_tests {
     #[test]
     fn test_verification_level_compliance() {
         let optimizer = Layer3Optimizer::new().unwrap();
-        assert!(matches!(optimizer.controls.verification_level, 
-                        VerificationLevel::Enhanced | 
-                        VerificationLevel::Maximum));
+        assert!(matches!(
+            optimizer.controls.verification_level,
+            VerificationLevel::Enhanced | VerificationLevel::Maximum
+        ));
     }
-} 
+}

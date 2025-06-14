@@ -3,8 +3,8 @@
 //! This module provides state management functionality for the RGB protocol.
 
 use crate::core::error::AnyaResult;
-use std::collections::HashMap;
 use bitcoin::Txid;
+use std::collections::HashMap;
 
 /// RGB state transition
 #[derive(Debug, Clone)]
@@ -46,16 +46,16 @@ impl StateValidator {
     pub fn new() -> Self {
         Self
     }
-    
+
     /// Validate a state transition
     pub fn validate_transition(&self, _transition: &StateTransition) -> AnyaResult<bool> {
         // Implementation would go here
         unimplemented!("State transition validation not yet implemented")
     }
-    
+
     /// Validate a state transfer
     pub fn validate_transfer(&self, _transfer: &StateTransfer) -> AnyaResult<bool> {
         // Implementation would go here
         unimplemented!("State transfer validation not yet implemented")
     }
-} 
+}
