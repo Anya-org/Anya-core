@@ -1,3 +1,0 @@
-23|if (Test-Path target) {
-24|    Remove-Item -Recurse -Force target
-25|} else { Write-Warning "Target directory not found" }  # Better error handling 
