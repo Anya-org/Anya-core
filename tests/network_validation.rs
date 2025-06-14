@@ -1,8 +1,6 @@
 #[cfg(test)]
 mod tests {
     use anya_core::network::validation::{NetworkValidator, NetworkValidationConfig};
-    use std::net::SocketAddr;
-    use tokio::net::TcpListener;
 
     #[tokio::test]
     async fn test_full_network_validation() {

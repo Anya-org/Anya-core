@@ -1,8 +1,12 @@
 #[test]
 fn verify_schnorr_implementation() {
+    use secp256k1::{Secp256k1, Keypair, XOnlyPublicKey, Message};
+    use secp256k1::hashes::sha256;
+    use rand::thread_rng;
+    
     let secp = Secp256k1::new();
-    let mut rng = rand::thread_rng();
-    let key_pair = KeyPair::new(&secp, &mut rng);
+    let mut rng = thread_rng();
+    let key_pair = Keypair::new(&secp, &mut rng);
     let (xonly, _) = XOnlyPublicKey::from_keypair(&key_pair);
 
     let msg = Message::from_hashed_data::<sha256::Hash>(b"test");

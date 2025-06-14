@@ -4,7 +4,7 @@ use std::error::Error;
 // as part of the Web5 integration - [AIR-012] Operational Reliability
 
 use serde::{Deserialize, Serialize};
-use sha2::{Sha256, Digest};
+use sha2::Digest;
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use std::time::{SystemTime, UNIX_EPOCH};

@@ -1,10 +1,9 @@
-use std::error::Error;
 use std::time::{Duration, Instant};
 use std::process::Command;
-use log::{info, warn, error};
+use log::info;
 use tokio::net::TcpStream;
 use tokio::time::timeout;
-use std::net::{IpAddr, Ipv4Addr, SocketAddr};
+use std::net::{IpAddr, SocketAddr};
 use trust_dns_resolver::config::{ResolverConfig, ResolverOpts};
 use trust_dns_resolver::Resolver;
 use serde::{Serialize, Deserialize};
@@ -332,10 +331,19 @@ impl NetworkValidator {
                 Err(_) => continue,
             };
             
+            // Create NameServerConfig instead of SocketAddr
+            let nameserver_config = trust_dns_resolver::config::NameServerConfig {
+                socket_addr: SocketAddr::new(resolver_ip, 53),
+                protocol: trust_dns_resolver::config::Protocol::Udp,
+                tls_dns_name: None,
+                bind_addr: None,
+                trust_negative_responses: true,
+            };
+            
             let resolver_config = ResolverConfig::from_parts(
                 None, 
                 vec![], 
-                vec![SocketAddr::new(resolver_ip, 53)],
+                vec![nameserver_config],
             );
             
             // Create the resolver
@@ -513,7 +521,7 @@ impl NetworkValidator {
     }
     
     /// Validate open ports
-    async fn validate_ports(&self) -> PortValidationResult  {
+    pub async fn validate_ports(&self) -> PortValidationResult  {
         info!("Validating required ports with BIP-341 compliance...");
         
         let mut open_ports = Vec::new();
@@ -1029,8 +1037,7 @@ impl NetworkValidator {
         // Implement Taproot-specific validation logic
         let taproot_check = Command::new("bitcoin-cli")
             .args(&["getnetworkinfo"])
-            .output()
-            .await;
+            .output();
         
         match taproot_check {
             Ok(output) => {
