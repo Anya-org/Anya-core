@@ -320,7 +320,7 @@ impl DWNManager {
             .records
             .lock()
             .map_err(|e| Web5Error::Storage(format!("Failed to acquire lock: {}", e)))?;
-        let record_id = generate_id();
+        let record_id = record.id.clone();
         storage.insert(record_id.clone(), record);
         Ok(record_id)
     }
