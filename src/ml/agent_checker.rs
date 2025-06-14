@@ -232,6 +232,17 @@ impl AgentChecker {
 
         if component_count > 0.0 {
             health.overall_status = total_status / component_count;
+
+            // Update system stage based on overall status
+            health.stage = if health.overall_status >= RELEASE_THRESHOLD {
+                SystemStage::Release
+            } else if health.overall_status >= PRODUCTION_THRESHOLD {
+                SystemStage::Production
+            } else if health.overall_status >= DEVELOPMENT_THRESHOLD {
+                SystemStage::Development
+            } else {
+                SystemStage::Unavailable
+            };
         }
     }
 

@@ -4,6 +4,7 @@ use std::error::Error;
 // as part of the Web5 integration - [AIR-012] Operational Reliability
 
 use serde::{Deserialize, Serialize};
+use sha2::Digest;
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use std::time::{SystemTime, UNIX_EPOCH};
@@ -184,21 +185,36 @@ impl DIDManager {
         // Generate a random ID for the DID
         let id = format!("did:{}:{}", self.method, generate_random_id());
 
+        // Generate a key pair for this DID
+        let private_key = generate_private_key();
+        let public_key_jwk = generate_public_key_jwk(&private_key);
+
+        // Create verification method
+        let verification_method = VerificationMethod {
+            id: format!("{}#key-1", id),
+            vm_type: "JsonWebKey2020".to_string(),
+            controller: id.clone(),
+            public_key_jwk: Some(public_key_jwk),
+        };
+
         // Create a basic DID document
         let document = DIDDocument {
             context: vec!["https://www.w3.org/ns/did/v1".to_string()],
             id: id.clone(),
-            verification_method: Vec::new(),
-            authentication: Vec::new(),
-            assertion_method: Vec::new(),
+            verification_method: vec![verification_method],
+            authentication: vec![format!("{}#key-1", id)],
+            assertion_method: vec![format!("{}#key-1", id)],
             service: Vec::new(),
         };
 
-        // Create the DID
+        // Create the DID with private keys
+        let mut private_keys = HashMap::new();
+        private_keys.insert("key-1".to_string(), private_key);
+
         let did = DID {
             id: id.clone(),
             document,
-            private_keys: HashMap::new(),
+            private_keys,
         };
 
         // Store the DID
@@ -248,23 +264,43 @@ impl DIDManager {
     }
 
     /// Sign data with a DID's private key
-    pub fn sign(&self, did: &str, _data: &[u8]) -> Result<Vec<u8>, Box<dyn Error>> {
-        // This is a simplified implementation
-        // In a real implementation, this would use the DID's private key
-
+    pub fn sign(&self, did: &str, data: &[u8]) -> Result<Vec<u8>, Box<dyn Error>> {
         // Get the DID
         let dids = self
             .dids
             .lock()
             .map_err(|e| format!("Mutex lock error: {}", e))?;
-        if !dids.contains_key(did) {
-            return Err(format!("DID not found: {}", did).into());
-        }
+        let did_obj = dids.get(did).ok_or_else(|| format!("DID not found: {}", did))?;
 
-        // For now, just return a placeholder signature
-        // In a real implementation, this would use the appropriate
-        // cryptographic algorithm based on the DID's verification method
-        Ok(vec![0u8; 64])
+        // Get the first private key for signing
+        if let Some((_, private_key_bytes)) = did_obj.private_keys.iter().next() {
+            // Parse the private key
+            let private_key = secp256k1::SecretKey::from_slice(private_key_bytes)
+                .map_err(|e| format!("Invalid private key: {}", e))?;
+            
+            // Create secp256k1 context
+            let secp = secp256k1::Secp256k1::signing_only();
+            
+            // Hash the data (using SHA256)
+            let hash = {
+                use sha2::{Sha256, Digest};
+                let mut hasher = Sha256::new();
+                hasher.update(data);
+                hasher.finalize()
+            };
+            
+            // Create message from hash
+            let message = secp256k1::Message::from_slice(&hash)
+                .map_err(|e| format!("Failed to create message: {}", e))?;
+            
+            // Sign the message
+            let signature = secp.sign_ecdsa(&message, &private_key);
+            
+            // Return the signature bytes
+            Ok(signature.serialize_compact().to_vec())
+        } else {
+            Err("No private keys found for DID".into())
+        }
     }
 
     /// Get a list of all DIDs
@@ -330,6 +366,31 @@ fn generate_random_id() -> String {
         .as_secs();
 
     format!("{:x}", now)
+}
+
+/// Generate a private key for cryptographic operations
+fn generate_private_key() -> Vec<u8> {
+    // Generate a 32-byte private key (simplified implementation)
+    use rand::RngCore;
+    let mut key = vec![0u8; 32];
+    rand::thread_rng().fill_bytes(&mut key);
+    key
+}
+
+/// Generate a public key JWK from a private key
+fn generate_public_key_jwk(private_key: &[u8]) -> JWK {
+    // Simplified implementation - in production this would derive the actual public key
+    // from the private key using proper cryptographic operations
+    use base64::Engine;
+    
+    // For demonstration, we'll create a placeholder JWK
+    JWK {
+        kty: "EC".to_string(),
+        crv: Some("secp256k1".to_string()),
+        x: Some(base64::engine::general_purpose::URL_SAFE_NO_PAD.encode(&private_key[..16])),
+        y: Some(base64::engine::general_purpose::URL_SAFE_NO_PAD.encode(&private_key[16..])),
+        kid: Some("key-1".to_string()),
+    }
 }
 
 #[cfg(test)]

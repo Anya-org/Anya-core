@@ -108,7 +108,7 @@ pub mod sectional {
     }
 
     /// Report test result to file for the CI pipeline
-    fn report_test_result(result: &TestResult) {
+    pub fn report_test_result(result: &TestResult) {
         // Create reports directory if it doesn't exist
         let reports_dir = Path::new("reports");
         if !reports_dir.exists() {

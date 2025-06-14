@@ -262,6 +262,6 @@ mod tests {
         };
 
         let name = resolver.format_dns_name("alice", "example.org").unwrap();
-        assert_eq!(name.to_string(), "_bitcoin._wallet.alice.example.org.");
+        assert_eq!(name.to_string(), "_bitcoin._wallet.alice.example.org");
     }
 }

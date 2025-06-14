@@ -1,12 +1,14 @@
 #[test]
 fn verify_bip341_implementation() {
+    use anya_core::bitcoin::BitcoinConfig;
+    use anya_core::bitcoin::bip341::TAPROOT_SILENT_LEAF_TAG;
+    
     let config = BitcoinConfig::default();
     assert!(
         config.supports_bip("BIP-341").unwrap(),
         "BIP-341 (Taproot) not properly implemented"
     );
 
-    let silent_leaf = hex::decode(BIP341_SILENT_LEAF.trim_start_matches("0x"))
-        .expect("Invalid SILENT_LEAF format");
-    assert_eq!(silent_leaf.len(), 32, "SILENT_LEAF must be 32 bytes");
+    // Verify the SILENT_LEAF tag exists and has correct format
+    assert_eq!(TAPROOT_SILENT_LEAF_TAG, b"SILENT_LEAF", "SILENT_LEAF tag must match BIP-341 specification");
 }

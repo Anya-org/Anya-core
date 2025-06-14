@@ -4,6 +4,7 @@
 
 // Core modules for Bitcoin functionality
 pub mod adapters;
+pub mod bip341;
 pub mod config;
 pub mod error;
 pub mod interface;

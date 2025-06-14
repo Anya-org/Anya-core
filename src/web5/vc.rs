@@ -247,11 +247,16 @@ mod tests {
 
     #[test]
     fn test_issue_credential() -> Result<(), Box<dyn std::error::Error>> {
-        let did_manager = DIDManager::new("ion");
-        let mut credential_manager = CredentialManager::new(did_manager);
+        let mut did_manager = DIDManager::new("ion");
+        
+        // Create the issuer and subject DIDs first
+        let issuer_did_obj = did_manager.create_did()?;
+        let subject_did_obj = did_manager.create_did()?;
+        
+        let issuer_did = &issuer_did_obj.id;
+        let subject_did = &subject_did_obj.id;
 
-        let issuer_did = "did:ion:issuer123";
-        let subject_did = "did:ion:subject456";
+        let mut credential_manager = CredentialManager::new(did_manager);
 
         let mut claims = HashMap::new();
         claims.insert(
@@ -272,8 +277,8 @@ mod tests {
         )?;
 
         // Verify basic properties
-        assert_eq!(credential.issuer, issuer_did);
-        assert_eq!(credential.credential_subject.id, subject_did);
+        assert_eq!(credential.issuer, *issuer_did);
+        assert_eq!(credential.credential_subject.id, *subject_did);
         assert!(credential
             .credential_type
             .contains(&"ExampleCredential".to_string()));
