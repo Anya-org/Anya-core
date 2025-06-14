@@ -9,6 +9,7 @@ use tracing::{debug, error};
 use trust_dns_resolver::{
     config::{ResolverConfig, ResolverOpts},
     proto::rr::Name,
+    error::ResolveError,
     TokioAsyncResolver,
 };
 
@@ -63,7 +64,7 @@ impl DnsResolver {
         let mut opts = ResolverOpts::default();
         opts.validate = validate_dnssec;
 
-        let resolver = TokioAsyncResolver::tokio(ResolverConfig::default(), opts);
+        let resolver = TokioAsyncResolver::tokio(ResolverConfig::default(), opts)?;
 
         Ok(Self {
             resolver,
@@ -193,7 +194,7 @@ impl DnsResolver {
             let mut opts = ResolverOpts::default();
             opts.validate = validate_dnssec;
 
-            let resolver = TokioAsyncResolver::tokio(ResolverConfig::default(), opts);
+            let resolver = TokioAsyncResolver::tokio(ResolverConfig::default(), opts)?;
 
             self.resolver = resolver;
             self.validate_dnssec = validate_dnssec;
@@ -217,6 +218,12 @@ pub fn parse_payment_instruction(txt_record: &str) -> Option<String> {
         Some(txt_record[8..].to_string())
     } else {
         None
+    }
+}
+
+impl From<ResolveError> for DnsResolverError {
+    fn from(err: ResolveError) -> Self {
+        DnsResolverError::Resolution(err.to_string())
     }
 }
 
@@ -255,7 +262,7 @@ mod tests {
     async fn test_format_dns_name() {
         // We'll use the real implementation for this test
         let resolver = DnsResolver {
-            resolver: TokioAsyncResolver::tokio(ResolverConfig::default(), ResolverOpts::default()),
+            resolver: TokioAsyncResolver::tokio(ResolverConfig::default(), ResolverOpts::default()).unwrap(),
             cache: Arc::new(Mutex::new(HashMap::new())),
             validate_dnssec: false,
             cache_duration: 3600,

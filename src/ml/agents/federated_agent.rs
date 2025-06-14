@@ -276,10 +276,10 @@ impl FederatedAgent {
         }
 
         // Validate model data
-        if model_data.len() > self.config.max_model_size {
+        if model__data.len() > self.config.max_model_size {
             return Err(AgentError::ProcessingError(format!(
                 "Model size exceeds maximum: {} > {}",
-                model_data.len(),
+                model__data.len(),
                 self.config.max_model_size
             )));
         }

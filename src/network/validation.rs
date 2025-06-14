@@ -337,7 +337,7 @@ impl NetworkValidator {
                 protocol: trust_dns_resolver::config::Protocol::Udp,
                 tls_dns_name: None,
                 bind_addr: None,
-                trust_negative_responses: true,
+                trust_nx_responses: true,
             };
             
             let resolver_config = ResolverConfig::from_parts(

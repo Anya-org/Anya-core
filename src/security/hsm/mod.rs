@@ -75,7 +75,7 @@ use base64::{engine::general_purpose::STANDARD as BASE64, Engine as _};
 use bitcoin::bip32::Xpriv;
 use bitcoin::block::Header as BlockHeader;
 use bitcoin::key::Secp256k1;
-use bitcoin::opcodes::{self, all as opcodes};
+use bitcoin::opcodes::all as opcodes;
 use bitcoin::taproot::TaprootBuilder;
 use bitcoin::{Psbt, Script, Txid, XOnlyPublicKey};
 use chrono::{DateTime, Utc};

@@ -593,7 +593,7 @@ impl HsmProvider for SoftHsmProvider {
 
     async fn execute_operation(&self, request: HsmRequest) -> Result<HsmResponse, HsmError> {
         // Log the operation
-        debug!("Executing operation: {:?}", request.operation);
+        tracing::debug!("Executing operation: {:?}", request.operation);
 
         // Execute the operation based on the type
         match request.operation {

@@ -425,7 +425,6 @@ impl SoftwareHsmProvider {
 
     /// Generate a new key pair
     async fn generate_key(&self, params: KeyGenParams) -> Result<(KeyPair, KeyInfo), HsmError> {
-        use crate::security::hsm::provider::EcCurve;
         use crate::security::hsm::provider::{EcCurve, KeyType};
         use chrono::Utc;
 

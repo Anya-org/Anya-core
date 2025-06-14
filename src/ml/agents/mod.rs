@@ -54,7 +54,16 @@ pub enum Observation {
     Custom(String, Vec<u8>),
 
     /// System state observation containing a snapshot of the system's state
-    SystemState(SystemState),
+    SystemState(SystemStateRef),
+}
+
+/// Reference to system state for cloneable observations
+#[derive(Debug, Clone)]
+pub struct SystemStateRef {
+    /// Timestamp of the observation
+    pub timestamp: u64,
+    /// Reference identifier for the system state
+    pub state_id: String,
 }
 
 /// Action taken by an agent
@@ -96,9 +105,8 @@ pub enum SystemUpdateType {
 #[derive(Debug)]
 pub struct SystemState {
     /// Current system index snapshot
-    #[serde(skip_serializing, skip_deserializing)]
     pub index: Option<SystemIndex>,
-    /// Current system map snapshot
+    /// Current system map snapshot  
     pub map: Option<SystemMap>,
     /// Timestamp of the observation
     pub timestamp: u64,
@@ -150,7 +158,7 @@ pub struct AgentMetrics {
 }
 
 /// Error from agent operations
-#[derive(Debug, Clone, thiserror::Error)]
+#[derive(Debug, thiserror::Error)]
 pub enum AgentError {
     /// Invalid observation format
     #[error("Invalid observation: {0}")]
@@ -175,6 +183,14 @@ pub enum AgentError {
     /// Ethical compliance error
     #[error("Ethical compliance error: {0}")]
     EthicalComplianceError(String),
+
+    /// System time error
+    #[error("System time error: {0}")]
+    SystemTimeError(#[from] std::time::SystemTimeError),
+
+    /// Version parsing error
+    #[error("Version error: {0}")]
+    VersionError(#[from] semver::Error),
 }
 
 /// The core agent trait that all ML agents must implement
@@ -202,10 +218,16 @@ pub trait Agent: Send + Sync {
 
     /// Read system state before processing (implements "read first always")
     async fn read_system_state(&self) -> Result<SystemState, AgentError> {
-        // Default implementation to fetch current system state
+        use crate::ml::agents::system_map::{system_index, system_map};
+        
+        // Check that we can read the index and map
+        system_index().read_index().await?;
+        system_map().read_map().await?;
+        
+        // Return a simple state indicating success
         Ok(SystemState {
-            index: Some(SystemIndex::global().read_index().await?),
-            map: Some(SystemMap::global().read_map().await?),
+            index: None, // Can't return actual index due to atomic types
+            map: None,   // Can't return actual map due to non-cloneable types
             timestamp: std::time::SystemTime::now()
                 .duration_since(std::time::UNIX_EPOCH)
                 .unwrap_or_default()
@@ -215,13 +237,15 @@ pub trait Agent: Send + Sync {
 
     /// Update system state after processing
     async fn update_system_state(&self, updates: &[SystemUpdateType]) -> Result<(), AgentError> {
+        use crate::ml::agents::system_map::{system_index, system_map};
+        
         for update_type in updates {
             match update_type {
                 SystemUpdateType::IndexUpdate => {
-                    SystemIndex::global().update_index().await?;
+                    system_index().increment_version().await?;
                 }
                 SystemUpdateType::MapUpdate => {
-                    SystemMap::global().update_map().await?;
+                    system_map().update_map().await?;
                 }
                 _ => {} // Other updates handled elsewhere
             }
@@ -380,9 +404,12 @@ impl AgentSystem {
             let system_state = agent.read_system_state().await?;
 
             // Then process with the original observation plus system state
-            let combined_observation = match observation {
+            let combined_observation =            match observation {
                 Observation::SystemState(_) => observation,
-                _ => Observation::SystemState(system_state),
+                _ => Observation::SystemState(SystemStateRef {
+                    timestamp: chrono::Utc::now().timestamp() as u64,
+                    state_id: format!("state_{}", chrono::Utc::now().timestamp()),
+                }),
             };
 
             let start_time = std::time::Instant::now();
@@ -396,7 +423,7 @@ impl AgentSystem {
                 })?;
 
                 metrics.total_observations += 1;
-                if result.is_ok() && result.as_ref()?.is_some() {
+                if result.is_ok() && result.as_ref().unwrap().is_some() {
                     metrics.total_actions += 1;
                 }
                 if result.is_err() {
@@ -481,9 +508,18 @@ impl Default for AgentSystem {
 }
 
 pub struct MLAgentCoordinator {
-    agents: Vec<Box<dyn MLAgent>>,
-    resource_pool: ResourcePool,
-    health_monitor: HealthMonitor,
+    agents: Vec<Box<dyn Agent>>,
+    // Add basic placeholders for missing types
+}
+
+/// Basic resource pool placeholder  
+pub struct ResourcePool {
+    capacity: usize,
+}
+
+/// Basic health monitor placeholder
+pub struct HealthMonitor {
+    is_healthy: bool,
 }
 
 #[cfg(test)]
