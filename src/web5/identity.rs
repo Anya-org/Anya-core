@@ -184,21 +184,36 @@ impl DIDManager {
         // Generate a random ID for the DID
         let id = format!("did:{}:{}", self.method, generate_random_id());
 
+        // Generate a key pair for this DID
+        let private_key = generate_private_key();
+        let public_key_jwk = generate_public_key_jwk(&private_key);
+
+        // Create verification method
+        let verification_method = VerificationMethod {
+            id: format!("{}#key-1", id),
+            vm_type: "JsonWebKey2020".to_string(),
+            controller: id.clone(),
+            public_key_jwk: Some(public_key_jwk),
+        };
+
         // Create a basic DID document
         let document = DIDDocument {
             context: vec!["https://www.w3.org/ns/did/v1".to_string()],
             id: id.clone(),
-            verification_method: Vec::new(),
-            authentication: Vec::new(),
-            assertion_method: Vec::new(),
+            verification_method: vec![verification_method],
+            authentication: vec![format!("{}#key-1", id)],
+            assertion_method: vec![format!("{}#key-1", id)],
             service: Vec::new(),
         };
 
-        // Create the DID
+        // Create the DID with private keys
+        let mut private_keys = HashMap::new();
+        private_keys.insert("key-1".to_string(), private_key);
+
         let did = DID {
             id: id.clone(),
             document,
-            private_keys: HashMap::new(),
+            private_keys,
         };
 
         // Store the DID
@@ -330,6 +345,31 @@ fn generate_random_id() -> String {
         .as_secs();
 
     format!("{:x}", now)
+}
+
+/// Generate a private key for cryptographic operations
+fn generate_private_key() -> Vec<u8> {
+    // Generate a 32-byte private key (simplified implementation)
+    use rand::RngCore;
+    let mut key = vec![0u8; 32];
+    rand::thread_rng().fill_bytes(&mut key);
+    key
+}
+
+/// Generate a public key JWK from a private key
+fn generate_public_key_jwk(private_key: &[u8]) -> JWK {
+    // Simplified implementation - in production this would derive the actual public key
+    // from the private key using proper cryptographic operations
+    use base64::Engine;
+    
+    // For demonstration, we'll create a placeholder JWK
+    JWK {
+        kty: "EC".to_string(),
+        crv: Some("secp256k1".to_string()),
+        x: Some(base64::engine::general_purpose::URL_SAFE_NO_PAD.encode(&private_key[..16])),
+        y: Some(base64::engine::general_purpose::URL_SAFE_NO_PAD.encode(&private_key[16..])),
+        kid: Some("key-1".to_string()),
+    }
 }
 
 #[cfg(test)]
