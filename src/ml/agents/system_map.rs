@@ -13,12 +13,14 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::sync::{Arc, RwLock};
 use std::time::{SystemTime, UNIX_EPOCH};
-use walkdir::WalkDir;
+use std::sync::atomic::Ordering;
+use blake3;
+use rayon::iter::{IntoParallelIterator, ParallelIterator};
 
 use super::AgentError;
 
 /// System-wide index of resources and components
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct SystemIndex {
     /// Available agent IDs
     pub agent_ids: DashSet<String>,
@@ -37,7 +39,7 @@ pub struct SystemIndex {
 }
 
 /// System-wide mapping of relationships and states
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[derive(Debug, Default)]
 pub struct SystemMap {
     /// Agent relationships (dependencies)
     pub agent_relationships: HashMap<String, Vec<String>>,
@@ -192,9 +194,9 @@ impl SystemIndexManager {
 
     /// Get the current index
     pub async fn read_index(&self) -> Result<SystemIndex, AgentError> {
-        self.index.read().map(|guard| guard.clone()).map_err(|_| {
-            AgentError::InternalError("Failed to acquire read lock on system index".to_string())
-        })
+        self.index.read()
+            .map(|idx| idx.clone())
+            .map_err(|_| AgentError::InternalError("Failed to acquire read lock on system index".to_string()))
     }
 
     /// Update the index
@@ -219,11 +221,16 @@ impl SystemIndexManager {
             AgentError::InternalError("Failed to acquire write lock on system index".to_string())
         })?;
         index.agent_ids.insert(agent_id);
-        index.last_updated = SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .map(|d| d.as_nanos() as u64)
-            .unwrap_or(0);
-        index.version += 1;
+        
+        // Update metadata
+        index.last_updated.store(
+            SystemTime::now()
+                .duration_since(UNIX_EPOCH)?
+                .as_nanos() as u64,
+            Ordering::SeqCst
+        );
+        index.version.store(index.version.load(Ordering::SeqCst) + 1, Ordering::SeqCst);
+        
         Ok(())
     }
 
@@ -236,15 +243,18 @@ impl SystemIndexManager {
         let mut index = self.index.write().map_err(|_| {
             AgentError::InternalError("Failed to acquire write lock on system index".to_string())
         })?;
-        index.component_paths.insert(
-            component_id,
-            (path.clone(), blake3::hash(path.as_bytes()).into()),
+        
+        index.component_paths.insert(component_id, (path, blake3::hash(path.as_bytes()).into()));
+        
+        // Update metadata
+        index.last_updated.store(
+            SystemTime::now()
+                .duration_since(UNIX_EPOCH)?
+                .as_nanos() as u64,
+            Ordering::SeqCst
         );
-        index.last_updated = SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .map(|d| d.as_nanos() as u64)
-            .unwrap_or(0);
-        index.version += 1;
+        index.version.store(index.version.load(Ordering::SeqCst) + 1, Ordering::SeqCst);
+        
         Ok(())
     }
 
@@ -253,14 +263,18 @@ impl SystemIndexManager {
         let mut index = self.index.write().map_err(|_| {
             AgentError::InternalError("Failed to acquire write lock on system index".to_string())
         })?;
-        let version = semver::Version::parse(path.split('.').last().unwrap_or("0.0.0"))
-            .unwrap_or_else(|_| semver::Version::new(0, 0, 0));
-        index.model_paths.insert(model_id, version);
-        index.last_updated = SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .map(|d| d.as_nanos() as u64)
-            .unwrap_or(0);
-        index.version += 1;
+        
+        index.model_paths.insert(model_id, semver::Version::parse(path.split('.').last().unwrap_or("0.0.0"))?);
+        
+        // Update metadata
+        index.last_updated.store(
+            SystemTime::now()
+                .duration_since(UNIX_EPOCH)?
+                .as_nanos() as u64,
+            Ordering::SeqCst
+        );
+        index.version.store(index.version.load(Ordering::SeqCst) + 1, Ordering::SeqCst);
+        
         Ok(())
     }
 
@@ -296,29 +310,38 @@ impl SystemIndexManager {
                 (file_type.to_string(), blake3::hash(hash.as_bytes()).into()),
             );
         });
-        new_index.last_updated = SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .map(|d| d.as_nanos() as u64)
-            .unwrap_or(0);
-        new_index.version += 1;
-        Ok(())
+
+        new_index.last_updated.store(
+            SystemTime::now()
+                .duration_since(UNIX_EPOCH)?
+                .as_nanos() as u64,
+            Ordering::SeqCst
+        );
+        
+        self.update_index(new_index).await
     }
-    fn analyze_rust_file(&self, path: &str) -> RustCodeMetrics {
+
+    async fn analyze_rust_file(&self, path: &str) -> RustCodeMetrics {
         let content = std::fs::read_to_string(path).unwrap_or_default();
+        let syntax = syn::parse_file(&content)?;
+        
         let mut metrics = RustCodeMetrics {
-            cyclomatic_complexity: calculate_cyclomatic_complexity(&content),
-            unsafe_usage_count: count_unsafe_blocks(&content),
+            cyclomatic_complexity: calculate_cyclomatic_complexity(&syntax),
+            unsafe_usage_count: count_unsafe_blocks(&syntax),
             test_coverage: get_test_coverage(path),
             dependency_graph: analyze_dependencies(&content),
             clippy_lints: run_clippy_checks(path),
             security_audit_flags: check_bitcoin_security(&content),
             bitcoin_protocol_adherence: calculate_protocol_adherence(&content),
         };
+
+        // Apply Bitcoin protocol rules
         if metrics.bitcoin_protocol_adherence < 0.9 {
-            metrics
-                .security_audit_flags
-                .push("Low Bitcoin protocol adherence - review BIP-341/342 compliance".into());
+            metrics.security_audit_flags.push(
+                "Low Bitcoin protocol adherence - review BIP-341/342 compliance".into()
+            );
         }
+
         metrics
     }
     pub fn enhanced_crawl(&self) -> Result<(), AgentError> {
@@ -335,35 +358,29 @@ impl SystemIndexManager {
                 let metrics = self.analyze_rust_file(&path);
                 (path, metrics)
             });
+
         walker.for_each(|(path, metrics)| {
-            index.rust_metrics.insert(path, metrics);
+            self.index.write()?.rust_metrics.insert(path, metrics);
         });
+
         Ok(())
     }
 
     pub async fn bitcoin_health_check(&self) -> f32 {
-        let index = self.read_index().await.unwrap_or_default();
+        let index = self.read_index().await?;
         let total = index.component_paths.len() as f32;
-        let compliant = index
-            .component_paths
-            .iter()
-            .filter_map(|refmulti| {
-                let (path, (file_type, _)) = refmulti.pair();
-                if Self::is_bitcoin_related(path) && file_type == "Rust Source" {
-                    Some(1.0)
-                } else {
-                    None
-                }
-            })
+        let compliant = index.component_paths.iter()
+            .filter(|(path, _)| is_bitcoin_related(path))
+            .filter(|(_, metrics)| metrics.bitcoin_protocol_adherence >= 0.9)
             .count() as f32;
-        if total == 0.0 {
-            0.0
-        } else {
-            compliant / total
-        }
+            
+        compliant / total
     }
+    
     fn is_bitcoin_related(path: &str) -> bool {
-        path.contains("bitcoin") || path.ends_with(".psbt") || path.contains("bip341")
+        path.contains("bitcoin") || 
+        path.ends_with(".psbt") ||
+        path.contains("bip341")
     }
 }
 
@@ -382,9 +399,9 @@ impl SystemMapManager {
 
     /// Get the current map
     pub async fn read_map(&self) -> Result<SystemMap, AgentError> {
-        self.map.read().map(|m| m.clone()).map_err(|_| {
-            AgentError::InternalError("Failed to acquire read lock on system map".to_string())
-        })
+        self.map.read()
+            .map(|m| m.clone())
+            .map_err(|_| AgentError::InternalError("Failed to acquire read lock on system map".to_string()))
     }
 
     /// Update the map

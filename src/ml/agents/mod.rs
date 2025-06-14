@@ -39,7 +39,7 @@ impl fmt::Display for AgentId {
 }
 
 /// Observation provided to an agent
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone)]
 pub enum Observation {
     /// Text-based observation
     Text(String),
@@ -93,7 +93,7 @@ pub enum SystemUpdateType {
 }
 
 /// System state observation
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug)]
 pub struct SystemState {
     /// Current system index snapshot
     #[serde(skip_serializing, skip_deserializing)]
@@ -150,7 +150,7 @@ pub struct AgentMetrics {
 }
 
 /// Error from agent operations
-#[derive(Debug, thiserror::Error)]
+#[derive(Debug, Clone, thiserror::Error)]
 pub enum AgentError {
     /// Invalid observation format
     #[error("Invalid observation: {0}")]
@@ -204,16 +204,8 @@ pub trait Agent: Send + Sync {
     async fn read_system_state(&self) -> Result<SystemState, AgentError> {
         // Default implementation to fetch current system state
         Ok(SystemState {
-            index: Some(
-                crate::ml::agents::system_map::SystemIndexManager::global()
-                    .read_index()
-                    .await?,
-            ),
-            map: Some(
-                crate::ml::agents::system_map::SystemMapManager::global()
-                    .read_map()
-                    .await?,
-            ),
+            index: Some(SystemIndex::global().read_index().await?),
+            map: Some(SystemMap::global().read_map().await?),
             timestamp: std::time::SystemTime::now()
                 .duration_since(std::time::UNIX_EPOCH)
                 .unwrap_or_default()
@@ -226,17 +218,10 @@ pub trait Agent: Send + Sync {
         for update_type in updates {
             match update_type {
                 SystemUpdateType::IndexUpdate => {
-                    let idx = crate::ml::agents::system_map::SystemIndexManager::global()
-                        .read_index()
-                        .await?;
-                    crate::ml::agents::system_map::SystemIndexManager::global()
-                        .update_index(idx)
-                        .await?;
+                    SystemIndex::global().update_index().await?;
                 }
                 SystemUpdateType::MapUpdate => {
-                    crate::ml::agents::system_map::SystemMapManager::global()
-                        .update_map()
-                        .await?;
+                    SystemMap::global().update_map().await?;
                 }
                 _ => {} // Other updates handled elsewhere
             }
@@ -411,10 +396,8 @@ impl AgentSystem {
                 })?;
 
                 metrics.total_observations += 1;
-                if let Ok(ref opt) = result {
-                    if opt.is_some() {
-                        metrics.total_actions += 1;
-                    }
+                if result.is_ok() && result.as_ref()?.is_some() {
+                    metrics.total_actions += 1;
                 }
                 if result.is_err() {
                     metrics.total_errors += 1;
@@ -502,11 +485,6 @@ pub struct MLAgentCoordinator {
     resource_pool: ResourcePool,
     health_monitor: HealthMonitor,
 }
-
-// Stub trait and types for compilation
-pub trait MLAgent {}
-pub struct ResourcePool;
-pub struct HealthMonitor;
 
 #[cfg(test)]
 mod tests {
