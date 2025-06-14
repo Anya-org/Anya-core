@@ -12,10 +12,21 @@ A powerful platform combining Bitcoin/crypto functionality, ML-based analytics, 
 [![PSBT-v2](https://img.shields.io/badge/PSBT_v2-100%25-brightgreen)](https://bips.xyz/370)
 [![BIP-Standards](https://img.shields.io/badge/BIP-Standards_Compliant-green)](https://bips.xyz)
 
-*Last Updated: June 7, 2025*  
-**Latest Release: v1.1.0 - Production Ready**
+*Last Updated: June 14, 2025*  
+**Latest Release: v1.2.0 - Production Ready**
 
 > **🎉 PRODUCTION MILESTONE ACHIEVED:** This release includes complete Bitcoin Core compliance (58+ compilation errors resolved), all Layer2 protocols operational, and 9.40/10.0 system alignment score with Bitcoin Core principles. Enterprise-ready with hexagonal architecture implementation.
+
+## 📖 Complete Documentation
+
+👉 **[Master Documentation Index](docs/MASTER_INDEX.md)** - Your complete guide to all Anya Core documentation
+
+**Quick Links:**
+- [Getting Started](docs/INSTALLATION.md) - Installation & setup
+- [Architecture](docs/ARCHITECTURE.md) - System design
+- [Bitcoin Integration](docs/BITCOIN_COMPLIANCE.md) - BIP compliance  
+- [API Reference](docs/API.md) - Developer APIs
+- [Security](SECURITY.md) - Security policies
 
 ---
 
