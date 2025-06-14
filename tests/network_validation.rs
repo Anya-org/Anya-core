@@ -1,7 +1,6 @@
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use bitcoin_protocol::BIP341Validator;
+    use anya_core::network::validation::{NetworkValidator, NetworkValidationConfig};
     use std::net::SocketAddr;
     use tokio::net::TcpListener;
 

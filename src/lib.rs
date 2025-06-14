@@ -51,6 +51,8 @@ pub mod enterprise; // Enterprise communications and NostrClient
 pub mod extensions;
 pub mod install;
 pub mod ml;
+pub mod network; // Network validation and related functionality
+pub mod security; // Security and cryptographic functionality
 pub mod testing;
 pub mod types;
 pub mod web5;
@@ -124,9 +126,6 @@ pub use crate::types::compliance::*;
 // Export core types will be defined below
 pub mod config;
 pub mod core;
-
-// Security module, with HSM functionality controlled by feature flag
-pub mod security;
 
 // Re-export HSM types for convenience when feature is enabled
 #[cfg(feature = "hsm")]
