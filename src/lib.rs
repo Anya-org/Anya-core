@@ -47,6 +47,7 @@ pub mod bip;
 pub mod bitcoin;
 pub mod compliance;
 pub mod dao;
+pub mod enterprise; // Enterprise communications and NostrClient
 pub mod extensions;
 pub mod install;
 pub mod ml;
