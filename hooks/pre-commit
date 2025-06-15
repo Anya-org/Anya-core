@@ -1,0 +1,82 @@
+#!/bin/bash
+# Pre-commit hook for Anya Core
+# This runs before each commit to ensure code quality
+
+echo "🔍 Running pre-commit checks for Anya Core..."
+
+# Check if we're on main branch
+CURRENT_BRANCH=$(git branch --show-current)
+if [[ "$CURRENT_BRANCH" == "main" ]]; then
+    echo "❌ Direct commits to main branch are not allowed!"
+    echo "Please create a feature branch:"
+    echo "  git checkout -b feature/your-feature-name"
+    echo "Then submit a Pull Request."
+    exit 1
+fi
+
+# Check for staged files
+if git diff --cached --quiet; then
+    echo "❌ No staged changes found!"
+    echo "Stage your changes with: git add <files>"
+    exit 1
+fi
+
+# Run cargo fmt check
+echo "📝 Checking code formatting..."
+if ! cargo fmt -- --check > /dev/null 2>&1; then
+    echo "❌ Code formatting issues found!"
+    echo "Run 'cargo fmt' to fix formatting."
+    echo "Then stage the changes: git add -u"
+    exit 1
+fi
+
+# Run clippy on staged files only
+echo "🔍 Running clippy checks..."
+if ! cargo clippy --all-targets --all-features -- -D warnings > /dev/null 2>&1; then
+    echo "❌ Clippy found issues!"
+    echo "Fix the warnings and try again."
+    exit 1
+fi
+
+# Check for potential secrets in staged files
+echo "🔐 Scanning for potential secrets..."
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(rs|toml|yml|yaml)$' || true)
+if [[ -n "$STAGED_FILES" ]]; then
+    for file in $STAGED_FILES; do
+        if [[ -f "$file" ]] && grep -E "(api_key|secret|password|token|private_key)" "$file" | grep -v -E "(test|example|//|#)" > /dev/null; then
+            echo "❌ Potential secrets found in $file!"
+            echo "Please remove secrets and use environment variables."
+            exit 1
+        fi
+    done
+fi
+
+# Check for debug statements
+echo "🐛 Checking for debug statements..."
+if [[ -n "$STAGED_FILES" ]]; then
+    for file in $STAGED_FILES; do
+        if [[ -f "$file" ]] && [[ "$file" == *.rs ]] && grep -E "(dbg!|println!.*debug|eprintln!)" "$file" > /dev/null; then
+            echo "❌ Debug statements found in $file!"
+            echo "Please remove debug statements before committing."
+            echo "Found:"
+            grep -n -E "(dbg!|println!.*debug|eprintln!)" "$file"
+            exit 1
+        fi
+    done
+fi
+
+# Check for TODO/FIXME in critical files
+echo "📋 Checking for TODOs in critical files..."
+CRITICAL_PATHS=("src/security/" "src/bitcoin/" "src/layer2/")
+for path in "${CRITICAL_PATHS[@]}"; do
+    if [[ -d "$path" ]]; then
+        TODO_COUNT=$(find "$path" -name "*.rs" -exec grep -l "TODO\|FIXME" {} \; 2>/dev/null | wc -l)
+        if [[ $TODO_COUNT -gt 0 ]]; then
+            echo "⚠️ Found TODOs/FIXMEs in critical path: $path"
+            echo "Consider addressing them before release."
+        fi
+    fi
+done
+
+echo "✅ Pre-commit checks passed!"
+echo "💡 Remember to sign your commit: git commit -S"

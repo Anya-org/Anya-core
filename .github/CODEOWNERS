@@ -1,20 +1,41 @@
-# Default owners for everything in the repo
-* @botshelomokoka/core-maintainers
+# Code Owners for Anya Core - Enhanced Security Review
 
-# Rust core systems
-/src/core/ @botshelomokoka/rust-team
-/src/bitcoin/ @botshelomokoka/bitcoin-team
+# Global ownership - all files require review from core maintainer
+* @botshelomokoka
 
-# Web5 integration
-/src/web5/ @botshelomokoka/web5-team
+# Critical security components require additional review
+/src/security/ @botshelomokoka
+/src/bitcoin/ @botshelomokoka
+/src/layer2/ @botshelomokoka
 
-# Mobile & UI
-/mobile/ @botshelomokoka/mobile-team
-/src/ui/ @botshelomokoka/mobile-team
+# HSM and cryptographic code requires security team review
+/src/security/hsm/ @botshelomokoka
+/src/security/crypto/ @botshelomokoka
 
-# Enterprise features
-/enterprise/ @botshelomokoka/enterprise-team
+# Web5 integration requires web5 expertise
+/src/web5/ @botshelomokoka
 
-# CI/CD and automation
-/.github/ @botshelomokoka/devops-team
-/scripts/ @botshelomokoka/devops-team
+# Mobile & UI components
+/mobile/ @botshelomokoka
+/src/ui/ @botshelomokoka
+
+# Enterprise features require enterprise team review
+/enterprise/ @botshelomokoka
+
+# Infrastructure and CI/CD require devops review
+/.github/ @botshelomokoka
+/scripts/ @botshelomokoka
+/Dockerfile @botshelomokoka
+/docker-compose*.yml @botshelomokoka
+
+# Release-critical files require maintainer approval
+/Cargo.toml @botshelomokoka
+/Cargo.lock @botshelomokoka
+/rust-toolchain.toml @botshelomokoka
+
+# Documentation requires review for accuracy
+/docs/ @botshelomokoka
+/*.md @botshelomokoka
+
+# Test files require review to maintain coverage
+/tests/ @botshelomokoka

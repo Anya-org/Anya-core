@@ -1,0 +1,141 @@
+name: Enforce Branch Protection
+on:
+  pull_request:
+    branches: [ main ]
+    types: [opened, synchronize, reopened]
+
+jobs:
+  enforce-protection:
+    name: Enforce Branch Protection Rules
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Verify signed commits
+      run: |
+        echo "Checking commit signatures..."
+        # Get all commits in this PR
+        COMMITS=$(git rev-list origin/main..HEAD)
+        for commit in $COMMITS; do
+          if ! git verify-commit $commit 2>/dev/null; then
+            echo "❌ Commit $commit is not signed!"
+            echo "Please sign your commits with 'git commit -S' or configure GPG signing."
+            exit 1
+          else
+            echo "✅ Commit $commit is properly signed"
+          fi
+        done
+
+    - name: Check conventional commits
+      run: |
+        echo "Checking commit message format..."
+        COMMITS=$(git rev-list origin/main..HEAD)
+        for commit in $COMMITS; do
+          MSG=$(git log --format=%s -n 1 $commit)
+          if ! echo "$MSG" | grep -qE '^(feat|fix|docs|style|refactor|test|chore|perf|ci|build|revert)(\(.+\))?: .+'; then
+            if ! echo "$MSG" | grep -qE '^(🔧|📊|✨|🐛|📝|💄|♻️|🧪|🔨|⚡|👷|🏗️|⏪)'; then
+              echo "❌ Commit message does not follow conventional format: $MSG"
+              echo "Please use format: type(scope): description"
+              echo "Types: feat, fix, docs, style, refactor, test, chore, perf, ci, build, revert"
+              echo "Or use emojis: 🔧 ✨ 🐛 📝 💄 ♻️ 🧪 🔨 ⚡ 👷 🏗️ ⏪"
+              exit 1
+            fi
+          fi
+          echo "✅ Commit message format OK: $MSG"
+        done
+
+    - name: Check for merge commits
+      run: |
+        echo "Checking for merge commits..."
+        MERGE_COMMITS=$(git rev-list --merges origin/main..HEAD)
+        if [ -n "$MERGE_COMMITS" ]; then
+          echo "❌ Merge commits are not allowed in PRs!"
+          echo "Please rebase your branch or use squash and merge."
+          echo "Merge commits found:"
+          for commit in $MERGE_COMMITS; do
+            echo "  - $commit: $(git log --format=%s -n 1 $commit)"
+          done
+          exit 1
+        fi
+        echo "✅ No merge commits found"
+
+    - name: Validate branch is up to date
+      run: |
+        echo "Checking if branch is up to date with main..."
+        git fetch origin main
+        BEHIND=$(git rev-list --count HEAD..origin/main)
+        if [ $BEHIND -gt 0 ]; then
+          echo "❌ Branch is $BEHIND commits behind main"
+          echo "Please rebase your branch: git rebase origin/main"
+          exit 1
+        fi
+        echo "✅ Branch is up to date with main"
+
+    - name: Check file permissions
+      run: |
+        echo "Checking for executable files..."
+        EXECUTABLE_FILES=$(find . -type f -executable -not -path './.git/*' -not -path './target/*' -not -name '*.sh' -not -name '*.py')
+        if [ -n "$EXECUTABLE_FILES" ]; then
+          echo "❌ Unexpected executable files found:"
+          echo "$EXECUTABLE_FILES"
+          echo "Please remove execute permissions from non-script files."
+          exit 1
+        fi
+        echo "✅ File permissions are correct"
+
+    - name: Check for secrets
+      run: |
+        echo "Scanning for potential secrets..."
+        # Basic secret patterns
+        if grep -r -E "(api_key|secret|password|token|private_key)" --include="*.rs" --include="*.toml" --include="*.yml" --include="*.yaml" . | grep -v "test" | grep -v "example" | grep -v "//"; then
+          echo "❌ Potential secrets found in code!"
+          echo "Please remove secrets and use environment variables or secret management."
+          exit 1
+        fi
+        echo "✅ No obvious secrets found in code"
+
+    - name: Validate cargo.toml changes
+      run: |
+        echo "Checking Cargo.toml changes..."
+        if git diff --name-only origin/main..HEAD | grep -q "Cargo.toml"; then
+          echo "📦 Cargo.toml has been modified"
+          # Check for version changes
+          if git diff origin/main..HEAD Cargo.toml | grep -q "^+version"; then
+            echo "📝 Version change detected in Cargo.toml"
+            echo "Make sure this is intentional and follows semantic versioning"
+          fi
+        fi
+        echo "✅ Cargo.toml validation complete"
+
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Rust
+      uses: dtolnay/rust-toolchain@stable
+
+    - name: Run cargo audit
+      run: |
+        cargo install cargo-audit
+        cargo audit
+        echo "✅ Security audit passed"
+
+    - name: Check for unsafe code
+      run: |
+        echo "Scanning for unsafe code blocks..."
+        UNSAFE_COUNT=$(grep -r "unsafe" --include="*.rs" src/ | wc -l)
+        if [ $UNSAFE_COUNT -gt 0 ]; then
+          echo "⚠️ Found $UNSAFE_COUNT unsafe code blocks"
+          echo "Please ensure unsafe code is properly documented and justified:"
+          grep -r "unsafe" --include="*.rs" src/
+        else
+          echo "✅ No unsafe code found"
+        fi
