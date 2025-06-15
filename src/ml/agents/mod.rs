@@ -507,17 +507,20 @@ impl Default for AgentSystem {
     }
 }
 
+#[allow(dead_code)]
 pub struct MLAgentCoordinator {
     agents: Vec<Box<dyn Agent>>,
     // Add basic placeholders for missing types
 }
 
-/// Basic resource pool placeholder  
+/// Basic resource pool placeholder
+#[allow(dead_code)]
 pub struct ResourcePool {
     capacity: usize,
 }
 
 /// Basic health monitor placeholder
+#[allow(dead_code)]
 pub struct HealthMonitor {
     is_healthy: bool,
 }

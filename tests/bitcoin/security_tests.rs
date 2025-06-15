@@ -290,17 +290,17 @@ fn calculate_std_dev(times: &[std::time::Duration], avg_ns: f64) -> f64 {
 fn test_invariant_violations(checker: &BitcoinCoreInvariantChecker) {
     // Test version invariant
     let invalid_version_tx = Transaction {
-        version: 0, // Invalid version
+        version: Version(0), // Invalid version
         lock_time: bitcoin::LockTime::ZERO,
         input: vec![TxIn {
             previous_output: OutPoint::null(),
-            script_sig: Script::new(),
-            sequence: 0,
-            witness: vec![],
+            script_sig: ScriptBuf::new().into(),
+            sequence: Sequence(0),
+            witness: Witness::default(),
         }],
         output: vec![TxOut {
-            value: 1000,
-            script_pubkey: Script::new(),
+            value: Amount::from_sat(1000),
+            script_pubkey: ScriptBuf::new().into(),
         }],
     };
     assert!(
@@ -310,12 +310,12 @@ fn test_invariant_violations(checker: &BitcoinCoreInvariantChecker) {
 
     // Test empty inputs invariant
     let empty_inputs_tx = Transaction {
-        version: 1,
+        version: Version(1),
         lock_time: bitcoin::LockTime::ZERO,
         input: vec![], // No inputs
         output: vec![TxOut {
-            value: 1000,
-            script_pubkey: Script::new(),
+            value: Amount::from_sat(1000),
+            script_pubkey: ScriptBuf::new().into(),
         }],
     };
     assert!(
@@ -325,13 +325,13 @@ fn test_invariant_violations(checker: &BitcoinCoreInvariantChecker) {
 
     // Test empty outputs invariant
     let empty_outputs_tx = Transaction {
-        version: 1,
+        version: Version(1),
         lock_time: bitcoin::LockTime::ZERO,
         input: vec![TxIn {
             previous_output: OutPoint::null(),
-            script_sig: Script::new(),
-            sequence: 0,
-            witness: vec![],
+            script_sig: ScriptBuf::new().into(),
+            sequence: Sequence(0),
+            witness: Witness::default(),
         }],
         output: vec![], // No outputs
     };
@@ -351,17 +351,17 @@ fn test_invariant_violations(checker: &BitcoinCoreInvariantChecker) {
 // Create a valid minimal transaction
 fn create_valid_transaction() -> Transaction {
     Transaction {
-        version: 1,
+        version: Version(1),
         lock_time: bitcoin::LockTime::ZERO,
         input: vec![TxIn {
             previous_output: OutPoint::null(),
-            script_sig: Script::new(),
-            sequence: 0,
-            witness: vec![],
+            script_sig: ScriptBuf::new().into(),
+            sequence: Sequence(0),
+            witness: Witness::default(),
         }],
         output: vec![TxOut {
-            value: 1000,
-            script_pubkey: Script::new(),
+            value: Amount::from_sat(1000),
+            script_pubkey: ScriptBuf::new().into(),
         }],
     }
 }
@@ -371,25 +371,25 @@ fn create_duplicate_inputs_transaction() -> Transaction {
     let outpoint = OutPoint::null();
 
     Transaction {
-        version: 1,
+        version: Version(1),
         lock_time: bitcoin::LockTime::ZERO,
         input: vec![
             TxIn {
                 previous_output: outpoint,
-                script_sig: Script::new(),
-                sequence: 0,
-                witness: vec![],
+                script_sig: ScriptBuf::new().into(),
+                sequence: Sequence(0),
+                witness: Witness::default(),
             },
             TxIn {
                 previous_output: outpoint, // Same as above, this is the duplicate
-                script_sig: Script::new(),
-                sequence: 0,
-                witness: vec![],
+                script_sig: ScriptBuf::new().into(),
+                sequence: Sequence(0),
+                witness: Witness::default(),
             },
         ],
         output: vec![TxOut {
-            value: 1000,
-            script_pubkey: Script::new(),
+            value: Amount::from_sat(1000),
+            script_pubkey: ScriptBuf::new().into(),
         }],
     }
 }
@@ -397,23 +397,23 @@ fn create_duplicate_inputs_transaction() -> Transaction {
 // Create a transaction that attempts value overflow (CVE-2010-5139)
 fn create_value_overflow_transaction() -> Transaction {
     Transaction {
-        version: 1,
+        version: Version(1),
         lock_time: bitcoin::LockTime::ZERO,
         input: vec![TxIn {
             previous_output: OutPoint::null(),
-            script_sig: Script::new(),
-            sequence: 0,
-            witness: vec![],
+            script_sig: ScriptBuf::new().into(),
+            sequence: Sequence(0),
+            witness: Witness::default(),
         }],
         output: vec![
             // Two outputs with maximum Bitcoin value could cause overflow
             TxOut {
-                value: 21_000_000 * 100_000_000, // Max BTC supply in satoshis
-                script_pubkey: Script::new(),
+                value: Amount::from_sat(21_000_000 * 100_000_000), // Max BTC supply in satoshis
+                script_pubkey: ScriptBuf::new().into(),
             },
             TxOut {
-                value: 21_000_000 * 100_000_000, // Max BTC supply in satoshis
-                script_pubkey: Script::new(),
+                value: Amount::from_sat(21_000_000 * 100_000_000), // Max BTC supply in satoshis
+                script_pubkey: ScriptBuf::new().into(),
             },
         ],
     }
@@ -422,22 +422,21 @@ fn create_value_overflow_transaction() -> Transaction {
 // Create a transaction with OP_EVAL (CVE-2012-2459)
 fn create_op_eval_transaction() -> Transaction {
     // Create script with OP_EVAL (0xBA)
-    // This opcode was temporarily introduced but removed due to security issues
     let script_bytes = vec![0xBA]; // OP_EVAL
-    let script = Script::from(script_bytes);
+    let script = ScriptBuf::from(script_bytes);
 
     Transaction {
-        version: 1,
+        version: Version(1),
         lock_time: bitcoin::LockTime::ZERO,
         input: vec![TxIn {
             previous_output: OutPoint::null(),
             script_sig: script,
-            sequence: 0,
-            witness: vec![],
+            sequence: Sequence(0),
+            witness: Witness::default(),
         }],
         output: vec![TxOut {
-            value: 1000,
-            script_pubkey: Script::new(),
+            value: Amount::from_sat(1000),
+            script_pubkey: ScriptBuf::new().into(),
         }],
     }
 }
@@ -455,13 +454,9 @@ fn create_mutated_transaction() -> Transaction {
 
 // Create a transaction with invalid signature
 fn create_invalid_signature_transaction() -> Transaction {
-    // Create a transaction with invalid signature data
     let mut tx = create_valid_transaction();
-
-    // Add some invalid signature data
     let invalid_sig = vec![0x30, 0xFF, 0xFF, 0xFF]; // Invalid DER encoding
-    tx.input[0].script_sig = Script::from(invalid_sig);
-
+    tx.input[0].script_sig = ScriptBuf::from(invalid_sig);
     tx
 }
 

@@ -31,7 +31,7 @@ Welcome to the Anya Core documentation. This index will help you navigate the va
 ## Core Documentation
 
 - [Documentation Index](docs/INDEX.md) - Main documentation index
-- [System Architecture](docs/SYSTEM_MAP.md) - Complete system architecture
+- [System Architecture](docs/SYSTEM_MAP.md#system-architecture) - Complete system architecture (with visual map)
 - [DAO System](src/dao/README.md) - Comprehensive DAO documentation
 - [Tokenomics System](docs/TOKENOMICS_SYSTEM.md) - Bitcoin-style tokenomics
 - [Implementation Milestones](docs/IMPLEMENTATION_MILESTONES.md) - Current progress tracking
@@ -279,3 +279,10 @@ The repository is organized into the following main directories:
 - [Taproot Mobile Demo](docs/mobile/TAPROOT_DEMO.md) - Mobile Taproot examples
 
 *Last updated: June 10, 2025*
+
+<!-- AI Labeling references -->
+[AIR-3]: ./docs/standards/AI_LABELING.md
+[AIS-3]: ./docs/standards/AI_LABELING.md
+[BPC-3]: ./docs/standards/AI_LABELING.md
+[AIT-3]: ./docs/standards/AI_LABELING.md
+[RES-3]: ./docs/standards/AI_LABELING.md
