@@ -29,6 +29,7 @@ MONITORING=false
 INSTALL_DEPS=false
 AUTO_RUN=false
 YES_ALL=false
+ROOTLESS=false
 INSTALL_DIR="${INSTALL_DIR:-$HOME/.anya-core}"
 MONITORING_AVAILABLE=${MONITORING_AVAILABLE:-false}
 
@@ -70,6 +71,11 @@ while [[ $# -gt 0 ]]; do
             INSTALL_DEPS=true
             shift
             ;;
+        --rootless|--sandbox)
+            ROOTLESS=true
+            INSTALL_DIR="$HOME/.anya-core"
+            shift
+            ;;
         *)
             shift
             ;;
@@ -79,6 +85,7 @@ done
 # Main installation function
 install_anya_core() {
     echo "[INFO] Starting Anya Core ${INSTALL_TYPE} installation for ${NETWORK} network"
+    echo "[INFO] Rootless: $ROOTLESS | Auto-run: $AUTO_RUN | Yes-all: $YES_ALL"
     
     if [ "$DRY_RUN" = true ]; then
         echo "[DRY RUN] Would install Anya Core with the following configuration:"
@@ -87,7 +94,8 @@ install_anya_core() {
         echo "  - Network: $NETWORK"
         echo "  - Install Dependencies: $INSTALL_DEPS"
         echo "  - Configure Firewall: $CONFIGURE_FIREWALL"
-        return 0
+        echo "  - Rootless: $ROOTLESS"
+        exit 0
     fi
 
     # Create installation directories with proper permissions
@@ -97,28 +105,55 @@ install_anya_core() {
         "$INSTALL_DIR/logs"
         "$INSTALL_DIR/data"
     )
-    
     for dir in "${dirs[@]}"; do
         if [ ! -d "$dir" ]; then
-            if [ "$DRY_RUN" = true ]; then
-                echo "[DRY RUN] Would create directory: $dir"
-            else
-                echo "[INFO] Creating directory: $dir"
-                if ! mkdir -p "$dir"; then
-                    echo "[ERROR] Failed to create directory: $dir"
-                    return 1
-                fi
-                chmod 755 "$dir"
-            fi
+            echo "[INFO] Creating directory: $dir"
+            mkdir -p "$dir"
+            chmod 755 "$dir"
         else
             echo "[INFO] Directory exists: $dir"
         fi
     done
-    
+
+    # Set install dir for rootless
+    if [ "$ROOTLESS" = true ]; then
+        INSTALL_DIR="$HOME/.anya-core"
+    fi
+
     # Install dependencies if needed
-    if [ "$INSTALL_DEPS" = true ]; then
+    if [ "$INSTALL_DEPS" = true ] || [ "$AUTO_RUN" = true ]; then
         echo "[INFO] Installing system dependencies..."
-        # Add actual dependency installation commands here
+        if [ "$ROOTLESS" = true ]; then
+            if ! command -v cargo >/dev/null 2>&1; then
+                echo "[INFO] Installing Rust toolchain (user-local)..."
+                curl https://sh.rustup.rs -sSf | sh -s -- -y
+                source "$HOME/.cargo/env"
+            fi
+            if ! command -v node >/dev/null 2>&1; then
+                echo "[INFO] Installing Node.js (user-local via nvm)..."
+                if ! command -v nvm >/dev/null 2>&1; then
+                    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+                    export NVM_DIR="$HOME/.nvm"
+                    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+                fi
+                nvm install --lts
+            fi
+        else
+            # System-wide install (assume root)
+            if ! command -v cargo >/dev/null 2>&1; then
+                echo "[INFO] Installing Rust toolchain (system)..."
+                curl https://sh.rustup.rs -sSf | sh -s -- -y
+                source "$HOME/.cargo/env"
+            fi
+            if ! command -v node >/dev/null 2>&1; then
+                echo "[INFO] Installing Node.js (system)..."
+                curl -fsSL https://deb.nodesource.com/setup_lts.x | bash -
+                apt-get install -y nodejs
+            fi
+        fi
+        if [ -f "$PROJECT_ROOT/dependencies/install_dependencies.sh" ]; then
+            bash "$PROJECT_ROOT/dependencies/install_dependencies.sh"
+        fi
     fi
 
     # Configure firewall if needed
@@ -136,36 +171,37 @@ install_anya_core() {
         echo "[ERROR] Failed to build Anya Core"
         return 1
     fi
-    
     # Copy binary to installation directory
     local binary_path="${INSTALL_DIR}/bin/anya-core"
     echo "[INFO] Installing binary to ${binary_path}"
     cp "target/release/anya-core" "${binary_path}"
     chmod +x "${binary_path}"
     
-    # Configure systemd service
-    echo "[INFO] Configuring systemd service..."
-    local systemd_script="${SCRIPT_DIR}/systemd_config.sh"
-    
-    if [ -f "$systemd_script" ]; then
-        # Ensure script is executable
-        chmod +x "$systemd_script"
-        
-        # Run with appropriate parameters
-        if "$systemd_script" \
-            --user="$(whoami)" \
-            --network="$NETWORK" \
-            --binary-path="$binary_path" \
-            --config-path="${INSTALL_DIR}/config/anya.toml" \
-            --start; then
-            echo "[SUCCESS] Systemd service configured and started"
+    # Configure systemd service (only if not rootless)
+    if [ "$ROOTLESS" = false ]; then
+        echo "[INFO] Configuring systemd service..."
+        local systemd_script="${SCRIPT_DIR}/systemd_config.sh"
+        if [ -f "$systemd_script" ]; then
+            chmod +x "$systemd_script"
+            if "$systemd_script" \
+                --user="$(whoami)" \
+                --network="$NETWORK" \
+                --binary-path="$binary_path" \
+                --config-path="${INSTALL_DIR}/config/anya.toml" \
+                --start; then
+                echo "[SUCCESS] Systemd service configured and started"
+            else
+                echo "[ERROR] Failed to configure systemd service"
+                return 1
+            fi
         else
-            echo "[ERROR] Failed to configure systemd service"
+            echo "[ERROR] Systemd configuration script not found at $systemd_script"
             return 1
         fi
     else
-        echo "[ERROR] Systemd configuration script not found at $systemd_script"
-        return 1
+        echo "[INFO] Rootless mode: Skipping systemd service setup."
+        echo "[INFO] To run Anya Core: $binary_path --config ${INSTALL_DIR}/config/anya.toml"
+        # Optionally create a user-level service or background script
     fi
     
     # Create default configuration if it doesn't exist

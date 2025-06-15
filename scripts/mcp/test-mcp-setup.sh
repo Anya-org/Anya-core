@@ -5,6 +5,10 @@
 
 set -euo pipefail
 
+WORKSPACE_DIR="$(pwd)"
+MCP_CONFIG="$WORKSPACE_DIR/.cursor/mcp.json"
+MCP_TEST_DIR="$WORKSPACE_DIR/.mcp_test"
+
 echo "🔧 MCP Tools Verification Test"
 echo "=============================="
 
@@ -36,18 +40,23 @@ fi
 
 # Test existing MCP configuration
 echo "⚙️ Checking existing MCP configuration..."
-if [ -f "/home/bmokoka/Anya-core/.cursor/mcp.json" ]; then
+if [ -f "$MCP_CONFIG" ]; then
     echo "✅ Found existing MCP configuration"
     echo "📋 Current configuration:"
-    head -20 "/home/bmokoka/Anya-core/.cursor/mcp.json"
+    head -20 "$MCP_CONFIG"
 else
     echo "⚠️ No existing MCP configuration found"
+    echo "📁 Creating MCP directory structure..."
+    mkdir -p "$MCP_TEST_DIR"
+    touch "$MCP_TEST_DIR/config.json"
+    echo "{}" > "$MCP_TEST_DIR/config.json"
+    echo "✅ Created local MCP test directory at $MCP_TEST_DIR"
 fi
 
 # Test MCP directory structure
 echo "📁 Creating MCP directory structure..."
-mkdir -p "/home/bmokoka/Anya-core/mcp"/{toolbox,logs,config,backups}
-mkdir -p "/home/bmokoka/Anya-core/mcp/toolbox"/{servers,tools,extensions}
+mkdir -p "$WORKSPACE_DIR/mcp"/{toolbox,logs,config,backups}
+mkdir -p "$WORKSPACE_DIR/mcp/toolbox"/{servers,tools,extensions}
 echo "✅ MCP directories created"
 
 # Test mem0 API key environment

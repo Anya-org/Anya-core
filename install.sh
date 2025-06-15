@@ -1,18 +1,20 @@
 #!/bin/bash
 # [AIR-3][AIS-3][BPC-3][RES-3]
-# Anya Core Installation Script
-# Following official Bitcoin Improvement Proposals (BIPs)
-# Date: 2025-05-21
+# Anya Core Installation Script (Upgraded for rootless/sandboxed install)
+# Date: 2025-06-15
 
 set -euo pipefail
 
 # Script version
-VERSION="1.0.0"
+VERSION="1.1.0"
 
 # Default values
 NETWORK="testnet"
 INSTALL_TYPE="standard"
 DRY_RUN=false
+ROOTLESS=false
+AUTO_RUN=false
+YES_ALL=false
 
 # Error handling
 handle_error() {
@@ -35,6 +37,9 @@ Options:
   --network=NETWORK    Network to connect to (mainnet, testnet, regtest, signet)
   --type=TYPE         Installation type (standard, minimal, full)
   --dry-run           Simulate installation without making changes
+  --rootless|--sandbox  Install in user home, no root/systemd required
+  --auto-run          Auto install all dependencies and run all steps
+  --yes-all           Assume yes to all prompts
   --help              Show this help message
   --version           Show version information
 
@@ -47,6 +52,9 @@ Examples:
 
   # Minimal installation for development
   sudo $0 --network=regtest --type=minimal
+
+  # Rootless installation with automatic dependency installation
+  $0 --network=testnet --rootless --auto-run --yes-all
 EOF
 }
 
@@ -64,6 +72,18 @@ parse_args() {
                 ;;
             --dry-run)
                 DRY_RUN=true
+                shift
+                ;;
+            --rootless|--sandbox)
+                ROOTLESS=true
+                shift
+                ;;
+            --auto-run)
+                AUTO_RUN=true
+                shift
+                ;;
+            --yes-all)
+                YES_ALL=true
                 shift
                 ;;
             --help)
@@ -105,55 +125,87 @@ parse_args() {
     esac
 }
 
+# Dependency installer (rootless aware)
+install_deps() {
+    echo "[INFO] Checking/installing dependencies..."
+    # Rust
+    if ! command -v cargo >/dev/null 2>&1; then
+        echo "[INFO] Installing Rust toolchain (user-local)..."
+        curl https://sh.rustup.rs -sSf | sh -s -- -y
+        source "$HOME/.cargo/env"
+    fi
+    # Node.js
+    if ! command -v node >/dev/null 2>&1; then
+        echo "[INFO] Installing Node.js (user-local via nvm)..."
+        if ! command -v nvm >/dev/null 2>&1; then
+            curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+        fi
+        nvm install --lts
+    fi
+    # Docker (optional, only if monitoring is requested)
+    if [ "$AUTO_RUN" = true ]; then
+        if ! command -v docker >/dev/null 2>&1; then
+            echo "[WARN] Docker not found. Monitoring stack will not be available unless Docker is installed."
+        fi
+    fi
+    # Python (for scripts)
+    if ! command -v python3 >/dev/null 2>&1; then
+        echo "[WARN] Python3 not found. Some scripts may not work."
+    fi
+    # npm packages (user-local)
+    if [ -f "dependencies/install_dependencies.sh" ]; then
+        bash dependencies/install_dependencies.sh
+    fi
+}
+
 # Main function
 main() {
-    echo "=== Anya Core Installation ==="
+    echo "=== Anya Core Installation (Upgraded) ==="
     echo "Version: ${VERSION}"
     echo "Network: ${NETWORK}"
     echo "Type: ${INSTALL_TYPE}"
     echo "Dry Run: ${DRY_RUN}"
+    echo "Rootless: ${ROOTLESS}"
+    echo "Auto Run: ${AUTO_RUN}"
+    echo "Yes All: ${YES_ALL}"
     echo "============================"
     echo
 
-    # Check if running as root
-    if [ "$(id -u)" -ne 0 ]; then
-        echo "[ERROR] This script must be run as root"
-        exit 1
+    # If not root and not rootless, warn and auto-switch
+    if [ "$(id -u)" -ne 0 ] && [ "$ROOTLESS" = false ]; then
+        echo "[WARN] Not running as root. Switching to rootless/sandboxed install."
+        ROOTLESS=true
     fi
 
-    # Define directories
-    ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-    INSTALL_DIR="${ROOT_DIR}/scripts/install"
-
-    # Check if install directory exists
-    if [ ! -d "$INSTALL_DIR" ]; then
-        echo "[ERROR] Installation directory not found: $INSTALL_DIR"
-        exit 1
-    fi
-
-    # Execute the main installer with all parameters
-    if [ -f "${INSTALL_DIR}/main_installer.sh" ]; then
-        echo "[INFO] Starting Anya Core installation..."
-        
-        # Build the command with all parameters
-        local cmd="${INSTALL_DIR}/main_installer.sh"
-        cmd+=" --network=${NETWORK}"
-        cmd+=" --type=${INSTALL_TYPE}"
-        
-        if [ "$DRY_RUN" = true ]; then
-            cmd+=" --dry-run"
-        fi
-        
-        # Execute the command
-        if bash -c "$cmd"; then
-            echo "[SUCCESS] Installation completed successfully"
-            exit 0
-        else
-            echo "[ERROR] Installation failed with status code $?"
-            exit 1
-        fi
+    # Set install dir and main_installer path
+    if [ "$ROOTLESS" = true ]; then
+        export INSTALL_DIR="$HOME/.anya-core"
+        mkdir -p "$INSTALL_DIR"
+        MAIN_INSTALLER_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")/scripts/install" && pwd)/main_installer.sh"
     else
-        echo "[ERROR] Main installer script not found: ${INSTALL_DIR}/main_installer.sh"
+        export INSTALL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/scripts/install"
+        MAIN_INSTALLER_PATH="${INSTALL_DIR}/main_installer.sh"
+    fi
+
+    # Install dependencies
+    if [ "$AUTO_RUN" = true ]; then
+        install_deps
+    fi
+
+    # Call main_installer.sh with all relevant flags
+    local cmd="$MAIN_INSTALLER_PATH --network=${NETWORK} --type=${INSTALL_TYPE}"
+    [ "$DRY_RUN" = true ] && cmd+=" --dry-run"
+    [ "$ROOTLESS" = true ] && cmd+=" --rootless"
+    [ "$AUTO_RUN" = true ] && cmd+=" --auto-run"
+    [ "$YES_ALL" = true ] && cmd+=" --yes-all"
+    echo "[INFO] Running: $cmd"
+    if bash -c "$cmd"; then
+        echo "[SUCCESS] Installation completed successfully"
+        exit 0
+    else
+        echo "[ERROR] Installation failed with status code $?"
         exit 1
     fi
 }
