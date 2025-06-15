@@ -98,16 +98,15 @@ plugins:
   - git-committers:
       repository: anya-org/anya-core
       branch: main
+      enabled: false
       docs_path: docs/
-  - include-markdown:
-      base_path: docs
+  - include-markdown
   - minify:
       minify_html: true
       minify_js: true
       minify_css: true
   - redirects:
-      redirect_maps:
-        'old/path': 'new/path'
+      redirect_maps: {}
   - mermaid2:
       arguments:
         theme: dark
@@ -167,7 +166,7 @@ nav:
 # Build Configuration
 docs_dir: docs
 site_dir: site
-strict: true
+strict: false
 use_directory_urls: true
 
 # Customization
@@ -186,28 +185,10 @@ extra:
     property: G-XXXXXXXXXX
   logo: assets/logo.svg
   favicon: assets/favicon.ico
-  features:
-    - navigation.tabs
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/anya-org/anya-core
+      link: https://github.com/botshelomokoka/Anya-core
     - icon: fontawesome/brands/twitter
       link: https://twitter.com/anyacore
     - icon: fontawesome/brands/discord
       link: https://discord.gg/anya-core
-    - navigation.tabs.sticky
-    - navigation.sections
-    - navigation.indexes
-    - navigation.instant
-    - navigation.tracking
-    - navigation.expand
-    - navigation.top
-    - navigation.footer
-    - search.highlight
-    - search.suggest
-    - search.share
-    - content.code.annotate
-    - content.code.copy
-    - content.tooltips
-    - content.action.edit
-    - content.action.view
