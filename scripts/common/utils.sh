@@ -40,10 +40,11 @@ get_project_root() {
 load_env() {
     local env_file="$1"
     if [ -f "$env_file" ]; then
-        # shellcheck source=/dev/null
+        log "Loading environment from $env_file"
+        # shellcheck disable=SC1090
         source "$env_file"
     else
-        log "Warning: $env_file not found"
+        log "Environment file $env_file not found, using defaults"
     fi
 }
 
@@ -82,9 +83,12 @@ check_system_requirements() {
 
 # Run cargo command with proper error handling
 run_cargo() {
-    local cmd="$1"
-    shift
-    cargo "$cmd" "$@" || error "Cargo $cmd failed"
+    log "Running: cargo $*"
+    if ! cargo "$@"; then
+        log "Error running: cargo $*"
+        return 1
+    fi
+    return 0
 }
 
 # Run tests for a specific package
