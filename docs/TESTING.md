@@ -1,159 +1,96 @@
 ---
 title: "Testing"
-description: "Documentation for Testing"
+description: "Anya Core Testing Guide and Framework"
 ---
 
-[AIR-3][AIS-3][BPC-3][RES-3]
+# Anya Core Testing Guide
 
+## Test Organization
 
-# Unified Testing Framework v2.5
+The test suite has been reorganized to eliminate duplicates and provide centralized utilities:
 
-## Overview
+### Test Structure
 
-Add a brief overview of this document here.
-
-## Table of Contents
-
-- [Section 1](#section-1)
-- [Section 2](#section-2)
-
-
-## Architecture
-```mermaid
-graph TD
-    A[Unified Test Runner] --> B[Module Tests]
-    A --> C[System Tests]
-    A --> D[Performance Tests]
-    A --> E[Security Analysis]
-    B --> F[BIP-341 Validation]
-    C --> G[PSBT v2 Compliance]
-    D --> H[Throughput Benchmarks]
-    E --> I[Taproot Signatures]
+```
+tests/
+├── common/
+│   ├── mod.rs              # Common module exports
+│   └── test_utilities.rs   # Centralized test utilities
+├── bitcoin/                # Bitcoin protocol tests
+├── hardware/               # Hardware optimization tests
+├── dao/                    # DAO functionality tests
+├── layer2/                 # Layer 2 protocol tests
+├── web5/                   # Web5 integration tests
+├── unit_tests/             # Unit tests
+└── mod.rs                  # Main test module
 ```
 
-## Test Execution
-```powershell
-# Full compliance test
-.\scripts\run-unified-tests.ps1 -TestType all -TestLevel compliance
+### Centralized Test Utilities
 
-# Security-focused test
-.\scripts\run-unified-tests.ps1 -TestType security -TestLevel strict
-```
+All tests now use centralized utilities from `tests/common/test_utilities.rs`:
 
-## Compliance Requirements
-1. All tests must validate BIP-341 signatures
-2. PSBT operations require v2 compliance
-3. Security tests must use Taproot commitments
-4. Performance thresholds:
-   - ≥150 tx/s for core operations
-   - ≤500ms latency for critical paths
+#### TestTransactionFactory
+- `create_simple()` - Creates basic test transactions
+- `create_dummy_transaction()` - Legacy compatibility wrapper
+- `create_dummy_transaction_batch(size)` - Batch transaction creation
 
-## Report Structure
-```json
-{
-    "metadata": {
-        "bipCompliance": ["bip-341", "bip-342", "bip-174"],
-        "testFrameworkVersion": "2.5"
-    },
-    "results": {
-        "modules": {
-            "dao-core": {
-                "bipChecks": 3/3,
-                "securityPatterns": ["verify-taproot", "psbt-v2"]
-            }
-        }
-    }
-}
-```
+#### TestEnvironmentFactory
+- `new_basic()` - Basic test environment
+- `new_with_config(config)` - Custom configuration
 
-## Test Configuration
-```json
-{
-    "modules": [
-        {
-            "name": "dao-core",
-            "path": "dao/core/dao-core.clar",
-            "testTypes": ["basic", "compliance"]
-        }
-    ],
-    "securityPatterns": {
-        "bip-compliance": {
-            "patterns": ["verify-taproot-signature", "process-psbt"],
-            "required": true
-        }
-    }
-}
-```
+#### MockFactory
+- `create_bitcoin_keys()` - Mock Bitcoin key pairs
+- `create_oracle_data()` - Mock DLC oracle data
+- `create_secp256k1_context()` - Mock secp256k1 context
+
+#### TestAssertions
+- `assert_transaction_valid(tx)` - Transaction validation
+- `assert_consensus_compliant(data)` - Consensus compliance
+- `assert_performance_acceptable(metrics)` - Performance validation
 
 ## Running Tests
-```powershell
-# Generate test templates
-.\scripts\create-test-templates.ps1 -Module dao-core
 
-# Execute full test suite
-.\scripts\run-module-tests.ps1 -Module dao-core -TestType all
-
-# View results
-code test-results/module-tests/module-test-results.json
-```
-
-## BIP Compliance Requirements
-- All contracts must implement:
-  - BIP-341 Taproot verification
-  - BIP-174 PSBT handling
-  - BIP-342 Tapscript validation 
-
-## Enhanced Search Features
-
-### Search Parameters
-```clarity
-(search-proposals 
-    (optional creator-principal) 
-    (optional "funding-category")
-    (list "keyword1" "keyword2")
-)
-```
-
-### Index Maintenance
-| Index Type       | Update Frequency | Storage Cost |
-|------------------|------------------|--------------|
-| Creator-Category | On submission    | 15 µSTX      |
-| Keyword Metadata | Hourly batches   | 42 µSTX      |
-
-**Compliance Requirements**
-- All search operations must validate BIP-341 signatures
-- Index updates require PSBT v2 compliance (BIP-370) 
-
-## Updated Test Structure
-
-### Directory Hierarchy
-```
-
-## Legacy System Deprecation
-
-### Removed Patterns
-```powershell
-# Old test structure (pre v2.5)
-test/
-├── dao/                 # Replaced by tests/modules/dao
-├── compliance/          # Migrated to tests/system/compliance
-└── performance/         # Consolidated into tests/performance
-```
-
-### Active Symlinks
+### Quick Test Run
 ```bash
-# Compliance reports
-test-results/compliance -> tests/system/compliance
-
-# Performance data
-test-results/performance -> tests/performance
+cargo test
 ```
 
-**Compliance Requirements:**
-1. All symlinks must validate BIP-341 signatures
-2. Path references require PSBT v2 encoding
-3. Audit trails must use Taproot commitments
-## See Also
+### Organized Test Execution
+```bash
+./scripts/run-all-tests.sh
+```
 
-- [Related Document](#related-document)
+### Category-Specific Tests
+```bash
+cargo test --test bitcoin_tests
+cargo test --test hardware_tests
+cargo test --test dao_tests
+```
 
+## Test Cleanup Completed
+
+✅ **Eliminated Duplicates:**
+- Removed duplicate `create_dummy_transaction()` functions
+- Consolidated `TestEnvironment::new()` patterns
+- Merged duplicate test directories
+- Removed RISC-V test file duplicates
+
+✅ **Standardized Patterns:**
+- Centralized test utilities
+- Consistent import structure
+- Unified assertion helpers
+- Common mock data creation
+
+✅ **Improved Organization:**
+- Clear test categorization
+- Proper module structure
+- Centralized re-exports
+- Backward compatibility maintained
+
+## Best Practices
+
+1. **Use Centralized Utilities**: Always import from `crate::common::test_utilities`
+2. **Follow Naming Conventions**: Use descriptive test function names
+3. **Categorize Tests**: Place tests in appropriate directories
+4. **Mock External Dependencies**: Use MockFactory for external resources
+5. **Validate Results**: Use TestAssertions for consistent validation

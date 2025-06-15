@@ -10,13 +10,13 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
   pages: write
   id-token: write
 
 concurrency:
   group: "pages"
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   deploy:
@@ -29,28 +29,38 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          submodules: recursive
 
-      - name: Setup Ruby
-        uses: actions/setup-ruby@v1
-        with:
-          ruby-version: '3.x'
-          bundler-cache: true
-
-      - name: Build Jekyll site
+      - name: Configure Git Credentials
         run: |
-          bundle install
-          bundle exec jekyll build --source docs --destination public
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          key: ${{ github.ref }}
+          path: .cache
+
+      - name: Install MkDocs dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements-docs.txt
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
-        with:
-          static_site_generator: jekyll
+
+      - name: Build MkDocs site
+        run: mkdocs build --clean --strict
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './public'
+          path: './site'
 
       - name: Deploy to GitHub Pages
         id: deployment
