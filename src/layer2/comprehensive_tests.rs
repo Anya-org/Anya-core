@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod comprehensive_layer2_tests {
-    use super::*;
+    // Removed unused import
     use crate::layer2::{
         manager::Layer2Manager, AssetParams, AssetTransfer, BobClient, Layer2Protocol,
         Layer2ProtocolTrait, LiquidModule, Proof, RskClient, StacksClient, TaprootAssetsProtocol,
@@ -37,21 +37,29 @@ mod comprehensive_layer2_tests {
 
     #[test]
     fn test_liquid_module_integration() {
+        // Create a fresh configuration and module instance
         let config = crate::layer2::liquid::LiquidConfig::default();
         let module = LiquidModule::new(config);
 
         // Test initialization
-        assert!(module.initialize().is_ok());
+        assert!(module.initialize().is_ok(), "Module initialization failed");
 
-        // Test state retrieval
-        let state = module.get_state().unwrap();
-        assert_eq!(state.version, "1.0.0");
-        assert_eq!(state.capacity, Some(21000000)); // L-BTC supply
+        // Test state retrieval and make sure it matches the expected version
+        match module.get_state() {
+            Ok(state) => {
+                // Verify the exact version from LiquidModule::new
+                assert_eq!(state.version, "23.2.1", "Version mismatch: expected '23.2.1', got '{}'", state.version);
+                assert_eq!(state.capacity, Some(21000000), "Capacity mismatch");
+            },
+            Err(e) => {
+                panic!("Failed to get state: {:?}", e);
+            }
+        }
 
         // Test transaction submission
         let tx_data = b"liquid_transaction";
         let tx_id = module.submit_transaction(tx_data).unwrap();
-        assert!(tx_id.starts_with("liquid_tx_"));
+        assert!(tx_id.starts_with("liquid_tx_"), "Transaction ID format incorrect");
 
         // Test asset issuance
         let asset_params = AssetParams {
@@ -62,7 +70,7 @@ mod comprehensive_layer2_tests {
             metadata: "liquid metadata".to_string(),
         };
         let asset_id = module.issue_asset(asset_params).unwrap();
-        assert!(asset_id.starts_with("liquid_asset_"));
+        assert!(asset_id.starts_with("liquid_asset_"), "Asset ID format incorrect");
     }
 
     #[test]

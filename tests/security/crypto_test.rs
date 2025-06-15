@@ -9,7 +9,9 @@ fn verify_schnorr_implementation() {
     let key_pair = Keypair::new(&secp, &mut rng);
     let (xonly, _) = XOnlyPublicKey::from_keypair(&key_pair);
 
-    let msg = Message::from_hashed_data::<sha256::Hash>(b"test");
+    // Use sha256::Hash directly to hash the data
+    let digest = sha256::Hash::hash(b"test");
+    let msg = Message::from_digest_slice(digest.as_ref()).expect("32 bytes");
     let sig = secp.sign_schnorr(&msg, &key_pair);
 
     assert!(

@@ -200,7 +200,6 @@ impl TestAssertions {
     }
 }
 
-pub use std::time::{Duration, Instant};
 
 #[cfg(test)]
 mod tests {

@@ -6,7 +6,7 @@ mod common;
 
 // Now use the 'common' module declared above
 use bitcoin::transaction::Version;
-use common::test_utilities::{TestAssertions, TestEnvironmentFactory, TestTransactionFactory}; // Import the Version type
+use common::test_utilities::{TestEnvironmentFactory, TestTransactionFactory}; // Import the Version type
 
 #[test]
 fn test_psbt_extension_support() {
