@@ -1,18 +1,18 @@
 //! Enterprise Communications Module
-//! 
+//!
 //! This module provides enterprise-grade communication capabilities,
 //! with NostrClient as the default for system communications (DAO, internal, etc.)
-//! 
+//!
 //! # Features
-//! 
+//!
 //! - NostrClient for decentralized communications
 //! - DAO integration
 //! - Internal system messaging
 //! - Enterprise-grade security
 
+use serde::{Deserialize, Serialize};
 use std::error::Error;
 use std::fmt;
-use serde::{Deserialize, Serialize};
 
 /// Nostr configuration for enterprise communications
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -49,14 +49,14 @@ impl NostrUserProfile {
     ) -> Result<Self, Box<dyn Error>> {
         // TODO: Implement actual Nostr key derivation
         let public_key = format!("npub{}", &private_key[4..]);
-        
+
         Ok(NostrUserProfile {
             public_key,
             private_key: private_key.to_string(),
             metadata: None,
         })
     }
-    
+
     /// Convert to nsec format
     pub fn to_nsec(&self) -> Result<String, Box<dyn Error>> {
         Ok(self.private_key.clone())
@@ -77,31 +77,39 @@ impl NostrClient {
             connected: false,
         })
     }
-    
+
     /// Connect to Nostr relays
     pub async fn connect(&mut self) -> Result<(), Box<dyn Error>> {
         // TODO: Implement actual Nostr relay connections
         self.connected = true;
         Ok(())
     }
-    
+
     /// Send a message through Nostr
-    pub async fn send_message(&self, content: &str, recipient: Option<&str>) -> Result<String, Box<dyn Error>> {
+    pub async fn send_message(
+        &self,
+        content: &str,
+        recipient: Option<&str>,
+    ) -> Result<String, Box<dyn Error>> {
         if !self.connected {
             return Err("Not connected to relays".into());
         }
-        
+
         // TODO: Implement actual Nostr message sending
         let event_id = format!("event_{}", uuid::Uuid::new_v4());
-        println!("Sent Nostr message: {} -> {}", content, recipient.unwrap_or("public"));
+        println!(
+            "Sent Nostr message: {} -> {}",
+            content,
+            recipient.unwrap_or("public")
+        );
         Ok(event_id)
     }
-    
+
     /// Publish a note
     pub async fn publish_note(&self, content: &str) -> Result<String, Box<dyn Error>> {
         self.send_message(content, None).await
     }
-    
+
     /// Send a direct message
     pub async fn send_dm(&self, recipient: &str, content: &str) -> Result<String, Box<dyn Error>> {
         self.send_message(content, Some(recipient)).await

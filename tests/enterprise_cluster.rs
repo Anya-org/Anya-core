@@ -14,7 +14,7 @@ async fn test_psbt_validation() {
     // Basic assertion to verify cluster config is created
     assert!(!cluster_config.cluster_url.is_empty());
     assert!(!cluster_config.auth_token.is_empty());
-    
+
     // TODO: Implement actual PSBT validation when psbt_validation module is ready
 }
 

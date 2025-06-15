@@ -1,9 +1,9 @@
 #[cfg(test)]
 mod tests {
-    use std::path::PathBuf;
-    use anya_core::install::{InstallationSource, InstallationHandler};
     use anya_core::config::BitcoinConfig;
-    use bitcoin::psbt::Psbt;  // Changed from PartiallySignedTransaction
+    use anya_core::install::{InstallationHandler, InstallationSource};
+    use bitcoin::psbt::Psbt; // Changed from PartiallySignedTransaction
+    use std::path::PathBuf;
     use tempfile::TempDir;
 
     #[tokio::test]
@@ -38,6 +38,6 @@ mod tests {
     fn test_taproot_activation_check() {
         // Use placeholder assertions since protocol module needs to be imported
         assert!(709_632 >= 709_632); // Taproot activation block
-        assert!(709_631 < 709_632);  // Before activation
+        assert!(709_631 < 709_632); // Before activation
     }
 }

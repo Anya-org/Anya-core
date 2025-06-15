@@ -565,7 +565,7 @@ impl HsmProvider for SoftHsmProvider {
         Ok(keys.values().cloned().collect())
     }
 
-    async fn delete_key(&self, _key_id: &str) -> Result<(), HsmError> {
+    async fn delete_key(&self, key_id: &str) -> Result<(), HsmError> {
         let mut keys = self.keys.lock().await;
         let mut key_data = self.key_data.lock().await;
 
@@ -599,7 +599,7 @@ impl HsmProvider for SoftHsmProvider {
         match request.operation {
             HsmOperation::GenerateKey => {
                 // Parse the parameters
-                let _params: KeyGenParams = serde_json::from_value(request.parameters.clone())
+                let params: KeyGenParams = serde_json::from_value(request.parameters.clone())
                     .map_err(|e| {
                         HsmError::InvalidParameters(format!("Invalid parameters: {}", e))
                     })?;

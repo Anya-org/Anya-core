@@ -269,32 +269,34 @@ impl DIDManager {
             .dids
             .lock()
             .map_err(|e| format!("Mutex lock error: {}", e))?;
-        let did_obj = dids.get(did).ok_or_else(|| format!("DID not found: {}", did))?;
+        let did_obj = dids
+            .get(did)
+            .ok_or_else(|| format!("DID not found: {}", did))?;
 
         // Get the first private key for signing
         if let Some((_, private_key_bytes)) = did_obj.private_keys.iter().next() {
             // Parse the private key
             let private_key = secp256k1::SecretKey::from_slice(private_key_bytes)
                 .map_err(|e| format!("Invalid private key: {}", e))?;
-            
+
             // Create secp256k1 context
             let secp = secp256k1::Secp256k1::signing_only();
-            
+
             // Hash the data (using SHA256)
             let hash = {
-                use sha2::{Sha256, Digest};
+                use sha2::{Digest, Sha256};
                 let mut hasher = Sha256::new();
                 hasher.update(data);
                 hasher.finalize()
             };
-            
+
             // Create message from hash
             let message = secp256k1::Message::from_digest_slice(&hash)
                 .map_err(|e| format!("Failed to create message: {}", e))?;
-            
+
             // Sign the message
             let signature = secp.sign_ecdsa(&message, &private_key);
-            
+
             // Return the signature bytes
             Ok(signature.serialize_compact().to_vec())
         } else {
@@ -381,7 +383,7 @@ fn generate_public_key_jwk(private_key: &[u8]) -> JWK {
     // Simplified implementation - in production this would derive the actual public key
     // from the private key using proper cryptographic operations
     use base64::Engine;
-    
+
     // For demonstration, we'll create a placeholder JWK
     JWK {
         kty: "EC".to_string(),

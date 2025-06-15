@@ -201,13 +201,13 @@ pub mod comprehensive_tests;
 pub use lightning::LightningNetwork;
 // [AIR-3][AIS-3][BPC-3][RES-3] Re-export Layer2 protocol implementations
 // This follows official Bitcoin Improvement Proposals (BIPs) for Layer2 protocols
-pub use state_channels::StateChannel;
 pub use bob::BobClient;
 pub use liquid::LiquidModule;
+pub use manager::Layer2Manager;
 pub use rsk::RskClient;
 pub use stacks::StacksClient;
+pub use state_channels::StateChannel;
 pub use taproot_assets::TaprootAssetsProtocol;
-pub use manager::Layer2Manager;
 
 // Define the RGB Protocol trait implementation
 // [AIR-3][AIS-3][BPC-3][RES-3]

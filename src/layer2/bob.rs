@@ -3,12 +3,12 @@
 //! This module provides integration with the BOB Layer 2 solution,
 //! which combines Bitcoin's security with Ethereum's EVM compatibility.
 
-use std::error::Error;
-use serde::{Deserialize, Serialize};
 use crate::layer2::{
-    Layer2ProtocolTrait, ProtocolState, TransactionStatus, AssetParams, 
-    AssetTransfer, TransferResult, Proof, VerificationResult, ValidationResult
+    AssetParams, AssetTransfer, Layer2ProtocolTrait, Proof, ProtocolState, TransactionStatus,
+    TransferResult, ValidationResult, VerificationResult,
 };
+use serde::{Deserialize, Serialize};
+use std::error::Error;
 
 /// BOB client configuration
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -54,7 +54,7 @@ impl BobClient {
             },
         }
     }
-    
+
     /// Get BOB-specific configuration
     pub fn get_config(&self) -> &BobConfig {
         &self.config
@@ -103,9 +103,11 @@ impl Layer2ProtocolTrait for BobClient {
 
     /// Transfer an asset on BOB
     fn transfer_asset(&self, transfer: AssetTransfer) -> Result<TransferResult, Box<dyn Error>> {
-        println!("Transferring {} of asset {} to {} on BOB", 
-                transfer.amount, transfer.asset_id, transfer.recipient);
-        
+        println!(
+            "Transferring {} of asset {} to {} on BOB",
+            transfer.amount, transfer.asset_id, transfer.recipient
+        );
+
         Ok(TransferResult {
             tx_id: format!("bob_transfer_{}", transfer.asset_id),
             status: TransactionStatus::Confirmed,
@@ -120,7 +122,7 @@ impl Layer2ProtocolTrait for BobClient {
     /// Verify a proof on BOB
     fn verify_proof(&self, proof: Proof) -> Result<VerificationResult, Box<dyn Error>> {
         println!("Verifying {} proof on BOB", proof.proof_type);
-        
+
         Ok(VerificationResult {
             is_valid: true,
             error: None,
@@ -134,7 +136,7 @@ impl Layer2ProtocolTrait for BobClient {
     /// Validate state on BOB
     fn validate_state(&self, state_data: &[u8]) -> Result<ValidationResult, Box<dyn Error>> {
         println!("Validating state on BOB: {} bytes", state_data.len());
-        
+
         Ok(ValidationResult {
             is_valid: true,
             violations: vec![],

@@ -3,12 +3,12 @@
 //! This module provides integration with the RSK sidechain,
 //! which brings smart contract functionality to Bitcoin.
 
-use std::error::Error;
-use serde::{Deserialize, Serialize};
 use crate::layer2::{
-    Layer2ProtocolTrait, ProtocolState, TransactionStatus, AssetParams, 
-    AssetTransfer, TransferResult, Proof, VerificationResult, ValidationResult
+    AssetParams, AssetTransfer, Layer2ProtocolTrait, Proof, ProtocolState, TransactionStatus,
+    TransferResult, ValidationResult, VerificationResult,
 };
+use serde::{Deserialize, Serialize};
+use std::error::Error;
 
 /// RSK configuration
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -54,12 +54,12 @@ impl RskClient {
             },
         }
     }
-    
+
     /// Get RSK-specific configuration
     pub fn get_config(&self) -> &RskConfig {
         &self.config
     }
-    
+
     /// Deploy a smart contract on RSK
     pub fn deploy_contract(&self, bytecode: &[u8]) -> Result<String, Box<dyn Error>> {
         println!("Deploying smart contract on RSK: {} bytes", bytecode.len());
@@ -107,9 +107,11 @@ impl Layer2ProtocolTrait for RskClient {
 
     /// Transfer an asset on RSK
     fn transfer_asset(&self, transfer: AssetTransfer) -> Result<TransferResult, Box<dyn Error>> {
-        println!("Transferring {} of asset {} to {} on RSK", 
-                transfer.amount, transfer.asset_id, transfer.recipient);
-        
+        println!(
+            "Transferring {} of asset {} to {} on RSK",
+            transfer.amount, transfer.asset_id, transfer.recipient
+        );
+
         Ok(TransferResult {
             tx_id: format!("rsk_transfer_{}", transfer.asset_id),
             status: TransactionStatus::Confirmed,
@@ -124,7 +126,7 @@ impl Layer2ProtocolTrait for RskClient {
     /// Verify a proof on RSK
     fn verify_proof(&self, proof: Proof) -> Result<VerificationResult, Box<dyn Error>> {
         println!("Verifying {} proof on RSK", proof.proof_type);
-        
+
         Ok(VerificationResult {
             is_valid: true,
             error: None,
@@ -138,7 +140,7 @@ impl Layer2ProtocolTrait for RskClient {
     /// Validate state on RSK
     fn validate_state(&self, state_data: &[u8]) -> Result<ValidationResult, Box<dyn Error>> {
         println!("Validating state on RSK: {} bytes", state_data.len());
-        
+
         Ok(ValidationResult {
             is_valid: true,
             violations: vec![],

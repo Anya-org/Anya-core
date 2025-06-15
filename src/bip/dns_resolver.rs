@@ -8,8 +8,8 @@ use tokio::time::timeout;
 use tracing::{debug, error};
 use trust_dns_resolver::{
     config::{ResolverConfig, ResolverOpts},
-    proto::rr::Name,
     error::ResolveError,
+    proto::rr::Name,
     TokioAsyncResolver,
 };
 
@@ -263,7 +263,8 @@ mod tests {
     async fn test_format_dns_name() {
         // We'll use the real implementation for this test
         let resolver = DnsResolver {
-            resolver: TokioAsyncResolver::tokio(ResolverConfig::default(), ResolverOpts::default()).unwrap(),
+            resolver: TokioAsyncResolver::tokio(ResolverConfig::default(), ResolverOpts::default())
+                .unwrap(),
             cache: Arc::new(Mutex::new(HashMap::new())),
             validate_dnssec: false,
             cache_duration: 3600,

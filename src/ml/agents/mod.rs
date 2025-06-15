@@ -219,11 +219,11 @@ pub trait Agent: Send + Sync {
     /// Read system state before processing (implements "read first always")
     async fn read_system_state(&self) -> Result<SystemState, AgentError> {
         use crate::ml::agents::system_map::{system_index, system_map};
-        
+
         // Check that we can read the index and map
         system_index().read_index().await?;
         system_map().read_map().await?;
-        
+
         // Return a simple state indicating success
         Ok(SystemState {
             index: None, // Can't return actual index due to atomic types
@@ -238,7 +238,7 @@ pub trait Agent: Send + Sync {
     /// Update system state after processing
     async fn update_system_state(&self, updates: &[SystemUpdateType]) -> Result<(), AgentError> {
         use crate::ml::agents::system_map::{system_index, system_map};
-        
+
         for update_type in updates {
             match update_type {
                 SystemUpdateType::IndexUpdate => {
@@ -404,7 +404,7 @@ impl AgentSystem {
             let _system_state = agent.read_system_state().await?;
 
             // Then process with the original observation plus system state
-            let combined_observation =            match observation {
+            let combined_observation = match observation {
                 Observation::SystemState(_) => observation,
                 _ => Observation::SystemState(SystemStateRef {
                     timestamp: chrono::Utc::now().timestamp() as u64,

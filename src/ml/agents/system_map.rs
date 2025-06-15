@@ -11,7 +11,10 @@ use once_cell::sync::Lazy;
 use rayon::iter::{ParallelBridge, ParallelIterator};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use std::sync::{Arc, RwLock, atomic::{AtomicU64, AtomicU32, Ordering}};
+use std::sync::{
+    atomic::{AtomicU32, AtomicU64, Ordering},
+    Arc, RwLock,
+};
 use std::time::{SystemTime, UNIX_EPOCH};
 use walkdir::WalkDir;
 
@@ -206,35 +209,42 @@ impl SystemIndexManager {
 
     /// Get the current index (returns a reference to avoid cloning atomic types)
     pub async fn read_index(&self) -> Result<(), AgentError> {
-        let _index = self.index.read()
-            .map_err(|_| AgentError::InternalError("Failed to acquire read lock on system index".to_string()))?;
+        let _index = self.index.read().map_err(|_| {
+            AgentError::InternalError("Failed to acquire read lock on system index".to_string())
+        })?;
         // Return success if we can read the index
         Ok(())
     }
 
     /// Get a clone of the SystemIndex for reading component paths
     async fn get_index_for_reading(&self) -> Result<SystemIndex, AgentError> {
-        let index = self.index.read()
-            .map_err(|_| AgentError::InternalError("Failed to acquire read lock on system index".to_string()))?;
-        
+        let index = self.index.read().map_err(|_| {
+            AgentError::InternalError("Failed to acquire read lock on system index".to_string())
+        })?;
+
         // Create a new SystemIndex with the current data
         let new_index = SystemIndex::default();
         for entry in index.component_paths.iter() {
-            new_index.component_paths.insert(entry.key().clone(), entry.value().clone());
+            new_index
+                .component_paths
+                .insert(entry.key().clone(), entry.value().clone());
         }
         for entry in index.agent_ids.iter() {
             new_index.agent_ids.insert(entry.clone());
         }
         for entry in index.model_paths.iter() {
-            new_index.model_paths.insert(entry.key().clone(), entry.value().clone());
+            new_index
+                .model_paths
+                .insert(entry.key().clone(), entry.value().clone());
         }
         Ok(new_index)
     }
 
     /// Get agent IDs from the index
     pub async fn get_agent_ids(&self) -> Result<Vec<String>, AgentError> {
-        let index = self.index.read()
-            .map_err(|_| AgentError::InternalError("Failed to acquire read lock on system index".to_string()))?;
+        let index = self.index.read().map_err(|_| {
+            AgentError::InternalError("Failed to acquire read lock on system index".to_string())
+        })?;
         let agents: Vec<String> = index.agent_ids.iter().map(|id| id.clone()).collect();
         Ok(agents)
     }
@@ -244,16 +254,18 @@ impl SystemIndexManager {
         let index = self.index.read().map_err(|_| {
             AgentError::InternalError("Failed to acquire read lock on system index".to_string())
         })?;
-        
-        index.version.store(index.version.load(Ordering::SeqCst) + 1, Ordering::SeqCst);
+
+        index
+            .version
+            .store(index.version.load(Ordering::SeqCst) + 1, Ordering::SeqCst);
         index.last_updated.store(
             SystemTime::now()
                 .duration_since(UNIX_EPOCH)
                 .map_err(AgentError::SystemTimeError)?
                 .as_nanos() as u64,
-            Ordering::SeqCst
+            Ordering::SeqCst,
         );
-        
+
         Ok(())
     }
 
@@ -263,17 +275,19 @@ impl SystemIndexManager {
             AgentError::InternalError("Failed to acquire read lock on system index".to_string())
         })?;
         index.agent_ids.insert(agent_id);
-        
+
         // Update metadata
         index.last_updated.store(
             SystemTime::now()
                 .duration_since(UNIX_EPOCH)
                 .map_err(AgentError::SystemTimeError)?
                 .as_nanos() as u64,
-            Ordering::SeqCst
+            Ordering::SeqCst,
         );
-        index.version.store(index.version.load(Ordering::SeqCst) + 1, Ordering::SeqCst);
-        
+        index
+            .version
+            .store(index.version.load(Ordering::SeqCst) + 1, Ordering::SeqCst);
+
         Ok(())
     }
 
@@ -286,19 +300,24 @@ impl SystemIndexManager {
         let index = self.index.read().map_err(|_| {
             AgentError::InternalError("Failed to acquire read lock on system index".to_string())
         })?;
-        
-        index.component_paths.insert(component_id, (path.clone(), blake3::hash(path.as_bytes()).into()));
-        
+
+        index.component_paths.insert(
+            component_id,
+            (path.clone(), blake3::hash(path.as_bytes()).into()),
+        );
+
         // Update metadata
         index.last_updated.store(
             SystemTime::now()
                 .duration_since(UNIX_EPOCH)
                 .map_err(AgentError::SystemTimeError)?
                 .as_nanos() as u64,
-            Ordering::SeqCst
+            Ordering::SeqCst,
         );
-        index.version.store(index.version.load(Ordering::SeqCst) + 1, Ordering::SeqCst);
-        
+        index
+            .version
+            .store(index.version.load(Ordering::SeqCst) + 1, Ordering::SeqCst);
+
         Ok(())
     }
 
@@ -307,24 +326,26 @@ impl SystemIndexManager {
         let index = self.index.read().map_err(|_| {
             AgentError::InternalError("Failed to acquire read lock on system index".to_string())
         })?;
-        
+
         // Extract version from path or default to 0.0.0
         let version_str = path.split('.').last().unwrap_or("0.0.0");
-        let version = semver::Version::parse(version_str)
-            .unwrap_or_else(|_| semver::Version::new(0, 0, 0));
-        
+        let version =
+            semver::Version::parse(version_str).unwrap_or_else(|_| semver::Version::new(0, 0, 0));
+
         index.model_paths.insert(model_id, version);
-        
+
         // Update metadata
         index.last_updated.store(
             SystemTime::now()
                 .duration_since(UNIX_EPOCH)
                 .map_err(AgentError::SystemTimeError)?
                 .as_nanos() as u64,
-            Ordering::SeqCst
+            Ordering::SeqCst,
         );
-        index.version.store(index.version.load(Ordering::SeqCst) + 1, Ordering::SeqCst);
-        
+        index
+            .version
+            .store(index.version.load(Ordering::SeqCst) + 1, Ordering::SeqCst);
+
         Ok(())
     }
 
@@ -342,7 +363,7 @@ impl SystemIndexManager {
                 } else {
                     String::new()
                 };
-                
+
                 let file_type = if path.ends_with(".md") {
                     "Documentation"
                 } else if path.ends_with(".rs") {
@@ -350,7 +371,7 @@ impl SystemIndexManager {
                 } else {
                     "Asset"
                 };
-                
+
                 let hash_bytes: [u8; 32] = blake3::hash(hash.as_bytes()).into();
                 (path, (file_type.to_string(), hash_bytes))
             })
@@ -359,9 +380,11 @@ impl SystemIndexManager {
         // Update the index with collected data
         {
             let index = self.index.write().map_err(|_| {
-                AgentError::InternalError("Failed to acquire write lock on system index".to_string())
+                AgentError::InternalError(
+                    "Failed to acquire write lock on system index".to_string(),
+                )
             })?;
-            
+
             for (path, (file_type, hash)) in update_data {
                 index.component_paths.insert(path, (file_type, hash));
             }
@@ -371,10 +394,10 @@ impl SystemIndexManager {
                     .duration_since(UNIX_EPOCH)
                     .map_err(AgentError::SystemTimeError)?
                     .as_nanos() as u64,
-                Ordering::SeqCst
+                Ordering::SeqCst,
             );
         }
-        
+
         Ok(())
     }
 
@@ -393,9 +416,9 @@ impl SystemIndexManager {
 
             // Apply Bitcoin protocol rules
             if metrics.bitcoin_protocol_adherence < 0.9 {
-                metrics.security_audit_flags.push(
-                    "Low Bitcoin protocol adherence - review BIP-341/342 compliance".into()
-                );
+                metrics
+                    .security_audit_flags
+                    .push("Low Bitcoin protocol adherence - review BIP-341/342 compliance".into());
             }
 
             metrics
@@ -407,7 +430,7 @@ impl SystemIndexManager {
         let index = self.index.read().map_err(|_| {
             AgentError::InternalError("Failed to acquire read lock on system index".to_string())
         })?;
-        
+
         let walker = WalkDir::new(".")
             .into_iter()
             .filter_map(|e| e.ok())
@@ -429,27 +452,29 @@ impl SystemIndexManager {
     pub async fn bitcoin_health_check(&self) -> Result<f32, AgentError> {
         let index = self.get_index_for_reading().await?;
         let total = index.component_paths.len() as f32;
-        let compliant = index.component_paths.iter()
+        let compliant = index
+            .component_paths
+            .iter()
             .filter(|entry| Self::is_bitcoin_related(&std::path::Path::new(entry.key())))
             .filter(|entry| entry.value().1.len() == 32) // Simple validation
             .count() as f32;
-            
+
         Ok(compliant / total.max(1.0))
     }
-    
+
     /// Check if a path is related to Bitcoin functionality
     pub fn is_bitcoin_related(path: &std::path::Path) -> bool {
         let path_str = path.to_string_lossy().to_lowercase();
-        path_str.contains("bitcoin") || 
-        path_str.contains("bip") || 
-        path_str.contains("address") ||
-        path_str.contains("transaction") ||
-        path_str.contains("wallet") ||
-        path_str.contains("script") ||
-        path_str.contains("secp256k1") ||
-        path_str.contains("hash") ||
-        path_str.contains("merkle") ||
-        path_str.contains("block")
+        path_str.contains("bitcoin")
+            || path_str.contains("bip")
+            || path_str.contains("address")
+            || path_str.contains("transaction")
+            || path_str.contains("wallet")
+            || path_str.contains("script")
+            || path_str.contains("secp256k1")
+            || path_str.contains("hash")
+            || path_str.contains("merkle")
+            || path_str.contains("block")
     }
 }
 
@@ -468,8 +493,9 @@ impl SystemMapManager {
 
     /// Get the current map status
     pub async fn read_map(&self) -> Result<(), AgentError> {
-        let _map = self.map.read()
-            .map_err(|_| AgentError::InternalError("Failed to acquire read lock on system map".to_string()))?;
+        let _map = self.map.read().map_err(|_| {
+            AgentError::InternalError("Failed to acquire read lock on system map".to_string())
+        })?;
         Ok(())
     }
 

@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod tests {
-    use anya_core::network::validation::{NetworkValidator, NetworkValidationConfig};
+    use anya_core::network::validation::{NetworkValidationConfig, NetworkValidator};
 
     #[tokio::test]
     async fn test_full_network_validation() {

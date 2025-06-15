@@ -4,19 +4,20 @@
 //! with hardware wallets and other specialized Bitcoin hardware security modules.
 
 use async_trait::async_trait;
+use base64::Engine;
 use chrono::Utc;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::Mutex;
-use tracing::{debug, error, info, warn};
+use tracing::{debug, info};
 use uuid::Uuid;
 
 use bitcoin::{
-    bip32::{ChildNumber, ExtendedPrivKey, ExtendedPubKey},
+    bip32::{ChildNumber, DerivationPath, Xpriv as ExtendedPrivKey, Xpub as ExtendedPubKey},
     hashes::{sha256, Hash},
-    secp256k1::{Message, PublicKey as SepcPublicKey, Secp256k1, SecretKey},
+    secp256k1::{ecdsa::Signature, Message, PublicKey as SepcPublicKey, Secp256k1, SecretKey},
     Network,
 };
 
@@ -50,10 +51,10 @@ pub struct BitcoinHsmProvider {
     master_seed: [u8; 32],
 
     /// Master extended key (derived from seed)
-    master_xpriv: Mutex<Option<ExtendedPrivKey>>,
+    master_xpriv: Mutex<Option<bitcoin::bip32::Xpriv>>,
 
     /// Master extended public key
-    master_xpub: Mutex<Option<ExtendedPubKey>>,
+    master_xpub: Mutex<Option<bitcoin::bip32::Xpub>>,
 }
 
 impl BitcoinHsmProvider {

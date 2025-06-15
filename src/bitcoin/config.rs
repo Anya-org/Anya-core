@@ -39,7 +39,7 @@ impl BitcoinConfig {
     pub fn supports_bip(&self, bip: &str) -> Result<bool, Box<dyn std::error::Error>> {
         match bip {
             "BIP-341" => Ok(true), // Taproot support
-            "BIP-340" => Ok(true), // Schnorr signatures  
+            "BIP-340" => Ok(true), // Schnorr signatures
             "BIP-174" => Ok(true), // PSBT support
             _ => Ok(false),
         }

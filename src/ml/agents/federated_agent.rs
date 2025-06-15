@@ -236,7 +236,7 @@ impl FederatedAgent {
         participant_id: &str,
         model_hash: &str,
         model_data: &[u8],
-        performance: HashMap<String, f64>
+        performance: HashMap<String, f64>,
     ) -> Result<(), AgentError> {
         // Update participant state
         {
@@ -245,7 +245,7 @@ impl FederatedAgent {
                     "Failed to acquire write lock on participant state".to_string(),
                 )
             })?;
-            
+
             if let Some(state) = participant_state.get_mut(participant_id) {
                 state.last_active = Utc::now().timestamp() as u64;
                 state.model_hash = Some(model_hash.to_string());

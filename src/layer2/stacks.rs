@@ -3,12 +3,12 @@
 //! This module provides integration with the Stacks blockchain,
 //! which brings smart contracts and DApps to Bitcoin through Proof of Transfer.
 
-use std::error::Error;
-use serde::{Deserialize, Serialize};
 use crate::layer2::{
-    Layer2ProtocolTrait, ProtocolState, TransactionStatus, AssetParams, 
-    AssetTransfer, TransferResult, Proof, VerificationResult, ValidationResult
+    AssetParams, AssetTransfer, Layer2ProtocolTrait, Proof, ProtocolState, TransactionStatus,
+    TransferResult, ValidationResult, VerificationResult,
 };
+use serde::{Deserialize, Serialize};
+use std::error::Error;
 
 /// Stacks configuration
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -54,21 +54,39 @@ impl StacksClient {
             },
         }
     }
-    
+
     /// Get Stacks-specific configuration
     pub fn get_config(&self) -> &StacksConfig {
         &self.config
     }
-    
+
     /// Deploy a Clarity smart contract
-    pub fn deploy_clarity_contract(&self, contract_code: &str, contract_name: &str) -> Result<String, Box<dyn Error>> {
-        println!("Deploying Clarity contract '{}' on Stacks: {} chars", contract_name, contract_code.len());
+    pub fn deploy_clarity_contract(
+        &self,
+        contract_code: &str,
+        contract_name: &str,
+    ) -> Result<String, Box<dyn Error>> {
+        println!(
+            "Deploying Clarity contract '{}' on Stacks: {} chars",
+            contract_name,
+            contract_code.len()
+        );
         Ok(format!("stacks_contract_{}", contract_name))
     }
-    
+
     /// Call a Clarity contract function
-    pub fn call_contract_function(&self, contract_id: &str, function_name: &str, args: Vec<String>) -> Result<String, Box<dyn Error>> {
-        println!("Calling function '{}' on contract '{}' with {} args", function_name, contract_id, args.len());
+    pub fn call_contract_function(
+        &self,
+        contract_id: &str,
+        function_name: &str,
+        args: Vec<String>,
+    ) -> Result<String, Box<dyn Error>> {
+        println!(
+            "Calling function '{}' on contract '{}' with {} args",
+            function_name,
+            contract_id,
+            args.len()
+        );
         Ok(format!("stacks_call_{}_{}", contract_id, function_name))
     }
 }
@@ -113,9 +131,11 @@ impl Layer2ProtocolTrait for StacksClient {
 
     /// Transfer an asset on Stacks
     fn transfer_asset(&self, transfer: AssetTransfer) -> Result<TransferResult, Box<dyn Error>> {
-        println!("Transferring {} of asset {} to {} on Stacks", 
-                transfer.amount, transfer.asset_id, transfer.recipient);
-        
+        println!(
+            "Transferring {} of asset {} to {} on Stacks",
+            transfer.amount, transfer.asset_id, transfer.recipient
+        );
+
         Ok(TransferResult {
             tx_id: format!("stacks_transfer_{}", transfer.asset_id),
             status: TransactionStatus::Confirmed,
@@ -130,7 +150,7 @@ impl Layer2ProtocolTrait for StacksClient {
     /// Verify a proof on Stacks
     fn verify_proof(&self, proof: Proof) -> Result<VerificationResult, Box<dyn Error>> {
         println!("Verifying {} proof on Stacks", proof.proof_type);
-        
+
         Ok(VerificationResult {
             is_valid: true,
             error: None,
@@ -144,7 +164,7 @@ impl Layer2ProtocolTrait for StacksClient {
     /// Validate state on Stacks
     fn validate_state(&self, state_data: &[u8]) -> Result<ValidationResult, Box<dyn Error>> {
         println!("Validating state on Stacks: {} bytes", state_data.len());
-        
+
         Ok(ValidationResult {
             is_valid: true,
             violations: vec![],

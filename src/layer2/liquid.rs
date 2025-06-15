@@ -4,13 +4,13 @@
 //! a Bitcoin sidechain that enables confidential transactions, asset issuance,
 //! and advanced script capabilities through Elements opcodes.
 
-use std::error::Error;
-use std::collections::HashMap;
-use serde::{Deserialize, Serialize};
 use crate::layer2::{
-    Layer2ProtocolTrait, ProtocolState, TransactionStatus, AssetParams, 
-    AssetTransfer, TransferResult, Proof, VerificationResult, ValidationResult
+    AssetParams, AssetTransfer, Layer2ProtocolTrait, Proof, ProtocolState, TransactionStatus,
+    TransferResult, ValidationResult, VerificationResult,
 };
+use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
+use std::error::Error;
 
 /// Liquid Network configuration
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -149,7 +149,7 @@ impl LiquidModule {
             pending_pegouts: HashMap::new(),
         }
     }
-    
+
     /// Get Liquid-specific configuration
     pub fn get_config(&self) -> &LiquidConfig {
         &self.config
@@ -157,74 +157,87 @@ impl LiquidModule {
 
     /// Initiate peg-in from Bitcoin to Liquid
     pub async fn peg_in(&mut self, request: PegInRequest) -> Result<String, Box<dyn Error>> {
-        println!("Initiating peg-in for {} satoshis from Bitcoin tx {}", 
-                request.amount, request.bitcoin_tx_id);
-        
+        println!(
+            "Initiating peg-in for {} satoshis from Bitcoin tx {}",
+            request.amount, request.bitcoin_tx_id
+        );
+
         // Validate Bitcoin transaction
         self.validate_bitcoin_transaction(&request.bitcoin_tx_id)?;
-        
+
         // Generate claim transaction
         let uuid_str = uuid::Uuid::new_v4().to_string();
         let claim_tx_id = format!("liquid_claim_{}", &uuid_str[..8]);
-        
+
         // Store pending peg-in
         self.pending_pegins.insert(claim_tx_id.clone(), request);
-        
+
         Ok(claim_tx_id)
     }
 
     /// Initiate peg-out from Liquid to Bitcoin  
     pub async fn peg_out(&mut self, request: PegOutRequest) -> Result<String, Box<dyn Error>> {
-        println!("Initiating peg-out for {} satoshis to Bitcoin address {}", 
-                request.amount, request.bitcoin_address);
-        
+        println!(
+            "Initiating peg-out for {} satoshis to Bitcoin address {}",
+            request.amount, request.bitcoin_address
+        );
+
         // Validate Liquid balance
         self.validate_liquid_balance(request.amount)?;
-        
+
         // Create peg-out transaction
         let pegout_tx_id = format!("liquid_pegout_{}", &uuid::Uuid::new_v4().to_string()[..8]);
-        
+
         // Store pending peg-out
         self.pending_pegouts.insert(pegout_tx_id.clone(), request);
-        
+
         Ok(pegout_tx_id)
     }
 
     /// Issue a new confidential asset on Liquid
-    pub async fn issue_confidential_asset(&mut self, asset: LiquidAsset) -> Result<String, Box<dyn Error>> {
-        println!("Issuing confidential asset: {} ({})", asset.name, asset.ticker);
-        
+    pub async fn issue_confidential_asset(
+        &mut self,
+        asset: LiquidAsset,
+    ) -> Result<String, Box<dyn Error>> {
+        println!(
+            "Issuing confidential asset: {} ({})",
+            asset.name, asset.ticker
+        );
+
         // Validate asset parameters
         self.validate_asset_params(&asset)?;
-        
+
         // Create issuance transaction
         let issuance_tx_id = format!("liquid_issuance_{}", &asset.asset_id[..8]);
-        
+
         // Store asset
         self.assets.insert(asset.asset_id.clone(), asset);
-        
+
         Ok(issuance_tx_id)
     }
 
     /// Create a confidential transaction with blinded amounts and assets
     pub async fn create_confidential_transaction(
-        &self, 
+        &self,
         inputs: Vec<ConfidentialInput>,
-        outputs: Vec<ConfidentialOutput>
+        outputs: Vec<ConfidentialOutput>,
     ) -> Result<ConfidentialTransaction, Box<dyn Error>> {
-        println!("Creating confidential transaction with {} inputs and {} outputs", 
-                inputs.len(), outputs.len());
-        
+        println!(
+            "Creating confidential transaction with {} inputs and {} outputs",
+            inputs.len(),
+            outputs.len()
+        );
+
         // Generate blinding factors
         let mut blinding_factors = HashMap::new();
         for (i, _output) in outputs.iter().enumerate() {
             let uuid_str = uuid::Uuid::new_v4().to_string();
             blinding_factors.insert(
                 format!("output_{}", i),
-                format!("blind_{}", &uuid_str[..16])
+                format!("blind_{}", &uuid_str[..16]),
             );
         }
-        
+
         let tx_uuid_str = uuid::Uuid::new_v4().to_string();
         let tx = ConfidentialTransaction {
             tx_id: format!("liquid_confidential_{}", &tx_uuid_str[..8]),
@@ -233,23 +246,28 @@ impl LiquidModule {
             fee: 1000, // Liquid fees
             blinding_factors,
         };
-        
+
         Ok(tx)
     }
 
     /// Execute atomic swap between assets
-    pub async fn execute_atomic_swap(&self, swap: AtomicSwap, secret: &str) -> Result<String, Box<dyn Error>> {
-        println!("Executing atomic swap: {} {} for {} {}", 
-                swap.offer_amount, swap.offer_asset,
-                swap.request_amount, swap.request_asset);
-        
+    pub async fn execute_atomic_swap(
+        &self,
+        swap: AtomicSwap,
+        secret: &str,
+    ) -> Result<String, Box<dyn Error>> {
+        println!(
+            "Executing atomic swap: {} {} for {} {}",
+            swap.offer_amount, swap.offer_asset, swap.request_amount, swap.request_asset
+        );
+
         // Validate secret against hash
         self.validate_swap_secret(&swap.secret_hash, secret)?;
-        
+
         // Create swap transaction
         let uuid_str = uuid::Uuid::new_v4().to_string();
         let swap_tx_id = format!("liquid_swap_{}", &uuid_str[..8]);
-        
+
         Ok(swap_tx_id)
     }
 
@@ -261,36 +279,45 @@ impl LiquidModule {
     /// Validate Elements opcodes in script
     pub fn validate_elements_script(&self, script: &[u8]) -> Result<bool, Box<dyn Error>> {
         println!("Validating Elements script with {} bytes", script.len());
-        
+
         // Basic script validation (would implement full Elements opcode validation)
         if script.is_empty() {
             return Ok(false);
         }
-        
+
         // Check for Elements-specific opcodes
         let has_elements_opcodes = script.iter().any(|&byte| {
-            matches!(byte, 
+            matches!(
+                byte,
                 0xc0 | // OP_SHA256INITIALIZE
                 0xc1 | // OP_SHA256UPDATE
                 0xc2 | // OP_SHA256FINALIZE
-                0xc3   // OP_CHECKSIGFROMSTACK
+                0xc3 // OP_CHECKSIGFROMSTACK
             )
         });
-        
+
         Ok(has_elements_opcodes || script.len() > 0)
     }
 
     /// Get federation status and block signing information
-    pub fn get_federation_status(&self) -> Result<HashMap<String, serde_json::Value>, Box<dyn Error>> {
+    pub fn get_federation_status(
+        &self,
+    ) -> Result<HashMap<String, serde_json::Value>, Box<dyn Error>> {
         let mut status = HashMap::new();
-        
-        status.insert("federation_size".to_string(), 
-                     serde_json::Value::Number(self.config.federation_pubkeys.len().into()));
-        status.insert("required_signatures".to_string(), 
-                     serde_json::Value::Number(self.config.required_signatures.into()));
-        status.insert("network".to_string(), 
-                     serde_json::Value::String(self.config.network.clone()));
-        
+
+        status.insert(
+            "federation_size".to_string(),
+            serde_json::Value::Number(self.config.federation_pubkeys.len().into()),
+        );
+        status.insert(
+            "required_signatures".to_string(),
+            serde_json::Value::Number(self.config.required_signatures.into()),
+        );
+        status.insert(
+            "network".to_string(),
+            serde_json::Value::String(self.config.network.clone()),
+        );
+
         Ok(status)
     }
 
@@ -367,9 +394,11 @@ impl Layer2ProtocolTrait for LiquidModule {
 
     /// Transfer an asset on Liquid
     fn transfer_asset(&self, transfer: AssetTransfer) -> Result<TransferResult, Box<dyn Error>> {
-        println!("Transferring {} of asset {} to {} on Liquid", 
-                transfer.amount, transfer.asset_id, transfer.recipient);
-        
+        println!(
+            "Transferring {} of asset {} to {} on Liquid",
+            transfer.amount, transfer.asset_id, transfer.recipient
+        );
+
         Ok(TransferResult {
             tx_id: format!("liquid_transfer_{}", transfer.asset_id),
             status: TransactionStatus::Confirmed,
@@ -384,7 +413,7 @@ impl Layer2ProtocolTrait for LiquidModule {
     /// Verify a proof on Liquid
     fn verify_proof(&self, proof: Proof) -> Result<VerificationResult, Box<dyn Error>> {
         println!("Verifying {} proof on Liquid", proof.proof_type);
-        
+
         Ok(VerificationResult {
             is_valid: true,
             error: None,
@@ -398,7 +427,7 @@ impl Layer2ProtocolTrait for LiquidModule {
     /// Validate state on Liquid
     fn validate_state(&self, state_data: &[u8]) -> Result<ValidationResult, Box<dyn Error>> {
         println!("Validating state on Liquid: {} bytes", state_data.len());
-        
+
         Ok(ValidationResult {
             is_valid: true,
             violations: vec![],

@@ -248,11 +248,11 @@ mod tests {
     #[test]
     fn test_issue_credential() -> Result<(), Box<dyn std::error::Error>> {
         let mut did_manager = DIDManager::new("ion");
-        
+
         // Create the issuer and subject DIDs first
         let issuer_did_obj = did_manager.create_did()?;
         let subject_did_obj = did_manager.create_did()?;
-        
+
         let issuer_did = &issuer_did_obj.id;
         let subject_did = &subject_did_obj.id;
 
