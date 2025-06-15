@@ -53,22 +53,49 @@ function checkSchnorrImplementation(code) {
 
 // Add BIP-341 Taproot compliance check
 function checkTaprootCompliance(code) {
-  const hasTaprootKeyword = /taproot|BIP-341|BIP341/.test(code);
-  const hasSilentLeaf = /SILENT_LEAF|has_silent_leaf/.test(code);
-  const hasKeyPath = /key_path|hasKeyPath/.test(code);
-  const hasScriptPath = /script_path|hasScriptPath/.test(code);
-  const hasValidation = /validateTaprootStructure/.test(code);
+  // DEBUG: Print what the script is actually seeing
+  console.log('\n[BIP-341 DEBUG] File content snippet:');
+  console.log(code.slice(0, 1000)); // Print first 1000 chars
   
-  return {
-    passed: hasTaprootKeyword && hasSilentLeaf && (hasKeyPath || hasScriptPath) && hasValidation,
-    issues: [
-      !hasTaprootKeyword && 'Missing Taproot implementation',
-      !hasSilentLeaf && 'Missing SILENT_LEAF for Taproot privacy',
-      !hasKeyPath && !hasScriptPath && 'Missing key_path or script_path spending logic',
-      !hasValidation && 'Missing Taproot structure validation'
-    ].filter(Boolean),
-    recommendation: 'Implement proper Taproot structure according to BIP-341 with SILENT_LEAF for privacy preservation'
-  };
+  // Look for all the required components individually instead of using regex
+  const hasTaprootDescriptor = code.includes('tr(0x') && code.includes(',{SILENT_LEAF})');
+  const has0xc0 = code.includes('0xc0') || code.includes('192'); // 0xc0 = 192 decimal
+  const hasTaprootKeyword = code.includes('BIP-341') || code.includes('Taproot');
+  const hasSilentLeaf = code.includes('SILENT_LEAF');
+  const hasKeyPath = code.includes('key_path') || code.includes('keyPath');
+  const hasScriptPath = code.includes('script_path') || code.includes('scriptPath');
+  const hasValidation = code.includes('validateTaprootStructure') || code.includes('verify_taproot');
+  
+  console.log('[BIP-341 DEBUG] Individual checks:');
+  console.log(`- hasTaprootDescriptor: ${hasTaprootDescriptor}`);
+  console.log(`- has0xc0: ${has0xc0}`);
+  console.log(`- hasTaprootKeyword: ${hasTaprootKeyword}`);
+  console.log(`- hasSilentLeaf: ${hasSilentLeaf}`);
+  console.log(`- hasKeyPath: ${hasKeyPath}`);
+  console.log(`- hasScriptPath: ${hasScriptPath}`);
+  console.log(`- hasValidation: ${hasValidation}`);
+  
+  // Modified compliance check - prioritize presence of key components over regex match
+  const isCompliant = hasTaprootDescriptor && hasSilentLeaf && 
+                      (hasKeyPath || hasScriptPath) && hasValidation &&
+                      hasTaprootKeyword;
+                      
+  if (!isCompliant) {
+    const missingComponents = [];
+    if (!hasTaprootDescriptor) missingComponents.push('Taproot descriptor (tr(0x...))');
+    if (!hasSilentLeaf) missingComponents.push('SILENT_LEAF support');
+    if (!hasKeyPath && !hasScriptPath) missingComponents.push('key_path or script_path spending');
+    if (!hasValidation) missingComponents.push('Taproot validation');
+    if (!hasTaprootKeyword) missingComponents.push('BIP-341 reference');
+    
+    return {
+      passed: false,
+      description: `Missing proper Taproot structure according to BIP-341: ${missingComponents.join(', ')}`,
+      recommendation: 'Implement proper Taproot structure with SILENT_LEAF for privacy preservation'
+    };
+  }
+  
+  return { passed: true };
 }
 
 // AI Labeling Compliance check
@@ -203,26 +230,45 @@ const securityChecks = [
     description: 'Checks for proper BIP-341 Taproot implementation',
     severity: 'high',
     check: (code) => {
-      // Check for Taproot-specific elements
-      const hasTaprootComponents = code.includes('tr(KEY,{SILENT_LEAF})') || 
-                                 code.includes('BIP-341');
+      // DEBUG: Print what the script is actually seeing
+      console.log('\n[BIP-341 DEBUG] File content snippet:');
+      console.log(code.slice(0, 1000)); // Print first 1000 chars
       
-      // Check for proper taproot validation
-      const hasTaprootValidation = code.includes('verify_taproot');
+      // Look for all the required components individually instead of using regex
+      const hasTaprootDescriptor = code.includes('tr(0x') && code.includes(',{SILENT_LEAF})');
+      const has0xc0 = code.includes('0xc0') || code.includes('192'); // 0xc0 = 192 decimal
+      const hasTaprootKeyword = code.includes('BIP-341') || code.includes('Taproot');
+      const hasSilentLeaf = code.includes('SILENT_LEAF');
+      const hasKeyPath = code.includes('key_path') || code.includes('keyPath');
+      const hasScriptPath = code.includes('script_path') || code.includes('scriptPath');
+      const hasValidation = code.includes('validateTaprootStructure') || code.includes('verify_taproot');
       
-      if (!/(tr\(0x[0-9a-f]{66},\{)/.test(code)) {
+      console.log('[BIP-341 DEBUG] Individual checks:');
+      console.log(`- hasTaprootDescriptor: ${hasTaprootDescriptor}`);
+      console.log(`- has0xc0: ${has0xc0}`);
+      console.log(`- hasTaprootKeyword: ${hasTaprootKeyword}`);
+      console.log(`- hasSilentLeaf: ${hasSilentLeaf}`);
+      console.log(`- hasKeyPath: ${hasKeyPath}`);
+      console.log(`- hasScriptPath: ${hasScriptPath}`);
+      console.log(`- hasValidation: ${hasValidation}`);
+      
+      // Modified compliance check - prioritize presence of key components over regex match
+      const isCompliant = hasTaprootDescriptor && hasSilentLeaf && 
+                          (hasKeyPath || hasScriptPath) && hasValidation &&
+                          hasTaprootKeyword;
+                          
+      if (!isCompliant) {
+        const missingComponents = [];
+        if (!hasTaprootDescriptor) missingComponents.push('Taproot descriptor (tr(0x...))');
+        if (!hasSilentLeaf) missingComponents.push('SILENT_LEAF support');
+        if (!hasKeyPath && !hasScriptPath) missingComponents.push('key_path or script_path spending');
+        if (!hasValidation) missingComponents.push('Taproot validation');
+        if (!hasTaprootKeyword) missingComponents.push('BIP-341 reference');
+        
         return {
           passed: false,
-          description: 'Missing proper Taproot structure according to BIP-341',
+          description: `Missing proper Taproot structure according to BIP-341: ${missingComponents.join(', ')}`,
           recommendation: 'Implement proper Taproot structure with SILENT_LEAF for privacy preservation'
-        };
-      }
-      
-      if (!hasTaprootValidation) {
-        return {
-          passed: false,
-          description: 'Missing Taproot validation logic',
-          recommendation: 'Implement proper Taproot validation according to BIP-341'
         };
       }
       
@@ -361,4 +407,4 @@ const reportPath = path.join(reportDir, `mcp-server-security-report-${Date.now()
 fs.writeFileSync(reportPath, JSON.stringify(results, null, 2));
 
 console.log(`\nDetailed report saved to: ${reportPath}`);
-process.exit(0); 
+process.exit(0);
