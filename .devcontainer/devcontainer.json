@@ -3,7 +3,7 @@
 {
 	"name": "Anya Core - Rust",
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-	"image": "mcr.microsoft.com/devcontainers/rust:latest-bullseye",
+	"image": "mcr.microsoft.com/devcontainers/rust", // Fixed image reference
 	"features": {
 		// Git features - Built from source as needed
 		"ghcr.io/devcontainers/features/git:1": {
