@@ -289,14 +289,11 @@ impl LiquidModule {
         let has_elements_opcodes = script.iter().any(|&byte| {
             matches!(
                 byte,
-                0xc0 | // OP_SHA256INITIALIZE
-                0xc1 | // OP_SHA256UPDATE
-                0xc2 | // OP_SHA256FINALIZE
-                0xc3 // OP_CHECKSIGFROMSTACK
+                0xc0..=0xc3 // OP_CHECKSIGFROMSTACK
             )
         });
 
-        Ok(has_elements_opcodes || script.len() > 0)
+        Ok(has_elements_opcodes || !script.is_empty())
     }
 
     /// Get federation status and block signing information

@@ -347,7 +347,7 @@ impl DependencyManager {
 
     fn check_package_installed(&self, package: &str) -> Result<String> {
         let output = Command::new("dpkg")
-            .args(&["-l", package])
+            .args(["-l", package])
             .output()
             .context("Failed to check package status")?;
 
@@ -380,7 +380,7 @@ impl DependencyManager {
 
         // Update package list
         let update_output = Command::new("sudo")
-            .args(&["apt", "update"])
+            .args(["apt", "update"])
             .output()
             .context("Failed to update package list")?;
 
@@ -391,7 +391,7 @@ impl DependencyManager {
         // Install packages
         let package_names: Vec<&str> = packages.iter().map(|(name, _)| name.as_str()).collect();
         let install_output = Command::new("sudo")
-            .args(&["apt", "install", "-y"])
+            .args(["apt", "install", "-y"])
             .args(&package_names)
             .output()
             .context("Failed to install packages")?;
@@ -407,7 +407,7 @@ impl DependencyManager {
 
     fn check_bitcoin_core(&self) -> Result<String> {
         let output = Command::new("bitcoind")
-            .args(&["--version"])
+            .args(["--version"])
             .output()
             .context("Bitcoin Core not found")?;
 
@@ -422,7 +422,7 @@ impl DependencyManager {
 
     fn check_tor_service(&self) -> Result<bool> {
         let output = Command::new("systemctl")
-            .args(&["is-active", "tor"])
+            .args(["is-active", "tor"])
             .output()
             .context("Failed to check Tor service")?;
 
@@ -432,7 +432,7 @@ impl DependencyManager {
     fn check_hardware_acceleration(&self) -> bool {
         // Check for AES-NI and AVX2 support
         if let Ok(output) = Command::new("grep")
-            .args(&["-m1", "-o", "aes", "/proc/cpuinfo"])
+            .args(["-m1", "-o", "aes", "/proc/cpuinfo"])
             .output()
         {
             return output.status.success();
@@ -524,7 +524,7 @@ impl EnhancedInstaller {
 
     fn check_cpu_feature(feature: &str) -> bool {
         if let Ok(output) = Command::new("grep")
-            .args(&["-m1", "-o", feature, "/proc/cpuinfo"])
+            .args(["-m1", "-o", feature, "/proc/cpuinfo"])
             .output()
         {
             return output.status.success();
@@ -787,7 +787,7 @@ impl EnhancedInstaller {
 
     fn check_systemd(&self) -> bool {
         Command::new("systemctl")
-            .args(&["--version"])
+            .args(["--version"])
             .output()
             .map(|output| output.status.success())
             .unwrap_or(false)
@@ -819,7 +819,7 @@ impl EnhancedInstaller {
 
         // Reload systemd
         Command::new("sudo")
-            .args(&["systemctl", "daemon-reload"])
+            .args(["systemctl", "daemon-reload"])
             .output()?;
 
         Ok(())
@@ -839,7 +839,7 @@ impl EnhancedInstaller {
             self.install_dir.display()
         );
 
-        let logrotate_path = format!("/etc/logrotate.d/anya-core");
+        let logrotate_path = "/etc/logrotate.d/anya-core".to_string();
         fs::write(logrotate_path, logrotate_content)?;
 
         Ok(())

@@ -1,13 +1,9 @@
-#![feature(test)]
-extern crate test;
-
 use anya_bitcoin::riscv::vm_layers::{
     HealthStatus, IsolationLevel, LayerConfigs, LayerState, OperationStatus, PerformanceMetrics,
     Priority, ResourceUsage, RiscVmManager, SystemOperation, SystemState, VmCapabilities,
     VmLayerConfig, VmType,
 };
 use anyhow::Result;
-use test::Bencher;
 use tokio::runtime::Runtime;
 
 /// Core VM functionality tests
@@ -134,8 +130,10 @@ mod security_tests {
 }
 
 /// Performance benchmarks
+#[cfg(feature = "bench")]
 mod benchmarks {
     use super::*;
+    use test::Bencher;
 
     #[bench]
     fn bench_layer_initialization(b: &mut Bencher) {

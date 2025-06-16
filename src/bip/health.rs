@@ -93,6 +93,12 @@ pub struct BipHealthReport {
     pub proposal_count: usize,
 }
 
+impl Default for BipHealthReport {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl BipHealthReport {
     /// Create a new empty report
     pub fn new() -> Self {
@@ -146,11 +152,11 @@ impl BipHealthReport {
     pub fn to_markdown(&self) -> String {
         let mut md = String::new();
 
-        md.push_str(&format!("# BIP System Health Report\n\n"));
+        md.push_str("# BIP System Health Report\n\n");
         md.push_str(&format!("Generated: {}\n\n", self.timestamp));
 
         // Overall summary
-        md.push_str(&format!("## Summary\n\n"));
+        md.push_str("## Summary\n\n");
         md.push_str(&format!(
             "- Overall Health: **{}**\n",
             if self.healthy {

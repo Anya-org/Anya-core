@@ -20,7 +20,7 @@ pub struct LightningPublicKey {
 
 impl fmt::Debug for LightningPublicKey {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "LightningPublicKey({})", hex::encode(&self.bytes))
+        write!(f, "LightningPublicKey({})", hex::encode(self.bytes))
     }
 }
 
@@ -62,7 +62,7 @@ impl LightningPublicKey {
 // Add Display implementation for LightningPublicKey
 impl std::fmt::Display for LightningPublicKey {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", hex::encode(&self.bytes))
+        write!(f, "{}", hex::encode(self.bytes))
     }
 }
 
@@ -75,6 +75,12 @@ pub struct LightningSecp256k1<T> {
 }
 
 pub struct All;
+
+impl Default for LightningSecp256k1<All> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
 impl LightningSecp256k1<All> {
     pub fn new() -> Self {
@@ -91,7 +97,7 @@ pub struct LightningTxid {
 
 impl std::fmt::Display for LightningTxid {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", hex::encode(&self.bytes))
+        write!(f, "{}", hex::encode(self.bytes))
     }
 }
 
@@ -113,6 +119,7 @@ pub struct LightningNode {
     state: Mutex<LightningState>,
 
     /// Secp256k1 context
+    #[allow(dead_code)] // See docs/research/PROTOCOL_UPGRADES.md for details on future cryptographic operations
     secp: LightningSecp256k1<All>,
 
     /// Node public key

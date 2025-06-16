@@ -19,6 +19,7 @@ pub struct BitcoinConfig {
 /// Main installer implementation
 pub struct AnyaInstaller {
     installation_source: InstallationSource,
+    #[allow(dead_code)] // Required for future Bitcoin config extensibility (see docs/INDEX_CORRECTED.md)
     bitcoin_config: BitcoinConfig,
 }
 

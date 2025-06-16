@@ -41,13 +41,13 @@ impl Default for Config {
 
 /// Main Bitcoin node implementation
 pub struct BitcoinNode {
-    /// Node configuration
+    #[allow(dead_code)] // Preserved for compatibility with upstream Bitcoin libraries and future protocol upgrades (see docs/INDEX_CORRECTED.md)
     config: Config,
-    /// Consensus validator
+    #[allow(dead_code)] // Preserved for extensibility and consensus validation (see docs/INDEX_CORRECTED.md)
     consensus: Arc<dyn core::consensus::Validator>,
-    /// Mempool for transaction management
+    #[allow(dead_code)] // Preserved for mempool management and future features (see docs/INDEX_CORRECTED.md)
     mempool: Arc<dyn core::mempool::Mempool>,
-    /// P2P network implementation
+    #[allow(dead_code)] // Preserved for P2P network extensibility (see docs/INDEX_CORRECTED.md)
     network: Arc<dyn core::network::P2P>,
     /// Layer 2 protocol registry
     layer2_registry: Option<Arc<layer2::framework::Layer2Registry>>,

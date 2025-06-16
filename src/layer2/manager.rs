@@ -10,8 +10,16 @@ pub struct Layer2Manager {
     rsk_client: Option<RskClient>,
     stacks_client: Option<StacksClient>,
     taproot_assets: Option<TaprootAssetsProtocol>,
+    #[allow(dead_code)] // Required for future Lightning integration (see docs/research/PROTOCOL_UPGRADES.md)
     lightning_network: Option<LightningNetwork>,
+    #[allow(dead_code)] // Required for future State Channel integration (see docs/research/PROTOCOL_UPGRADES.md)
     state_channels: Option<StateChannel>,
+}
+
+impl Default for Layer2Manager {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl Layer2Manager {

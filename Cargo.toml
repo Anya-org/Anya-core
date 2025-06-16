@@ -136,8 +136,10 @@ chacha20poly1305 = "0.10.1"
 regex = "1.9.6"
 
 [dev-dependencies]
+did-key = "0.2.1"
 mockall = "=0.13.1"
 tokio-test = "=0.4.4"
 tower-test = "=0.4.0"
+uuid = { version = "1.17.0", features = ["v4"] }
 
 

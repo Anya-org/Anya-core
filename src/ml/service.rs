@@ -164,6 +164,12 @@ impl MLModel for MLService {
     }
 }
 
+impl Default for MLService {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl MLService {
     /// Create a new ML service instance
     pub fn new() -> Self {
@@ -262,9 +268,9 @@ impl MLService {
         // In a real implementation, this would be based on model certainty
         // This is a placeholder implementation
         let feature_sum: f64 = features.iter().sum();
-        let confidence = (0.5 + (feature_sum / (features.len() as f64 * 10.0))).min(0.99);
+        
 
-        confidence
+        (0.5 + (feature_sum / (features.len() as f64 * 10.0))).min(0.99)
     }
 
     /// Assess risks for a proposal
