@@ -105,6 +105,12 @@ pub struct ContractManager {
     secp: Secp256k1<bitcoin::secp256k1::All>,
 }
 
+impl Default for ContractManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl ContractManager {
     /// Create a new Contract Manager
     /// [AIR-3][AIS-3][BPC-3][RES-3]
@@ -544,9 +550,9 @@ impl DlcManager {
             };
 
         // Call the contract manager's sign_contract method with both required arguments
-        Ok(self
+        self
             .contract_manager
-            .sign_contract(contract, &private_key)?)
+            .sign_contract(contract, &private_key)
     }
 
     /// Broadcast a DLC contract

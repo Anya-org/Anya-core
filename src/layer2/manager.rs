@@ -16,6 +16,12 @@ pub struct Layer2Manager {
     state_channels: Option<StateChannel>,
 }
 
+impl Default for Layer2Manager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Layer2Manager {
     /// Create a new Layer 2 manager with all protocols
     pub fn new() -> Self {

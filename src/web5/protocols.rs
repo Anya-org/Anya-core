@@ -73,6 +73,12 @@ pub struct ProtocolManager {
     handlers: HashMap<String, Box<dyn ProtocolHandler>>,
 }
 
+impl Default for ProtocolManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl ProtocolManager {
     /// Create a new protocol manager
     pub fn new() -> Self {
@@ -124,6 +130,12 @@ impl ProtocolManager {
 ///
 /// Handles the standard profile protocol for Web5.
 pub struct ProfileProtocolHandler;
+
+impl Default for ProfileProtocolHandler {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
 impl ProfileProtocolHandler {
     /// Create a new profile protocol handler
@@ -188,6 +200,12 @@ impl ProtocolHandler for ProfileProtocolHandler {
 ///
 /// Handles the standard credentials protocol for Web5.
 pub struct CredentialProtocolHandler;
+
+impl Default for CredentialProtocolHandler {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
 impl CredentialProtocolHandler {
     /// Create a new credentials protocol handler

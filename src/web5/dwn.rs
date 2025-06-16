@@ -306,6 +306,12 @@ pub struct DWNQueryPagination {
     pub cursor: Option<String>,
 }
 
+impl Default for DWNManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl DWNManager {
     /// Create a new DWN Manager
     pub fn new() -> Self {

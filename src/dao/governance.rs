@@ -102,6 +102,12 @@ pub struct SecurityAudit {
     passed: bool,
 }
 
+impl Default for SecurityAudit {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl SecurityAudit {
     pub fn new() -> Self {
         Self { passed: true }

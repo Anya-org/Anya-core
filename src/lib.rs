@@ -224,7 +224,7 @@ impl Default for AnyaConfig {
             #[cfg(feature = "hsm")]
             bitcoin_config: crate::security::hsm::config::HsmConfig::default(),
             #[cfg(not(feature = "hsm"))]
-            bitcoin_config: crate::security::hsm_shim::HsmConfig::default(),
+            bitcoin_config: crate::security::hsm_shim::HsmConfig,
             dao_config: dao::DAOConfig::default(),
         }
     }
