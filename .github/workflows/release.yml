@@ -1,4 +1,4 @@
- name: Release
+name: Release
 
 on:
   push:
@@ -10,21 +10,22 @@ jobs:
     name: Create Release
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
           
       - name: Install Rust
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@stable
         with:
-          profile: minimal
           toolchain: stable
+          components: rustfmt, clippy
           
       - name: Build
         run: cargo build --release
         
       - name: Create Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -35,7 +36,7 @@ jobs:
           prerelease: false
           
       - name: Update Version
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         with:
           script: |
             const tag = context.ref.replace('refs/tags/', '');
@@ -64,7 +65,7 @@ jobs:
             });
             
       - name: Create Release PR
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         with:
           script: |
             const tag = context.ref.replace('refs/tags/', '');
