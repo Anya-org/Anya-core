@@ -59,9 +59,14 @@
 				"rust-analyzer.checkOnSave.command": "clippy",
 				"rust-analyzer.cargo.allFeatures": true,
 				"rust-analyzer.procMacro.enable": true,
-				"rust-analyzer.checkOnSave.extraArgs": ["--target-dir", "/tmp/rust-analyzer-check"],
+				"rust-analyzer.checkOnSave.extraArgs": [
+					"--target-dir",
+					"/tmp/rust-analyzer-check"
+				],
 				"rust-analyzer.cargo.buildScripts.enable": true,
-				"rust-analyzer.diagnostics.disabled": ["inactive-code"],
+				"rust-analyzer.diagnostics.disabled": [
+					"inactive-code"
+				],
 				// Editor settings
 				"editor.inlayHints.enabled": "on",
 				"editor.semanticHighlighting.enabled": true,
@@ -103,14 +108,14 @@
 	],
 	// Forward ports for common Rust application needs
 	"forwardPorts": [
-		3000,  // Web frontend
-		8000,  // API server
-		8080,  // Alternative web server
-		8332,  // Bitcoin RPC
-		8333,  // Bitcoin P2P
-		9735,  // Lightning Network
-		8888,  // Jupyter notebook
-		9999   // Debug port
+		3000, // Web frontend
+		8000, // API server
+		8080, // Alternative web server
+		8332, // Bitcoin RPC
+		8333, // Bitcoin P2P
+		9735, // Lightning Network
+		8888, // Jupyter notebook
+		9999 // Debug port
 	],
 	// Configure environment variables
 	"containerEnv": {

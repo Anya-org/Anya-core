@@ -1,7 +1,7 @@
 #!/bin/bash
 # Script to install required tools for Anya Core development
 
-set -e  # Stop on first error
+set -e # Stop on first error
 echo "=== Installing Development Tools for Anya Core ==="
 
 # Update system packages
@@ -70,8 +70,8 @@ cargo binstall -y --force \
     cargo-web \
     wasm-pack \
     cross \
-    sccache \
-    || echo "Some binary tools failed to install, falling back to cargo install"
+    sccache ||
+    echo "Some binary tools failed to install, falling back to cargo install"
 
 # Fallback for tools that might have failed binary installation
 echo "Installing any missing tools via cargo install..."
@@ -82,13 +82,13 @@ for tool in cargo-audit cargo-update cargo-outdated cargo-edit cargo-tarpaulin c
     fi
 done
 
-# Install Python ML dependencies 
+# Install Python ML dependencies
 echo "Installing Python ML dependencies..."
 python -m pip install --upgrade pip
 python -m pip install numpy pandas matplotlib scikit-learn tensorflow torch torchvision jupyter jupyterlab
 
 # Install Node.js if not already installed
-if ! command -v node &> /dev/null; then
+if ! command -v node &>/dev/null; then
     echo "Installing Node.js..."
     if [ "$(id -u)" -ne 0 ]; then
         # Not running as root, use sudo
