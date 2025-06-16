@@ -113,7 +113,8 @@ pub struct LightningNode {
     state: Mutex<LightningState>,
 
     /// Secp256k1 context
-    secp: LightningSecp256k1<All>,
+    #[allow(dead_code)] // Required for future cryptographic operations (see docs/research/PROTOCOL_UPGRADES.md)
+    secp: LightningSecp256k1<All>, // Required for future cryptographic operations
 
     /// Node public key
     pub node_id: LightningPublicKey,

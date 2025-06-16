@@ -1,8 +1,6 @@
 //! Git Contribution Analyzer (skeleton)
 //! Analyzes git history and quantifies contributions.
 
-use std::collections::HashMap;
-
 #[derive(Debug, Clone)]
 pub struct ContributionMetrics {
     pub commit_count: u32,
@@ -33,3 +31,6 @@ impl ContributionAnalyzer {
         vec![]
     }
 }
+
+#[allow(unused_imports)] // Required for future contribution analysis extensions (see docs/research/PROTOCOL_UPGRADES.md)
+use std::collections::HashMap;

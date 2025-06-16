@@ -912,12 +912,15 @@ pub struct WalletInfo {
 /// Bitcoin wallet implementation
 pub struct BitcoinWallet {
     /// Wallet configuration
+    #[allow(dead_code)] // Required for future wallet extensibility and compliance (see docs/INDEX_CORRECTED.md)
     config: WalletConfig,
 
     /// Wallet data storage
+    #[allow(dead_code)] // Required for future storage backends (see docs/INDEX_CORRECTED.md)
     storage: Arc<Mutex<WalletStorage>>,
 
     /// Secp256k1 context
+    #[allow(dead_code)] // Required for future cryptographic operations (see docs/research/PROTOCOL_UPGRADES.md)
     secp: Secp256k1<bitcoin::secp256k1::All>,
 }
 
