@@ -17,8 +17,8 @@ fn test_transaction_validator_creation() {
 
 #[test]
 fn test_transaction_validator_with_level() {
-    let validator = TransactionValidator::with_level(BPCLevel::default());
-    assert_eq!(validator.protocol.get_level(), BPCLevel::default());
+    let validator = TransactionValidator::with_level(BPCLevel::BPC2);
+    assert_eq!(validator.protocol.get_level(), BPCLevel::BPC2);
 }
 
 #[test]
@@ -54,8 +54,8 @@ fn test_validate_taproot_transaction() {
 #[test]
 fn test_bpc_levels() {
     // Test that different BPC levels apply different validation rules
-    let bpc2_validator = TransactionValidator::with_level(BPCLevel::default());
-    let bpc3_validator = TransactionValidator::with_level(BPCLevel::default());
+    let bpc2_validator = TransactionValidator::with_level(BPCLevel::BPC2);
+    let bpc3_validator = TransactionValidator::with_level(BPCLevel::BPC3);
 
     // In a real test, we'd create transactions that pass BPC2 but fail BPC3
     // For now, we'll just verify the levels are set correctly

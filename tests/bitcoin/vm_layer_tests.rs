@@ -200,7 +200,7 @@ mod integration_tests {
         // Test layer shutdown order
         assert!(manager.stop_zk_layer().await.is_ok());
         assert!(manager.stop_l3_layer().await.is_ok());
-        assert!(manager.stop_l2_layer().await is_ok());
+        assert!(manager.stop_l2_layer().await.is_ok());
         assert!(manager.stop_l1_layer().await.is_ok());
     }
 }
