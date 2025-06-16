@@ -21,7 +21,6 @@ impl fmt::Display for RandomError {
 
 impl std::error::Error for RandomError {}
 
-#[allow(dead_code)]
 type Result<T> = std::result::Result<T, RandomError>;
 
 /// Generate random bytes

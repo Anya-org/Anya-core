@@ -50,7 +50,6 @@ pub struct Bip353Config {
 
 /// Beta features configuration
 #[derive(Debug, Clone, Serialize, Deserialize)]
-#[derive(Default)]
 pub struct BetaFeatures {
     /// Support for non-ASCII identifiers (punycode)
     pub non_ascii_identifiers: bool,
@@ -62,6 +61,16 @@ pub struct BetaFeatures {
     pub enhanced_privacy: bool,
 }
 
+impl Default for BetaFeatures {
+    fn default() -> Self {
+        Self {
+            non_ascii_identifiers: false,
+            wildcard_records: false,
+            oob_notifications: false,
+            enhanced_privacy: false,
+        }
+    }
+}
 
 impl Default for Bip353Config {
     fn default() -> Self {
@@ -196,7 +205,7 @@ impl Bip353 {
 
         // Check for non-ASCII identifiers
         let has_non_ascii =
-            !user.is_ascii() || !domain.is_ascii();
+            !user.chars().all(|c| c.is_ascii()) || !domain.chars().all(|c| c.is_ascii());
         if has_non_ascii && !self.is_feature_enabled("non_ascii_identifiers") {
             return Err(Bip353Error::FeatureNotEnabled(
                 "Non-ASCII identifiers not enabled".to_string(),

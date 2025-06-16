@@ -54,12 +54,6 @@ pub struct QuadraticVoting {
     votes: HashMap<String, HashMap<String, Vote>>,
 }
 
-impl Default for QuadraticVoting {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl QuadraticVoting {
     /// Create a new quadratic voting system
     pub fn new() -> Self {
@@ -88,7 +82,7 @@ impl QuadraticVoting {
         let proposal_votes = self
             .votes
             .entry(vote.proposal_id.clone())
-            .or_default();
+            .or_insert_with(HashMap::new);
 
         // Store the vote
         proposal_votes.insert(vote.voter.clone(), vote);

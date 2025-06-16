@@ -191,12 +191,6 @@ pub struct FederatedLearningManager {
     aggregation_method: String,
 }
 
-impl Default for FederatedLearningManager {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl FederatedLearningManager {
     /// Create a new federated learning manager
     pub fn new() -> Self {

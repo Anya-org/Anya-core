@@ -99,18 +99,16 @@ pub trait CrossChainBridge: Send + Sync {
 
 /// Security audit interface
 pub struct SecurityAudit {
+    last_audit_time: DateTime<Utc>,
     passed: bool,
-}
-
-impl Default for SecurityAudit {
-    fn default() -> Self {
-        Self::new()
-    }
 }
 
 impl SecurityAudit {
     pub fn new() -> Self {
-        Self { passed: true }
+        Self {
+            last_audit_time: Utc::now(),
+            passed: true,
+        }
     }
 
     pub fn check(&self) -> Result<bool> {

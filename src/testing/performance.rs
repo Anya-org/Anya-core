@@ -123,12 +123,6 @@ pub struct PerformanceTestRunner {
     results: Vec<TestResult>,
 }
 
-impl Default for PerformanceTestRunner {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl PerformanceTestRunner {
     /// Create a new performance test runner
     pub fn new() -> Self {
@@ -240,7 +234,7 @@ impl PerformanceTestRunner {
                 markdown.push_str(&format!("  - **{}:** {}\n", name, value));
             }
 
-            markdown.push('\n');
+            markdown.push_str("\n");
         }
 
         markdown
@@ -254,12 +248,6 @@ pub struct Timer {
 
     /// End time
     end: Option<Instant>,
-}
-
-impl Default for Timer {
-    fn default() -> Self {
-        Self::new()
-    }
 }
 
 impl Timer {

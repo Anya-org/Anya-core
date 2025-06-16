@@ -134,7 +134,7 @@ impl TaprootAsset {
             ));
         }
 
-        if metadata.len() > 1024 {
+        if metadata.as_bytes().len() > 1024 {
             return Err(crate::bitcoin::taproot::TaprootError::ValidationError(
                 "Metadata too large (max 1024 bytes)".to_string(),
             ));

@@ -42,12 +42,6 @@ pub struct UnifiedTester {
     ai_monitor: AIMetricCollector,
 }
 
-impl Default for UnifiedTester {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl UnifiedTester {
     pub fn new() -> Self {
         // Placeholder implementation

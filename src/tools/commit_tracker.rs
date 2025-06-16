@@ -21,7 +21,7 @@ pub struct CommitInfo {
 /// Implements secure commit tracking with validation
 pub fn update_ai_labelling_file(commit_info: &CommitInfo) -> Result<(), DocError> {
     let mut content = std::fs::read_to_string("docs/standards/AI_LABELING.md")
-        .map_err(DocError::IoError)?;
+        .map_err(|e| DocError::IoError(e))?;
 
     // Add new commit entry in chronological order
     let entry = format!(
@@ -37,6 +37,6 @@ pub fn update_ai_labelling_file(commit_info: &CommitInfo) -> Result<(), DocError
     // Insert at appropriate location
     content.push_str(&entry);
 
-    std::fs::write("docs/standards/AI_LABELING.md", content).map_err(DocError::IoError)?;
+    std::fs::write("docs/standards/AI_LABELING.md", content).map_err(|e| DocError::IoError(e))?;
     Ok(())
 }

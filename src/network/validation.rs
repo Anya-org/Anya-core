@@ -533,7 +533,7 @@ impl NetworkValidator {
         let mut closed_ports = Vec::new();
 
         // Add BIP-341 required ports
-        let bip341_ports = [8333, 18333, 8433]; // 8433 for Taproot monitoring
+        let bip341_ports = vec![8333, 18333, 8433]; // 8433 for Taproot monitoring
 
         for &port in bip341_ports.iter().chain(&self.config.required_ports) {
             let is_open = if port == 8433 {
@@ -686,7 +686,7 @@ impl NetworkValidator {
 
         #[cfg(target_os = "linux")]
         {
-            let output = Command::new("sudo").args(["iptables", "-L"]).output();
+            let output = Command::new("sudo").args(&["iptables", "-L"]).output();
 
             match output {
                 Ok(output) => {
@@ -796,20 +796,23 @@ impl NetworkValidator {
         #[cfg(any(target_os = "linux", target_os = "macos"))]
         {
             let output = Command::new("traceroute")
-                .args(["-m", "15", host])
+                .args(&["-m", "15", host])
                 .output();
 
-            if let Ok(output) = output {
-                let stdout = String::from_utf8_lossy(&output.stdout);
+            match output {
+                Ok(output) => {
+                    let stdout = String::from_utf8_lossy(&output.stdout);
 
-                for line in stdout.lines().skip(1) {
-                    // Skip header
-                    if line.contains("* * *") {
-                        problematic.push(format!("Hop timeout: {}", line));
-                    } else {
-                        hops.push(line.to_string());
+                    for line in stdout.lines().skip(1) {
+                        // Skip header
+                        if line.contains("* * *") {
+                            problematic.push(format!("Hop timeout: {}", line));
+                        } else {
+                            hops.push(line.to_string());
+                        }
                     }
                 }
+                Err(_) => (),
             }
         }
 
@@ -857,7 +860,7 @@ impl NetworkValidator {
 
         #[cfg(target_os = "linux")]
         {
-            let output = Command::new("ip").args(["tuntap", "list"]).output();
+            let output = Command::new("ip").args(&["tuntap", "list"]).output();
 
             match output {
                 Ok(output) => {
@@ -1069,7 +1072,7 @@ impl NetworkValidator {
     async fn validate_taproot_port(&self, _port: u16) -> bool {
         // Implement Taproot-specific validation logic
         let taproot_check = Command::new("bitcoin-cli")
-            .args(["getnetworkinfo"])
+            .args(&["getnetworkinfo"])
             .output();
 
         match taproot_check {

@@ -38,12 +38,6 @@ pub trait Layer2Protocol {
 /// Registry of Layer 2 protocols
 pub struct Layer2Registry(Vec<(String, Box<dyn Layer2Protocol>)>);
 
-impl Default for Layer2Registry {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl Layer2Registry {
     /// Create a new Layer 2 registry
     pub fn new() -> Self {

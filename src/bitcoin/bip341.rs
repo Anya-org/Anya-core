@@ -165,12 +165,6 @@ pub struct TaprootMerkleTree {
     root: Option<[u8; 32]>,
 }
 
-impl Default for TaprootMerkleTree {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl TaprootMerkleTree {
     /// Create a new empty Merkle tree
     pub fn new() -> Self {
@@ -354,12 +348,6 @@ pub struct Bip341Taproot {
     pub script_tree: Option<TaprootMerkleTree>,
     /// Taproot spend info
     pub spend_info: Option<TaprootSpendInfo>,
-}
-
-impl Default for Bip341Taproot {
-    fn default() -> Self {
-        Self::new()
-    }
 }
 
 impl Bip341Taproot {

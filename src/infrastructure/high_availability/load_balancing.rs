@@ -210,7 +210,7 @@ impl LoadBalancer {
         let mut nodes = self.nodes.write().await;
 
         if let Some(node) = nodes.get_mut(node_id) {
-            node.health_status = health_status;
+            node.health_status = health_status.clone();
             node.last_health_check = Some(Utc::now());
 
             if health_status != HealthState::Healthy {
@@ -280,9 +280,11 @@ impl LoadBalancer {
         let mut min_connections = u32::MAX;
 
         for (id, node) in nodes.iter() {
-            if node.enabled && node.health_status == HealthState::Healthy && node.active_connections < min_connections {
-                min_connections = node.active_connections;
-                best_node = Some((id, node));
+            if node.enabled && node.health_status == HealthState::Healthy {
+                if node.active_connections < min_connections {
+                    min_connections = node.active_connections;
+                    best_node = Some((id, node));
+                }
             }
         }
 
@@ -298,9 +300,11 @@ impl LoadBalancer {
         let mut min_response_time = Duration::from_secs(u64::MAX);
 
         for (id, node) in nodes.iter() {
-            if node.enabled && node.health_status == HealthState::Healthy && node.response_time < min_response_time {
-                min_response_time = node.response_time;
-                best_node = Some((id, node));
+            if node.enabled && node.health_status == HealthState::Healthy {
+                if node.response_time < min_response_time {
+                    min_response_time = node.response_time;
+                    best_node = Some((id, node));
+                }
             }
         }
 
@@ -447,7 +451,7 @@ impl LoadBalancer {
             for (id, node) in nodes_guard.iter_mut() {
                 // In a real implementation, this would make actual health checks
                 let health_status = Self::perform_health_check(&node.address).await;
-                node.health_status = health_status;
+                node.health_status = health_status.clone();
                 node.last_health_check = Some(Utc::now());
 
                 if health_status != HealthState::Healthy {

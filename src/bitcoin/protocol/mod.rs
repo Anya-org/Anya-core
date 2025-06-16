@@ -10,7 +10,6 @@ pub mod testing;
 
 /// Bitcoin Protocol Compliance Level [BPC-3]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
-#[derive(Default)]
 pub enum BPCLevel {
     /// No Bitcoin protocol compliance
     None = 0,
@@ -19,10 +18,14 @@ pub enum BPCLevel {
     /// Enhanced Bitcoin protocol compliance with Taproot support
     Enhanced = 2,
     /// Full Bitcoin protocol compliance with all BIPs
-    #[default]
     Full = 3,
 }
 
+impl Default for BPCLevel {
+    fn default() -> Self {
+        BPCLevel::Full
+    }
+}
 
 impl fmt::Display for BPCLevel {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {

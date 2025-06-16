@@ -3,7 +3,6 @@ use std::collections::HashMap;
 // [AIR-3][AIS-3][BPC-3][RES-3] Removed unused import: crate::AnyaResult
 
 /// Simple prometheus metrics implementation
-#[derive(Default)]
 pub struct PrometheusMetrics {
     /// Counters for various metrics
     counters: HashMap<String, u64>,
@@ -13,6 +12,15 @@ pub struct PrometheusMetrics {
     labels: HashMap<String, Vec<(String, String)>>,
 }
 
+impl Default for PrometheusMetrics {
+    fn default() -> Self {
+        Self {
+            counters: HashMap::new(),
+            gauges: HashMap::new(),
+            labels: HashMap::new(),
+        }
+    }
+}
 
 impl PrometheusMetrics {
     /// Create new metrics collector
@@ -27,7 +35,7 @@ impl PrometheusMetrics {
 
         // Add label if provided
         if !label_name.is_empty() && !label_value.is_empty() {
-            let labels = self.labels.entry(name.to_string()).or_default();
+            let labels = self.labels.entry(name.to_string()).or_insert_with(Vec::new);
             labels.push((label_name.to_string(), label_value.to_string()));
         }
     }

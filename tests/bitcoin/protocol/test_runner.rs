@@ -5,6 +5,7 @@
 // Bitcoin Development Framework v2.5 requirements
 
 use anyhow::{Context, Result};
+use colored::*;
 use std::collections::HashMap;
 use std::time::{Duration, Instant};
 
@@ -35,7 +36,7 @@ impl ProtocolTestSuite {
     where
         F: FnOnce() -> Result<()>,
     {
-        println!("Running test: {}", name);
+        println!("Running test: {}", name.blue());
 
         let start = Instant::now();
         let result = test_fn();
@@ -54,11 +55,11 @@ impl ProtocolTestSuite {
         self.results.push(test_result);
 
         if success {
-            println!("  SUCCESS ({:.2?})", duration);
+            println!("  {} ({:.2?})", "SUCCESS".green(), duration);
         } else {
-            println!("  FAILED ({:.2?})", duration);
+            println!("  {} ({:.2?})", "FAILED".red(), duration);
             if let Some(err) = &self.results.last().unwrap().error {
-                println!("  Error: {}", err);
+                println!("  Error: {}", err.red());
             }
         }
     }
@@ -72,22 +73,22 @@ impl ProtocolTestSuite {
         println!("\n{}", "=".repeat(50));
         println!("Test Summary:");
         println!("  Total: {}", total);
-        println!("  Passed: {}", passed);
+        println!("  Passed: {}", passed.to_string().green());
 
         if failed > 0 {
-            println!("  Failed: {}", failed);
+            println!("  Failed: {}", failed.to_string().red());
 
             println!("\nFailed tests:");
             for result in &self.results {
                 if !result.success {
-                    println!("  - {} ({:.2?})", result.name, result.duration);
+                    println!("  - {} ({:.2?})", result.name.red(), result.duration);
                     if let Some(err) = &result.error {
                         println!("    Error: {}", err);
                     }
                 }
             }
         } else {
-            println!("  Failed: {}", "0");
+            println!("  Failed: {}", "0".green());
         }
         println!("{}", "=".repeat(50));
     }
@@ -148,16 +149,16 @@ pub fn run_all_tests() -> Result<HashMap<String, bool>> {
 
 /// Main entry point for running tests
 pub fn main() -> Result<()> {
-    println!("{}", "Running Bitcoin Protocol Tests");
+    println!("{}", "Running Bitcoin Protocol Tests".yellow().bold());
     println!("{}", "=".repeat(50));
 
     let results = run_all_tests()?;
 
     let all_passed = results.values().all(|&success| success);
     if all_passed {
-        println!("\n{}", "All tests passed!");
+        println!("\n{}", "All tests passed!".green().bold());
     } else {
-        println!("\n{}", "Some tests failed!");
+        println!("\n{}", "Some tests failed!".red().bold());
         std::process::exit(1);
     }
 

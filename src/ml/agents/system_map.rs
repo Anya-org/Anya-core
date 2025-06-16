@@ -199,12 +199,6 @@ pub struct SystemIndexManager {
     index: RwLock<SystemIndex>,
 }
 
-impl Default for SystemIndexManager {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl SystemIndexManager {
     /// Create a new system index manager
     pub fn new() -> Self {
@@ -334,7 +328,7 @@ impl SystemIndexManager {
         })?;
 
         // Extract version from path or default to 0.0.0
-        let version_str = path.split('.').next_back().unwrap_or("0.0.0");
+        let version_str = path.split('.').last().unwrap_or("0.0.0");
         let version =
             semver::Version::parse(version_str).unwrap_or_else(|_| semver::Version::new(0, 0, 0));
 
@@ -461,7 +455,7 @@ impl SystemIndexManager {
         let compliant = index
             .component_paths
             .iter()
-            .filter(|entry| Self::is_bitcoin_related(std::path::Path::new(entry.key())))
+            .filter(|entry| Self::is_bitcoin_related(&std::path::Path::new(entry.key())))
             .filter(|entry| entry.value().1.len() == 32) // Simple validation
             .count() as f32;
 
@@ -487,12 +481,6 @@ impl SystemIndexManager {
 /// Manager for the system map
 pub struct SystemMapManager {
     map: RwLock<SystemMap>,
-}
-
-impl Default for SystemMapManager {
-    fn default() -> Self {
-        Self::new()
-    }
 }
 
 impl SystemMapManager {

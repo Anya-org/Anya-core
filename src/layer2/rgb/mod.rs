@@ -95,7 +95,6 @@ impl AssetRegistry {
 /// Contract Manager for RGB assets
 /// [AIR-3][AIS-3][BPC-3][RES-3]
 pub struct ContractManager {
-    #[allow(dead_code)] // Required for future cryptographic operations (see docs/research/PROTOCOL_UPGRADES.md)
     secp: Secp256k1<bitcoin::secp256k1::All>,
 }
 

@@ -468,7 +468,7 @@ impl MessageFactory {
 
 #[cfg(test)]
 mod tests {
-    
+    use super::*;
 
     #[test]
     fn test_message_parse() {

@@ -3,7 +3,6 @@
 //! This module provides infrastructure management functionality including
 //! database management, monitoring, and high availability features.
 
-pub mod dev_rewards;
 pub mod high_availability;
 
 // Re-export commonly used infrastructure types
@@ -11,7 +10,6 @@ pub use high_availability::{HaError, HighAvailabilityManager};
 
 /// Database management placeholder
 /// This is a placeholder implementation until proper database integration is added
-#[allow(dead_code)]
 pub struct Database {
     connection_string: String,
 }
@@ -35,12 +33,14 @@ impl Database {
 
 /// Monitoring management placeholder
 /// This is a placeholder implementation until proper monitoring integration is added
-pub struct Monitoring {}
+pub struct Monitoring {
+    config: MonitoringConfig,
+}
 
 impl Monitoring {
     /// Create a new monitoring instance
-    pub fn new(_config: MonitoringConfig) -> Self {
-        Monitoring {}
+    pub fn new(config: MonitoringConfig) -> Self {
+        Monitoring { config }
     }
 
     /// Start monitoring

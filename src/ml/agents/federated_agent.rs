@@ -50,7 +50,6 @@ impl Default for FederatedAgentConfig {
 }
 
 /// Agent for coordinating federated learning
-#[allow(dead_code)]
 pub struct FederatedAgent {
     /// Unique identifier
     id: AgentId,
