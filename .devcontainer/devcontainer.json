@@ -15,20 +15,7 @@
 			"version": "3.11",
 			"installJupyterlab": true
 		},
-		// Rust utilities
-		"ghcr.io/lee-orr/rusty-dev-containers/cargo-binstall:0": {},
-		"ghcr.io/lee-orr/rusty-dev-containers/cargo-bundle:0": {},
-		"ghcr.io/lee-orr/rusty-dev-containers/cargo-deny:0": {},
-		"ghcr.io/lee-orr/rusty-dev-containers/cargo-expand:0": {},
-		"ghcr.io/lee-orr/rusty-dev-containers/cargo-llvm-cov:0": {},
-		"ghcr.io/lee-orr/rusty-dev-containers/cargo-make:0": {},
-		"ghcr.io/lee-orr/rusty-dev-containers/cargo-mobile:0": {},
-		"ghcr.io/lee-orr/rusty-dev-containers/cargo-nextest:0": {},
-		"ghcr.io/lee-orr/rusty-dev-containers/cargo-watch:0": {},
-		"ghcr.io/lee-orr/rusty-dev-containers/cargo-web:0": {},
-		"ghcr.io/lee-orr/rusty-dev-containers/wasm-pack:0": {},
-		"ghcr.io/lee-orr/rusty-dev-containers/cross:0": {},
-		// Add additional tools for Bitcoin development
+		// Node.js for web components
 		"ghcr.io/devcontainers/features/node:1": {
 			"version": "lts"
 		},
@@ -95,7 +82,7 @@
 			}
 		}
 	},
-	"postCreateCommand": "bash -c 'chmod +x ./.devcontainer/install-tools.sh && ./.devcontainer/install-tools.sh'",
+	"postCreateCommand": "bash -c 'chmod +x ./.devcontainer/*.sh && bash ./.devcontainer/install-tools.sh || echo \"🚨 Tool installation had some errors - check logs\"'",
 	// Use 'mounts' to make the cargo cache persistent in a Docker Volume.
 	"mounts": [
 		{
