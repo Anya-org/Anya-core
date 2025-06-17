@@ -9,17 +9,20 @@ Multi-Factor Authentication (MFA) adds an additional layer of security by requir
 ## Supported Authentication Factors
 
 ### 1. Something You Know (Knowledge)
+
 - **Passwords**: Strong password requirements
 - **PINs**: Numeric personal identification numbers
 - **Security Questions**: Customizable security questions
 
 ### 2. Something You Have (Possession)
+
 - **TOTP Tokens**: Time-based One-Time Passwords
 - **Hardware Tokens**: Physical security keys (FIDO2/WebAuthn)
 - **SMS Tokens**: SMS-based verification codes
 - **Mobile Apps**: Authenticator mobile applications
 
 ### 3. Something You Are (Inherence)
+
 - **Biometric Authentication**: Fingerprint, facial recognition
 - **Hardware Security Modules**: HSM-based authentication
 
@@ -370,7 +373,7 @@ export const MFADashboard: React.FC = () => {
 
 ## See Also
 
-- [Security Features Overview](README.md)
+- [Security Features Overview](../README.md)
 - [Authentication Guide](authorization.md)
 - [Session Management](session-management.md)
 - [Security Monitoring](security-monitoring.md)

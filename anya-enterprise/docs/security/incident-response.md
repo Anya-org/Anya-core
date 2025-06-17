@@ -11,6 +11,7 @@ This document outlines the incident response process for security events in Anya
 ### Severity Levels
 
 #### Critical (P0)
+
 - Data breach with customer data exposed
 - System compromise affecting multiple customers
 - Ransomware or destructive attacks
@@ -19,6 +20,7 @@ This document outlines the incident response process for security events in Anya
 - **Escalation:** CEO, CTO, Security Team Lead
 
 #### High (P1)
+
 - Unauthorized access to sensitive systems
 - Malware detected on production systems
 - DDoS attacks affecting service availability
@@ -27,6 +29,7 @@ This document outlines the incident response process for security events in Anya
 - **Escalation:** CTO, Security Team Lead, Engineering Manager
 
 #### Medium (P2)
+
 - Suspicious activity detected
 - Minor security control failures
 - Failed security scans
@@ -35,6 +38,7 @@ This document outlines the incident response process for security events in Anya
 - **Escalation:** Security Team, On-call Engineer
 
 #### Low (P3)
+
 - Security awareness violations
 - Minor configuration issues
 - Documentation updates needed
@@ -46,6 +50,7 @@ This document outlines the incident response process for security events in Anya
 ### Phase 1: Detection and Analysis
 
 #### Detection Methods
+
 ```typescript
 interface SecurityAlert {
   id: string;
@@ -79,6 +84,7 @@ class IncidentDetector {
 ```
 
 #### Initial Assessment
+
 1. **Verify the incident**
    - Confirm the alert is legitimate
    - Eliminate false positives
@@ -97,6 +103,7 @@ class IncidentDetector {
 ### Phase 2: Containment
 
 #### Short-term Containment
+
 ```bash
 #!/bin/bash
 # Emergency containment script
@@ -140,6 +147,7 @@ preserve_evidence() {
 ```
 
 #### Long-term Containment
+
 - Apply security patches
 - Update firewall rules
 - Implement additional monitoring
@@ -148,6 +156,7 @@ preserve_evidence() {
 ### Phase 3: Eradication
 
 #### Remove Threats
+
 ```python
 import os
 import subprocess
@@ -197,6 +206,7 @@ class ThreatEradicator:
 ### Phase 4: Recovery
 
 #### System Restoration
+
 1. **Verify system integrity**
    - Run integrity checks
    - Validate security controls
@@ -213,6 +223,7 @@ class ThreatEradicator:
    - Increase logging verbosity
 
 #### Recovery Checklist
+
 - [ ] All threats removed and vulnerabilities closed
 - [ ] Systems restored from clean backups
 - [ ] Security controls tested and verified
@@ -224,6 +235,7 @@ class ThreatEradicator:
 ### Phase 5: Lessons Learned
 
 #### Post-Incident Review
+
 ```typescript
 interface PostIncidentReport {
   incident_id: string;
@@ -271,6 +283,7 @@ class PostIncidentAnalysis {
 ### Internal Communications
 
 #### Incident Response Team
+
 - **Security Team Lead**: Overall incident coordination
 - **IT Operations**: System administration and recovery
 - **Engineering**: Application-specific expertise
@@ -279,6 +292,7 @@ class PostIncidentAnalysis {
 - **Executive**: Strategic decisions and resource allocation
 
 #### Communication Channels
+
 - **Primary**: Secure incident response chat room
 - **Secondary**: Encrypted email threads
 - **Emergency**: Direct phone calls
@@ -287,6 +301,7 @@ class PostIncidentAnalysis {
 ### External Communications
 
 #### Customer Notifications
+
 ```typescript
 interface CustomerNotification {
   incident_id: string;
@@ -318,6 +333,7 @@ class CustomerCommunications {
 ```
 
 #### Regulatory Reporting
+
 - **Data Protection Authorities**: Within 72 hours for data breaches
 - **Financial Regulators**: For incidents affecting financial operations
 - **Law Enforcement**: For criminal activities
@@ -328,6 +344,7 @@ class CustomerCommunications {
 ### Incident Response Tools
 
 #### Forensic Analysis
+
 ```bash
 # Digital forensics toolkit
 FORENSIC_TOOLS=(
@@ -350,6 +367,7 @@ install_forensic_tools() {
 ```
 
 #### Automation Scripts
+
 ```python
 #!/usr/bin/env python3
 """
@@ -406,12 +424,14 @@ class IncidentResponseAutomation:
 ### Contact Information
 
 #### Internal Contacts
+
 - **Security Team Lead**: +1-555-SECURITY (24/7)
 - **IT Operations**: +1-555-ITOPS (24/7)
 - **Executive On-Call**: +1-555-EXECUTIVE
 - **Legal**: +1-555-LEGAL
 
 #### External Contacts
+
 - **Cyber Insurance**: Policy #CYB-2024-001
 - **Forensic Consultant**: Digital Forensics Inc.
 - **Legal Counsel**: Security Law Partners
@@ -420,12 +440,14 @@ class IncidentResponseAutomation:
 ## Training and Awareness
 
 ### Regular Training
+
 - Monthly tabletop exercises
 - Quarterly incident simulations
 - Annual red team assessments
 - Continuous security awareness training
 
 ### Documentation Maintenance
+
 - Review incident response plan quarterly
 - Update contact information monthly
 - Validate tools and procedures annually
@@ -434,12 +456,14 @@ class IncidentResponseAutomation:
 ## Compliance Requirements
 
 ### Regulatory Frameworks
+
 - **GDPR**: Data breach notification requirements
 - **SOX**: Financial reporting incident procedures
 - **PCI DSS**: Payment card incident response
 - **ISO 27001**: Information security incident management
 
 ### Documentation Requirements
+
 - Incident response plan documentation
 - Training records and certifications
 - Incident response testing results
@@ -449,7 +473,7 @@ class IncidentResponseAutomation:
 
 - [Security Monitoring](./security-monitoring.md)
 - [Compliance Management](./compliance-management.md)
-- [Security Policies](../../../dependencies/docs/security/security-policies.md)
+- [Security Policies](./security-policies.md)
 - [Business Continuity Plan](../business-continuity/plan.md)
 
 ---

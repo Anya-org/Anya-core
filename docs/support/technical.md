@@ -11,18 +11,21 @@ This document provides technical support procedures, troubleshooting guides, and
 ### Support Tiers
 
 #### Tier 1 - Level 1 Support
+
 - **Primary Contact**: First line of support
 - **Capabilities**: Basic troubleshooting, account issues, general inquiries
 - **Tools**: Help desk system, knowledge base, standard procedures
 - **Escalation Criteria**: Complex technical issues, security concerns, system outages
 
 #### Tier 2 - Level 2 Support  
+
 - **Primary Contact**: Technical specialists
 - **Capabilities**: Advanced troubleshooting, system configuration, integration support
 - **Tools**: Remote access tools, diagnostic software, system logs
 - **Escalation Criteria**: Code-level issues, infrastructure problems, security incidents
 
 #### Tier 3 - Level 3 Support
+
 - **Primary Contact**: Engineering team
 - **Capabilities**: Code debugging, system architecture, development support
 - **Tools**: Source code access, development environments, debugging tools
@@ -31,6 +34,7 @@ This document provides technical support procedures, troubleshooting guides, and
 ### Support Channels
 
 #### Primary Channels
+
 ```typescript
 interface SupportChannel {
   channel_type: 'email' | 'chat' | 'phone' | 'ticket' | 'forum';
@@ -70,12 +74,15 @@ const supportChannels: SupportChannel[] = [
 ### Authentication and Access Issues
 
 #### Issue: Unable to authenticate
+
 **Symptoms:**
+
 - Login failures
 - "Invalid credentials" errors
 - Account lockouts
 
 **Troubleshooting Steps:**
+
 ```bash
 # Check account status
 curl -X GET "https://api.anya-core.org/auth/status" \
@@ -96,18 +103,22 @@ curl -X POST "https://api.anya-core.org/auth/reset-password" \
 ```
 
 **Resolution:**
+
 1. Verify username and password
 2. Check for account lockout
 3. Reset password if necessary
 4. Contact support if issue persists
 
 #### Issue: Two-factor authentication problems
+
 **Symptoms:**
+
 - 2FA codes not working
 - Lost authenticator device
 - Time synchronization issues
 
 **Troubleshooting Steps:**
+
 ```python
 import time
 import hmac
@@ -152,12 +163,15 @@ else:
 ### Bitcoin Transaction Issues
 
 #### Issue: Transaction not confirming
+
 **Symptoms:**
+
 - Transaction stuck in mempool
 - Low confirmation priority
 - Fee estimation problems
 
 **Troubleshooting Steps:**
+
 ```rust
 use bitcoin::blockdata::transaction::Transaction;
 use bitcoin::util::psbt::PartiallySignedTransaction;
@@ -203,6 +217,7 @@ impl TransactionDiagnostics {
 ```
 
 **Resolution:**
+
 1. Check current network fee rates
 2. Verify transaction fee is adequate
 3. Consider Replace-by-Fee (RBF) if enabled
@@ -212,12 +227,15 @@ impl TransactionDiagnostics {
 ### Wallet Integration Issues
 
 #### Issue: Wallet connection failures
+
 **Symptoms:**
+
 - Unable to connect to hardware wallet
 - Wallet not detected
 - Communication errors
 
 **Troubleshooting Steps:**
+
 ```typescript
 interface WalletDiagnostics {
   wallet_type: 'hardware' | 'software' | 'web';
@@ -288,12 +306,15 @@ class WalletTroubleshooter {
 ### API Integration Issues
 
 #### Issue: API rate limiting
+
 **Symptoms:**
+
 - 429 "Too Many Requests" errors
 - API calls being rejected
 - Slow response times
 
 **Troubleshooting Steps:**
+
 ```python
 import asyncio
 import time
@@ -347,6 +368,7 @@ async def get_wallet_balance(wallet_id: str):
 ## Diagnostic Tools
 
 ### System Health Check
+
 ```bash
 #!/bin/bash
 # Anya Core System Health Check Script
@@ -402,6 +424,7 @@ echo "Health check completed at: $(date)"
 ```
 
 ### Performance Diagnostics
+
 ```python
 import psutil
 import asyncio
@@ -512,6 +535,7 @@ class PerformanceDiagnostics:
 ## Support Procedures
 
 ### Ticket Management
+
 ```typescript
 interface SupportTicket {
   ticket_id: string;
@@ -599,8 +623,10 @@ class SupportTicketManager {
 ### Frequently Asked Questions
 
 #### General Questions
+
 **Q: How do I get started with Anya Core?**
 A: Follow our [Getting Started Guide](../getting-started/README.md) which covers:
+
 - Account setup and verification
 - API key generation
 - First transaction tutorial
@@ -608,6 +634,7 @@ A: Follow our [Getting Started Guide](../getting-started/README.md) which covers
 
 **Q: What are the system requirements?**
 A: Minimum requirements:
+
 - OS: Linux (Ubuntu 20.04+), macOS (10.15+), Windows 10+
 - RAM: 4GB minimum, 8GB recommended
 - Storage: 100GB available space
@@ -615,20 +642,24 @@ A: Minimum requirements:
 
 **Q: How do I report a security vulnerability?**
 A: Please follow our [Security Guidelines](../SECURITY_GUIDELINES.md):
-- Email: security@anya-core.org
+
+- Email: <security@anya-core.org>
 - Use PGP encryption for sensitive reports
 - Do not disclose publicly until resolved
 - Expected response time: 24 hours
 
 #### Technical Questions
+
 **Q: How do I handle API rate limits?**
 A: Implement exponential backoff and request queuing:
+
 ```python
 # See rate limiting example in API Integration Issues section above
 ```
 
 **Q: What should I do if my transaction is stuck?**
 A: Follow these steps:
+
 1. Check transaction status in block explorer
 2. Verify fee rate is adequate for current network conditions
 3. Use Replace-by-Fee (RBF) if enabled
@@ -637,17 +668,20 @@ A: Follow these steps:
 ## Contact Information
 
 ### Support Channels
-- **Email**: support@anya-core.org
+
+- **Email**: <support@anya-core.org>
 - **Emergency**: +1-800-ANYA-911
 - **Chat**: Available on [support portal](https://support.anya-core.org)
 - **Community**: [Discord](https://discord.gg/anya-core)
 
 ### Business Hours
+
 - **Standard Support**: Monday-Friday, 9 AM - 5 PM PST
 - **Premium Support**: 24/7 coverage
 - **Emergency Support**: 24/7 for critical issues
 
 ### SLA Commitments
+
 - **Critical Issues**: 1 hour response time
 - **High Priority**: 4 hour response time
 - **Standard Issues**: 24 hour response time

@@ -11,6 +11,7 @@ This document outlines the audit framework used to evaluate the effectiveness of
 ### Internal Security Audits
 
 #### Control Effectiveness Testing
+
 ```typescript
 interface SecurityControl {
   id: string;
@@ -63,6 +64,7 @@ class SecurityControlAuditor {
 ```
 
 #### Access Control Audits
+
 ```python
 class AccessControlAuditor:
     def __init__(self):
@@ -134,6 +136,7 @@ class AccessControlAuditor:
 ### Compliance Audits
 
 #### SOC 2 Type II Audit
+
 ```typescript
 interface SOC2AuditProcedure {
   control_id: string;
@@ -198,6 +201,7 @@ class SOC2Auditor {
 ```
 
 #### GDPR Compliance Audit
+
 ```python
 class GDPRAuditor:
     def __init__(self):
@@ -288,6 +292,7 @@ class GDPRAuditor:
 ### Technical Audits
 
 #### Vulnerability Assessments
+
 ```typescript
 interface VulnerabilityAssessment {
   assessment_id: string;
@@ -364,6 +369,7 @@ class VulnerabilityAuditor {
 ```
 
 #### Penetration Testing
+
 ```python
 class PenetrationTestAuditor:
     def __init__(self):
@@ -430,6 +436,7 @@ class PenetrationTestAuditor:
 ## Audit Planning and Scheduling
 
 ### Annual Audit Plan
+
 ```typescript
 interface AnnualAuditPlan {
   plan_year: number;
@@ -481,6 +488,7 @@ class AuditPlanner {
 ```
 
 ### Risk-Based Audit Selection
+
 ```python
 class RiskBasedAuditSelector:
     def __init__(self):
@@ -553,6 +561,7 @@ class RiskBasedAuditSelector:
 ## Audit Execution
 
 ### Audit Workflow Management
+
 ```typescript
 interface AuditWorkflow {
   audit_id: string;
@@ -614,6 +623,7 @@ class AuditWorkflowManager {
 ```
 
 ### Evidence Collection and Management
+
 ```python
 class AuditEvidenceManager:
     def __init__(self):
@@ -679,6 +689,7 @@ class AuditEvidenceManager:
 ## Audit Reporting
 
 ### Report Generation
+
 ```typescript
 interface AuditReport {
   report_id: string;
@@ -743,6 +754,7 @@ class AuditReportGenerator {
 ```
 
 ### Finding and Recommendation Tracking
+
 ```python
 class FindingTracker:
     def __init__(self):
@@ -799,6 +811,7 @@ class FindingTracker:
 ## Quality Assurance
 
 ### Audit Quality Control
+
 ```typescript
 interface QualityControlChecklist {
   audit_id: string;
@@ -859,6 +872,7 @@ class AuditQualityController {
 ## Continuous Improvement
 
 ### Audit Program Metrics
+
 ```python
 class AuditMetricsManager:
     def __init__(self):
@@ -913,10 +927,10 @@ class AuditMetricsManager:
 
 ## See Also
 
-- [Compliance Management](../security/compliance-management.md)
-- [Incident Response](../security/incident-response.md)
+- [Compliance Management](./compliance-management.md)
+- [Incident Response](./incident-response.md)
 - [Risk Management](../risk/management.md)
-- [Security Monitoring](../security/security-monitoring.md)
+- [Security Monitoring](./security-monitoring.md)
 
 ---
 

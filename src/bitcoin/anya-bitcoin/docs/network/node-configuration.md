@@ -291,9 +291,9 @@ For performance monitoring, see [Performance Monitoring Guide](../monitoring/per
 
 For node-related support:
 
-- [Technical Support](../../support/technical.md)
+- [Technical Support](../../../../../docs/support/technical.md)
 - [Security Issues](../../../../../docs/SECURITY.md)
 - [Feature Requests](../../../../../dependencies/docs/build-system/features.md)
-- [Bug Reports](../../support/bugs.md)
+- [Bug Reports](../../../../../docs/support/bugs.md)
 
 *Last updated: 2025-06-02*

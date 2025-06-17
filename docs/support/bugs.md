@@ -11,11 +11,13 @@ This document provides guidelines for reporting bugs, tracking issues, and contr
 ### Before Reporting
 
 #### Check Existing Issues
+
 1. Search the [GitHub Issues](https://github.com/anya-core/issues) for similar problems
 2. Check our [Known Issues](../known-issues.md) documentation
 3. Review the [FAQ](../support/technical.md#frequently-asked-questions) for common solutions
 
 #### Gather Information
+
 ```bash
 # System Information Script
 #!/bin/bash
@@ -81,12 +83,14 @@ echo "=== End of System Information ==="
 ### Bug Report Template
 
 #### Severity Classification
+
 - **Critical**: System crash, data loss, security vulnerability
 - **High**: Major feature broken, significant impact on functionality
 - **Medium**: Minor feature issue, workaround available
 - **Low**: Cosmetic issue, documentation problem
 
 #### Report Format
+
 ```markdown
 # Bug Report
 
@@ -127,6 +131,7 @@ Any additional information that might be helpful
 ### Code Examples for Common Bug Reports
 
 #### Performance Issues
+
 ```python
 import time
 import psutil
@@ -187,6 +192,7 @@ class PerformanceBugReporter:
 ```
 
 #### Transaction Issues
+
 ```typescript
 interface TransactionBugReport {
   transaction_id: string;
@@ -260,6 +266,7 @@ class TransactionBugReporter {
 ### Issue Lifecycle
 
 #### States
+
 ```typescript
 enum BugStatus {
   REPORTED = 'reported',
@@ -334,6 +341,7 @@ class BugTracker {
 ### Triage Process
 
 #### Priority Assignment
+
 ```python
 class BugTriageSystem:
     def __init__(self):
@@ -419,6 +427,7 @@ class BugTriageSystem:
 ### Bug Verification
 
 #### Verification Checklist
+
 ```markdown
 ## Bug Verification Checklist
 
@@ -454,6 +463,7 @@ class BugTriageSystem:
 ```
 
 #### Verification Tools
+
 ```rust
 use std::process::Command;
 use serde_json::Value;
@@ -543,6 +553,7 @@ impl BugVerificationTools {
 ## Bug Prevention
 
 ### Static Analysis Integration
+
 ```yaml
 # GitHub Actions Workflow for Bug Prevention
 name: Bug Prevention Pipeline
@@ -604,6 +615,7 @@ jobs:
 ```
 
 ### Code Review Guidelines
+
 ```markdown
 ## Code Review Checklist for Bug Prevention
 
@@ -641,6 +653,7 @@ jobs:
 ## Bug Metrics and Reporting
 
 ### Key Performance Indicators
+
 ```python
 class BugMetricsCollector:
     def __init__(self):
