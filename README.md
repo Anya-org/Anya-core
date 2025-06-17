@@ -22,6 +22,7 @@ A powerful platform combining Bitcoin/crypto functionality, ML-based analytics, 
 👉 **[Master Documentation Index](docs/MASTER_INDEX.md)** - Your complete guide to all Anya Core documentation
 
 **Quick Links:**
+
 - [Getting Started](docs/INSTALLATION.md) - Installation & setup
 - [Architecture](docs/ARCHITECTURE.md) - System design
 - [Bitcoin Integration](docs/BITCOIN_COMPLIANCE.md) - BIP compliance  
@@ -31,6 +32,7 @@ A powerful platform combining Bitcoin/crypto functionality, ML-based analytics, 
 ---
 
 ## Table of Contents
+
 - [Overview](#overview)
 - [Quick Start](#quick-start)
 - [Installation & Configuration](#installation--configuration)
@@ -49,6 +51,7 @@ A powerful platform combining Bitcoin/crypto functionality, ML-based analytics, 
 ## Overview
 
 Anya Core is a modular, enterprise-ready platform for Bitcoin, Web5, and AI/ML applications. It features:
+
 - Bitcoin Core & Lightning integration
 - Web5 DWN decentralized storage
 - DAO governance and tokenomics
@@ -65,6 +68,7 @@ Anya Core is a modular, enterprise-ready platform for Bitcoin, Web5, and AI/ML a
 ## Quick Start
 
 ### 1. Clone and Setup
+
 ```bash
 git clone https://github.com/anya-org/anya-core.git
 cd anya-core
@@ -73,10 +77,12 @@ cargo build --release
 ```
 
 ### 2. Configuration
+
 - Main config: `config/anya.conf` (TOML/INI style)
 - All settings can be overridden with environment variables.
 
 Example environment variables:
+
 ```env
 WEB5_DWN_URL=http://localhost:3000
 BITCOIN_RPC_URL=http://localhost:8332
@@ -86,6 +92,7 @@ ML_MODEL_PATH=/path/to/models
 ```
 
 ### 3. Install & Run
+
 ```bash
 # Standard install
 sudo ./scripts/install.sh
@@ -96,6 +103,7 @@ sudo ./scripts/install.sh --type=full
 ```
 
 ### 4. Verify
+
 ```bash
 ./scripts/install/utils/monitor_health.sh
 ./scripts/test/debug_test.sh
@@ -106,17 +114,20 @@ sudo ./scripts/install.sh --type=full
 ## Installation & Configuration
 
 ### Prerequisites
+
 - Rust 1.70+
 - Bitcoin Core 24.0+
 - Web5 DWN Node
 - Clarinet 2.3.0+ (for DAO contracts)
 
 ### Configuration System
+
 - **File:** `config/anya.conf` (edit `[web5] dwn_endpoint` for Web5 node URL)
 - **Environment:** All config can be overridden with env vars (e.g., `export WEB5_DWN_URL=...`)
 - **Secrets:** Set sensitive data (like DWN node URL for CI) as GitHub Actions secrets (e.g., `DWN_NODE_URL`). Never commit `.env` files with secrets.
 
 #### Web5 DWN Endpoint Alignment
+
 - **Local:** Set in `config/anya.conf` under `[web5]` as `dwn_endpoint = "http://localhost:3000"`
 - **CI/CD:** Set `DWN_NODE_URL` secret in GitHub repo to match your local value.
 - **Sync Script:** Use `./sync-dwn-secret.sh <github-repo> <github-username>` to sync your local value to GitHub Actions (requires GitHub CLI).
@@ -131,6 +142,7 @@ sudo ./scripts/install.sh --type=full
 - [Documentation Standards](docs/standards/MARKDOWN_STYLE_GUIDE.md)
 
 ### Documentation Tools
+
 | Script | Purpose |
 |--------|---------|
 | `./scripts/setup_docs.sh` | Set up docs environment |
@@ -146,33 +158,39 @@ sudo ./scripts/install.sh --type=full
 ## Core Features
 
 ### Architecture
+
 - Hexagonal, modular, and domain-driven
 - Clean separation of concerns (ports/adapters)
 - Advanced error handling, telemetry, and health monitoring
 - Thread-safe caching and circuit breaker patterns
 
 ### HSM Support
+
 - Modular HSM provider architecture
 - Software and hardware HSM support (TPM, PKCS#11, YubiHSM, Ledger)
 - Bitcoin-specific HSM operations
 - Feature-flag enabled for flexible deployment
 
 ### DAO & Tokenomics
+
 - Bitcoin-style token issuance (21B supply)
 - Adaptive emission schedule, DAO-controlled halving
 - Decentralized governance, proposals, and voting
 - Integrated DEX, protocol treasury, and logging
 
 ### Blockchain & Web5
+
 - Bitcoin Core & Lightning support
 - Taproot/Schnorr, DLC, Layer 2, cross-chain
 - Web5 DWN decentralized storage, identity-centric
 
 ### ML & AI
+
 - Model optimization, federated learning, analytics
 - Real-time inference, distributed training, A/B testing
 
 ### Security & Monitoring
+
 - Comprehensive security operations, audit trail, threat detection
 - Distributed tracing, metrics, dashboards
 
@@ -181,12 +199,14 @@ sudo ./scripts/install.sh --type=full
 ## Production Status & System Alignment
 
 ### 🎯 Bitcoin Core Compliance: **9.40/10.0**
+
 - **Decentralization:** 5.0/5.0 ✅ Full compliance with distributed architecture
 - **Security:** 3.8/5.0 ⚠️ Enterprise-grade with ongoing enhancements  
 - **Immutability:** 5.0/5.0 ✅ Complete blockchain integrity protection
 - **Privacy:** 5.0/5.0 ✅ Full privacy preservation mechanisms
 
 ### 🚀 Production Milestones Achieved
+
 - ✅ **Bitcoin Core Integration:** 58+ compilation errors resolved → 0 errors
 - ✅ **Layer2 Protocols:** All protocols (Lightning, RGB, BOB, RSK, DLC, Taproot Assets) operational
 - ✅ **Hexagonal Architecture:** Complete port/adapter separation implemented
@@ -195,6 +215,7 @@ sudo ./scripts/install.sh --type=full
 - ✅ **Documentation:** Complete API, architecture, and deployment guides
 
 ### 🏗️ Architecture Patterns
+
 - **Hexagonal Architecture:** Clean separation of business logic and infrastructure
 - **Bitcoin Core Alignment:** Following official Bitcoin development patterns
 - **Enterprise Security:** Multi-layer protection with hardware integration
@@ -210,6 +231,7 @@ sudo ./scripts/install.sh --type=full
 - Data storage: DWN (Decentralized Web Node)
 
 #### Core Dependencies (Cargo.toml)
+
 ```toml
 [dependencies]
 tokio = { version = "1.34", features = ["full"] }
@@ -274,6 +296,7 @@ This project is dual-licensed under [Apache 2.0](LICENSE.md) and MIT. Enterprise
 ## Acknowledgments
 
 Special thanks to our contributors and the following projects:
+
 - Bitcoin Core
 - Lightning Network
 - Web5
@@ -285,11 +308,13 @@ Special thanks to our contributors and the following projects:
 ## Validation & Compliance
 
 Run the following to verify system compliance:
+
 ```shell
 ./scripts/validate_upgrade.ps1 -CheckAll -ProtocolLevel 3
 ```
 
 This project adheres to:
+
 - Bitcoin Protocol Compliance Level 3 (BPC-3)
 - DAO Governance Standard Level 4 (DAO-4)
 - AI Security Standard Level 3 (AIS-3)

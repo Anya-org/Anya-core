@@ -29,11 +29,13 @@ https://api.anya-core.org/v1/governance
 List all governance proposals.
 
 **Parameters:**
+
 - `status` (optional): Filter by proposal status (`active`, `passed`, `rejected`)
 - `limit` (optional): Number of results to return (default: 20)
 - `offset` (optional): Pagination offset
 
 **Response:**
+
 ```json
 {
   "proposals": [
@@ -59,6 +61,7 @@ List all governance proposals.
 Create a new governance proposal.
 
 **Request Body:**
+
 ```json
 {
   "title": "Proposal Title",
@@ -79,6 +82,7 @@ Get details of a specific proposal.
 Cast a vote on a proposal.
 
 **Request Body:**
+
 ```json
 {
   "vote": "for" | "against",
@@ -103,6 +107,7 @@ Get all votes for a specific proposal.
 Get the governance token balance for the authenticated user.
 
 **Response:**
+
 ```json
 {
   "balance": "1000.0",
@@ -116,6 +121,7 @@ Get the governance token balance for the authenticated user.
 Delegate voting power to another address.
 
 **Request Body:**
+
 ```json
 {
   "delegate_address": "anya1abc123...",
@@ -130,6 +136,7 @@ Delegate voting power to another address.
 Get the current status of the DAO.
 
 **Response:**
+
 ```json
 {
   "active_proposals": 5,

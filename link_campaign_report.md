@@ -1,12 +1,12 @@
 # Link Campaign Report
 
-*Generated: 2025-06-17 17:58:06*
+*Generated: 2025-06-17 18:03:57*
 
 ## Summary
 
-- **Total broken links found**: 512
+- **Total broken links found**: 509
 - **Links automatically fixed**: 0
-- **Links requiring manual review**: 512
+- **Links requiring manual review**: 509
 - **Mode**: Applied fixes
 
 ## Links Requiring Manual Review
@@ -16,7 +16,6 @@
 | INDEX_CORRECTED.md | System Architecture | docs/SYSTEM_MAP.md#system-architecture | No suggestion |
 | README.md | Contribute to Docs | docs/CONTRIBUTING.md#documentation | No suggestion |
 | anya-enterprise/docs/SUMMARY.md | Backup & Recovery | administration/backup-recovery.md | No suggestion |
-| anya-enterprise/docs/features/advanced-analytics.md | Guide | ./fee-estimation.md | No suggestion |
 | anya-enterprise/docs/features/advanced-analytics.md | Guide | ./price-analysis.md | No suggestion |
 | anya-enterprise/docs/features/advanced-analytics.md | Details | ./market-trends.md | No suggestion |
 | anya-enterprise/docs/features/advanced-analytics.md | Guide | ./liquidity-metrics.md | No suggestion |
@@ -46,9 +45,12 @@
 | anya-enterprise/docs/features/advanced-analytics.md | Production Configuration Guide | ./production-config.md | No suggestion |
 | anya-enterprise/docs/features/advanced-analytics.md | Technical Support | ../../support/technical.md | No suggestion |
 | anya-enterprise/docs/features/advanced-analytics.md | Bug Reports | ../../support/bugs.md | No suggestion |
+| anya-enterprise/docs/features/fee-estimation.md | Network Performance | network-performance.md | No suggestion |
+| anya-enterprise/docs/features/fee-estimation.md | Price Analysis | price-analysis.md | No suggestion |
 | anya-enterprise/docs/features/volume-analysis.md | Market Analysis | market-trends.md | No suggestion |
 | anya-enterprise/docs/features/volume-analysis.md | API Documentation | ../../api/rest-api.md | No suggestion |
-| anya-enterprise/docs/security/security-features.md | Guide | ./mfa.md | No suggestion |
+| anya-enterprise/docs/security/mfa.md | Authentication Guide | authorization.md | No suggestion |
+| anya-enterprise/docs/security/mfa.md | Session Management | session-management.md | No suggestion |
 | anya-enterprise/docs/security/security-features.md | Details | ./rbac.md | No suggestion |
 | anya-enterprise/docs/security/security-features.md | Guide | ./token-auth.md | No suggestion |
 | anya-enterprise/docs/security/security-features.md | Details | ./session-management.md | No suggestion |
@@ -67,7 +69,6 @@
 | anya-enterprise/docs/security/security-features.md | Guide | ./key-backup.md | No suggestion |
 | anya-enterprise/docs/security/security-features.md | Guide | ./key-access-control.md | No suggestion |
 | anya-enterprise/docs/security/security-features.md | Guide | ./password-policies.md | No suggestion |
-| anya-enterprise/docs/security/security-features.md | Guide | ./mfa.md | No suggestion |
 | anya-enterprise/docs/security/security-features.md | Guide | ./session-management.md | No suggestion |
 | anya-enterprise/docs/security/security-features.md | Guide | ./token-security.md | No suggestion |
 | anya-enterprise/docs/security/security-features.md | Guide | ./encryption-algorithms.md | No suggestion |
@@ -259,7 +260,6 @@
 | docs/bitcoin/docs/features/transaction-management.md | UTXO Guide | ../features/utxo-management.md | No suggestion |
 | docs/bitcoin/docs/features/transaction-management.md | Hardware Integration | ../features/hardware-wallets.md | No suggestion |
 | docs/bitcoin/docs/features/transaction-management.md | Signing Guide | ../features/signing-schemes.md | No suggestion |
-| docs/bitcoin/docs/features/transaction-management.md | Fee Estimation | ../features/fee-estimation.md | No suggestion |
 | docs/bitcoin/docs/features/transaction-management.md | Batch Processing | ../features/batch-operations.md | No suggestion |
 | docs/bitcoin/docs/features/wallet-integration.md | Security Guide | ../../security/multi-signature.md | No suggestion |
 | docs/bitcoin/docs/features/wallet-integration.md | Technical Details | ../technical/hd-wallets.md | No suggestion |
@@ -267,7 +267,6 @@
 | docs/bitcoin/docs/features/wallet-integration.md | UTXO Guide | ../features/utxo-management.md | No suggestion |
 | docs/bitcoin/docs/features/wallet-integration.md | Hardware Integration | ../features/hardware-wallets.md | No suggestion |
 | docs/bitcoin/docs/features/wallet-integration.md | Signing Guide | ../features/signing-schemes.md | No suggestion |
-| docs/bitcoin/docs/features/wallet-integration.md | Fee Estimation | ../features/fee-estimation.md | No suggestion |
 | docs/bitcoin/docs/features/wallet-integration.md | Batch Processing | ../features/batch-operations.md | No suggestion |
 | docs/bitcoin/docs/features/wallet-integration.md | Wallet Creation Guide | ../guides/wallet-creation.md | No suggestion |
 | docs/bitcoin/docs/features/wallet-integration.md | Transaction Signing Guide | ../guides/transaction-signing.md | No suggestion |
@@ -444,7 +443,6 @@
 | src/bitcoin/anya-bitcoin/docs/features/transaction-management.md | UTXO Guide | ../features/utxo-management.md | No suggestion |
 | src/bitcoin/anya-bitcoin/docs/features/transaction-management.md | Hardware Integration | ../features/hardware-wallets.md | No suggestion |
 | src/bitcoin/anya-bitcoin/docs/features/transaction-management.md | Signing Guide | ../features/signing-schemes.md | No suggestion |
-| src/bitcoin/anya-bitcoin/docs/features/transaction-management.md | Fee Estimation | ../features/fee-estimation.md | No suggestion |
 | src/bitcoin/anya-bitcoin/docs/features/transaction-management.md | Batch Processing | ../features/batch-operations.md | No suggestion |
 | src/bitcoin/anya-bitcoin/docs/features/wallet-integration.md | Security Guide | ../../security/multi-signature.md | No suggestion |
 | src/bitcoin/anya-bitcoin/docs/features/wallet-integration.md | Technical Details | ../technical/hd-wallets.md | No suggestion |
@@ -452,7 +450,6 @@
 | src/bitcoin/anya-bitcoin/docs/features/wallet-integration.md | UTXO Guide | ../features/utxo-management.md | No suggestion |
 | src/bitcoin/anya-bitcoin/docs/features/wallet-integration.md | Hardware Integration | ../features/hardware-wallets.md | No suggestion |
 | src/bitcoin/anya-bitcoin/docs/features/wallet-integration.md | Signing Guide | ../features/signing-schemes.md | No suggestion |
-| src/bitcoin/anya-bitcoin/docs/features/wallet-integration.md | Fee Estimation | ../features/fee-estimation.md | No suggestion |
 | src/bitcoin/anya-bitcoin/docs/features/wallet-integration.md | Batch Processing | ../features/batch-operations.md | No suggestion |
 | src/bitcoin/anya-bitcoin/docs/features/wallet-integration.md | Wallet Creation Guide | ../guides/wallet-creation.md | No suggestion |
 | src/bitcoin/anya-bitcoin/docs/features/wallet-integration.md | Transaction Signing Guide | ../guides/transaction-signing.md | No suggestion |

@@ -20,7 +20,7 @@ The Anya Bitcoin wallet integration provides enterprise-grade wallet management 
 
 - Hardware wallet support ([Hardware Integration](../features/hardware-wallets.md))
 - Custom signing schemes ([Signing Guide](../features/signing-schemes.md))
-- Fee management ([Fee Estimation](../features/fee-estimation.md))
+- Fee management ([Fee Estimation](../../../../anya-enterprise/docs/features/fee-estimation.md))
 - Batch operations ([Batch Processing](../features/batch-operations.md))
 
 ## Implementation

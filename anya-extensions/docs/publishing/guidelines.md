@@ -58,6 +58,7 @@ tokio = { version = "1.0", features = ["full"] }
    - Update any outdated screenshots or references
 
 3. **Final Testing**
+
    ```bash
    # Run comprehensive test suite
    cargo test --all-features
@@ -78,6 +79,7 @@ tokio = { version = "1.0", features = ["full"] }
 ### Step 2: Security Review
 
 1. **Automated Security Scanning**
+
    ```bash
    # Run security audit
    cargo audit
@@ -98,6 +100,7 @@ tokio = { version = "1.0", features = ["full"] }
 ### Step 3: Submission
 
 1. **Package Creation**
+
    ```bash
    # Create distributable package
    cargo package
@@ -145,6 +148,7 @@ The extension review process includes:
 ### 2. Documentation Requirements
 
 #### README.md Structure
+
 ```markdown
 # Extension Name
 
@@ -176,6 +180,7 @@ License information and attribution.
 ```
 
 #### API Documentation
+
 - Document all public APIs
 - Include usage examples
 - Specify parameter types and return values
