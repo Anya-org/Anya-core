@@ -27,12 +27,12 @@ Add a brief overview of this document here.
 
 ## Core Platform
 
-* [Web5 Integration](README.md)
-  * [DWN Storage](web5/README.md#dwn-storage)
-  * [Identity Management](web5/README.md#identity-management)
-  * [Protocol Support](web5/README.md#protocol-support)
-  * [Data Models](web5/README.md#data-models)
-  * [Security](web5/README.md#security)
+* [Web5 Integration](../src/web5/README.md)
+  * [DWN Storage](../src/web5/README.md#dwn-storage)
+  * [Identity Management](../src/web5/README.md#identity-management)
+  * [Protocol Support](../src/web5/README.md#protocol-support)
+  * [Data Models](../src/web5/README.md#data-models)
+  * [Security](../src/web5/README.md#security)
 
 * [Bitcoin Features](bitcoin/README.md)
   * [Wallet Management](bitcoin/README.md)

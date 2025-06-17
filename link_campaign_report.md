@@ -1,12 +1,12 @@
 # Link Campaign Report
 
-*Generated: 2025-06-17 17:47:49*
+*Generated: 2025-06-17 17:58:06*
 
 ## Summary
 
-- **Total broken links found**: 514
+- **Total broken links found**: 512
 - **Links automatically fixed**: 0
-- **Links requiring manual review**: 514
+- **Links requiring manual review**: 512
 - **Mode**: Applied fixes
 
 ## Links Requiring Manual Review
@@ -16,7 +16,6 @@
 | INDEX_CORRECTED.md | System Architecture | docs/SYSTEM_MAP.md#system-architecture | No suggestion |
 | README.md | Contribute to Docs | docs/CONTRIBUTING.md#documentation | No suggestion |
 | anya-enterprise/docs/SUMMARY.md | Backup & Recovery | administration/backup-recovery.md | No suggestion |
-| anya-enterprise/docs/features/advanced-analytics.md | Details | ./volume-analysis.md | No suggestion |
 | anya-enterprise/docs/features/advanced-analytics.md | Guide | ./fee-estimation.md | No suggestion |
 | anya-enterprise/docs/features/advanced-analytics.md | Guide | ./price-analysis.md | No suggestion |
 | anya-enterprise/docs/features/advanced-analytics.md | Details | ./market-trends.md | No suggestion |
@@ -47,7 +46,8 @@
 | anya-enterprise/docs/features/advanced-analytics.md | Production Configuration Guide | ./production-config.md | No suggestion |
 | anya-enterprise/docs/features/advanced-analytics.md | Technical Support | ../../support/technical.md | No suggestion |
 | anya-enterprise/docs/features/advanced-analytics.md | Bug Reports | ../../support/bugs.md | No suggestion |
-| anya-enterprise/docs/features/anomaly-detection.md | Security Monitoring | ../security/security-monitoring.md | No suggestion |
+| anya-enterprise/docs/features/volume-analysis.md | Market Analysis | market-trends.md | No suggestion |
+| anya-enterprise/docs/features/volume-analysis.md | API Documentation | ../../api/rest-api.md | No suggestion |
 | anya-enterprise/docs/security/security-features.md | Guide | ./mfa.md | No suggestion |
 | anya-enterprise/docs/security/security-features.md | Details | ./rbac.md | No suggestion |
 | anya-enterprise/docs/security/security-features.md | Guide | ./token-auth.md | No suggestion |
@@ -57,11 +57,9 @@
 | anya-enterprise/docs/security/security-features.md | Guide | ./hsm-integration.md | No suggestion |
 | anya-enterprise/docs/security/security-features.md | Details | ./key-storage.md | No suggestion |
 | anya-enterprise/docs/security/security-features.md | Details | ./compliance-reporting.md | No suggestion |
-| anya-enterprise/docs/security/security-features.md | Guide | ./security-monitoring.md | No suggestion |
 | anya-enterprise/docs/security/security-features.md | Details | ./incident-response.md | No suggestion |
 | anya-enterprise/docs/security/security-features.md | Authorization Guide | ./authorization.md | No suggestion |
 | anya-enterprise/docs/security/security-features.md | Data Encryption Guide | ./data-encryption.md | No suggestion |
-| anya-enterprise/docs/security/security-features.md | Security Monitoring Guide | ./security-monitoring.md | No suggestion |
 | anya-enterprise/docs/security/security-features.md | Compliance Management Guide | ./compliance-management.md | No suggestion |
 | anya-enterprise/docs/security/security-features.md | Policy Enforcement Guide | ./policy-enforcement.md | No suggestion |
 | anya-enterprise/docs/security/security-features.md | Guide | ./key-rotation.md | No suggestion |
@@ -81,6 +79,9 @@
 | anya-enterprise/docs/security/security-features.md | Audit Guide | ./audit.md | No suggestion |
 | anya-enterprise/docs/security/security-features.md | Technical Support | ../../support/technical.md | No suggestion |
 | anya-enterprise/docs/security/security-features.md | Bug Reports | ../../support/bugs.md | No suggestion |
+| anya-enterprise/docs/security/security-monitoring.md | Incident Response | incident-response.md | No suggestion |
+| anya-enterprise/docs/security/security-monitoring.md | Compliance Management | compliance-management.md | No suggestion |
+| anya-enterprise/docs/security/security-monitoring.md | Audit Logging | audit.md | No suggestion |
 | anya-extensions/docs/getting-started/configuration.md | Installation Guide | ./installation.md#troubleshooting | No suggestion |
 | anya-extensions/docs/getting-started/quick-start.md | Web5 Protocols | ../web5/protocols.md | No suggestion |
 | anya-extensions/docs/getting-started/quick-start.md | ML Training | ../ml/training.md | No suggestion |
@@ -124,17 +125,13 @@
 | dependencies/docs/SUMMARY.md | Compilation Errors | troubleshooting/compilation-errors.md | No suggestion |
 | dependencies/docs/SUMMARY.md | Linking Errors | troubleshooting/linking-errors.md | No suggestion |
 | dependencies/docs/security/security-policies.md | Compliance Checks | compliance-checks.md | No suggestion |
-| docs/.template.md | MIT License | ../LICENSE | No suggestion |
 | docs/ARCHITECTURE.md | Hexagonal Architecture | images/hexagonal_architecture.png | No suggestion |
 | docs/DAO_INDEX.md | System Architecture | SYSTEM_ARCHITECTURE.md | No suggestion |
-| docs/DAO_INDEX.md | API Reference | api/GOVERNANCE_API.md | No suggestion |
 | docs/DAO_INDEX.md | Tokenomics Flowchart | TOKENOMICS_FLOWCHART.md | No suggestion |
 | docs/DAO_INDEX.md | Contract Reference | CONTRACT_REFERENCE.md | No suggestion |
 | docs/DAO_INDEX.md | Contribution Guide | CONTRIBUTION_GUIDE.md | No suggestion |
 | docs/DAO_SYSTEM_GUIDE.md | DAO Technical Documentation | ./DAO_TECHNICAL.md | No suggestion |
-| docs/DAO_SYSTEM_GUIDE.md | Governance API Reference | ./api/GOVERNANCE_API.md | No suggestion |
 | docs/DOCUMENTATION_SYSTEM.md | MIT License | ../LICENSE | No suggestion |
-| docs/GOVERNANCE_FRAMEWORK.md | API Reference | api/GOVERNANCE_API.md | No suggestion |
 | docs/GOVERNANCE_TOKEN.md | Tokenomics Flowchart | TOKENOMICS_FLOWCHART.md | No suggestion |
 | docs/INSTALLATION.md | Audit Workflow | docs/images/audit_workflow.png | No suggestion |
 | docs/MARKDOWN_STYLE_GUIDE.md | Architecture Diagram | ../images/architecture.png "System Architecture" | No suggestion |
@@ -184,11 +181,11 @@
 | docs/SEARCH_INDEX.md | model_manager.rs | ../src/ml/models/manager.rs | No suggestion |
 | docs/SEARCH_INDEX.md | inference.rs | ../src/ml/inference/engine.rs | No suggestion |
 | docs/SECURITY.md | SECURITY_GUIDELINES.md | docs/SECURITY_GUIDELINES.md | No suggestion |
-| docs/SUMMARY.md | DWN Storage | web5/README.md#dwn-storage | No suggestion |
-| docs/SUMMARY.md | Identity Management | web5/README.md#identity-management | No suggestion |
-| docs/SUMMARY.md | Protocol Support | web5/README.md#protocol-support | No suggestion |
-| docs/SUMMARY.md | Data Models | web5/README.md#data-models | No suggestion |
-| docs/SUMMARY.md | Security | web5/README.md#security | No suggestion |
+| docs/SUMMARY.md | DWN Storage | ../src/web5/README.md#dwn-storage | No suggestion |
+| docs/SUMMARY.md | Identity Management | ../src/web5/README.md#identity-management | No suggestion |
+| docs/SUMMARY.md | Protocol Support | ../src/web5/README.md#protocol-support | No suggestion |
+| docs/SUMMARY.md | Data Models | ../src/web5/README.md#data-models | No suggestion |
+| docs/SUMMARY.md | Security | ../src/web5/README.md#security | No suggestion |
 | docs/SUMMARY.md | Reporting | enterprise/analytics/reporting.md | No suggestion |
 | docs/SUMMARY.md | Data Visualization | enterprise/analytics/visualization.md | No suggestion |
 | docs/SUMMARY.md | Audit Logging | enterprise/security/audit.md | No suggestion |
@@ -244,6 +241,7 @@
 | docs/SUMMARY.md | Performance | reference/best-practices/performance.md | No suggestion |
 | docs/SUMMARY.md | Version History | reference/versions.md | No suggestion |
 | docs/SUMMARY.md | Release Notes | reference/releases.md | No suggestion |
+| docs/api/GOVERNANCE_API.md | API Authentication | README.md#authentication | No suggestion |
 | docs/api/README.md | Rate Limiting Guide | ../security/rate-limiting.md | No suggestion |
 | docs/bitcoin/PR_CHECKLIST.md | Bitcoin Development Framework v2.5 | docs/bitcoin/DEVELOPMENT_FRAMEWORK.md | No suggestion |
 | docs/bitcoin/docs/features/README.md | Bitcoin Core Integration | bitcoin-core-integration.md | No suggestion |
