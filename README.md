@@ -26,7 +26,7 @@ A powerful platform combining Bitcoin/crypto functionality, ML-based analytics, 
 - [Architecture](docs/ARCHITECTURE.md) - System design
 - [Bitcoin Integration](docs/BITCOIN_COMPLIANCE.md) - BIP compliance  
 - [API Reference](docs/API.md) - Developer APIs
-- [Security](SECURITY.md) - Security policies
+- [Security](docs/SECURITY.md) - Security policies
 
 ---
 
@@ -58,7 +58,7 @@ Anya Core is a modular, enterprise-ready platform for Bitcoin, Web5, and AI/ML a
 
 > **AI Labeling:** This project follows the [canonical AI Labeling System](docs/standards/AI_LABELING.md) based on official BIPs. All components are labeled with appropriate Core and Extended category labels.
 
-![Anya Architecture](docs/images/anya_architecture.png)
+![Anya Architecture](docs/ARCHITECTURE.md)
 
 ---
 
@@ -127,7 +127,7 @@ sudo ./scripts/install.sh --type=full
 
 - [Documentation System Guide](docs/DOCUMENTATION_SYSTEM.md)
 - [View Documentation](https://docs.anya.org/)
-- [Contribute to Docs](CONTRIBUTING.md#documentation)
+- [Contribute to Docs](docs/CONTRIBUTING.md#documentation)
 - [Documentation Standards](docs/standards/MARKDOWN_STYLE_GUIDE.md)
 
 ### Documentation Tools
@@ -258,7 +258,7 @@ We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ## License
 
-This project is dual-licensed under [Apache 2.0](LICENSE.md) and MIT. Enterprise features are under a separate license (see [Enterprise License](./enterprise/LICENSE)).
+This project is dual-licensed under [Apache 2.0](LICENSE.md) and MIT. Enterprise features are under a separate license (see [Enterprise License](dependencies/anya-enterprise/LICENSE)).
 
 ---
 

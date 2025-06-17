@@ -19,11 +19,11 @@ pub use system_map::*;
 pub mod federated_agent;
 pub use federated_agent::FederatedAgent;
 
+pub mod dao_agent;
+pub use dao_agent::DaoAgent;
+
 // pub mod web5_agent;
 // pub use web5_agent::Web5Agent;
-
-// pub mod dao_agent;
-// pub use dao_agent::DAOAgent;
 
 // pub mod stacks_agent;
 // pub use stacks_agent::StacksAgent;

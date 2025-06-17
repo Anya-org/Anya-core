@@ -85,9 +85,9 @@ All modules maintain compliance with official Bitcoin Improvement Proposals (BIP
 - [Getting Started](README.md) - Project overview and setup
 - [Installation](INSTALLATION.md) - Installation instructions
 - [System Architecture](SYSTEM_MAP.md) - Complete system architecture
-- [Security Framework](SECURITY.md) - AIS-3 compliance details
+- [Security Framework](docs/SECURITY.md) - AIS-3 compliance details
 - [Changelog](CHANGELOG.md) - Release notes and changes
-- [Roadmap](ROADMAP.md) - Development roadmap and milestones
+- [Roadmap](docs/ROADMAP.md) - Development roadmap and milestones
 
 ### Bitcoin Protocol Integration [BPC-3]
 
@@ -116,8 +116,8 @@ All modules maintain compliance with official Bitcoin Improvement Proposals (BIP
 
 ### MCP Tools & Development [MCP-3] **[NEW]**
 
-- [MCP Tools Overview](mcp/toolbox/README.md) - Comprehensive MCP integration guide
-- [MCP Configuration](mcp/mcp.json) - Main MCP server configuration
+- [MCP Tools Overview](anya-enterprise/README.md) - Comprehensive MCP integration guide
+- [MCP Configuration](.cursor/mcp.json) - Main MCP server configuration
 - [Development Tools](mcp/toolbox/servers/anya-dev-tools.js) - Custom Anya development server
 - [Management Scripts](scripts/mcp/manage-tools.sh) - MCP lifecycle management
 - [Setup Guide](scripts/mcp/init-toolbox.sh) - MCP toolbox initialization
@@ -164,7 +164,7 @@ All modules maintain compliance with official Bitcoin Improvement Proposals (BIP
 
 ### Testing & Validation
 
-- [Test Framework](TESTING.md) - Testing procedures
+- [Test Framework](docs/TESTING.md) - Testing procedures
 - [Security Tests](src/security/README.md) - Security validation
 - [Performance Tests](src/testing/performance/README.md) - Benchmarking
 
