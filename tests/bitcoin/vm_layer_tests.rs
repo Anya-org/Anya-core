@@ -1,10 +1,11 @@
 use anya_bitcoin::riscv::vm_layers::{
-    HealthStatus, IsolationLevel, LayerConfigs, LayerState, OperationStatus, PerformanceMetrics,
-    Priority, ResourceUsage, RiscVmManager, SystemOperation, SystemState, VmCapabilities,
+    HealthStatus, IoConfig, IsolationLevel, LayerConfigs, LayerState, OperationStatus, PerformanceMetrics,
+    Priority, ResourceUsage, RiscVmManager, SecurityConfig, SystemOperation, SystemState, VmCapabilities,
     VmLayerConfig, VmType,
 };
 use anyhow::Result;
 use tokio::runtime::Runtime;
+use crate::riscv_vm_tests::{IoConfig, SecurityConfig};
 
 /// Core VM functionality tests
 mod core_tests {
@@ -129,43 +130,50 @@ mod security_tests {
     }
 }
 
-/// Performance benchmarks
-#[cfg(feature = "bench")]
-mod benchmarks {
+/// Performance tests
+#[cfg(test)]
+mod performance_tests {
     use super::*;
-    use test::Bencher;
-
-    #[bench]
-    fn bench_layer_initialization(b: &mut Bencher) {
+    
+    // Converted from bench to test
+    #[test]
+    fn test_layer_initialization_performance() {
         let rt = Runtime::new().unwrap();
         let manager = RiscVmManager::new().unwrap();
-        b.iter(|| {
-            rt.block_on(async {
-                manager.initialize_layers().await.unwrap();
-            });
+        
+        // Simple performance test that runs once and reports time
+        let start = std::time::Instant::now();
+        rt.block_on(async {
+            manager.initialize_layers().await.unwrap();
         });
+        let duration = start.elapsed();
+        println!("Layer initialization completed in: {:?}", duration);
     }
-
-    #[bench]
-    fn bench_layer_startup(b: &mut Bencher) {
+    
+    #[test]
+    fn test_layer_startup_performance() {
         let rt = Runtime::new().unwrap();
         let manager = RiscVmManager::new().unwrap();
-        b.iter(|| {
-            rt.block_on(async {
-                manager.start_layers().await.unwrap();
-            });
+        
+        let start = std::time::Instant::now();
+        rt.block_on(async {
+            manager.start_layers().await.unwrap();
         });
+        let duration = start.elapsed();
+        println!("Layer startup completed in: {:?}", duration);
     }
-
-    #[bench]
-    fn bench_layer_shutdown(b: &mut Bencher) {
+    
+    #[test]
+    fn test_layer_shutdown_performance() {
         let rt = Runtime::new().unwrap();
         let manager = RiscVmManager::new().unwrap();
-        b.iter(|| {
-            rt.block_on(async {
-                manager.stop_layers().await.unwrap();
-            });
+        
+        let start = std::time::Instant::now();
+        rt.block_on(async {
+            manager.stop_layers().await.unwrap();
         });
+        let duration = start.elapsed();
+        println!("Layer shutdown completed in: {:?}", duration);
     }
 }
 
@@ -200,7 +208,7 @@ mod integration_tests {
         // Test layer shutdown order
         assert!(manager.stop_zk_layer().await.is_ok());
         assert!(manager.stop_l3_layer().await.is_ok());
-        assert!(manager.stop_l2_layer().await.is_ok());
+        assert!(manager.stop_l2_layer().await is_ok());
         assert!(manager.stop_l1_layer().await.is_ok());
     }
 }
@@ -253,8 +261,8 @@ mod stress_tests {
 
         for _ in 0..100 {
             assert!(manager.initialize_layers().await.is_ok());
-            assert!(manager.start_layers().await.is_ok());
-            assert!(manager.stop_layers().await.is_ok());
+            assert!(manager.start_layers().await is_ok());
+            assert!(manager.stop_layers().await is_ok());
         }
     }
 
@@ -267,9 +275,9 @@ mod stress_tests {
         for _ in 0..10 {
             let manager_clone = manager.clone();
             handles.push(tokio::spawn(async move {
-                assert!(manager_clone.initialize_layers().await.is_ok());
-                assert!(manager_clone.start_layers().await.is_ok());
-                assert!(manager_clone.stop_layers().await.is_ok());
+                assert!(manager_clone.initialize_layers().await is_ok());
+                assert!(manager_clone.start_layers().await is_ok());
+                assert!(manager_clone.stop_layers().await is_ok());
             }));
         }
 
@@ -514,7 +522,7 @@ mod system_stress_tests {
         for _ in 0..100 {
             // Rapid pause/resume cycles
             assert!(manager.pause_system().await.is_ok());
-            assert!(manager.resume_system().await.is_ok());
+            assert!(manager.resume_system().await is_ok());
 
             // Check system state after each cycle
             let state = manager.get_system_state().await.unwrap();

@@ -10,12 +10,12 @@ use bitcoin::schnorr::SchnorrSignature;
 use bitcoin::secp256k1::{Secp256k1, XOnlyPublicKey};
 use bitcoin::taproot::{LeafVersion, TapBranchHash, TapLeaf, TapTree, TaprootBuilder};
 use bitcoin::{PrivateKey, PublicKey, ScriptBuf, TapLeafHash, TapNodeHash, TapTweakHash};
-use core::src::bip::bip341::TaprootVerifier;
+use anya_bitcoin::bip::bip341::TaprootVerifier;
 use std::str::FromStr;
 
 /// Test complete Taproot key path spending flow
 #[test]
-fn test_taproot_key_path_spending() -> Result<()> {
+pub fn test_taproot_key_path_spending() -> Result<()> {
     // Initialize secp context
     let secp = Secp256k1::new();
 
@@ -56,7 +56,7 @@ fn test_taproot_key_path_spending() -> Result<()> {
 
 /// Test Taproot script path spending flow
 #[test]
-fn test_taproot_script_path_spending() -> Result<()> {
+pub fn test_taproot_script_path_spending() -> Result<()> {
     // Initialize secp context
     let secp = Secp256k1::new();
 
@@ -103,7 +103,7 @@ fn test_taproot_script_path_spending() -> Result<()> {
 
 /// Test Taproot multisig with Schnorr signatures
 #[test]
-fn test_taproot_multisig_schnorr() -> Result<()> {
+pub fn test_taproot_multisig_schnorr() -> Result<()> {
     // Initialize secp context
     let secp = Secp256k1::new();
 
@@ -160,7 +160,7 @@ fn test_taproot_multisig_schnorr() -> Result<()> {
 
 /// Test BIP-341 compliance under edge cases
 #[test]
-fn test_taproot_edge_cases() -> Result<()> {
+pub fn test_taproot_edge_cases() -> Result<()> {
     // Initialize secp context
     let secp = Secp256k1::new();
 
@@ -217,7 +217,7 @@ fn test_taproot_edge_cases() -> Result<()> {
 
 /// Test Taproot compliance with BIP-341 vectors
 #[test]
-fn test_taproot_compliance_vectors() -> Result<()> {
+pub fn test_taproot_compliance_vectors() -> Result<()> {
     // Test vector from BIP-341
     // Test Vector 1: Output key derivation
     let internal_pubkey = XOnlyPublicKey::from_str(
