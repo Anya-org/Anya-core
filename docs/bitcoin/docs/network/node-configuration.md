@@ -14,7 +14,7 @@
 
 ## Overview
 
-The Anya Bitcoin node configuration system provides enterprise-grade Bitcoin network integration with advanced features for security, performance, and reliability. For architecture details, see our [Architecture Overview](../../architecture/overview.md).
+The Anya Bitcoin node configuration system provides enterprise-grade Bitcoin network integration with advanced features for security, performance, and reliability. For architecture details, see our [Architecture Overview](../layer2/OVERVIEW.md).
 
 ## Configuration Options
 
@@ -68,7 +68,7 @@ maxuploadtarget = 1024  # MB
 ban_threshold = 100
 ```
 
-For security details, see [Security Configuration Guide](../../security/network-security.md).
+For security details, see [Security Configuration Guide](../security/network-security.md).
 
 ## Advanced Features
 
@@ -150,13 +150,13 @@ For logging details, see [Logging Configuration Guide](../monitoring/logging-con
 
 ## Security Best Practices
 
-1. **Network Security** ([Guide](../../security/network-security.md))
+1. **Network Security** ([Guide](../security/network-security.md))
    - Use firewall rules
    - Implement rate limiting
    - Enable SSL/TLS
    - Use strong authentication
 
-2. **Access Control** ([Guide](../../security/access-control.md))
+2. **Access Control** ([Guide](../../../../anya-enterprise/docs/security/access-control.md))
    - Implement IP whitelisting
    - Use strong RPC authentication
    - Regular credential rotation
@@ -184,7 +184,7 @@ prune = false
 txindex = true
 ```
 
-For development setup, see [Development Environment Guide](../guides/development-setup.md).
+For development setup, see [Development Environment Guide](../../../contributing/development-setup.md).
 
 ### Production Environment
 ```toml
@@ -263,17 +263,17 @@ For performance monitoring, see [Performance Monitoring Guide](../monitoring/per
 ## Related Documentation
 
 - [Network Setup](./network-setup.md)
-- [Security Features](../../anya-enterprise/docs/security/security-features.md)
-- [Performance Optimization](../performance/optimization.md)
-- [Monitoring Guide](../monitoring/overview.md)
-- [Troubleshooting Guide](../troubleshooting/index.md)
+- [Security Features](../../../../anya-enterprise/docs/security/security-features.md)
+- [Performance Optimization](../../../../anya-enterprise/docs/performance/optimization.md)
+- [Monitoring Guide](../layer2/OVERVIEW.md)
+- [Troubleshooting Guide](../../index.md)
 
 ## Support
 
 For node-related support:
 - [Technical Support](../../support/technical.md)
-- [Security Issues](../../support/security.md)
-- [Feature Requests](../../support/features.md)
+- [Security Issues](../../../SECURITY.md)
+- [Feature Requests](../../../../dependencies/docs/build-system/features.md)
 - [Bug Reports](../../support/bugs.md)
 
 *Last updated: 2025-06-02*

@@ -99,9 +99,9 @@ The security framework adheres to Bitcoin protocol standards:
 
 For more information, see:
 
-- [Security Guidelines](../../../SECURITY.md)
+- [Security Guidelines](../../docs/SECURITY.md)
 - [Cryptographic Standards](./crypto/README.md)
-- [Implementation Status](../../../docs/IMPLEMENTATION_MILESTONES.md)
+- [Implementation Status](../../docs/IMPLEMENTATION_MILESTONES.md)
 
 ## Version Information
 
@@ -109,4 +109,4 @@ For more information, see:
 - Last Updated: 2025-04-29
 - Bitcoin Improvement Proposals: BIP-340, BIP-341, BIP-342, BIP-174
 
-*This component complies with [AI Labeling Standards](../../../docs/standards/AI_LABELING.md)* 
+*This component complies with [AI Labeling Standards](../../docs/AI_LABELING.md)* 

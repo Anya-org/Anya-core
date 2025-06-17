@@ -102,7 +102,7 @@ for pattern in patterns {
 
 - [Transaction Monitoring](transaction-monitoring.md)
 - [Anomaly Detection](anomaly-detection.md)
-- [Machine Learning Models](../ml/models.md)
+- [Machine Learning Models](../../../docs/ml/models.md)
 
 ---
 

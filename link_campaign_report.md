@@ -1,13 +1,13 @@
 # Link Campaign Report
 
-*Generated: 2025-06-17 17:40:15*
+*Generated: 2025-06-17 17:47:49*
 
 ## Summary
 
-- **Total broken links found**: 518
+- **Total broken links found**: 514
 - **Links automatically fixed**: 0
-- **Links requiring manual review**: 518
-- **Mode**: Dry run
+- **Links requiring manual review**: 514
+- **Mode**: Applied fixes
 
 ## Links Requiring Manual Review
 
@@ -184,15 +184,11 @@
 | docs/SEARCH_INDEX.md | model_manager.rs | ../src/ml/models/manager.rs | No suggestion |
 | docs/SEARCH_INDEX.md | inference.rs | ../src/ml/inference/engine.rs | No suggestion |
 | docs/SECURITY.md | SECURITY_GUIDELINES.md | docs/SECURITY_GUIDELINES.md | No suggestion |
-| docs/SUMMARY.md | DWN Storage | web5/dwn/storage.md | No suggestion |
-| docs/SUMMARY.md | Identity Management | web5/identity/management.md | No suggestion |
-| docs/SUMMARY.md | Transaction Handling | bitcoin/wallet/transactions.md | No suggestion |
-| docs/SUMMARY.md | Address Types | bitcoin/wallet/addresses.md | No suggestion |
-| docs/SUMMARY.md | DLC Implementation | bitcoin/contracts/dlc.md | No suggestion |
-| docs/SUMMARY.md | Oracle Integration | bitcoin/contracts/oracle.md | No suggestion |
-| docs/SUMMARY.md | Contract Templates | bitcoin/contracts/templates.md | No suggestion |
-| docs/SUMMARY.md | Node Configuration | bitcoin/network/node-setup.md | No suggestion |
-| docs/SUMMARY.md | P2P Protocol | bitcoin/network/p2p.md | No suggestion |
+| docs/SUMMARY.md | DWN Storage | web5/README.md#dwn-storage | No suggestion |
+| docs/SUMMARY.md | Identity Management | web5/README.md#identity-management | No suggestion |
+| docs/SUMMARY.md | Protocol Support | web5/README.md#protocol-support | No suggestion |
+| docs/SUMMARY.md | Data Models | web5/README.md#data-models | No suggestion |
+| docs/SUMMARY.md | Security | web5/README.md#security | No suggestion |
 | docs/SUMMARY.md | Reporting | enterprise/analytics/reporting.md | No suggestion |
 | docs/SUMMARY.md | Data Visualization | enterprise/analytics/visualization.md | No suggestion |
 | docs/SUMMARY.md | Audit Logging | enterprise/security/audit.md | No suggestion |

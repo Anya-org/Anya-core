@@ -27,7 +27,7 @@ Add a brief overview of this document here.
 
 ## Core Platform
 
-* [Web5 Integration](web5/README.md)
+* [Web5 Integration](README.md)
   * [DWN Storage](web5/README.md#dwn-storage)
   * [Identity Management](web5/README.md#identity-management)
   * [Protocol Support](web5/README.md#protocol-support)

@@ -304,8 +304,8 @@ component.doSomething();
 
 ## Related Components
 
-- [Related Component 1](./related1.md)
-- [Related Component 2](./related2.md)
+- [Related Component 1](../INSTALLATION.md)
+- [Related Component 2](../INSTALLATION_REVIEW.md)
 
 ```
 

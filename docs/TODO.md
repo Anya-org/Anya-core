@@ -268,7 +268,7 @@ To contribute to these tasks:
 
 - [WORKSPACE_MANAGEMENT.md](WORKSPACE_MANAGEMENT.md) – Workspace organization
 - [DOCUMENTATION_CLEANUP_PLAN.md](DOCUMENTATION_CLEANUP_PLAN.md) – Documentation strategy
-- [ROADMAP.md](../ROADMAP.md) – Project roadmap and milestones
+- [ROADMAP.md](ROADMAP.md) – Project roadmap and milestones
 - [IMPLEMENTATION_SUMMARY.md](IMPLEMENTATION_SUMMARY.md) – Current implementation status
 - [IMPLEMENTATION_MILESTONES.md](IMPLEMENTATION_MILESTONES.md) – Implementation milestones
 - [IMPLEMENTATION_ARCHITECTURE.md](IMPLEMENTATION_ARCHITECTURE.md) – Architecture overview

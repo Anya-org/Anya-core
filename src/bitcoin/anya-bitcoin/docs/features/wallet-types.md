@@ -9,21 +9,25 @@ Anya supports multiple wallet types to accommodate different use cases and secur
 ## Supported Wallet Types
 
 ### 1. HD Wallets
+
 - BIP32/44/49/84 compliant
 - Hierarchical deterministic structure
 - Multiple account support
 
 ### 2. Multi-signature Wallets
+
 - M-of-N signature schemes
 - Configurable threshold
 - Multiple key holder support
 
 ### 3. Watch-only Wallets
+
 - Public key only wallets
 - Transaction monitoring
 - Balance tracking
 
 ### 4. Hardware Wallets
+
 - Ledger support
 - Trezor support
 - Cold storage integration

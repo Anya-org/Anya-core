@@ -7,7 +7,7 @@ description: "Anya Core Project Roadmap and Development Timeline"
 
 [AIR-3][AIS-3][BPC-3][RES-3]
 
-> Note: For Enterprise features and roadmap, please see [Enterprise Roadmap](./enterprise/ROADMAP.md)
+> Note: For Enterprise features and roadmap, please see [Enterprise Roadmap](ROADMAP.md)
 
 ## Current Status (June 7, 2025)
 

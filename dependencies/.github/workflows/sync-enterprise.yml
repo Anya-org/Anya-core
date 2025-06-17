@@ -32,8 +32,13 @@ jobs:
         env:
           ENTERPRISE_TOKEN: ${{ secrets.ENTERPRISE_REPO_TOKEN }}
         run: |
-          cd anya-enterprise
-          git fetch origin main
-          git merge origin/main --ff-only
-          git push origin main
+          if [ -d "anya-enterprise" ]; then
+            cd anya-enterprise
+            git fetch origin main
+            git merge origin/main --ff-only
+            git push origin main
+          else
+            echo "anya-enterprise directory not found"
+            exit 1
+          fi
 

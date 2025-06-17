@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Anya Bitcoin Core features provide a robust foundation for building scalable and secure Bitcoin-based applications. For architecture details, see our [Architecture Overview](../../architecture/overview.md).
+The Anya Bitcoin Core features provide a robust foundation for building scalable and secure Bitcoin-based applications. For architecture details, see our [Architecture Overview](../layer2/OVERVIEW.md).
 
 ### Core Features
 
@@ -17,9 +17,9 @@ The Anya Bitcoin Core features provide a robust foundation for building scalable
 - [Cross-chain Bridge Foundation](cross-chain-bridge-foundation.md)
 - [Wallet Integration](wallet-integration.md)
 - [Block Processing](block-processing.md)
-- [Node Configuration](network/node-configuration.md)
-- [Network Types](network/network-types.md)
-- [P2P Communication](network/p2p-communication.md)
+- [Node Configuration](../network/node-configuration.md)
+- [Network Types](../network/network-types.md)
+- [P2P Communication](../network/p2p-communication.md)
 
 ### In Progress
 

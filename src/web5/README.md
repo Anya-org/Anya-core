@@ -75,9 +75,9 @@ The implementation is fully compliant with Web5 standards:
 
 To contribute to the Web5 implementation:
 
-1. Read the [Contributing Guide](../../../CONTRIBUTING.md)
-2. Follow the [AI Labeling Standards](../../../docs/standards/AI_LABELING.md)
-3. Ensure all code meets [official Bitcoin Improvement Proposals (BIPs)](../../../docs/standards/BIP_COMPLIANCE.md) requirements
+1. Read the [Contributing Guide](../../dependencies/CONTRIBUTING.md)
+2. Follow the [AI Labeling Standards](../../docs/AI_LABELING.md)
+3. Ensure all code meets [official Bitcoin Improvement Proposals (BIPs)](../../docs/BIP_COMPLIANCE.md) requirements
 
 ## Testing
 
@@ -92,9 +92,9 @@ All Web5 components are tested using:
 
 For more information, see:
 
-- [Web5 Documentation](../../../docs/web5/README.md): Complete Web5 documentation
-- [DID System](../../../docs/identity/README.md): Detailed DID implementation documentation
-- [Bitcoin Integration](../../../docs/BIP_COMPLIANCE.md): Bitcoin integration details
+- [Web5 Documentation](README.md): Complete Web5 documentation
+- [DID System](README.md): Detailed DID implementation documentation
+- [Bitcoin Integration](../../docs/BIP_COMPLIANCE.md): Bitcoin integration details
 
 ## Version Information
 
@@ -103,4 +103,4 @@ For more information, see:
 - Bitcoin Development Framework: v2.5
 - Web5 Protocol: v1.0
 
-*This component complies with [AI Labeling Standards](../../../docs/standards/AI_LABELING.md)* 
+*This component complies with [AI Labeling Standards](../../docs/AI_LABELING.md)* 

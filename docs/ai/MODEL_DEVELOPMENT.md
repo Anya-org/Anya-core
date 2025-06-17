@@ -8,10 +8,10 @@ description: "Documentation for Model_development"
 
 # AI Model Development Guide
 
-
 This guide outlines the process for developing and training AI models for the Anya Core platform.
 
 ## Table of Contents
+
 - [Overview](#overview)
 - [Development Environment](#development-environment)
 - [Project Structure](#project-structure)
@@ -39,24 +39,28 @@ This guide covers the end-to-end process of developing AI models for Anya Core, 
 ### Setup
 
 1. Clone the repository:
+
    ```bash
    git clone https://github.com/anya-org/anya-core.git
    cd anya-core/ai
    ```
 
 2. Create a virtual environment:
+
    ```bash
    python -m venv venv
    source venv/bin/activate  # On Windows: venv\Scripts\activate
    ```
 
 3. Install dependencies:
+
    ```bash
    pip install -r requirements-dev.txt
    pip install -e .
    ```
 
 4. Install pre-commit hooks:
+
    ```bash
    pre-commit install
    ```

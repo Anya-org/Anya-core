@@ -4,7 +4,7 @@ Documentation for Transaction Management
 
 ## Overview
 
-The Anya Bitcoin wallet integration provides enterprise-grade wallet management capabilities with advanced security features and multi-signature support. For architecture details, see our [Architecture Overview](../../architecture/overview.md).
+The Anya Bitcoin wallet integration provides enterprise-grade wallet management capabilities with advanced security features and multi-signature support. For architecture details, see our [Architecture Overview](../layer2/OVERVIEW.md).
 
 ## Features
 

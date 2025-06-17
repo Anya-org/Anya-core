@@ -101,16 +101,16 @@ BROKEN_LINKS=0
 check_links() {
     local file="$1"
     local dir=$(dirname "$file")
-    
+
     echo -e "${YELLOW}Checking links in ${file}${NC}"
-    
+
     # Find all markdown links in the file [text](url)
     grep -o '\[.*\](.*\.md)' "$file" | grep -o '(.*\.md)' | tr -d '()' | while read -r link; do
         # Skip external links
         if [[ "$link" =~ ^https?:// ]]; then
             continue
         fi
-        
+
         # Handle relative links
         if [[ "$link" = /* ]]; then
             # Absolute path within the repository
@@ -119,14 +119,14 @@ check_links() {
             # Relative path
             target="${dir}/${link}"
         fi
-        
+
         # Normalize the path (resolve ../ etc)
         target=$(realpath --relative-to="${WORKSPACE_ROOT}" "$target" 2>/dev/null || echo "$target")
         target="${WORKSPACE_ROOT}/${target}"
-        
+
         if [ ! -f "$target" ]; then
             echo -e "${RED}  ✗ Broken link in $file: $link (target not found: $target)${NC}"
-            BROKEN_LINKS=$((BROKEN_LINKS+1))
+            BROKEN_LINKS=$((BROKEN_LINKS + 1))
         fi
     done
 }

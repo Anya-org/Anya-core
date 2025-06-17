@@ -40,7 +40,7 @@ for file in "${CRITICAL_FILES[@]}"; do
         echo -e "${GREEN}✓ ${file} exists${NC}"
     else
         echo -e "${RED}✗ ${file} does not exist${NC}"
-        MISSING_FILES=$((MISSING_FILES+1))
+        MISSING_FILES=$((MISSING_FILES + 1))
     fi
 done
 
@@ -61,7 +61,7 @@ check_date_consistency() {
         echo -e "${GREEN}✓ ${file} has current date (${CURRENT_DATE})${NC}"
     else
         echo -e "${RED}✗ ${file} may not have current date (${CURRENT_DATE})${NC}"
-        INCONSISTENT_DATES=$((INCONSISTENT_DATES+1))
+        INCONSISTENT_DATES=$((INCONSISTENT_DATES + 1))
     fi
 }
 
@@ -88,11 +88,11 @@ check_for_production_claims() {
         echo -e "${GREEN}✓ ${file} does not contain any production-ready terms${NC}"
         return 0
     fi
-    
+
     # Check if the terms are in the context of explaining what was fixed
-    if grep -i "production-ready\|production ready\|fully operational\|PRODUCTION STATUS ACHIEVED" "$file" | grep -v -i "corrected\|removed\|fixed\|previous\|before\|false\|identified\|misleading\|CLAIM\|REALITY\|documentation\|found\|claims\|BEFORE\|AFTER" > /dev/null; then
+    if grep -i "production-ready\|production ready\|fully operational\|PRODUCTION STATUS ACHIEVED" "$file" | grep -v -i "corrected\|removed\|fixed\|previous\|before\|false\|identified\|misleading\|CLAIM\|REALITY\|documentation\|found\|claims\|BEFORE\|AFTER" >/dev/null; then
         echo -e "${RED}✗ ${file} may contain misleading production-ready claims${NC}"
-        PRODUCTION_CLAIMS=$((PRODUCTION_CLAIMS+1))
+        PRODUCTION_CLAIMS=$((PRODUCTION_CLAIMS + 1))
     else
         echo -e "${GREEN}✓ ${file} only mentions production-ready in the context of fixes${NC}"
     fi
@@ -115,9 +115,9 @@ echo -e "\n${BLUE}Checking for empty or redundant index files...${NC}"
 EMPTY_FILES=0
 
 if [ -f "${WORKSPACE_ROOT}/INDEX.md" ]; then
-    if [ ! -s "${WORKSPACE_ROOT}/INDEX.md" ] || [ $(wc -l < "${WORKSPACE_ROOT}/INDEX.md") -lt 5 ]; then
+    if [ ! -s "${WORKSPACE_ROOT}/INDEX.md" ] || [ $(wc -l <"${WORKSPACE_ROOT}/INDEX.md") -lt 5 ]; then
         echo -e "${RED}✗ ${WORKSPACE_ROOT}/INDEX.md appears to be empty or nearly empty${NC}"
-        EMPTY_FILES=$((EMPTY_FILES+1))
+        EMPTY_FILES=$((EMPTY_FILES + 1))
     else
         echo -e "${YELLOW}⚠ ${WORKSPACE_ROOT}/INDEX.md still exists and has content${NC}"
     fi
@@ -125,7 +125,7 @@ fi
 
 if [ -f "${WORKSPACE_ROOT}/INDEX_ORIGINAL.md" ]; then
     echo -e "${RED}✗ ${WORKSPACE_ROOT}/INDEX_ORIGINAL.md still exists (should be removed)${NC}"
-    EMPTY_FILES=$((EMPTY_FILES+1))
+    EMPTY_FILES=$((EMPTY_FILES + 1))
 fi
 
 if [ "${EMPTY_FILES}" -eq 0 ]; then
@@ -147,7 +147,7 @@ MISSING_SCRIPTS=0
 for script in "${SCRIPTS[@]}"; do
     if [ -f "$script" ]; then
         echo -e "${GREEN}✓ ${script} exists${NC}"
-        
+
         # Check if executable
         if [ -x "$script" ]; then
             echo -e "${GREEN}  ✓ ${script} is executable${NC}"
@@ -158,7 +158,7 @@ for script in "${SCRIPTS[@]}"; do
         fi
     else
         echo -e "${RED}✗ ${script} does not exist${NC}"
-        MISSING_SCRIPTS=$((MISSING_SCRIPTS+1))
+        MISSING_SCRIPTS=$((MISSING_SCRIPTS + 1))
     fi
 done
 

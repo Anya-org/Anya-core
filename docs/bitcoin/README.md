@@ -22,10 +22,10 @@ This directory contains documentation for the Bitcoin protocol implementation in
 
 ## Contents
 
-- [Architecture](architecture.md) - High-level architecture of the Bitcoin integration
-- [API Reference](api.md) - API documentation for Bitcoin-related functionality
-- [Development Guide](development.md) - Guide for developers working on Bitcoin features
-- [Testing](testing.md) - Testing strategy and guidelines for Bitcoin features
+- [Architecture](../ARCHITECTURE.md) - High-level architecture of the Bitcoin integration
+- [API Reference](../API.md) - API documentation for Bitcoin-related functionality
+- [Development Guide](../development.md) - Guide for developers working on Bitcoin features
+- [Testing](../TESTING.md) - Testing strategy and guidelines for Bitcoin features
 
 ## Features
 
@@ -42,5 +42,5 @@ This directory contains documentation for the Bitcoin protocol implementation in
 
 ## See Also
 
-- [Related Document 1](./related1.md)
-- [Related Document 2](./related2.md)
+- [Related Document 1](../INSTALLATION.md)
+- [Related Document 2](../../INSTALLATION_REVIEW.md)

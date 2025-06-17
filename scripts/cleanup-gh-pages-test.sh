@@ -23,17 +23,17 @@ echo -e "${BLUE}=====================================${NC}"
 # Check if the file exists
 if [ -f "${TEST_FILE}" ]; then
     echo -e "${YELLOW}Temporary GitHub Pages test file found at ${TEST_FILE}${NC}"
-    
+
     # Create a backup
     BACKUP_DIR="/tmp/anya-docs-backup-$(date +%Y%m%d-%H%M%S)"
     mkdir -p "${BACKUP_DIR}"
     echo -e "${YELLOW}Creating backup at ${BACKUP_DIR}${NC}"
     cp "${TEST_FILE}" "${BACKUP_DIR}/$(basename ${TEST_FILE})"
-    
+
     # Remove the file
     echo -e "${YELLOW}Removing temporary GitHub Pages test file...${NC}"
     rm "${TEST_FILE}"
-    
+
     echo -e "${GREEN}Temporary GitHub Pages test file successfully removed!${NC}"
     echo -e "${YELLOW}A backup was created at ${BACKUP_DIR}/$(basename ${TEST_FILE})${NC}"
 else

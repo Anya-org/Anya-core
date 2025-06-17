@@ -12,7 +12,7 @@
 
 ## Overview
 
-The Anya Bitcoin wallet integration provides enterprise-grade wallet management capabilities with advanced security features and multi-signature support. For architecture details, see our [Architecture Overview](../../architecture/overview.md).
+The Anya Bitcoin wallet integration provides enterprise-grade wallet management capabilities with advanced security features and multi-signature support. For architecture details, see our [Architecture Overview](../layer2/OVERVIEW.md).
 
 ## Features
 
@@ -81,7 +81,7 @@ For multi-signature implementation details, see:
 ## API Reference
 
 ### REST Endpoints
-For complete API documentation, see our [API Reference](../../api/api-reference.md#wallet-endpoints).
+For complete API documentation, see our [API Reference](../integration/api-reference.md#wallet-endpoints).
 
 ```rust
 // Wallet endpoints
@@ -112,7 +112,7 @@ let wallet = Wallet::create(config).await?;
 For more examples, see:
 - [Basic Examples](../examples/basic-wallet.md)
 - [Advanced Examples](../examples/advanced-wallet.md)
-- [Integration Examples](../examples/wallet-integration.md)
+- [Integration Examples](wallet-integration.md)
 
 ## Configuration
 
@@ -142,7 +142,7 @@ pub enum WalletError {
 }
 ```
 
-For error handling details, see [Error Handling Guide](../guides/error-handling.md).
+For error handling details, see [Error Handling Guide](../integration/error-handling.md).
 
 ## Testing
 
@@ -156,24 +156,24 @@ fn test_wallet_creation() {
 ```
 
 For testing guidelines, see:
-- [Testing Guide](../guides/testing.md)
-- [Integration Tests](../guides/integration-testing.md)
-- [Security Testing](../guides/security-testing.md)
+- [Testing Guide](../../../TESTING.md)
+- [Integration Tests](../../../../dependencies/docs/testing/integration-testing.md)
+- [Security Testing](../../../../dependencies/docs/testing/security-testing.md)
 
 ## Related Documentation
 
 - [Node Configuration](../network/node-configuration.md)
 - [Transaction Management](../features/transaction-management.md)
-- [Security Features](../../anya-enterprise/docs/security/security-features.md)
-- [API Reference](../../api/api-reference.md)
-- [Contributing Guide](../../contributing/index.md)
+- [Security Features](../../../../anya-enterprise/docs/security/security-features.md)
+- [API Reference](../integration/api-reference.md)
+- [Contributing Guide](../../index.md)
 
 ## Support
 
 For wallet-related support:
 - [Technical Support](../../support/technical.md)
-- [Security Issues](../../support/security.md)
-- [Feature Requests](../../support/features.md)
+- [Security Issues](../../../SECURITY.md)
+- [Feature Requests](../../../../dependencies/docs/build-system/features.md)
 - [Bug Reports](../../support/bugs.md)
 
 *Last updated: 2025-06-02*

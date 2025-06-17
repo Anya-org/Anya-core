@@ -22,7 +22,7 @@ This directory contains documentation for Layer 2 solutions implemented in Anya 
 
 ## Contents
 
-- [Lightning Network](lightning.md) - Implementation details for the Lightning Network
+- [Lightning Network](../bitcoin/lightning.md) - Implementation details for the Lightning Network
 - [State Channels](state_channels.md) - General state channels implementation
 - [Sidechains](sidechains.md) - Sidechain implementations and bridges
 - [Rollups](rollups.md) - Rollup solutions for scaling
@@ -36,7 +36,7 @@ This directory contains documentation for Layer 2 solutions implemented in Anya 
 
 ## Development
 
-For information on developing Layer 2 solutions, see the [development guide](development.md).
+For information on developing Layer 2 solutions, see the [development guide](../development.md).
 
 ## See Also
 

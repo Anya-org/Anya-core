@@ -52,10 +52,10 @@ Based on actual repository analysis:
 
 | Document | Description | Status | Verification Date |
 |----------|-------------|--------|-------------------|
-| [README.md](../README.md) | Main project overview | ✅ Accurate | 2025-06-10 |
-| [CONTRIBUTING.md](../CONTRIBUTING.md) | Contribution guidelines | ✅ Current | 2025-06-10 |
-| [SECURITY.md](../SECURITY.md) | Security policies | ✅ Current | 2025-06-10 |
-| [LICENSE.md](../LICENSE.md) | License information | ✅ Current | 2025-06-10 |
+| [README.md](anya-enterprise/README.md) | Main project overview | ✅ Accurate | 2025-06-10 |
+| [CONTRIBUTING.md](dependencies/CONTRIBUTING.md) | Contribution guidelines | ✅ Current | 2025-06-10 |
+| [SECURITY.md](docs/SECURITY.md) | Security policies | ✅ Current | 2025-06-10 |
+| [LICENSE.md](dependencies/LICENSE.md) | License information | ✅ Current | 2025-06-10 |
 
 ### Bitcoin Implementation (Truth-Verified)
 
@@ -71,16 +71,16 @@ Based on actual repository analysis:
 
 | Document | Description | Status | Notes |
 |----------|-------------|--------|-------|
-| [SYSTEM_MAP.md](../SYSTEM_MAP.md) | System architecture | ⚠️ Contains false claims | Needs truth correction |
+| [SYSTEM_MAP.md](src/system_map.md) | System architecture | ⚠️ Contains false claims | Needs truth correction |
 | [docs/bitcoin/README.md](docs/bitcoin/README.md) | Bitcoin documentation | ✅ Accurate technical content | Well-written |
-| [src/bitcoin/README.md](../src/bitcoin/README.md) | Bitcoin implementation | ✅ Accurate status | Honest about progress |
+| [src/bitcoin/README.md](anya-enterprise/README.md) | Bitcoin implementation | ✅ Accurate status | Honest about progress |
 
 ### Development Documentation (Accurate)
 
 | Document | Description | Status | Quality |
 |----------|-------------|--------|---------|
-| [INSTALLATION.md](../INSTALLATION.md) | Installation guide | ✅ Current | High |
-| [TESTING.md](../TESTING.md) | Testing strategy | ✅ Comprehensive | High |
+| [INSTALLATION.md](docs/INSTALLATION.md) | Installation guide | ✅ Current | High |
+| [TESTING.md](docs/TESTING.md) | Testing strategy | ✅ Comprehensive | High |
 | [docs/standards/](docs/standards/) | Development standards | ✅ Well-defined | High |
 
 ---

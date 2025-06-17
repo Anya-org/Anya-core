@@ -32,7 +32,7 @@
 | [README.md](../README.md) | Project overview & quick start | All users | 🔥 Critical |
 | [INSTALLATION.md](./INSTALLATION.md) | Complete installation guide | Developers | 🔥 Critical |
 | [Configuration Guide](./installation/CONFIGURATION.md) | System configuration | DevOps | ⚡ High |
-| [Troubleshooting](./installation/TROUBLESHOOTING.md) | Common issues & solutions | Support | ⚡ High |
+| [Troubleshooting](installation/troubleshooting.md) | Common issues & solutions | Support | ⚡ High |
 
 ## 🏗️ Architecture
 
@@ -53,7 +53,7 @@
 |----------|-----------|------------------|--------|
 | [Bitcoin Compliance](./BITCOIN_COMPLIANCE.md) | BIP-174, 340-342 | Full | ✅ Production |
 | [BIP Implementation](./BIP_COMPLIANCE.md) | All supported BIPs | Comprehensive | ✅ Production |
-| [Taproot Integration](./bitcoin/TAPROOT.md) | BIP-340/341/342 | Complete | ✅ Production |
+| [Taproot Integration](bitcoin/taproot.md) | BIP-340/341/342 | Complete | ✅ Production |
 | [Layer 2 Solutions](./bitcoin/LAYER2.md) | Lightning, RGB, DLC | Extended | ✅ Production |
 
 ## 🌐 Web5 Platform
@@ -75,8 +75,8 @@
 |---------|-------------|---------|--------|
 | [Enterprise Overview](./ENTERPRISE.md) | Enterprise feature set | Commercial | ✅ Available |
 | [High Availability](./high_availability.md) | HA deployment guide | Enterprise | ✅ Production |
-| [Monitoring](./monitoring/README.md) | Enterprise monitoring | Commercial | ✅ Available |
-| [Compliance](./compliance/README.md) | Regulatory compliance | Enterprise | ✅ Available |
+| [Monitoring](layer2/README.md) | Enterprise monitoring | Commercial | ✅ Available |
+| [Compliance](layer2/README.md) | Regulatory compliance | Enterprise | ✅ Available |
 
 ## 🔒 Security
 
@@ -84,7 +84,7 @@
 
 | Component | Security Level | Audit Status | Last Review |
 |-----------|----------------|--------------|-------------|
-| [Security Policy](../SECURITY.md) | Enterprise | ✅ Audited | 2025-06-07 |
+| [Security Policy](standards/SECURITY.md) | Enterprise | ✅ Audited | 2025-06-07 |
 | [HSM Integration](./security/HSM.md) | Hardware | ✅ Certified | 2025-06-07 |
 | [Cryptography](./security/CRYPTOGRAPHY.md) | Military grade | ✅ Validated | 2025-06-07 |
 | [Audit Reports](./security/AUDITS.md) | Third-party | ✅ Current | 2025-06-07 |
