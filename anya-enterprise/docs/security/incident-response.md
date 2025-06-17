@@ -449,7 +449,7 @@ class IncidentResponseAutomation:
 
 - [Security Monitoring](./security-monitoring.md)
 - [Compliance Management](./compliance-management.md)
-- [Security Policies](./security-policies.md)
+- [Security Policies](../../../dependencies/docs/security/security-policies.md)
 - [Business Continuity Plan](../business-continuity/plan.md)
 
 ---

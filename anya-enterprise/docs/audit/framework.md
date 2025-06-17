@@ -913,10 +913,10 @@ class AuditMetricsManager:
 
 ## See Also
 
-- [Compliance Management](./compliance-management.md)
-- [Incident Response](./incident-response.md)
+- [Compliance Management](../security/compliance-management.md)
+- [Incident Response](../security/incident-response.md)
 - [Risk Management](../risk/management.md)
-- [Security Monitoring](./security-monitoring.md)
+- [Security Monitoring](../security/security-monitoring.md)
 
 ---
 
