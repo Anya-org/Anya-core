@@ -1,19 +1,13 @@
 # Link Campaign Report
 
-*Generated: 2025-06-17 17:19:32*
+*Generated: 2025-06-17 17:40:15*
 
 ## Summary
 
-- **Total broken links found**: 521
-- **Links automatically fixed**: 1
-- **Links requiring manual review**: 520
-- **Mode**: Applied fixes
-
-## Automatically Fixed Links
-
-| Source File | Link Text | Old Path | New Path |
-|-------------|-----------|----------|----------|
-| anya-enterprise/docs/features/transaction-monitoring.md | API Documentation | ../api/README.md | README.md |
+- **Total broken links found**: 518
+- **Links automatically fixed**: 0
+- **Links requiring manual review**: 518
+- **Mode**: Dry run
 
 ## Links Requiring Manual Review
 
@@ -21,8 +15,7 @@
 |-------------|-----------|-------------|---------------|
 | INDEX_CORRECTED.md | System Architecture | docs/SYSTEM_MAP.md#system-architecture | No suggestion |
 | README.md | Contribute to Docs | docs/CONTRIBUTING.md#documentation | No suggestion |
-| anya-enterprise/docs/features/advanced-analytics.md | Details | ./pattern-recognition.md | No suggestion |
-| anya-enterprise/docs/features/advanced-analytics.md | Guide | ./anomaly-detection.md | No suggestion |
+| anya-enterprise/docs/SUMMARY.md | Backup & Recovery | administration/backup-recovery.md | No suggestion |
 | anya-enterprise/docs/features/advanced-analytics.md | Details | ./volume-analysis.md | No suggestion |
 | anya-enterprise/docs/features/advanced-analytics.md | Guide | ./fee-estimation.md | No suggestion |
 | anya-enterprise/docs/features/advanced-analytics.md | Guide | ./price-analysis.md | No suggestion |
@@ -54,8 +47,7 @@
 | anya-enterprise/docs/features/advanced-analytics.md | Production Configuration Guide | ./production-config.md | No suggestion |
 | anya-enterprise/docs/features/advanced-analytics.md | Technical Support | ../../support/technical.md | No suggestion |
 | anya-enterprise/docs/features/advanced-analytics.md | Bug Reports | ../../support/bugs.md | No suggestion |
-| anya-enterprise/docs/features/transaction-monitoring.md | Pattern Recognition | pattern-recognition.md | No suggestion |
-| anya-enterprise/docs/features/transaction-monitoring.md | Anomaly Detection | anomaly-detection.md | No suggestion |
+| anya-enterprise/docs/features/anomaly-detection.md | Security Monitoring | ../security/security-monitoring.md | No suggestion |
 | anya-enterprise/docs/security/security-features.md | Guide | ./mfa.md | No suggestion |
 | anya-enterprise/docs/security/security-features.md | Details | ./rbac.md | No suggestion |
 | anya-enterprise/docs/security/security-features.md | Guide | ./token-auth.md | No suggestion |
