@@ -87,7 +87,7 @@ class LinkDatabase:
     def save_custom_mappings(self):
         """Save custom mappings back to the file"""
         with open(LINK_MAPPING_FILE, 'w') as f:
-            json.dump(self.custom_mappings, indent=2, sort_keys=True)
+            json.dump(self.custom_mappings, f, indent=2, sort_keys=True)
 
     def scan_all_files(self):
         """Build a database of all markdown files in the repository"""

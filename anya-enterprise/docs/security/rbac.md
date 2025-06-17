@@ -546,7 +546,7 @@ mod tests {
 
 ## See Also
 
-- [Security Features Overview](../README.md)
+- [Security Features Overview](README.md)
 - [Multi-Factor Authentication](mfa.md)
 - [Session Management](session-management.md)
 - [Authorization Guide](authorization.md)
