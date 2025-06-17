@@ -1,13 +1,13 @@
 ---
 redirect_to: /docs/ARCHITECTURE.md
-title: "System_map - PRODUCTION-READY (June 7, 2025)"
-description: "Documentation for System_map - Bitcoin Integration Complete"
-last_updated: 2025-06-07
+title: "System_map - Development Status (June 17, 2025)"
+description: "Documentation for System_map - Bitcoin Integration Progress"
+last_updated: 2025-06-17
 ---
 
 [AIR-3][AIS-3][BPC-3][RES-3]
 
-# ✅ Anya Core System Map - PRODUCTION-READY
+# Anya Core System Map
 
 ## Visual System Map (Mermaid)
 
@@ -65,28 +65,28 @@ flowchart TD
 
 *To view this diagram, use a Mermaid-enabled Markdown viewer or VS Code extension.*
 
-## ✅ PRODUCTION STATUS ACHIEVED (June 7, 2025)
+## Development Status (June 17, 2025)
 
-**MAJOR MILESTONE:** All Bitcoin Core compilation issues resolved and Layer2 protocols are fully operational!
+**UPDATE:** Branch management and consolidation completed via PR #44 (branch-management-20250616). The project has made significant progress but is still under active development.
 
 ## Overview
 
 The Anya Core System Map provides a high-level visual and descriptive overview of the system's architecture, major components, and their interactions. It serves as a reference for understanding the modular structure, integration points, and relationships between subsystems such as Bitcoin, Web5, ML, and security modules.
 
-**Current Status:** All systems operational and production-ready as of June 7, 2025.
+**Current Status:** Development in progress with branch consolidation completed as of June 17, 2025.
 
-## 🎉 Bitcoin Implementation Status - COMPLETED
+## Bitcoin Implementation Status - In Progress
 
-### ✅ Core Integration Achievements
-- **Bitcoin Core Compilation:** All 58+ errors resolved → Zero errors
-- **Build System:** Fully functional and tested
-- **Layer2 Protocols:** All operational and production-ready:
-  - ✅ BOB Protocol - Operational
-  - ✅ Lightning Network - Integrated
-  - ✅ RSK (Rootstock) - Production-ready
-  - ✅ RGB Protocol - Functional
-  - ✅ DLC Support - Active
-  - ✅ Taproot Assets - Complete
+### Core Integration Progress
+- **Bitcoin Core Compilation:** Most critical errors resolved, some warnings remain
+- **Build System:** Functional with ongoing improvements
+- **Layer2 Protocols:** Various stages of development:
+  - 🔄 BOB Protocol - In development
+  - ⚠️ Lightning Network - Partially integrated
+  - 🔄 RSK (Rootstock) - In development
+  - 🔄 RGB Protocol - Framework defined
+  - 🔄 DLC Support - Base implementation
+  - 🔄 Taproot Assets - Implementation in progress
 
 ## Table of Contents
 
@@ -118,12 +118,3 @@ The Anya Core System Map provides a high-level visual and descriptive overview o
 [AIS-3]: ./standards/AI_LABELING.md
 [BPC-3]: ./standards/AI_LABELING.md
 [RES-3]: ./standards/AI_LABELING.md
-
----
-redirect_to: /docs/ARCHITECTURE.md
-title: "System_map"
-description: "Documentation for System_map"
-last_updated: 2025-05-30
----
-
-[AIR-3][AIS-3][BPC-3][RES-3]
