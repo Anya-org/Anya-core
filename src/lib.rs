@@ -158,6 +158,8 @@ pub enum AnyaError {
     Timeout(String),
     /// Low confidence AI output errors
     LowConfidence(String),
+    /// Resource not found errors
+    NotFound(String),
 }
 
 impl fmt::Display for AnyaError {
@@ -172,6 +174,7 @@ impl fmt::Display for AnyaError {
             AnyaError::Custom(msg) => write!(f, "Custom error: {}", msg),
             AnyaError::Timeout(msg) => write!(f, "Timeout error: {}", msg),
             AnyaError::LowConfidence(msg) => write!(f, "Low confidence error: {}", msg),
+            AnyaError::NotFound(msg) => write!(f, "Not found error: {}", msg),
         }
     }
 }
@@ -194,6 +197,13 @@ impl From<String> for AnyaError {
 impl From<secp256k1::Error> for AnyaError {
     fn from(err: secp256k1::Error) -> Self {
         AnyaError::Bitcoin(format!("Secp256k1 error: {}", err))
+    }
+}
+
+// Add conversion from serde_json::Error to AnyaError
+impl From<serde_json::Error> for AnyaError {
+    fn from(err: serde_json::Error) -> Self {
+        AnyaError::System(format!("JSON error: {}", err))
     }
 }
 

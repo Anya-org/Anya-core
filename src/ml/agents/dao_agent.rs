@@ -1,13 +1,13 @@
 // DAO Agent - Machine Learning Governance Agent for Anya Core
 // Implements intelligent governance mechanisms for the DAO
 
-use crate::error::AnyaError;
+use crate::AnyaError;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use tokio::sync::RwLock;
 
 /// DAO Governance Agent for intelligent decision-making
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct DaoAgent {
     /// Agent identifier
     id: String,
@@ -135,7 +135,7 @@ pub struct ParticipationRequirements {
 }
 
 /// Participation metrics
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct ParticipationMetrics {
     /// Total members
     pub total_members: u64,
@@ -172,7 +172,7 @@ pub enum GovernanceEventType {
 }
 
 /// Training sample for ML model
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct TrainingSample {
     /// Input features
     pub features: Vec<f64>,
@@ -253,12 +253,12 @@ impl DaoAgent {
         if let Some(proposal) = state.active_proposals.get_mut(&proposal_id) {
             let vote = Vote {
                 voter: voter.clone(),
-                choice,
+                choice: choice.clone(),
                 weight,
                 timestamp: chrono::Utc::now().timestamp() as u64,
             };
             
-            proposal.votes.insert(voter, vote);
+            proposal.votes.insert(voter.clone(), vote);
 
             // Record governance event
             let event = GovernanceEvent {
@@ -295,7 +295,7 @@ impl DaoAgent {
     /// Update governance rules based on ML insights
     pub async fn update_governance_rules(&self) -> Result<(), AnyaError> {
         let model = self.model.read().await;
-        let insights = model.generate_governance_insights()?;
+        let _insights = model.generate_governance_insights()?;
         
         // Apply insights to update rules
         // This would involve updating the governance parameters
@@ -319,7 +319,7 @@ impl DaoAgent {
 }
 
 /// Analysis result for a proposal
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct ProposalAnalysis {
     /// Predicted outcome
     pub predicted_outcome: ProposalStatus,
@@ -342,7 +342,7 @@ impl GovernanceModel {
     }
 
     /// Initialize the model with parameters
-    pub fn initialize(&mut self, params: &ModelParameters) -> Result<(), AnyaError> {
+    pub fn initialize(&mut self, _params: &ModelParameters) -> Result<(), AnyaError> {
         // Initialize ML model with given parameters
         // This would set up the actual ML algorithms
         Ok(())
@@ -400,19 +400,19 @@ impl GovernanceModel {
     }
 
     /// Calculate confidence in prediction
-    fn calculate_confidence(&self, features: &[f64]) -> Result<f64, AnyaError> {
+    fn calculate_confidence(&self, _features: &[f64]) -> Result<f64, AnyaError> {
         // Calculate confidence score based on model certainty
         Ok(0.85) // Placeholder
     }
 
     /// Predict participation rate
-    fn predict_participation(&self, features: &[f64]) -> Result<f64, AnyaError> {
+    fn predict_participation(&self, _features: &[f64]) -> Result<f64, AnyaError> {
         // Predict expected participation
         Ok(0.65) // Placeholder
     }
 
     /// Assess proposal quality
-    fn assess_quality(&self, features: &[f64]) -> Result<f64, AnyaError> {
+    fn assess_quality(&self, _features: &[f64]) -> Result<f64, AnyaError> {
         // Assess the quality of the proposal
         Ok(0.75) // Placeholder
     }
