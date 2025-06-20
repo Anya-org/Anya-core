@@ -22,7 +22,7 @@
 		// Add Docker support for container-based testing
 		"ghcr.io/devcontainers/features/docker-in-docker:2": {
 			"version": "latest",
-			"dockerDashComposeVersion": "v2"
+			"dockerComposeVersion": "v2"
 		}
 	},
 	"customizations": {
