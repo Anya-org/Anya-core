@@ -2,31 +2,7 @@
 """
 Link Campaign - Advanced documentation link fixer
 Created: June 17, 2025
-Purpose: Find and fix broken links in ma        # Return the best match if found
-        if matches:
-            best_match = matches[0][0]
-            try:
-                source_dir = os.path.dirname(os.path.join(ROOT_DIR, source_file))
-                target_path = os.path.join(ROOT_DIR, best_match)
-                
-                # Handle empty source directory
-                if not source_dir:
-                    source_dir = ROOT_DIR
-                    
-                rel_path = os.path.relpath(target_path, source_dir)
-                
-                # Normalize path with forward slashes
-                rel_path = rel_path.replace('\\', '/')
-                
-                # Add anchor if present
-                if anchor:
-                    rel_path = f"{rel_path}#{anchor}"
-                    
-                return rel_path
-            except Exception as e:
-                print(f"Error calculating relative path: {e}")
-                # Return absolute path as fallback
-                return "/" + best_matchmentation
+Purpose: Find and fix broken links in markdown documentation
 
 Features:
 - Finds broken links across all documentation
@@ -69,14 +45,14 @@ class LinkDatabase:
         self.all_files: set[str] = set()  # All available markdown files
         self.file_content: Dict[str, str] = {}  # Cache of file content
         # List of broken links found
-        self.broken_links: List[Dict[str, str]] = []
+        self.broken_links: List[Dict[str, Optional[str]]] = []
         # List of links that were fixed
-        self.fixed_links: List[Dict[str, str]] = []
+        self.fixed_links: List[Dict[str, Optional[str]]] = []
         # Links that need manual review
-        self.manual_review: List[Dict[str, str]] = []
+        self.manual_review: List[Dict[str, Optional[str]]] = []
         self.custom_mappings: Dict[str, str] = {}  # User-defined link mappings
 
-    def load_custom_mappings(self):
+    def load_custom_mappings(self) -> None:
         """Load any custom link mappings from the mapping file"""
         if os.path.exists(LINK_MAPPING_FILE):
             try:
@@ -88,12 +64,12 @@ class LinkDatabase:
                 print(
                     f"{YELLOW}Warning: Could not parse custom link mappings file{RESET}")
 
-    def save_custom_mappings(self):
+    def save_custom_mappings(self) -> None:
         """Save custom mappings back to the file"""
         with open(LINK_MAPPING_FILE, 'w') as f:
             json.dump(self.custom_mappings, f, indent=2, sort_keys=True)
 
-    def scan_all_files(self):
+    def scan_all_files(self) -> None:
         """Build a database of all markdown files in the repository"""
         print(f"{BLUE}Building file database...{RESET}")
         for root, dirs, files in os.walk(ROOT_DIR):
@@ -108,7 +84,7 @@ class LinkDatabase:
 
         print(f"{GREEN}Found {len(self.all_files)} markdown files{RESET}")
 
-    def find_best_match(self, broken_link, source_file):
+    def find_best_match(self, broken_link: str, source_file: str) -> Optional[str]:
         """Find the best match for a broken link based on filename"""
         if broken_link in self.custom_mappings:
             return self.custom_mappings[broken_link]
@@ -180,7 +156,7 @@ class LinkDatabase:
 
         return None
 
-    def check_links(self, dry_run=True):
+    def check_links(self, dry_run: bool = True) -> None:
         """Check all links in all markdown files"""
         print(f"{BLUE}Checking links in all files...{RESET}")
         for source_file in self.all_files:
@@ -228,7 +204,7 @@ class LinkDatabase:
         if not dry_run:
             self.fix_links()
 
-    def fix_links(self):
+    def fix_links(self) -> None:
         """Fix broken links where a confident match exists"""
         print(f"{BLUE}Fixing broken links...{RESET}")
 
@@ -244,13 +220,16 @@ class LinkDatabase:
             file_changes = []
 
             # Sort links by length (descending) to avoid replacement conflicts
-            links.sort(key=lambda x: len(x['link']), reverse=True)
+            # Use sorted with a type-safe approach
+            links = sorted(links, key=lambda x: len(
+                str(x.get('link', ''))), reverse=True)
 
             for link_info in links:
-                if link_info['suggested_fix']:
+                suggested_fix = link_info['suggested_fix']
+                if suggested_fix is not None:
                     old_link_pattern = re.escape(
                         f'[{link_info["text"]}]({link_info["link"]})')
-                    new_link = f'[{link_info["text"]}]({link_info["suggested_fix"]})'
+                    new_link = f'[{link_info["text"]}]({suggested_fix})'
 
                     # Check if this exact pattern exists in the content
                     if re.search(old_link_pattern, updated_content):
@@ -288,7 +267,7 @@ class LinkDatabase:
         print(f"{GREEN}Fixed {len(self.fixed_links)} links automatically{RESET}")
         print(f"{YELLOW}{len(self.manual_review)} links need manual review{RESET}")
 
-    def generate_report(self):
+    def generate_report(self) -> None:
         """Generate a detailed report of link issues and fixes"""
         print(f"{BLUE}Generating report...{RESET}")
 
@@ -362,7 +341,7 @@ class LinkDatabase:
                 f"{GREEN}Created empty link mappings file at {LINK_MAPPING_FILE}{RESET}")
 
 
-def main():
+def main() -> int:
     import argparse
 
     parser = argparse.ArgumentParser(

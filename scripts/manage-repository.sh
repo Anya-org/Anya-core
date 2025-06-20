@@ -3,7 +3,7 @@
 # Anya Core Repository Management Script
 # COO-level repository cleanup and branch management
 # Author: COO Operations Team
-# Date: June 14, 2025
+# Date: June 20, 2025
 
 set -e
 
@@ -70,8 +70,8 @@ for workflow in .github/workflows/*.yml; do
     if [ -f "$workflow" ]; then
         echo "Checking $workflow..."
         # Basic YAML syntax check
-        python3 -c "import yaml; yaml.safe_load(open('$workflow'))" 2>/dev/null && \
-            print_status $GREEN "  ✅ $workflow is valid" || \
+        python3 -c "import yaml; yaml.safe_load(open('$workflow'))" 2>/dev/null &&
+            print_status $GREEN "  ✅ $workflow is valid" ||
             print_status $RED "  ❌ $workflow has syntax errors"
     fi
 done
@@ -159,4 +159,4 @@ echo ""
 print_status $BLUE "🚀 Repository is now aligned and production-ready!"
 
 # Create a completion timestamp
-echo "$(date): Repository management completed successfully" >> .anya-management.log
+echo "$(date): Repository management completed successfully" >>.anya-management.log
