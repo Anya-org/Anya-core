@@ -852,12 +852,14 @@ mod tests {
 
     #[test]
     fn test_report_generation() {
-        let mut config = BitcoinConfig::default();
-        config.taproot_enabled = true;
-        config.tapscript_enabled = true;
-        config.psbt_version = 2;
-        config.bip353_enabled = true;
-        config.bip353_status = Bip353Status::Beta;
+        let config = BitcoinConfig {
+            taproot_enabled: true,
+            tapscript_enabled: true,
+            psbt_version: 2,
+            bip353_enabled: true,
+            bip353_status: Bip353Status::Beta,
+            ..BitcoinConfig::default()
+        };
 
         let mut checker = BipHealthChecker::new(config, None);
         let report = checker.check_health().unwrap();
