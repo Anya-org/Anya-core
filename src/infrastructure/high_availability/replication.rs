@@ -221,7 +221,6 @@ impl ReplicationManager {
     }
 
     /// Private methods for implementation details
-
     async fn initialize_wal(&self) -> Result<(), HaError> {
         debug!("Initializing write-ahead log");
 

@@ -688,20 +688,6 @@ impl MapProvider for SystemMapManager {
     }
 }
 
-#[cfg(test)]
-mod tests {
-
-    #[tokio::test]
-    async fn test_system_index_operations() {
-        // Test index operations
-    }
-
-    #[tokio::test]
-    async fn test_system_map_operations() {
-        // Test map operations
-    }
-}
-
 // Stub implementations for missing analysis functions
 fn calculate_cyclomatic_complexity(_syntax: &syn::File) -> f32 {
     1.0 // Default complexity
@@ -723,4 +709,18 @@ fn check_bitcoin_security(_content: &str) -> Vec<String> {
 }
 fn calculate_protocol_adherence(_content: &str) -> f32 {
     0.0
+}
+
+#[cfg(test)]
+mod tests {
+
+    #[tokio::test]
+    async fn test_system_index_operations() {
+        // Test index operations
+    }
+
+    #[tokio::test]
+    async fn test_system_map_operations() {
+        // Test map operations
+    }
 }

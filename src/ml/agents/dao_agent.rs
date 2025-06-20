@@ -331,6 +331,12 @@ pub struct ProposalAnalysis {
     pub quality_score: f64,
 }
 
+impl Default for GovernanceModel {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl GovernanceModel {
     /// Create a new governance model
     pub fn new() -> Self {

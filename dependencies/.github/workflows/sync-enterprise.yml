@@ -32,11 +32,18 @@ jobs:
         env:
           ENTERPRISE_TOKEN: ${{ secrets.ENTERPRISE_REPO_TOKEN }}
         run: |
+          set -e  # Exit immediately if a command exits with a non-zero status
+          
           if [ -d "anya-enterprise" ]; then
             cd anya-enterprise
-            git fetch origin main
-            git merge origin/main --ff-only
-            git push origin main
+            echo "Fetching latest changes from enterprise repository..."
+            git fetch origin main || { echo "::error::Failed to fetch from origin"; exit 1; }
+            
+            echo "Merging changes from main branch..."
+            git merge origin/main --ff-only || { echo "::error::Fast-forward merge failed. Please resolve conflicts manually"; exit 1; }
+            
+            echo "Pushing changes to origin..."
+            git push origin main || { echo "::error::Failed to push to origin"; exit 1; }
           else
             echo "anya-enterprise directory not found"
             exit 1

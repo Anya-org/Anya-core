@@ -632,7 +632,6 @@ impl DlcManager {
 
 /// Oracle attestation for non-interactive verification
 /// [AIR-3][AIS-3][BPC-3][RES-3]
-
 /// Oracle attestation for non-interactive verification
 /// [AIR-3][AIS-3][BPC-3][RES-3]
 #[derive(Clone, Debug)]

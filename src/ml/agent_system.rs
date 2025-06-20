@@ -77,7 +77,7 @@ mod tests {
         let agent_system = MLAgentSystem::init(config).await?;
 
         let health = agent_system.check_health().await?;
-        assert!(health >= 0.0 && health <= 1.0);
+        assert!((0.0..=1.0).contains(&health));
 
         Ok(())
     }

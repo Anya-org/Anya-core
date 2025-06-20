@@ -276,7 +276,7 @@ impl DependencyManager {
     fn check_crate_installed(&self, crate_name: &str) -> Result<String> {
         // Use cargo to check if crate is installed
         let output = Command::new("cargo")
-            .args(&["install", "--list"])
+            .args(["install", "--list"])
             .output()
             .context("Failed to check installed crates")?;
 
@@ -320,7 +320,7 @@ impl DependencyManager {
             
             // Install crate
             let install_output = Command::new("cargo")
-                .args(&["install", crate_name])
+                .args(["install", crate_name])
                 .output()
                 .context(format!("Failed to install crate {}", crate_name))?;
 
@@ -338,7 +338,7 @@ impl DependencyManager {
     fn check_optional_packages(&self) -> HashMap<String, bool> {
         let mut available = HashMap::new();
         
-        for (package, _) in &self.optional_packages {
+        for package in self.optional_packages.keys() {
             available.insert(package.clone(), self.check_package_installed(package).is_ok());
         }
         

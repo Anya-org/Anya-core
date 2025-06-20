@@ -42,6 +42,7 @@ import sys
 import json
 from collections import defaultdict
 from pathlib import Path
+from typing import Dict, List, Optional, Any, Union
 
 # Configuration
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -65,12 +66,15 @@ RESET = '\033[0m'
 
 class LinkDatabase:
     def __init__(self):
-        self.all_files = set()  # All available markdown files
-        self.file_content = {}  # Cache of file content
-        self.broken_links = []  # List of broken links found
-        self.fixed_links = []   # List of links that were fixed
-        self.manual_review = []  # Links that need manual review
-        self.custom_mappings = {}  # User-defined link mappings
+        self.all_files: set[str] = set()  # All available markdown files
+        self.file_content: Dict[str, str] = {}  # Cache of file content
+        # List of broken links found
+        self.broken_links: List[Dict[str, str]] = []
+        # List of links that were fixed
+        self.fixed_links: List[Dict[str, str]] = []
+        # Links that need manual review
+        self.manual_review: List[Dict[str, str]] = []
+        self.custom_mappings: Dict[str, str] = {}  # User-defined link mappings
 
     def load_custom_mappings(self):
         """Load any custom link mappings from the mapping file"""
@@ -206,8 +210,7 @@ class LinkDatabase:
                     os.path.join(os.path.dirname(
                         os.path.join(ROOT_DIR, source_file)), link_path)
                 )
-                link_rel_path = os.path.relpath(link_full_path, ROOT_DIR)
-
+                # Relative path might be used for reporting or later features
                 # Check if the target exists
                 if not os.path.exists(link_full_path):
                     # This link is broken
