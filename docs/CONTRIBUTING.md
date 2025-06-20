@@ -6,7 +6,7 @@ description: "Documentation for Contributing"
 [AIR-3][AIS-3][BPC-3][RES-3]
 
 
-# Contributing Guide \[AIR-1\]\[AIT-2\]
+# Contributing Guide [AIR-3][AIS-3][AIT-3]
 
 ## Overview
 

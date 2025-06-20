@@ -3,7 +3,7 @@ title: "Anya Core Readme"
 description: "Comprehensive documentation for Anya Core platform."
 ---
 
-# Anya Core
+# Anya Core [AIR-3][AIS-3][AIT-3][BPC-3][RES-3][SCL-3][PFM-3]
 
 A powerful platform combining Bitcoin/crypto functionality, ML-based analytics, Web5 decentralized data management, and a Bitcoin-style DAO governance system.
 
