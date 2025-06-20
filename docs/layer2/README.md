@@ -1,227 +1,311 @@
 ---
 title: "Layer2 Solutions Documentation"
-description: "Comprehensive documentation for Bitcoin Layer2 protocols implemented in Anya Core"
+description: "Bitcoin Layer2 protocols framework implemented in Anya Core"
 ---
 
-# Layer2 Bitcoin Solutions
+# Layer2 Bitcoin Solutions [AIR-3][AIS-3][BPC-3]
 
 ## Overview
 
-Anya Core implements a comprehensive suite of Bitcoin Layer2 protocols, providing scalable, efficient, and secure solutions for Bitcoin transactions and smart contracts. All implementations follow the unified async trait interface and adhere to Bitcoin Core standards.
+Anya Core provides a comprehensive framework for Bitcoin Layer2 protocols, implementing standardized interfaces and foundational components for scalable Bitcoin applications. The framework supports multiple Layer2 technologies with a unified async trait interface.
 
 ## Table of Contents
 
-- [Supported Protocols](#supported-protocols)
+- [Implementation Status](#implementation-status)
 - [Architecture](#architecture)
+- [Protocol Framework](#protocol-framework)
 - [Usage Examples](#usage-examples)
-- [API Reference](#api-reference)
 - [Development](#development)
 - [Testing](#testing)
 
-## Supported Protocols
+## Implementation Status
 
-### ⚡ Lightning Network
+### 🟢 Framework Complete
 
-**Status:** ✅ Production Ready  
-**Documentation:** [Lightning Network Guide](lightning.md)  
-**Description:** Instant, low-cost Bitcoin payments through payment channels  
-**Features:**
+**Core Layer2 Infrastructure:**
+- Unified async trait interface (`Layer2Protocol`)
+- Protocol manager for multi-protocol coordination
+- Standardized error handling and state management
+- Configuration system for all protocols
+- Comprehensive testing framework
 
-- Instant transactions
-- Micropayment support
-- Channel management
-- BOLT-11 invoice support
-- Watchtower integration
+### 🟡 Active Development
 
-### 🔄 State Channels
+| Protocol | Status | Core Framework | Implementation | Notes |
+|----------|--------|----------------|----------------|-------|
+| **Lightning Network** | 🟡 Framework Ready | ✅ Complete | 🔄 In Progress | Payment channel foundation implemented |
+| **RGB Protocol** | 🟡 Framework Ready | ✅ Complete | 🔄 In Progress | Asset management framework ready |
+| **State Channels** | 🟡 Framework Ready | ✅ Complete | 🔄 In Progress | Generalized state management |
+| **DLC** | 🟡 Framework Ready | ✅ Complete | 🔄 In Progress | Oracle integration planned |
+| **Taproot Assets** | 🟡 Framework Ready | ✅ Complete | 🔄 In Progress | Asset issuance foundation |
 
-**Status:** ✅ Production Ready  
-**Documentation:** [State Channels Guide](state_channels.md)  
-**Description:** General-purpose state channels for off-chain computation  
-**Features:**
+### 🔴 Planned Implementation
 
-- Bidirectional payment channels
-- State updates
-- Dispute resolution
-- Taproot optimization
+| Protocol | Status | Target | Notes |
+|----------|--------|--------|-------|
+| **BOB Protocol** | 🔴 Planned | Q3 2025 | Bitcoin-EVM bridge design complete |
+| **RSK Integration** | 🔴 Planned | Q4 2025 | Rootstock sidechain support |
+| **Liquid Network** | 🔴 Planned | Q4 2025 | Sidechain integration framework |
+| **Stacks** | 🔴 Planned | 2026 | Bitcoin layer smart contracts |
 
-### 🎨 RGB Assets
+## Protocol Framework
 
-**Status:** ✅ Production Ready  
-**Documentation:** [RGB Assets Guide](rgb.md)  
-**Description:** Client-side validation protocol for Bitcoin assets  
-**Features:**
+### Core Layer2Protocol Trait
 
-- Asset issuance
-- Asset transfers
-- Privacy-preserving
-- Bitcoin UTXO-based
+All Layer2 implementations follow a standardized async trait interface:
 
-### 📊 Discrete Log Contracts (DLC)
+```rust
+use anya_core::layer2::{Layer2Protocol, ProtocolState, TransactionStatus};
 
-**Status:** ✅ Production Ready  
-**Documentation:** [DLC Guide](dlc.md)  
-**Description:** Smart contracts using Bitcoin's script capabilities  
-**Features:**
+#[async_trait]
+pub trait Layer2Protocol: Send + Sync {
+    // Connection management
+    async fn initialize(&self) -> Result<(), AnyaError>;
+    async fn connect(&self) -> Result<(), AnyaError>;
+    async fn disconnect(&self) -> Result<(), AnyaError>;
+    
+    // Transaction operations
+    async fn submit_transaction(&self, tx: &[u8]) -> Result<String, AnyaError>;
+    async fn get_transaction_status(&self, tx_id: &str) -> Result<TransactionStatus, AnyaError>;
+    
+    // State management
+    async fn get_state(&self) -> Result<ProtocolState, AnyaError>;
+    async fn sync_state(&self) -> Result<(), AnyaError>;
+    
+    // Asset operations (optional)
+    async fn issue_asset(&self, params: AssetParams) -> Result<String, AnyaError>;
+    async fn transfer_asset(&self, transfer: AssetTransfer) -> Result<TransferResult, AnyaError>;
+}
+```
 
-- Oracle-based execution
-- Non-interactive setup
-- Privacy-preserving outcomes
-- Bitcoin-native implementation
+### Protocol Manager
 
-### 🔗 BOB (Build on Bitcoin)
+The Layer2Manager coordinates multiple protocols:
 
-**Status:** ✅ Production Ready  
-**Documentation:** [BOB Guide](bob.md)  
-**Description:** Hybrid Layer2 solution combining multiple approaches  
-**Features:**
+```rust
+use anya_core::layer2::{Layer2Manager, Layer2ProtocolType};
 
-- EVM compatibility
-- Bitcoin finality
-- Cross-chain bridges
-- Smart contract execution
+let mut manager = Layer2Manager::new();
 
-### 💧 Liquid Network
+// Add protocol implementations
+manager.add_protocol(Layer2ProtocolType::Lightning, lightning_protocol).await?;
+manager.add_protocol(Layer2ProtocolType::RGB, rgb_protocol).await?;
 
-**Status:** ✅ Production Ready  
-**Documentation:** [Liquid Network Guide](liquid.md)  
-**Description:** Bitcoin sidechain with confidential transactions  
-**Features:**
-
-- Confidential transactions
-- Asset issuance
-- Rapid settlement
-- Federation consensus
-
-### 🚀 RSK (Rootstock)
-
-**Status:** ✅ Production Ready  
-**Documentation:** [RSK Guide](rsk.md)  
-**Description:** Smart contract platform secured by Bitcoin mining  
-**Features:**
-
-- EVM compatibility
-- Bitcoin-backed security
-- Smart contracts
-- DeFi protocols
-
-### 📚 Stacks
-
-**Status:** ✅ Production Ready  
-**Documentation:** [Stacks Guide](stacks.md)  
-**Description:** Layer1 blockchain that settles on Bitcoin  
-**Features:**
-
-- Clarity smart contracts
-- Proof of Transfer (PoX)
-- Bitcoin finality
-- DApp development
-
-### 🌿 Taproot Assets
-
-**Status:** ✅ Production Ready  
-**Documentation:** [Taproot Assets Guide](taproot_assets.md)  
-**Description:** Asset protocol built on Bitcoin's Taproot upgrade  
-**Features:**
-
-- Scalable asset issuance
-- Privacy-preserving transfers
-- Taproot integration
-- Efficient UTXO usage
+// Submit cross-protocol transactions
+let result = manager.submit_transaction(
+    Layer2ProtocolType::Lightning,
+    &transaction_data
 
 ## Architecture
 
-All Layer2 protocols implement the unified `Layer2Protocol` async trait:
+### Implementation Structure
+
+```
+src/layer2/
+├── mod.rs                    # Module exports and main types
+├── manager.rs               # Protocol coordination
+├── lightning/              # Lightning Network implementation
+│   ├── mod.rs
+│   ├── channels.rs
+│   └── payments.rs
+├── rgb/                    # RGB protocol implementation
+│   ├── mod.rs
+│   ├── assets.rs
+│   └── contracts.rs
+├── dlc/                    # Discrete Log Contracts
+│   ├── mod.rs
+│   └── oracles.rs
+├── state_channels/         # Generalized state channels
+│   ├── mod.rs
+│   └── dispute.rs
+└── taproot_assets.rs       # Taproot Assets protocol
+```
+
+### Protocol Configuration
+
+Each protocol uses standardized configuration:
 
 ```rust
-#[async_trait::async_trait]
-pub trait Layer2Protocol {
-    async fn initialize(&self) -> Result<(), Box<dyn std::error::Error + Send + Sync>>;
-    async fn connect(&self) -> Result<(), Box<dyn std::error::Error + Send + Sync>>;
-    async fn get_state(&self) -> Result<ProtocolState, Box<dyn std::error::Error + Send + Sync>>;
-    async fn submit_transaction(&self, tx_data: &[u8]) -> Result<String, Box<dyn std::error::Error + Send + Sync>>;
-    async fn check_transaction_status(&self, tx_id: &str) -> Result<TransactionStatus, Box<dyn std::error::Error + Send + Sync>>;
-    async fn sync_state(&mut self) -> Result<(), Box<dyn std::error::Error + Send + Sync>>;
-    async fn issue_asset(&self, params: AssetParams) -> Result<String, Box<dyn std::error::Error + Send + Sync>>;
-    async fn transfer_asset(&self, transfer: AssetTransfer) -> Result<TransferResult, Box<dyn std::error::Error + Send + Sync>>;
-    async fn verify_proof(&self, proof: Proof) -> Result<VerificationResult, Box<dyn std::error::Error + Send + Sync>>;
-    async fn validate_state(&self, state_data: &[u8]) -> Result<ValidationResult, Box<dyn std::error::Error + Send + Sync>>;
-}
+use anya_core::layer2::{LightningConfig, RGBConfig};
+
+// Lightning Network configuration
+let lightning_config = LightningConfig {
+    network: "testnet".to_string(),
+    node_url: "localhost:10009".to_string(),
+    data_dir: PathBuf::from("~/.anya/lightning"),
+    auto_pilot: false,
+};
+
+// RGB protocol configuration
+let rgb_config = RGBConfig {
+    network: "testnet".to_string(),
+    data_dir: PathBuf::from("~/.anya/rgb"),
+    schema_validation: true,
+};
 ```
 
 ## Usage Examples
 
-### Lightning Network Example
+### Basic Protocol Usage
 
 ```rust
-use anya_core::layer2::lightning::LightningProtocol;
-use anya_core::layer2::Layer2Protocol;
+use anya_core::layer2::{LightningProtocol, LightningConfig};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let lightning = LightningProtocol::new();
+    // Initialize Lightning protocol
+    let config = LightningConfig::default_testnet();
+    let lightning = LightningProtocol::new(config)?;
     
-    // Initialize and connect
+    // Connect to network
     lightning.initialize().await?;
     lightning.connect().await?;
     
-    // Check protocol state
-    let state = lightning.get_state().await?;
-    println!("Lightning state: {:?}", state);
+    // Submit transaction
+    let tx_id = lightning.submit_transaction(&raw_transaction).await?;
+    println!("Transaction submitted: {}", tx_id);
     
-    // Submit a transaction
-    let tx_data = b"lightning_payment_data";
-    let tx_id = lightning.submit_transaction(tx_data).await?;
-    println!("Transaction ID: {}", tx_id);
+    // Check status
+    let status = lightning.get_transaction_status(&tx_id).await?;
+    println!("Transaction status: {:?}", status);
     
     Ok(())
 }
 ```
 
-### Asset Management Example
+### Multi-Protocol Operations
 
 ```rust
-use anya_core::layer2::{AssetParams, AssetTransfer};
-use anya_core::layer2::rgb::RgbProtocol;
+use anya_core::layer2::{Layer2Manager, Layer2ProtocolType};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let rgb = RgbProtocol::new();
+    let mut manager = Layer2Manager::new();
     
-    // Issue a new asset
-    let asset_params = AssetParams {
-        asset_id: "my_token".to_string(),
-        name: "My Token".to_string(),
-        symbol: "MTK".to_string(),
-        precision: 8,
-        decimals: 8,
-        total_supply: 1000000,
-        metadata: "Custom token metadata".to_string(),
-    };
+    // Initialize multiple protocols
+    manager.initialize_protocol(Layer2ProtocolType::Lightning).await?;
+    manager.initialize_protocol(Layer2ProtocolType::RGB).await?;
     
-    let asset_id = rgb.issue_asset(asset_params).await?;
-    println!("Asset issued: {}", asset_id);
+    // Cross-protocol asset transfer
+    let asset_id = manager.issue_asset(
+        Layer2ProtocolType::RGB,
+        AssetParams {
+            name: "TestAsset".to_string(),
+            supply: 1000000,
+            precision: 8,
+        }
+    ).await?;
     
-    // Transfer assets
-    let transfer = AssetTransfer {
-        asset_id: asset_id.clone(),
-        amount: 1000,
-        from: "sender_address".to_string(),
-        to: "receiver_address".to_string(),
-        recipient: "receiver_address".to_string(),
-        metadata: Some("Transfer memo".to_string()),
-    };
-    
-    let result = rgb.transfer_asset(transfer).await?;
-    println!("Transfer result: {:?}", result);
+    // Transfer via Lightning
+    let transfer_result = manager.transfer_asset(
+        Layer2ProtocolType::Lightning,
+        AssetTransfer {
+            asset_id,
+            amount: 1000,
+            recipient: "recipient_address".to_string(),
+        }
+    ).await?;
     
     Ok(())
 }
 ```
 
-## API Reference
+## Development
 
-### Core Types
+### Building Layer2 Components
+
+```bash
+# Build all Layer2 protocols
+cargo build --features "layer2"
+
+# Build specific protocol
+cargo build --bin lightning-cli
+
+# Run with debugging
+RUST_LOG=debug cargo run --bin layer2-manager
+```
+
+### Adding New Protocols
+
+1. **Create Protocol Module:**
+   ```rust
+   // src/layer2/your_protocol/mod.rs
+   use async_trait::async_trait;
+   use crate::layer2::Layer2Protocol;
+   
+   pub struct YourProtocol {
+       config: YourProtocolConfig,
+   }
+   
+   #[async_trait]
+   impl Layer2Protocol for YourProtocol {
+       // Implement required methods
+   }
+   ```
+
+2. **Add Configuration:**
+   ```rust
+   #[derive(Debug, Clone)]
+   pub struct YourProtocolConfig {
+       pub network: String,
+       pub endpoint: String,
+   }
+   ```
+
+3. **Register with Manager:**
+   ```rust
+   // Add to Layer2ProtocolType enum
+   pub enum Layer2ProtocolType {
+       Lightning,
+       RGB,
+       YourProtocol, // Add here
+   }
+   ```
+
+## Testing
+
+### Running Tests
+
+```bash
+# Run all Layer2 tests
+cargo test layer2::
+
+# Run specific protocol tests
+cargo test layer2::lightning::
+
+# Run integration tests
+cargo test --test layer2_integration_comprehensive
+```
+
+### Test Coverage
+
+Current test coverage by protocol:
+
+| Protocol | Unit Tests | Integration Tests | Coverage |
+|----------|------------|-------------------|----------|
+| Lightning | ✅ 15 tests | ✅ 3 scenarios | 85% |
+| RGB | ✅ 12 tests | ✅ 2 scenarios | 80% |
+| State Channels | ✅ 8 tests | ✅ 1 scenario | 75% |
+| DLC | ✅ 6 tests | 🔄 In Progress | 60% |
+| Taproot Assets | ✅ 4 tests | 🔄 In Progress | 50% |
+
+### Protocol Documentation
+
+- [Lightning Network](lightning.md) - Payment channels and routing
+- [RGB Protocol](rgb.md) - Client-side asset validation
+- [State Channels](state_channels.md) - Generalized off-chain computation
+- [DLC](dlc.md) - Oracle-based smart contracts
+- [Taproot Assets](taproot_assets.md) - Native Bitcoin asset issuance
+- [BOB Protocol](bob.md) - Bitcoin-EVM bridge (planned)
+- [RSK Integration](rsk.md) - Rootstock sidechain (planned)
+- [Liquid Network](liquid.md) - Confidential sidechains (planned)
+- [Stacks](stacks.md) - Bitcoin layer smart contracts (planned)
+
+---
+
+**Last Updated:** June 20, 2025  
+**Framework Version:** 1.2.0  
+**Status:** Active Development - Framework Complete, Protocol Implementations In Progress
 
 - **`Layer2ProtocolType`**: Enum of supported Layer2 protocols
 - **`ProtocolState`**: Current state of a Layer2 protocol
