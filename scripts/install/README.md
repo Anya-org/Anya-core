@@ -1,6 +1,6 @@
 # Anya Core Installation System
 
-# [AIR-3][AIS-3][BPC-3][RES-3][HSM-3][CRY-3]
+# [AIR-3][AIS-3][BPC-3][RES-3][PFM-3]
 
 *Last Updated: June 7, 2025*
 
@@ -13,19 +13,22 @@ This directory contains the Anya Core installation system scripts. This system h
 ## System Components [AIR-3][AIS-3][BPC-3]
 
 ### Core Installation Scripts
+
 - **main_installer.sh** - Comprehensive installation framework following BDF v2.5 standards
 - **unified_install_framework.sh** - Unified installation framework with hardware detection
 - **systemd_config.sh** - Systemd service configuration and management
 - **dashboard.sh** - System monitoring and status dashboard
 - **utils/** - Directory containing utility scripts and common functions
 
-### Security Features [AIS-3][SEC-3]
+### Security Features [AIS-3][RES-3]
+
 - Hardware-based security recommendations
 - Automatic TPM attestation verification
 - Secure key generation and management
 - System hardening configurations
 
 ### Monitoring & Maintenance [RES-3]
+
 - System health checks
 - Performance monitoring
 - Automatic updates and patches
@@ -61,15 +64,17 @@ The installation system supports various modes and configurations:
 - **regtest**: Local regtest environment (for testing)
 - **signet**: Bitcoin signet (for testing with real BTC)
 
-### Security Hardening [AIS-3][SEC-3]
+### Security Hardening [AIS-3][RES-3]
 
 #### Hardening Levels
+
 - **basic**: Minimal security configuration (not recommended for production)
 - **standard**: Balanced security with reasonable performance impact (default)
 - **high**: Enhanced security with additional protections (recommended for production)
 - **paranoid**: Maximum security with significant performance impact (for high-security environments)
 
 #### Security Features
+
 - Automatic firewall configuration
 - Process isolation
 - Memory protection

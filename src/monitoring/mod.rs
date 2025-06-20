@@ -5,6 +5,12 @@ use std::collections::HashMap;
 
 pub struct MonitoringSystem;
 
+impl Default for MonitoringSystem {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl MonitoringSystem {
     pub fn new() -> Self {
         Self
@@ -18,6 +24,12 @@ impl MonitoringSystem {
 }
 
 pub struct Registry;
+impl Default for Registry {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Registry {
     pub fn new() -> Self {
         Self

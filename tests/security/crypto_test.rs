@@ -2,6 +2,8 @@
 fn verify_schnorr_implementation() {
     use rand::thread_rng;
     use secp256k1::hashes::sha256;
+    // Import the Hash trait to use the hash method on sha256::Hash
+    use secp256k1::hashes::Hash;
     use secp256k1::{Keypair, Message, Secp256k1, XOnlyPublicKey};
 
     let secp = Secp256k1::new();

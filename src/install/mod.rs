@@ -1,5 +1,5 @@
 use anyhow::Result;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 /// Installation source configuration
 #[derive(Debug, Clone)]
@@ -19,6 +19,7 @@ pub struct BitcoinConfig {
 /// Main installer implementation
 pub struct AnyaInstaller {
     installation_source: InstallationSource,
+    #[allow(dead_code)] // Required for future Bitcoin config extensibility (see docs/INDEX_CORRECTED.md)
     bitcoin_config: BitcoinConfig,
 }
 
@@ -64,7 +65,7 @@ impl AnyaInstaller {
         }
     }
 
-    async fn execute_installation(&self, _target_dir: &PathBuf) -> Result<()> {
+    async fn execute_installation(&self, _target_dir: &Path) -> Result<()> {
         // Implementation placeholder for installation logic
         Ok(())
     }

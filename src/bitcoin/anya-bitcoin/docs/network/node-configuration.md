@@ -14,11 +14,12 @@
 
 ## Overview
 
-The Anya Bitcoin node configuration system provides enterprise-grade Bitcoin network integration with advanced features for security, performance, and reliability. For architecture details, see our [Architecture Overview](../../architecture/overview.md).
+The Anya Bitcoin node configuration system provides enterprise-grade Bitcoin network integration with advanced features for security, performance, and reliability. For architecture details, see our [Architecture Overview](../../../../../docs/architecture/OVERVIEW.md).
 
 ## Configuration Options
 
 ### Network Selection
+
 ```toml
 [bitcoin.network]
 network = "mainnet"  # Options: mainnet, testnet, regtest
@@ -32,6 +33,7 @@ For network setup details, see [Network Setup Guide](./network-setup.md).
 ### Node Types
 
 1. **Full Node** ([Details](./node-types.md#full-node))
+
 ```toml
 [bitcoin.node]
 type = "full"
@@ -41,6 +43,7 @@ assumevalid = "0000000000000000000b9d2ec5a352ecba0592946514a92f14319dc2b367fc72"
 ```
 
 2. **Pruned Node** ([Details](./node-types.md#pruned-node))
+
 ```toml
 [bitcoin.node]
 type = "pruned"
@@ -50,6 +53,7 @@ txindex = false
 ```
 
 3. **Archive Node** ([Details](./node-types.md#archive-node))
+
 ```toml
 [bitcoin.node]
 type = "archive"
@@ -60,6 +64,7 @@ coinstatsindex = true
 ```
 
 ### Security Settings
+
 ```toml
 [bitcoin.security]
 rpcauth = "user:7d85aa47c6aba01cb2c32cecb8"
@@ -68,11 +73,12 @@ maxuploadtarget = 1024  # MB
 ban_threshold = 100
 ```
 
-For security details, see [Security Configuration Guide](../../security/network-security.md).
+For security details, see [Security Configuration Guide](../security/network-security.md).
 
 ## Advanced Features
 
 ### Memory Pool Configuration
+
 ```toml
 [bitcoin.mempool]
 mempool_max_mb = 300
@@ -84,6 +90,7 @@ max_orphan_tx = 100
 For mempool details, see [Mempool Configuration Guide](./mempool-configuration.md).
 
 ### Block Template Configuration
+
 ```toml
 [bitcoin.mining]
 block_max_weight = 4000000
@@ -93,6 +100,7 @@ block_min_tx_fee = 1000  # satoshis/vB
 For mining details, see [Mining Configuration Guide](./mining-configuration.md).
 
 ### P2P Network Settings
+
 ```toml
 [bitcoin.p2p]
 bind = "0.0.0.0:8333"
@@ -107,6 +115,7 @@ For P2P details, see [P2P Network Guide](./p2p-configuration.md).
 ## Performance Tuning
 
 ### Database Configuration
+
 ```toml
 [bitcoin.db]
 db_cache_mb = 450
@@ -117,6 +126,7 @@ thread_pool_size = 16
 For database optimization, see [Database Tuning Guide](../performance/database-tuning.md).
 
 ### Network Optimization
+
 ```toml
 [bitcoin.network.optimization]
 max_orphan_size = 10
@@ -129,6 +139,7 @@ For network optimization, see [Network Performance Guide](../performance/network
 ## Monitoring & Logging
 
 ### Metrics Configuration
+
 ```toml
 [bitcoin.metrics]
 prometheus_port = 9332
@@ -139,6 +150,7 @@ export_network_stats = true
 For metrics details, see [Metrics Configuration Guide](../monitoring/metrics-configuration.md).
 
 ### Logging Configuration
+
 ```toml
 [bitcoin.logging]
 debug_categories = ["net", "mempool", "rpc", "estimatefee"]
@@ -150,13 +162,13 @@ For logging details, see [Logging Configuration Guide](../monitoring/logging-con
 
 ## Security Best Practices
 
-1. **Network Security** ([Guide](../../security/network-security.md))
+1. **Network Security** ([Guide](../security/network-security.md))
    - Use firewall rules
    - Implement rate limiting
    - Enable SSL/TLS
    - Use strong authentication
 
-2. **Access Control** ([Guide](../../security/access-control.md))
+2. **Access Control** ([Guide](../../../../../anya-enterprise/docs/security/access-control.md))
    - Implement IP whitelisting
    - Use strong RPC authentication
    - Regular credential rotation
@@ -171,6 +183,7 @@ For logging details, see [Logging Configuration Guide](../monitoring/logging-con
 ## Deployment Examples
 
 ### Development Environment
+
 ```toml
 [bitcoin]
 network = "regtest"
@@ -184,9 +197,10 @@ prune = false
 txindex = true
 ```
 
-For development setup, see [Development Environment Guide](../guides/development-setup.md).
+For development setup, see [Development Environment Guide](../../../../../docs/contributing/development-setup.md).
 
 ### Production Environment
+
 ```toml
 [bitcoin]
 network = "mainnet"
@@ -208,35 +222,39 @@ For production setup, see [Production Deployment Guide](../guides/production-dep
 ### Common Issues
 
 1. **Connection Problems** ([Guide](../troubleshooting/connection-issues.md))
-```bash
-# Check network connectivity
-bitcoin-cli getnetworkinfo
 
-# Verify peer connections
-bitcoin-cli getpeerinfo
-```
+   ```bash
+   # Check network connectivity
+   bitcoin-cli getnetworkinfo
+
+   # Verify peer connections
+   bitcoin-cli getpeerinfo
+   ```
 
 2. **Performance Issues** ([Guide](../troubleshooting/performance-issues.md))
-```bash
-# Check memory pool
-bitcoin-cli getmempoolinfo
 
-# Monitor resource usage
-bitcoin-cli getnettotals
-```
+   ```bash
+   # Check memory pool
+   bitcoin-cli getmempoolinfo
+
+   # Monitor resource usage
+   bitcoin-cli getnettotals
+   ```
 
 3. **Synchronization Problems** ([Guide](../troubleshooting/sync-issues.md))
-```bash
-# Check sync status
-bitcoin-cli getblockchaininfo
 
-# Verify block height
-bitcoin-cli getblockcount
-```
+   ```bash
+   # Check sync status
+   bitcoin-cli getblockchaininfo
+
+   # Verify block height
+   bitcoin-cli getblockcount
+   ```
 
 ## Monitoring Scripts
 
 ### Health Check
+
 ```bash
 #!/bin/bash
 # health_check.sh
@@ -248,6 +266,7 @@ bitcoin-cli getmempoolinfo | jq .size
 For monitoring scripts, see [Monitoring Scripts Guide](../monitoring/scripts.md).
 
 ### Performance Monitor
+
 ```bash
 #!/bin/bash
 # monitor.sh
@@ -263,17 +282,18 @@ For performance monitoring, see [Performance Monitoring Guide](../monitoring/per
 ## Related Documentation
 
 - [Network Setup](./network-setup.md)
-- [Security Features](../../anya-enterprise/docs/security/security-features.md)
-- [Performance Optimization](../performance/optimization.md)
-- [Monitoring Guide](../monitoring/overview.md)
-- [Troubleshooting Guide](../troubleshooting/index.md)
+- [Security Features](../../../../../anya-enterprise/docs/security/security-features.md)
+- [Performance Optimization](../../../../../anya-enterprise/docs/performance/optimization.md)
+- [Monitoring Guide](../../../../../docs/architecture/OVERVIEW.md)
+- [Troubleshooting Guide](../../../../../docs/index.md)
 
 ## Support
 
 For node-related support:
-- [Technical Support](../../support/technical.md)
-- [Security Issues](../../support/security.md)
-- [Feature Requests](../../support/features.md)
-- [Bug Reports](../../support/bugs.md)
+
+- [Technical Support](../../../../../docs/support/technical.md)
+- [Security Issues](../../../../../docs/SECURITY.md)
+- [Feature Requests](../../../../../dependencies/docs/build-system/features.md)
+- [Bug Reports](../../../../../docs/support/bugs.md)
 
 *Last updated: 2025-06-02*

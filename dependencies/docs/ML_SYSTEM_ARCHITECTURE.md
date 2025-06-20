@@ -291,4 +291,4 @@ Distributed learning across multiple nodes:
 - Global federated network expansion
 - Next-generation protocol support
 
-*This documentation follows the [AI Labeling Standards](../standards/AI_LABELING.md) based on official Bitcoin Improvement Proposals (BIPs).*
+*This documentation follows the [AI Labeling Standards](../../docs/AI_LABELING.md) based on official Bitcoin Improvement Proposals (BIPs).*

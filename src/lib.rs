@@ -158,6 +158,8 @@ pub enum AnyaError {
     Timeout(String),
     /// Low confidence AI output errors
     LowConfidence(String),
+    /// Resource not found errors
+    NotFound(String),
 }
 
 impl fmt::Display for AnyaError {
@@ -172,6 +174,7 @@ impl fmt::Display for AnyaError {
             AnyaError::Custom(msg) => write!(f, "Custom error: {}", msg),
             AnyaError::Timeout(msg) => write!(f, "Timeout error: {}", msg),
             AnyaError::LowConfidence(msg) => write!(f, "Low confidence error: {}", msg),
+            AnyaError::NotFound(msg) => write!(f, "Not found error: {}", msg),
         }
     }
 }
@@ -194,6 +197,13 @@ impl From<String> for AnyaError {
 impl From<secp256k1::Error> for AnyaError {
     fn from(err: secp256k1::Error) -> Self {
         AnyaError::Bitcoin(format!("Secp256k1 error: {}", err))
+    }
+}
+
+// Add conversion from serde_json::Error to AnyaError
+impl From<serde_json::Error> for AnyaError {
+    fn from(err: serde_json::Error) -> Self {
+        AnyaError::System(format!("JSON error: {}", err))
     }
 }
 
@@ -224,7 +234,7 @@ impl Default for AnyaConfig {
             #[cfg(feature = "hsm")]
             bitcoin_config: crate::security::hsm::config::HsmConfig::default(),
             #[cfg(not(feature = "hsm"))]
-            bitcoin_config: crate::security::hsm_shim::HsmConfig::default(),
+            bitcoin_config: crate::security::hsm_shim::HsmConfig,
             dao_config: dao::DAOConfig::default(),
         }
     }
@@ -402,8 +412,12 @@ mod tests {
         // For HSM config, we check the general.enabled field as per BDF v2.5 standards
         #[cfg(feature = "hsm")]
         assert!(config.bitcoin_config.general.enabled);
+        // In non-HSM builds, the config is just an empty struct, so no assertions needed
         #[cfg(not(feature = "hsm"))]
-        assert!(true); // Skip HSM check when feature is disabled
+        {
+            // Just check that the config exists
+            let _ = &config.bitcoin_config;
+        }
         assert!(config.dao_config.enabled);
     }
 

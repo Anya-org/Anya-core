@@ -1,12 +1,19 @@
 ---
 title: "Readme"
-description: "Documentation for Readme"
+### AI Labeling References
+
+- [AIR-3] - AI Readiness
+- [AIS-3] - AI Security
+- [BPC-3] - Bitcoin Protocol Compliance
+- [RES-3] - Resilience
+- [PFM-3] - Performance Optimization
+- [SCL-3] - Scalabilityion: "Documentation for Readme"
 last_updated: 2025-05-30
 ---
 
 [AIR-3][AIS-3][BPC-3][RES-3]
 
-# Security Documentation [AIS-3][SEC-3][BPC-3]
+# Security Documentation [AIS-3][BPC-3][RES-3]
 
 ## Table of Contents
 
@@ -23,9 +30,9 @@ last_updated: 2025-05-30
 - [AIR-3] - AI Readiness
 - [AIS-3] - AI Security
 - [BPC-3] - Bitcoin Protocol Compliance
-- [SEC-3] - Security Implementation
-- [CRY-3] - Cryptography Standards
-- [HSM-3] - Hardware Security Module Integration
+- [RES-3] - Resilience
+- [AIP-3] - AI Privacy
+- [AIT-3] - AI Testing
 
 ## Overview
 
@@ -33,7 +40,7 @@ This document outlines the security architecture, practices, and guidelines for 
 
 ## Security Architecture [AIS-3][BPC-3]
 
-### Authentication [AIS-3][AUT-3]
+### Authentication [AIS-3][RES-3]
 
 - **JWT-based authentication** with configurable expiration
 - **Multi-factor authentication** (TOTP, WebAuthn, FIDO2)
@@ -42,7 +49,7 @@ This document outlines the security architecture, practices, and guidelines for 
 - **Session management** with secure cookie policies
 - **API key authentication** with rate limiting
 
-### Authorization [AIS-3][AUT-3]
+### Authorization [AIS-3][RES-3]
 
 - **Role-based access control** (RBAC) with hierarchical roles
 - **Attribute-based access control** (ABAC) for fine-grained permissions
@@ -50,7 +57,7 @@ This document outlines the security architecture, practices, and guidelines for 
 - **Time-based access** restrictions
 - **Delegated authorization** with OAuth 2.0 and OIDC
 
-### Data Protection [AIS-3][SEC-3]
+### Data Protection [AIS-3][AIP-3]
 
 - **End-to-end encryption** for all sensitive communications
 - **At-rest encryption** using AES-256-GCM
@@ -59,7 +66,7 @@ This document outlines the security architecture, practices, and guidelines for 
 - **Key rotation** and lifecycle management
 - **Secure enclave** support for sensitive operations
 
-### Hardware Security Module (HSM) Integration [AIS-3][HSM-3]
+### Hardware Security Module (HSM) Integration [AIS-3][RES-3]
 
 - **PKCS#11** and **KMIP** protocol support
 - **FIPS 140-2 Level 3** compliant HSM support
@@ -179,9 +186,9 @@ hsm:
     retention_days: 90
 ```
 
-## Security Best Practices [AIS-3][SEC-3]
+## Security Best Practices [AIS-3][RES-3]
 
-### Secure Coding [DEV-3][SEC-3]
+### Secure Coding [AIS-3][AIT-3]
 
 - **Input validation** with strict type checking
 - **Output encoding** contextually aware (HTML, URL, JavaScript)
@@ -192,7 +199,7 @@ hsm:
 - **Fuzz testing** for critical components
 - **Formal verification** for cryptographic primitives
 
-### Network Security [NET-3][SEC-3]
+### Network Security [AIS-3][RES-3]
 
 - **TLS 1.3** with modern cipher suites
 - **Certificate pinning** with HPKP alternatives
@@ -203,7 +210,7 @@ hsm:
 - **Tor and I2P** network support for privacy
 - **Secure peer discovery** with authenticated peer lists
 
-### Cryptographic Standards [CRY-3][SEC-3]
+### Cryptographic Standards [AIS-3][BPC-3]
 
 - **Elliptic Curve Cryptography**: secp256k1 (Bitcoin), Ed25519
 - **Hashing**: SHA-256, SHA-3, BLAKE3
@@ -212,7 +219,7 @@ hsm:
 - **Zero-Knowledge Proofs**: zk-SNARKs, Bulletproofs
 - **Post-Quantum Cryptography**: Dilithium, Falcon
 
-### Security Audits and Compliance [AUD-3][SEC-3]
+### Security Audits and Compliance [AIS-3][AIT-3]
 
 - **Annual third-party security audits**
 - **Automated vulnerability scanning**
@@ -224,7 +231,7 @@ hsm:
   - GDPR and CCPA compliance
   - Financial-grade security standards policies
 
-## Incident Response [RES-3][SEC-3]
+## Incident Response [RES-3][AIS-3]
 
 ### Incident Management
 
@@ -368,5 +375,5 @@ For security-related issues, please contact:
 
 ## See Also
 
-- [Related Document 1](./related1.md)
-- [Related Document 2](./related2.md)
+- [Related Document 1](../INSTALLATION.md)
+- [Related Document 2](../../INSTALLATION_REVIEW.md)

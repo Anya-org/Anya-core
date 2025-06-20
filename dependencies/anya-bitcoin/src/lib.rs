@@ -100,22 +100,13 @@ impl Default for Config {
 
 /// Bitcoin node implementation
 pub struct BitcoinNode {
-    /// Configuration options
-    pub config: Config,
-    
-    /// Connection to the Bitcoin network
-    pub network: Arc<net::p2p::Network>,
-    
-    /// Local mempool
-    pub mempool: Arc<mempool::pool::Mempool>,
-    
     /// Wallet instance (if enabled)
     pub wallet: Option<Arc<wallet::BitcoinWallet>>,
 }
 
 impl BitcoinNode {
     /// Create a new Bitcoin node with the given configuration
-    pub fn new(config: Config) -> Result<Self, BitcoinError> {
+    pub fn new(_config: Config) -> Result<Self, BitcoinError> {
         // Implementation details...
         unimplemented!("BitcoinNode creation not yet implemented")
     }

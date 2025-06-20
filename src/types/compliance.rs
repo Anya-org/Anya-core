@@ -106,21 +106,19 @@ impl Default for EnhancedDwnOptions {
 
 /// DWN operation priority levels
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Default)]
 pub enum DwnPriority {
     Low,
+    #[default]
     Normal,
     High,
     Critical,
 }
 
-impl Default for DwnPriority {
-    fn default() -> Self {
-        DwnPriority::Normal
-    }
-}
 
 /// Core system structure for main.rs
 #[derive(Debug, Clone)]
+#[derive(Default)]
 pub struct CoreSystem {
     /// System configuration
     pub config: SystemConfig,
@@ -130,15 +128,6 @@ pub struct CoreSystem {
     pub metrics: HashMap<String, f64>,
 }
 
-impl Default for CoreSystem {
-    fn default() -> Self {
-        Self {
-            config: SystemConfig::default(),
-            status: SystemStatus::default(),
-            metrics: HashMap::new(),
-        }
-    }
-}
 
 /// System configuration
 #[derive(Debug, Clone)]

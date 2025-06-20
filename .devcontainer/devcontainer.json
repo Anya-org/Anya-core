@@ -1,45 +1,129 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
 // README at: https://github.com/devcontainers/templates/tree/main/src/rust
 {
-	"name": "Rust",
+	"name": "Anya Core - Rust",
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-	"image": "mcr.microsoft.com/devcontainers/rust:1-1-bullseye",
+	"image": "mcr.microsoft.com/devcontainers/rust", // Fixed image reference
 	"features": {
-		"ghcr.io/lee-orr/rusty-dev-containers/cargo-binstall:0": {},
-		"ghcr.io/lee-orr/rusty-dev-containers/cargo-bundle:0": {},
-		"ghcr.io/lee-orr/rusty-dev-containers/cargo-deny:0": {},
-		"ghcr.io/lee-orr/rusty-dev-containers/cargo-expand:0": {},
-		"ghcr.io/lee-orr/rusty-dev-containers/cargo-llvm-cov:0": {},
-		"ghcr.io/lee-orr/rusty-dev-containers/cargo-make:0": {},
-		"ghcr.io/lee-orr/rusty-dev-containers/cargo-mobile:0": {},
-		"ghcr.io/lee-orr/rusty-dev-containers/cargo-nextest:0": {},
-		"ghcr.io/lee-orr/rusty-dev-containers/cargo-watch:0": {},
-		"ghcr.io/lee-orr/rusty-dev-containers/cargo-web:0": {}
+		// Git features - Built from source as needed
+		"ghcr.io/devcontainers/features/git:1": {
+			"version": "latest",
+			"ppa": true
+		},
+		// Python features for ML components
+		"ghcr.io/devcontainers/features/python:1": {
+			"version": "3.11",
+			"installJupyterlab": true
+		},
+		// Node.js for web components
+		"ghcr.io/devcontainers/features/node:1": {
+			"version": "lts"
+		},
+		// Add Docker support for container-based testing
+		"ghcr.io/devcontainers/features/docker-in-docker:2": {
+			"version": "latest",
+			"dockerDashComposeVersion": "v2"
+		}
 	},
 	"customizations": {
 		"vscode": {
 			"extensions": [
-				"serayuzgur.crates"
-			]
+				// Rust development
+				"rust-lang.rust-analyzer",
+				"serayuzgur.crates",
+				"vadimcn.vscode-lldb",
+				"tamasfe.even-better-toml",
+				// Better development experience
+				"mutantdino.resourcemonitor",
+				"streetsidesoftware.code-spell-checker",
+				"github.copilot",
+				"github.vscode-github-actions",
+				"eamodio.gitlens",
+				// Web development support
+				"ms-vscode.vscode-typescript-next",
+				"foxundermoon.shell-format",
+				// ML/Python support
+				"ms-python.python",
+				"ms-toolsai.jupyter",
+				// Docker support
+				"ms-azuretools.vscode-docker",
+				// Bitcoin/Crypto development
+				"ms-vscode.hexeditor",
+				// Better documentation
+				"bierner.markdown-preview-github-styles",
+				"yzhang.markdown-all-in-one"
+			],
+			"settings": {
+				"editor.formatOnSave": true,
+				// Rust settings
+				"rust-analyzer.checkOnSave.command": "clippy",
+				"rust-analyzer.cargo.allFeatures": true,
+				"rust-analyzer.procMacro.enable": true,
+				"rust-analyzer.checkOnSave.extraArgs": [
+					"--target-dir",
+					"/tmp/rust-analyzer-check"
+				],
+				"rust-analyzer.cargo.buildScripts.enable": true,
+				"rust-analyzer.diagnostics.disabled": [
+					"inactive-code"
+				],
+				// Editor settings
+				"editor.inlayHints.enabled": "on",
+				"editor.semanticHighlighting.enabled": true,
+				"editor.bracketPairColorization.enabled": true,
+				"editor.guides.bracketPairs": "active",
+				// Python settings for ML components
+				"python.linting.enabled": true,
+				"python.linting.pylintEnabled": true,
+				"python.formatting.provider": "black",
+				// Terminal settings
+				"terminal.integrated.defaultProfile.linux": "bash",
+				"terminal.integrated.profiles.linux": {
+					"bash": {
+						"path": "bash",
+						"icon": "terminal-bash"
+					}
+				}
+			}
 		}
 	},
-	"postCreateCommand": "cargo install cargo-audit",
+	"postCreateCommand": "bash -c 'chmod +x ./.devcontainer/*.sh && bash ./.devcontainer/install-tools.sh || echo \"🚨 Tool installation had some errors - check logs\"'",
 	// Use 'mounts' to make the cargo cache persistent in a Docker Volume.
-	// "mounts": [
-	// 	{
-	// 		"source": "devcontainer-cargo-cache-${devcontainerId}",
-	// 		"target": "/usr/local/cargo",
-	// 		"type": "volume"
-	// 	}
-	// ]
-	// Features to add to the dev container. More info: https://containers.dev/features.
-	// "features": {},
-	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	// "forwardPorts": [],
-	// Use 'postCreateCommand' to run commands after the container is created.
-	// "postCreateCommand": "cargo install cargo-audit",
-	// Configure tool-specific properties.
-	// "customizations": {},
-	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+	"mounts": [
+		{
+			"source": "anya-core-cargo-cache-${devcontainerId}",
+			"target": "/usr/local/cargo",
+			"type": "volume"
+		},
+		{
+			"source": "anya-core-rustup-${devcontainerId}",
+			"target": "/usr/local/rustup",
+			"type": "volume"
+		},
+		{
+			"source": "anya-core-node-modules-${devcontainerId}",
+			"target": "${containerWorkspaceFolder}/node_modules",
+			"type": "volume"
+		}
+	],
+	// Forward ports for common Rust application needs
+	"forwardPorts": [
+		3000, // Web frontend
+		8000, // API server
+		8080, // Alternative web server
+		8332, // Bitcoin RPC
+		8333, // Bitcoin P2P
+		9735, // Lightning Network
+		8888, // Jupyter notebook
+		9999 // Debug port
+	],
+	// Configure environment variables
+	"containerEnv": {
+		"CARGO_INCREMENTAL": "1",
+		"RUST_BACKTRACE": "1",
+		"RUSTFLAGS": "-C target-cpu=native",
+		"SCCACHE_CACHE_SIZE": "5G"
+	},
+	// Use connect as non-root user. More info: https://aka.ms/dev-containers-non-root.
 	"remoteUser": "vscode"
 }

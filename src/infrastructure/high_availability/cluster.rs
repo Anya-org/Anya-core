@@ -23,8 +23,8 @@ impl ClusterManager {
     /// Creates a new cluster manager
     pub fn new(config: &HighAvailabilityConfig) -> Self {
         let node_id = Uuid::new_v4().to_string();
-        let discovery_service = create_discovery_service(&config);
-        let membership_service = create_membership_service(&config);
+        let discovery_service = create_discovery_service(config);
+        let membership_service = create_membership_service(config);
 
         Self {
             config: Arc::new(config.clone()),
@@ -162,15 +162,15 @@ impl ClusterManager {
         self.config = Arc::new(config.clone());
 
         // Update discovery service if needed
-        if self.discovery_service.needs_update(&config) {
-            self.discovery_service = create_discovery_service(&config);
+        if self.discovery_service.needs_update(config) {
+            self.discovery_service = create_discovery_service(config);
         }
 
         // Update membership service if needed
-        if self.membership_service.needs_update(&config) {
+        if self.membership_service.needs_update(config) {
             let old_membership = std::mem::replace(
                 &mut self.membership_service,
-                create_membership_service(&config),
+                create_membership_service(config),
             );
             old_membership
                 .leave(self.node_id.clone())

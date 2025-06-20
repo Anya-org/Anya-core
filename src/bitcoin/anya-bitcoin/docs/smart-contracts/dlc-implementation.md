@@ -14,7 +14,7 @@
 
 ## Overview
 
-Anya's DLC implementation provides a robust framework for creating and managing Bitcoin-based smart contracts using the Discreet Log Contracts protocol. This implementation follows the latest DLC specifications while adding enterprise-grade features and security. For architecture details, see our [Architecture Overview](../../architecture/overview.md).
+Anya's DLC implementation provides a robust framework for creating and managing Bitcoin-based smart contracts using the Discreet Log Contracts protocol. This implementation follows the latest DLC specifications while adding enterprise-grade features and security. For architecture details, see our [Architecture Overview](../../../../../docs/architecture/OVERVIEW.md).
 
 ## Core Features
 
@@ -110,9 +110,9 @@ contract_keys.backup_to_encrypted_file("backup.enc", password)?;
 ```
 
 For security details, see:
-- [Key Management Guide](../../security/key-management.md)
+- [Key Management Guide](../security/key-management.md)
 - [Backup Procedures](../../security/backup-procedures.md)
-- [Security Best Practices](../../security/best-practices.md)
+- [Security Best Practices](../../../../../anya-extensions/docs/development/best-practices.md)
 
 ### Validation
 ```rust
@@ -172,9 +172,9 @@ pub enum DLCError {
 ```
 
 For error handling details, see:
-- [Error Handling Guide](./guides/error-handling.md)
+- [Error Handling Guide](../integration/error-handling.md)
 - [Recovery Procedures](./guides/error-recovery.md)
-- [Troubleshooting Guide](./guides/troubleshooting.md)
+- [Troubleshooting Guide](../../../../../docs/TROUBLESHOOTING.md)
 
 ### Error Recovery
 ```rust
@@ -215,24 +215,24 @@ async fn test_complete_flow() {
 ```
 
 For testing details, see:
-- [Testing Guide](./guides/testing.md)
-- [Integration Testing](./guides/integration-testing.md)
-- [Performance Testing](./guides/performance-testing.md)
+- [Testing Guide](../../../../../docs/TESTING.md)
+- [Integration Testing](../../../../../dependencies/docs/testing/integration-testing.md)
+- [Performance Testing](../../../../../dependencies/docs/testing/performance-testing.md)
 
 ## Related Documentation
 
 - [Oracle Integration](./oracle-integration.md)
 - [Contract Types](./contract-types.md)
-- [Security Features](../../anya-enterprise/docs/security/security-features.md)
-- [API Reference](../../api/api-reference.md)
-- [Contributing Guide](../../contributing/index.md)
+- [Security Features](../../../../../anya-enterprise/docs/security/security-features.md)
+- [API Reference](../integration/api-reference.md)
+- [Contributing Guide](../../../../../docs/index.md)
 
 ## Support
 
 For DLC-related support:
-- [Technical Support](../../support/technical.md)
-- [Security Issues](../../support/security.md)
-- [Feature Requests](../../support/features.md)
-- [Bug Reports](../../support/bugs.md)
+- [Technical Support](../../../../../docs/support/technical.md)
+- [Security Issues](../../../../../docs/SECURITY.md)
+- [Feature Requests](../../../../../dependencies/docs/build-system/features.md)
+- [Bug Reports](../../../../../docs/support/bugs.md)
 
 *Last updated: 2025-06-02*

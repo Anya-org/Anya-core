@@ -6,6 +6,12 @@ pub mod wallet;
 
 pub struct ApiHandlers;
 
+impl Default for ApiHandlers {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl ApiHandlers {
     pub fn new() -> Self {
         Self

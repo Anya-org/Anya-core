@@ -492,13 +492,13 @@ anya metrics --live
 - **[Security Guidelines](../integration/security-guidelines.md)**: Security implementation
 
 ### Advanced Features
-- **[Bitcoin Lightning](../bitcoin/lightning.md)**: Lightning Network integration
+- **[Bitcoin Lightning](../../../docs/bitcoin/lightning.md)**: Lightning Network integration
 - **[Web5 Protocols](../web5/protocols.md)**: Custom protocol development
 - **[ML Training](../ml/training.md)**: Custom model training
 
 ### Production
-- **[Deployment Guide](../deployment/README.md)**: Production deployment
-- **[Monitoring](../monitoring/README.md)**: System monitoring and alerting
+- **[Deployment Guide](README.md)**: Production deployment
+- **[Monitoring](README.md)**: System monitoring and alerting
 - **[Security Hardening](../security/hardening.md)**: Production security
 
 ## Troubleshooting

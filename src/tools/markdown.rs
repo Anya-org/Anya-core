@@ -85,7 +85,7 @@ impl MarkdownDocument {
             let new_heading = format!("{} {}", lines[0], labels_to_add);
             let mut new_content = new_heading;
             for line in &lines[1..] {
-                new_content.push_str("\n");
+                new_content.push('\n');
                 new_content.push_str(line);
             }
             self.content = new_content;
@@ -172,7 +172,7 @@ impl MarkdownDocument {
             for word in words {
                 if current_line.is_empty() {
                     current_line.push_str(word);
-                } else if current_line.len() + word.len() + 1 <= MAX_LINE_LENGTH {
+                } else if current_line.len() + word.len() < MAX_LINE_LENGTH {
                     current_line.push(' ');
                     current_line.push_str(word);
                 } else {
@@ -266,11 +266,9 @@ impl DocumentationValidator {
             }
 
             // Fix issues if requested
-            if fix_issues && !file_report.issues.is_empty() {
-                if doc.fix_all()? {
-                    doc.save()?;
-                    file_report.fixed = true;
-                }
+            if fix_issues && !file_report.issues.is_empty() && doc.fix_all()? {
+                doc.save()?;
+                file_report.fixed = true;
             }
 
             if !file_report.issues.is_empty() {

@@ -15,7 +15,7 @@
 
 ## Overview
 
-Anya's Enterprise Security module provides comprehensive security features for Bitcoin operations, smart contracts, and enterprise infrastructure. For architecture details, see our [Architecture Overview](../../architecture/overview.md).
+Anya's Enterprise Security module provides comprehensive security features for Bitcoin operations, smart contracts, and enterprise infrastructure. For architecture details, see our [Architecture Overview](../../../docs/architecture/OVERVIEW.md).
 
 ## Core Features
 
@@ -57,7 +57,7 @@ impl AuthenticationManager {
 }
 ```
 
-For authentication details, see [Authentication Guide](./authentication.md).
+For authentication details, see [Authentication Guide](../integration/authentication.md).
 
 ### Authorization
 ```rust
@@ -122,7 +122,7 @@ impl KeyManager {
 }
 ```
 
-For key management details, see [Key Management Guide](./key-management.md).
+For key management details, see [Key Management Guide](../../../docs/bitcoin/docs/security/key-management.md).
 
 ## Audit Logging
 
@@ -218,7 +218,7 @@ certificate_path = "/path/to/cert.pem"
 private_key_path = "/path/to/key.pem"
 ```
 
-For network security details, see [Network Security Guide](./network-security.md).
+For network security details, see [Network Security Guide](../../../docs/bitcoin/docs/security/network-security.md).
 
 ### Access Control
 ```toml
@@ -254,7 +254,7 @@ For access control details, see [Access Control Guide](./access-control.md).
 ## Related Documentation
 
 - [Security Overview](./security-overview.md)
-- [Authentication Guide](./authentication.md)
+- [Authentication Guide](../integration/authentication.md)
 - [Encryption Guide](./encryption.md)
 - [Compliance Guide](./compliance.md)
 - [Audit Guide](./audit.md)
@@ -262,9 +262,9 @@ For access control details, see [Access Control Guide](./access-control.md).
 ## Support
 
 For security-related support:
-- [Technical Support](../../support/technical.md)
-- [Security Issues](../../support/security.md)
-- [Feature Requests](../../support/features.md)
-- [Bug Reports](../../support/bugs.md)
+- [Technical Support](../../../docs/support/technical.md)
+- [Security Issues](../../../docs/SECURITY.md)
+- [Feature Requests](../../../dependencies/docs/build-system/features.md)
+- [Bug Reports](../../../docs/support/bugs.md)
 
 *Last updated: 2025-06-02*

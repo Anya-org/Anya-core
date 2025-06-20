@@ -143,4 +143,4 @@ Maintenance Schedule:
 
 ## Related Security Documentation
 
-For our general security policy, vulnerability reporting process, and bug bounty program information, please refer to [SECURITY.md](./SECURITY.md).
+For our general security policy, vulnerability reporting process, and bug bounty program information, please refer to [SECURITY.md](docs/SECURITY.md).

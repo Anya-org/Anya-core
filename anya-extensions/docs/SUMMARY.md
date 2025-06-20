@@ -1,6 +1,6 @@
 # Extensions Documentation
 
-* [Introduction](README.md)
+* [Introduction](maintenance/README.md)
 * [Getting Started](getting-started/README.md)
   * [Installation](getting-started/installation.md)
   * [Quick Start](getting-started/quick-start.md)

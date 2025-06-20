@@ -145,7 +145,7 @@ For security-related issues:
 
 1. **Emergency**: Email `botshelomokoka+security@gmail.com` with [SECURITY] in subject
 2. **General Questions**: Open an issue on GitHub
-3. **Documentation**: See [SECURITY_GUIDELINES.md](docs/SECURITY_GUIDELINES.md)
+3. **Documentation**: See [SECURITY_GUIDELINES.md](SECURITY_GUIDELINES.md)
 
 ## AI Labeling
 

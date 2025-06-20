@@ -51,5 +51,5 @@ Space Complexity: O(|B|)
 
 ## See Also
 
-- [Related Document 1](./related1.md)
-- [Related Document 2](./related2.md)
+- [Related Document 1](../INSTALLATION.md)
+- [Related Document 2](../../INSTALLATION_REVIEW.md)

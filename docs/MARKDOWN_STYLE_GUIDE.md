@@ -77,7 +77,7 @@ fn main() {
 3. **Relative Links**: Use relative links for internal documentation
 
 ```markdown
-[API Documentation](../api/README.md)
+[API Documentation](layer2/README.md)
 ![Architecture Diagram](../images/architecture.png "System Architecture")
 ```
 
@@ -163,5 +163,5 @@ node scripts/fix_markdown.js docs
 2025-03-12 
 ## See Also
 
-- [Related Document 1](./related1.md)
-- [Related Document 2](./related2.md)
+- [Related Document 1](../INSTALLATION.md)
+- [Related Document 2](../INSTALLATION_REVIEW.md)

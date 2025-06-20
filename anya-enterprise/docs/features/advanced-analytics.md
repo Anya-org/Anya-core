@@ -357,9 +357,9 @@ For production configuration details, see [Production Configuration Guide](./pro
 ## Support
 
 For additional support:
-- [Technical Support](../../support/technical.md)
-- [Security Issues](../../support/security.md)
-- [Feature Requests](../../support/features.md)
-- [Bug Reports](../../support/bugs.md)
+- [Technical Support](../../../docs/support/technical.md)
+- [Security Issues](../../../docs/SECURITY.md)
+- [Feature Requests](../../../dependencies/docs/build-system/features.md)
+- [Bug Reports](../../../docs/support/bugs.md)
 
 *Last updated: 2025-06-02*

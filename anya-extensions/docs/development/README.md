@@ -134,7 +134,7 @@ All extensions must include:
 
 ## Community Guidelines
 
-- Follow the [Code of Conduct](../../CODE_OF_CONDUCT.md)
+- Follow the [Code of Conduct](../../../CODE_OF_CONDUCT.md)
 - Participate in design discussions
 - Provide constructive feedback
 - Help maintain documentation

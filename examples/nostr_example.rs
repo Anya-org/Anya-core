@@ -18,29 +18,32 @@ async fn main() -> Result<(), Box<dyn Error>> {
             "wss://relay.nostr.info".to_string(),
             "wss://nostr-pub.wellorder.net".to_string(),
         ],
-        default_kind: 1,
-        pow_difficulty: 0,
+        metadata: None,
+        // default_kind: 1,
+        // pow_difficulty: 0,
     };
 
     let client = NostrClient::new(config).await?;
 
     // Send encrypted message
     client
-        .send_encrypted_message("recipient_pubkey", "Hello, this is an encrypted message!")
+        .send_message("Hello, this is an encrypted message!", Some("recipient_pubkey"))
         .await?;
 
-    // Publish public note
-    let event = client.create_text_note("Hello Nostr world!")?;
-    client.publish_event_to_best_relays(event).await?;
+    // Publish public note (commented out - API not yet implemented)
+    // let event = client.create_text_note("Hello Nostr world!")?;
+    // client.publish_event_to_best_relays(event).await?;
 
-    // Monitor relay health
-    for relay in client.get_healthy_relays().await? {
-        println!("Healthy relay: {}", relay);
-        println!(
-            "Health score: {}",
-            client.get_relay_health_score(&relay).await?
-        );
-    }
+    // Monitor relay health (commented out - API not yet implemented)
+    // for relay in client.get_healthy_relays().await? {
+    //     println!("Healthy relay: {}", relay);
+    //     println!(
+    //         "Health score: {}",
+    //         client.get_relay_health_score(&relay).await?
+    //     );
+    // }
+    
+    println!("Nostr client example completed successfully!");
 
     Ok(())
 }

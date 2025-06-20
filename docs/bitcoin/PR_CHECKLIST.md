@@ -101,7 +101,7 @@ The following tools can help with the PR process:
 ## References
 
 - [Bitcoin Development Framework v2.5](docs/bitcoin/DEVELOPMENT_FRAMEWORK.md)
-- [Branching Strategy](docs/bitcoin/BRANCHING_STRATEGY.md)
-- [BIP Implementation Index](docs/bitcoin/BIP_IMPLEMENTATION_INDEX.md)
-- [Architecture Update Document](docs/bitcoin/ARCHITECTURE_UPDATE.md)
-- [PR Preparation Guide](docs/bitcoin/PR_PREPARATION.md) 
+- [Branching Strategy](BRANCHING_STRATEGY.md)
+- [BIP Implementation Index](BIP_IMPLEMENTATION_INDEX.md)
+- [Architecture Update Document](ARCHITECTURE_UPDATE.md)
+- [PR Preparation Guide](PR_PREPARATION.md) 

@@ -195,7 +195,7 @@ If you encounter any issues, please:
 ## Next Steps
 
 - [Contribution Guidelines](CONTRIBUTING.md)
-- [Code of Conduct](CODE_OF_CONDUCT.md)
+- [Code of Conduct](../CODE_OF_CONDUCT.md)
 - [API Documentation](https://docs.anya.org/api)
 
 ## See Also

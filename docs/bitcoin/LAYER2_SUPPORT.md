@@ -449,9 +449,9 @@ As the Bitcoin ecosystem evolves, we will consider supporting additional Layer 2
 [AIR-3][AIS-3][BPC-3][RES-3]
 
 
-*This document follows the [AI Labeling System](../docs/standards/AI_LABELING.md) standards based on official Bitcoin Improvement Proposals (BIPs).*
+*This document follows the [AI Labeling System](../AI_LABELING.md) standards based on official Bitcoin Improvement Proposals (BIPs).*
 
 ## See Also
 
-- [Related Document 1](./related1.md)
-- [Related Document 2](./related2.md)
+- [Related Document 1](../INSTALLATION.md)
+- [Related Document 2](../../INSTALLATION_REVIEW.md)

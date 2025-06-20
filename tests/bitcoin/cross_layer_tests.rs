@@ -1,12 +1,9 @@
-#![feature(test)]
-extern crate test;
-
 use anya_bitcoin::riscv::cross_layer::{
     CrossLayerCapabilities, CrossLayerControls, CrossLayerOptimizer, LayerOptimizationLevels,
     OptimizationLevel, Priority, ResourceAllocation, ResourceStrategy, SyncMode,
 };
 use anyhow::Result;
-use test::Bencher;
+use std::time::Instant;
 
 /// Core functionality tests
 mod core_tests {
@@ -180,32 +177,36 @@ mod proof_tests {
     }
 }
 
-/// Performance benchmarks
-mod benchmarks {
+/// Performance tests
+mod performance_tests {
     use super::*;
+    use std::time::Instant;
 
-    #[bench]
-    fn bench_consensus_optimization(b: &mut Bencher) {
+    #[test]
+    fn test_consensus_optimization_performance() {
         let optimizer = CrossLayerOptimizer::new().unwrap();
-        b.iter(|| {
-            optimizer.optimize_consensus().unwrap();
-        });
+        let start = Instant::now();
+        optimizer.optimize_consensus().unwrap();
+        let duration = start.elapsed();
+        println!("Consensus optimization completed in: {:?}", duration);
     }
 
-    #[bench]
-    fn bench_state_optimization(b: &mut Bencher) {
+    #[test]
+    fn test_state_optimization_performance() {
         let optimizer = CrossLayerOptimizer::new().unwrap();
-        b.iter(|| {
-            optimizer.optimize_state_management().unwrap();
-        });
+        let start = Instant::now();
+        optimizer.optimize_state_management().unwrap();
+        let duration = start.elapsed();
+        println!("State management optimization completed in: {:?}", duration);
     }
 
-    #[bench]
-    fn bench_proof_optimization(b: &mut Bencher) {
+    #[test]
+    fn test_proof_optimization_performance() {
         let optimizer = CrossLayerOptimizer::new().unwrap();
-        b.iter(|| {
-            optimizer.optimize_proof_systems().unwrap();
-        });
+        let start = Instant::now();
+        optimizer.optimize_proof_systems().unwrap();
+        let duration = start.elapsed();
+        println!("Proof system optimization completed in: {:?}", duration);
     }
 }
 

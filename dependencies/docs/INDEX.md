@@ -68,10 +68,10 @@
 
 ### Project Management
 
-- [Roadmap](ROADMAP.md)
-- [Changelog](CHANGELOG.md)
+- [Roadmap](../ROADMAP.md)
+- [Changelog](../CHANGELOG.md)
 - [Contributing](CONTRIBUTING.md)
-- [New Features](NEW_FEATURES.md)
+- [New Features](../NEW_FEATURES.md)
 
 ### CI/CD
 

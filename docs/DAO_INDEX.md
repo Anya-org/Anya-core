@@ -32,7 +32,7 @@ This index serves as the central entry point to all Anya DAO documentation.
 
 | Document | Description |
 |----------|-------------|
-| [DAO Overview](src/dao/README.md) | Introduction and high-level overview of the Anya DAO |
+| [DAO Overview](layer2/README.md) | Introduction and high-level overview of the Anya DAO |
 | [Governance Token](GOVERNANCE_TOKEN.md) | Details on the AGT token, economics, and distribution |
 | [Governance Framework](GOVERNANCE_FRAMEWORK.md) | Proposal types, voting process, and mechanism |
 | [Treasury Management](TREASURY_MANAGEMENT.md) | Treasury composition, operations, and guards |

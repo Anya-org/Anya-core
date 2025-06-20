@@ -38,6 +38,12 @@ pub trait Layer2Protocol {
 /// Registry of Layer 2 protocols
 pub struct Layer2Registry(Vec<(String, Box<dyn Layer2Protocol>)>);
 
+impl Default for Layer2Registry {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Layer2Registry {
     /// Create a new Layer 2 registry
     pub fn new() -> Self {
@@ -50,8 +56,8 @@ impl Layer2Registry {
     }
 
     /// Get a Layer 2 protocol by name
-    pub fn get(&self, name: &str) -> Option<&Box<dyn Layer2Protocol>> {
-        self.0.iter().find(|(n, _)| n == name).map(|(_, p)| p)
+    pub fn get(&self, name: &str) -> Option<&dyn Layer2Protocol> {
+        self.0.iter().find(|(n, _)| n == name).map(|(_, p)| p.as_ref())
     }
 
     /// List all registered Layer 2 protocols

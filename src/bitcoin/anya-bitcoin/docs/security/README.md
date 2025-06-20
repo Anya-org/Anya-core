@@ -21,17 +21,17 @@ Security is a key component of the Anya Bitcoin Platform. We provide a comprehen
 ## Related Documentation
 
 * [Security Overview](security-overview.md)
-* [Authentication Guide](authentication.md)
+* [Authentication Guide](../../../../../docs/integration/authentication.md)
 * [Encryption Guide](encryption.md)
-* [Compliance Guide](compliance.md)
+* [Compliance Guide](../../../../../docs/COMPLIANCE.md)
 * [Audit Guide](audit.md)
 
 ## Support
 
 For security-related support:
-* [Technical Support](../../support/technical.md)
-* [Security Issues](../../support/security.md)
-* [Feature Requests](../../support/features.md)
-* [Bug Reports](../../support/bugs.md)
+* [Technical Support](../../../../../docs/support/technical.md)
+* [Security Issues](../../../../../docs/SECURITY.md)
+* [Feature Requests](../../../../../dependencies/docs/build-system/features.md)
+* [Bug Reports](../../../../../docs/support/bugs.md)
 
 *Last updated: 2025-06-02*

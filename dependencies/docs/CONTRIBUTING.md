@@ -18,7 +18,7 @@ We welcome contributions to the Anya Core project! This document provides guidel
 
 ## Code of Conduct
 
-Please read our [Code of Conduct](CODE_OF_CONDUCT.md) to foster an open and welcoming environment.
+Please read our [Code of Conduct](../../CODE_OF_CONDUCT.md) to foster an open and welcoming environment.
 
 ## Getting Started
 

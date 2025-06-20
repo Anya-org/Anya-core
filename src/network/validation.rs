@@ -5,7 +5,7 @@ use std::process::Command;
 use std::time::{Duration, Instant};
 use tokio::net::TcpStream;
 use tokio::time::timeout;
-use trust_dns_resolver::config::{ResolverConfig, ResolverOpts};
+use trust_dns_resolver::config::{NameServerConfig, Protocol, ResolverConfig, ResolverOpts};
 use trust_dns_resolver::Resolver;
 
 /// Network validation configuration
@@ -55,6 +55,18 @@ pub struct NetworkValidationResult {
     pub vpn_detected: bool,
     pub recommendations: Vec<String>,
     pub overall_status: ValidationStatus,
+}
+
+/// Group validation results into a single struct to avoid too many arguments
+pub(crate) struct ValidationResults<'a> {
+    pub connectivity: &'a NetworkConnectivityResult,
+    pub dns: &'a DnsValidationResult,
+    pub bandwidth: &'a BandwidthValidationResult,
+    pub latency: &'a LatencyValidationResult,
+    pub ports: &'a PortValidationResult,
+    pub ssl: &'a Option<SslValidationResult>,
+    pub firewall: &'a Option<FirewallValidationResult>,
+    pub route: &'a Option<RouteValidationResult>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
@@ -140,10 +152,8 @@ impl NetworkValidator {
     pub async fn validate_network(&self) -> NetworkValidationResult {
         info!("Running comprehensive network validation...");
 
-        // Run connectivity check
         let connectivity = self.validate_connectivity().await;
 
-        // Skip remaining tests if no internet connectivity
         if !connectivity.internet_available {
             return NetworkValidationResult {
                 connectivity,
@@ -178,16 +188,14 @@ impl NetworkValidator {
             };
         }
 
-        // Run all other validations in parallel
-        let dns_future = self.validate_dns();
-        let bandwidth_future = self.validate_bandwidth();
-        let latency_future = self.validate_latency();
-        let ports_future = self.validate_ports();
+        // Run DNS, bandwidth, latency, and ports checks concurrently for better performance
+        let (dns, bandwidth, latency, ports) = futures::join!(
+            self.validate_dns(),
+            self.validate_bandwidth(),
+            self.validate_latency(),
+            self.validate_ports()
+        );
 
-        let (dns, bandwidth, latency, ports) =
-            tokio::join!(dns_future, bandwidth_future, latency_future, ports_future);
-
-        // Run optional checks
         let ssl = if self.config.check_ssl {
             Some(self.validate_ssl().await)
         } else {
@@ -206,32 +214,21 @@ impl NetworkValidator {
             None
         };
 
-        // Check for VPN
         let vpn_detected = self.detect_vpn().await;
 
-        // Generate recommendations
-        let recommendations = self.generate_recommendations(
-            &connectivity,
-            &dns,
-            &bandwidth,
-            &latency,
-            &ports,
-            &ssl,
-            &firewall,
-            &route,
-        );
+        let results = ValidationResults {
+            connectivity: &connectivity,
+            dns: &dns,
+            bandwidth: &bandwidth,
+            latency: &latency,
+            ports: &ports,
+            ssl: &ssl,
+            firewall: &firewall,
+            route: &route,
+        };
 
-        // Determine overall status
-        let overall_status = self.determine_overall_status(
-            &connectivity,
-            &dns,
-            &bandwidth,
-            &latency,
-            &ports,
-            &ssl,
-            &firewall,
-            &route,
-        );
+        let recommendations = self.generate_recommendations(&results);
+        let overall_status = self.determine_overall_status(&results);
 
         NetworkValidationResult {
             connectivity,
@@ -248,34 +245,27 @@ impl NetworkValidator {
         }
     }
 
-    /// Validate basic internet connectivity
     async fn validate_connectivity(&self) -> NetworkConnectivityResult {
         info!("Validating internet connectivity...");
 
-        // Check if we can reach a reliable internet endpoint
         let internet_check = tokio::spawn(async {
             let addresses = ["1.1.1.1:443", "8.8.8.8:443", "9.9.9.9:443"];
-
             for addr in &addresses {
                 if let Ok(Ok(_)) = timeout(Duration::from_secs(5), TcpStream::connect(addr)).await {
                     return true;
                 }
             }
-
             false
         })
         .await
         .unwrap_or(false);
 
-        // Check each endpoint
         let mut endpoints_reachable = Vec::new();
-
         for endpoint in &self.config.endpoints {
             let result = self.is_endpoint_reachable(endpoint).await;
             endpoints_reachable.push((endpoint.clone(), result));
         }
 
-        // Determine status
         let status = if !internet_check {
             ValidationStatus::Fail
         } else if endpoints_reachable.iter().all(|(_, reachable)| *reachable) {
@@ -293,55 +283,42 @@ impl NetworkValidator {
         }
     }
 
-    /// Check if endpoint is reachable
     async fn is_endpoint_reachable(&self, endpoint: &str) -> bool {
-        // Parse the URL to get host and port
         if let Ok(url) = url::Url::parse(endpoint) {
             let host = match url.host_str() {
                 Some(h) => h,
                 None => return false,
             };
-
             let port = url.port().unwrap_or_else(|| match url.scheme() {
                 "https" => 443,
                 "http" => 80,
                 _ => 0,
             });
-
             if port == 0 {
                 return false;
             }
-
-            // Try to connect
             let addr = format!("{}:{}", host, port);
-            match timeout(Duration::from_secs(5), TcpStream::connect(&addr)).await {
-                Ok(Ok(_)) => true,
-                _ => false,
-            }
+            matches!(timeout(Duration::from_secs(5), TcpStream::connect(&addr)).await, Ok(Ok(_)))
         } else {
             false
         }
     }
 
-    /// Validate DNS resolution
     async fn validate_dns(&self) -> DnsValidationResult {
         info!("Validating DNS resolution...");
 
         let mut resolvers_available = Vec::new();
         let mut resolution_times_ms = Vec::new();
 
-        // Check standard resolvers
         for dns in &self.config.dns_servers {
-            // Create a custom resolver config
             let resolver_ip: IpAddr = match dns.parse() {
                 Ok(ip) => ip,
                 Err(_) => continue,
             };
 
-            // Create NameServerConfig instead of SocketAddr
-            let nameserver_config = trust_dns_resolver::config::NameServerConfig {
+            let nameserver_config = NameServerConfig {
                 socket_addr: SocketAddr::new(resolver_ip, 53),
-                protocol: trust_dns_resolver::config::Protocol::Udp,
+                protocol: Protocol::Udp,
                 tls_dns_name: None,
                 bind_addr: None,
                 trust_nx_responses: true,
@@ -349,7 +326,6 @@ impl NetworkValidator {
 
             let resolver_config = ResolverConfig::from_parts(None, vec![], vec![nameserver_config]);
 
-            // Create the resolver
             let resolver = match Resolver::new(resolver_config, ResolverOpts::default()) {
                 Ok(r) => r,
                 Err(_) => {
@@ -358,7 +334,6 @@ impl NetworkValidator {
                 }
             };
 
-            // Try to resolve a well-known domain
             let start = Instant::now();
             let lookup_result = resolver.lookup_ip("google.com");
             let elapsed = start.elapsed();
@@ -374,7 +349,6 @@ impl NetworkValidator {
             }
         }
 
-        // Determine status
         let status = if resolvers_available.iter().all(|(_, available)| !available) {
             ValidationStatus::Fail
         } else if resolvers_available.iter().all(|(_, available)| *available) {
@@ -390,15 +364,9 @@ impl NetworkValidator {
         }
     }
 
-    /// Validate bandwidth
     async fn validate_bandwidth(&self) -> BandwidthValidationResult {
         info!("Validating network bandwidth...");
 
-        // Simple bandwidth test
-        // In a real implementation, you'd want to use a more sophisticated
-        // bandwidth testing service or method
-
-        // Download test (simplified)
         let download_start = Instant::now();
         let download_result =
             reqwest::get("https://speed.cloudflare.com/__down?bytes=5000000").await;
@@ -417,9 +385,8 @@ impl NetworkValidator {
             Err(_) => 0.0,
         };
 
-        // Upload test (simplified)
         let client = reqwest::Client::new();
-        let upload_bytes = vec![0u8; 1_000_000]; // 1MB of data
+        let upload_bytes = vec![0u8; 1_000_000];
 
         let upload_start = Instant::now();
         let upload_result = client
@@ -438,7 +405,6 @@ impl NetworkValidator {
             Err(_) => 0.0,
         };
 
-        // Determine status
         let status = if download_mbps < 1.0 || upload_mbps < 0.5 {
             ValidationStatus::Fail
         } else if download_mbps < self.config.bandwidth_threshold_mbps {
@@ -454,7 +420,6 @@ impl NetworkValidator {
         }
     }
 
-    /// Validate network latency
     async fn validate_latency(&self) -> LatencyValidationResult {
         info!("Validating network latency...");
 
@@ -465,12 +430,9 @@ impl NetworkValidator {
         let mut max_ms = 0u64;
 
         for endpoint in &self.config.endpoints {
-            // Parse URL to get host
             if let Ok(url) = url::Url::parse(endpoint) {
                 if let Some(host) = url.host_str() {
-                    // Ping with timeout
                     let latency = self.measure_latency(host).await;
-
                     if latency > 0 {
                         endpoint_latencies.push((endpoint.clone(), latency));
                         total_latency += latency;
@@ -484,7 +446,6 @@ impl NetworkValidator {
 
         let average_ms = if count > 0 { total_latency / count } else { 0 };
 
-        // Determine status
         let status = if count == 0 {
             ValidationStatus::Fail
         } else if average_ms > self.config.latency_threshold_ms {
@@ -502,7 +463,6 @@ impl NetworkValidator {
         }
     }
 
-    /// Measure latency to a host
     async fn measure_latency(&self, host: &str) -> u64 {
         let mut total_ms = 0u64;
         let mut successful_pings = 0u64;
@@ -525,19 +485,16 @@ impl NetworkValidator {
         }
     }
 
-    /// Validate open ports
     pub async fn validate_ports(&self) -> PortValidationResult {
         info!("Validating required ports with BIP-341 compliance...");
 
         let mut open_ports = Vec::new();
         let mut closed_ports = Vec::new();
 
-        // Add BIP-341 required ports
-        let bip341_ports = vec![8333, 18333, 8433]; // 8433 for Taproot monitoring
+        let bip341_ports = [8333, 18333, 8433];
 
         for &port in bip341_ports.iter().chain(&self.config.required_ports) {
             let is_open = if port == 8433 {
-                // Special handling for Taproot port
                 self.validate_taproot_port(port).await
             } else {
                 self.is_port_open("localhost", port).await
@@ -550,7 +507,6 @@ impl NetworkValidator {
             }
         }
 
-        // Determine status
         let status = if closed_ports.contains(&8333) && closed_ports.contains(&18333) {
             ValidationStatus::Fail
         } else if !closed_ports.is_empty() {
@@ -566,16 +522,11 @@ impl NetworkValidator {
         }
     }
 
-    /// Check if a port is open
     async fn is_port_open(&self, host: &str, port: u16) -> bool {
         let addr = format!("{}:{}", host, port);
-        match timeout(Duration::from_secs(3), TcpStream::connect(&addr)).await {
-            Ok(Ok(_)) => true,
-            _ => false,
-        }
+        matches!(timeout(Duration::from_secs(3), TcpStream::connect(&addr)).await, Ok(Ok(_)))
     }
 
-    /// Validate SSL certificates
     async fn validate_ssl(&self) -> SslValidationResult {
         info!("Validating SSL certificates...");
 
@@ -587,9 +538,7 @@ impl NetworkValidator {
                 if url.scheme() != "https" {
                     continue;
                 }
-
                 if let Some(_host) = url.host_str() {
-                    // Simple check using reqwest to validate HTTPS
                     let client = reqwest::Client::builder()
                         .danger_accept_invalid_certs(true)
                         .build()
@@ -601,8 +550,6 @@ impl NetworkValidator {
                         Ok(resp) => {
                             let is_secure = resp.status().is_success();
                             endpoints_secure.push((endpoint.clone(), is_secure));
-
-                            // Check for certificate warnings
                             if resp.status().is_client_error() {
                                 certificate_issues.push((
                                     endpoint.clone(),
@@ -620,7 +567,6 @@ impl NetworkValidator {
             }
         }
 
-        // Determine status
         let status = if endpoints_secure.iter().all(|(_, secure)| !secure) {
             ValidationStatus::Fail
         } else if endpoints_secure.iter().all(|(_, secure)| *secure) {
@@ -636,20 +582,13 @@ impl NetworkValidator {
         }
     }
 
-    /// Validate firewall settings
     async fn validate_firewall(&self) -> FirewallValidationResult {
         info!("Validating firewall settings...");
 
-        // Detect if a firewall is present and active
         let firewall_detected = self.detect_firewall().await;
-
-        // Check if firewall blocks Bitcoin connections
         let blocks_bitcoin = self.check_firewall_blocks_bitcoin().await;
-
-        // Check which ports are blocked
         let blocks_required_ports = self.check_blocked_ports().await;
 
-        // Determine status
         let status = if blocks_bitcoin {
             ValidationStatus::Fail
         } else if !blocks_required_ports.is_empty() {
@@ -666,9 +605,7 @@ impl NetworkValidator {
         }
     }
 
-    /// Detect if a firewall is present
     async fn detect_firewall(&self) -> bool {
-        // Platform-specific firewall detection
         #[cfg(target_os = "windows")]
         {
             let output = Command::new("netsh")
@@ -686,7 +623,7 @@ impl NetworkValidator {
 
         #[cfg(target_os = "linux")]
         {
-            let output = Command::new("sudo").args(&["iptables", "-L"]).output();
+            let output = Command::new("sudo").args(["iptables", "-L"]).output();
 
             match output {
                 Ok(output) => {
@@ -718,28 +655,22 @@ impl NetworkValidator {
         }
     }
 
-    /// Check if firewall blocks Bitcoin connections
     async fn check_firewall_blocks_bitcoin(&self) -> bool {
-        // Updated to check Taproot port requirements from BIP-341
-        !(self.is_port_open("bitcoin.org", 8333).await ||   // Mainnet
-          self.is_port_open("bitcoin.org", 18333).await ||  // Testnet
-          self.is_port_open("bitcoin.org", 8433).await) // Taproot monitoring
+        !(self.is_port_open("bitcoin.org", 8333).await
+            || self.is_port_open("bitcoin.org", 18333).await
+            || self.is_port_open("bitcoin.org", 8433).await)
     }
 
-    /// Check which required ports are blocked
     async fn check_blocked_ports(&self) -> Vec<u16> {
         let mut blocked_ports = Vec::new();
-
         for &port in &self.config.required_ports {
             if !self.is_port_open("example.com", port).await {
                 blocked_ports.push(port);
             }
         }
-
         blocked_ports
     }
 
-    /// Validate network routes
     async fn validate_routes(&self) -> RouteValidationResult {
         info!("Validating network routes...");
 
@@ -748,12 +679,10 @@ impl NetworkValidator {
         let mut problematic_hops = Vec::new();
         let mut route_count = 0u32;
 
-        // Traceroute to endpoints
         for endpoint in &self.config.endpoints {
             if let Ok(url) = url::Url::parse(endpoint) {
                 if let Some(host) = url.host_str() {
                     let (route_hops, route_problems) = self.trace_route(host).await;
-
                     if !route_hops.is_empty() {
                         total_hops += route_hops.len() as u32;
                         route_count += 1;
@@ -770,7 +699,6 @@ impl NetworkValidator {
             0
         };
 
-        // Determine status
         let status = if route_count == 0 {
             ValidationStatus::Fail
         } else if !problematic_hops.is_empty() {
@@ -787,32 +715,25 @@ impl NetworkValidator {
         }
     }
 
-    /// Trace route to host
     async fn trace_route(&self, host: &str) -> (Vec<String>, Vec<String>) {
         let mut hops = Vec::new();
         let mut problematic = Vec::new();
 
-        // Platform-specific traceroute
         #[cfg(any(target_os = "linux", target_os = "macos"))]
         {
             let output = Command::new("traceroute")
-                .args(&["-m", "15", host])
+                .args(["-m", "15", host])
                 .output();
 
-            match output {
-                Ok(output) => {
-                    let stdout = String::from_utf8_lossy(&output.stdout);
-
-                    for line in stdout.lines().skip(1) {
-                        // Skip header
-                        if line.contains("* * *") {
-                            problematic.push(format!("Hop timeout: {}", line));
-                        } else {
-                            hops.push(line.to_string());
-                        }
+            if let Ok(output) = output {
+                let stdout = String::from_utf8_lossy(&output.stdout);
+                for line in stdout.lines().skip(1) {
+                    if line.contains("* * *") {
+                        problematic.push(format!("Hop timeout: {}", line));
+                    } else {
+                        hops.push(line.to_string());
                     }
                 }
-                Err(_) => (),
             }
         }
 
@@ -823,9 +744,7 @@ impl NetworkValidator {
             match output {
                 Ok(output) => {
                     let stdout = String::from_utf8_lossy(&output.stdout);
-
                     for line in stdout.lines().skip(4) {
-                        // Skip headers
                         if line.contains("*") {
                             problematic.push(format!("Hop timeout: {}", line));
                         } else if !line.trim().is_empty() {
@@ -840,9 +759,7 @@ impl NetworkValidator {
         (hops, problematic)
     }
 
-    /// Detect if a VPN is in use
     async fn detect_vpn(&self) -> bool {
-        // Platform-specific VPN detection
         #[cfg(target_os = "windows")]
         {
             let output = Command::new("netsh")
@@ -860,7 +777,7 @@ impl NetworkValidator {
 
         #[cfg(target_os = "linux")]
         {
-            let output = Command::new("ip").args(&["tuntap", "list"]).output();
+            let output = Command::new("ip").args(["tuntap", "list"]).output();
 
             match output {
                 Ok(output) => {
@@ -894,81 +811,50 @@ impl NetworkValidator {
         }
     }
 
-    /// Generate recommendations based on validation results
-    fn generate_recommendations(
-        &self,
-        connectivity: &NetworkConnectivityResult,
-        dns: &DnsValidationResult,
-        bandwidth: &BandwidthValidationResult,
-        latency: &LatencyValidationResult,
-        ports: &PortValidationResult,
-        ssl: &Option<SslValidationResult>,
-        firewall: &Option<FirewallValidationResult>,
-        route: &Option<RouteValidationResult>,
-    ) -> Vec<String> {
+    fn generate_recommendations(&self, results: &ValidationResults) -> Vec<String> {
         let mut recommendations = Vec::new();
 
-        // Connectivity recommendations
-        if !connectivity.internet_available {
-            recommendations
-                .push("Check your internet connection, it appears to be offline".to_string());
-        } else if !connectivity
-            .endpoints_reachable
-            .iter()
-            .all(|(_, reachable)| *reachable)
-        {
-            recommendations.push(
-                "Some Bitcoin RPC endpoints are unreachable, check your network configuration"
-                    .to_string(),
-            );
+        if !results.connectivity.internet_available {
+            recommendations.push("Check your internet connection, it appears to be offline".to_string());
+        } else if !results.connectivity.endpoints_reachable.iter().all(|(_, reachable)| *reachable) {
+            recommendations.push("Some Bitcoin RPC endpoints are unreachable, check your network configuration".to_string());
         }
 
-        // DNS recommendations
-        if dns.status == ValidationStatus::Fail {
+        if results.dns.status == ValidationStatus::Fail {
             recommendations.push("DNS resolution is failing, check your DNS servers or try using alternative DNS like 1.1.1.1 or 8.8.8.8".to_string());
-        } else if dns.status == ValidationStatus::Warning {
-            recommendations.push(
-                "Some DNS servers are not responding, consider using more reliable DNS servers"
-                    .to_string(),
-            );
+        } else if results.dns.status == ValidationStatus::Warning {
+            recommendations.push("Some DNS servers are not responding, consider using more reliable DNS servers".to_string());
         }
 
-        // Bandwidth recommendations
-        if bandwidth.status == ValidationStatus::Fail {
+        if results.bandwidth.status == ValidationStatus::Fail {
             recommendations.push(format!(
                 "Network bandwidth is too low (Download: {:.2} Mbps, Upload: {:.2} Mbps). Minimum requirements are 1 Mbps download and 0.5 Mbps upload",
-                bandwidth.download_mbps, bandwidth.upload_mbps
+                results.bandwidth.download_mbps, results.bandwidth.upload_mbps
             ));
-        } else if bandwidth.status == ValidationStatus::Warning {
+        } else if results.bandwidth.status == ValidationStatus::Warning {
             recommendations.push(format!(
                 "Network bandwidth is below recommended levels (Download: {:.2} Mbps). For optimal performance, {:.2} Mbps is recommended",
-                bandwidth.download_mbps, self.config.bandwidth_threshold_mbps
+                results.bandwidth.download_mbps, self.config.bandwidth_threshold_mbps
             ));
         }
 
-        // Latency recommendations
-        if latency.status == ValidationStatus::Fail {
-            recommendations.push(
-                "Network latency could not be measured, your network connection may be unstable"
-                    .to_string(),
-            );
-        } else if latency.status == ValidationStatus::Warning {
+        if results.latency.status == ValidationStatus::Fail {
+            recommendations.push("Network latency could not be measured, your network connection may be unstable".to_string());
+        } else if results.latency.status == ValidationStatus::Warning {
             recommendations.push(format!(
                 "Network latency is high (Average: {} ms). For optimal performance, latency should be below {} ms",
-                latency.average_ms, self.config.latency_threshold_ms
+                results.latency.average_ms, self.config.latency_threshold_ms
             ));
         }
 
-        // Port recommendations
-        if !ports.closed_ports.is_empty() {
+        if !results.ports.closed_ports.is_empty() {
             recommendations.push(format!(
                 "The following required ports are closed or blocked: {}. Consider opening these ports in your firewall",
-                ports.closed_ports.iter().map(|p| p.to_string()).collect::<Vec<_>>().join(", ")
+                results.ports.closed_ports.iter().map(|p| p.to_string()).collect::<Vec<_>>().join(", ")
             ));
         }
 
-        // SSL recommendations
-        if let Some(ssl_result) = ssl {
+        if let Some(ssl_result) = &results.ssl {
             if ssl_result.status == ValidationStatus::Fail {
                 recommendations.push("SSL certificate validation failed for all endpoints. Check your system's certificate store".to_string());
             } else if ssl_result.status == ValidationStatus::Warning {
@@ -976,8 +862,7 @@ impl NetworkValidator {
             }
         }
 
-        // Firewall recommendations
-        if let Some(firewall_result) = firewall {
+        if let Some(firewall_result) = &results.firewall {
             if firewall_result.blocks_bitcoin {
                 recommendations.push("Your firewall appears to be blocking Bitcoin network traffic. Configure your firewall to allow ports 8333 (mainnet) and 18333 (testnet)".to_string());
             } else if !firewall_result.blocks_required_ports.is_empty() {
@@ -986,78 +871,49 @@ impl NetworkValidator {
                     firewall_result.blocks_required_ports.iter().map(|p| p.to_string()).collect::<Vec<_>>().join(", ")
                 ));
             }
-        }
-
-        // Route recommendations
-        if let Some(route_result) = route {
-            if route_result.status == ValidationStatus::Fail {
-                recommendations.push(
-                    "Network route tracing failed. Your network may be blocking ICMP traffic"
-                        .to_string(),
-                );
-            } else if route_result.status == ValidationStatus::Warning {
-                recommendations.push(
-                    "Network routes contain problematic hops, which may cause connection issues"
-                        .to_string(),
-                );
+            if firewall_result.blocks_required_ports.contains(&174) {
+                recommendations.push("PSBT (BIP-174) port 174 is blocked. Required for partial transactions".to_string());
             }
         }
 
-        // Add PSBT check
-        if let Some(firewall_result) = firewall {
-            if firewall_result.blocks_required_ports.contains(&174) {
-                recommendations.push(
-                    "PSBT (BIP-174) port 174 is blocked. Required for partial transactions"
-                        .to_string(),
-                );
+        if let Some(route_result) = &results.route {
+            if route_result.status == ValidationStatus::Fail {
+                recommendations.push("Network route tracing failed. Your network may be blocking ICMP traffic".to_string());
+            } else if route_result.status == ValidationStatus::Warning {
+                recommendations.push("Network routes contain problematic hops, which may cause connection issues".to_string());
             }
         }
 
         recommendations
     }
 
-    /// Determine overall status based on individual test results
-    fn determine_overall_status(
-        &self,
-        connectivity: &NetworkConnectivityResult,
-        dns: &DnsValidationResult,
-        bandwidth: &BandwidthValidationResult,
-        latency: &LatencyValidationResult,
-        ports: &PortValidationResult,
-        ssl: &Option<SslValidationResult>,
-        firewall: &Option<FirewallValidationResult>,
-        route: &Option<RouteValidationResult>,
-    ) -> ValidationStatus {
-        // Critical failures
-        if connectivity.status == ValidationStatus::Fail
-            || dns.status == ValidationStatus::Fail
-            || bandwidth.status == ValidationStatus::Fail
+    fn determine_overall_status(&self, results: &ValidationResults) -> ValidationStatus {
+        if results.connectivity.status == ValidationStatus::Fail
+            || results.dns.status == ValidationStatus::Fail
+            || results.bandwidth.status == ValidationStatus::Fail
         {
             return ValidationStatus::Fail;
         }
 
-        // Firewall blocking Bitcoin is a critical failure
-        if let Some(firewall_result) = firewall {
+        if let Some(firewall_result) = results.firewall {
             if firewall_result.blocks_bitcoin {
                 return ValidationStatus::Fail;
             }
         }
 
-        // Check for warnings
-        let has_warnings = connectivity.status == ValidationStatus::Warning
-            || dns.status == ValidationStatus::Warning
-            || bandwidth.status == ValidationStatus::Warning
-            || latency.status == ValidationStatus::Warning
-            || ports.status == ValidationStatus::Warning;
+        let has_warnings = results.connectivity.status == ValidationStatus::Warning
+            || results.dns.status == ValidationStatus::Warning
+            || results.bandwidth.status == ValidationStatus::Warning
+            || results.latency.status == ValidationStatus::Warning
+            || results.ports.status == ValidationStatus::Warning;
 
-        // Check optional components
-        let optional_warnings = ssl
+        let optional_warnings = results.ssl
             .as_ref()
             .map_or(false, |r| r.status == ValidationStatus::Warning)
-            || firewall
+            || results.firewall
                 .as_ref()
                 .map_or(false, |r| r.status == ValidationStatus::Warning)
-            || route
+            || results.route
                 .as_ref()
                 .map_or(false, |r| r.status == ValidationStatus::Warning);
 
@@ -1068,11 +924,9 @@ impl NetworkValidator {
         }
     }
 
-    /// BIP-341 specific port validation
     async fn validate_taproot_port(&self, _port: u16) -> bool {
-        // Implement Taproot-specific validation logic
         let taproot_check = Command::new("bitcoin-cli")
-            .args(&["getnetworkinfo"])
+            .args(["getnetworkinfo"])
             .output();
 
         match taproot_check {

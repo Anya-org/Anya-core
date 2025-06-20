@@ -12,8 +12,8 @@ description: "Documentation for Agent_architecture"
 
 ## Table of Contents
 
-- [Section 1](#section-1)
-- [Section 2](#section-2)
+- [Overview](#overview)
+- [Architectural Principles](#architectural-principles)
 
 [AIS-3][BPC-3][DAO-3]
 
@@ -53,6 +53,7 @@ The Operations Manager serves as the central coordination layer that orchestrate
 ```
 
 **Key Features:**
+
 - Workflow definition and execution
 - Dependency management
 - Scheduling and prioritization
@@ -65,6 +66,7 @@ The Operations Manager serves as the central coordination layer that orchestrate
 The Financial Agent executes financial operations based on metric triggers, applying simulation and ML-driven recommendations.
 
 **Key Features:**
+
 - Operation simulation
 - Multi-signature verification
 - Risk assessment
@@ -77,6 +79,7 @@ The Financial Agent executes financial operations based on metric triggers, appl
 The Metrics Oracle provides real-time data feeds to guide agent decisions.
 
 **Key Features:**
+
 - Tokenomics metrics
 - Treasury metrics
 - Governance metrics
@@ -89,6 +92,7 @@ The Metrics Oracle provides real-time data feeds to guide agent decisions.
 The Reporting System generates comprehensive analytics and reports for stakeholders.
 
 **Key Features:**
+
 - Scheduled reporting
 - Custom report generation
 - Historical data analysis
@@ -236,18 +240,21 @@ The agent system follows a hexagonal architecture pattern:
 ```
 
 ### Domain Layer
+
 - Core business logic
 - Entity definitions
 - Value objects
 - Domain services
 
 ### Application Layer
+
 - Agent coordination
 - Use case implementation
 - Event handling
 - Domain event publishing
 
 ### Infrastructure Layer
+
 - Data persistence
 - External API integration
 - Messaging implementation
@@ -323,24 +330,28 @@ The Anya Agent Architecture provides a robust, extensible framework for building
 ## Core Agents
 
 ### MLCoreAgent
+
 - Model Training Supervision
 - Prediction Pipeline Management
 - Optimization Control
 - Metrics Collection
 
 ### DataPipelineAgent
+
 - Data Ingestion Control
 - Preprocessing Management
 - Validation Orchestration
 - Privacy Enforcement
 
 ### ValidationAgent
+
 - Data Quality Monitoring
 - Model Performance Tracking
 - System State Verification
 - Compliance Checking
 
 ### NetworkAgent
+
 - Peer Discovery
 - Resource Management
 - Protocol Coordination
@@ -349,18 +360,21 @@ The Anya Agent Architecture provides a robust, extensible framework for building
 ## Enterprise Agents
 
 ### AnalyticsAgent
+
 - Market Analysis
 - Risk Assessment
 - Performance Analytics
 - Trading Strategy Optimization
 
 ### ComplianceAgent
+
 - Regulatory Monitoring
 - Policy Enforcement
 - Audit Trail Management
 - License Verification
 
 ### SecurityAgent
+
 - Access Control
 - Encryption Management
 - Key Rotation
@@ -369,18 +383,21 @@ The Anya Agent Architecture provides a robust, extensible framework for building
 ## Integration Agents
 
 ### BlockchainAgent
+
 - Bitcoin Integration
 - Lightning Network Management
 - DLC Coordination
 - RGB/Stacks Integration
 
 ### Web5Agent
+
 - DID Management
 - Protocol Coordination
 - Data Synchronization
 - State Management
 
 ### ResearchAgent
+
 - Literature Analysis
 - Code Repository Monitoring
 - Protocol Updates

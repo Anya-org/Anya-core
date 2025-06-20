@@ -1,3 +1,164 @@
+//! [AIR-3][AIS-3][BPC-3][RES-3] Reliability and monitoring components for Anya Core
+
+use crate::{AnyaError, AnyaResult};
+use log::{error, info, warn};
+use std::future::Future;
+use std::time::{Duration, Instant};
+
+/// Watchdog timer for monitoring operations
+#[derive(Debug, Clone)]
+pub struct Watchdog {
+    name: String,
+    timeout: Duration,
+    start_time: Instant,
+    is_active: bool,
+}
+
+impl Watchdog {
+    /// Create a new watchdog with specified timeout
+    pub fn new(name: &str, timeout: Duration) -> Self {
+        Self {
+            name: name.to_string(),
+            timeout,
+            start_time: Instant::now(),
+            is_active: true,
+        }
+    }
+
+    /// Stop the watchdog
+    pub fn stop(&mut self) {
+        self.is_active = false;
+    }
+
+    /// Trigger an alert for timeout
+    pub fn trigger_alert(&self) {
+        error!("Watchdog '{}' triggered alert after {:?}", self.name, self.timeout);
+    }
+
+    /// Check if the watchdog has timed out
+    pub fn has_timed_out(&self) -> bool {
+        self.is_active && self.start_time.elapsed() > self.timeout
+    }
+}
+
+/// Progress tracker for long-running operations
+#[derive(Debug, Clone)]
+pub struct ProgressTracker {
+    name: String,
+    timeout: Duration,
+    verbose: bool,
+    start_time: Instant,
+}
+
+impl ProgressTracker {
+    /// Create a new progress tracker
+    pub fn new(name: &str) -> Self {
+        Self {
+            name: name.to_string(),
+            timeout: Duration::from_secs(300), // Default 5 minutes
+            verbose: false,
+            start_time: Instant::now(),
+        }
+    }
+
+    /// Set timeout for the operation
+    pub fn with_timeout(mut self, timeout: Duration) -> Self {
+        self.timeout = timeout;
+        self
+    }
+
+    /// Enable verbose logging
+    pub fn with_verbosity(mut self, verbose: bool) -> Self {
+        self.verbose = verbose;
+        self
+    }
+
+    /// Log progress if verbose mode is enabled
+    pub fn log_progress(&self, message: &str) {
+        if self.verbose {
+            info!("[{}] {}", self.name, message);
+        }
+    }
+
+    /// Get elapsed time since start
+    pub fn elapsed(&self) -> Duration {
+        self.start_time.elapsed()
+    }
+}
+
+/// AI verification component for blockchain operations
+#[derive(Debug, Clone)]
+pub struct AiVerification {
+    min_confidence: f64,
+    blockchain_verification: bool,
+    external_data_verification: bool,
+    human_verification: bool,
+}
+
+impl AiVerification {
+    /// Create a new AI verification instance
+    pub fn new() -> Self {
+        Self {
+            min_confidence: 0.95,
+            blockchain_verification: true,
+            external_data_verification: true,
+            human_verification: false,
+        }
+    }
+
+    /// Set minimum confidence threshold
+    pub fn with_min_confidence(mut self, confidence: f64) -> Self {
+        self.min_confidence = confidence;
+        self
+    }
+
+    /// Enable/disable blockchain verification
+    pub fn with_blockchain_verification(mut self, enabled: bool) -> Self {
+        self.blockchain_verification = enabled;
+        self
+    }
+
+    /// Enable/disable external data verification
+    pub fn with_external_data_verification(mut self, enabled: bool) -> Self {
+        self.external_data_verification = enabled;
+        self
+    }
+
+    /// Enable/disable human verification requirement
+    pub fn with_human_verification(mut self, enabled: bool) -> Self {
+        self.human_verification = enabled;
+        self
+    }
+
+    /// Verify data with AI analysis
+    pub async fn verify(&self, data: &[u8]) -> AnyaResult<bool> {
+        // Simulate AI verification process
+        let confidence = self.calculate_confidence(data).await?;
+        
+        if confidence >= self.min_confidence {
+            Ok(true)
+        } else {
+            Err(AnyaError::LowConfidence(format!(
+                "Verification confidence {} below threshold {}", 
+                confidence, self.min_confidence
+            )))
+        }
+    }
+
+    /// Calculate confidence score for data
+    async fn calculate_confidence(&self, _data: &[u8]) -> AnyaResult<f64> {
+        // Placeholder for AI confidence calculation
+        // In real implementation, this would use ML models
+        Ok(0.98) // High confidence for now
+    }
+}
+
+impl Default for AiVerification {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// [AIR-3][AIS-3][BPC-3][RES-3] Execute an async operation with timeout and progress tracking
 pub async fn execute_with_monitoring<T, F>(
     operation_name: &str,
@@ -7,7 +168,7 @@ pub async fn execute_with_monitoring<T, F>(
 where
     F: Future<Output = AnyaResult<T>> {
     // Create watchdog
-    let watchdog = Watchdog::new(operation_name, timeout_duration);
+    let mut watchdog = Watchdog::new(operation_name, timeout_duration);
     
     // Execute with timeout
     match tokio::time::timeout(timeout_duration, operation).await {
@@ -38,7 +199,7 @@ where
     F: Future<Output = AnyaResult<T>>,
     R: Future<Output = AnyaResult<T>> {
     // Create watchdog for the entire operation
-    let watchdog = Watchdog::new(operation_name, primary_timeout + recovery_timeout + Duration::from_secs(1));
+    let mut watchdog = Watchdog::new(operation_name, primary_timeout + recovery_timeout + Duration::from_secs(1));
     
     // Try primary operation with timeout
     match tokio::time::timeout(primary_timeout, primary_operation).await {

@@ -9,7 +9,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Validate branch name
-        uses: dawidd6/action-branch-name-validator@v1
+        uses: deepakputhraya/action-branch-name@master
         with:
-          pattern: '^(main|release\/.*|feature\/.*|bugfix\/.*|hotfix\/.*)$'
-          mandatory: true
+          regex: '^(main|release\/.*|feature\/.*|bugfix\/.*|hotfix\/.*)$'
+          allowed_prefixes: 'feature,bugfix,hotfix,release,main'
+          ignore: main,master

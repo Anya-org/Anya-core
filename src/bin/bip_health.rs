@@ -129,7 +129,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                     println!("BIP System Health Report");
                     println!("=======================");
                     println!("Generated: {}", report.timestamp);
-                    println!("");
+                    println!();
                     println!(
                         "Overall Health: {}",
                         if report.healthy {
@@ -143,7 +143,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                     println!("Partial: {}", report.partial_count);
                     println!("Beta Features: {}", report.beta_count);
                     println!("Missing: {}", report.missing_count);
-                    println!("");
+                    println!();
                     println!("BIP Details:");
 
                     // Sort BIPs by number

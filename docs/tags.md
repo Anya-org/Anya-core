@@ -64,37 +64,37 @@ This page provides a comprehensive index of documentation tags to help you find 
 ### Setup
 - [Installation Guide](getting-started/installation.md)
 - [Quick Start Guide](getting-started/quick-start.md)
-- [Development Setup](development/setup.md)
+- [Development Setup](development/SETUP.md)
 
 ### Technical
 - [System Architecture](architecture/README.md)
 - [API Documentation](api/README.md)
-- [Security Model](architecture/security.md)
+- [Security Model](standards/SECURITY.md)
 - [Performance Guide](architecture/performance.md)
 
 ### Operational
-- [Deployment Guide](operations/deployment.md)
-- [Monitoring Setup](operations/monitoring.md)
+- [Deployment Guide](deployment/DEPLOYMENT.md)
+- [Monitoring Setup](deployment/monitoring.md)
 - [Backup Procedures](operations/backup.md)
-- [Security Operations](operations/security.md)
+- [Security Operations](standards/SECURITY.md)
 
 ### Development
 - [Contributing Guide](contributing/getting-started.md)
-- [Testing Guidelines](contributing/testing.md)
+- [Testing Guidelines](TESTING.md)
 - [Code Standards](contributing/standards.md)
-- [Automation Tools](automation/README.md)
+- [Automation Tools](layer2/README.md)
 
 ### Features
-- [Web5 Integration](web5/README.md)
+- [Web5 Integration](layer2/README.md)
 - [Bitcoin Features](bitcoin/README.md)
-- [Enterprise Features](enterprise/README.md)
-- [Analytics Guide](enterprise/analytics/README.md)
+- [Enterprise Features](layer2/README.md)
+- [Analytics Guide](layer2/README.md)
 
 ### Reference
 - [Glossary](reference/glossary.md)
-- [Best Practices](reference/best-practices.md)
+- [Best Practices](../anya-extensions/docs/development/best-practices.md)
 - [Version History](reference/versions.md)
-- [Project Roadmap](reference/roadmap.md)
+- [Project Roadmap](ROADMAP.md)
 
 ## Using Tags
 

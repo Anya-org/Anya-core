@@ -8,7 +8,7 @@
 
 #[cfg(test)]
 mod tests {
-    use anya_bitcoin::layer2::{
+    use anya_core::layer2::{
         bob::{
             BitVMProof, BobClient, BobConfig, BobError, EvmTransaction, EvmTransactionReceipt,
             RelayStatus,
@@ -136,7 +136,7 @@ mod tests {
     // Layer 2 Framework tests
     #[test]
     fn test_layer2_framework() {
-        use anya_bitcoin::layer2::framework::{Layer2Factory, Layer2Registry, ProtocolConfig};
+        use anya_core::layer2::framework::{Layer2Factory, Layer2Registry, ProtocolConfig};
         use std::fmt::Debug;
 
         // Create factory and registry

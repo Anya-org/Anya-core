@@ -25,7 +25,7 @@ This document serves as a searchable index for all Anya Core documentation, incl
 ## Main Documentation Entries
 
 - [ROOT_INDEX](../ROOT_INDEX.md) - Root documentation index
-- [INDEX](INDEX.md) - Main documentation index
+- [INDEX](identity/index.md) - Main documentation index
 - [README](../README.md) - Main project README
 - [SYSTEM_MAP](SYSTEM_MAP.md) - System architecture map
 - [ARCHITECTURE](ARCHITECTURE.md) - Detailed architecture documentation
@@ -42,11 +42,11 @@ This document serves as a searchable index for all Anya Core documentation, incl
 ## Bitcoin & Crypto Documentation
 
 - [bitcoin/README](bitcoin/README.md) - Bitcoin integration
-- [lightning/README](lightning/README.md) - Lightning Network integration
+- [lightning/README](layer2/README.md) - Lightning Network integration
 
 ## Web5 & Identity Documentation
 
-- [web5/README](web5/README.md) - Web5 integration
+- [web5/README](layer2/README.md) - Web5 integration
 - [identity/README](identity/README.md) - Decentralized identity
 
 ## Machine Learning Documentation
@@ -81,14 +81,14 @@ This document serves as a searchable index for all Anya Core documentation, incl
 ### Bitcoin & Crypto Terms
 
 - **Bitcoin Integration**: [bitcoin/README](bitcoin/README.md)
-- **Lightning Network**: [lightning/README](lightning/README.md)
+- **Lightning Network**: [lightning/README](layer2/README.md)
 - **DLC (Discreet Log Contracts)**: [bitcoin/dlc](bitcoin/dlc.md)
 - **Taproot Assets**: [bitcoin/taproot](bitcoin/taproot.md)
 - **Cross-Chain**: [bitcoin/cross-chain](bitcoin/cross-chain.md)
 
 ### Web5 & Identity Terms
 
-- **Web5 Integration**: [web5/README](web5/README.md)
+- **Web5 Integration**: [web5/README](layer2/README.md)
 - **Decentralized Identity**: [identity/README](identity/README.md)
 - **DWN (Decentralized Web Nodes)**: [web5/dwn](web5/dwn.md)
 - **DID (Decentralized Identifiers)**: [identity/did](identity/did.md)
@@ -98,7 +98,7 @@ This document serves as a searchable index for all Anya Core documentation, incl
 - **ML Architecture**: [ML_SYSTEM_ARCHITECTURE](ML_SYSTEM_ARCHITECTURE.md)
 - **Model Management**: [ml/models](ml/models.md)
 - **Inference Engine**: [ml/inference](ml/inference.md)
-- **Performance Monitoring**: [ml/monitoring](ml/monitoring.md)
+- **Performance Monitoring**: [ml/monitoring](deployment/monitoring.md)
 
 ### Development Terms
 

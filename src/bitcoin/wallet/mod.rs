@@ -210,7 +210,7 @@ impl Wallet {
                 )?;
 
                 let address = match address_type {
-                    AddressType::Legacy => Address::p2pkh(&bitcoin_pubkey, self.config.network),
+                    AddressType::Legacy => Address::p2pkh(bitcoin_pubkey, self.config.network),
                     AddressType::SegWit => Address::p2wpkh(&compressed_pubkey, self.config.network),
                     AddressType::NestedSegWit => {
                         Address::p2shwpkh(&compressed_pubkey, self.config.network)
@@ -241,8 +241,8 @@ impl KeyManager for Wallet {
             .as_ref()
             .ok_or_else(|| BitcoinError::Wallet("Wallet not initialized".to_string()))?;
 
-        Ok(bip32::derive_key_from_seed(seed, path)
-            .map_err(|e| AnyaError::Bitcoin(e.to_string()))?)
+        bip32::derive_key_from_seed(seed, path)
+            .map_err(|e| AnyaError::Bitcoin(e.to_string()))
     }
 
     fn get_public_key(&self, path: &str) -> AnyaResult<bitcoin::secp256k1::PublicKey> {
@@ -307,7 +307,7 @@ impl AddressManager for Wallet {
             bitcoin::key::CompressedPublicKey::from_slice(&bitcoin_pubkey.inner.serialize())?;
 
         let address = match address_type {
-            AddressType::Legacy => Address::p2pkh(&bitcoin_pubkey, self.config.network),
+            AddressType::Legacy => Address::p2pkh(bitcoin_pubkey, self.config.network),
             AddressType::SegWit => Address::p2wpkh(&compressed_pubkey, self.config.network),
             AddressType::NestedSegWit => Address::p2shwpkh(&compressed_pubkey, self.config.network),
             AddressType::Taproot => {
@@ -351,7 +351,7 @@ impl AddressManager for Wallet {
             bitcoin::key::CompressedPublicKey::from_slice(&bitcoin_pubkey.inner.serialize())?;
 
         let address = match address_type {
-            AddressType::Legacy => Address::p2pkh(&bitcoin_pubkey, self.config.network),
+            AddressType::Legacy => Address::p2pkh(bitcoin_pubkey, self.config.network),
             AddressType::SegWit => Address::p2wpkh(&compressed_pubkey, self.config.network),
             AddressType::NestedSegWit => Address::p2shwpkh(&compressed_pubkey, self.config.network),
             AddressType::Taproot => {
@@ -912,12 +912,15 @@ pub struct WalletInfo {
 /// Bitcoin wallet implementation
 pub struct BitcoinWallet {
     /// Wallet configuration
+    #[allow(dead_code)] // Required for future wallet extensibility and compliance (see docs/INDEX_CORRECTED.md)
     config: WalletConfig,
 
     /// Wallet data storage
+    #[allow(dead_code)] // Required for future storage backends (see docs/INDEX_CORRECTED.md)
     storage: Arc<Mutex<WalletStorage>>,
 
     /// Secp256k1 context
+    #[allow(dead_code)] // Required for future cryptographic operations (see docs/research/PROTOCOL_UPGRADES.md)
     secp: Secp256k1<bitcoin::secp256k1::All>,
 }
 

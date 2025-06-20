@@ -86,31 +86,6 @@ pub fn create_basic_security_config(
     settings
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_basic_security_config() {
-        let network_config = create_basic_security_config("network");
-        let db_config = create_basic_security_config("database");
-
-        // Check common settings
-        assert_eq!(network_config.get("firewall"), Some(&"enabled".to_string()));
-        assert_eq!(db_config.get("firewall"), Some(&"enabled".to_string()));
-
-        // Check component-specific settings
-        assert_eq!(
-            network_config.get("ddos_protection"),
-            Some(&"enabled".to_string())
-        );
-        assert_eq!(
-            db_config.get("data_encryption"),
-            Some(&"aes-256".to_string())
-        );
-    }
-}
-
 // Security module
 // Implements security features for Bitcoin operations
 // as per official Bitcoin Improvement Proposals (BIPs) requirements
@@ -279,4 +254,29 @@ pub async fn create_taproot_asset(
     // Fallback stub for when HSM is not enabled
     // [AIR-3][AIS-3][BPC-3][RES-3]
     Err(hsm_shim::HsmStubError::feature_disabled())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_basic_security_config() {
+        let network_config = create_basic_security_config("network");
+        let db_config = create_basic_security_config("database");
+
+        // Check common settings
+        assert_eq!(network_config.get("firewall"), Some(&"enabled".to_string()));
+        assert_eq!(db_config.get("firewall"), Some(&"enabled".to_string()));
+
+        // Check component-specific settings
+        assert_eq!(
+            network_config.get("ddos_protection"),
+            Some(&"enabled".to_string())
+        );
+        assert_eq!(
+            db_config.get("data_encryption"),
+            Some(&"aes-256".to_string())
+        );
+    }
 }

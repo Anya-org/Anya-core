@@ -18,6 +18,12 @@ pub struct Metrics {
     pub network_usage: HashMap<String, f64>,
 }
 
+impl Default for Metrics {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Metrics {
     /// Create new metrics
     pub fn new() -> Self {

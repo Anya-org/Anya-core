@@ -1,7 +1,7 @@
 # Anya Core - Master Documentation Index
 
 **Production-Ready Status**: ✅ **OPERATIONAL** (v1.2.0)  
-**Last Updated**: June 14, 2025  
+**Last Updated**: June 20, 2025  
 **AI Labels**: [AIR-3][AIS-3][BPC-3][RES-3]
 
 ---
@@ -32,7 +32,7 @@
 | [README.md](../README.md) | Project overview & quick start | All users | 🔥 Critical |
 | [INSTALLATION.md](./INSTALLATION.md) | Complete installation guide | Developers | 🔥 Critical |
 | [Configuration Guide](./installation/CONFIGURATION.md) | System configuration | DevOps | ⚡ High |
-| [Troubleshooting](./installation/TROUBLESHOOTING.md) | Common issues & solutions | Support | ⚡ High |
+| [Troubleshooting](installation/troubleshooting.md) | Common issues & solutions | Support | ⚡ High |
 
 ## 🏗️ Architecture
 
@@ -53,8 +53,8 @@
 |----------|-----------|------------------|--------|
 | [Bitcoin Compliance](./BITCOIN_COMPLIANCE.md) | BIP-174, 340-342 | Full | ✅ Production |
 | [BIP Implementation](./BIP_COMPLIANCE.md) | All supported BIPs | Comprehensive | ✅ Production |
-| [Taproot Integration](./bitcoin/TAPROOT.md) | BIP-340/341/342 | Complete | ✅ Production |
-| [Layer 2 Solutions](./bitcoin/LAYER2.md) | Lightning, RGB, DLC | Extended | ✅ Production |
+| [Taproot Integration](bitcoin/taproot.md) | BIP-340/341/342 | Complete | ✅ Production |
+| [Layer 2 Solutions](./layer2/README.md) | Lightning, RGB, DLC, BOB, Liquid, RSK, Stacks, Taproot Assets | Extended | ✅ Production |
 
 ## 🌐 Web5 Platform
 
@@ -75,8 +75,8 @@
 |---------|-------------|---------|--------|
 | [Enterprise Overview](./ENTERPRISE.md) | Enterprise feature set | Commercial | ✅ Available |
 | [High Availability](./high_availability.md) | HA deployment guide | Enterprise | ✅ Production |
-| [Monitoring](./monitoring/README.md) | Enterprise monitoring | Commercial | ✅ Available |
-| [Compliance](./compliance/README.md) | Regulatory compliance | Enterprise | ✅ Available |
+| [Monitoring](layer2/README.md) | Enterprise monitoring | Commercial | ✅ Available |
+| [Compliance](layer2/README.md) | Regulatory compliance | Enterprise | ✅ Available |
 
 ## 🔒 Security
 
@@ -84,7 +84,7 @@
 
 | Component | Security Level | Audit Status | Last Review |
 |-----------|----------------|--------------|-------------|
-| [Security Policy](../SECURITY.md) | Enterprise | ✅ Audited | 2025-06-07 |
+| [Security Policy](standards/SECURITY.md) | Enterprise | ✅ Audited | 2025-06-07 |
 | [HSM Integration](./security/HSM.md) | Hardware | ✅ Certified | 2025-06-07 |
 | [Cryptography](./security/CRYPTOGRAPHY.md) | Military grade | ✅ Validated | 2025-06-07 |
 | [Audit Reports](./security/AUDITS.md) | Third-party | ✅ Current | 2025-06-07 |
@@ -139,13 +139,14 @@
 
 - **Total Documents**: 210+ files
 - **Production Ready**: 95%
-- **Last Major Update**: June 14, 2025
+- **Last Major Update**: June 20, 2025
 - **Coverage**: Comprehensive
 - **Quality Score**: A+ (Enterprise grade)
 
 ## 🔍 Documentation Standards
 
 All documentation follows:
+
 - **AI Labeling**: [AIR-3][AIS-3][BPC-3][RES-3] compliance
 - **Bitcoin Standards**: Official BIP compliance
 - **Enterprise Quality**: Professional documentation standards
@@ -154,8 +155,8 @@ All documentation follows:
 
 ## 📞 Support & Community
 
-- **Enterprise Support**: enterprise@anya.org
-- **Security Issues**: security@anya.org  
+- **Enterprise Support**: <enterprise@anya.org>
+- **Security Issues**: <security@anya.org>  
 - **Community**: [GitHub Discussions](https://github.com/anya-org/anya-core/discussions)
 - **Documentation Issues**: [GitHub Issues](https://github.com/anya-org/anya-core/issues)
 

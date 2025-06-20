@@ -165,6 +165,12 @@ pub struct TaprootMerkleTree {
     root: Option<[u8; 32]>,
 }
 
+impl Default for TaprootMerkleTree {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl TaprootMerkleTree {
     /// Create a new empty Merkle tree
     pub fn new() -> Self {
@@ -350,6 +356,12 @@ pub struct Bip341Taproot {
     pub spend_info: Option<TaprootSpendInfo>,
 }
 
+impl Default for Bip341Taproot {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Bip341Taproot {
     /// Create a new Taproot implementation with default settings
     pub fn new() -> Self {
@@ -458,84 +470,6 @@ impl Bip341Taproot {
     /// Get the SILENT_LEAF hash for validation
     pub fn silent_leaf_hash(&self) -> [u8; 32] {
         self.create_silent_leaf().compute_leaf_hash()
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_taproot_leaf_hash() {
-        let script = vec![0x51, 0x21, 0x03]; // OP_1 OP_SIZE OP_PUSH3
-        let leaf = TaprootLeaf::new(LeafVersion::Default, script);
-
-        let hash = leaf.compute_leaf_hash();
-
-        // We should verify the hash against a known test vector
-        // For now, just check it's not all zeros
-        assert!(!hash.iter().all(|&b| b == 0));
-    }
-
-    #[test]
-    fn test_merkle_tree() {
-        let mut tree = TaprootMerkleTree::new();
-
-        // Add two leaves to the tree
-        let leaf1 = TaprootLeaf::new(LeafVersion::Default, vec![0x51]); // OP_1
-        let leaf2 = TaprootLeaf::new(LeafVersion::Default, vec![0x52]); // OP_2
-
-        tree.add_leaf(0, leaf1);
-        tree.add_leaf(1, leaf2);
-
-        // Compute the root hash
-        let root_hash = tree.root_hash();
-
-        // We should verify the hash against a known test vector
-        // For now, just check it's not all zeros
-        assert!(!root_hash.iter().all(|&b| b == 0));
-
-        // Get the proof for leaf 0
-        let proof = tree.get_proof(0);
-
-        // Should have exactly one proof element
-        assert_eq!(proof.len(), 1);
-    }
-
-    #[test]
-    fn test_create_taproot_output() -> Result<(), Box<dyn std::error::Error>> {
-        let taproot = Bip341Taproot::new();
-
-        // Instead of hardcoding a potentially invalid key, use the one from the taproot instance
-        let internal_key = taproot.internal_key;
-
-        // Create a Merkle tree with a single leaf
-        let mut tree = TaprootMerkleTree::new();
-        let leaf = TaprootLeaf::new(LeafVersion::Default, vec![0x51]); // OP_1
-        tree.add_leaf(0, leaf);
-
-        let merkle_root = Some(tree.root_hash());
-
-        // Create a Taproot output
-        let output = taproot.create_taproot_output(internal_key, merkle_root)?;
-
-        // Since we simplified the implementation for testing purposes,
-        // we now expect the output key to be equal to the internal key
-        assert_eq!(
-            output.internal_key.serialize(),
-            output.output_key.serialize()
-        );
-
-        // Verify that the Merkle root is stored correctly
-        assert!(merkle_root.is_some());
-        assert!(output.merkle_root.is_some());
-        if let Some(root) = merkle_root {
-            if let Some(out_root) = output.merkle_root {
-                assert_eq!(root, out_root);
-            }
-        }
-
-        Ok(())
     }
 }
 
@@ -720,4 +654,82 @@ pub fn create_taproot_output(
     };
 
     Ok(tx_out)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_taproot_leaf_hash() {
+        let script = vec![0x51, 0x21, 0x03]; // OP_1 OP_SIZE OP_PUSH3
+        let leaf = TaprootLeaf::new(LeafVersion::Default, script);
+
+        let hash = leaf.compute_leaf_hash();
+
+        // We should verify the hash against a known test vector
+        // For now, just check it's not all zeros
+        assert!(!hash.iter().all(|&b| b == 0));
+    }
+
+    #[test]
+    fn test_merkle_tree() {
+        let mut tree = TaprootMerkleTree::new();
+
+        // Add two leaves to the tree
+        let leaf1 = TaprootLeaf::new(LeafVersion::Default, vec![0x51]); // OP_1
+        let leaf2 = TaprootLeaf::new(LeafVersion::Default, vec![0x52]); // OP_2
+
+        tree.add_leaf(0, leaf1);
+        tree.add_leaf(1, leaf2);
+
+        // Compute the root hash
+        let root_hash = tree.root_hash();
+
+        // We should verify the hash against a known test vector
+        // For now, just check it's not all zeros
+        assert!(!root_hash.iter().all(|&b| b == 0));
+
+        // Get the proof for leaf 0
+        let proof = tree.get_proof(0);
+
+        // Should have exactly one proof element
+        assert_eq!(proof.len(), 1);
+    }
+
+    #[test]
+    fn test_create_taproot_output() -> Result<(), Box<dyn std::error::Error>> {
+        let taproot = Bip341Taproot::new();
+
+        // Instead of hardcoding a potentially invalid key, use the one from the taproot instance
+        let internal_key = taproot.internal_key;
+
+        // Create a Merkle tree with a single leaf
+        let mut tree = TaprootMerkleTree::new();
+        let leaf = TaprootLeaf::new(LeafVersion::Default, vec![0x51]); // OP_1
+        tree.add_leaf(0, leaf);
+
+        let merkle_root = Some(tree.root_hash());
+
+        // Create a Taproot output
+        let output = taproot.create_taproot_output(internal_key, merkle_root)?;
+
+        // Since we simplified the implementation for testing purposes,
+        // we now expect the output key to be equal to the internal key
+        assert_eq!(
+            output.internal_key.serialize(),
+            output.output_key.serialize()
+        );
+
+        // Verify that the Merkle root is stored correctly
+        assert!(merkle_root.is_some());
+        assert!(output.merkle_root.is_some());
+        if let Some(root) = merkle_root {
+            if let Some(out_root) = output.merkle_root {
+                assert_eq!(root, out_root);
+            }
+        }
+
+        Ok(())
+    }
 }

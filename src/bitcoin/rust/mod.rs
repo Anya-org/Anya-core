@@ -104,7 +104,7 @@ impl BitcoinInterface for RustBitcoinImplementation {
         // [AIR-3][AIS-3][BPC-3][RES-3] Using parameters to avoid unused variable warnings
         // This follows official Bitcoin Improvement Proposals (BIPs) standards for SPV verification
         // Access block header fields directly as per BDF v2.5 standards
-        let block_hash = format!("{}", block_header.merkle_root);
+        let block_hash = block_header.merkle_root.to_string();
         println!(
             "Verifying merkle proof for tx: {} in block with merkle root: {}",
             tx_hash, block_hash

@@ -69,8 +69,8 @@ RSK operations are secured through:
 For more information, see:
 
 - [RSK Developer Portal](https://developers.rsk.co/)
-- [Implementation Status](../../../docs/IMPLEMENTATION_MILESTONES.md)
-- [Layer 2 Overview](../../../anya-bitcoin/docs/layer2/OVERVIEW.md)
+- [Implementation Status](../../../../docs/IMPLEMENTATION_MILESTONES.md)
+- [Layer 2 Overview](../../../../docs/architecture/OVERVIEW.md)
 
 ## Version Information
 
@@ -78,4 +78,4 @@ For more information, see:
 - Last Updated: 2025-04-29
 - Bitcoin Development Framework: v2.5
 
-*This component complies with [AI Labeling Standards](../../../docs/standards/AI_LABELING.md)* 
+*This component complies with [AI Labeling Standards](../../../../docs/AI_LABELING.md)* 
