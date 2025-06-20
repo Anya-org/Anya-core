@@ -8,7 +8,6 @@ use crate::layer2::{
     TransferResult, ValidationResult, VerificationResult,
 };
 use serde::{Deserialize, Serialize};
-use std::error::Error;
 
 /// Taproot Assets configuration
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -54,6 +53,12 @@ impl TaprootAssetsProtocol {
                 connections: 0,
                 capacity: None, // No fixed capacity
                 operational: false,
+                height: 0,
+                hash: "default_hash".to_string(),
+                timestamp: std::time::SystemTime::now()
+                    .duration_since(std::time::UNIX_EPOCH)
+                    .unwrap_or_default()
+                    .as_secs(),
             },
         }
     }
@@ -69,7 +74,7 @@ impl TaprootAssetsProtocol {
         name: &str,
         supply: u64,
         asset_type: &str,
-    ) -> Result<String, Box<dyn Error>> {
+    ) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
         println!(
             "Minting {} asset '{}' with supply {}",
             asset_type, name, supply
@@ -78,7 +83,7 @@ impl TaprootAssetsProtocol {
     }
 
     /// Create asset universe proof
-    pub fn create_universe_proof(&self, asset_id: &str) -> Result<Vec<u8>, Box<dyn Error>> {
+    pub fn create_universe_proof(&self, asset_id: &str) -> Result<Vec<u8>, Box<dyn std::error::Error + Send + Sync>> {
         println!("Creating universe proof for asset {}", asset_id);
         Ok(vec![0x01, 0x02, 0x03, 0x04]) // Mock proof
     }
@@ -86,18 +91,18 @@ impl TaprootAssetsProtocol {
 
 impl Layer2ProtocolTrait for TaprootAssetsProtocol {
     /// Initialize the Taproot Assets protocol
-    fn initialize(&self) -> Result<(), Box<dyn Error>> {
+    fn initialize(&self) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         println!("Initializing Taproot Assets protocol...");
         Ok(())
     }
 
     /// Get the current state of the protocol
-    fn get_state(&self) -> Result<ProtocolState, Box<dyn Error>> {
+    fn get_state(&self) -> Result<ProtocolState, Box<dyn std::error::Error + Send + Sync>> {
         Ok(self.state.clone())
     }
 
     /// Submit a transaction (asset transfer)
-    fn submit_transaction(&self, tx_data: &[u8]) -> Result<String, Box<dyn Error>> {
+    fn submit_transaction(&self, tx_data: &[u8]) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
         println!(
             "Submitting Taproot Assets transaction: {} bytes",
             tx_data.len()
@@ -106,13 +111,13 @@ impl Layer2ProtocolTrait for TaprootAssetsProtocol {
     }
 
     /// Check transaction status
-    fn check_transaction_status(&self, tx_id: &str) -> Result<TransactionStatus, Box<dyn Error>> {
+    fn check_transaction_status(&self, tx_id: &str) -> Result<TransactionStatus, Box<dyn std::error::Error + Send + Sync>> {
         println!("Checking Taproot Assets transaction status: {}", tx_id);
         Ok(TransactionStatus::Confirmed)
     }
 
     /// Synchronize state
-    fn sync_state(&mut self) -> Result<(), Box<dyn Error>> {
+    fn sync_state(&mut self) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         println!("Syncing Taproot Assets state...");
         self.state.operational = true;
         self.state.connections = 1;
@@ -120,14 +125,14 @@ impl Layer2ProtocolTrait for TaprootAssetsProtocol {
     }
 
     /// Issue a new Taproot asset
-    fn issue_asset(&self, params: AssetParams) -> Result<String, Box<dyn Error>> {
+    fn issue_asset(&self, params: AssetParams) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
         println!("Issuing Taproot asset {}", params.name);
         let asset_id = self.mint_asset(&params.name, params.total_supply, "normal")?;
         Ok(asset_id)
     }
 
     /// Transfer a Taproot asset
-    fn transfer_asset(&self, transfer: AssetTransfer) -> Result<TransferResult, Box<dyn Error>> {
+    fn transfer_asset(&self, transfer: AssetTransfer) -> Result<TransferResult, Box<dyn std::error::Error + Send + Sync>> {
         println!(
             "Transferring {} of Taproot asset {} to {}",
             transfer.amount, transfer.asset_id, transfer.recipient
@@ -145,13 +150,14 @@ impl Layer2ProtocolTrait for TaprootAssetsProtocol {
     }
 
     /// Verify a Merkle proof for Taproot assets
-    fn verify_proof(&self, proof: Proof) -> Result<VerificationResult, Box<dyn Error>> {
+    fn verify_proof(&self, proof: Proof) -> Result<VerificationResult, Box<dyn std::error::Error + Send + Sync>> {
         println!("Verifying Taproot {} proof", proof.proof_type);
 
         // In a real implementation, this would verify Merkle proofs
         let is_valid = proof.proof_type == "merkle" || proof.proof_type == "universe";
 
         Ok(VerificationResult {
+            valid: is_valid,
             is_valid,
             error: if is_valid {
                 None
@@ -166,7 +172,7 @@ impl Layer2ProtocolTrait for TaprootAssetsProtocol {
     }
 
     /// Validate Taproot Assets state
-    fn validate_state(&self, state_data: &[u8]) -> Result<ValidationResult, Box<dyn Error>> {
+    fn validate_state(&self, state_data: &[u8]) -> Result<ValidationResult, Box<dyn std::error::Error + Send + Sync>> {
         println!(
             "Validating Taproot Assets state: {} bytes",
             state_data.len()

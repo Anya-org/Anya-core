@@ -31,7 +31,7 @@ impl LightningPublicKey {
         }
 
         // Remove 0x prefix if present
-        let hex_str = if s.starts_with("0x") { &s[2..] } else { s };
+        let hex_str = s.strip_prefix("0x").unwrap_or(s);
 
         // Parse hex string to bytes
         let mut bytes = [0u8; 33];

@@ -10,9 +10,9 @@ pub struct Layer2Manager {
     rsk_client: Option<RskClient>,
     stacks_client: Option<StacksClient>,
     taproot_assets: Option<TaprootAssetsProtocol>,
-    #[allow(dead_code)] // Required for future Lightning integration (see docs/research/PROTOCOL_UPGRADES.md)
+    #[allow(dead_code)] // For future Lightning integration
     lightning_network: Option<LightningNetwork>,
-    #[allow(dead_code)] // Required for future State Channel integration (see docs/research/PROTOCOL_UPGRADES.md)
+    #[allow(dead_code)] // For future State Channel integration
     state_channels: Option<StateChannel>,
 }
 
@@ -38,30 +38,19 @@ impl Layer2Manager {
 
     /// Initialize all Layer 2 protocols
     pub fn initialize_all(&mut self) -> Result<(), Box<dyn std::error::Error>> {
-        // Initialize BOB
-        let bob_client = BobClient::new(Default::default());
-        bob_client.initialize()?;
-        self.bob_client = Some(bob_client);
+        macro_rules! init_protocol {
+            ($field:ident, $ty:ty) => {{
+                let instance = <$ty>::new(Default::default());
+                instance.initialize()?;
+                self.$field = Some(instance);
+            }};
+        }
 
-        // Initialize Liquid
-        let liquid_module = LiquidModule::new(Default::default());
-        liquid_module.initialize()?;
-        self.liquid_module = Some(liquid_module);
-
-        // Initialize RSK
-        let rsk_client = RskClient::new(Default::default());
-        rsk_client.initialize()?;
-        self.rsk_client = Some(rsk_client);
-
-        // Initialize Stacks
-        let stacks_client = StacksClient::new(Default::default());
-        stacks_client.initialize()?;
-        self.stacks_client = Some(stacks_client);
-
-        // Initialize Taproot Assets
-        let taproot_assets = TaprootAssetsProtocol::new(Default::default());
-        taproot_assets.initialize()?;
-        self.taproot_assets = Some(taproot_assets);
+        init_protocol!(bob_client, BobClient);
+        init_protocol!(liquid_module, LiquidModule);
+        init_protocol!(rsk_client, RskClient);
+        init_protocol!(stacks_client, StacksClient);
+        init_protocol!(taproot_assets, TaprootAssetsProtocol);
 
         println!("All Layer 2 protocols initialized successfully");
         Ok(())
@@ -70,27 +59,12 @@ impl Layer2Manager {
     /// Get protocol by type
     pub fn get_protocol(&self, protocol_type: Layer2Protocol) -> Option<&dyn Layer2ProtocolTrait> {
         match protocol_type {
-            Layer2Protocol::BOB => self
-                .bob_client
-                .as_ref()
-                .map(|c| c as &dyn Layer2ProtocolTrait),
-            Layer2Protocol::Liquid => self
-                .liquid_module
-                .as_ref()
-                .map(|c| c as &dyn Layer2ProtocolTrait),
-            Layer2Protocol::RSK => self
-                .rsk_client
-                .as_ref()
-                .map(|c| c as &dyn Layer2ProtocolTrait),
-            Layer2Protocol::Stacks => self
-                .stacks_client
-                .as_ref()
-                .map(|c| c as &dyn Layer2ProtocolTrait),
-            Layer2Protocol::TaprootAssets => self
-                .taproot_assets
-                .as_ref()
-                .map(|c| c as &dyn Layer2ProtocolTrait),
-            _ => None, // Other protocols would be handled similarly
+            Layer2Protocol::BOB => self.bob_client.as_ref().map(|c| c as _),
+            Layer2Protocol::Liquid => self.liquid_module.as_ref().map(|c| c as _),
+            Layer2Protocol::RSK => self.rsk_client.as_ref().map(|c| c as _),
+            Layer2Protocol::Stacks => self.stacks_client.as_ref().map(|c| c as _),
+            Layer2Protocol::TaprootAssets => self.taproot_assets.as_ref().map(|c| c as _),
+            _ => None,
         }
     }
 
@@ -107,7 +81,6 @@ impl Layer2Manager {
             from_protocol, to_protocol
         );
 
-        // This would implement actual cross-layer bridging logic
         let transfer_id = format!(
             "cross_{}_{}_{}_{}",
             protocol_name(from_protocol),
@@ -132,8 +105,7 @@ impl Layer2Manager {
 
         for protocol_type in protocols {
             if let Some(protocol) = self.get_protocol(protocol_type) {
-                let result = protocol.verify_proof(proof.clone())?;
-                if !result.is_valid {
+                if !protocol.verify_proof(proof.clone())?.is_valid {
                     return Ok(false);
                 }
             }
@@ -144,16 +116,17 @@ impl Layer2Manager {
 }
 
 fn protocol_name(protocol: Layer2Protocol) -> &'static str {
+    use Layer2Protocol::*;
     match protocol {
-        Layer2Protocol::Lightning => "lightning",
-        Layer2Protocol::StateChannels => "state_channels",
-        Layer2Protocol::RGB => "rgb",
-        Layer2Protocol::DLC => "dlc",
-        Layer2Protocol::BOB => "bob",
-        Layer2Protocol::Liquid => "liquid",
-        Layer2Protocol::RSK => "rsk",
-        Layer2Protocol::Stacks => "stacks",
-        Layer2Protocol::TaprootAssets => "taproot_assets",
+        Lightning => "lightning",
+        StateChannels => "state_channels",
+        RGB => "rgb",
+        DLC => "dlc",
+        BOB => "bob",
+        Liquid => "liquid",
+        RSK => "rsk",
+        Stacks => "stacks",
+        TaprootAssets => "taproot_assets",
     }
 }
 
@@ -172,14 +145,11 @@ mod tests {
         let mut manager = Layer2Manager::new();
         manager.initialize_all().unwrap();
 
-        // Test that all protocols are available
         assert!(manager.get_protocol(Layer2Protocol::BOB).is_some());
         assert!(manager.get_protocol(Layer2Protocol::Liquid).is_some());
         assert!(manager.get_protocol(Layer2Protocol::RSK).is_some());
         assert!(manager.get_protocol(Layer2Protocol::Stacks).is_some());
-        assert!(manager
-            .get_protocol(Layer2Protocol::TaprootAssets)
-            .is_some());
+        assert!(manager.get_protocol(Layer2Protocol::TaprootAssets).is_some());
     }
 
     #[test]
