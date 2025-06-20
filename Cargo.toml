@@ -1,7 +1,7 @@
 [workspace]
 members = [
     "anya-bitcoin",
-    "anya-extensions" # Add this for better workspace organization
+    "anya-extensions", # Add this for better workspace organization
 ]
 
 [workspace.package]
@@ -20,8 +20,19 @@ anyhow = { version = "1.0.98", features = ["std", "backtrace"] }
 tracing = { version = "0.1.41", features = ["std", "attributes"] }
 
 # Bitcoin dependencies for workspace
-bitcoin = { version = "0.32", features = ["std", "serde", "rand", "secp-recovery", "base64", "rand-std"] }
-secp256k1 = { version = "0.29", features = ["rand-std", "global-context", "recovery"] }
+bitcoin = { version = "0.32", features = [
+    "std",
+    "serde",
+    "rand",
+    "secp-recovery",
+    "base64",
+    "rand-std",
+] }
+secp256k1 = { version = "0.29", features = [
+    "rand-std",
+    "global-context",
+    "recovery",
+] }
 bitcoincore-rpc = { version = "0.19", features = ["default"] }
 
 # Web5 dependencies for workspace
@@ -40,8 +51,17 @@ authors = ["botshelomokoka@gmail.com"]
 license = "MIT"
 repository = "https://github.com/anya-org/anya-core"
 readme = "README.md" # Following API guidelines for discoverability
-keywords = ["bitcoin", "cryptocurrency", "blockchain", "enterprise", "hexagonal"]
-categories = ["api-bindings", "cryptography::cryptocurrencies"] # Improve crates.io discoverability
+keywords = [
+    "bitcoin",
+    "cryptocurrency",
+    "blockchain",
+    "enterprise",
+    "hexagonal",
+]
+categories = [
+    "api-bindings",
+    "cryptography::cryptocurrencies",
+] # Improve crates.io discoverability
 
 [features]
 default = ["std", "rust-bitcoin"]
@@ -56,7 +76,14 @@ rust-bitcoin = ["bitcoin", "bdk"]
 # RSK integration for Bitcoin verification
 rsk = []
 # Add alignment-focused feature for system optimization
-system-alignment = ["bitcoin_integration", "hsm"] # New feature for enhanced alignment
+system-alignment = [
+    "bitcoin_integration",
+    "hsm",
+] # New feature for enhanced alignment
+# Web5 integration features
+web5 = []
+# Memory tracking for performance monitoring
+memory_tracking = []
 
 [dependencies]
 # API dependencies
@@ -68,46 +95,80 @@ tokio = { version = "=1.45.1", features = ["full"] }
 
 # Bitcoin dependencies with enhanced consensus safety
 bitcoin = { version = "0.32", features = [
-    "std", "serde", "rand", "secp-recovery", 
-    "base64", "rand-std"
+    "std",
+    "serde",
+    "rand",
+    "secp-recovery",
+    "base64",
+    "rand-std",
 ], optional = true }
-secp256k1 = { version = "0.29", features = ["rand-std", "global-context", "recovery"] }
+secp256k1 = { version = "0.29", features = [
+    "rand-std",
+    "global-context",
+    "recovery",
+] }
 bdk = { version = "0.30", optional = true, features = ["std", "compiler"] }
-miniscript = { version = "12.3", features = ["std", "compiler"] } # Enhanced for better policy compilation
+miniscript = { version = "12.3", features = [
+    "std",
+    "compiler",
+] } # Enhanced for better policy compilation
 bip39 = { version = "2.0", features = ["std"] }
 
 # Enhanced Web5/DID dependencies for better alignment
 web5 = { git = "https://github.com/TBD54566975/web5-rs", rev = "310d79c9" }
-jsonwebtoken = { version = "=9.3.1", features = ["use_pem"] } # Enhanced JWT support
+jsonwebtoken = { version = "=9.3.1", features = [
+    "use_pem",
+] } # Enhanced JWT support
 multibase = { version = "=0.9.1", features = ["std"] }
 multihash = { version = "=0.19.3", features = ["std"] }
 
 # Serialization with enhanced features for system alignment
-serde = { version = "1.0.219", features = ["derive", "rc"] } # Add rc for reference counting
-serde_json = { version = "1.0.140", features = ["std", "preserve_order"] } # Maintain order for consensus
+serde = { version = "1.0.219", features = [
+    "derive",
+    "rc",
+] } # Add rc for reference counting
+serde_json = { version = "1.0.140", features = [
+    "std",
+    "preserve_order",
+] } # Maintain order for consensus
 humantime-serde = "=1.1.1"
 getrandom = { version = "=0.3.3", features = ["std"] }
 url = { version = "=2.5.4", features = ["serde"] }
-toml = { version = "0.8.23", features = ["preserve_order"] } # Maintain configuration order
+toml = { version = "0.8.23", features = [
+    "preserve_order",
+] } # Maintain configuration order
 
 # Enhanced error handling for better system alignment
-anyhow = { version = "1.0.98", features = ["std", "backtrace"] } # Better error tracking
+anyhow = { version = "1.0.98", features = [
+    "std",
+    "backtrace",
+] } # Better error tracking
 thiserror = { version = "2.0.12", features = ["std"] }
 
 # Enhanced logging for system monitoring
 tracing = { version = "0.1.41", features = ["std", "attributes"] }
-tracing-subscriber = { version = "0.3.19", features = ["env-filter", "json", "fmt"] }
+tracing-subscriber = { version = "0.3.19", features = [
+    "env-filter",
+    "json",
+    "fmt",
+] }
 log = "0.4"
 
 # System alignment focused utilities
 async-trait = "0.1.88"
-clap = { version = "=4.5.39", features = ["derive", "env", "color"] } # Enhanced CLI
+clap = { version = "=4.5.39", features = [
+    "derive",
+    "env",
+    "color",
+] } # Enhanced CLI
 base64 = "=0.22.1"
 uuid = { version = "1.17.0", features = ["v4", "serde", "fast-rng"] }
 chrono = { version = "0.4.41", features = ["serde", "std"] }
 rand = { version = "0.8.5", features = ["std", "std_rng"] }
 rand_distr = "0.4"
-reqwest = { version = "0.12.20", features = ["json"] } # HTTP client for network validation
+reqwest = { version = "0.12.20", features = [
+    "json",
+] } # HTTP client for network validation
 
 # Additional dependencies for installer and other bins
 ring = "0.17"
@@ -134,12 +195,12 @@ trust-dns-resolver = "0.22.0"
 aes-gcm = "0.10.3"
 chacha20poly1305 = "0.10.1"
 regex = "1.9.6"
+futures = "0.3.31"
 
 [dev-dependencies]
 did-key = "0.2.1"
 mockall = "=0.13.1"
+tempfile = "3.20.0"
 tokio-test = "=0.4.4"
 tower-test = "=0.4.0"
 uuid = { version = "1.17.0", features = ["v4"] }
-
-
