@@ -307,9 +307,9 @@ BOB integration follows our hexagonal architecture pattern with clearly defined 
    - Provides insights on system performance
    - Identifies optimization opportunities
 
-#### Other Layer 2 Integrations
+#### Layer 2 Protocol Integrations
 
-In addition to BOB, Anya Core supports:
+Anya Core provides comprehensive Layer2 support through a unified architecture:
 
 1. **Lightning Network**
    - Payment channel management
@@ -323,11 +323,49 @@ In addition to BOB, Anya Core supports:
    - On-chain settlement and dispute resolution
    - State channel monitoring
 
-3. **Sidechains**
-   - Two-way peg mechanisms
-   - Federation support
-   - Merged mining compatibility
-   - Cross-chain asset transfers
+3. **RGB Assets**
+   - Client-side validation protocol
+   - Asset issuance and transfers
+   - Privacy-preserving transactions
+   - Bitcoin UTXO-based implementation
+
+4. **Discrete Log Contracts (DLC)**
+   - Oracle-based smart contracts
+   - Non-interactive setup
+   - Privacy-preserving outcomes
+   - Bitcoin-native implementation
+
+5. **BOB (Build on Bitcoin)**
+   - EVM-compatible smart contracts
+   - Bitcoin security model
+   - Cross-chain bridging
+   - Hybrid transaction support
+
+6. **Liquid Network**
+   - Confidential transactions
+   - Asset issuance platform
+   - Federation consensus
+   - Two-way peg with Bitcoin
+
+7. **RSK (Rootstock)**
+   - Smart contracts secured by Bitcoin mining
+   - EVM compatibility
+   - Merged mining support
+   - DeFi ecosystem
+
+8. **Stacks**
+   - Clarity smart contracts
+   - Proof of Transfer (PoX)
+   - Bitcoin finality
+   - STX stacking rewards
+
+9. **Taproot Assets**
+   - Bitcoin-native asset protocol
+   - Taproot optimization
+   - Lightning Network compatible
+   - Scalable asset transfers
+
+**Unified Interface**: All protocols implement the common `Layer2Protocol` trait for consistent integration and management.
 
 ### 8. Consensus Mechanisms
 

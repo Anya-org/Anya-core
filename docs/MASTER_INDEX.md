@@ -1,7 +1,7 @@
 # Anya Core - Master Documentation Index
 
 **Production-Ready Status**: ✅ **OPERATIONAL** (v1.2.0)  
-**Last Updated**: June 14, 2025  
+**Last Updated**: June 20, 2025  
 **AI Labels**: [AIR-3][AIS-3][BPC-3][RES-3]
 
 ---
@@ -54,7 +54,7 @@
 | [Bitcoin Compliance](./BITCOIN_COMPLIANCE.md) | BIP-174, 340-342 | Full | ✅ Production |
 | [BIP Implementation](./BIP_COMPLIANCE.md) | All supported BIPs | Comprehensive | ✅ Production |
 | [Taproot Integration](bitcoin/taproot.md) | BIP-340/341/342 | Complete | ✅ Production |
-| [Layer 2 Solutions](./bitcoin/LAYER2.md) | Lightning, RGB, DLC | Extended | ✅ Production |
+| [Layer 2 Solutions](./layer2/README.md) | Lightning, RGB, DLC, BOB, Liquid, RSK, Stacks, Taproot Assets | Extended | ✅ Production |
 
 ## 🌐 Web5 Platform
 
@@ -139,13 +139,14 @@
 
 - **Total Documents**: 210+ files
 - **Production Ready**: 95%
-- **Last Major Update**: June 14, 2025
+- **Last Major Update**: June 20, 2025
 - **Coverage**: Comprehensive
 - **Quality Score**: A+ (Enterprise grade)
 
 ## 🔍 Documentation Standards
 
 All documentation follows:
+
 - **AI Labeling**: [AIR-3][AIS-3][BPC-3][RES-3] compliance
 - **Bitcoin Standards**: Official BIP compliance
 - **Enterprise Quality**: Professional documentation standards
@@ -154,8 +155,8 @@ All documentation follows:
 
 ## 📞 Support & Community
 
-- **Enterprise Support**: enterprise@anya.org
-- **Security Issues**: security@anya.org  
+- **Enterprise Support**: <enterprise@anya.org>
+- **Security Issues**: <security@anya.org>  
 - **Community**: [GitHub Discussions](https://github.com/anya-org/anya-core/discussions)
 - **Documentation Issues**: [GitHub Issues](https://github.com/anya-org/anya-core/issues)
 

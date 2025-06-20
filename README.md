@@ -12,7 +12,7 @@ A powerful platform combining Bitcoin/crypto functionality, ML-based analytics, 
 [![PSBT-v2](https://img.shields.io/badge/PSBT_v2-100%25-brightgreen)](https://bips.xyz/370)
 [![BIP-Standards](https://img.shields.io/badge/BIP-Standards_Compliant-green)](https://bips.xyz)
 
-*Last Updated: June 14, 2025*  
+*Last Updated: June 20, 2025*  
 **Latest Release: v1.2.0 - Production Ready**
 
 > **🎉 PRODUCTION MILESTONE ACHIEVED:** This release includes complete Bitcoin Core compliance (58+ compilation errors resolved), all Layer2 protocols operational, and 9.40/10.0 system alignment score with Bitcoin Core principles. Enterprise-ready with hexagonal architecture implementation.
@@ -181,8 +181,10 @@ sudo ./scripts/install.sh --type=full
 ### Blockchain & Web5
 
 - Bitcoin Core & Lightning support
+- **Layer2 Protocols:** Complete suite including Lightning, State Channels, RGB Assets, DLC, BOB, Liquid, RSK, Stacks, and Taproot Assets
 - Taproot/Schnorr, DLC, Layer 2, cross-chain
 - Web5 DWN decentralized storage, identity-centric
+- **[📖 Layer2 Documentation](docs/layer2/README.md)** - Complete Layer2 integration guide
 
 ### ML & AI
 
