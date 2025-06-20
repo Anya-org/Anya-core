@@ -230,13 +230,119 @@ impl DependencyManager {
         // Check hardware acceleration
         let hardware_acceleration = self.check_hardware_acceleration();
 
+        // Check Rust crates
+        let rust_crates = self.check_rust_crates()?;
+
         Ok(DependencyStatus {
             system_packages,
-            rust_crates: HashMap::new(), // Will be populated during Rust build
+            rust_crates,
             bitcoin_core,
             tor_service,
             hardware_acceleration,
         })
+    }
+
+    fn check_rust_crates(&self) -> Result<HashMap<String, String>> {
+        let mut rust_crates = HashMap::new();
+        let mut missing_crates = Vec::new();
+
+        // Check for required Rust crates
+        for (crate_name, description) in &self.required_crates {
+            match self.check_crate_installed(crate_name) {
+                Ok(version) => {
+                    rust_crates.insert(crate_name.clone(), version);
+                }
+                Err(_) => {
+                    missing_crates.push((crate_name.clone(), description.clone()));
+                }
+            }
+        }
+
+        // Auto-install missing crates if allowed
+        if !missing_crates.is_empty() {
+            self.install_missing_crates(&missing_crates)?;
+
+            // Re-check after installation
+            for (crate_name, _) in &missing_crates {
+                if let Ok(version) = self.check_crate_installed(crate_name) {
+                    rust_crates.insert(crate_name.clone(), version);
+                }
+            }
+        }
+
+        Ok(rust_crates)
+    }
+
+    fn check_crate_installed(&self, crate_name: &str) -> Result<String> {
+        // Use cargo to check if crate is installed
+        let output = Command::new("cargo")
+            .args(&["install", "--list"])
+            .output()
+            .context("Failed to check installed crates")?;
+
+        if output.status.success() {
+            let stdout = String::from_utf8_lossy(&output.stdout);
+            // Look for crate in the output
+            for line in stdout.lines() {
+                if line.starts_with(crate_name) {
+                    // Extract version from cargo output
+                    if let Some(version) = line
+                        .split_whitespace()
+                        .nth(1)
+                        .map(|v| v.trim_start_matches('v').to_string())
+                    {
+                        return Ok(version);
+                    }
+                }
+            }
+        }
+
+        // Check if crate is in Cargo.toml dependencies
+        if let Ok(cargo_toml) = fs::read_to_string("Cargo.toml") {
+            if cargo_toml.contains(&format!("{} ", crate_name)) || 
+               cargo_toml.contains(&format!("{}=", crate_name)) ||
+               cargo_toml.contains(&format!("{} =", crate_name)) {
+                return Ok("In Cargo.toml".to_string());
+            }
+        }
+
+        anyhow::bail!("Crate {} not installed", crate_name)
+    }
+
+    fn install_missing_crates(&self, crates: &[(String, String)]) -> Result<()> {
+        if crates.is_empty() {
+            return Ok(());
+        }
+
+        println!("🦀 Installing missing Rust crates...");
+        for (crate_name, description) in crates {
+            println!("  - {} ({})", crate_name, description);
+            
+            // Install crate
+            let install_output = Command::new("cargo")
+                .args(&["install", crate_name])
+                .output()
+                .context(format!("Failed to install crate {}", crate_name))?;
+
+            if !install_output.status.success() {
+                let stderr = String::from_utf8_lossy(&install_output.stderr);
+                println!("⚠️  Warning: Failed to install {}: {}", crate_name, stderr);
+                // Continue with other crates even if one fails
+            }
+        }
+
+        println!("✅ Rust crates installation completed");
+        Ok(())
+    }
+
+    fn check_optional_packages(&self) -> HashMap<String, bool> {
+        let mut available = HashMap::new();
+        
+        for (package, _) in &self.optional_packages {
+            available.insert(package.clone(), self.check_package_installed(package).is_ok());
+        }
+        
+        available
     }
 
     fn check_package_installed(&self, package: &str) -> Result<String> {
