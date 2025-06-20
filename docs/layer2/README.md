@@ -23,6 +23,7 @@ Anya Core provides a comprehensive framework for Bitcoin Layer2 protocols, imple
 ### 🟢 Framework Complete
 
 **Core Layer2 Infrastructure:**
+
 - Unified async trait interface (`Layer2Protocol`)
 - Protocol manager for multi-protocol coordination
 - Standardized error handling and state management
@@ -101,6 +102,7 @@ let result = manager.submit_transaction(
 ### Implementation Structure
 
 ```
+
 src/layer2/
 ├── mod.rs                    # Module exports and main types
 ├── manager.rs               # Protocol coordination
@@ -119,6 +121,7 @@ src/layer2/
 │   ├── mod.rs
 │   └── dispute.rs
 └── taproot_assets.rs       # Taproot Assets protocol
+
 ```
 
 ### Protocol Configuration
@@ -228,6 +231,7 @@ RUST_LOG=debug cargo run --bin layer2-manager
 ### Adding New Protocols
 
 1. **Create Protocol Module:**
+
    ```rust
    // src/layer2/your_protocol/mod.rs
    use async_trait::async_trait;
@@ -244,6 +248,7 @@ RUST_LOG=debug cargo run --bin layer2-manager
    ```
 
 2. **Add Configuration:**
+
    ```rust
    #[derive(Debug, Clone)]
    pub struct YourProtocolConfig {
@@ -253,6 +258,7 @@ RUST_LOG=debug cargo run --bin layer2-manager
    ```
 
 3. **Register with Manager:**
+
    ```rust
    // Add to Layer2ProtocolType enum
    pub enum Layer2ProtocolType {

@@ -57,6 +57,7 @@ cargo test --lib
 ## System Requirements
 
 ### Minimum Requirements
+
 - **OS**: Linux (Ubuntu 20.04+), macOS (Big Sur+)
 - **CPU**: 2 cores, 2.0GHz
 - **RAM**: 4GB
@@ -64,12 +65,14 @@ cargo test --lib
 - **Network**: Stable internet connection
 
 ### Recommended for Development
+
 - **CPU**: 4+ cores, 3.0GHz+
 - **RAM**: 8GB+
 - **Storage**: 50GB+ SSD
 - **Network**: Broadband connection
 
 ### For Production
+
 - **CPU**: 8+ cores
 - **RAM**: 16GB+
 - **Storage**: 100GB+ NVMe SSD
@@ -152,6 +155,7 @@ nano anya.conf
 ```
 
 Basic configuration:
+
 ```toml
 [network]
 mode = "testnet"
@@ -182,9 +186,10 @@ cargo run --bin dev-server
 ```
 
 Your development server will be available at:
-- **API**: http://localhost:8080
-- **Dashboard**: http://localhost:8080/dashboard
-- **Layer2 Status**: http://localhost:8080/layer2/status
+
+- **API**: <http://localhost:8080>
+- **Dashboard**: <http://localhost:8080/dashboard>
+- **Layer2 Status**: <http://localhost:8080/layer2/status>
 
 ## Development Workflow
 
@@ -260,30 +265,35 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 ## Next Steps
 
 ### Learn Core Concepts
+
 - [Bitcoin Integration](../bitcoin/README.md) - Bitcoin protocol implementation
 - [Layer2 Protocols](../layer2/README.md) - Lightning, RGB, DLC protocols
 - [Nostr Integration](../nostr/README.md) - Decentralized messaging
 - [Security Framework](../security/README.md) - Enterprise security
 
 ### Explore Examples
+
 - [Payment Examples](../../examples/payments/) - Bitcoin and Lightning payments
 - [Nostr Examples](../../examples/nostr/) - Messaging and social
 - [Layer2 Examples](../../examples/layer2/) - Protocol implementations
 - [Integration Examples](../../examples/integration/) - Full stack applications
 
 ### Development Resources
+
 - [API Documentation](../api/README.md) - Complete API reference
 - [Architecture Guide](../architecture/README.md) - System design and patterns
 - [Contributing Guide](../contributing/README.md) - How to contribute
 - [Testing Guide](../testing/README.md) - Testing strategies and tools
 
 ### Production Deployment
+
 - [Deployment Guide](../deployment/README.md) - Production setup
 - [Security Hardening](../security/hardening.md) - Security best practices
 - [Monitoring Setup](../performance/README.md) - Observability and metrics
 - [Backup & Recovery](../operations/backup.md) - Data protection
 
 ### Community
+
 - **Discord**: Join our developer community
 - **GitHub**: Report issues and contribute code
 - **Documentation**: Help improve our docs

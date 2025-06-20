@@ -24,11 +24,13 @@ This document reviews the last 10 commits for compliance with AI_LABELING.md v3.
 ### Commit `54d981b` - fix(tests): fix Layer2 integration test compilation errors
 
 **Issues:**
+
 - Uses non-standard labels: `[FIX] [TESTING] [INTEGRATION]`
 - Missing required AI labels for test components
 - Labels should follow `[XXX-N]` format
 
 **Required Labels for Test Component:**
+
 - AIR (AI Readiness) - Required
 - AIS (AI Security) - Required
 - AIT (AI Testing) - Required (mandatory for test components)
@@ -40,11 +42,13 @@ This document reviews the last 10 commits for compliance with AI_LABELING.md v3.
 ### Commit `9baa2de` - feat(testing): add comprehensive Layer2 integration tests and audit framework
 
 **Issues:**
+
 - Uses non-standard labels: `[FEAT] [TESTING] [SECURITY] [PERFORMANCE]`
 - Missing required AI labels
 - Labels should follow `[XXX-N]` format
 
 **Required Labels for Testing/Security/Performance Component:**
+
 - AIR (AI Readiness) - Required
 - AIS (AI Security) - Required (especially for security framework)
 - AIT (AI Testing) - Required (mandatory for test components)
@@ -68,11 +72,13 @@ This document reviews the last 10 commits for compliance with AI_LABELING.md v3.
 ## Standard Label Categories Reference
 
 ### Core Categories (Always Required)
+
 - **AIR**: AI Readiness (0-3)
 - **AIS**: AI Security (0-3)
 - **AIT**: AI Testing (0-3)
 
 ### Extended Categories (Component-Specific)
+
 - **BPC**: Bitcoin Protocol Compliance (0-3) - Required for Bitcoin/Layer2 components
 - **PFM**: Performance (0-3) - Required for performance-critical components
 - **RES**: Resilience (0-3) - Required for system reliability components
