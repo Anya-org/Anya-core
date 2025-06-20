@@ -142,6 +142,7 @@ pub mod rsk;
 pub mod stacks;
 pub mod taproot_assets;
 pub mod mock;
+pub mod manager;
 
 // Example function using Layer2ProtocolType instead of Layer2Protocol
 pub fn use_layer2_protocol(protocol: Layer2ProtocolType) {
@@ -169,6 +170,7 @@ pub use rsk::RskClient;
 pub use stacks::StacksClient;
 pub use state_channels::StateChannel;
 pub use taproot_assets::TaprootAssetsProtocol;
+pub use manager::Layer2Manager;
 
 // Re-export protocol implementations for tests
 pub use lightning::LightningProtocol;

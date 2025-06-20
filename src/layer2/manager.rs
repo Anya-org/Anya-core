@@ -1,5 +1,5 @@
 use crate::layer2::{
-    BobClient, Layer2Protocol, Layer2ProtocolTrait, LightningNetwork, LiquidModule, Proof,
+    BobClient, Layer2ProtocolType, Layer2Protocol, Layer2ProtocolTrait, LightningNetwork, LiquidModule, Proof,
     RskClient, StacksClient, StateChannel, TaprootAssetsProtocol,
 };
 
@@ -37,12 +37,19 @@ impl Layer2Manager {
     }
 
     /// Initialize all Layer 2 protocols
-    pub fn initialize_all(&mut self) -> Result<(), Box<dyn std::error::Error>> {
+    pub fn initialize_all(&mut self) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         macro_rules! init_protocol {
             ($field:ident, $ty:ty) => {{
                 let instance = <$ty>::new(Default::default());
-                instance.initialize()?;
-                self.$field = Some(instance);
+                match instance.initialize() {
+                    Ok(_) => {
+                        self.$field = Some(instance);
+                    }
+                    Err(e) => {
+                        eprintln!("Failed to initialize {}: {}", stringify!($ty), e);
+                        return Err(e);
+                    }
+                }
             }};
         }
 
@@ -57,13 +64,13 @@ impl Layer2Manager {
     }
 
     /// Get protocol by type
-    pub fn get_protocol(&self, protocol_type: Layer2Protocol) -> Option<&dyn Layer2ProtocolTrait> {
+    pub fn get_protocol(&self, protocol_type: Layer2ProtocolType) -> Option<&dyn Layer2ProtocolTrait> {
         match protocol_type {
-            Layer2Protocol::BOB => self.bob_client.as_ref().map(|c| c as _),
-            Layer2Protocol::Liquid => self.liquid_module.as_ref().map(|c| c as _),
-            Layer2Protocol::RSK => self.rsk_client.as_ref().map(|c| c as _),
-            Layer2Protocol::Stacks => self.stacks_client.as_ref().map(|c| c as _),
-            Layer2Protocol::TaprootAssets => self.taproot_assets.as_ref().map(|c| c as _),
+            Layer2ProtocolType::BOB => self.bob_client.as_ref().map(|c| c as &dyn Layer2ProtocolTrait),
+            Layer2ProtocolType::Liquid => self.liquid_module.as_ref().map(|c| c as &dyn Layer2ProtocolTrait),
+            Layer2ProtocolType::RSK => self.rsk_client.as_ref().map(|c| c as &dyn Layer2ProtocolTrait),
+            Layer2ProtocolType::Stacks => self.stacks_client.as_ref().map(|c| c as &dyn Layer2ProtocolTrait),
+            Layer2ProtocolType::TaprootAssets => self.taproot_assets.as_ref().map(|c| c as &dyn Layer2ProtocolTrait),
             _ => None,
         }
     }
@@ -71,11 +78,11 @@ impl Layer2Manager {
     /// Cross-layer asset transfer
     pub fn cross_layer_transfer(
         &self,
-        from_protocol: Layer2Protocol,
-        to_protocol: Layer2Protocol,
+        from_protocol: Layer2ProtocolType,
+        to_protocol: Layer2ProtocolType,
         asset_id: &str,
         amount: u64,
-    ) -> Result<String, Box<dyn std::error::Error>> {
+    ) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
         println!(
             "Executing cross-layer transfer from {:?} to {:?}",
             from_protocol, to_protocol
@@ -96,8 +103,8 @@ impl Layer2Manager {
     pub fn verify_cross_layer_proof(
         &self,
         proof: Proof,
-        protocols: Vec<Layer2Protocol>,
-    ) -> Result<bool, Box<dyn std::error::Error>> {
+        protocols: Vec<Layer2ProtocolType>,
+    ) -> Result<bool, Box<dyn std::error::Error + Send + Sync>> {
         println!(
             "Verifying cross-layer proof across {} protocols",
             protocols.len()
@@ -115,18 +122,17 @@ impl Layer2Manager {
     }
 }
 
-fn protocol_name(protocol: Layer2Protocol) -> &'static str {
-    use Layer2Protocol::*;
+fn protocol_name(protocol: Layer2ProtocolType) -> &'static str {
     match protocol {
-        Lightning => "lightning",
-        StateChannels => "state_channels",
-        RGB => "rgb",
-        DLC => "dlc",
-        BOB => "bob",
-        Liquid => "liquid",
-        RSK => "rsk",
-        Stacks => "stacks",
-        TaprootAssets => "taproot_assets",
+        Layer2ProtocolType::Lightning => "lightning",
+        Layer2ProtocolType::StateChannels => "state_channels",
+        Layer2ProtocolType::RGB => "rgb",
+        Layer2ProtocolType::DLC => "dlc",
+        Layer2ProtocolType::BOB => "bob",
+        Layer2ProtocolType::Liquid => "liquid",
+        Layer2ProtocolType::RSK => "rsk",
+        Layer2ProtocolType::Stacks => "stacks",
+        Layer2ProtocolType::TaprootAssets => "taproot_assets",
     }
 }
 
@@ -145,11 +151,11 @@ mod tests {
         let mut manager = Layer2Manager::new();
         manager.initialize_all().unwrap();
 
-        assert!(manager.get_protocol(Layer2Protocol::BOB).is_some());
-        assert!(manager.get_protocol(Layer2Protocol::Liquid).is_some());
-        assert!(manager.get_protocol(Layer2Protocol::RSK).is_some());
-        assert!(manager.get_protocol(Layer2Protocol::Stacks).is_some());
-        assert!(manager.get_protocol(Layer2Protocol::TaprootAssets).is_some());
+        assert!(manager.get_protocol(Layer2ProtocolType::BOB).is_some());
+        assert!(manager.get_protocol(Layer2ProtocolType::Liquid).is_some());
+        assert!(manager.get_protocol(Layer2ProtocolType::RSK).is_some());
+        assert!(manager.get_protocol(Layer2ProtocolType::Stacks).is_some());
+        assert!(manager.get_protocol(Layer2ProtocolType::TaprootAssets).is_some());
     }
 
     #[test]
@@ -158,8 +164,8 @@ mod tests {
         manager.initialize_all().unwrap();
 
         let result = manager.cross_layer_transfer(
-            Layer2Protocol::BOB,
-            Layer2Protocol::Liquid,
+            Layer2ProtocolType::BOB,
+            Layer2ProtocolType::Liquid,
             "test_asset",
             1000,
         );
