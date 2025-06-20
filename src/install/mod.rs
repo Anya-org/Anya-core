@@ -1,5 +1,5 @@
 use anyhow::Result;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 /// Installation source configuration
 #[derive(Debug, Clone)]
@@ -65,7 +65,7 @@ impl AnyaInstaller {
         }
     }
 
-    async fn execute_installation(&self, _target_dir: &PathBuf) -> Result<()> {
+    async fn execute_installation(&self, _target_dir: &Path) -> Result<()> {
         // Implementation placeholder for installation logic
         Ok(())
     }

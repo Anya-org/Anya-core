@@ -429,10 +429,7 @@ impl DWNManager {
                 if let Ok(records) = self.records.lock() {
                     if let Some(record) = records.get(&id) {
                         let mut response = message.clone();
-                        response.data = match serde_json::to_vec(&record.data) {
-                            Ok(bytes) => bytes,
-                            Err(_) => Vec::new(),
-                        };
+                        response.data = serde_json::to_vec(&record.data).unwrap_or_default();
                         return Ok(response);
                     }
                 }

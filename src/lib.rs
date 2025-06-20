@@ -412,8 +412,12 @@ mod tests {
         // For HSM config, we check the general.enabled field as per BDF v2.5 standards
         #[cfg(feature = "hsm")]
         assert!(config.bitcoin_config.general.enabled);
+        // In non-HSM builds, the config is just an empty struct, so no assertions needed
         #[cfg(not(feature = "hsm"))]
-        assert!(true); // Skip HSM check when feature is disabled
+        {
+            // Just check that the config exists
+            let _ = &config.bitcoin_config;
+        }
         assert!(config.dao_config.enabled);
     }
 
