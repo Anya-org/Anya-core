@@ -1,4 +1,4 @@
----
+*---
 title: "Readme"
 description: "Documentation for Readme"
 ---
@@ -97,7 +97,9 @@ The following scripts help with standards implementation:
 | `scripts/validate_ai_labels.ps1` | Validates AI labels in code and documentation |
 | `scripts/install_hooks.ps1` | Installs Git hooks for standards validation |
 | `scripts/update_ai_labeling_docs.ps1` | Updates deprecated documentation with notices | 
+
 ## See Also
 
 - [Related Document](#related-document)
 
+-
