@@ -386,20 +386,28 @@ impl AgentSystem {
         agent_id: &AgentId,
         observation: Observation,
     ) -> Result<Option<Action>, AgentError> {
-        let agents = self.agents.read().map_err(|_| {
-            AgentError::InternalError("Failed to acquire read lock on agents".to_string())
-        })?;
-
-        let agent = agents
-            .get(agent_id)
-            .ok_or_else(|| AgentError::ProcessingError(format!("Agent {} not found", agent_id)))?;
-
-        let config = self.config.read().map_err(|_| {
-            AgentError::InternalError("Failed to acquire read lock on config".to_string())
-        })?;
+        // Get agent and config values without holding the locks through await points
+        let (agent, enforce_read_first) = {
+            // Get agent reference
+            let agents = self.agents.read().map_err(|_| {
+                AgentError::InternalError("Failed to acquire read lock on agents".to_string())
+            })?;
+            
+            let agent = agents
+                .get(agent_id)
+                .ok_or_else(|| AgentError::ProcessingError(format!("Agent {} not found", agent_id)))?
+                .clone();
+                
+            // Get config value
+            let config = self.config.read().map_err(|_| {
+                AgentError::InternalError("Failed to acquire read lock on config".to_string())
+            })?;
+            
+            (agent, config.enforce_read_first)
+        };
 
         // Enforce read-first principle if configured
-        if config.enforce_read_first {
+        if enforce_read_first {
             // First read the current system state
             let _system_state = agent.read_system_state().await?;
 
@@ -460,16 +468,22 @@ impl AgentSystem {
         &self,
         observation: Observation,
     ) -> HashMap<AgentId, Result<Option<Action>, AgentError>> {
-        let agents = match self.agents.read() {
-            Ok(agents) => agents,
-            Err(_) => return HashMap::new(),
+        // Get agent IDs without holding the lock through await points
+        let agent_ids = {
+            let agents = match self.agents.read() {
+                Ok(agents) => agents,
+                Err(_) => return HashMap::new(),
+            };
+            
+            // Collect agent IDs to process after releasing the lock
+            agents.keys().cloned().collect::<Vec<_>>()
         };
 
         let mut results = HashMap::new();
 
-        for (agent_id, _agent) in agents.iter() {
-            let result = self.process_with_agent(agent_id, observation.clone()).await;
-            results.insert(agent_id.clone(), result);
+        for agent_id in agent_ids {
+            let result = self.process_with_agent(&agent_id, observation.clone()).await;
+            results.insert(agent_id, result);
         }
 
         results

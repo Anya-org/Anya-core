@@ -264,7 +264,7 @@ impl MLService {
     }
 
     /// Calculate confidence for the prediction
-    fn calculate_confidence(&self, features: &Vec<f64>) -> f64 {
+    fn calculate_confidence(&self, features: &[f64]) -> f64 {
         // In a real implementation, this would be based on model certainty
         // This is a placeholder implementation
         let feature_sum: f64 = features.iter().sum();
@@ -369,18 +369,16 @@ impl MLService {
         let risk_assessment = self.assess_risks(proposal)?;
 
         // [AIR-3][AIS-3][BPC-3][RES-3] Create proposal metrics according to BDF v2.5 standards
-        // Create a new ProposalMetrics instance with the fields from the DAO module
-        let mut metrics = ProposalMetrics::default();
-
-        // Set the fields based on our predictions
-        metrics.proposal_count = 1; // Just counting the current proposal
-        metrics.active_count = 1;
-        metrics.passed_count = 0;
-        metrics.rejected_count = 0;
-
-        // Set ML-specific fields
-        metrics.sentiment_score = predictions.get("confidence").cloned().unwrap_or(0.75);
-        metrics.risk_assessment = risk_assessment;
+        // Create a new ProposalMetrics instance with all fields initialized
+        let mut metrics = ProposalMetrics {
+            proposal_count: 1, // Just counting the current proposal
+            active_count: 1,
+            passed_count: 0,
+            rejected_count: 0,
+            sentiment_score: predictions.get("confidence").cloned().unwrap_or(0.75),
+            risk_assessment,
+            ..ProposalMetrics::default()
+        };
 
         // Create a HashMap for ML predictions
         let mut ml_predictions = std::collections::HashMap::new();

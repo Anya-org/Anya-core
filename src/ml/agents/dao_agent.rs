@@ -19,6 +19,18 @@ pub struct DaoAgent {
     model: RwLock<GovernanceModel>,
 }
 
+impl DaoAgent {
+    /// Get the agent ID
+    pub fn agent_id(&self) -> &str {
+        &self.id
+    }
+
+    /// Update agent ID if needed
+    pub fn set_agent_id(&mut self, new_id: String) {
+        self.id = new_id;
+    }
+}
+
 /// Configuration for the DAO Agent
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DaoAgentConfig {
@@ -52,6 +64,55 @@ pub struct GovernanceModel {
     training_data: Vec<TrainingSample>,
     /// Model accuracy metrics
     accuracy: f64,
+}
+
+impl GovernanceModel {
+    /// Create a new governance model
+    pub fn new() -> Self {
+        Self {
+            weights: HashMap::new(),
+            training_data: Vec::new(),
+            accuracy: 0.0,
+        }
+    }
+
+    /// Get current accuracy
+    pub fn get_accuracy(&self) -> f64 {
+        self.accuracy
+    }
+
+    /// Update model weights based on new data
+    pub fn update_weights(&mut self, new_weights: HashMap<String, f64>) {
+        self.weights.extend(new_weights);
+    }
+
+    /// Add training sample
+    pub fn add_training_sample(&mut self, sample: TrainingSample) {
+        self.training_data.push(sample);
+    }
+
+    /// Train the model and update accuracy
+    pub fn train(&mut self) -> Result<(), AnyaError> {
+        if self.training_data.is_empty() {
+            return Err(AnyaError::ML("No training data available".to_string()));
+        }
+
+        // Simple training simulation - in real implementation this would be more sophisticated
+        let mut total_accuracy = 0.0;
+        for sample in &self.training_data {
+            // Simulate prediction accuracy based on sample complexity
+            let sample_accuracy = 1.0 - (sample.complexity * 0.1);
+            total_accuracy += sample_accuracy.max(0.0).min(1.0);
+        }
+        
+        self.accuracy = total_accuracy / self.training_data.len() as f64;
+        Ok(())
+    }
+
+    /// Get decision weights for a specific proposal
+    pub fn get_decision_weights(&self, proposal_type: &str) -> Option<f64> {
+        self.weights.get(proposal_type).copied()
+    }
 }
 
 /// Governance proposal
@@ -171,15 +232,32 @@ pub enum GovernanceEventType {
     MemberRemoved,
 }
 
-/// Training sample for ML model
-#[derive(Debug)]
+/// Training sample for ML governance model
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TrainingSample {
-    /// Input features
-    pub features: Vec<f64>,
-    /// Expected output
-    pub label: f64,
-    /// Sample weight
-    pub weight: f64,
+    /// Proposal ID
+    pub proposal_id: String,
+    /// Features extracted from the proposal
+    pub features: HashMap<String, f64>,
+    /// Outcome (0.0 = rejected, 1.0 = accepted)
+    pub outcome: f64,
+    /// Complexity score for training difficulty
+    pub complexity: f64,
+    /// Timestamp when sample was created
+    pub timestamp: u64,
+}
+
+impl TrainingSample {
+    /// Create a new training sample
+    pub fn new(proposal_id: String, features: HashMap<String, f64>, outcome: f64) -> Self {
+        Self {
+            proposal_id,
+            features,
+            outcome,
+            complexity: 0.5, // Default complexity
+            timestamp: chrono::Utc::now().timestamp() as u64,
+        }
+    }
 }
 
 impl DaoAgent {
@@ -338,15 +416,6 @@ impl Default for GovernanceModel {
 }
 
 impl GovernanceModel {
-    /// Create a new governance model
-    pub fn new() -> Self {
-        Self {
-            weights: HashMap::new(),
-            training_data: Vec::new(),
-            accuracy: 0.0,
-        }
-    }
-
     /// Initialize the model with parameters
     pub fn initialize(&mut self, _params: &ModelParameters) -> Result<(), AnyaError> {
         // Initialize ML model with given parameters
@@ -383,11 +452,11 @@ impl GovernanceModel {
     /// Extract features from a proposal for ML analysis
     fn extract_features(&self, proposal: &Proposal) -> Result<Vec<f64>, AnyaError> {
         // Extract relevant features for ML model
-        let mut features = Vec::new();
-        
-        // Example features:
-        features.push(proposal.description.len() as f64); // Description length
-        features.push(proposal.votes.len() as f64); // Current vote count
+        // Using vec![] macro as suggested by Clippy
+        let features = vec![
+            proposal.description.len() as f64, // Description length
+            proposal.votes.len() as f64,       // Current vote count
+        ];
         
         // Add more sophisticated feature extraction here
         
