@@ -294,3 +294,9 @@ impl Layer2Protocol for StacksProtocol {
         Ok(create_validation_result(true, vec![]))
     }
 }
+
+impl Default for StacksClient {
+    fn default() -> Self {
+        Self::new(StacksConfig::default())
+    }
+}

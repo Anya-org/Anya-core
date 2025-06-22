@@ -1,5 +1,5 @@
 use crate::layer2::{
-    BobClient, Layer2ProtocolType, Layer2Protocol, Layer2ProtocolTrait, LightningNetwork, LiquidModule, Proof,
+    BobClient, Layer2ProtocolType, Layer2ProtocolType, Layer2ProtocolTrait, LightningNetwork, LiquidModule, Proof,
     RskClient, StacksClient, StateChannel, TaprootAssetsProtocol,
 };
 
@@ -38,28 +38,30 @@ impl Layer2Manager {
 
     /// Initialize all Layer 2 protocols
     pub fn initialize_all(&mut self) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-        macro_rules! init_protocol {
-            ($field:ident, $ty:ty) => {{
-                let instance = <$ty>::new(Default::default());
-                match instance.initialize() {
-                    Ok(_) => {
-                        self.$field = Some(instance);
-                    }
-                    Err(e) => {
-                        eprintln!("Failed to initialize {}: {}", stringify!($ty), e);
-                        return Err(e);
-                    }
-                }
-            }};
-        }
-
-        init_protocol!(bob_client, BobClient);
-        init_protocol!(liquid_module, LiquidModule);
-        init_protocol!(rsk_client, RskClient);
-        init_protocol!(stacks_client, StacksClient);
-        init_protocol!(taproot_assets, TaprootAssetsProtocol);
+        self.init_protocol::<BobClient>(&mut self.bob_client, "BobClient")?;
+        self.init_protocol::<LiquidModule>(&mut self.liquid_module, "LiquidModule")?;
+        self.init_protocol::<RskClient>(&mut self.rsk_client, "RskClient")?;
+        self.init_protocol::<StacksClient>(&mut self.stacks_client, "StacksClient")?;
+        self.init_protocol::<TaprootAssetsProtocol>(&mut self.taproot_assets, "TaprootAssetsProtocol")?;
 
         println!("All Layer 2 protocols initialized successfully");
+        Ok(())
+    }
+
+    fn init_protocol<T>(
+        &mut self,
+        field: &mut Option<T>,
+        name: &str,
+    ) -> Result<(), Box<dyn std::error::Error + Send + Sync>>
+    where
+        T: Layer2ProtocolTrait + Default,
+    {
+        let mut instance = T::default();
+        if let Err(e) = instance.initialize() {
+            eprintln!("Failed to initialize {}: {}", name, e);
+            return Err(e);
+        }
+        *field = Some(instance);
         Ok(())
     }
 

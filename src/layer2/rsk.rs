@@ -92,6 +92,12 @@ impl RskClient {
     }
 }
 
+impl Default for RskClient {
+    fn default() -> Self {
+        Self::new(RskConfig::default())
+    }
+}
+
 impl Layer2ProtocolTrait for RskClient {
     /// Initialize the RSK protocol
     fn initialize(&self) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {

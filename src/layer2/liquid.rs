@@ -281,6 +281,11 @@ impl LiquidModule {
     pub fn get_asset_registry(&self) -> &HashMap<String, LiquidAsset> {
         &self.assets
     }
+    
+impl Default for LiquidModule {
+    fn default() -> Self {
+        Self::new(LiquidConfig::default())
+    }
 
     /// Validate Elements opcodes in script
     pub fn validate_elements_script(&self, script: &[u8]) -> Result<bool, Box<dyn std::error::Error + Send + Sync>> {

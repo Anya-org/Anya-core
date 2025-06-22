@@ -60,6 +60,19 @@ pub struct StateChannelConfig {
     pub fee_rate: u64,
 }
 
+impl Default for StateChannelConfig {
+    fn default() -> Self {
+        Self {
+            network: "mainnet".to_string(),
+            capacity: 1_000_000, // 1 million sats
+            time_lock: 144,      // ~1 day
+            commitment_type: CommitmentType::TaprootKeySpend,
+            use_taproot: true,
+            fee_rate: 10,        // 10 sats/vbyte
+        }
+    }
+}
+
 /// State update
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct StateUpdate {
@@ -143,6 +156,41 @@ impl StateChannel {
             updates,
             transactions,
         })
+    }
+
+    /// Create a new state channel with default configuration
+    pub fn new_default() -> Self {
+        // Use default keys and 50/50 balance split for the default state channel
+        let config = StateChannelConfig::default();
+        let pubkey_a = "02d0de0aaeaefad02b8bdc8a01a1b8b11c696bd3d66a2c5f10780d95b7df42645c";
+        let pubkey_b = "03a36339f413da869df12b1ab0def91749413a0dee87f0bfa85ba7196e6cdad102";
+        let half_capacity = config.capacity / 2;
+        
+        match Self::new(config, pubkey_a, pubkey_b, half_capacity, half_capacity) {
+            Ok(channel) => channel,
+            Err(_) => {
+                // This should never happen with our controlled defaults
+                // But create a minimal valid object if it does
+                Self {
+                    channel_id: "sc_default".to_string(),
+                    config: StateChannelConfig::default(),
+                    state: ChannelState::Creating,
+                    balance_a: 500_000,
+                    balance_b: 500_000,
+                    pubkey_a: pubkey_a.to_string(),
+                    pubkey_b: pubkey_b.to_string(),
+                    version: 0,
+                    updates: Vec::new(),
+                    transactions: HashMap::new(),
+                }
+            }
+        }
+    }
+    
+    impl Default for StateChannel {
+        fn default() -> Self {
+            Self::new_default()
+        }
     }
 
     /// Open the state channel (create funding transaction)

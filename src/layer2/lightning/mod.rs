@@ -34,6 +34,20 @@ pub struct LightningConfig {
     pub fee_rate: u64,
 }
 
+impl Default for LightningConfig {
+    fn default() -> Self {
+        Self {
+            network: "mainnet".to_string(),
+            node_url: "http://127.0.0.1:10009".to_string(),
+            auth_token: None,
+            auto_pilot: false,
+            watchtower_enabled: true,
+            min_channel_capacity: 100000, // 100,000 sats
+            fee_rate: 5,
+        }
+    }
+}
+
 /// Lightning Network implementation
 #[derive(Debug)]
 pub struct LightningNetwork {
@@ -92,6 +106,16 @@ impl LightningNetwork {
             node_pubkey: None,
             channels: Vec::new(),
         }
+    }
+
+    /// Create a new Lightning Network instance with default configuration
+    pub fn new_default() -> Self {
+        Self::new(LightningConfig::default())
+    }
+    
+impl Default for LightningNetwork {
+    fn default() -> Self {
+        Self::new(LightningConfig::default())
     }
 
     /// Connect to the Lightning Network node

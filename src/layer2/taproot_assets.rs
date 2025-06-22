@@ -89,6 +89,12 @@ impl TaprootAssetsProtocol {
     }
 }
 
+impl Default for TaprootAssetsProtocol {
+    fn default() -> Self {
+        Self::new(TaprootAssetsConfig::default())
+    }
+}
+
 impl Layer2ProtocolTrait for TaprootAssetsProtocol {
     /// Initialize the Taproot Assets protocol
     fn initialize(&self) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {

@@ -66,6 +66,12 @@ impl BobClient {
     }
 }
 
+impl Default for BobClient {
+    fn default() -> Self {
+        Self::new(BobConfig::default())
+    }
+}
+
 impl Layer2ProtocolTrait for BobClient {
     /// Initialize the BOB protocol
     fn initialize(&self) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
