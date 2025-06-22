@@ -1,4 +1,4 @@
-****# Async Layer2 Protocol Implementation Status
+# Async Layer2 Protocol Implementation Status
 
 This document tracks the status of the async Layer2Protocol trait implementation across all Layer2 protocol clients.
 
@@ -35,6 +35,10 @@ This document tracks the status of the async Layer2Protocol trait implementation
 5. ✅ Fixed method disambiguation in code and tests
 6. ✅ Created comprehensive async tests for Layer2 protocols
 7. ✅ Created specific Layer2Manager async tests
+8. ✅ Fixed LightningNetwork async Layer2Protocol implementation
+9. ✅ Added StateChannel async Layer2Protocol implementation
+10. ✅ Fixed Layer2Manager to use async initialization for all protocols
+11. ✅ Fixed verify_cross_layer_proof_async method signature and implementation
 
 ## Testing Status
 

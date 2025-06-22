@@ -1,5 +1,5 @@
 use crate::layer2::{
-    BobClient, Layer2ProtocolType, Layer2ProtocolType, Layer2ProtocolTrait, LightningNetwork, LiquidModule, Proof,
+    BobClient, Layer2ProtocolType, Layer2ProtocolTrait, LightningNetwork, LiquidModule, Proof,
     RskClient, StacksClient, StateChannel, TaprootAssetsProtocol,
 };
 
@@ -48,6 +48,63 @@ impl Layer2Manager {
         Ok(())
     }
 
+    /// Initialize all Layer 2 protocols asynchronously
+    pub async fn initialize_all_async(&mut self) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+        // Initialize BOB Client
+        self.bob_client = Some(BobClient::default());
+        if let Some(client) = &self.bob_client {
+            client.initialize().await?;
+            println!("BobClient initialized asynchronously");
+        }
+
+        // Initialize Liquid Module
+        self.liquid_module = Some(LiquidModule::default());
+        if let Some(module) = &self.liquid_module {
+            module.initialize().await?;
+            println!("LiquidModule initialized asynchronously");
+        }
+
+        // Initialize RSK Client
+        self.rsk_client = Some(RskClient::default());
+        if let Some(client) = &self.rsk_client {
+            client.initialize().await?;
+            println!("RskClient initialized asynchronously");
+        }
+
+        // Initialize Stacks Client
+        self.stacks_client = Some(StacksClient::default());
+        if let Some(client) = &self.stacks_client {
+            client.initialize().await?;
+            println!("StacksClient initialized asynchronously");
+        }
+
+        // Initialize Taproot Assets Protocol
+        self.taproot_assets = Some(TaprootAssetsProtocol::default());
+        if let Some(protocol) = &self.taproot_assets {
+            protocol.initialize().await?;
+            println!("TaprootAssetsProtocol initialized asynchronously");
+        }
+
+        // Initialize Lightning Network
+        self.lightning_network = Some(LightningNetwork::default());
+        if let Some(network) = &self.lightning_network {
+            // Now we can use the async initialization for LightningNetwork
+            network.initialize().await?;
+            println!("LightningNetwork initialized asynchronously");
+        }
+
+        // Initialize State Channel
+        self.state_channels = Some(StateChannel::default());
+        if let Some(channel) = &self.state_channels {
+            // Now we can use the async initialization for StateChannel
+            channel.initialize().await?;
+            println!("StateChannel initialized asynchronously");
+        }
+
+        println!("All Layer 2 protocols initialized asynchronously");
+        Ok(())
+    }
+
     fn init_protocol<T>(
         &mut self,
         field: &mut Option<T>,
@@ -77,6 +134,20 @@ impl Layer2Manager {
         }
     }
 
+    /// Get protocol for async usage
+    pub fn get_protocol_async(&self, protocol_type: Layer2ProtocolType) -> Option<&dyn crate::layer2::Layer2Protocol> {
+        match protocol_type {
+            Layer2ProtocolType::BOB => self.bob_client.as_ref().map(|c| c as &dyn crate::layer2::Layer2Protocol),
+            Layer2ProtocolType::Liquid => self.liquid_module.as_ref().map(|c| c as &dyn crate::layer2::Layer2Protocol),
+            Layer2ProtocolType::RSK => self.rsk_client.as_ref().map(|c| c as &dyn crate::layer2::Layer2Protocol),
+            Layer2ProtocolType::Stacks => self.stacks_client.as_ref().map(|c| c as &dyn crate::layer2::Layer2Protocol),
+            Layer2ProtocolType::TaprootAssets => self.taproot_assets.as_ref().map(|c| c as &dyn crate::layer2::Layer2Protocol),
+            Layer2ProtocolType::Lightning => self.lightning_network.as_ref().map(|c| c as &dyn crate::layer2::Layer2Protocol),
+            Layer2ProtocolType::StateChannels => self.state_channels.as_ref().map(|c| c as &dyn crate::layer2::Layer2Protocol),
+            _ => None,
+        }
+    }
+
     /// Cross-layer asset transfer
     pub fn cross_layer_transfer(
         &self,
@@ -90,6 +161,42 @@ impl Layer2Manager {
             from_protocol, to_protocol
         );
 
+        let transfer_id = format!(
+            "cross_{}_{}_{}_{}",
+            protocol_name(from_protocol),
+            protocol_name(to_protocol),
+            asset_id,
+            amount
+        );
+
+        Ok(transfer_id)
+    }
+
+    /// Execute cross-layer transfer asynchronously
+    pub async fn cross_layer_transfer_async(
+        &self,
+        from_protocol: Layer2ProtocolType,
+        to_protocol: Layer2ProtocolType,
+        asset_id: &str,
+        amount: u64,
+    ) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+        println!(
+            "Asynchronously executing cross-layer transfer from {:?} to {:?}",
+            from_protocol, to_protocol
+        );
+
+        let source = self.get_protocol_async(from_protocol);
+        let destination = self.get_protocol_async(to_protocol);
+
+        if source.is_none() || destination.is_none() {
+            return Err(Box::new(std::io::Error::new(
+                std::io::ErrorKind::NotFound,
+                "Source or destination protocol not found",
+            )));
+        }
+
+        // In a real implementation, this would handle the cross-layer transfer
+        // For now, we just simulate it
         let transfer_id = format!(
             "cross_{}_{}_{}_{}",
             protocol_name(from_protocol),
@@ -120,6 +227,35 @@ impl Layer2Manager {
             }
         }
 
+        Ok(true)
+    }
+
+    /// Verify cross-layer proof asynchronously
+    pub async fn verify_cross_layer_proof_async(
+        &self,
+        proof: Proof,
+        protocols: Vec<Layer2ProtocolType>,
+    ) -> Result<bool, Box<dyn std::error::Error + Send + Sync>> {
+        println!(
+            "Asynchronously verifying cross-layer proof across {} protocols",
+            protocols.len()
+        );
+
+        for protocol_type in &protocols {
+            if let Some(protocol) = self.get_protocol_async(*protocol_type) {
+                let result = protocol.verify_proof(proof.clone()).await?;
+                if !result.is_valid {
+                    return Ok(false);
+                }
+            } else {
+                return Err(Box::new(std::io::Error::new(
+                    std::io::ErrorKind::NotFound,
+                    format!("{:?} protocol not found", protocol_type),
+                )));
+            }
+        }
+
+        // All protocols validated the proof
         Ok(true)
     }
 }

@@ -345,6 +345,84 @@ impl crate::layer2::Layer2ProtocolTrait for LightningNetwork {
     }
 }
 
+// Implement the async Layer2Protocol trait for LightningNetwork
+#[async_trait::async_trait]
+impl crate::layer2::Layer2Protocol for LightningNetwork {
+    async fn initialize(&self) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+        // Connect to the Lightning Network node
+        println!("Asynchronously initializing Lightning Network...");
+        Ok(())
+    }
+
+    async fn connect(&self) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+        // Connect to the lightning network
+        println!("Asynchronously connecting to Lightning Network...");
+        Ok(())
+    }
+
+    async fn get_state(&self) -> Result<ProtocolState, Box<dyn std::error::Error + Send + Sync>> {
+        let total_capacity = self
+            .channels
+            .iter()
+            .map(|c| c.capacity)
+            .sum::<u64>();
+        
+        // Create state information
+        let state = ProtocolState {
+            version: "1.0".to_string(),
+            connections: 1,
+            capacity: Some(total_capacity),
+            operational: self.connected,
+            height: 0,
+            hash: "00000000".to_string(),
+            timestamp: std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_secs(),
+        };
+        
+        Ok(state)
+    }
+
+    async fn submit_transaction(&self, tx_data: &[u8]) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+        // Submit transaction to the Lightning Network
+        println!("Asynchronously submitting transaction to Lightning: {} bytes", tx_data.len());
+        Ok(format!("tx_{}", uuid::Uuid::new_v4()))
+    }
+
+    async fn check_transaction_status(&self, tx_id: &str) -> Result<TransactionStatus, Box<dyn std::error::Error + Send + Sync>> {
+        // Check transaction status
+        println!("Asynchronously checking transaction status for {}", tx_id);
+        Ok(TransactionStatus::Confirmed)
+    }
+    
+    async fn sync_state(&mut self) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+        // Sync with the Lightning Network
+        println!("Asynchronously syncing Lightning Network state");
+        self.connected = true;
+        Ok(())
+    }
+    
+    async fn issue_asset(&self, params: AssetParams) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+        // Lightning doesn't support asset issuance
+        println!("Attempting to issue asset {} on Lightning Network (not supported)", params.name);
+        Err(Box::new(Layer2Error::Protocol("Asset issuance not supported in Lightning".to_string())))
+    }
+    
+    async fn transfer_asset(&self, transfer: AssetTransfer) -> Result<TransferResult, Box<dyn std::error::Error + Send + Sync>> {
+        // Lightning doesn't support asset transfer directly
+        println!("Attempting to transfer asset {} on Lightning Network (not supported)", transfer.asset_id);
+        Err(Box::new(Layer2Error::Protocol("Asset transfer not supported in Lightning".to_string())))
+    }
+    
+    async fn verify_proof(&self, proof: Proof) -> Result<VerificationResult, Box<dyn std::error::Error + Send + Sync>> {
+        println!("Asynchronously verifying {} proof on Lightning Network", proof.proof_type);
+        Ok(crate::layer2::create_verification_result(true, None))
+    }
+    
+    async fn validate_state(&self, state_data: &[u8]) -> Result<ValidationResult, Box<dyn std::error::Error + Send + Sync>> {
+        println!("Asynchronously validating state on Lightning Network: {} bytes", state_data.len());
+        Ok(crate::layer2::create_validation_result(true, vec![]))
+    }
+}
+
 /// Lightning Protocol implementation for tests
 #[derive(Debug)]
 pub struct LightningProtocol {
@@ -374,74 +452,5 @@ impl LightningProtocol {
     /// Get mutable access to the underlying network
     pub fn get_network_mut(&mut self) -> &mut LightningNetwork {
         &mut self.network
-    }
-}
-
-#[async_trait::async_trait]
-impl crate::layer2::Layer2Protocol for LightningProtocol {
-    async fn initialize(&self) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-        // Initialize the underlying network
-        println!("Asynchronously initializing Lightning Network...");
-        Ok(())
-    }
-    
-    async fn connect(&self) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-        // Connect to the lightning network
-        println!("Asynchronously connecting to Lightning Network...");
-        Ok(())
-    }
-    
-    async fn get_state(&self) -> Result<ProtocolState, Box<dyn std::error::Error + Send + Sync>> {
-        // Get the state from the network
-        let total_capacity = self.network.channels.iter().map(|c| c.capacity).sum::<u64>();
-        
-        Ok(ProtocolState {
-            version: "1.0".to_string(),
-            connections: 1,
-            capacity: Some(total_capacity),
-            operational: self.network.connected,
-            height: 0,
-            hash: "00000000".to_string(),
-            timestamp: std::time::SystemTime::now()
-                .duration_since(std::time::UNIX_EPOCH)
-                .unwrap_or_default()
-                .as_secs(),
-        })
-    }
-    
-    async fn submit_transaction(&self, tx_data: &[u8]) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
-        // Submit transaction to the Lightning Network
-        println!("Submitting transaction to Lightning Network: {} bytes", tx_data.len());
-        Ok(format!("tx_{}", uuid::Uuid::new_v4()))
-    }
-    
-    async fn check_transaction_status(&self, tx_id: &str) -> Result<TransactionStatus, Box<dyn std::error::Error + Send + Sync>> {
-        println!("Checking transaction status for {}", tx_id);
-        // In a real implementation, this would check via LND API
-        Ok(TransactionStatus::Confirmed)
-    }
-    
-    async fn sync_state(&mut self) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-        // Sync with the Lightning Network
-        println!("Synchronizing Lightning Network state...");
-        Ok(())
-    }
-    
-    async fn issue_asset(&self, _params: AssetParams) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
-        // Lightning doesn't support asset creation directly
-        Err(Box::new(Layer2Error::Protocol("Asset issuance not supported in Lightning".to_string())))
-    }
-    
-    async fn transfer_asset(&self, _transfer: AssetTransfer) -> Result<TransferResult, Box<dyn std::error::Error + Send + Sync>> {
-        // Lightning doesn't support asset transfers directly
-        Err(Box::new(Layer2Error::Protocol("Asset transfer not supported in Lightning".to_string())))
-    }
-    
-    async fn verify_proof(&self, _proof: Proof) -> Result<VerificationResult, Box<dyn std::error::Error + Send + Sync>> {
-        Ok(crate::layer2::create_verification_result(true, None))
-    }
-    
-    async fn validate_state(&self, _state_data: &[u8]) -> Result<ValidationResult, Box<dyn std::error::Error + Send + Sync>> {
-        Ok(crate::layer2::create_validation_result(true, vec![]))
     }
 }
