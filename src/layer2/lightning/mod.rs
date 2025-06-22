@@ -18,75 +18,64 @@ use crate::layer2::{
 /// Lightning Network configuration
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct LightningConfig {
-    /// Network type (mainnet, testnet, regtest)
+    /// Network type: mainnet, testnet, regtest
     pub network: String,
     /// Node URL
     pub node_url: String,
-    /// Authentication token
-    pub auth_token: Option<String>,
-    /// Auto-pilot enabled
-    pub auto_pilot: bool,
-    /// Watchtower enabled
-    pub watchtower_enabled: bool,
-    /// Minimum channel capacity in sats
-    pub min_channel_capacity: u64,
-    /// Fee rate in sats/byte
-    pub fee_rate: u64,
+    /// Macaroon for authentication (hex encoded)
+    pub macaroon: String,
+    /// TLS certificate (base64 encoded)
+    pub cert: String,
 }
 
 impl Default for LightningConfig {
     fn default() -> Self {
         Self {
-            network: "mainnet".to_string(),
-            node_url: "http://127.0.0.1:10009".to_string(),
-            auth_token: None,
-            auto_pilot: false,
-            watchtower_enabled: true,
-            min_channel_capacity: 100000, // 100,000 sats
-            fee_rate: 5,
+            network: "regtest".to_string(),
+            node_url: "127.0.0.1:10009".to_string(),
+            macaroon: "0201036c6e64022f030a10b493a60e861b6c8a0e0a854355b4320612071f9e0f708e354d9234d6171d7cd0111d1313c7cd088f8ac2cd900101201301".to_string(),
+            cert: "".to_string(),
         }
     }
 }
 
 /// Lightning Network implementation
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct LightningNetwork {
-    /// Configuration
-    config: LightningConfig,
-    /// Connection state
-    connected: bool,
-    /// Node pubkey
-    node_pubkey: Option<String>,
-    /// Active channels
-    channels: Vec<LightningChannel>,
+    /// Lightning configuration
+    pub config: LightningConfig,
+    /// Connection status
+    pub connected: bool,
+    /// Node public key
+    pub node_pubkey: Option<String>,
+    /// Lightning channels
+    pub channels: Vec<LightningChannel>,
 }
 
-/// Lightning Channel
-#[derive(Debug, Clone, Serialize, Deserialize)]
+/// Lightning Channel representation
+#[derive(Debug, Clone)]
 pub struct LightningChannel {
     /// Channel ID
     pub channel_id: String,
     /// Remote node pubkey
     pub remote_pubkey: String,
-    /// Channel capacity in sats
-    pub capacity: u64,
     /// Local balance in sats
     pub local_balance: u64,
     /// Remote balance in sats
     pub remote_balance: u64,
-    /// Channel is active
+    /// Channel capacity
+    pub capacity: u64,
+    /// Active status
     pub active: bool,
-    /// Channel is private
-    pub private: bool,
 }
 
-/// BOLT-11 Invoice
-#[derive(Debug, Clone, Serialize, Deserialize)]
+/// Lightning invoice representation
+#[derive(Debug, Clone)]
 pub struct LightningInvoice {
-    /// Invoice string
-    pub bolt11: String,
     /// Payment hash
     pub payment_hash: String,
+    /// Payment request (BOLT11)
+    pub payment_request: String,
     /// Description
     pub description: String,
     /// Amount in sats
@@ -112,142 +101,186 @@ impl LightningNetwork {
     pub fn new_default() -> Self {
         Self::new(LightningConfig::default())
     }
+}
     
 impl Default for LightningNetwork {
     fn default() -> Self {
         Self::new(LightningConfig::default())
     }
+}
 
-    /// Connect to the Lightning Network node
-    pub fn connect(&mut self) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-        // Actual implementation would connect to LND, c-lightning, or similar
-        self.connected = true;
-        self.node_pubkey =
-            Some("0283863a78ec0df67ae8f369e4082a1f67ce09e309e3ce35c6dc4a7e2cb425993c".to_string());
-        Ok(())
-    }
-
-    /// Open a channel with another node
-    pub fn open_channel(
-        &mut self,
-        node_pubkey: &str,
-        capacity: u64,
-        private: bool,
-    ) -> Result<LightningChannel, Box<dyn std::error::Error + Send + Sync>> {
-        if !self.connected {
-            return Err(Box::new(Layer2Error::Connection(
-                "Not connected to node".to_string(),
-            )));
-        }
-
-        if capacity < self.config.min_channel_capacity {
-            return Err(Box::new(Layer2Error::Protocol(format!(
-                "Channel capacity too low, minimum is {} sats",
-                self.config.min_channel_capacity
-            ))));
-        }
-
-        // Actual implementation would create a channel
-        let channel = LightningChannel {
-            channel_id: format!("{}:{}", node_pubkey, capacity),
-            remote_pubkey: node_pubkey.to_string(),
-            capacity,
-            local_balance: capacity,
-            remote_balance: 0,
-            active: true,
-            private,
-        };
-
-        self.channels.push(channel.clone());
-        Ok(channel)
-    }
-
-    /// Create a BOLT-11 invoice
-    pub fn create_invoice(
-        &self,
-        amount_sats: u64,
-        description: &str,
-        expiry: u64,
-    ) -> Result<LightningInvoice, Box<dyn std::error::Error + Send + Sync>> {
-        if !self.connected {
-            return Err(Box::new(Layer2Error::Connection(
-                "Not connected to node".to_string(),
-            )));
-        }
-
-        // Create a payment hash (would be random in real implementation)
-        let payment_hash =
-            "0001020304050607080910111213141516171819202122232425262728293031".to_string();
-
-        // Actual implementation would create a real invoice using the node
-        let timestamp = std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .unwrap()
-            .as_secs();
-
+// Methods for LightningNetwork
+impl LightningNetwork {
+    /// Create a payment invoice
+    pub fn create_invoice(&self, amount_sats: u64, description: &str) -> Result<LightningInvoice, Box<dyn std::error::Error + Send + Sync>> {
+        // Create a unique payment hash
+        let payment_hash = format!("ph_{}", uuid::Uuid::new_v4());
+        
+        // Create the invoice
         let invoice = LightningInvoice {
-            bolt11: format!("lnbc{}n1p0zzzzzzpp5qqqsyqcyq5rqwzqfqqqsyqcyq5rqwzqfqqqsyqcyq5rqwzqfqypqdq5xysxxatsyp3k7enxv4jsxqzpuatp8xqnk4kx5ur98a5q5u7q9p4q8qu6xq8q0azqgd4x3wmx35x2ctp4xys",
-                amount_sats),
             payment_hash,
+            payment_request: format!("lnbc{}n1p0rkj34pp5{}zktzcaayf952fuknteqkzn269ghmgj8w6hzygxg7dfty02qsdqqcqzpgsp5{}q9qy9qsqsp5{}ac0ddx0gsw3tx8d46vdr5n04w4jf4sn4m48m2uus8gusq9qyyssq4g8p6qpk370wljx8y60naskwd30p4y08k4qgyhkz4q2tyjn0cta9ewchqs2536nx7k6hv28kg0hw0z2rrw48qxvj9x8khjx94fqqhwcpw5qzty", 
+                                       amount_sats,
+                                       uuid::Uuid::new_v4(),
+                                       uuid::Uuid::new_v4(),
+                                       uuid::Uuid::new_v4()),
             description: description.to_string(),
             amount_sats,
-            timestamp,
-            expiry,
+            timestamp: std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_secs(),
+            expiry: 3600,
         };
-
+        
         Ok(invoice)
     }
 
-    /// Pay a BOLT-11 invoice
-    pub fn pay_invoice(&self, _bolt11: &str) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
-        if !self.connected {
-            return Err(Box::new(Layer2Error::Connection(
-                "Not connected to node".to_string(),
-            )));
-        }
-
-        // Actual implementation would decode and pay the invoice
-        // For simplicity, we just return a payment result
-        Ok("payment_successful".to_string())
+    /// Pay a lightning invoice
+    pub fn pay_invoice(&self, payment_request: &str) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+        // Simulate payment
+        // In real implementation, this would call the LND API
+        
+        // Extract payment hash from the invoice
+        // This is just a simulation - in reality we'd decode the BOLT11 invoice
+        let payment_hash = if payment_request.len() > 20 {
+            payment_request[20..52].to_string()
+        } else {
+            return Err(Box::new(Layer2Error::Protocol("Invalid payment request".to_string())));
+        };
+        
+        Ok(payment_hash)
     }
-
-    /// Get channel by ID
-    pub fn get_channel(&self, channel_id: &str) -> Option<&LightningChannel> {
-        self.channels.iter().find(|c| c.channel_id == channel_id)
+    
+    /// Open a lightning channel
+    pub fn open_channel(&mut self, remote_pubkey: &str, capacity: u64) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+        // Create a channel ID
+        let channel_id = format!("chan_{}", uuid::Uuid::new_v4());
+        
+        // Create the channel
+        let channel = LightningChannel {
+            channel_id: channel_id.clone(),
+            remote_pubkey: remote_pubkey.to_string(),
+            local_balance: capacity,
+            remote_balance: 0,
+            capacity,
+            active: true,
+        };
+        
+        // Add to channels list
+        self.channels.push(channel);
+        
+        Ok(channel_id)
     }
-
-    /// List all channels
-    pub fn list_channels(&self) -> &[LightningChannel] {
-        &self.channels
-    }
-
-    /// Close channel
-    pub fn close_channel(&mut self, channel_id: &str, _force: bool) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-        if !self.connected {
-            return Err(Box::new(Layer2Error::Connection(
-                "Not connected to node".to_string(),
-            )));
-        }
-
-        let pos = self
-            .channels
-            .iter()
-            .position(|c| c.channel_id == channel_id);
-        match pos {
-            Some(index) => {
-                // In real implementation, we would initiate channel closure with the node
-                self.channels.remove(index);
-                Ok(())
-            }
+    
+    /// Get channel information
+    pub fn get_channel_info(&self, channel_id: &str) -> Result<&LightningChannel, Box<dyn std::error::Error + Send + Sync>> {
+        // Find the channel
+        match self.channels.iter().find(|c| c.channel_id == channel_id) {
+            Some(channel) => Ok(channel),
             None => Err(Box::new(Layer2Error::Protocol(format!(
-                "Channel {} not found",
+                "Channel not found with id: {}",
                 channel_id
             )))),
         }
     }
+
+    /// Get balance for an asset
+    pub fn get_balance(&self, _asset_id: &str) -> Result<u64, Box<dyn std::error::Error + Send + Sync>> {
+        // In Lightning, we just return the sum of channel capacities
+        let total_capacity = self
+            .channels
+            .iter()
+            .map(|c| c.local_balance)
+            .sum::<u64>();
+        
+        Ok(total_capacity)
+    }
+    
+    /// Get the Lightning Network's balance for a specific asset
+    pub fn get_balance_by_asset(&self, asset_id: &str) -> Result<u64, Box<dyn std::error::Error + Send + Sync>> {
+        // For Lightning, the asset_id is ignored as we just deal with BTC
+        println!("Getting balance for asset_id {}", asset_id);
+        
+        let total_capacity = self
+            .channels
+            .iter()
+            .map(|c| c.local_balance)
+            .sum::<u64>();
+            
+        Ok(total_capacity)
+    }
+    
+    /// Send payment
+    pub fn send(&mut self, to: &str, amount: u64, _asset_id: &str) -> Result<TransactionStatus, Box<dyn std::error::Error + Send + Sync>> {
+        // In Lightning, we would create a payment via BOLT11 invoice
+        // This is a mock implementation
+        println!("Sending {} sats to {}", amount, to);
+        Ok(TransactionStatus::Confirmed)
+    }
+    
+    /// Create a payment channel to a node
+    pub fn create_payment_channel(&mut self, node_id: &str, capacity: u64) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+        // In a real implementation, this would create an actual payment channel via LND API
+        println!("Creating payment channel to {} with capacity {}", node_id, capacity);
+        
+        // Generate a channel ID
+        let channel_id = format!("chan_{}", uuid::Uuid::new_v4());
+        
+        // Create a channel object
+        let channel = LightningChannel {
+            channel_id: channel_id.clone(),
+            remote_pubkey: node_id.to_string(),
+            local_balance: capacity,
+            remote_balance: 0,
+            capacity,
+            active: true,
+        };
+        
+        // Add the channel to our list
+        self.channels.push(channel);
+        
+        Ok(channel_id)
+    }
+    
+    /// Close a payment channel
+    pub fn close_payment_channel(&mut self, channel_id: &str) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+        // Find the channel
+        let channel_index = self.channels.iter().position(|c| c.channel_id == channel_id);
+        
+        match channel_index {
+            Some(index) => {
+                // Remove the channel
+                let _channel = self.channels.remove(index);
+                let close_tx_id = format!("close_tx_{}", uuid::Uuid::new_v4());
+                Ok(close_tx_id)
+            }
+            None => Err(Box::new(Layer2Error::Protocol(format!(
+                "Channel not found with id: {}", channel_id
+            )))),
+        }
+    }
+    
+    /// Get the number of active channels
+    pub fn get_active_channel_count(&self) -> usize {
+        self.channels.iter().filter(|c| c.active).count()
+    }
+    
+    /// Get transaction status
+    pub fn get_transaction_status(&self, txid: &str) -> Result<TransactionStatus, Box<dyn std::error::Error + Send + Sync>> {
+        // Check transaction status, default to confirmed for mock implementation
+        println!("Checking status for transaction {}", txid);
+        Ok(TransactionStatus::Confirmed)
+    }
+    
+    /// Get address
+    pub fn get_address(&self) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+        // In Lightning, this would typically return a node pubkey or BOLT11 invoice
+        match &self.node_pubkey {
+            Some(pubkey) => Ok(pubkey.clone()),
+            None => Ok("unknown_pubkey".to_string()),
+        }
+    }
 }
 
-// Implement Layer2Protocol trait for LightningNetwork
+// Implement Layer2ProtocolTrait for LightningNetwork
 impl crate::layer2::Layer2ProtocolTrait for LightningNetwork {
     fn initialize(&self) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         // Connect to the Lightning Network node
@@ -258,91 +291,57 @@ impl crate::layer2::Layer2ProtocolTrait for LightningNetwork {
         let total_capacity = self
             .channels
             .iter()
-            .filter(|c| c.active)
             .map(|c| c.capacity)
-            .sum();
-
-        Ok(crate::layer2::create_protocol_state(
-            "0.13.1",
-            self.channels.len() as u32,
-            Some(total_capacity),
-            self.connected,
-        ))
+            .sum::<u64>();
+        
+        // Create state information
+        let state = ProtocolState {
+            version: "1.0".to_string(),
+            connections: 1,
+            capacity: Some(total_capacity),
+            operational: self.connected,
+            height: 0,
+            hash: "00000000".to_string(),
+            timestamp: std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_secs(),
+        };
+        
+        Ok(state)
     }
 
-    fn submit_transaction(&self, tx_data: &[u8]) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
-        // Convert tx_data to a hex string (simplified)
-        let tx_hex = hex::encode(tx_data);
-        Ok(format!(
-            "txid_{}",
-            tx_hex.chars().take(8).collect::<String>()
-        ))
+    fn submit_transaction(&self, _tx_data: &[u8]) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+        // Submit transaction to the Lightning Network
+        // In a real implementation, this would use LND API
+        Ok(format!("tx_{}", uuid::Uuid::new_v4()))
     }
 
-    fn check_transaction_status(&self, tx_id: &str) -> Result<TransactionStatus, Box<dyn std::error::Error + Send + Sync>> {
-        // Simplified implementation
-        if tx_id.starts_with("txid_") {
-            Ok(TransactionStatus::Confirmed)
-        } else {
-            Ok(TransactionStatus::Pending)
-        }
+    fn check_transaction_status(&self, _tx_id: &str) -> Result<TransactionStatus, Box<dyn std::error::Error + Send + Sync>> {
+        // Check transaction status
+        // In a real implementation, this would check via LND API
+        Ok(TransactionStatus::Confirmed)
     }
-
+    
     fn sync_state(&mut self) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-        // Synchronize state with the Lightning Network node
+        // Sync with the Lightning Network
+        self.connected = true;
         Ok(())
     }
-
+    
     fn issue_asset(&self, _params: AssetParams) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
-        // Lightning doesn't support asset issuance directly
-        Err(Box::new(Layer2Error::Protocol(
-            "Asset issuance not supported in Lightning Network".to_string(),
-        )))
+        // Lightning doesn't support asset issuance
+        Err(Box::new(Layer2Error::Protocol("Asset issuance not supported in Lightning".to_string())))
     }
-
+    
     fn transfer_asset(&self, _transfer: AssetTransfer) -> Result<TransferResult, Box<dyn std::error::Error + Send + Sync>> {
-        // Lightning doesn't support asset transfers directly, but we can simulate payments
-        let timestamp = std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .unwrap()
-            .as_secs();
-
-        Ok(TransferResult {
-            tx_id: format!("ln_payment_{}", timestamp),
-            status: TransactionStatus::Confirmed,
-            fee: Some(1000), // 1000 sats fee
-            timestamp,
-        })
+        // Lightning doesn't support asset transfer directly
+        Err(Box::new(Layer2Error::Protocol("Asset transfer not supported in Lightning".to_string())))
     }
-
-    fn verify_proof(&self, proof: Proof) -> Result<VerificationResult, Box<dyn std::error::Error + Send + Sync>> {
-        // Simplified proof verification
-        let is_valid = proof.proof_type == "payment_proof";
-        let _timestamp = std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .unwrap()
-            .as_secs();
-
-        Ok(crate::layer2::create_verification_result(
-            is_valid,
-            if is_valid {
-                None
-            } else {
-                Some("Invalid proof type".to_string())
-            },
-        ))
+    
+    fn verify_proof(&self, _proof: Proof) -> Result<VerificationResult, Box<dyn std::error::Error + Send + Sync>> {
+        Ok(crate::layer2::create_verification_result(true, None))
     }
-
+    
     fn validate_state(&self, _state_data: &[u8]) -> Result<ValidationResult, Box<dyn std::error::Error + Send + Sync>> {
-        let _timestamp = std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .unwrap()
-            .as_secs();
-
-        Ok(crate::layer2::create_validation_result(
-            true,
-            vec![],
-        ))
+        Ok(crate::layer2::create_validation_result(true, vec![]))
     }
 }
 
@@ -357,110 +356,91 @@ impl LightningProtocol {
     pub fn new() -> Self {
         let config = LightningConfig {
             network: "regtest".to_string(),
-            node_url: "localhost:10009".to_string(),
-            auth_token: None,
-            auto_pilot: false,
-            watchtower_enabled: false,
-            min_channel_capacity: 20000,
-            fee_rate: 1,
+            node_url: "127.0.0.1:10009".to_string(),
+            macaroon: "0201036c6e64022f030a10b493a60e861b6c8a0e0a854355b4320612071f9e0f708e354d9234d6171d7cd0111d1313c7cd088f8ac2cd900101201301".to_string(),
+            cert: "".to_string(),
         };
         
-        let network = LightningNetwork::new(config);
-        
-        Self { network }
+        Self {
+            network: LightningNetwork::new(config),
+        }
     }
-
-    /// Get network configuration
+    
+    /// Get the underlying network
     pub fn get_network(&self) -> &LightningNetwork {
         &self.network
     }
-
-    /// Get mutable network reference
+    
+    /// Get mutable access to the underlying network
     pub fn get_network_mut(&mut self) -> &mut LightningNetwork {
         &mut self.network
-    }
-
-    /// Connect to Lightning network
-    pub async fn connect(&mut self) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-        self.network.connect()
-    }
-
-    /// Check network connection status
-    pub fn is_connected(&self) -> bool {
-        self.network.connected
-    }
-
-    /// Open a Lightning channel
-    pub async fn open_channel(&mut self, node_id: &str, capacity: u64) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
-        let channel_id = format!("ch_{}", uuid::Uuid::new_v4());
-        self.network.open_channel(node_id, capacity, true)?;
-        Ok(channel_id)
-    }
-
-    /// Close a Lightning channel
-    pub async fn close_channel(&mut self, channel_id: &str) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-        self.network.close_channel(channel_id, false)
-    }
-
-    /// Get active channels count
-    pub fn get_channel_count(&self) -> usize {
-        self.network.channels.len()
     }
 }
 
 #[async_trait::async_trait]
 impl crate::layer2::Layer2Protocol for LightningProtocol {
     async fn initialize(&self) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-        // Initialize Lightning Network protocol
+        // Initialize the underlying network
+        println!("Asynchronously initializing Lightning Network...");
         Ok(())
     }
-
+    
     async fn connect(&self) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-        // Connect to Lightning Network
+        // Connect to the lightning network
+        println!("Asynchronously connecting to Lightning Network...");
         Ok(())
     }
-
+    
     async fn get_state(&self) -> Result<ProtocolState, Box<dyn std::error::Error + Send + Sync>> {
-        Ok(crate::layer2::create_protocol_state(
-            "1.0.0",
-            0,
-            Some(0),
-            true,
-        ))
-    }
-
-    async fn submit_transaction(&self, _tx_data: &[u8]) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
-        Ok("mock_lightning_tx_id".to_string())
-    }
-
-    async fn check_transaction_status(&self, _tx_id: &str) -> Result<TransactionStatus, Box<dyn std::error::Error + Send + Sync>> {
-        Ok(TransactionStatus::Confirmed)
-    }
-
-    async fn sync_state(&mut self) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-        Ok(())
-    }
-
-    async fn issue_asset(&self, _params: AssetParams) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
-        Ok("mock_lightning_asset_id".to_string())
-    }
-
-    async fn transfer_asset(&self, _transfer: AssetTransfer) -> Result<TransferResult, Box<dyn std::error::Error + Send + Sync>> {
-        Ok(TransferResult {
-            tx_id: "mock_lightning_transfer_id".to_string(),
-            status: TransactionStatus::Confirmed,
-            fee: Some(1000),
+        // Get the state from the network
+        let total_capacity = self.network.channels.iter().map(|c| c.capacity).sum::<u64>();
+        
+        Ok(ProtocolState {
+            version: "1.0".to_string(),
+            connections: 1,
+            capacity: Some(total_capacity),
+            operational: self.network.connected,
+            height: 0,
+            hash: "00000000".to_string(),
             timestamp: std::time::SystemTime::now()
                 .duration_since(std::time::UNIX_EPOCH)
-                .unwrap()
+                .unwrap_or_default()
                 .as_secs(),
         })
     }
-
+    
+    async fn submit_transaction(&self, tx_data: &[u8]) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+        // Submit transaction to the Lightning Network
+        println!("Submitting transaction to Lightning Network: {} bytes", tx_data.len());
+        Ok(format!("tx_{}", uuid::Uuid::new_v4()))
+    }
+    
+    async fn check_transaction_status(&self, tx_id: &str) -> Result<TransactionStatus, Box<dyn std::error::Error + Send + Sync>> {
+        println!("Checking transaction status for {}", tx_id);
+        // In a real implementation, this would check via LND API
+        Ok(TransactionStatus::Confirmed)
+    }
+    
+    async fn sync_state(&mut self) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+        // Sync with the Lightning Network
+        println!("Synchronizing Lightning Network state...");
+        Ok(())
+    }
+    
+    async fn issue_asset(&self, _params: AssetParams) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+        // Lightning doesn't support asset creation directly
+        Err(Box::new(Layer2Error::Protocol("Asset issuance not supported in Lightning".to_string())))
+    }
+    
+    async fn transfer_asset(&self, _transfer: AssetTransfer) -> Result<TransferResult, Box<dyn std::error::Error + Send + Sync>> {
+        // Lightning doesn't support asset transfers directly
+        Err(Box::new(Layer2Error::Protocol("Asset transfer not supported in Lightning".to_string())))
+    }
+    
     async fn verify_proof(&self, _proof: Proof) -> Result<VerificationResult, Box<dyn std::error::Error + Send + Sync>> {
         Ok(crate::layer2::create_verification_result(true, None))
     }
-
+    
     async fn validate_state(&self, _state_data: &[u8]) -> Result<ValidationResult, Box<dyn std::error::Error + Send + Sync>> {
         Ok(crate::layer2::create_validation_result(true, vec![]))
     }
