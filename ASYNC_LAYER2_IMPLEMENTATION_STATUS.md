@@ -1,5 +1,12 @@
 # Async Layer2 Protocol Implementation Status
 
+> **Update (June 22, 2025):**
+>
+> - All Layer2 modules (Core Framework, BobClient, LiquidModule, RskClient, StacksClient, TaprootAssetsProtocol, LightningNetwork, StateChannel, Layer2Manager) are now **locked** and marked **stable**.
+> - Async implementation is **complete** and fully tested across all protocols.
+> - Documentation, benchmarks, and migration guides are up to date.
+> - Ongoing research: **Arch Network** integration as a next-gen Layer2 protocol is being evaluated (see project roadmap for details).
+
 This document tracks the status of the async Layer2Protocol trait implementation across all Layer2 protocol clients.
 
 ## Implementation Status

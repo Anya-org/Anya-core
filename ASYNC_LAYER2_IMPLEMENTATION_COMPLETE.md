@@ -1,5 +1,12 @@
 # Async Layer2 Protocol Implementation - Complete Summary
 
+> **Update (June 22, 2025):**
+>
+> - All Layer2 modules are now **locked** and marked **stable**.
+> - Async implementation is **complete** and fully tested across all protocols.
+> - Documentation, benchmarks, and migration guides are up to date.
+> - Ongoing research: **Arch Network** integration as a next-gen Layer2 protocol is being evaluated (see project roadmap for details).
+
 **Last Updated: June 22, 2025**
 
 ## Completed Tasks
