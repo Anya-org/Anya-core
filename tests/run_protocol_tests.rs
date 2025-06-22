@@ -1,7 +1,7 @@
 use anya_core::layer2::{
-    dlc::DlcProtocol, lightning::LightningProtocol, liquid::LiquidProtocol,
-    mock::MockLayer2Protocol, rgb::RgbProtocol, rsk::RskProtocol, stacks::StacksProtocol,
-    state_channels::StateChannelsProtocol, AssetParams, AssetTransfer, Layer2Protocol, Proof,
+    dlc::DlcProtocol, lightning::{LightningNetwork, LightningConfig}, liquid::{LiquidModule, LiquidConfig},
+    mock::MockLayer2Protocol, rgb::RgbProtocol, rsk::{RskClient, RskConfig}, stacks::{StacksClient, StacksConfig},
+    state_channels::{StateChannel, StateChannelConfig}, AssetParams, AssetTransfer, Layer2Protocol, Proof,
     TransactionStatus,
 };
 
@@ -9,12 +9,12 @@ use anya_core::layer2::{
 async fn test_all_protocols() {
     // Create instances of all protocols
     let protocols: Vec<Box<dyn Layer2Protocol>> = vec![
-        Box::new(LightningProtocol::new()),
+        Box::new(LightningNetwork::new(LightningConfig::default())),
         Box::new(RgbProtocol::new()),
-        Box::new(RskProtocol::new()),
+        Box::new(RskClient::new(RskConfig::default())),
         Box::new(DlcProtocol::new()),
-        Box::new(StacksProtocol::new()),
-        Box::new(LiquidProtocol::new()),
+        Box::new(StacksClient::new(StacksConfig::default())),
+        Box::new(LiquidModule::new(LiquidConfig::default())),
         Box::new(StateChannelsProtocol::new()),
         Box::new(MockLayer2Protocol::new()),
     ];

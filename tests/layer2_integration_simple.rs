@@ -11,8 +11,8 @@ use anya_core::layer2::{
     liquid::{LiquidModule, LiquidConfig},
     state_channels::{StateChannel, StateChannelConfig, CommitmentType},
     mock::MockLayer2Protocol,
-    Layer2ProtocolTrait, TransactionStatus, ProtocolState,
-    AssetParams, AssetTransfer,
+    Layer2ProtocolTrait,
+    AssetParams,
 };
 
 /// Configuration for integration testing
@@ -86,7 +86,8 @@ async fn test_lightning_network_operations() {
     let lightning_config = LightningConfig {
         network: "testnet".to_string(),
         node_url: "http://localhost:9735".to_string(),
-        timeout_ms: 5000,
+        macaroon: "0201036c6e64022f030a10b493a60e861b6c8a0e0a854355b4320612071f9e0f708e354d9234d6171d7cd0111d1313c7cd088f8ac2cd900101201301".to_string(),
+        cert: "".to_string(),
     };
     
     let lightning = Arc::new(LightningNetwork::new(lightning_config));
@@ -160,7 +161,7 @@ async fn test_state_channel_operations() {
         network: "testnet".to_string(),
         capacity: 1000000, // 1 BTC in satoshis
         time_lock: 144,    // ~24 hours in blocks
-        commitment_type: CommitmentType::P2WSH,
+        commitment_type: CommitmentType::MultiSig2of2,
         use_taproot: false,
         fee_rate: 10,     // 10 sat/vbyte
     };
@@ -209,8 +210,15 @@ async fn test_state_channel_operations() {
 async fn test_liquid_sidechain_operations() {
     let liquid_config = LiquidConfig {
         network: "testnet".to_string(),
-        node_url: "http://localhost:7041".to_string(),
+        rpc_url: "http://localhost:7041".to_string(),
+        confidential: true,
         timeout_ms: 5000,
+        federation_pubkeys: vec![
+            "02142b5513b2bb94c35310618b6e7c80b08c04b0e3c26ba7e1b306b7f3fecefbfb".to_string(),
+            "027f76e2d59b7acc8b2f43c2b7b2b4de5abaff7eadb7d8b2a6b1e7b7b4d8b2".to_string(),
+        ],
+        required_signatures: 11,
+        elementsd_path: "/usr/local/bin/elementsd".to_string(),
     };
     
     let liquid = Arc::new(LiquidModule::new(liquid_config));

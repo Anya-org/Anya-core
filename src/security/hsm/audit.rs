@@ -75,6 +75,7 @@ pub enum AuditStorageType {
 
 /// Audit logger for HSM operations
 /// [AIR-3][AIS-3][AIM-3][AIP-3][RES-3]
+#[derive(Debug)]
 pub struct AuditLogger {
     /// Configuration for the audit logger
     config: AuditLoggerConfig,
@@ -179,6 +180,60 @@ impl AuditLogger {
 
         let mut storage = self.storage.lock().await;
         storage.store_event(event).await
+    }
+
+    /// Compatibility log method for legacy code
+    pub async fn log<T: serde::Serialize>(
+        &self,
+        event_type: crate::security::hsm::error::AuditEventType,
+        result: crate::security::hsm::error::AuditEventResult,
+        severity: crate::security::hsm::error::AuditEventSeverity,
+        details: T,
+    ) -> Result<(), crate::security::hsm::error::HsmError> {
+        self.log_event(event_type, result, severity, details).await
+    }
+
+    /// Compatibility method for legacy code that uses the types::HsmAuditEvent
+    pub async fn log_event_legacy(
+        &self,
+        event_name: &str,
+        event: &crate::security::hsm::types::HsmAuditEvent,
+    ) -> Result<(), HsmError> {
+        if !self.config.enabled {
+            return Ok(());
+        }
+
+        // Convert the legacy HsmAuditEvent to parameters for the standard log_event method
+        let event_type = match event.event_type.as_str() {
+            "health_check" => AuditEventType::HsmInitialize,
+            "key_generation" => AuditEventType::KeyGeneration,
+            "encryption" => AuditEventType::Encrypt,
+            "decryption" => AuditEventType::Decrypt,
+            "signing" => AuditEventType::Sign,
+            "verification" => AuditEventType::Verify,
+            "key_rotation" => AuditEventType::KeyRotation,
+            "operation" => AuditEventType::OperationRequest,
+            _ => AuditEventType::Custom(event.event_type.clone()),
+        };
+
+        let result = match event.status.as_str() {
+            "started" => AuditEventResult::InProgress,
+            "success" => AuditEventResult::Success,
+            "failed" => AuditEventResult::Failure,
+            _ => AuditEventResult::InProgress,
+        };
+
+        let severity = AuditEventSeverity::Info;
+
+        // Build a details object
+        let details = serde_json::json!({
+            "provider": event.provider,
+            "status": event.status,
+            "details": event.details,
+            "operation_id": event.operation_id,
+        });
+
+        self.log_event(event_type, result, severity, details).await
     }
 
     /// Gets events from the audit log

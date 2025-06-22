@@ -54,11 +54,10 @@ impl HsmProvider for TpmHsmProvider {
         // For now, just log that we're using a stub implementation
         self.audit_logger.log(
             crate::security::hsm::error::AuditEventType::Initialization,
-            &self.config.hsm_id,
-            None,
-            "TPM provider initialized (stub implementation)",
             crate::security::hsm::error::AuditEventResult::Success,
-        )?;
+            crate::security::hsm::error::AuditEventSeverity::Info,
+            "TPM provider initialized (stub implementation)",
+        ).await?;
 
         Ok(())
     }

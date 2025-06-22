@@ -208,7 +208,8 @@ impl From<std::io::Error> for HsmError {
 pub enum AuditEventType {
     /// HSM initialization
     HsmInitialize,
-
+    /// Alias for legacy code
+    Initialization,
     /// HSM key generation
     KeyGeneration,
 
@@ -283,6 +284,7 @@ impl fmt::Display for AuditEventType {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             AuditEventType::HsmInitialize => write!(f, "hsm.initialize"),
+            AuditEventType::Initialization => write!(f, "hsm.initialize"), // Alias
             AuditEventType::KeyGeneration => write!(f, "key.generation"),
             AuditEventType::KeyDeletion => write!(f, "key.deletion"),
             AuditEventType::KeyRotation => write!(f, "key.rotation"),

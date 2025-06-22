@@ -5,7 +5,7 @@
 
 use std::sync::Arc;
 use anya_core::layer2::{
-    lightning::LightningNetwork,
+    lightning::{LightningConfig, LightningNetwork},
     rgb::RgbProtocol,
     rsk::RskClient,
     dlc::DlcProtocol,
@@ -46,41 +46,41 @@ async fn test_layer2_protocol_initialization() {
     
     // Test Stacks client initialization
     let stacks_config = StacksConfig {
-        node_url: "http://localhost:20443".to_string(),
-        contract_address: "test_contract".to_string(),
-        private_key: "test_key".to_string(),
         network: "testnet".to_string(),
+        rpc_url: "http://localhost:20443".to_string(),
+        pox_enabled: false,
+        timeout_ms: 30000,
     };
     let stacks = Arc::new(StacksClient::new(stacks_config));
     
     // Test BOB client initialization  
     let bob_config = BobConfig {
-        node_url: "http://localhost:8080".to_string(),
-        network: "testnet".to_string(),
-        timeout_seconds: config.timeout_seconds,
+        rpc_url: "http://localhost:8080".to_string(),
+        chain_id: 60808,
+        timeout_ms: 30000,
+        validate_relay: true,
     };
     let bob = Arc::new(BobClient::new(bob_config));
     
     // Verify basic protocol state
-    match stacks.get_state() {
+    match Layer2ProtocolTrait::get_state(&stacks) {
         Ok(state) => {
             assert!(!state.version.is_empty(), "Stacks version should not be empty");
             assert!(state.operational, "Stacks should be operational");
         }
         Err(_) => {
-            // Protocol may not be available in test environment
-            println!("Stacks protocol not available for testing");
+            println!("Stacks client not available for testing");
         }
     }
     
-    match bob.get_state() {
+    // Verify BOB protocol state
+    match Layer2ProtocolTrait::get_state(&bob) {
         Ok(state) => {
             assert!(!state.version.is_empty(), "BOB version should not be empty");
             assert!(state.operational, "BOB should be operational");
         }
         Err(_) => {
-            // Protocol may not be available in test environment
-            println!("BOB protocol not available for testing");
+            println!("BOB client not available for testing");
         }
     }
 }
@@ -91,12 +91,17 @@ async fn test_cross_protocol_asset_transfers() {
     let _config = IntegrationTestConfig::default();
     
     // Initialize protocols
-    let rgb = Arc::new(RgbProtocol {
-        version: "1.0.0".to_string(),
-        network: "testnet".to_string(),
-    });
+    let rgb = Arc::new(RgbProtocol::new());
     
-    let lightning = Arc::new(LightningNetwork::new());
+    // Test Lightning Network
+    let lightning_config = LightningConfig {
+        network: "testnet".to_string(),
+        node_url: "http://localhost:9735".to_string(),
+        macaroon: "0201036c6e64022f030a10b493a60e861b6c8a0e0a854355b4320612071f9e0f708e354d9234d6171d7cd0111d1313c7cd088f8ac2cd900101201301".to_string(),
+        cert: "".to_string(),
+    };
+    
+    let lightning = Arc::new(LightningNetwork::new(lightning_config));
     
     // Test asset parameters
     let asset_params = AssetParams {
@@ -136,10 +141,10 @@ async fn test_cross_protocol_asset_transfers() {
 #[tokio::test]
 async fn test_stacks_smart_contract_deployment() {
     let stacks_config = StacksConfig {
-        node_url: "http://localhost:20443".to_string(),
-        contract_address: "test_contract".to_string(),
-        private_key: "test_key".to_string(),
         network: "testnet".to_string(),
+        rpc_url: "http://localhost:20443".to_string(),
+        pox_enabled: false,
+        timeout_ms: 30000,
     };
     let stacks = Arc::new(StacksClient::new(stacks_config));
     
@@ -149,7 +154,7 @@ async fn test_stacks_smart_contract_deployment() {
             (ok "Hello, World!"))
     "#;
     
-    match stacks.deploy_clarity_contract("test_contract".to_string(), contract_code.to_string()).await {
+    match stacks.deploy_clarity_contract("test_contract", contract_code).await {
         Ok(tx_id) => {
             assert!(!tx_id.is_empty(), "Transaction ID should not be empty");
             println!("Contract deployment successful: {}", tx_id);
@@ -165,11 +170,12 @@ async fn test_stacks_smart_contract_deployment() {
 async fn test_state_channel_operations() {
     // Create state channel configuration
     let config = StateChannelConfig {
-        counterparty: "test_counterparty".to_string(),
-        initial_balance_a: 1000000, // 1 BTC in satoshis
-        initial_balance_b: 500000,  // 0.5 BTC in satoshis
-        timeout_blocks: 144,        // ~24 hours
-        fee_rate: 10,              // 10 sat/vbyte
+        network: "testnet".to_string(),
+        capacity: 1000000, // 1 BTC in satoshis
+        time_lock: 144,    // ~24 hours in blocks
+        commitment_type: CommitmentType::MultiSig2of2,
+        use_taproot: false,
+        fee_rate: 10,     // 10 sat/vbyte
     };
     
     let mut state_channel = StateChannel::new(
@@ -192,7 +198,7 @@ async fn test_state_channel_operations() {
                     let signatures = vec!["sig_alice".to_string(), "sig_bob".to_string()];
                     match channel.update_state(800000, 700000, signatures) {
                         Ok(state_update) => {
-                            assert!(state_update.sequence_number > 0, "Sequence number should increment");
+                            assert!(state_update.version > 0, "State version should increment");
                             println!("State updated successfully");
                         }
                         Err(e) => {
@@ -215,9 +221,10 @@ async fn test_state_channel_operations() {
 #[tokio::test]
 async fn test_bob_proof_operations() {
     let bob_config = BobConfig {
-        node_url: "http://localhost:8080".to_string(),
-        network: "testnet".to_string(),
-        timeout_seconds: 30,
+        rpc_url: "http://localhost:8080".to_string(),
+        chain_id: 60808,
+        timeout_ms: 30000,
+        validate_relay: true,
     };
     let bob = Arc::new(BobClient::new(bob_config));
     
@@ -245,17 +252,24 @@ async fn test_layer2_performance_benchmarks() {
     let start_time = std::time::Instant::now();
     
     // Initialize multiple protocols
-    let rgb = Arc::new(RgbProtocol {
-        version: "1.0.0".to_string(),
-        network: "testnet".to_string(),
-    });
+    let rgb = Arc::new(RgbProtocol::new());
     
-    let dlc = Arc::new(DlcProtocol {
-        version: "1.0.0".to_string(),
-        network: "testnet".to_string(),
-    });
+    let dlc = Arc::new(DlcProtocol::new());
     
-    let liquid = Arc::new(LiquidModule::new());
+    let liquid_config = LiquidConfig {
+        network: "testnet".to_string(),
+        rpc_url: "http://localhost:7041".to_string(),
+        confidential: true,
+        timeout_ms: 5000,
+        federation_pubkeys: vec![
+            "02142b5513b2bb94c35310618b6e7c80b08c04b0e3c26ba7e1b306b7f3fecefbfb".to_string(),
+            "027f76e2d59b7acc8b2f43c2b7b2b4de5abaff7eadb7d8b2a6b1e7b7b4d8b2".to_string(),
+        ],
+        required_signatures: 11,
+        elementsd_path: "/usr/local/bin/elementsd".to_string(),
+    };
+    
+    let liquid = Arc::new(LiquidModule::new(liquid_config));
     
     // Test multiple transactions for performance
     let num_transactions = 10;
@@ -302,10 +316,10 @@ async fn test_layer2_performance_benchmarks() {
 async fn test_error_handling_and_recovery() {
     // Test invalid configurations
     let invalid_stacks_config = StacksConfig {
-        node_url: "invalid_url".to_string(),
-        contract_address: "".to_string(),
-        private_key: "".to_string(),
         network: "invalid_network".to_string(),
+        rpc_url: "invalid_url".to_string(),
+        pox_enabled: false,
+        timeout_ms: 30000,
     };
     
     let stacks = StacksClient::new(invalid_stacks_config);
@@ -323,9 +337,10 @@ async fn test_error_handling_and_recovery() {
     
     // Test invalid BOB configuration
     let invalid_bob_config = BobConfig {
-        node_url: "".to_string(),
-        network: "invalid".to_string(),
-        timeout_seconds: 0,
+        rpc_url: "".to_string(),
+        chain_id: 0,
+        timeout_ms: 0,
+        validate_relay: false,
     };
     
     let bob = BobClient::new(invalid_bob_config);
@@ -346,14 +361,8 @@ async fn test_error_handling_and_recovery() {
 async fn test_protocol_state_synchronization() {
     let protocols: Vec<Box<dyn Layer2ProtocolTrait + Send + Sync>> = vec![
         Box::new(MockLayer2Protocol::new()),
-        Box::new(RgbProtocol {
-            version: "1.0.0".to_string(),
-            network: "testnet".to_string(),
-        }),
-        Box::new(DlcProtocol {
-            version: "1.0.0".to_string(),
-            network: "testnet".to_string(),
-        }),
+        Box::new(RgbProtocol::new()),
+        Box::new(DlcProtocol::new()),
     ];
     
     for protocol in protocols.iter() {

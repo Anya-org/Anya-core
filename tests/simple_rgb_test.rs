@@ -1,9 +1,9 @@
 // Simple RGB test to verify core functionality
 #[cfg(test)]
 mod rgb_simple_tests {
-    use bitcoin::Network;
+    
     use std::collections::HashMap;
-    use std::path::PathBuf;
+    
     use tempfile::tempdir;
 
     #[tokio::test]
@@ -50,7 +50,7 @@ mod rgb_simple_tests {
 // Simple Web5 test to verify core functionality
 #[cfg(test)]
 mod web5_simple_tests {
-    use bitcoin::Network;
+    
     use std::collections::HashMap;
     use tempfile::tempdir;
 

@@ -38,11 +38,58 @@ impl Layer2Manager {
 
     /// Initialize all Layer 2 protocols
     pub fn initialize_all(&mut self) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-        self.init_protocol::<BobClient>(&mut self.bob_client, "BobClient")?;
-        self.init_protocol::<LiquidModule>(&mut self.liquid_module, "LiquidModule")?;
-        self.init_protocol::<RskClient>(&mut self.rsk_client, "RskClient")?;
-        self.init_protocol::<StacksClient>(&mut self.stacks_client, "StacksClient")?;
-        self.init_protocol::<TaprootAssetsProtocol>(&mut self.taproot_assets, "TaprootAssetsProtocol")?;
+        // Initialize all protocols one by one
+        // Using a separate scope for each one to avoid borrow checker issues
+        
+        // Initialize BOB Client
+        self.bob_client = Some(BobClient::default());
+        if let Some(client) = &mut self.bob_client {
+            if let Err(e) = client.initialize() {
+                eprintln!("Failed to initialize BobClient: {}", e);
+                return Err(e);
+            }
+            println!("BobClient initialized successfully");
+        }
+
+        // Initialize Liquid Module
+        self.liquid_module = Some(LiquidModule::default());
+        if let Some(module) = &mut self.liquid_module {
+            if let Err(e) = module.initialize() {
+                eprintln!("Failed to initialize LiquidModule: {}", e);
+                return Err(e);
+            }
+            println!("LiquidModule initialized successfully");
+        }
+
+        // Initialize RSK Client
+        self.rsk_client = Some(RskClient::default());
+        if let Some(client) = &mut self.rsk_client {
+            if let Err(e) = client.initialize() {
+                eprintln!("Failed to initialize RskClient: {}", e);
+                return Err(e);
+            }
+            println!("RskClient initialized successfully");
+        }
+
+        // Initialize Stacks Client
+        self.stacks_client = Some(StacksClient::default());
+        if let Some(client) = &mut self.stacks_client {
+            if let Err(e) = client.initialize() {
+                eprintln!("Failed to initialize StacksClient: {}", e);
+                return Err(e);
+            }
+            println!("StacksClient initialized successfully");
+        }
+
+        // Initialize Taproot Assets Protocol
+        self.taproot_assets = Some(TaprootAssetsProtocol::default());
+        if let Some(protocol) = &mut self.taproot_assets {
+            if let Err(e) = protocol.initialize() {
+                eprintln!("Failed to initialize TaprootAssetsProtocol: {}", e);
+                return Err(e);
+            }
+            println!("TaprootAssetsProtocol initialized successfully");
+        }
 
         println!("All Layer 2 protocols initialized successfully");
         Ok(())
@@ -53,51 +100,49 @@ impl Layer2Manager {
         // Initialize BOB Client
         self.bob_client = Some(BobClient::default());
         if let Some(client) = &self.bob_client {
-            client.initialize().await?;
+            client.initialize()?; // No await needed for synchronous method
             println!("BobClient initialized asynchronously");
         }
 
         // Initialize Liquid Module
         self.liquid_module = Some(LiquidModule::default());
         if let Some(module) = &self.liquid_module {
-            module.initialize().await?;
+            module.initialize()?; // No await needed for synchronous method
             println!("LiquidModule initialized asynchronously");
         }
 
         // Initialize RSK Client
         self.rsk_client = Some(RskClient::default());
         if let Some(client) = &self.rsk_client {
-            client.initialize().await?;
+            client.initialize()?; // No await needed for synchronous method
             println!("RskClient initialized asynchronously");
         }
 
         // Initialize Stacks Client
         self.stacks_client = Some(StacksClient::default());
         if let Some(client) = &self.stacks_client {
-            client.initialize().await?;
+            client.initialize()?; // No await needed for synchronous method
             println!("StacksClient initialized asynchronously");
         }
 
         // Initialize Taproot Assets Protocol
         self.taproot_assets = Some(TaprootAssetsProtocol::default());
         if let Some(protocol) = &self.taproot_assets {
-            protocol.initialize().await?;
+            protocol.initialize()?; // No await needed for synchronous method
             println!("TaprootAssetsProtocol initialized asynchronously");
         }
 
         // Initialize Lightning Network
         self.lightning_network = Some(LightningNetwork::default());
         if let Some(network) = &self.lightning_network {
-            // Now we can use the async initialization for LightningNetwork
-            network.initialize().await?;
+            network.initialize()?; // No await needed for synchronous method
             println!("LightningNetwork initialized asynchronously");
         }
 
         // Initialize State Channel
         self.state_channels = Some(StateChannel::default());
         if let Some(channel) = &self.state_channels {
-            // Now we can use the async initialization for StateChannel
-            channel.initialize().await?;
+            channel.initialize()?; // No await needed for synchronous method
             println!("StateChannel initialized asynchronously");
         }
 
@@ -113,7 +158,7 @@ impl Layer2Manager {
     where
         T: Layer2ProtocolTrait + Default,
     {
-        let mut instance = T::default();
+        let instance = T::default();
         if let Err(e) = instance.initialize() {
             eprintln!("Failed to initialize {}: {}", name, e);
             return Err(e);

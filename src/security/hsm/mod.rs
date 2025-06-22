@@ -260,9 +260,9 @@ impl HsmManager {
             *status = HsmStatus::Initializing;
         }
         self.audit_logger
-            .log_event(
+            .log_event_legacy(
                 "hsm.health_check",
-                &HsmAuditEvent {
+                &crate::security::hsm::types::HsmAuditEvent {
                     event_type: "health_check".to_string(),
                     provider: format!("{:?}", self.config.provider_type),
                     status: "started".to_string(),

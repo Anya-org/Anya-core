@@ -56,11 +56,10 @@ impl HsmProvider for Pkcs11HsmProvider {
         // and establish a connection to the device
         self.audit_logger.log(
             crate::security::hsm::error::AuditEventType::Initialization,
-            &self.config.hsm_id,
-            None,
-            "PKCS#11 provider initialized (stub implementation)",
             crate::security::hsm::error::AuditEventResult::Success,
-        )?;
+            crate::security::hsm::error::AuditEventSeverity::Info,
+            "PKCS#11 provider initialized (stub implementation)",
+        ).await?;
 
         Ok(())
     }
