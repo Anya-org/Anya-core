@@ -295,6 +295,70 @@ impl Layer2Protocol for StacksProtocol {
     }
 }
 
+/// Implementation of async Layer2Protocol trait for StacksClient
+#[async_trait]
+impl Layer2Protocol for StacksClient {
+    async fn initialize(&self) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+        // Reuse existing sync implementation
+        <StacksClient as Layer2ProtocolTrait>::initialize(self)
+    }
+
+    async fn connect(&self) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+        println!("Asynchronously connecting to Stacks network...");
+        Ok(())
+    }
+
+    async fn get_state(&self) -> Result<ProtocolState, Box<dyn std::error::Error + Send + Sync>> {
+        // Reuse existing sync implementation
+        <StacksClient as Layer2ProtocolTrait>::get_state(self)
+    }
+
+    async fn submit_transaction(&self, tx_data: &[u8]) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+        println!("Asynchronously submitting transaction to Stacks: {} bytes", tx_data.len());
+        // Reuse existing sync implementation with logging
+        <StacksClient as Layer2ProtocolTrait>::submit_transaction(self, tx_data)
+    }
+
+    async fn check_transaction_status(&self, tx_id: &str) -> Result<TransactionStatus, Box<dyn std::error::Error + Send + Sync>> {
+        println!("Asynchronously checking Stacks transaction status: {}", tx_id);
+        // Reuse existing sync implementation
+        <StacksClient as Layer2ProtocolTrait>::check_transaction_status(self, tx_id)
+    }
+
+    async fn sync_state(&mut self) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+        println!("Asynchronously syncing Stacks state...");
+        // Reuse existing sync implementation
+        <StacksClient as Layer2ProtocolTrait>::sync_state(self)
+    }
+
+    async fn issue_asset(&self, params: AssetParams) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+        println!("Asynchronously issuing SIP-010 token {} on Stacks", params.name);
+        // Reuse existing sync implementation
+        <StacksClient as Layer2ProtocolTrait>::issue_asset(self, params)
+    }
+
+    async fn transfer_asset(&self, transfer: AssetTransfer) -> Result<TransferResult, Box<dyn std::error::Error + Send + Sync>> {
+        println!(
+            "Asynchronously transferring {} of asset {} to {} on Stacks",
+            transfer.amount, transfer.asset_id, transfer.recipient
+        );
+        // Reuse existing sync implementation
+        <StacksClient as Layer2ProtocolTrait>::transfer_asset(self, transfer)
+    }
+
+    async fn verify_proof(&self, proof: Proof) -> Result<VerificationResult, Box<dyn std::error::Error + Send + Sync>> {
+        println!("Asynchronously verifying {} proof on Stacks", proof.proof_type);
+        // Reuse existing sync implementation
+        <StacksClient as Layer2ProtocolTrait>::verify_proof(self, proof)
+    }
+
+    async fn validate_state(&self, state_data: &[u8]) -> Result<ValidationResult, Box<dyn std::error::Error + Send + Sync>> {
+        println!("Asynchronously validating state on Stacks: {} bytes", state_data.len());
+        // Reuse existing sync implementation
+        <StacksClient as Layer2ProtocolTrait>::validate_state(self, state_data)
+    }
+}
+
 impl Default for StacksClient {
     fn default() -> Self {
         Self::new(StacksConfig::default())

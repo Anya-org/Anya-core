@@ -4,7 +4,7 @@
 //! which enables issuing assets on Bitcoin using Taproot and Merkle trees.
 
 use crate::layer2::{
-    AssetParams, AssetTransfer, Layer2ProtocolTrait, Proof, ProtocolState, TransactionStatus,
+    AssetParams, AssetTransfer, Layer2Protocol, Layer2ProtocolTrait, Proof, ProtocolState, TransactionStatus,
     TransferResult, ValidationResult, VerificationResult,
 };
 use serde::{Deserialize, Serialize};
@@ -199,5 +199,69 @@ impl Layer2ProtocolTrait for TaprootAssetsProtocol {
                 .unwrap()
                 .as_secs(),
         })
+    }
+}
+
+/// Implementation of async Layer2Protocol trait for TaprootAssetsProtocol
+#[async_trait::async_trait]
+impl Layer2Protocol for TaprootAssetsProtocol {
+    async fn initialize(&self) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+        // Reuse existing sync implementation
+        <TaprootAssetsProtocol as Layer2ProtocolTrait>::initialize(self)
+    }
+
+    async fn connect(&self) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+        println!("Asynchronously connecting to Taproot Assets network...");
+        Ok(())
+    }
+
+    async fn get_state(&self) -> Result<ProtocolState, Box<dyn std::error::Error + Send + Sync>> {
+        // Reuse existing sync implementation
+        <TaprootAssetsProtocol as Layer2ProtocolTrait>::get_state(self)
+    }
+
+    async fn submit_transaction(&self, tx_data: &[u8]) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+        println!("Asynchronously submitting transaction to Taproot Assets: {} bytes", tx_data.len());
+        // Reuse existing sync implementation with logging
+        <TaprootAssetsProtocol as Layer2ProtocolTrait>::submit_transaction(self, tx_data)
+    }
+
+    async fn check_transaction_status(&self, tx_id: &str) -> Result<TransactionStatus, Box<dyn std::error::Error + Send + Sync>> {
+        println!("Asynchronously checking Taproot Assets transaction status: {}", tx_id);
+        // Reuse existing sync implementation
+        <TaprootAssetsProtocol as Layer2ProtocolTrait>::check_transaction_status(self, tx_id)
+    }
+
+    async fn sync_state(&mut self) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+        println!("Asynchronously syncing Taproot Assets state...");
+        // Reuse existing sync implementation
+        <TaprootAssetsProtocol as Layer2ProtocolTrait>::sync_state(self)
+    }
+
+    async fn issue_asset(&self, params: AssetParams) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+        println!("Asynchronously issuing Taproot asset {}", params.name);
+        // Reuse existing sync implementation
+        <TaprootAssetsProtocol as Layer2ProtocolTrait>::issue_asset(self, params)
+    }
+
+    async fn transfer_asset(&self, transfer: AssetTransfer) -> Result<TransferResult, Box<dyn std::error::Error + Send + Sync>> {
+        println!(
+            "Asynchronously transferring {} of Taproot asset {} to {}",
+            transfer.amount, transfer.asset_id, transfer.recipient
+        );
+        // Reuse existing sync implementation
+        <TaprootAssetsProtocol as Layer2ProtocolTrait>::transfer_asset(self, transfer)
+    }
+
+    async fn verify_proof(&self, proof: Proof) -> Result<VerificationResult, Box<dyn std::error::Error + Send + Sync>> {
+        println!("Asynchronously verifying Taproot {} proof", proof.proof_type);
+        // Reuse existing sync implementation
+        <TaprootAssetsProtocol as Layer2ProtocolTrait>::verify_proof(self, proof)
+    }
+
+    async fn validate_state(&self, state_data: &[u8]) -> Result<ValidationResult, Box<dyn std::error::Error + Send + Sync>> {
+        println!("Asynchronously validating Taproot Assets state: {} bytes", state_data.len());
+        // Reuse existing sync implementation
+        <TaprootAssetsProtocol as Layer2ProtocolTrait>::validate_state(self, state_data)
     }
 }

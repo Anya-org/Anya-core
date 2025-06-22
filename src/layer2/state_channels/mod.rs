@@ -11,8 +11,8 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 use crate::layer2::{
-    AssetParams, AssetTransfer, Layer2Error, Proof, ProtocolState, TransactionStatus,
-    TransferResult, ValidationResult, VerificationResult,
+    AssetParams, AssetTransfer, Layer2Error, Layer2Protocol, Proof, 
+    ProtocolState, TransactionStatus, TransferResult, ValidationResult, VerificationResult,
 };
 
 /// Channel state
@@ -186,13 +186,15 @@ impl StateChannel {
             }
         }
     }
-    
-    impl Default for StateChannel {
-        fn default() -> Self {
-            Self::new_default()
-        }
-    }
+}
 
+impl Default for StateChannel {
+    fn default() -> Self {
+        Self::new_default()
+    }
+}
+
+impl StateChannel {
     /// Open the state channel (create funding transaction)
     pub fn open(&mut self) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
         if self.state != ChannelState::Creating {
@@ -518,6 +520,100 @@ impl crate::layer2::Layer2Protocol for StateChannelsProtocol {
 
     async fn validate_state(&self, _state_data: &[u8]) -> Result<crate::layer2::ValidationResult, Box<dyn std::error::Error + Send + Sync>> {
         Ok(crate::layer2::create_validation_result(true, vec![]))
+    }
+}
+
+/// Implementation of async Layer2Protocol trait for StateChannel
+#[async_trait::async_trait]
+impl Layer2Protocol for StateChannel {
+    async fn initialize(&self) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+        println!("Asynchronously initializing State Channel...");
+        Ok(())
+    }
+
+    async fn connect(&self) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+        println!("Asynchronously connecting State Channel...");
+        Ok(())
+    }
+
+    async fn get_state(&self) -> Result<ProtocolState, Box<dyn std::error::Error + Send + Sync>> {
+        println!("Asynchronously getting State Channel state...");
+        Ok(ProtocolState {
+            version: "1.0".to_string(),
+            connections: 1,
+            capacity: Some(self.config.capacity),
+            operational: true,
+            height: 0,
+            hash: "0000000000000000000000000000000000000000000000000000000000000000".to_string(),
+            timestamp: std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_secs(),
+        })
+    }
+
+    async fn submit_transaction(&self, tx_data: &[u8]) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+        println!("Asynchronously submitting transaction to State Channel: {} bytes", tx_data.len());
+        Ok(format!("tx_{}", hex::encode(&tx_data[0..4])))
+    }
+
+    async fn check_transaction_status(&self, tx_id: &str) -> Result<TransactionStatus, Box<dyn std::error::Error + Send + Sync>> {
+        println!("Asynchronously checking State Channel transaction status: {}", tx_id);
+        Ok(TransactionStatus::Confirmed)
+    }
+
+    async fn sync_state(&mut self) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+        println!("Asynchronously syncing State Channel state...");
+        Ok(())
+    }
+
+    async fn issue_asset(&self, params: AssetParams) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+        println!("Asynchronously issuing asset {} on State Channel", params.name);
+        Ok(format!("sc_asset_{}", params.asset_id))
+    }
+
+    async fn transfer_asset(&self, transfer: AssetTransfer) -> Result<TransferResult, Box<dyn std::error::Error + Send + Sync>> {
+        println!(
+            "Asynchronously transferring {} of asset {} to {} on State Channel",
+            transfer.amount, transfer.asset_id, transfer.recipient
+        );
+
+        Ok(TransferResult {
+            tx_id: format!("sc_transfer_{}", transfer.asset_id),
+            status: TransactionStatus::Confirmed,
+            fee: Some(100),
+            timestamp: std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_secs(),
+        })
+    }
+
+    async fn verify_proof(&self, proof: Proof) -> Result<VerificationResult, Box<dyn std::error::Error + Send + Sync>> {
+        println!("Asynchronously verifying {} proof on State Channel", proof.proof_type);
+
+        Ok(VerificationResult {
+            valid: true,
+            is_valid: true,
+            error: None,
+            timestamp: std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_secs(),
+        })
+    }
+
+    async fn validate_state(&self, state_data: &[u8]) -> Result<ValidationResult, Box<dyn std::error::Error + Send + Sync>> {
+        println!("Asynchronously validating state on State Channel: {} bytes", state_data.len());
+
+        Ok(ValidationResult {
+            is_valid: true,
+            violations: vec![],
+            timestamp: std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_secs(),
+        })
     }
 }
 

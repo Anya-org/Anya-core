@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 use std::error::Error;
 
 /// Layer2 protocol types supported by the implementation
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub enum Layer2ProtocolType {
     Lightning,
     StateChannels,
@@ -22,7 +22,7 @@ pub enum Layer2ProtocolType {
 }
 
 /// Transaction status in a Layer2 protocol
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum TransactionStatus {
     Pending,
     Confirmed,
