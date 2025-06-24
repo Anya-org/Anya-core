@@ -15,6 +15,7 @@ pub mod service_integration;
 use std::collections::HashMap;
 use std::sync::Arc;
 use log::info;
+use crate::monitoring::generic_metrics::register_metric;
 
 /// Legacy monitoring system (kept for backward compatibility)
 pub struct MonitoringSystem {
@@ -66,7 +67,7 @@ impl MonitoringSystem {
             },
             _ => {
                 // For other metrics, store in the generic system
-                metrics::register_metric(name, value);
+                register_metric(name, value);
             }
         }
         Ok(())

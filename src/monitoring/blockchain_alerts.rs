@@ -7,7 +7,6 @@ use serde::{Deserialize, Serialize};
 
 use crate::monitoring::blockchain_metrics;
 
-// Global alerts registry
 lazy_static! {
     static ref ALERTS: Mutex<BlockchainAlerts> = Mutex::new(BlockchainAlerts::new());
 }
@@ -192,7 +191,7 @@ impl BlockchainAlerts {
             "High Mempool Size",
             "Mempool size is above {threshold}MB (currently {value}MB)",
             "mempool_size_bytes",
-            50 * 1024 * 1024.0, // 50MB
+            50.0 * 1024.0 * 1024.0, // 50MB
             ">", 
             AlertSeverity::Warning,
             300, // 5 minutes
@@ -246,116 +245,108 @@ impl BlockchainAlerts {
     /// Check metrics against all defined alert thresholds
     pub fn check_alerts(&mut self) {
         self.last_check = Instant::now();
-        
+
         // Get current metrics
         let metrics_json = blockchain_metrics::get_metrics_json();
-        
-        // Check each alert definition
-        for (alert_id, definition) in &mut self.alert_definitions {
+
+        let mut checks = Vec::new();
+
+        for (alert_id, definition) in &self.alert_definitions {
             let metric_value = self.get_metric_value(&metrics_json, &definition.metric_name);
-            
+
             match metric_value {
                 Some(value) => {
                     let threshold_exceeded = self.is_threshold_exceeded(
-                        value, 
-                        definition.threshold, 
+                        value,
+                        definition.threshold,
                         &definition.comparison_operator,
                     );
-                    
-                    if threshold_exceeded {
-                        // Update consecutive count
-                        definition.current_consecutive += 1;
-                        
-                        // Set first exceeded time if not already set
-                        if definition.first_exceeded_at.is_none() {
-                            definition.first_exceeded_at = Some(Instant::now());
-                        }
-                        
-                        // Check if we should trigger the alert
-                        let duration_exceeded = match definition.first_exceeded_at {
-                            Some(time) => time.elapsed().as_secs() >= definition.duration_threshold_seconds,
-                            None => false,
-                        };
-                        
-                        if duration_exceeded && definition.current_consecutive >= definition.consecutive_readings {
-                            // Trigger alert if not already active
-                            if !self.active_alerts.contains_key(alert_id) {
-                                let description = definition.description_template
-                                    .replace("{threshold}", &definition.threshold.to_string())
-                                    .replace("{value}", &value.to_string());
-                                
-                                let now = std::time::SystemTime::now()
-                                    .duration_since(std::time::UNIX_EPOCH)
-                                    .unwrap()
-                                    .as_secs();
-                                
-                                let alert = Alert {
-                                    id: alert_id.clone(),
-                                    name: definition.name.clone(),
-                                    description,
-                                    severity: definition.severity,
-                                    status: AlertStatus::Active,
-                                    triggered_at: now,
-                                    resolved_at: None,
-                                    metric_name: definition.metric_name.clone(),
-                                    threshold: definition.threshold,
-                                    current_value: value,
-                                    comparison_operator: definition.comparison_operator.clone(),
-                                };
-                                
-                                self.active_alerts.insert(alert_id.clone(), alert.clone());
-                                self.alert_history.push(alert.clone());
-                                
-                                // Trim history if needed
-                                if self.alert_history.len() > 100 {
-                                    self.alert_history.remove(0);
-                                }
-                                
-                                // Log the alert
-                                match definition.severity {
-                                    AlertSeverity::Info => info!("ALERT: {}", description),
-                                    AlertSeverity::Warning => warn!("ALERT: {}", description),
-                                    AlertSeverity::Error => error!("ALERT: {}", description),
-                                    AlertSeverity::Critical => error!("CRITICAL ALERT: {}", description),
-                                }
-                            } else {
-                                // Update current value for existing alert
-                                if let Some(alert) = self.active_alerts.get_mut(alert_id) {
-                                    alert.current_value = value;
-                                }
-                            }
-                        }
-                    } else {
-                        // Reset consecutive counter and first exceeded time
-                        definition.current_consecutive = 0;
-                        definition.first_exceeded_at = None;
-                        
-                        // Resolve alert if it was active
-                        if let Some(mut alert) = self.active_alerts.remove(alert_id) {
-                            let now = std::time::SystemTime::now()
-                                .duration_since(std::time::UNIX_EPOCH)
-                                .unwrap()
-                                .as_secs();
-                            
-                            alert.status = AlertStatus::Resolved;
-                            alert.resolved_at = Some(now);
-                            
-                            // Add resolved alert to history
-                            self.alert_history.push(alert);
-                            
-                            // Trim history if needed
-                            if self.alert_history.len() > 100 {
-                                self.alert_history.remove(0);
-                            }
-                            
-                            info!("RESOLVED: {}", alert.description);
-                        }
+
+                    checks.push((alert_id.clone(), value, threshold_exceeded));
+                },
+                None => {
+                    checks.push((alert_id.clone(), 0.0, false));
+                }
+            }
+        }
+
+        for (alert_id, value, threshold_exceeded) in checks {
+            let definition = match self.alert_definitions.get_mut(&alert_id) {
+                Some(def) => def,
+                None => continue,
+            };
+
+            if threshold_exceeded {
+                definition.current_consecutive += 1;
+
+                if definition.first_exceeded_at.is_none() {
+                    definition.first_exceeded_at = Some(Instant::now());
+                }
+
+                let duration_exceeded = definition
+                    .first_exceeded_at
+                    .map(|time| time.elapsed().as_secs() >= definition.duration_threshold_seconds)
+                    .unwrap_or(false);
+
+                if duration_exceeded && definition.current_consecutive >= definition.consecutive_readings {
+                    let description = definition.description_template
+                        .replace("{threshold}", &definition.threshold.to_string())
+                        .replace("{value}", &value.to_string());
+
+                    let now = std::time::SystemTime::now()
+                        .duration_since(std::time::UNIX_EPOCH)
+                        .unwrap()
+                        .as_secs();
+
+                    let alert = Alert {
+                        id: alert_id.clone(),
+                        name: definition.name.clone(),
+                        description: description.clone(),
+                        severity: definition.severity,
+                        status: AlertStatus::Active,
+                        triggered_at: now,
+                        resolved_at: None,
+                        metric_name: definition.metric_name.clone(),
+                        threshold: definition.threshold,
+                        current_value: value,
+                        comparison_operator: definition.comparison_operator.clone(),
+                    };
+
+                    self.active_alerts.insert(alert_id.clone(), alert.clone());
+                    self.alert_history.push(alert);
+
+                    if self.alert_history.len() > 100 {
+                        self.alert_history.remove(0);
+                    }
+
+                    match definition.severity {
+                        AlertSeverity::Info => info!("ALERT: {}", description),
+                        AlertSeverity::Warning => warn!("ALERT: {}", description),
+                        AlertSeverity::Error => error!("ALERT: {}", description),
+                        AlertSeverity::Critical => error!("CRITICAL ALERT: {}", description),
                     }
                 }
-                None => {
-                    // Metric not found, can't evaluate the alert
-                    warn!("Could not evaluate alert '{}': metric '{}' not found", 
-                          definition.name, definition.metric_name);
+            } else {
+                definition.current_consecutive = 0;
+                definition.first_exceeded_at = None;
+
+                if let Some(mut alert) = self.active_alerts.remove(&alert_id) {
+                    let now = std::time::SystemTime::now()
+                        .duration_since(std::time::UNIX_EPOCH)
+                        .unwrap()
+                        .as_secs();
+
+                    alert.status = AlertStatus::Resolved;
+                    alert.resolved_at = Some(now);
+                    
+                    let description = alert.description.clone();
+                    self.alert_history.push(alert);
+
+                    if self.alert_history.len() > 100 {
+                        self.alert_history.remove(0);
+                    }
+
+                    info!("RESOLVED: {}", description);
                 }
             }
         }
@@ -421,25 +412,25 @@ impl BlockchainAlerts {
 
 /// Check all alert thresholds against current metrics
 pub fn check_alerts() {
-    let mut alerts = ALERTS.lock().unwrap();
+    let mut alerts: std::sync::MutexGuard<BlockchainAlerts> = ALERTS.lock().unwrap();
     alerts.check_alerts();
 }
 
 /// Acknowledge an alert
 pub fn acknowledge_alert(alert_id: &str) {
-    let mut alerts = ALERTS.lock().unwrap();
-    alerts.acknowledge_alert(alert_id);
+    let mut alerts: std::sync::MutexGuard<BlockchainAlerts> = ALERTS.lock().unwrap();
+    let _ = alerts.acknowledge_alert(alert_id);
 }
 
 /// Get all active alerts
 pub fn get_active_alerts() -> Vec<Alert> {
-    let alerts = ALERTS.lock().unwrap();
+    let alerts: std::sync::MutexGuard<BlockchainAlerts> = ALERTS.lock().unwrap();
     alerts.get_active_alerts().iter().map(|a| (*a).clone()).collect()
 }
 
 /// Get alert history
 pub fn get_alert_history() -> Vec<Alert> {
-    let alerts = ALERTS.lock().unwrap();
+    let alerts: std::sync::MutexGuard<BlockchainAlerts> = ALERTS.lock().unwrap();
     alerts.get_alert_history().clone()
 }
 
@@ -454,3 +445,5 @@ mod tests {
         assert!(alerts.is_empty(), "Should have no active alerts initially");
     }
 }
+
+

@@ -10,31 +10,31 @@ use crate::monitoring::metrics;
 pub fn create_routes() -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
     let metrics_route = warp::path!("metrics")
         .and(warp::get())
-        .map(handle_metrics);
+        .and_then(|| async { Ok::<_, warp::Rejection>(handle_metrics().await) });
     
     let prometheus_route = warp::path!("metrics" / "prometheus")
         .and(warp::get())
-        .map(handle_prometheus);
+        .and_then(|| async { Ok::<_, warp::Rejection>(handle_prometheus().await) });
     
     let blockchain_metrics_route = warp::path!("metrics" / "blockchain")
         .and(warp::get())
-        .map(handle_blockchain_metrics);
+        .and_then(|| async { Ok::<_, warp::Rejection>(handle_blockchain_metrics().await) });
     
     let blockchain_historical_route = warp::path!("metrics" / "blockchain" / "historical" / String)
         .and(warp::get())
-        .map(handle_blockchain_historical);
+        .and_then(|id: String| async move { Ok::<_, warp::Rejection>(handle_blockchain_historical(id).await) });
     
     let alerts_route = warp::path!("metrics" / "alerts")
         .and(warp::get())
-        .map(handle_alerts);
+        .and_then(|| async { Ok::<_, warp::Rejection>(handle_alerts().await) });
     
     let alert_history_route = warp::path!("metrics" / "alerts" / "history")
         .and(warp::get())
-        .map(handle_alert_history);
+        .and_then(|| async { Ok::<_, warp::Rejection>(handle_alert_history().await) });
     
     let acknowledge_alert_route = warp::path!("metrics" / "alerts" / "acknowledge" / String)
         .and(warp::post())
-        .map(handle_acknowledge_alert);
+        .and_then(|id: String| async move { Ok::<_, warp::Rejection>(handle_acknowledge_alert(id).await) });
     
     metrics_route
         .or(prometheus_route)

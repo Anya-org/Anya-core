@@ -15,9 +15,9 @@ lazy_static! {
 
 /// Timestamp-based sample for time series metrics
 #[derive(Debug, Clone, Serialize, Deserialize)]
-struct TimeSample {
-    timestamp: u64,
-    value: f64,
+pub struct TimeSample {
+    pub timestamp: u64,
+    pub value: f64,
 }
 
 /// Blockchain metrics collector for real-time monitoring

@@ -53,11 +53,8 @@ impl MetricsController {
         tokio::spawn(async move {
             info!("Starting metrics API server on port {}", port);
             
-            // Create server
-            let server = warp::serve(routes).run(([0, 0, 0, 0], port));
-            
-            // Run until signaled to stop
-            let (_, server_future) = warp::serve(routes).bind_with_graceful_shutdown(
+            // Create server with graceful shutdown
+            let (_addr, server_future) = warp::serve(routes.clone()).bind_with_graceful_shutdown(
                 ([0, 0, 0, 0], port),
                 async move {
                     // Wait until running becomes false
@@ -106,7 +103,7 @@ mod tests {
     #[tokio::test]
     async fn test_metrics_controller() {
         // Create dependencies
-        let interval = metrics_service::get_metrics_interval();
+        // Using fixed interval of 100ms for tests
         let metrics_service = Arc::new(metrics_service::MetricsService::new(Some(100)));
         
         // Create controller with test port
