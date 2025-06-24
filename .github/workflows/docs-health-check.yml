@@ -21,6 +21,10 @@ on:
   schedule:
     - cron: '0 1 * * 1'  # Weekly on Monday at 1 AM
 
+# Default permissions for all jobs
+permissions:
+  contents: read
+
 jobs:
   link-check:
     name: "Check Documentation Links"
