@@ -84,7 +84,7 @@ async function runDemo() {
         console.log('-----------------------------------------');
         console.log('MCP GitHub Tools Demonstration');
         console.log('-----------------------------------------');
-        console.log(`GitHub User: ${process.env.MCP_GITHUB_USERNAME}`);
+        console.log('GitHub User: [REDACTED]');
         console.log(`Default Repo: ${process.env.MCP_GITHUB_DEFAULT_OWNER}/${process.env.MCP_GITHUB_DEFAULT_REPO}`);
         console.log('-----------------------------------------');
 
