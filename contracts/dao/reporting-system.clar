@@ -3,16 +3,21 @@
 
 ;; Imports
 (use-trait token-trait 'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait;)
+(use-trait multi-sig-trait .governance-traits.multi-sig-trait)
+(use-trait governance-trait .governance-traits.governance-trait)
+
+;; Import shared constants
+(use-contract dao-constants .shared.dao-constants)
 
 ;; Constants
-(define-constant ERR_UNAUTHORIZED u401;);
-(define-constant ERR_INVALID_PARAMETER u402;);(define-constant ERR_REPORT_DISABLED u403;);
-(define-constant ERR_REPORT_NOT_FOUND u404;);(define-constant ERR_DATA_NOT_AVAILABLE u405;)
+;; Using shared constants from dao-constants contract
 
 ;; Contract references
 (define-constant TOKEN_CONTRACT 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.token;);
-(define-constant DAO_CONTRACT 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.dao-governance;);(define-constant TREASURY_CONTRACT 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.treasury-management;);
-(define-constant METRICS_CONTRACT 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.metrics-oracle;);(define-constant FINANCIAL_AGENT 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.financial-agent;)
+(define-constant GOVERNANCE_CONTRACT .multi-sig-governance)
+(define-constant TREASURY_CONTRACT .decentralized-treasury-management)
+(define-constant METRICS_CONTRACT 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.metrics-oracle;);
+(define-constant FINANCIAL_AGENT 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.financial-agent;)
 
 ;; Data vars
 (define-data-var reporting-enabled bool true;);
@@ -21,12 +26,11 @@
 (define-data-var last-report-generation uint u0;);
 (define-data-var privacy-level (string-ascii 20;) "aggregated";)
 
-;; Admin list
-(define-map administrators principal bool;);
+;; Report generators map
 (define-map report-generators principal bool;)
 
-;; Initialize administrators
-(map-set administrators tx-sender true;);(map-set report-generators tx-sender true;)
+;; Initialize report generators (governance contract as default)
+(map-set report-generators GOVERNANCE_CONTRACT true;)
 
 ;; Report Types
 (define-constant REPORT_TYPE_TREASURY u1;);
@@ -413,19 +417,56 @@
   };)
 
 ;; Check if account is a report generator
+;; Check if account is a report generator
 (define-read-only (is-report-generator (account principal;););
-  (default-to false (map-get? report-generators account;););)
+  (or 
+    (default-to false (map-get? report-generators account;);)
+    (is-eq account GOVERNANCE_CONTRACT)
+  )
+)
 
-;; Check if account is an administrator
-(define-read-only (is-administrator (account principal;););
-  (default-to false (map-get? administrators account;););)
+;; Check if caller is the governance contract
+(define-private (is-governance-contract)
+  (is-eq tx-sender GOVERNANCE_CONTRACT))
 
 ;; Administrative Functions
 
-;; Add a report type
+;; Add a report generator (only through governance)
+(define-public (add-report-generator (generator principal))
+  (begin
+    (asserts! (is-governance-contract) (get-error-unauthorized dao-constants))
+    (ok (map-set report-generators generator true))
+  )
+)
+
+;; Remove a report generator (only through governance)
+(define-public (remove-report-generator (generator principal))
+  (begin
+    (asserts! (is-governance-contract) (get-error-unauthorized dao-constants))
+    (ok (map-set report-generators generator false))
+  )
+)
+
+;; Update reporting settings (only through governance)
+(define-public (update-reporting-settings 
+                (enabled bool) 
+                (interval uint) 
+                (retention uint) 
+                (privacy (string-ascii 20)))
+  (begin
+    (asserts! (is-governance-contract) (get-error-unauthorized dao-constants))
+    (var-set reporting-enabled enabled)
+    (var-set reporting-interval interval)
+    (var-set data-retention-blocks retention)
+    (var-set privacy-level privacy)
+    (ok true)
+  )
+)
+
+;; Add a report type (only through governance)
 (define-public (add-report-type (report-type uint;); 
                               (name (string-ascii 64;););                              (description (string-utf8 256;););                              (components (list 10 (string-ascii 64;);););                              (frequency uint;););  (begin
-    (asserts! (is-administrator tx-sender;) (err ERR_UNAUTHORIZED;);)
+    (asserts! (is-governance-contract) (get-error-unauthorized dao-constants))
     ;    (map-set report-types
       {report-type: report-type}
       {
@@ -438,9 +479,9 @@
     ;    (ok true;)
 ;);)
 
-;; Toggle report type enabled status
+;; Toggle report type enabled status (only through governance)
 (define-public (toggle-report-type (report-type uint;); (enabled bool;););  (begin
-    (asserts! (is-administrator tx-sender;) (err ERR_UNAUTHORIZED;);)
+    (asserts! (is-governance-contract) (get-error-unauthorized dao-constants))
     ;    (match (map-get? report-types {report-type: report-type};)
       type-info (begin
         (map-set report-types
@@ -451,35 +492,14 @@
 ;)
 ;);)
 
-;; Add a report generator
-(define-public (add-report-generator (generator principal;););
-  (begin
-    (asserts! (is-administrator tx-sender;) (err ERR_UNAUTHORIZED;););    (map-set report-generators generator true;);    (ok true;)
-;);)
+;; Note: Add-report-generator and remove-report-generator functions are now defined above
+;; with updated governance controls
 
-;; Remove a report generator
-(define-public (remove-report-generator (generator principal;););
-  (begin
-    (asserts! (is-administrator tx-sender;) (err ERR_UNAUTHORIZED;););    (map-set report-generators generator false;);    (ok true;)
-;);)
-
-;; Add an administrator
-(define-public (add-administrator (admin principal;););
-  (begin
-    (asserts! (is-administrator tx-sender;) (err ERR_UNAUTHORIZED;););    (map-set administrators admin true;);    (ok true;)
-;);)
-
-;; Remove an administrator
-(define-public (remove-administrator (admin principal;););
-  (begin
-    (asserts! (is-administrator tx-sender;) (err ERR_UNAUTHORIZED;););    (map-set administrators admin false;);    (ok true;)
-;);)
-
-;; Update reporting settings
-(define-public (update-reporting-settings 
+;; Update reporting settings with optional parameters (only through governance)
+(define-public (update-reporting-settings-optional 
                (new-enabled (optional bool;););
                (new-interval (optional uint;););               (new-retention (optional uint;););               (new-privacy-level (optional (string-ascii 20;););););  (begin
-    (asserts! (is-administrator tx-sender;) (err ERR_UNAUTHORIZED;);)
+    (asserts! (is-governance-contract) (get-error-unauthorized dao-constants))
     
     ;; Update enabled status if provided
     (match new-enabled

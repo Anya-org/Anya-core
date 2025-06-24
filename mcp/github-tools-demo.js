@@ -3,136 +3,132 @@
 /**
  * MCP GitHub Tools Demo Script
  * 
- * This script demonstrates how to interact with GitHub using
- * the available tools in the Anya-core project.
- * 
- * It doesn't require a running MCP server, but simulates the
- * functionality that would be available through the MCP tools.
+ * Demonstrates GitHub API interactions using GitHub CLI (gh) for authentication.
+ * This approach:
+ * 1. Is more secure (no hardcoded credentials)
+ * 2. Allows for DAO contribution tracking
+ * 3. Aligns with Web5 and Lightning auth flows
+ * 4. Integrates with the GitHub CLI
  */
 
-const fs = require('fs');
-const path = require('path');
 const https = require('https');
+const { execSync } = require('child_process');
 const util = require('util');
 const exec = util.promisify(require('child_process').exec);
 
-// Set environment variables for MCP GitHub tools
-process.env.MCP_GITHUB_USERNAME = 'Bo_theBig';
-process.env.MCP_GITHUB_EMAIL = 'botshelomokoka@gmail.com';
-process.env.MCP_GITHUB_DEFAULT_OWNER = 'anya-org';
-process.env.MCP_GITHUB_DEFAULT_REPO = 'anya-core';
+// Get GitHub auth info from GitHub CLI
+function getGitHubAuthInfo() {
+    try {
+        // Check if GitHub CLI is authenticated
+        const authStatus = execSync('gh auth status --hostname github.com', { stdio: ['pipe', 'pipe', 'ignore'] }).toString();
 
-// GitHub API helper function
-async function githubApiRequest(endpoint, options = {}) {
-    const defaultOptions = {
+        // Extract username from auth status
+        const usernameMatch = authStatus.match(/Logged in to github.com account (\S+)/);
+        const username = usernameMatch ? usernameMatch[1] : null;
+
+        // Get the auth token from GitHub CLI
+        const token = execSync('gh auth token', { stdio: ['pipe', 'pipe', 'ignore'] }).toString().trim();
+
+        return { username, token };
+    } catch (error) {
+        console.error('Error getting GitHub authentication:', error.message);
+        console.error('Please run "gh auth login" to authenticate with GitHub CLI');
+        process.exit(1);
+    }
+}
+
+// Config for MCP GitHub tools - using GitHub CLI for authentication
+const auth = getGitHubAuthInfo();
+const config = {
+    defaultOwner: 'anya-org',
+    defaultRepo: 'anya-core',
+    username: auth.username,
+    token: auth.token
+};
+
+// GitHub API request helper - now with authentication from GitHub CLI
+function githubApiRequest(endpoint, options = {}) {
+    const requestOptions = {
         hostname: 'api.github.com',
         path: endpoint,
         headers: {
-            'User-Agent': 'MCP-GitHub-Demo-Script'
+            'User-Agent': 'MCP-GitHub-Demo-Script',
+            'Authorization': `token ${config.token}`
         },
-        method: 'GET'
+        method: 'GET',
+        ...options
     };
-
-    const requestOptions = { ...defaultOptions, ...options };
 
     return new Promise((resolve, reject) => {
         const req = https.request(requestOptions, (res) => {
             let data = '';
-            res.on('data', (chunk) => {
-                data += chunk;
-            });
+            res.on('data', chunk => data += chunk);
             res.on('end', () => {
                 try {
-                    const parsedData = JSON.parse(data);
-                    resolve(parsedData);
+                    resolve(JSON.parse(data));
                 } catch (e) {
                     reject(new Error(`Failed to parse GitHub API response: ${e.message}`));
                 }
             });
         });
-
-        req.on('error', (error) => {
-            reject(error);
-        });
-
+        req.on('error', reject);
         req.end();
     });
 }
 
-// MCP GitHub tool simulations
-async function searchRepositories(query) {
-    console.log(`Searching for repositories matching: "${query}"...`);
-    const endpoint = `/search/repositories?q=${encodeURIComponent(query)}`;
-    return await githubApiRequest(endpoint);
-}
+// GitHub tool simulations - enhanced with auth token
+const searchRepositories = async (query) => {
+    console.log(`Searching GitHub repositories for: ${query}...`);
+    return await githubApiRequest(`/search/repositories?q=${encodeURIComponent(query)}`);
+};
 
-async function listIssues(owner, repo) {
-    console.log(`Listing issues for ${owner}/${repo}...`);
-    const endpoint = `/repos/${owner}/${repo}/issues`;
-    return await githubApiRequest(endpoint);
-}
+const getRepoDetails = async (owner, repo) => {
+    console.log(`Getting details for ${owner}/${repo}...`);
+    return await githubApiRequest(`/repos/${owner}/${repo}`);
+};
 
-async function getRepoDetails(owner, repo) {
-    console.log(`Getting details for repository ${owner}/${repo}...`);
-    const endpoint = `/repos/${owner}/${repo}`;
-    return await githubApiRequest(endpoint);
-}
+const listPullRequests = async (owner, repo, state = 'open') => {
+    console.log(`Listing ${state} pull requests for ${owner}/${repo}...`);
+    return await githubApiRequest(`/repos/${owner}/${repo}/pulls?state=${state}`);
+};
 
-// Main demo function
+// Main demo
 async function runDemo() {
     try {
         console.log('-----------------------------------------');
         console.log('MCP GitHub Tools Demonstration');
         console.log('-----------------------------------------');
-        console.log('GitHub User: [REDACTED]');
-        console.log(`Default Repo: ${process.env.MCP_GITHUB_DEFAULT_OWNER}/${process.env.MCP_GITHUB_DEFAULT_REPO}`);
+        console.log(`Authenticated as: ${config.username}`);
+        console.log(`Default Repo: ${config.defaultOwner}/${config.defaultRepo}`);
         console.log('-----------------------------------------');
 
-        // Demonstrate search repositories
+        // Search repositories
         const searchResults = await searchRepositories('async layer2protocol');
         console.log(`\nFound ${searchResults.total_count} repositories in search`);
-        if (searchResults.items && searchResults.items.length > 0) {
+        if (searchResults.items?.length) {
             console.log('Top 3 search results:');
-            searchResults.items.slice(0, 3).forEach((repo, index) => {
-                console.log(`${index + 1}. ${repo.full_name} (${repo.stargazers_count} stars)`);
+            searchResults.items.slice(0, 3).forEach((repo, i) => {
+                console.log(`${i + 1}. ${repo.full_name} (${repo.stargazers_count} stars)`);
                 console.log(`   Description: ${repo.description || 'No description'}`);
             });
         }
 
         // Check if the Anya-core repo exists
-        let owner = 'anya-org';
-        let repo = 'anya-core';
-        let repoDetails;
-
+        const owner = config.defaultOwner;
+        const repo = config.defaultRepo;
         try {
-            repoDetails = await getRepoDetails(owner, repo);
+            const repoDetails = await getRepoDetails(owner, repo);
             console.log(`\nRepository ${owner}/${repo} exists:`);
             console.log(`Name: ${repoDetails.name}`);
             console.log(`Stars: ${repoDetails.stargazers_count}`);
             console.log(`Forks: ${repoDetails.forks_count}`);
             console.log(`Default Branch: ${repoDetails.default_branch}`);
-        } catch (e) {
-            console.log(`\nRepository ${owner}/${repo} not found. Trying alternate repository...`);
-
-            // Try with the username we have
-            owner = 'botshelomokoka';
-            try {
-                repoDetails = await getRepoDetails(owner, repo);
-                console.log(`\nAlternate repository ${owner}/${repo} exists:`);
-                console.log(`Name: ${repoDetails.name}`);
-                console.log(`Stars: ${repoDetails.stargazers_count}`);
-                console.log(`Forks: ${repoDetails.forks_count}`);
-                console.log(`Default Branch: ${repoDetails.default_branch}`);
-            } catch (e2) {
-                console.log(`\nCould not find repository ${owner}/${repo} either.`);
-            }
+        } catch {
+            console.log(`\nRepository ${owner}/${repo} not found.`);
         }
 
-        // Success message
         console.log('\n-----------------------------------------');
         console.log('MCP GitHub Tools Demo completed successfully!');
-        console.log('This demonstrates the functionality that would be available');
-        console.log('through the actual MCP GitHub tools.\n');
         console.log('To fully integrate with MCP, install and configure:');
         console.log('1. @modelcontextprotocol/server-github package');
         console.log('2. Set up proper GitHub authentication');
@@ -143,5 +139,4 @@ async function runDemo() {
     }
 }
 
-// Run the demo
 runDemo();

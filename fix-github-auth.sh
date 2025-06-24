@@ -1,53 +1,64 @@
 #!/bin/bash
-# Fix GitHub authentication for Codespaces
+# Fix GitHub authentication for Codespaces using GitHub CLI
 
 echo "Setting up GitHub authentication..."
 
-# Check if GITHUB_TOKEN is set in environment
-if [ -z "${GITHUB_TOKEN}" ]; then
-  echo "No GITHUB_TOKEN found in environment."
-  echo "You need to set a valid GitHub token."
-  echo "Please generate a new token with repo and workflow scopes at:"
-  echo "https://github.com/settings/tokens"
-  
-  # Generate a temporary token for this session
-  echo
-  echo "Creating a temporary GitHub token for this session..."
-  echo "This will expire when your codespace session ends."
-  
-  # Set codespace permissions to access the repo
-  gh codespace permissions set --repo $(git remote get-url origin | sed -e 's/.*github.com[:\/]\(.*\).git/\1/') --permissions write
-  
-  # Get the token from gh codespace
-  GH_TOKEN=$(gh codespace ssh -c "cat /workspaces/.codespaces/shared/_.env | grep GITHUB_TOKEN | cut -d= -f2" | tr -d '\r\n')
-  
-  if [ -n "$GH_TOKEN" ]; then
-    export GITHUB_TOKEN="$GH_TOKEN"
-    echo "export GITHUB_TOKEN=\"$GH_TOKEN\"" >> ~/.bashrc
-    echo "GitHub token set successfully from codespace environment."
-  else
-    echo "Failed to retrieve a valid GitHub token automatically."
-    echo "Please provide one manually by running:"
-    echo "  export GITHUB_TOKEN=\"your_token_here\""
-    exit 1
-  fi
-fi
+# Check if gh is already authenticated
+if gh auth status &>/dev/null; then
+  echo "GitHub CLI is already authenticated."
+  gh auth status
+else
+  echo "Not authenticated with GitHub CLI."
 
-# Set up GitHub CLI authentication with the token
-echo "${GITHUB_TOKEN}" | gh auth login --with-token
-if [ $? -ne 0 ]; then
-  echo "Failed to authenticate with GitHub using the provided token."
-  echo "The token may be invalid or expired."
-  echo "Please generate a new token and try again."
-  exit 1
+  # In a Codespace, we can use the built-in GitHub authentication
+  if [ -n "$CODESPACES" ] || [ -n "$GITHUB_CODESPACES" ]; then
+    echo "Codespace environment detected. Using GitHub CLI auth..."
+
+    # Set codespace permissions to access the repo
+    REPO_NAME=$(git remote get-url origin | sed -e 's/.*github.com[:\/]\(.*\).git/\1/')
+    echo "Setting permissions for repo: $REPO_NAME"
+    gh codespace permissions set --repo $REPO_NAME --permissions write
+
+    # Log in using GitHub CLI (will use codespace identity)
+    gh auth login --with-token </dev/null
+
+    if [ $? -eq 0 ]; then
+      echo "Authenticated with GitHub through Codespace identity."
+    else
+      echo "Failed to authenticate with GitHub CLI using Codespace identity."
+      echo "Please run 'gh auth login' manually."
+      exit 1
+    fi
+  else
+    # Regular authentication
+    echo "Please authenticate with GitHub CLI by running:"
+    echo "  gh auth login"
+    gh auth login
+  fi
 fi
 
 # Verify authentication
 gh auth status
 if [ $? -eq 0 ]; then
   echo "GitHub authentication successfully configured!"
+  # Get the username for display
+  USERNAME=$(gh api user | grep login | cut -d'"' -f4)
+  echo "Authenticated as: $USERNAME"
   echo "You can now commit with signing."
+
+  # Set up Git config for commit signing if needed
+  if [ -z "$(git config --global --get user.email)" ]; then
+    # Set Git config based on GitHub info
+    USER_EMAIL=$(gh api user/emails | grep email | head -n 1 | cut -d'"' -f4)
+    if [ -n "$USER_EMAIL" ]; then
+      git config --global user.email "$USER_EMAIL"
+      git config --global user.name "$USERNAME"
+      echo "Set up Git user config based on GitHub account."
+    fi
+  fi
+
+  echo "GitHub CLI-based authentication workflow is complete."
 else
-  echo "GitHub authentication failed. Please check your token."
+  echo "GitHub authentication failed. Please run 'gh auth login' manually."
   exit 1
 fi

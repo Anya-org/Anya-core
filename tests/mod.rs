@@ -13,6 +13,7 @@ pub mod dao;
 pub mod hardware;
 pub mod integration;
 pub mod layer2;
+pub mod lightning;
 pub mod protocols;
 pub mod security;
 

@@ -1,0 +1,35 @@
+{
+  "username": "botshelomokoka",
+  "period": "7-days",
+  "activities": {
+    "commits": 30,
+    "pullRequests": 0,
+    "reviews": 1
+  },
+  "points": {
+    "commits": 300,
+    "pullRequests": 0,
+    "reviews": 20,
+    "total": 320
+  },
+  "timestamp": "2025-06-24T08:05:29.679Z",
+  "lastUpdated": "2025-06-24T10:41:44.512Z",
+  "contributors": {
+    "botshelomokoka": {
+      "username": "botshelomokoka",
+      "period": "2025-days",
+      "activities": {
+        "commits": 30,
+        "pullRequests": 2,
+        "reviews": 1
+      },
+      "points": {
+        "commits": 300,
+        "pullRequests": 60,
+        "reviews": 20,
+        "total": 380
+      },
+      "timestamp": "2025-06-24T10:41:44.512Z"
+    }
+  }
+}

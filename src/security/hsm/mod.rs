@@ -126,10 +126,20 @@ impl HsmManager {
             config.provider_type
         );
 
+        let stats = HsmStats::default();
+        let audit_logger = Arc::new(AuditLogger::new(&config.audit).await?);
+
         let provider: Box<dyn HsmProvider> = match config.provider_type {
             HsmProviderType::Simulator => Box::new(SimulatorHsmProvider::new(&config.simulator)?),
             HsmProviderType::SoftwareKeyStore => {
-                Box::new(SoftwareHsmProvider::new(&config.software)?)
+                Box::new(
+                    SoftwareHsmProvider::new(
+                        config.software.clone(),
+                        config.network,
+                        audit_logger.clone(),
+                    )
+                    .await?,
+                )
             }
             HsmProviderType::CloudHsm => Box::new(CloudHsmProvider::new(&config.cloud).await?),
             HsmProviderType::HardwareHsm => {
@@ -140,10 +150,7 @@ impl HsmManager {
             }
         };
 
-        let stats = HsmStats::default();
-        let audit_logger = Arc::new(AuditLogger::new(&config.audit).await?);
-
-        let manager = Self {
+        Ok(Self {
             config,
             provider,
             stats,
@@ -152,9 +159,7 @@ impl HsmManager {
             operation_tracker: Arc::new(Mutex::new(HashMap::new())),
             status: Arc::new(RwLock::new(HsmStatus::Initializing)),
             health_status: Arc::new(RwLock::new(HsmHealthStatus::default())),
-        };
-
-        Ok(manager)
+        })
     }
 
     pub async fn initialize(&mut self) -> Result<(), HsmError> {
@@ -169,17 +174,10 @@ impl HsmManager {
                 "hsm.initialize",
                 &HsmAuditEvent {
                     event_type: AuditEventType::HsmInitialize,
-                    result: AuditEventResult::InProgress,
-                    severity: AuditEventSeverity::Info,
-                    timestamp: chrono::Utc::now(),
-                    id: Uuid::new_v4().to_string(),
-                    user_id: None,
-                    key_id: None,
-                    parameters: Some(
-                        serde_json::to_value(&self.config.provider_type).unwrap_or_default(),
-                    ),
-                    error: None,
-                    metadata: None,
+                    provider: format!("{:?}", self.config.provider_type),
+                    status: "started".to_string(),
+                    details: None,
+                    operation_id: None,
                 },
             )
             .await?;
@@ -196,17 +194,10 @@ impl HsmManager {
                 "hsm.initialize",
                 &HsmAuditEvent {
                     event_type: AuditEventType::HsmInitialize,
-                    result: AuditEventResult::Success,
-                    severity: AuditEventSeverity::Info,
-                    timestamp: chrono::Utc::now(),
-                    id: Uuid::new_v4().to_string(),
-                    user_id: None,
-                    key_id: None,
-                    parameters: Some(
-                        serde_json::to_value(&self.config.provider_type).unwrap_or_default(),
-                    ),
-                    error: None,
-                    metadata: None,
+                    provider: format!("{:?}", self.config.provider_type),
+                    status: "completed".to_string(),
+                    details: None,
+                    operation_id: None,
                 },
             )
             .await?;
@@ -219,39 +210,11 @@ impl HsmManager {
 
     pub async fn should_run_health_check(&self) -> bool {
         let health_status = self.health_status.read().await;
-        if health_status.last_upgrade_time.is_none() {
-            return false;
+        match (health_status.last_upgrade_time, health_status.last_check_time) {
+            (None, _) => false,
+            (Some(_), None) => true,
+            (Some(upgrade_time), Some(check_time)) => upgrade_time > check_time,
         }
-        if let (Some(upgrade_time), Some(check_time)) = (
-            health_status.last_upgrade_time,
-            health_status.last_check_time,
-        ) {
-            return upgrade_time > check_time;
-        }
-        if health_status.last_upgrade_time.is_some() && health_status.last_check_time.is_none() {
-            return true;
-        }
-        false
-    }
-
-    pub async fn record_system_upgrade(&self) -> Result<(), HsmError> {
-        let mut health_status = self.health_status.write().await;
-        health_status.last_upgrade_time = Some(Utc::now());
-        health_status.disabled_reason =
-            Some("System upgrade requires health check validation".to_string());
-        self.audit_logger
-            .log_event(
-                "hsm.system_upgrade",
-                &HsmAuditEvent {
-                    event_type: "system_upgrade".to_string(),
-                    provider: format!("{:?}", self.config.provider_type),
-                    status: "recorded".to_string(),
-                    details: Some("HSM disabled until health check passes".to_string()),
-                    operation_id: None,
-                },
-            )
-            .await?;
-        Ok(())
     }
 
     pub async fn run_health_check(&mut self) -> Result<bool, HsmError> {
@@ -403,18 +366,10 @@ impl HsmManager {
                 "hsm.operation",
                 &HsmAuditEvent {
                     event_type: AuditEventType::HsmOperation,
-                    result: AuditEventResult::InProgress,
-                    severity: AuditEventSeverity::Info,
-                    timestamp: chrono::Utc::now(),
-                    id: Uuid::new_v4().to_string(),
-                    user_id: None,
-                    key_id: None,
-                    parameters: Some(serde_json::to_value(&operation).unwrap_or_default()),
-                    error: None,
-                    metadata: Some(serde_json::json!({
-                        "operation_id": operation_id.clone(),
-                        "status": "started"
-                    })),
+                    provider: format!("{:?}", self.config.provider_type),
+                    status: "started".to_string(),
+                    details: Some(format!("operation_id: {}", operation_id.clone())),
+                    operation_id: Some(operation_id.clone()),
                 },
             )
             .await?;
@@ -457,31 +412,47 @@ impl HsmManager {
                     }))?;
                 self.audit_logger
                     .log_event(
-                        AuditEventType::HsmOperation,
-                        AuditEventResult::Success,
-                        AuditEventSeverity::Info,
-                        event.to_hsm_audit_event(),
+                        "hsm.operation",
+                        &HsmAuditEvent {
+                            event_type: AuditEventType::HsmOperation,
+                            result: AuditEventResult::Success,
+                            severity: AuditEventSeverity::Info,
+                            timestamp: chrono::Utc::now(),
+                            id: Uuid::new_v4().to_string(),
+                            user_id: None,
+                            key_id: None,
+                            parameters: Some(serde_json::to_value(&operation).unwrap_or_default()),
+                            error: None,
+                            metadata: Some(serde_json::json!({
+                                "operation_id": operation_id,
+                                "status": "success",
+                                "provider": format!("{:?}", self.config.provider_type)
+                            })),
+                        },
                     )
                     .await?;
                 Ok(result)
             }
             Err(err) => {
-                let event = HsmAuditEvent::failure(
-                    AuditEventType::HsmOperation,
-                    format!("Operation failed: {}", err),
-                )
-                .with_operation_id(operation_id)
-                .with_metadata(&serde_json::json!({
-                    "provider": format!("{:?}", self.config.provider_type),
-                    "error": format!("{:?}", err),
-                    "action": "EXECUTE_OPERATION_FAILED"
-                }))?;
                 self.audit_logger
                     .log_event(
-                        AuditEventType::HsmOperation,
-                        AuditEventResult::Failure,
-                        AuditEventSeverity::Error,
-                        event.to_hsm_audit_event(),
+                        "hsm.operation",
+                        &HsmAuditEvent {
+                            event_type: AuditEventType::HsmOperation,
+                            result: AuditEventResult::Failure,
+                            severity: AuditEventSeverity::Error,
+                            timestamp: chrono::Utc::now(),
+                            id: Uuid::new_v4().to_string(),
+                            user_id: None,
+                            key_id: None,
+                            parameters: Some(serde_json::to_value(&operation).unwrap_or_default()),
+                            error: Some(format!("{:?}", err)),
+                            metadata: Some(serde_json::json!({
+                                "operation_id": operation_id,
+                                "status": "failed",
+                                "provider": format!("{:?}", self.config.provider_type)
+                            })),
+                        },
                     )
                     .await?;
                 Err(err)
@@ -692,10 +663,14 @@ impl HsmManager {
         *self.status.write().await = HsmStatus::Disabled;
         self.audit_logger
             .log_event(
-                AuditEventType::HsmOperation,
-                AuditEventResult::Success,
-                AuditEventSeverity::Info,
-                serde_json::json!({ "action": "DISABLE_HSM", "message": "HSM disabled by user" }),
+                "hsm.disable",
+                &HsmAuditEvent {
+                    event_type: AuditEventType::HsmOperation,
+                    provider: format!("{:?}", self.config.provider_type),
+                    status: "completed".to_string(),
+                    details: Some("HSM disabled by user".to_string()),
+                    operation_id: None,
+                },
             )
             .await?;
         Ok(())
@@ -733,7 +708,7 @@ impl NetworkManager {
     pub async fn initiate_swap(
         &self,
         amount: u64,
-        counterparty: &str,
+        _counterparty: &str,
     ) -> Result<AtomicSwap, Box<dyn std::error::Error>> {
         use bitcoin::blockdata::script::Builder;
         use bitcoin::opcodes;
@@ -830,26 +805,24 @@ pub struct MobileSDK {
 }
 
 impl MobileSDK {
-    pub fn generate_repudiation_proof(&self, txid: &Txid) -> Result<RepudiationProof> {
+    pub async fn generate_repudiation_proof(&self, txid: &Txid) -> Result<RepudiationProof, Box<dyn std::error::Error>> {
         use rand::RngCore;
 
         let mut nonce = [0u8; 32];
         rand::thread_rng().fill_bytes(&mut nonce);
 
-        let partial_sig = self
+        let partial_sig_bytes = self
             .security
             .sign_data(
                 "repudiation_key",
                 &nonce,
                 SignatureAlgorithm::EcdsaSecp256k1Sha256,
             )
-            .map_err(|e| Box::new(e) as Box<dyn std::error::Error>)?;
+            .await?;
 
-        let merkle_proof = futures::executor::block_on(self.network.get_merkle_proof(txid))
-            .map_err(|e| Box::new(e) as Box<dyn std::error::Error>)?;
+        let merkle_proof = self.network.get_merkle_proof(txid).await?;
 
-        let partial_sig = Signature::from_der(&partial_sig)
-            .map_err(|e| Box::new(e) as Box<dyn std::error::Error>)?;
+        let partial_sig = Signature::from_slice(&partial_sig_bytes)?;
 
         Ok(RepudiationProof {
             nonce,

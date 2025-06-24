@@ -13,6 +13,16 @@ dao/
 │   └── dex-integration-trait.clar # DEX integration interface
 ├── extensions/
 │   └── token-economics.clar # Advanced token economics implementation
+├── tools/
+│   ├── contribution-tracker.js  # GitHub activity tracker
+│   ├── track-contributions.sh   # Tracker shell wrapper
+│   ├── dao-reward-engine.js     # Bitcoin-style reward engine
+│   └── run-dao-rewards.sh       # Reward engine shell wrapper
+├── data/
+│   ├── contribution_history.json # Contribution history data
+│   └── reward_distribution.json  # Reward distribution records
+├── docs/
+│   └── REWARD_SYSTEM_GUIDE.md    # Reward system documentation
 ├── tests/
 │   └── dao-core-test.clar   # Test script for DAO core
 └── README.md                # This file
@@ -62,6 +72,69 @@ Advanced token economics implementation:
   - 55% to DAO/community
 - **Phase Management**: Initial and regular distribution phase tracking
 
+### Contribution & Reward System (`tools/`)
+
+GitHub contribution tracking and Bitcoin-style reward distribution:
+
+- **Contribution Tracker**: Tracks GitHub activity and assigns points
+- **DAO Reward Engine**: Calculates and distributes rewards based on tokenomics
+- **Bitcoin-Style Rewards**: Reward calculation based on block height and halving schedule
+- **Strategic Distribution**: Follows the 15% community allocation from tokenomics
+
+## Bitcoin-Style Reward System
+
+The reward system implements Anya Core's tokenomics with:
+
+- **Total Supply**: 21 billion AGT tokens (Bitcoin parity)
+- **Block Reward**: Initial 10,000 AGT tokens per block
+- **Halving Schedule**: Every 210,000 blocks (following Bitcoin model)
+- **Community Allocation**: 15% of total supply for contributor rewards
+
+### Usage: Tracking Contributions
+
+Track GitHub contributions with:
+
+```bash
+# Track last 30 days by default
+./track-contributions.sh
+
+# Track a specific time period
+./track-contributions.sh --period=quarter
+
+# Full contribution history
+./track-contributions.sh --full-history
+```
+
+Options:
+
+- `--period=PERIOD`: Time period to track (all-time, year, quarter, month, week)
+- `--full-history`: Track complete repository history
+- `--auto-run`: Run in non-interactive mode
+- `--yes-all`: Answer yes to all prompts
+
+### Usage: Processing Rewards
+
+Calculate and distribute rewards using:
+
+```bash
+# Simulate reward distribution
+./run-dao-rewards.sh
+
+# Calculate rewards without distribution
+./run-dao-rewards.sh --audit-only
+
+# Execute actual token transfers
+./run-dao-rewards.sh --mainnet
+```
+
+Options:
+
+- `--simulate`: Run in simulation mode (default)
+- `--mainnet`: Execute actual token transfers
+- `--audit-only`: Calculate rewards without distribution
+- `--force`: Override safety checks
+- `--block=NUMBER`: Set current block height for calculations
+
 ### Test Script (`tests/dao-core-test.clar`)
 
 Comprehensive test suite covering all aspects of the DAO Core implementation:
@@ -77,6 +150,7 @@ Comprehensive test suite covering all aspects of the DAO Core implementation:
 ### Prerequisites
 
 - [Clarinet](https://github.com/hirosystems/clarinet) v2.3.0 or later
+- [Node.js](https://nodejs.org/) v14 or later (for contribution tracking and rewards)
 
 ### Installation
 
@@ -175,6 +249,7 @@ To use the DAO in your contract:
 
 For more detailed information about the DAO system, see:
 
+- [DAO Reward System Guide](docs/REWARD_SYSTEM_GUIDE.md) - Bitcoin-style reward system details
 - [DAO Documentation Index](../docs/DAO_INDEX.md) - Central entry point to all DAO documentation
 - [DAO System Map](../docs/DAO_SYSTEM_MAP.md) - Architectural overview
 - [Tokenomics System](../docs/TOKENOMICS_SYSTEM.md) - Token economics details

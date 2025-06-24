@@ -1,0 +1,75 @@
+{
+  "periods": {
+    "currentPeriod": "2025-Q2",
+    "schedule": [
+      {
+        "id": "2025-Q1",
+        "startDate": "2025-01-01",
+        "endDate": "2025-03-31",
+        "status": "completed",
+        "onChainId": "2025-Q1"
+      },
+      {
+        "id": "2025-Q2",
+        "startDate": "2025-04-01",
+        "endDate": "2025-06-30",
+        "status": "active",
+        "onChainId": "2025-Q2"
+      },
+      {
+        "id": "2025-Q3",
+        "startDate": "2025-07-01",
+        "endDate": "2025-09-30",
+        "status": "scheduled",
+        "onChainId": "2025-Q3"
+      },
+      {
+        "id": "2025-Q4",
+        "startDate": "2025-10-01",
+        "endDate": "2025-12-31",
+        "status": "scheduled",
+        "onChainId": "2025-Q4"
+      }
+    ]
+  },
+  "automation": {
+    "trackingSchedule": "0 0 1 * *",
+    "submissionSchedule": "0 12 1 * *",
+    "distributionSchedule": "0 12 5 * *",
+    "autoConfirm": false,
+    "autoDistribute": false
+  },
+  "security": {
+    "requiredConfirmations": 12,
+    "timelock": 86400,
+    "votingThreshold": 60,
+    "minQuorum": 30,
+    "votingPeriod": 259200
+  },
+  "blockchain": {
+    "testnet": {
+      "network": "testnet",
+      "apiUrl": "https://stacks-node-api.testnet.stacks.co",
+      "explorerUrl": "https://explorer.stacks.co",
+      "contracts": {
+        "contributionOracle": "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.contribution-oracle",
+        "rewardController": "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.reward-controller",
+        "rewardDistributor": "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.reward-distributor",
+        "rewardScheduler": "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.reward-scheduler",
+        "token": "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.token"
+      }
+    },
+    "mainnet": {
+      "network": "mainnet",
+      "apiUrl": "https://stacks-node-api.mainnet.stacks.co",
+      "explorerUrl": "https://explorer.stacks.co",
+      "contracts": {
+        "contributionOracle": "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.contribution-oracle",
+        "rewardController": "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.reward-controller",
+        "rewardDistributor": "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.reward-distributor",
+        "rewardScheduler": "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.reward-scheduler",
+        "token": "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.token"
+      }
+    }
+  }
+}

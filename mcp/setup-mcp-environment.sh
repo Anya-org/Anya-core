@@ -27,17 +27,54 @@ mkdir -p "${TOOLBOX_DIR}/servers"
 # Set up environment variables
 echo -e "${YELLOW}Setting up environment variables...${NC}"
 
-# Create .env file in MCP directory if it doesn't exist
-ENV_FILE="${MCP_DIR}/.env"
-if [ ! -f "$ENV_FILE" ]; then
-  echo -e "Creating MCP environment file at ${ENV_FILE}..."
-  cat >"$ENV_FILE" <<EOL
+# Source the GitHub auth helper
+GITHUB_AUTH_HELPER="${WORKSPACE_ROOT}/scripts/common/github-auth.sh"
+if [ -f "$GITHUB_AUTH_HELPER" ]; then
+  echo -e "Using GitHub CLI authentication helper..."
+  source "$GITHUB_AUTH_HELPER"
+
+  # Check if GitHub CLI is available and authenticated
+  if check_github_cli && check_github_auth; then
+    # Set up environment using GitHub CLI auth
+    echo -e "Setting up environment using GitHub CLI authentication..."
+
+    # Get GitHub auth info
+    eval $(get_github_auth_info)
+
+    # Create .env file in MCP directory
+    ENV_FILE="${MCP_DIR}/.env"
+    echo -e "Creating MCP environment file at ${ENV_FILE}..."
+    cat >"$ENV_FILE" <<EOL
 # MCP Environment Variables
 # Created: $(date)
+# Generated from GitHub CLI authentication
 
 # GitHub credentials
-MCP_GITHUB_USERNAME="Bo_theBig"
-MCP_GITHUB_EMAIL="botshelomokoka@gmail.com"
+MCP_GITHUB_USERNAME="$GITHUB_USERNAME"
+MCP_GITHUB_EMAIL="$GITHUB_EMAIL"
+MCP_GITHUB_DEFAULT_OWNER="anya-org"
+MCP_GITHUB_DEFAULT_REPO="anya-core"
+
+# GitHub token from GitHub CLI
+GITHUB_TOKEN="$GITHUB_TOKEN"
+
+# Other API Keys (add as needed)
+# MEM0_API_KEY="your_mem0_api_key"
+# BRAVE_API_KEY="your_brave_api_key"
+EOL
+    echo -e "${GREEN}✓${NC} Created .env file with GitHub CLI authentication"
+  else
+    # Fallback to existing .env file or create one with placeholder values
+    if [ ! -f "$ENV_FILE" ]; then
+      echo -e "Creating MCP environment file with placeholder values..."
+      cat >"$ENV_FILE" <<EOL
+# MCP Environment Variables
+# Created: $(date)
+# WARNING: Using placeholder values - please authenticate with GitHub CLI
+
+# GitHub credentials
+MCP_GITHUB_USERNAME="placeholder_username"
+MCP_GITHUB_EMAIL="placeholder_email@example.com"
 MCP_GITHUB_DEFAULT_OWNER="anya-org"
 MCP_GITHUB_DEFAULT_REPO="anya-core"
 
@@ -48,9 +85,37 @@ GITHUB_TOKEN="gh_placeholder_token"
 # MEM0_API_KEY="your_mem0_api_key"
 # BRAVE_API_KEY="your_brave_api_key"
 EOL
-  echo -e "${GREEN}✓${NC} Created .env file"
+      echo -e "${YELLOW}⚠️${NC} Created .env file with placeholder values"
+      echo -e "${YELLOW}⚠️${NC} Please authenticate with GitHub CLI by running 'gh auth login'"
+    else
+      echo -e "${GREEN}✓${NC} Using existing .env file"
+    fi
+  fi
 else
-  echo -e "${GREEN}✓${NC} Found existing .env file"
+  echo -e "${YELLOW}⚠️${NC} GitHub CLI auth helper not found at ${GITHUB_AUTH_HELPER}"
+  echo -e "${YELLOW}⚠️${NC} Falling back to existing .env file or creating with placeholder values"
+
+  if [ ! -f "$ENV_FILE" ]; then
+    echo -e "Creating MCP environment file with placeholder values..."
+    cat >"$ENV_FILE" <<EOL
+# MCP Environment Variables
+# Created: $(date)
+# WARNING: Using placeholder values - please authenticate with GitHub CLI
+
+# GitHub credentials
+MCP_GITHUB_USERNAME="placeholder_username"
+MCP_GITHUB_EMAIL="placeholder_email@example.com"
+MCP_GITHUB_DEFAULT_OWNER="anya-org"
+MCP_GITHUB_DEFAULT_REPO="anya-core"
+
+# Set a placeholder token for testing (replace with a real token for actual GitHub operations)
+GITHUB_TOKEN="gh_placeholder_token"
+
+# Other API Keys (add as needed)
+# MEM0_API_KEY="your_mem0_api_key"
+# BRAVE_API_KEY="your_brave_api_key"
+EOL
+  fi
 fi
 
 # Load the environment variables

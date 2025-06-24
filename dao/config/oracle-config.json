@@ -1,0 +1,60 @@
+{
+    "DEFAULT_NETWORK": "testnet",
+    "DEFAULT_DATA_SOURCE": {
+        "type": "github",
+        "repo": "anya-org/anya-core",
+        "trackContributions": true
+    },
+    "DEFAULT_SUBMISSION_INTERVAL": 3600000,
+    "CONTRACT_ADDRESS": "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM",
+    "NETWORKS": {
+        "mainnet": {
+            "apiUrl": "https://stacks-node-api.mainnet.stacks.co",
+            "explorerUrl": "https://explorer.stacks.co"
+        },
+        "testnet": {
+            "apiUrl": "https://stacks-node-api.testnet.stacks.co",
+            "explorerUrl": "https://explorer.stacks.co"
+        },
+        "regtest": {
+            "apiUrl": "http://localhost:20443",
+            "explorerUrl": "http://localhost:8000"
+        },
+        "mocknet": {
+            "apiUrl": "http://localhost:3999",
+            "explorerUrl": "http://localhost:8000"
+        }
+    },
+    "ORACLE_CONFIG": {
+        "minStake": 100000000,
+        "rewardPercentage": 0.5,
+        "slashPercentage": 5,
+        "consensusThreshold": 67,
+        "minSubmissionInterval": 3600,
+        "maxOracleCount": 7
+    },
+    "DATA_SOURCES": {
+        "github": {
+            "commitWeight": 10,
+            "pullRequestWeight": 20,
+            "issueWeight": 5,
+            "reviewWeight": 15
+        },
+        "api": {
+            "endpoints": [
+                {
+                    "name": "contribution-api",
+                    "url": "https://api.anya.org/contributions",
+                    "method": "GET",
+                    "headers": {
+                        "Authorization": "Bearer ${ANYA_API_TOKEN}"
+                    }
+                }
+            ]
+        }
+    },
+    "SIGNING_CONFIG": {
+        "algorithm": "secp256k1",
+        "hashAlgorithm": "sha256"
+    }
+}

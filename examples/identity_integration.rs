@@ -1,8 +1,6 @@
-use anya_core::web5::{
-    identity::{IdentityManager, DIDManager, DID},
-};
+use anya_core::web5::identity::{IdentityManager, DID};
 use serde_json;
-use chrono::{Duration, Utc};
+use chrono::Duration;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {

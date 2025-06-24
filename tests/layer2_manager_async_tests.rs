@@ -3,8 +3,7 @@
 //! This module tests the Layer2Manager's async capabilities.
 
 use anya_core::layer2::{
-    AssetParams, AssetTransfer, Layer2Manager, Layer2ProtocolType, Proof,
-    TransactionStatus, ProtocolState, TransferResult, VerificationResult, ValidationResult,
+    Layer2Manager, Layer2ProtocolType, Proof,
 };
 
 #[cfg(test)]

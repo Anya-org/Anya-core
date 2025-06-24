@@ -1,0 +1,3 @@
+mod decentralized_reporting_test;
+mod decentralized_treasury_management_test;
+mod multi_sig_governance_test;
