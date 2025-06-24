@@ -60,3 +60,5 @@ scripts/systemd/
 
 # Node.js build artifacts
 node_modules/
+*.bak2
+*.new
