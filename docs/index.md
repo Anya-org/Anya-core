@@ -1,23 +1,25 @@
 ---
 layout: default
-title: "Index - PRODUCTION-READY (June 7, 2025)"
-description: "Documentation for Index - Bitcoin Integration Complete"
+title: "Index - PRODUCTION-READY (June 24, 2025)"
+description: "Documentation for Index - Bitcoin Integration Complete with Monitoring"
 show_support: true
-last_updated: 2025-06-07
+last_updated: 2025-06-24
 ---
 
 <!-- markdownlint-disable MD013 line-length -->
 
 # ✅ Anya Core Documentation - PRODUCTION-READY
 
-## 🎉 PRODUCTION STATUS ACHIEVED (June 7, 2025)
+## 🎉 PRODUCTION STATUS ACHIEVED (June 24, 2025)
 
-**MAJOR MILESTONE:** Bitcoin Core compilation complete and all Layer2 protocols operational!
+**MAJOR MILESTONE:** Bitcoin Core compilation complete, all Layer2 protocols operational, and blockchain metrics monitoring system implemented!
 
 ### ✅ Bitcoin Implementation Status
+
 - **All compilation errors resolved:** 58+ errors → 0 errors
 - **Layer2 protocols operational:** BOB, Lightning, RSK, RGB, DLC, Taproot Assets
 - **Production-ready status:** All critical systems functional
+- **NEW: Blockchain Metrics Monitoring:** Real-time monitoring system with alerts and CI/CD integration
 
 ## Overview
 
@@ -44,6 +46,7 @@ This is the central index for all Anya Core documentation. All documentation fol
 | [Security Policy](standards/SECURITY.md) | Security policies and procedures | ✅ Current | 2.6.0 | 2025-06-07 |
 | [Upgrade Guide](./UPGRADE.md) | Version upgrade instructions | ✅ Updated | 2.6.0 | 2025-06-07 |
 | **[Bitcoin Integration](../BITCOIN_FRAMEWORK_IMPLEMENTATION.md)** | **Bitcoin Core implementation** | **✅ PRODUCTION-READY** | **1.1.0** | **2025-06-07** |
+| **[Blockchain Metrics Monitoring](./monitoring/BLOCKCHAIN_METRICS_MONITORING.md)** | **Real-time blockchain metrics monitoring** | **✅ NEW** | **1.0.0** | **2025-06-24** |
 
 ## ✅ Bitcoin & Layer2 Protocol Documentation
 
@@ -150,8 +153,9 @@ This index was last updated on 2025-05-21.
 ## Getting Help
 
 For documentation issues or suggestions:
+
 1. Open an issue on [GitHub](https://github.com/your-org/anya-core/issues)
-2. Email: botshelomokoka+docs@gmail.com
+2. Email: <botshelomokoka+docs@gmail.com>
 3. Join our [community forum](https://community.anya-core.org)
 
 ## License

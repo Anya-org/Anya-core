@@ -21,6 +21,13 @@ pub fn export_metrics() -> String {
         output.push_str(&format!("{} {}\n", key, value));
     }
     
+    // Include generic metrics if available
+    if let Ok(generic_metrics) = std::fs::metadata("/workspaces/Anya-core/src/monitoring/generic_metrics.rs") {
+        if generic_metrics.is_file() {
+            crate::monitoring::generic_metrics::include_generic_metrics(&mut output);
+        }
+    }
+    
     output
 }
 

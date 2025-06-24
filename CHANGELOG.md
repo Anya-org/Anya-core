@@ -1,51 +1,66 @@
 # Changelog for Anya Core
 
+## [Unreleased]
+
+### Added (v0.9.0-dev)
+
+- **Blockchain Metrics Monitoring**: Comprehensive system for real-time metrics (SegWit/Taproot adoption, block propagation, etc.)
+  - Configurable alerting system
+  - RESTful API endpoints (JSON, Prometheus)
+  - Command-line utilities for metrics validation
+  - Testnet to Mainnet promotion validation
+- **CI/CD Improvements**: 
+  - GitHub CLI integration for CI workflows
+  - Testnet to Mainnet promotion workflow with metrics validation
+
+### Fixed (v0.9.0-dev)
+
+- **Compilation**: Resolved Layer 2 module compilation issues
+- **Test Failures**: Fixed DLC test assertion mismatch
+- **Import Errors**: Corrected TypeScript import paths and dependencies
+- **Type Safety**: Enhanced type definitions for protocol interactions
+
+### Changed (v0.9.0-dev)
+
+- **Architecture**: Migrated frontend from Dart to React/TypeScript
+- **Module Structure**: Reorganized Layer 2 modules
+- **Test Organization**: Consolidated Layer 2 tests
+
+---
+
 ## [1.2.0] - 2025-06-14 🎉 MAJOR RELEASE - MERGED RELEASE BRANCH
 
 ### 🚀 RELEASE BRANCH MERGE COMPLETED
 
 #### Added - Release Infrastructure
 
-- **Docker Configuration**: Complete containerization with secure production configs
-- **Documentation**: Enhanced Jekyll-based documentation system with link checking
-- **CI/CD Workflows**: Advanced GitHub Actions workflows for all protocols
-- **Installation Scripts**: Enhanced Clarinet and dependency installation scripts
+- **Docker Configuration**: Secure, production-ready containerization
+- **Documentation**: Enhanced Jekyll-based docs with link checking
+- **CI/CD Workflows**: Advanced GitHub Actions for all protocols
+- **Installation Scripts**: Improved Clarinet and dependency scripts
 
 #### Added - Release Documentation
 
-- **Action Plan**: Comprehensive June 2025 development plan
-- **Repository Analysis**: Complete repository structure analysis and optimization
-- **Docker Integration**: Secure multi-stage Dockerfiles for production deployment
+- **Action Plan**: June 2025 development plan
+- **Repository Analysis**: Structure analysis and optimization
+- **Docker Integration**: Secure multi-stage Dockerfiles
 
 #### Technical Improvements
 
-- **Version Alignment**: All packages updated to v1.2.0 for consistency
-- **Dependency Updates**: Latest compatible versions for all dependencies
-- **Build System**: Enhanced Cargo workspace configuration
-- **Release Process**: Streamlined merge process from release branch to main
+- **Version Alignment**: All packages updated to v1.2.0
+- **Dependency Updates**: Latest compatible versions
+- **Build System**: Enhanced Cargo workspace config
+- **Release Process**: Streamlined release branch merge
 
-### Fixed
-
-- **Compilation**: Resolved all Layer 2 module compilation issues
-- **Test Failures**: Fixed DLC test assertion mismatch
-- **Import Errors**: Corrected TypeScript import paths and dependencies
-- **Type Safety**: Enhanced type definitions for protocol interactions
-
-### Changed
-
-- **Architecture**: Migrated from Dart to React/TypeScript for frontend
-- **Module Structure**: Reorganized Layer 2 modules for better maintainability
-- **Test Organization**: Consolidated all Layer 2 tests into comprehensive suite
-
+---
 
 ## [Unreleased] - Development Branch
 
 ### 🔧 Current Development Work (v0.9.0-dev)
 
-- **Async Layer2 Implementation:** Completed async trait implementation for all Layer2 protocol clients
-- **Layer2Manager Async Support:** Updated Layer2Manager with comprehensive async initialization and protocol access
+- **Async Layer2 Implementation:** Async trait implementation for all Layer2 protocol clients
+- **Layer2Manager Async Support:** Comprehensive async initialization and protocol access
 - **Lightning and StateChannel Implementation:** Added missing async trait implementations
-- **Performance Testing Framework:** Fixed 10 compilation errors in performance testing modules
 - **Dependencies:** Added `rand_distr` for Zipf distribution support
 - **Timer Implementation:** Fixed Timer API usage in performance tests
 - **TestResult Structure:** Corrected field mismatches in test result reporting
@@ -53,40 +68,38 @@
 
 ### 📊 Technical Improvements
 
-- **Async Layer2Protocol:** Enhanced async/await support across all protocol implementations
-- **Transaction Performance Tests:** Implemented comprehensive mock transaction validation
 - **Cache Performance Tests:** Added Zipf distribution for realistic access patterns
+- **Transaction Performance Tests:** Comprehensive mock transaction validation
 - **Database Performance Tests:** Enhanced database access pattern testing
 - **Error Handling:** Improved error propagation in performance test framework
 
 ### 🎯 Documentation Updates
 
-- **System Status:** Updated documentation to reflect accurate compilation status
-- **TODO Tracking:** Corrected compilation error counts and progress tracking
+- **System Status:** Updated documentation for compilation status
+- **TODO Tracking:** Corrected error counts and progress tracking
 - **SYSTEM_MAP:** Added transparency about recent fixes and current state
 
 ### 🚀 Major Features in Development
 
 - **Complete Layer2 Ecosystem:**
-  - BOB: BitVM, EVM, analytics, and cross-layer functionality
+  - BOB: BitVM, EVM, analytics, cross-layer functionality
   - Lightning: Enhanced channel management and routing
   - RGB: Advanced state management and wallet integration
-  - RSK: Enhanced federation and bridging mechanisms
-  - DLC: Comprehensive discrete log contract support
-  - Taproot Assets: Full asset management capabilities
+  - RSK: Enhanced federation and bridging
+  - DLC: Discrete log contract support
+  - Taproot Assets: Full asset management
 
 - **Enterprise Security Infrastructure:**
-  - System alignment framework with Bitcoin Core principle validation
-  - Hardware integration system with comprehensive scoring
+  - Protection for reentrancy and resource exhaustion
+  - Hardware integration with scoring
   - Enhanced API handlers with security validation
-  - Protection mechanisms for reentrancy and resource exhaustion
-  - BIP compliance validation and enforcement
+  - BIP compliance validation
 
 - **Production-Ready Architecture:**
-  - Hexagonal architecture with clean separation of concerns
-  - Unified Layer2 protocol framework with shared types and traits
+  - Hexagonal architecture
+  - Unified Layer2 protocol framework
   - Enterprise-grade dependency management
-  - Comprehensive testing and validation infrastructure
+  - Comprehensive testing and validation
 
 ---
 
@@ -100,72 +113,65 @@
 
 ### Version Locking Terms
 
-- **LTE (Long Term Evolution)**: Gradual feature evolution on development branches
-- **Stable**: Full version releases only on main branch
-- **Candidate**: RC versions for release preparation
-- **Development**: Pre-release versions with active development
+- **LTE (Long Term Evolution)**: Gradual feature evolution on dev branches
+- **Stable**: Full releases only on main
+- **Candidate**: RC versions for release prep
+- **Development**: Pre-release versions with active dev
 
 ---
 
 ## Release History
 
-*Note: No stable releases (v1.0.0+) have been published yet. All previous changelog entries represent development work leading toward the first stable release.*
+### [0.9.0-dev] - 2025-06-08 (Current Development)
 
-### Development Milestones
+- Fixed serde derive macro issues by adding `features = ["derive"]` to Cargo.toml
 
-## [0.9.0-dev] - 2025-06-08 (Current Development)
+#### Fixed
 
-### Fixed
-
-- **MAJOR: Complete Bitcoin Core Compilation Fix** - Resolved 58+ compilation errors to achieve production-ready codebase
-  - Fixed serde derive macro issues by adding `features = ["derive"]` to Cargo.toml
-  - Resolved duplicate AnyaResult import conflicts in P2P module
-  - Fixed hash import compatibility (bitcoin_hashes version conflicts)
-  - Fixed tokio time import conflicts (tokio::time → std::time in prelude)
-  - Resolved futures_io::Error conflicts with manual String conversion
-  - Fixed async trait method signatures in Layer2Protocol implementations
-  - Fixed ValidationResult enum usage across multiple modules
-  - Fixed Amount vs u64 type mismatches using proper Amount::from_sat()
-  - Added missing trait derives (Debug, Hash, Serialize) where needed
-  - Fixed random number generation patterns (rng.fill() → rng.fill_bytes())
-  - Resolved borrowing conflicts in RSK federation module
-  - Added comprehensive error handling with proper From implementations
+- **MAJOR: Complete Bitcoin Core Compilation Fix** - 58+ compilation errors resolved
+  - Fixed serde derive macro issues
+  - Resolved duplicate AnyaResult import conflicts
+  - Fixed hash import compatibility (bitcoin_hashes)
+  - Fixed tokio time import conflicts
+  - Resolved futures_io::Error conflicts
+  - Fixed async trait method signatures
+  - Fixed ValidationResult enum usage
+  - Fixed Amount vs u64 type mismatches
+  - Added missing trait derives
+  - Fixed random number generation patterns
+  - Resolved borrowing conflicts in RSK module
+  - Added comprehensive error handling
   - Fixed Arc type annotations for Layer2Protocol registry
-  - Implemented ProtocolConfig trait for all Layer2 config structs
-  - Fixed final hash method compatibility with proper type annotations
+  - Implemented ProtocolConfig trait for all Layer2 configs
+  - Fixed final hash method compatibility
 
-### Added
+#### Added
 
-- **Production-Ready Bitcoin Implementation** - All core Bitcoin functionality now compiles and builds successfully
+- **Production-Ready Bitcoin Implementation** - All core Bitcoin functionality compiles and builds
   - Complete Layer2 protocol support (BOB, Lightning, RSK, RGB, DLC, Taproot Assets)
   - Comprehensive P2P networking and mempool management
-  - Full Taproot/BIP-341 support with proper validation
-  - Multi-protocol factory pattern for Layer2 protocol creation
-  - Security validation framework with comprehensive error handling
-- Enhanced error handling system with secp256k1::Error integration
-- Missing AnyaError variants (NotImplemented, Peer, Protocol, P2P, General)
-- Proper ProtocolConfig trait implementations for all Layer2 protocols
+  - Full Taproot/BIP-341 support
+  - Multi-protocol factory pattern
+  - Security validation framework
+- Enhanced error handling with secp256k1::Error integration
+- Missing AnyaError variants
+- Proper ProtocolConfig trait implementations
 
-### Changed
+#### Changed
 
-- Updated hash method calls for bitcoin_hashes compatibility
-- Improved Layer2 protocol registration with proper config type matching
-- Enhanced random number generation for cryptographic operations
-- Modernized async trait method signatures across Layer2 protocols
+- Updated hash method calls for bitcoin_hashes
+- Improved Layer2 protocol registration
+- Enhanced random number generation
+- Modernized async trait method signatures
 
-### Technical Achievements (Development)
+#### Technical Achievements
 
-- ✅ Compilation: 0 errors (reduced from 58+ errors)
+- ✅ Compilation: 0 errors (from 58+)
 - ✅ Build: cargo build successful
 - ✅ Check: cargo check successful
-- ⚠️ Warnings: 130+ warnings (unused imports/variables - non-blocking)
-- ✅ Core Functionality: All Bitcoin, Layer2, P2P, mempool modules operational
-- 🚧 Pre-Release: Codebase ready for release candidate preparation
-
+- ⚠️ Warnings: 130+ (non-blocking)
 
 ---
-
-[AIR-3][AIS-3][BPC-3][AIT-3][RES-3]
 
 All notable changes to the Anya Core project will be documented in this file.
 
@@ -175,52 +181,47 @@ All notable changes to the Anya Core project will be documented in this file.
 
 ## Historical Development Work (Pre-1.0.0)
 
-*Note: All entries below represent development work and experimental features. No stable versions (1.0.0+) have been released yet. These version numbers were used for development tracking and do not represent actual releases.*
+*Note: All entries below are development/experimental milestones. No stable versions (1.0.0+) released yet.*
 
 ### Development Archive (2024-2025)
 
-**Important**: The following versions were development milestones and prototyping work:
-
-- Versions 2.x.x were experimental development tracking
-- Versions 1.x.x were pre-release development work
-- Only when this repository reaches `main` branch will version 1.0.0 be the first stable release
-
-### Key Development Milestones
+- Versions 2.x.x: Experimental tracking
+- Versions 1.x.x: Pre-release development
+- First stable release will be 1.0.0 on main branch
 
 #### [Development v2.6.0] - 2025-05-21 (Experimental)
 
-- Comprehensive monitoring stack prototyping
-- Prometheus, Grafana, and Alertmanager integration testing
-- Email notification system development
+- Monitoring stack prototyping
+- Prometheus, Grafana, Alertmanager integration
+- Email notification system
 - Security configuration experiments
 
 #### [Development v2.5.1] - 2025-05-19 (Bug Fixes)
 
-- RGB Module: Fixed duplicate `generate_asset_id` function
-- Bitcoin Module: Removed duplicate `InvalidConfiguration` error variant
-- ML Module: Fixed Device API usage
-- DLC Module: Added missing `OracleClient` implementation
+- RGB: Fixed duplicate `generate_asset_id`
+- Bitcoin: Removed duplicate `InvalidConfiguration` error
+- ML: Fixed Device API usage
 
-#### [Development v1.4.0] - 2024-12-27 (Feature Expansion)
+#### [Development v1.3.0] - 2024-11-30 (Nostr Integration)
 
-- Advanced ML component development
+- Nostr protocol integration
 - Security enhancement prototyping
 - Blockchain feature expansion
 - Web5 integration improvements
 
-#### [Development v1.3.0] - 2024-11-30 (Nostr Integration)
+#### [Development v1.3.0.1] - 2024-11-30
 
-- Nostr protocol integration development
+- Nostr protocol integration
 - Decentralized communication system
 - Enhanced key management
 - Relay management improvements
 
 #### [Development v1.2.0] - 2024-11-29 (Analytics)
 
-- Enterprise analytics system development
+- Enterprise analytics system
 - Business intelligence features
 - Risk management system
-- Innovation tracking capabilities
+- Innovation tracking
 
 #### [Development v1.1.0] - 2024-11-15 (Protocol Versioning)
 
@@ -237,7 +238,7 @@ All notable changes to the Anya Core project will be documented in this file.
 - Web5 identity management foundation
 - P2P network infrastructure
 
-#### [Development v0.9.0] - 2023-11-01 (Early Development)
+#### [Development v0.9.0] - 2023-11-01
 
 - Initial Bitcoin integration attempts
 - Basic Lightning Network exploration
@@ -248,10 +249,15 @@ All notable changes to the Anya Core project will be documented in this file.
 ### Notes
 
 - All dates are in YYYY-MM-DD format
-- Development versions were used for internal tracking only
-- True semantic versioning begins with the first stable release (1.0.0) on main branch
-- Current development work is tracked as 0.9.X-dev versions
 
-### Last updated
-
-*June 8, 2025*
+<!-- Link definitions -->
+[Unreleased]: https://github.com/anya-org/anya-core/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/anya-org/anya-core/releases/tag/v1.2.0
+[0.9.0-dev]: https://github.com/anya-org/anya-core/releases/tag/v0.9.0-dev
+[Development v2.6.0]: https://github.com/anya-org/anya-core/releases/tag/v2.6.0-dev
+[Development v2.5.1]: https://github.com/anya-org/anya-core/releases/tag/v2.5.1-dev
+[Development v1.3.0]: https://github.com/anya-org/anya-core/releases/tag/v1.3.0-dev
+[Development v1.2.0]: https://github.com/anya-org/anya-core/releases/tag/v1.2.0-dev
+[Development v1.1.0]: https://github.com/anya-org/anya-core/releases/tag/v1.1.0-dev
+[Development v1.0.0]: https://github.com/organization/anya-core/releases/tag/v1.0.0-dev
+[Development v0.9.0]: https://github.com/organization/anya-core/releases/tag/v0.9.0-dev
