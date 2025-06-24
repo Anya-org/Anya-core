@@ -7,7 +7,6 @@ on:
     branches: [ main, develop ]
   workflow_dispatch:
 
-# Default permissions for all jobs
 permissions:
   contents: read
 
@@ -76,13 +75,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      # Rust Setup
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@master
         with:
           toolchain: ${{ matrix.rust }}
           components: rustfmt, clippy
-          
+        
       - name: Cache Cargo dependencies
         uses: actions/cache@v4
         with:
@@ -91,20 +89,84 @@ jobs:
             ~/.cargo/git
             target
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-
-      - name: Cargo check
-        run: cargo check --all
-
-      - name: Cargo build
-        run: cargo build --all
-
-      - name: Cargo test
-        run: cargo test --all
-
-      - name: Cargo fmt
+        
+      - name: Check formatting
         if: matrix.os == 'ubuntu-latest'
-        run: cargo fmt --all -- --check
+        run: cargo fmt -- --check
+      
+      - name: Run clippy
+        run: cargo clippy --all-targets --all-features -- -D warnings
+      
+      - name: Run core tests
+        run: cargo test --workspace
+      
+      - name: Run tests with enterprise feature
+        run: cargo test --workspace --features enterprise
+      
+      - name: Test Bitcoin modules
+        run: cargo test -p anya-bitcoin
+      
+      - name: Test Web5 modules
+        run: cargo test -p anya-web5
 
-      - name: Cargo clippy
-        if: matrix.os == 'ubuntu-latest'
-        run: cargo clippy -- -D warnings
+  coverage:
+    name: Test Coverage
+    needs: [rust-test]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+    
+      - name: Install Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+        
+      - name: Install cargo-tarpaulin
+        run: cargo install cargo-tarpaulin
+      
+      - name: Run tarpaulin
+        run: cargo tarpaulin --out Xml --verbose --workspace --timeout 120
+      
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          fail_ci_if_error: false
+          verbose: true
+
+  notify:
+    name: Notification
+    needs: [rust-test, coverage]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify on success
+        if: success()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const message = "✅ Core CI Pipeline completed successfully!";
+            if (context.issue && context.issue.number) {
+              github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: message
+              });
+            }
+          
+      - name: Notify on failure
+        if: failure()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const message = "❌ Core CI Pipeline failed. Please check the logs for details.";
+            if (context.issue && context.issue.number) {
+              github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: message
+              });
+            }

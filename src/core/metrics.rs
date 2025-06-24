@@ -3,7 +3,7 @@ use std::collections::HashMap;
 // [AIR-3][AIS-3][BPC-3][RES-3] Removed unused import: crate::AnyaResult
 
 /// Simple prometheus metrics implementation
-#[derive(Default, Debug)]
+#[derive(Default)]
 pub struct PrometheusMetrics {
     /// Counters for various metrics
     counters: HashMap<String, u64>,

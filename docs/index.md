@@ -1,25 +1,24 @@
 ---
 layout: default
-title: "Index - PRODUCTION-READY (June 24, 2025)"
-description: "Documentation for Index - Bitcoin Integration Complete with Monitoring"
+title: "Index - PRODUCTION-READY (June 7, 2025)"
+description: "Documentation for Index - Bitcoin Integration Complete"
 show_support: true
-last_updated: 2025-06-24
+last_updated: 2025-06-07
 ---
 
 <!-- markdownlint-disable MD013 line-length -->
 
 # ✅ Anya Core Documentation - PRODUCTION-READY
 
-## 🎉 PRODUCTION STATUS ACHIEVED (June 24, 2025)
+## 🎉 PRODUCTION STATUS ACHIEVED (June 7, 2025)
 
-**MAJOR MILESTONE:** Bitcoin Core compilation complete, all Layer2 protocols operational, and blockchain metrics monitoring system implemented!
+**MAJOR MILESTONE:** Bitcoin Core compilation complete and all Layer2 protocols operational!
 
 ### ✅ Bitcoin Implementation Status
 
 - **All compilation errors resolved:** 58+ errors → 0 errors
 - **Layer2 protocols operational:** BOB, Lightning, RSK, RGB, DLC, Taproot Assets
 - **Production-ready status:** All critical systems functional
-- **NEW: Blockchain Metrics Monitoring:** Real-time monitoring system with alerts and CI/CD integration
 
 ## Overview
 
@@ -43,10 +42,9 @@ This is the central index for all Anya Core documentation. All documentation fol
 |----------|-------------|--------|---------|--------------|
 | [AI Labeling Reference Guide](./standards/AI_LABELING.md) | Standardized AI labeling tags | ✅ Operational | 2.6.0 | 2025-06-07 |
 | [High Availability](./high_availability.md) | High Availability subsystem | ✅ Production | 2.5.0 | 2025-06-07 |
-| [Security Policy](standards/SECURITY.md) | Security policies and procedures | ✅ Current | 2.6.0 | 2025-06-07 |
+| [Security Policy](../SECURITY.md) | Security policies and procedures | ✅ Current | 2.6.0 | 2025-06-07 |
 | [Upgrade Guide](./UPGRADE.md) | Version upgrade instructions | ✅ Updated | 2.6.0 | 2025-06-07 |
 | **[Bitcoin Integration](../BITCOIN_FRAMEWORK_IMPLEMENTATION.md)** | **Bitcoin Core implementation** | **✅ PRODUCTION-READY** | **1.1.0** | **2025-06-07** |
-| **[Blockchain Metrics Monitoring](./monitoring/BLOCKCHAIN_METRICS_MONITORING.md)** | **Real-time blockchain metrics monitoring** | **✅ NEW** | **1.0.0** | **2025-06-24** |
 
 ## ✅ Bitcoin & Layer2 Protocol Documentation
 
@@ -74,7 +72,7 @@ This is the central index for all Anya Core documentation. All documentation fol
 |----------|-------------|--------|---------|--------------|
 | [Installation Guide](./installation/README.md) | Complete installation instructions | ✅ Updated | 2.6.0 | 2025-06-07 |
 | [Configuration Reference](./installation/CONFIGURATION.md) | Configuration options | ✅ Current | 2.6.0 | 2025-06-07 |
-| [Troubleshooting](installation/troubleshooting.md) | Common issues and solutions | ✅ Updated | 2.6.0 | 2025-06-07 |
+| [Troubleshooting](./installation/TROUBLESHOOTING.md) | Common issues and solutions | ✅ Updated | 2.6.0 | 2025-06-07 |
 
 ## Security Documentation
 
@@ -83,7 +81,7 @@ This is the central index for all Anya Core documentation. All documentation fol
 | [Security Guidelines](./SECURITY_GUIDELINES.md) | Security best practices | 2.6.0 | 2025-05-21 |
 | [HSM Integration](./hsm_bitcoin_integration.md) | Hardware Security Module | 2.5.0 | 2025-05-15 |
 | [Audit Reports](./audits/) | Security audit reports | 2.5.0 | 2025-05-15 |
-| [Compliance](layer2/README.md) | Regulatory compliance | 2.6.0 | 2025-05-21 |
+| [Compliance](./compliance/README.md) | Regulatory compliance | 2.6.0 | 2025-05-21 |
 
 ## Module-Specific Documentation
 
@@ -97,7 +95,7 @@ The following README files provide documentation for specific modules:
 
 | Document | Description | Version | Last Updated |
 |----------|-------------|---------|--------------|
-| [Contributing Guide](reference/CONTRIBUTING.md) | Contribution guidelines | 2.6.0 | 2025-05-21 |
+| [Contributing Guide](./contributing.md) | Contribution guidelines | 2.6.0 | 2025-05-21 |
 | [Development Setup](./dev_setup.md) | Environment setup | 2.6.0 | 2025-05-21 |
 | [API Reference](./api/README.md) | API documentation | 2.6.0 | 2025-05-21 |
 | [Testing Guide](./testing/README.md) | Testing procedures | 2.6.0 | 2025-05-21 |
@@ -106,7 +104,7 @@ The following README files provide documentation for specific modules:
 
 | Document | Description | Version | Last Updated |
 |----------|-------------|---------|--------------|
-| [System Architecture](ARCHITECTURE.md) | Overall system design | 2.6.0 | 2025-05-21 |
+| [System Architecture](./architecture.md) | Overall system design | 2.6.0 | 2025-05-21 |
 | [Hexagonal Architecture](./hexagonal.md) | Architecture pattern | 2.6.0 | 2025-05-21 |
 | [Data Flow](./data_flow.md) | Data processing pipelines | 2.6.0 | 2025-05-21 |
 | [Performance](./performance/README.md) | Performance characteristics | 2.6.0 | 2025-05-21 |
@@ -116,9 +114,9 @@ The following README files provide documentation for specific modules:
 | Document | Description | Version | Last Updated |
 |----------|-------------|---------|--------------|
 | [Backup & Recovery](./operations/backup.md) | Data protection | 2.6.0 | 2025-05-21 |
-| [Scaling Guide](deployment/scaling.md) | System scaling | 2.6.0 | 2025-05-21 |
+| [Scaling Guide](./operations/scaling.md) | System scaling | 2.6.0 | 2025-05-21 |
 | [Disaster Recovery](./operations/disaster_recovery.md) | Recovery procedures | 2.6.0 | 2025-05-21 |
-| [Monitoring Setup](development/SETUP.md) | Monitoring configuration | 2.6.0 | 2025-05-21 |
+| [Monitoring Setup](./monitoring/SETUP.md) | Monitoring configuration | 2.6.0 | 2025-05-21 |
 
 ## API Templates & Stubbing Approach
 
@@ -328,7 +326,7 @@ The core protocol is community-supported through:
 
 - [GitHub Issues]({{ site.github.repository_url }}/issues)
 - [Discussions]({{ site.github.repository_url }}/discussions)
-- [Contributing Guide](reference/CONTRIBUTING.md)
+- [Contributing Guide]({{ site.github.repository_url }}/blob/main/CONTRIBUTING.md)
 
 ### Support Hours
 

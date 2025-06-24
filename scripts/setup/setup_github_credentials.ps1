@@ -1,16 +1,16 @@
 # GitHub Credentials and GPG Setup for MCP Tools
 # This script configures GitHub credentials for MCP tools integration
-# Uses GitHub CLI (gh) for secure authentication
+# Sets up authentication for Bo_theBig (botshelomokoka@gmail.com)
 # Adheres to Bitcoin Core principles of security and transparency
 
 param(
     [switch]$ConfigureGPG = $false,
-    [switch]$ForceLogin = $false,
+    [switch]$StoreCredentials = $true,
     [string]$GPGKeyPath
 )
 
-$scriptName = "GitHub MCP Credentials Setup via GitHub CLI"
-$scriptVersion = "2.0.0"
+$scriptName = "GitHub MCP Credentials Setup"
+$scriptVersion = "1.0.0"
 $logFile = Join-Path $PSScriptRoot "github-credentials-setup.log"
 
 function Write-Log {
@@ -35,22 +35,9 @@ function Write-Log {
     Add-Content -Path $logFile -Value $logMessage
 }
 
-function Test-GitHubCLI {
-    try {
-        $ghVersion = gh --version
-        Write-Log "GitHub CLI found: $($ghVersion[0])" -Level "INFO"
-        return $true
-    } catch {
-        Write-Log "GitHub CLI (gh) not found. Please install it first." -Level "ERROR"
-        Write-Log "Installation guide: https://cli.github.com/manual/installation" -Level "INFO"
-        return $false
-    }
-}
-
 function Test-GitHubConnection {
     try {
-        # Use GitHub CLI to test API access
-        $status = gh api user --silent
+        $result = git ls-remote https://github.com/anya-org/anya-core.git HEAD 2>&1
         if ($LASTEXITCODE -eq 0) {
             return $true
         } else {
@@ -62,49 +49,17 @@ function Test-GitHubConnection {
 }
 
 function Setup-GitHubCredentials {
-    # Import the GitHub Auth module
-    $GitHubAuthModulePath = Join-Path $PSScriptRoot ".." "common" "GitHub-Auth.psm1"
+    # Set Git user configuration
+    git config --global user.name "Bo_theBig"
+    git config --global user.email "botshelomokoka@gmail.com"
     
-    if (-not (Test-Path $GitHubAuthModulePath)) {
-        Write-Log "GitHub Auth module not found at: $GitHubAuthModulePath" -Level "ERROR"
-        return
-    }
-    
-    Import-Module $GitHubAuthModulePath -Force
-    
-    # First check if GitHub CLI is installed
-    if (-not (Test-GitHubCLI)) {
-        return
-    }
-    
-    # Check if already authenticated
-    if ((Test-GitHubAuth) -and -not $ForceLogin) {
-        Write-Log "Already authenticated with GitHub CLI" -Level "INFO"
-        $authStatus = gh auth status 2>&1
-        $authOutput = $authStatus -join "`n"
-        Write-Log $authOutput -Level "INFO"
-    } else {
-        # Prompt for authentication
-        Write-Log "Authenticating with GitHub..." -Level "INFO"
-        Write-Log "You will be guided through the GitHub CLI login process." -Level "INFO"
-        gh auth login
+    # Store credentials using Git credential helper
+    if ($StoreCredentials) {
+        git config --global credential.helper store
         
-        if (-not $?) {
-            Write-Log "GitHub CLI authentication failed" -Level "ERROR"
-            return
-        }
+        Write-Log "Git global credentials configured for user: Bo_theBig <botshelomokoka@gmail.com>" -Level "SUCCESS"
+        Write-Log "Credentials will be stored using Git credential helper" -Level "INFO"
     }
-    
-    # Get the authenticated user info using our module
-    $authInfo = Get-GitHubAuthInfo
-    $username = $authInfo.Username
-    $email = $authInfo.Email
-    
-    # Set Git user configuration based on GitHub account
-    git config --global user.name $username
-    git config --global user.email $email
-    
-    Write-Log "Git global credentials configured for user: $username <$email>" -Level "SUCCESS"
     
     # Create MCP credentials file
     $mcpCredentialsDir = Join-Path $HOME ".mcp"
@@ -115,12 +70,11 @@ function Setup-GitHubCredentials {
     }
     
     $credentials = @{
-        username = $username
-        email = $email
+        username = "Bo_theBig"
+        email = "botshelomokoka@gmail.com"
         owner = "anya-org"
         repo = "anya-core"
         timestamp = Get-Date -Format "yyyy-MM-ddTHH:mm:ssZ"
-        auth_method = "github-cli"
     }
     
     $credentials | ConvertTo-Json | Set-Content -Path $mcpCredentialsFile
@@ -180,29 +134,31 @@ function Setup-GPGKeys {
 }
 
 function Setup-GitHubMCPConfig {
-    # Import the GitHub Auth module if not already imported
-    $GitHubAuthModulePath = Join-Path $PSScriptRoot ".." "common" "GitHub-Auth.psm1"
-    
-    if (-not (Get-Module -Name GitHub-Auth)) {
-        Import-Module $GitHubAuthModulePath -Force
-    }
-    
     # Create MCP config file with GitHub authentication
     $mcpConfigDir = Join-Path $HOME ".mcp"
     $mcpConfigFile = Join-Path $mcpConfigDir "config.json"
     
-    # Create the config file using our module
-    $success = New-MCPGitHubConfig -OutputFile $mcpConfigFile -DefaultOwner "anya-org" -DefaultRepo "anya-core"
-    
-    if (-not $success) {
-        Write-Log "Failed to create MCP GitHub configuration" -Level "ERROR"
-        return
+    if (-not (Test-Path $mcpConfigDir)) {
+        New-Item -ItemType Directory -Path $mcpConfigDir -Force | Out-Null
     }
     
-    Write-Log "MCP GitHub configuration created at: $mcpConfigFile" -Level "SUCCESS"
-    
-    # Read the config back for reference
-    $config = Get-Content -Path $mcpConfigFile | ConvertFrom-Json
+    $config = @{
+        github = @{
+            username = "Bo_theBig"
+            email = "botshelomokoka@gmail.com"
+            auth_method = "direct"
+            default_owner = "anya-org"
+            default_repo = "anya-core"
+        }
+        user_preferences = @{
+            log_level = "INFO"
+            auto_update = $true
+        }
+        bitcoin_core = @{
+            principles = @("decentralization", "security", "immutability", "transparency")
+            version = "24.0"
+        }
+    }
     
     $config | ConvertTo-Json -Depth 3 | Set-Content -Path $mcpConfigFile
     
@@ -232,20 +188,6 @@ Write-Host "MCP GitHub environment variables set for: Bo_theBig" -ForegroundColo
 }
 
 function Export-MCPCredentialsToEnv {
-    # Import the GitHub Auth module if not already imported
-    $GitHubAuthModulePath = Join-Path $PSScriptRoot ".." "common" "GitHub-Auth.psm1"
-    
-    if (-not (Get-Module -Name GitHub-Auth)) {
-        Import-Module $GitHubAuthModulePath -Force
-    }
-    
-    # Get GitHub auth info
-    $authInfo = Get-GitHubAuthInfo
-    if (-not $authInfo) {
-        Write-Log "Failed to get GitHub authentication info" -Level "ERROR"
-        return $null
-    }
-    
     # Save environment variables to a file that can be sourced in shell sessions
     $envFilePath = Join-Path $PSScriptRoot "mcp_github_env.ps1"
     
@@ -254,17 +196,16 @@ function Export-MCPCredentialsToEnv {
 # Source this file to set up GitHub credentials for MCP tools
 # Generated: $(Get-Date -Format "yyyy-MM-dd HH:mm:ss")
 
-`$env:MCP_GITHUB_USERNAME = "$($authInfo.Username)"
-`$env:MCP_GITHUB_EMAIL = "$($authInfo.Email)"
+`$env:MCP_GITHUB_USERNAME = "Bo_theBig"
+`$env:MCP_GITHUB_EMAIL = "botshelomokoka@gmail.com"
 `$env:MCP_GITHUB_DEFAULT_OWNER = "anya-org"
 `$env:MCP_GITHUB_DEFAULT_REPO = "anya-core"
-`$env:GITHUB_TOKEN = "$($authInfo.Token)"
 
 # Usage instructions:
 # PowerShell: . "$envFilePath"
 # Command line: powershell -File "$envFilePath"
 
-Write-Host "MCP GitHub credentials loaded for: $($authInfo.Username) <$($authInfo.Email)>" -ForegroundColor Green
+Write-Host "MCP GitHub credentials loaded for: Bo_theBig <botshelomokoka@gmail.com>" -ForegroundColor Green
 "@ | Set-Content -Path $envFilePath
     
     Write-Log "Created environment variables export file: $envFilePath" -Level "SUCCESS"
