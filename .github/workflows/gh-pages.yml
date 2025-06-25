@@ -51,6 +51,10 @@ jobs:
           pip install --upgrade pip
           pip install -r requirements-docs.txt
 
+      - name: Install mkdocs-include-markdown-plugin
+        run: |
+          pip install mkdocs-include-markdown-plugin
+        
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
