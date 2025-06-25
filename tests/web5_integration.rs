@@ -1,4 +1,3 @@
-
 #[test]
 fn test_web5_did_rotation() {
     // For now, skip this test as it requires a full wallet setup
@@ -14,8 +13,8 @@ fn test_web5_did_rotation() {
 #[test]
 fn test_web5_credential_revocation() {
     // Mock implementation for testing - in production would use actual credentials
-    let credential_id = "vc:1";
-    let revocation_list = "https://revoke.anya";
+    let _credential_id = "vc:1";
+    let _revocation_list = "https://revoke.anya";
 
     // Mock status check - not revoked
     let revoked = false;
