@@ -6,6 +6,7 @@
 
 use serde::{Deserialize, Serialize};
 use std::error::Error;
+use std::sync::Arc;
 
 /// Layer2 protocol types supported by the implementation
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
@@ -103,46 +104,176 @@ pub struct ValidationResult {
     pub timestamp: u64,
 }
 
-/// Layer2 protocol interface (async trait for modern implementation)
+/// Legacy Layer2 protocol interface for synchronous implementations
+pub trait Layer2ProtocolTrait {
+    fn initialize(&self) -> Result<(), Box<dyn std::error::Error + Send + Sync>>;
+    fn get_state(&self) -> Result<ProtocolState, Box<dyn std::error::Error + Send + Sync>>;
+    fn submit_transaction(
+        &self,
+        tx_data: &[u8],
+    ) -> Result<String, Box<dyn std::error::Error + Send + Sync>>;
+    fn check_transaction_status(
+        &self,
+        tx_id: &str,
+    ) -> Result<TransactionStatus, Box<dyn std::error::Error + Send + Sync>>;
+    fn sync_state(&mut self) -> Result<(), Box<dyn std::error::Error + Send + Sync>>;
+    fn issue_asset(
+        &self,
+        params: AssetParams,
+    ) -> Result<String, Box<dyn std::error::Error + Send + Sync>>;
+    fn transfer_asset(
+        &self,
+        transfer: AssetTransfer,
+    ) -> Result<TransferResult, Box<dyn std::error::Error + Send + Sync>>;
+    fn verify_proof(
+        &self,
+        proof: Proof,
+    ) -> Result<VerificationResult, Box<dyn std::error::Error + Send + Sync>>;
+    fn validate_state(
+        &self,
+        state_data: &[u8],
+    ) -> Result<ValidationResult, Box<dyn std::error::Error + Send + Sync>>;
+}
+
+/// Modern Layer2 protocol interface (async trait for modern implementation)
 #[async_trait::async_trait]
 pub trait Layer2Protocol {
     async fn initialize(&self) -> Result<(), Box<dyn std::error::Error + Send + Sync>>;
     async fn connect(&self) -> Result<(), Box<dyn std::error::Error + Send + Sync>>;
     async fn get_state(&self) -> Result<ProtocolState, Box<dyn std::error::Error + Send + Sync>>;
-    async fn submit_transaction(&self, tx_data: &[u8]) -> Result<String, Box<dyn std::error::Error + Send + Sync>>;
-    async fn check_transaction_status(&self, tx_id: &str) -> Result<TransactionStatus, Box<dyn std::error::Error + Send + Sync>>;
+    async fn submit_transaction(
+        &self,
+        tx_data: &[u8],
+    ) -> Result<String, Box<dyn std::error::Error + Send + Sync>>;
+    async fn check_transaction_status(
+        &self,
+        tx_id: &str,
+    ) -> Result<TransactionStatus, Box<dyn std::error::Error + Send + Sync>>;
     async fn sync_state(&mut self) -> Result<(), Box<dyn std::error::Error + Send + Sync>>;
-    async fn issue_asset(&self, params: AssetParams) -> Result<String, Box<dyn std::error::Error + Send + Sync>>;
-    async fn transfer_asset(&self, transfer: AssetTransfer) -> Result<TransferResult, Box<dyn std::error::Error + Send + Sync>>;
-    async fn verify_proof(&self, proof: Proof) -> Result<VerificationResult, Box<dyn std::error::Error + Send + Sync>>;
-    async fn validate_state(&self, state_data: &[u8]) -> Result<ValidationResult, Box<dyn std::error::Error + Send + Sync>>;
+    async fn issue_asset(
+        &self,
+        params: AssetParams,
+    ) -> Result<String, Box<dyn std::error::Error + Send + Sync>>;
+    async fn transfer_asset(
+        &self,
+        transfer: AssetTransfer,
+    ) -> Result<TransferResult, Box<dyn std::error::Error + Send + Sync>>;
+    async fn verify_proof(
+        &self,
+        proof: Proof,
+    ) -> Result<VerificationResult, Box<dyn std::error::Error + Send + Sync>>;
+    async fn validate_state(
+        &self,
+        state_data: &[u8],
+    ) -> Result<ValidationResult, Box<dyn std::error::Error + Send + Sync>>;
 }
 
 /// Legacy sync trait for backwards compatibility
 pub trait Layer2ProtocolTrait {
     fn initialize(&self) -> Result<(), Box<dyn std::error::Error + Send + Sync>>;
     fn get_state(&self) -> Result<ProtocolState, Box<dyn std::error::Error + Send + Sync>>;
-    fn submit_transaction(&self, tx_data: &[u8]) -> Result<String, Box<dyn std::error::Error + Send + Sync>>;
-    fn check_transaction_status(&self, tx_id: &str) -> Result<TransactionStatus, Box<dyn std::error::Error + Send + Sync>>;
+    fn submit_transaction(
+        &self,
+        tx_data: &[u8],
+    ) -> Result<String, Box<dyn std::error::Error + Send + Sync>>;
+    fn check_transaction_status(
+        &self,
+        tx_id: &str,
+    ) -> Result<TransactionStatus, Box<dyn std::error::Error + Send + Sync>>;
     fn sync_state(&mut self) -> Result<(), Box<dyn std::error::Error + Send + Sync>>;
-    fn issue_asset(&self, params: AssetParams) -> Result<String, Box<dyn std::error::Error + Send + Sync>>;
-    fn transfer_asset(&self, transfer: AssetTransfer) -> Result<TransferResult, Box<dyn std::error::Error + Send + Sync>>;
-    fn verify_proof(&self, proof: Proof) -> Result<VerificationResult, Box<dyn std::error::Error + Send + Sync>>;
-    fn validate_state(&self, state_data: &[u8]) -> Result<ValidationResult, Box<dyn std::error::Error + Send + Sync>>;
+    fn issue_asset(
+        &self,
+        params: AssetParams,
+    ) -> Result<String, Box<dyn std::error::Error + Send + Sync>>;
+    fn transfer_asset(
+        &self,
+        transfer: AssetTransfer,
+    ) -> Result<TransferResult, Box<dyn std::error::Error + Send + Sync>>;
+    fn verify_proof(
+        &self,
+        proof: Proof,
+    ) -> Result<VerificationResult, Box<dyn std::error::Error + Send + Sync>>;
+    fn validate_state(
+        &self,
+        state_data: &[u8],
+    ) -> Result<ValidationResult, Box<dyn std::error::Error + Send + Sync>>;
+}
+
+// Add implementation for Arc<T> where T: Layer2ProtocolTrait
+impl<T> Layer2ProtocolTrait for Arc<T>
+where
+    T: Layer2ProtocolTrait + ?Sized,
+{
+    fn initialize(&self) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+        (**self).initialize()
+    }
+
+    fn get_state(&self) -> Result<ProtocolState, Box<dyn std::error::Error + Send + Sync>> {
+        (**self).get_state()
+    }
+
+    fn submit_transaction(
+        &self,
+        tx_data: &[u8],
+    ) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+        (**self).submit_transaction(tx_data)
+    }
+
+    fn check_transaction_status(
+        &self,
+        tx_id: &str,
+    ) -> Result<TransactionStatus, Box<dyn std::error::Error + Send + Sync>> {
+        (**self).check_transaction_status(tx_id)
+    }
+
+    fn sync_state(&mut self) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+        // This requires mutability, which Arc doesn't easily provide.
+        // We'll need to define a proper implementation or use interior mutability
+        // For now, let's return a sensible error
+        Err("Cannot sync_state on an Arc<T> directly. Use interior mutability like Arc<Mutex<T>> instead.".into())
+    }
+
+    fn issue_asset(
+        &self,
+        params: AssetParams,
+    ) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+        (**self).issue_asset(params)
+    }
+
+    fn transfer_asset(
+        &self,
+        transfer: AssetTransfer,
+    ) -> Result<TransferResult, Box<dyn std::error::Error + Send + Sync>> {
+        (**self).transfer_asset(transfer)
+    }
+
+    fn verify_proof(
+        &self,
+        proof: Proof,
+    ) -> Result<VerificationResult, Box<dyn std::error::Error + Send + Sync>> {
+        (**self).verify_proof(proof)
+    }
+
+    fn validate_state(
+        &self,
+        state_data: &[u8],
+    ) -> Result<ValidationResult, Box<dyn std::error::Error + Send + Sync>> {
+        (**self).validate_state(state_data)
+    }
 }
 
 // Layer2 protocol implementations
-pub mod lightning;
-pub mod state_channels;
-pub mod rgb;
-pub mod dlc;
 pub mod bob;
+pub mod dlc;
+pub mod lightning;
 pub mod liquid;
+pub mod manager;
+pub mod mock;
+pub mod rgb;
 pub mod rsk;
 pub mod stacks;
+pub mod state_channels;
 pub mod taproot_assets;
-pub mod mock;
-pub mod manager;
 
 // Example function using Layer2ProtocolType instead of Layer2Protocol
 pub fn use_layer2_protocol(protocol: Layer2ProtocolType) {
@@ -163,24 +294,24 @@ pub fn use_layer2_protocol(protocol: Layer2ProtocolType) {
 pub mod comprehensive_tests;
 
 // Re-export key components
-pub use lightning::LightningNetwork;
 pub use bob::BobClient;
+pub use lightning::LightningNetwork;
 pub use liquid::LiquidModule;
+pub use manager::Layer2Manager;
 pub use rsk::RskClient;
 pub use stacks::StacksClient;
 pub use state_channels::StateChannel;
 pub use taproot_assets::TaprootAssetsProtocol;
-pub use manager::Layer2Manager;
 
 // Re-export protocol implementations for tests
-pub use lightning::LightningProtocol;
-pub use rgb::RgbProtocol;
 pub use dlc::DlcProtocol;
-pub use state_channels::StateChannelsProtocol;
-pub use rsk::RskProtocol;
-pub use stacks::StacksProtocol;
+pub use lightning::LightningProtocol;
 pub use liquid::LiquidProtocol;
 pub use mock::MockLayer2Protocol;
+pub use rgb::RgbProtocol;
+pub use rsk::RskProtocol;
+pub use stacks::StacksProtocol;
+pub use state_channels::StateChannelsProtocol;
 
 // RGB Protocol trait implementation
 pub struct RGBProtocol {
