@@ -182,13 +182,22 @@ class ConfigurationManager {
 
         for (let i = 0; i < keyPath.length - 1; i++) {
             const segment = keyPath[i];
+            if (segment === "__proto__" || segment === "constructor") {
+                console.warn(`Blocked attempt to set dangerous property: ${segment}`);
+                return;
+            }
             if (!current[segment]) {
                 current[segment] = {};
             }
             current = current[segment];
         }
 
-        current[keyPath[keyPath.length - 1]] = value;
+        const lastSegment = keyPath[keyPath.length - 1];
+        if (lastSegment === "__proto__" || lastSegment === "constructor") {
+            console.warn(`Blocked attempt to set dangerous property: ${lastSegment}`);
+            return;
+        }
+        current[lastSegment] = value;
     }
 
     /**
