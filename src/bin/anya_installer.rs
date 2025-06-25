@@ -1,4 +1,4 @@
-use anya_core::compliance::BipComplianceReport;
+use anya_core::BipComplianceReport;
 use anyhow::{Context, Result};
 use clap::{Parser, Subcommand};
 use dialoguer::{theme::ColorfulTheme, Confirm, Input, Select};
@@ -16,35 +16,6 @@ use std::collections::HashMap;
 /// Implements BIP-341, BIP-342, BIP-174, and AIS-3 security standards
 use std::{fs, path::PathBuf, process::Command, time::SystemTime};
 use sysinfo::System;
-
-// BIP-341 Taproot silent leaf constant for script validation
-const BIP341_SILENT_LEAF: &str = "0x8f3a1c29566443e2e2d6e5a9a5a4e8d";
-// Required BIPs for Anya Core installation validation
-const REQUIRED_BIPS: [&str; 4] = ["BIP-341", "BIP-342", "BIP-174", "BIP-370"];
-const MIN_STABLE_VERSION: &str = "v0.10.0";
-
-/// Validate BIP-341 Taproot silent leaf
-fn validate_bip341_silent_leaf(leaf_hash: &str) -> bool {
-    leaf_hash == BIP341_SILENT_LEAF
-}
-
-/// Check if all required BIPs are supported
-fn check_required_bips() -> Result<Vec<String>, String> {
-    let mut supported_bips = Vec::new();
-    
-    for bip in REQUIRED_BIPS {
-        // In a real implementation, this would check actual BIP support
-        // For now, we assume all are supported
-        supported_bips.push(bip.to_string());
-        println!("✓ {} support validated", bip);
-    }
-    
-    if supported_bips.len() == REQUIRED_BIPS.len() {
-        Ok(supported_bips)
-    } else {
-        Err("Not all required BIPs are supported".to_string())
-    }
-}
 
 #[derive(Parser)]
 #[command(name = "anya_installer")]
@@ -172,13 +143,10 @@ impl Default for BitcoinConfig {
 
 struct EnhancedInstaller {
     install_dir: PathBuf,
-    bitcoin_conf: PathBuf,
     audit_path: PathBuf,
     profile: InstallProfile,
     hw_profile: HardwareProfile,
-    bitcoin_config: BitcoinConfig,
     dependencies: DependencyManager,
-    verbose: bool,
 }
 
 impl EnhancedInstaller {
@@ -344,9 +312,10 @@ impl DependencyManager {
 
         // Check if crate is in Cargo.toml dependencies
         if let Ok(cargo_toml) = fs::read_to_string("Cargo.toml") {
-            if cargo_toml.contains(&format!("{} ", crate_name)) || 
-               cargo_toml.contains(&format!("{}=", crate_name)) ||
-               cargo_toml.contains(&format!("{} =", crate_name)) {
+            if cargo_toml.contains(&format!("{} ", crate_name))
+                || cargo_toml.contains(&format!("{}=", crate_name))
+                || cargo_toml.contains(&format!("{} =", crate_name))
+            {
                 return Ok("In Cargo.toml".to_string());
             }
         }
@@ -362,7 +331,7 @@ impl DependencyManager {
         println!("🦀 Installing missing Rust crates...");
         for (crate_name, description) in crates {
             println!("  - {} ({})", crate_name, description);
-            
+
             // Install crate
             let install_output = Command::new("cargo")
                 .args(["install", crate_name])
@@ -378,15 +347,6 @@ impl DependencyManager {
 
         println!("✅ Rust crates installation completed");
         Ok(())
-    }
-
-    fn check_optional_packages(&self) -> HashMap<String, bool> {
-        let mut available = HashMap::new();
-        for package in self.optional_packages.keys() {
-            available.insert(package.clone(), self.check_package_installed(package).is_ok());
-        }
-        
-        available
     }
 
     fn check_package_installed(&self, package: &str) -> Result<String> {
@@ -498,14 +458,7 @@ impl DependencyManager {
 impl EnhancedInstaller {
     fn new(install_path: &str, verbose: bool) -> Result<Self> {
         let install_dir = PathBuf::from(install_path);
-        let bitcoin_conf = install_dir.join("conf/bitcoin.conf");
         let audit_path = install_dir.join("audit/v2.6_audit.json");
-
-        // Enforce minimum stable version
-        let current_version = env!("CARGO_PKG_VERSION");
-        if version_compare(current_version, MIN_STABLE_VERSION) == Ordering::Less {
-            anyhow::bail!("Minimum required version: {}", MIN_STABLE_VERSION);
-        }
 
         fs::create_dir_all(&install_dir).context("Failed to create installation directory")?;
 
@@ -514,18 +467,15 @@ impl EnhancedInstaller {
 
         Ok(Self {
             install_dir,
-            bitcoin_conf,
             audit_path,
             profile: InstallProfile::Auto(hw_profile.clone()),
             hw_profile,
-            bitcoin_config: BitcoinConfig::default(),
             dependencies,
-            verbose,
         })
     }
 
     fn interactive_setup() -> Result<Self> {
-        println!("🚀 Anya Core Enhanced Installer v2.6");
+        println!("🚀 Anya Core Enhanced Installer");
         println!("=====================================");
 
         let install_dir = Input::<String>::new()

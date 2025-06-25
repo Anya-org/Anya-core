@@ -1,5 +1,5 @@
 use crate::layer2::{
-    BobClient, Layer2ProtocolType, Layer2ProtocolTrait, LightningNetwork, LiquidModule, Proof,
+    BobClient, Layer2ProtocolTrait, Layer2ProtocolType, LightningNetwork, LiquidModule, Proof,
     RskClient, StacksClient, StateChannel, TaprootAssetsProtocol,
 };
 
@@ -40,7 +40,7 @@ impl Layer2Manager {
     pub fn initialize_all(&mut self) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         // Initialize all protocols one by one
         // Using a separate scope for each one to avoid borrow checker issues
-        
+
         // Initialize BOB Client
         self.bob_client = Some(BobClient::default());
         if let Some(client) = &mut self.bob_client {
@@ -96,7 +96,9 @@ impl Layer2Manager {
     }
 
     /// Initialize all Layer 2 protocols asynchronously
-    pub async fn initialize_all_async(&mut self) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+    pub async fn initialize_all_async(
+        &mut self,
+    ) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         // Initialize BOB Client
         self.bob_client = Some(BobClient::default());
         if let Some(client) = &self.bob_client {
@@ -150,45 +152,70 @@ impl Layer2Manager {
         Ok(())
     }
 
-    fn init_protocol<T>(
-        &mut self,
-        field: &mut Option<T>,
-        name: &str,
-    ) -> Result<(), Box<dyn std::error::Error + Send + Sync>>
-    where
-        T: Layer2ProtocolTrait + Default,
-    {
-        let instance = T::default();
-        if let Err(e) = instance.initialize() {
-            eprintln!("Failed to initialize {}: {}", name, e);
-            return Err(e);
-        }
-        *field = Some(instance);
-        Ok(())
-    }
-
     /// Get protocol by type
-    pub fn get_protocol(&self, protocol_type: Layer2ProtocolType) -> Option<&dyn Layer2ProtocolTrait> {
+    pub fn get_protocol(
+        &self,
+        protocol_type: Layer2ProtocolType,
+    ) -> Option<&dyn Layer2ProtocolTrait> {
         match protocol_type {
-            Layer2ProtocolType::BOB => self.bob_client.as_ref().map(|c| c as &dyn Layer2ProtocolTrait),
-            Layer2ProtocolType::Liquid => self.liquid_module.as_ref().map(|c| c as &dyn Layer2ProtocolTrait),
-            Layer2ProtocolType::RSK => self.rsk_client.as_ref().map(|c| c as &dyn Layer2ProtocolTrait),
-            Layer2ProtocolType::Stacks => self.stacks_client.as_ref().map(|c| c as &dyn Layer2ProtocolTrait),
-            Layer2ProtocolType::TaprootAssets => self.taproot_assets.as_ref().map(|c| c as &dyn Layer2ProtocolTrait),
+            Layer2ProtocolType::BOB => self
+                .bob_client
+                .as_ref()
+                .map(|c| c as &dyn Layer2ProtocolTrait),
+            Layer2ProtocolType::Liquid => self
+                .liquid_module
+                .as_ref()
+                .map(|c| c as &dyn Layer2ProtocolTrait),
+            Layer2ProtocolType::RSK => self
+                .rsk_client
+                .as_ref()
+                .map(|c| c as &dyn Layer2ProtocolTrait),
+            Layer2ProtocolType::Stacks => self
+                .stacks_client
+                .as_ref()
+                .map(|c| c as &dyn Layer2ProtocolTrait),
+            Layer2ProtocolType::TaprootAssets => self
+                .taproot_assets
+                .as_ref()
+                .map(|c| c as &dyn Layer2ProtocolTrait),
             _ => None,
         }
     }
 
     /// Get protocol for async usage
-    pub fn get_protocol_async(&self, protocol_type: Layer2ProtocolType) -> Option<&dyn crate::layer2::Layer2Protocol> {
+    pub fn get_protocol_async(
+        &self,
+        protocol_type: Layer2ProtocolType,
+    ) -> Option<&dyn crate::layer2::Layer2Protocol> {
         match protocol_type {
-            Layer2ProtocolType::BOB => self.bob_client.as_ref().map(|c| c as &dyn crate::layer2::Layer2Protocol),
-            Layer2ProtocolType::Liquid => self.liquid_module.as_ref().map(|c| c as &dyn crate::layer2::Layer2Protocol),
-            Layer2ProtocolType::RSK => self.rsk_client.as_ref().map(|c| c as &dyn crate::layer2::Layer2Protocol),
-            Layer2ProtocolType::Stacks => self.stacks_client.as_ref().map(|c| c as &dyn crate::layer2::Layer2Protocol),
-            Layer2ProtocolType::TaprootAssets => self.taproot_assets.as_ref().map(|c| c as &dyn crate::layer2::Layer2Protocol),
-            Layer2ProtocolType::Lightning => self.lightning_network.as_ref().map(|c| c as &dyn crate::layer2::Layer2Protocol),
-            Layer2ProtocolType::StateChannels => self.state_channels.as_ref().map(|c| c as &dyn crate::layer2::Layer2Protocol),
+            Layer2ProtocolType::BOB => self
+                .bob_client
+                .as_ref()
+                .map(|c| c as &dyn crate::layer2::Layer2Protocol),
+            Layer2ProtocolType::Liquid => self
+                .liquid_module
+                .as_ref()
+                .map(|c| c as &dyn crate::layer2::Layer2Protocol),
+            Layer2ProtocolType::RSK => self
+                .rsk_client
+                .as_ref()
+                .map(|c| c as &dyn crate::layer2::Layer2Protocol),
+            Layer2ProtocolType::Stacks => self
+                .stacks_client
+                .as_ref()
+                .map(|c| c as &dyn crate::layer2::Layer2Protocol),
+            Layer2ProtocolType::TaprootAssets => self
+                .taproot_assets
+                .as_ref()
+                .map(|c| c as &dyn crate::layer2::Layer2Protocol),
+            Layer2ProtocolType::Lightning => self
+                .lightning_network
+                .as_ref()
+                .map(|c| c as &dyn crate::layer2::Layer2Protocol),
+            Layer2ProtocolType::StateChannels => self
+                .state_channels
+                .as_ref()
+                .map(|c| c as &dyn crate::layer2::Layer2Protocol),
             _ => None,
         }
     }
@@ -338,7 +365,9 @@ mod tests {
         assert!(manager.get_protocol(Layer2ProtocolType::Liquid).is_some());
         assert!(manager.get_protocol(Layer2ProtocolType::RSK).is_some());
         assert!(manager.get_protocol(Layer2ProtocolType::Stacks).is_some());
-        assert!(manager.get_protocol(Layer2ProtocolType::TaprootAssets).is_some());
+        assert!(manager
+            .get_protocol(Layer2ProtocolType::TaprootAssets)
+            .is_some());
     }
 
     #[test]

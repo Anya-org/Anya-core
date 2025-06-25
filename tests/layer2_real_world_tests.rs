@@ -7,7 +7,7 @@ use std::sync::Arc;
 use std::time::{Duration, Instant};
 use tokio::time::sleep;
 use anya_core::layer2::{
-    AssetParams, AssetTransfer, Layer2Protocol, Layer2ProtocolTrait, Layer2ProtocolType,
+    AssetParams, AssetTransfer, Layer2Protocol, Layer2ProtocolType,
     TransactionStatus,
     lightning::{LightningNetwork, LightningConfig},
     liquid::{LiquidModule, LiquidConfig},
