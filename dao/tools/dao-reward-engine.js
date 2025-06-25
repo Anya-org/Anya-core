@@ -21,7 +21,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { execSync } = require('child_process');
+const { execFileSync } = require('child_process');
 
 // Blockchain integration
 const {
@@ -424,7 +424,8 @@ async function submitRewardsToBlockchain(rewardDistribution) {
         // Execute the bridge script
         // In production, this would be a proper async execution
         // For now, simulate with a synchronous call
-        const result = execSync(`node ${ON_CHAIN_BRIDGE} ${bridgeArgs.join(' ')}`, {
+        const result = execFileSync('node', [ON_CHAIN_BRIDGE, ...bridgeArgs], {
+
             encoding: 'utf8',
             stdio: 'inherit'
         });

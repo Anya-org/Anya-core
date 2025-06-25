@@ -182,9 +182,8 @@ class ConfigurationManager {
 
         for (let i = 0; i < keyPath.length - 1; i++) {
             const segment = keyPath[i];
-            if (segment === "__proto__" || segment === "constructor") {
-                console.warn(`Blocked attempt to set dangerous property: ${segment}`);
-                return;
+            if (segment === "__proto__" || segment === "constructor" || segment === "prototype") {
+                throw new Error(`Invalid configuration key segment: ${segment}`);
             }
             if (!current[segment]) {
                 current[segment] = {};
@@ -192,12 +191,11 @@ class ConfigurationManager {
             current = current[segment];
         }
 
-        const lastSegment = keyPath[keyPath.length - 1];
-        if (lastSegment === "__proto__" || lastSegment === "constructor") {
-            console.warn(`Blocked attempt to set dangerous property: ${lastSegment}`);
-            return;
+        const finalSegment = keyPath[keyPath.length - 1];
+        if (finalSegment === "__proto__" || finalSegment === "constructor" || finalSegment === "prototype") {
+            throw new Error(`Invalid configuration key segment: ${finalSegment}`);
         }
-        current[lastSegment] = value;
+        current[finalSegment] = value;
     }
 
     /**

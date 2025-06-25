@@ -238,7 +238,10 @@
         })
       
       ;; Store report data
-      (map add-report-metric metrics-list report-id)
+
+      (foreach metric metrics-list
+        (add-report-metric metric report-id))
+
       
       ;; Update report counter
       (var-set report-counter report-id)

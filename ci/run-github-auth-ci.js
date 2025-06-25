@@ -3,7 +3,8 @@
 
 const fs = require('fs');
 const path = require('path');
-const { execFileSync } = require('child_process');
+const { execSync } = require('child_process');
+
 
 // Import GitHub auth helper
 const githubAuth = require('../scripts/common/github-auth');
@@ -66,7 +67,7 @@ async function runCiTasks() {
             if (config.yesAll) contributionArgs.push('--yes-all');
 
             try {
-                execFileSync('node', [contributionTrackerPath, ...contributionArgs], {
+                execSync(`node ${contributionTrackerPath} ${contributionArgs.join(' ')}`, {
                     stdio: 'inherit'
                 });
             } catch (error) {
