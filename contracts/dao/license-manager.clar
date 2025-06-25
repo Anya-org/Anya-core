@@ -129,12 +129,12 @@
                   is-valid: false,
                   feature-requested: feature,
                   result: (if (> (get expiration-date license) block-height)
-                           "expired"
-                           "feature-denied")
+                           "feature-denied"
+                           "expired")
                 })
               (err (if (> (get expiration-date license) block-height)
-                     ERR_EXPIRED
-                     ERR_UNAUTHORIZED)))))
+                     ERR_UNAUTHORIZED
+                     ERR_EXPIRED)))))
       (begin
         ;; Log unknown license
         (map-set license-validations
