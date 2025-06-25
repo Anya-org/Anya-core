@@ -29,6 +29,7 @@ else
   
   # Try SSH signing
   if git commit --no-gpg-sign -S -m "$COMMIT_MSG" $ADDITIONAL_ARGS; then
+
     echo "Commit successful with SSH signature!"
   else
     echo "All signing methods failed. Commit was not made."

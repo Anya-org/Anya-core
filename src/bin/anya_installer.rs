@@ -382,7 +382,6 @@ impl DependencyManager {
 
     fn check_optional_packages(&self) -> HashMap<String, bool> {
         let mut available = HashMap::new();
-       
         for package in self.optional_packages.keys() {
             available.insert(package.clone(), self.check_package_installed(package).is_ok());
         }

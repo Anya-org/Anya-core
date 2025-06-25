@@ -425,6 +425,7 @@ async function submitRewardsToBlockchain(rewardDistribution) {
         // In production, this would be a proper async execution
         // For now, simulate with a synchronous call
         const result = execFileSync('node', [ON_CHAIN_BRIDGE, ...bridgeArgs], {
+
             encoding: 'utf8',
             stdio: 'inherit'
         });
