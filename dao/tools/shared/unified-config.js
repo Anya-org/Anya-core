@@ -182,13 +182,20 @@ class ConfigurationManager {
 
         for (let i = 0; i < keyPath.length - 1; i++) {
             const segment = keyPath[i];
+            if (segment === "__proto__" || segment === "constructor" || segment === "prototype") {
+                throw new Error(`Invalid configuration key segment: ${segment}`);
+            }
             if (!current[segment]) {
                 current[segment] = {};
             }
             current = current[segment];
         }
 
-        current[keyPath[keyPath.length - 1]] = value;
+        const finalSegment = keyPath[keyPath.length - 1];
+        if (finalSegment === "__proto__" || finalSegment === "constructor" || finalSegment === "prototype") {
+            throw new Error(`Invalid configuration key segment: ${finalSegment}`);
+        }
+        current[finalSegment] = value;
     }
 
     /**
