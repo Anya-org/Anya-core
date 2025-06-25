@@ -168,37 +168,6 @@ pub trait Layer2Protocol {
     ) -> Result<ValidationResult, Box<dyn std::error::Error + Send + Sync>>;
 }
 
-/// Legacy sync trait for backwards compatibility
-pub trait Layer2ProtocolTrait {
-    fn initialize(&self) -> Result<(), Box<dyn std::error::Error + Send + Sync>>;
-    fn get_state(&self) -> Result<ProtocolState, Box<dyn std::error::Error + Send + Sync>>;
-    fn submit_transaction(
-        &self,
-        tx_data: &[u8],
-    ) -> Result<String, Box<dyn std::error::Error + Send + Sync>>;
-    fn check_transaction_status(
-        &self,
-        tx_id: &str,
-    ) -> Result<TransactionStatus, Box<dyn std::error::Error + Send + Sync>>;
-    fn sync_state(&mut self) -> Result<(), Box<dyn std::error::Error + Send + Sync>>;
-    fn issue_asset(
-        &self,
-        params: AssetParams,
-    ) -> Result<String, Box<dyn std::error::Error + Send + Sync>>;
-    fn transfer_asset(
-        &self,
-        transfer: AssetTransfer,
-    ) -> Result<TransferResult, Box<dyn std::error::Error + Send + Sync>>;
-    fn verify_proof(
-        &self,
-        proof: Proof,
-    ) -> Result<VerificationResult, Box<dyn std::error::Error + Send + Sync>>;
-    fn validate_state(
-        &self,
-        state_data: &[u8],
-    ) -> Result<ValidationResult, Box<dyn std::error::Error + Send + Sync>>;
-}
-
 // Add implementation for Arc<T> where T: Layer2ProtocolTrait
 impl<T> Layer2ProtocolTrait for Arc<T>
 where
