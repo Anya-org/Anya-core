@@ -69,11 +69,10 @@ impl HsmProvider for LedgerHsmProvider {
         // In a real implementation, this would initialize the connection to the Ledger device
         self.audit_logger.log(
             crate::security::hsm::error::AuditEventType::Initialization,
-            &self.config.hsm_id,
-            None,
-            "Ledger provider initialized (stub implementation)",
             crate::security::hsm::error::AuditEventResult::Success,
-        )?;
+            crate::security::hsm::error::AuditEventSeverity::Info,
+            "Ledger provider initialized (stub implementation)",
+        ).await?;
 
         Ok(())
     }

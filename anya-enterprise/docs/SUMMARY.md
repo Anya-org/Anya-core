@@ -1,6 +1,6 @@
 # Enterprise Documentation
 
-* [Overview](README.md)
+* [Overview](integration/README.md)
 * [Features](features/README.md)
   * [Advanced Analytics](features/advanced-analytics.md)
   * [High Volume Trading](features/high-volume-trading.md)

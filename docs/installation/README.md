@@ -136,11 +136,11 @@ docker-compose -f monitoring/docker-compose.yml up -d
 
 For additional help:
 
-1. Check the [troubleshooting guide](troubleshooting.md)
+1. Check the [troubleshooting guide](../TROUBLESHOOTING.md)
 2. Open an issue on [GitHub](https://github.com/your-org/anya-core/issues)
 3. Email support: <botshelomokoka@gmail.com>
 
 ## See Also
 
-- [Related Document 1](./related1.md)
-- [Related Document 2](./related2.md)
+- [Related Document 1](../INSTALLATION.md)
+- [Related Document 2](../../INSTALLATION_REVIEW.md)

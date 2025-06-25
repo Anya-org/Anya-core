@@ -1,5 +1,3 @@
-use anya_core::web5::identity::DIDManager;
-use anya_core::web5::vc::VerifiableCredential;
 
 #[test]
 fn test_web5_did_rotation() {

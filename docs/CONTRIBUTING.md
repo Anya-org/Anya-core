@@ -6,7 +6,7 @@ description: "Documentation for Contributing"
 [AIR-3][AIS-3][BPC-3][RES-3]
 
 
-# Contributing Guide \[AIR-1\]\[AIT-2\]
+# Contributing Guide [AIR-3][AIS-3][AIT-3]
 
 ## Overview
 
@@ -79,7 +79,7 @@ Follow these guidelines for commit messages:
 
 ### AI Labelling \[AIR-1\]
 
-All new code must include appropriate AI labelling tags as defined in the [AI Labelling Reference Guide](./docs/standards/AI_LABELING.md). For example:
+All new code must include appropriate AI labelling tags as defined in the [AI Labelling Reference Guide](standards/AI_LABELING.md). For example:
 
 ```rust
 /// Redis-based cache implementation

@@ -65,6 +65,7 @@ impl NostrUserProfile {
 
 /// Nostr client for enterprise communications
 pub struct NostrClient {
+    #[allow(dead_code)] // Required for future Nostr extensibility (see docs/INDEX_CORRECTED.md)
     config: NostrConfig,
     connected: bool,
 }

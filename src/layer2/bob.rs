@@ -4,11 +4,10 @@
 //! which combines Bitcoin's security with Ethereum's EVM compatibility.
 
 use crate::layer2::{
-    AssetParams, AssetTransfer, Layer2ProtocolTrait, Proof, ProtocolState, TransactionStatus,
+    AssetParams, AssetTransfer, Layer2Protocol, Layer2ProtocolTrait, Proof, ProtocolState, TransactionStatus,
     TransferResult, ValidationResult, VerificationResult,
 };
 use serde::{Deserialize, Serialize};
-use std::error::Error;
 
 /// BOB client configuration
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -51,6 +50,12 @@ impl BobClient {
                 connections: 0,
                 capacity: Some(1000000),
                 operational: false,
+                height: 0,
+                hash: "default_hash".to_string(),
+                timestamp: std::time::SystemTime::now()
+                    .duration_since(std::time::UNIX_EPOCH)
+                    .unwrap_or_default()
+                    .as_secs(),
             },
         }
     }
@@ -61,34 +66,40 @@ impl BobClient {
     }
 }
 
+impl Default for BobClient {
+    fn default() -> Self {
+        Self::new(BobConfig::default())
+    }
+}
+
 impl Layer2ProtocolTrait for BobClient {
     /// Initialize the BOB protocol
-    fn initialize(&self) -> Result<(), Box<dyn Error>> {
+    fn initialize(&self) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         // Implementation would connect to BOB network
         println!("Initializing BOB Layer 2 protocol...");
         Ok(())
     }
 
     /// Get the current state of the protocol
-    fn get_state(&self) -> Result<ProtocolState, Box<dyn Error>> {
+    fn get_state(&self) -> Result<ProtocolState, Box<dyn std::error::Error + Send + Sync>> {
         Ok(self.state.clone())
     }
 
     /// Submit a transaction to BOB
-    fn submit_transaction(&self, tx_data: &[u8]) -> Result<String, Box<dyn Error>> {
+    fn submit_transaction(&self, tx_data: &[u8]) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
         // Implementation would submit to BOB network
         println!("Submitting transaction to BOB: {} bytes", tx_data.len());
         Ok("bob_tx_".to_string() + &hex::encode(&tx_data[..8]))
     }
 
     /// Check transaction status
-    fn check_transaction_status(&self, tx_id: &str) -> Result<TransactionStatus, Box<dyn Error>> {
+    fn check_transaction_status(&self, tx_id: &str) -> Result<TransactionStatus, Box<dyn std::error::Error + Send + Sync>> {
         println!("Checking BOB transaction status: {}", tx_id);
         Ok(TransactionStatus::Confirmed)
     }
 
     /// Synchronize state with BOB network
-    fn sync_state(&mut self) -> Result<(), Box<dyn Error>> {
+    fn sync_state(&mut self) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         println!("Syncing BOB state...");
         self.state.operational = true;
         self.state.connections = 1;
@@ -96,13 +107,13 @@ impl Layer2ProtocolTrait for BobClient {
     }
 
     /// Issue an asset on BOB
-    fn issue_asset(&self, params: AssetParams) -> Result<String, Box<dyn Error>> {
+    fn issue_asset(&self, params: AssetParams) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
         println!("Issuing asset {} on BOB", params.name);
         Ok(format!("bob_asset_{}", params.asset_id))
     }
 
     /// Transfer an asset on BOB
-    fn transfer_asset(&self, transfer: AssetTransfer) -> Result<TransferResult, Box<dyn Error>> {
+    fn transfer_asset(&self, transfer: AssetTransfer) -> Result<TransferResult, Box<dyn std::error::Error + Send + Sync>> {
         println!(
             "Transferring {} of asset {} to {} on BOB",
             transfer.amount, transfer.asset_id, transfer.recipient
@@ -120,10 +131,11 @@ impl Layer2ProtocolTrait for BobClient {
     }
 
     /// Verify a proof on BOB
-    fn verify_proof(&self, proof: Proof) -> Result<VerificationResult, Box<dyn Error>> {
+    fn verify_proof(&self, proof: Proof) -> Result<VerificationResult, Box<dyn std::error::Error + Send + Sync>> {
         println!("Verifying {} proof on BOB", proof.proof_type);
 
         Ok(VerificationResult {
+            valid: true,
             is_valid: true,
             error: None,
             timestamp: std::time::SystemTime::now()
@@ -134,8 +146,94 @@ impl Layer2ProtocolTrait for BobClient {
     }
 
     /// Validate state on BOB
-    fn validate_state(&self, state_data: &[u8]) -> Result<ValidationResult, Box<dyn Error>> {
+    fn validate_state(&self, state_data: &[u8]) -> Result<ValidationResult, Box<dyn std::error::Error + Send + Sync>> {
         println!("Validating state on BOB: {} bytes", state_data.len());
+
+        Ok(ValidationResult {
+            is_valid: true,
+            violations: vec![],
+            timestamp: std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_secs(),
+        })
+    }
+}
+
+#[async_trait::async_trait]
+impl Layer2Protocol for BobClient {
+    async fn initialize(&self) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+        // Implementation would connect to BOB network
+        println!("Asynchronously initializing BOB Layer 2 protocol...");
+        Ok(())
+    }
+
+    async fn connect(&self) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+        println!("Asynchronously connecting to BOB Layer 2 protocol...");
+        Ok(())
+    }
+
+    async fn get_state(&self) -> Result<ProtocolState, Box<dyn std::error::Error + Send + Sync>> {
+        // Reuse existing implementation
+        Ok(self.state.clone())
+    }
+
+    async fn submit_transaction(&self, tx_data: &[u8]) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+        // Reuse existing implementation
+        println!("Asynchronously submitting transaction to BOB: {} bytes", tx_data.len());
+        Ok("bob_tx_".to_string() + &hex::encode(&tx_data[..8]))
+    }
+
+    async fn check_transaction_status(&self, tx_id: &str) -> Result<TransactionStatus, Box<dyn std::error::Error + Send + Sync>> {
+        println!("Asynchronously checking BOB transaction status: {}", tx_id);
+        Ok(TransactionStatus::Confirmed)
+    }
+
+    async fn sync_state(&mut self) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+        println!("Asynchronously syncing BOB state...");
+        self.state.operational = true;
+        self.state.connections = 1;
+        Ok(())
+    }
+
+    async fn issue_asset(&self, params: AssetParams) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+        println!("Asynchronously issuing asset {} on BOB", params.name);
+        Ok(format!("bob_asset_{}", params.asset_id))
+    }
+
+    async fn transfer_asset(&self, transfer: AssetTransfer) -> Result<TransferResult, Box<dyn std::error::Error + Send + Sync>> {
+        println!(
+            "Asynchronously transferring {} of asset {} to {} on BOB",
+            transfer.amount, transfer.asset_id, transfer.recipient
+        );
+
+        Ok(TransferResult {
+            tx_id: format!("bob_transfer_{}", transfer.asset_id),
+            status: TransactionStatus::Confirmed,
+            fee: Some(1000),
+            timestamp: std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_secs(),
+        })
+    }
+
+    async fn verify_proof(&self, proof: Proof) -> Result<VerificationResult, Box<dyn std::error::Error + Send + Sync>> {
+        println!("Asynchronously verifying {} proof on BOB", proof.proof_type);
+
+        Ok(VerificationResult {
+            valid: true,
+            is_valid: true,
+            error: None,
+            timestamp: std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_secs(),
+        })
+    }
+
+    async fn validate_state(&self, state_data: &[u8]) -> Result<ValidationResult, Box<dyn std::error::Error + Send + Sync>> {
+        println!("Asynchronously validating state on BOB: {} bytes", state_data.len());
 
         Ok(ValidationResult {
             is_valid: true,

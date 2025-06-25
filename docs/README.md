@@ -224,7 +224,7 @@ cargo test --all-features
 
 - Review the [Security Guide](SECURITY.md)
 - Configure [ML Models](ML_SETUP.md)
-- Set up [Monitoring](MONITORING.md)
+- Set up [Monitoring](deployment/monitoring.md)
 - Deploy [Web5 Nodes](WEB5_SETUP.md)
 - Configure [Revenue Tracking](REVENUE_SETUP.md)
 

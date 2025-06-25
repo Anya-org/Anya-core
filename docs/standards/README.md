@@ -1,13 +1,13 @@
----
+*---
 title: "Readme"
 description: "Documentation for Readme"
 ---
 
-# Anya Core Standards
+# Anya Core Standards [AIR-3][AIS-3][BPC-3][AIT-3]
 
-## Overview
+## Overview [AIR-3][AIS-3][BPC-3]
 
-Add a brief overview of this document here.
+This directory contains the canonical standards documentation for the Anya Core project, in compliance with official Bitcoin Improvement Proposals (BIPs). These standards ensure consistent implementation and AI readiness across all components.
 
 ## Table of Contents
 
@@ -97,7 +97,9 @@ The following scripts help with standards implementation:
 | `scripts/validate_ai_labels.ps1` | Validates AI labels in code and documentation |
 | `scripts/install_hooks.ps1` | Installs Git hooks for standards validation |
 | `scripts/update_ai_labeling_docs.ps1` | Updates deprecated documentation with notices | 
+
 ## See Also
 
 - [Related Document](#related-document)
 
+-

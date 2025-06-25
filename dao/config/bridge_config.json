@@ -1,0 +1,90 @@
+{
+    "testnet": {
+        "network": "testnet",
+        "contractAddress": "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.contribution-oracle",
+        "rewardController": "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.reward-controller",
+        "rewardDistributor": "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.reward-distributor",
+        "rewardScheduler": "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.reward-scheduler",
+        "tokenContract": "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.token",
+        "batchSize": 50,
+        "maxRetries": 3,
+        "gasLimit": 100000,
+        "gasPrice": 1,
+        "confirmations": 6,
+        "apiUrl": "https://stacks-node-api.testnet.stacks.co",
+        "bridgeSettings": {
+            "stacksToBitcoin": {
+                "enabled": true,
+                "feeRate": 0.05,
+                "minimumAmount": 1000,
+                "confirmations": 6
+            },
+            "stacksToEthereum": {
+                "enabled": true,
+                "feeRate": 0.05,
+                "minimumAmount": 500,
+                "confirmations": 12
+            },
+            "bitcoinToStacks": {
+                "enabled": true,
+                "feeRate": 0.05,
+                "minimumAmount": 1000,
+                "confirmations": 3
+            },
+            "ethereumToStacks": {
+                "enabled": true,
+                "feeRate": 0.05,
+                "minimumAmount": 500,
+                "confirmations": 12
+            }
+        },
+        "feeDistribution": {
+            "treasuryShare": 0.8,
+            "communityShare": 0.2
+        }
+    },
+    "mainnet": {
+        "network": "mainnet",
+        "contractAddress": "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.contribution-oracle",
+        "rewardController": "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.reward-controller",
+        "rewardDistributor": "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.reward-distributor",
+        "rewardScheduler": "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.reward-scheduler",
+        "tokenContract": "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.token",
+        "batchSize": 30,
+        "maxRetries": 5,
+        "gasLimit": 200000,
+        "gasPrice": 2,
+        "confirmations": 12,
+        "apiUrl": "https://stacks-node-api.mainnet.stacks.co",
+        "bridgeSettings": {
+            "stacksToBitcoin": {
+                "enabled": true,
+                "feeRate": 0.05,
+                "minimumAmount": 1000,
+                "confirmations": 6
+            },
+            "stacksToEthereum": {
+                "enabled": true,
+                "feeRate": 0.05,
+                "minimumAmount": 500,
+                "confirmations": 12
+            },
+            "bitcoinToStacks": {
+                "enabled": true,
+                "feeRate": 0.05,
+                "minimumAmount": 1000,
+                "confirmations": 3
+            },
+            "ethereumToStacks": {
+                "enabled": true,
+                "feeRate": 0.05,
+                "minimumAmount": 500,
+                "confirmations": 12
+            }
+        },
+        "feeDistribution": {
+            "treasuryShare": 0.8,
+            "communityShare": 0.2
+        }
+    }
+}

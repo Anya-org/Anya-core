@@ -340,8 +340,9 @@ pub enum SignatureAlgorithm {
     /// RSA with PSS padding and SHA-512
     RsaPssSha512,
 
-    /// ECDSA with SHA-256
+    /// ECDSA with SHA-256 (alias for secp256k1)
     EcdsaSha256,
+    EcdsaSecp256k1Sha256,
 
     /// ECDSA with SHA-384
     EcdsaSha384,

@@ -15,6 +15,7 @@ last_updated: 2025-06-07
 **MAJOR MILESTONE:** Bitcoin Core compilation complete and all Layer2 protocols operational!
 
 ### ✅ Bitcoin Implementation Status
+
 - **All compilation errors resolved:** 58+ errors → 0 errors
 - **Layer2 protocols operational:** BOB, Lightning, RSK, RGB, DLC, Taproot Assets
 - **Production-ready status:** All critical systems functional
@@ -150,8 +151,9 @@ This index was last updated on 2025-05-21.
 ## Getting Help
 
 For documentation issues or suggestions:
+
 1. Open an issue on [GitHub](https://github.com/your-org/anya-core/issues)
-2. Email: botshelomokoka+docs@gmail.com
+2. Email: <botshelomokoka+docs@gmail.com>
 3. Join our [community forum](https://community.anya-core.org)
 
 ## License

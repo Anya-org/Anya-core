@@ -18,7 +18,9 @@ pub struct ReplicationManager {
     pending_writes: Arc<Mutex<Vec<WriteOperation>>>,
     node_status: Arc<RwLock<HashMap<String, NodeReplicationStatus>>>,
     write_ahead_log: Arc<Mutex<Vec<LogEntry>>>,
+    #[allow(dead_code)] // Required for future WAL/consensus extensions (see docs/INDEX_CORRECTED.md)
     last_applied_index: Arc<RwLock<u64>>,
+    #[allow(dead_code)] // Required for future WAL/consensus extensions (see docs/INDEX_CORRECTED.md)
     commit_index: Arc<RwLock<u64>>,
 }
 
@@ -219,7 +221,6 @@ impl ReplicationManager {
     }
 
     /// Private methods for implementation details
-
     async fn initialize_wal(&self) -> Result<(), HaError> {
         debug!("Initializing write-ahead log");
 

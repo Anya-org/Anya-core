@@ -93,6 +93,12 @@ pub struct BipHealthReport {
     pub proposal_count: usize,
 }
 
+impl Default for BipHealthReport {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl BipHealthReport {
     /// Create a new empty report
     pub fn new() -> Self {
@@ -146,11 +152,11 @@ impl BipHealthReport {
     pub fn to_markdown(&self) -> String {
         let mut md = String::new();
 
-        md.push_str(&format!("# BIP System Health Report\n\n"));
+        md.push_str("# BIP System Health Report\n\n");
         md.push_str(&format!("Generated: {}\n\n", self.timestamp));
 
         // Overall summary
-        md.push_str(&format!("## Summary\n\n"));
+        md.push_str("## Summary\n\n");
         md.push_str(&format!(
             "- Overall Health: **{}**\n",
             if self.healthy {
@@ -846,12 +852,14 @@ mod tests {
 
     #[test]
     fn test_report_generation() {
-        let mut config = BitcoinConfig::default();
-        config.taproot_enabled = true;
-        config.tapscript_enabled = true;
-        config.psbt_version = 2;
-        config.bip353_enabled = true;
-        config.bip353_status = Bip353Status::Beta;
+        let config = BitcoinConfig {
+            taproot_enabled: true,
+            tapscript_enabled: true,
+            psbt_version: 2,
+            bip353_enabled: true,
+            bip353_status: Bip353Status::Beta,
+            ..BitcoinConfig::default()
+        };
 
         let mut checker = BipHealthChecker::new(config, None);
         let report = checker.check_health().unwrap();

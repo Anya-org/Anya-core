@@ -2,7 +2,7 @@
 
 Welcome to the Anya Core documentation. This index will help you navigate the various documentation files and resources available for the Anya Core platform.
 
-## 🔧 CURRENT DEVELOPMENT STATUS (June 10, 2025)
+## 🔧 CURRENT DEVELOPMENT STATUS (June 17, 2025)
 
 **The Anya-core project is actively under development with strong architectural foundations and ongoing Bitcoin protocol implementation.**
 
@@ -30,14 +30,14 @@ Welcome to the Anya Core documentation. This index will help you navigate the va
 
 ## Core Documentation
 
-- [Documentation Index](docs/INDEX.md) - Main documentation index
-- [System Architecture](docs/SYSTEM_MAP.md) - Complete system architecture
+- [Documentation Index](docs/index.md) - Main documentation index
+- [System Architecture](docs/SYSTEM_MAP.md#system-architecture) - Complete system architecture (with visual map)
 - [DAO System](src/dao/README.md) - Comprehensive DAO documentation
 - [Tokenomics System](docs/TOKENOMICS_SYSTEM.md) - Bitcoin-style tokenomics
 - [Implementation Milestones](docs/IMPLEMENTATION_MILESTONES.md) - Current progress tracking
-- [Testing Strategy](TESTING.md) - Sectional testing methodology
+- [Testing Strategy](docs/TESTING.md) - Sectional testing methodology
 - [SECURITY_CODEQL.md](./SECURITY_CODEQL.md) - Security analysis framework documentation
-- [ROADMAP.md](./ROADMAP.md) - Project development roadmap
+- [ROADMAP.md](docs/ROADMAP.md) - Project development roadmap
 - [CHANGELOG.md](./CHANGELOG.md) - Version history and changes
 - [TODO.md](./TODO.md) - Current development tasks
 - [AI Labeling System](./docs/standards/AI_LABELING.md) - AI labeling system documentation
@@ -168,7 +168,7 @@ Welcome to the Anya Core documentation. This index will help you navigate the va
 
 ## Security & Compliance
 
-- [Security Guidelines](SECURITY.md) - Security best practices
+- [Security Guidelines](docs/SECURITY.md) - Security best practices
 - [Compliance Framework](docs/COMPLIANCE.md) - Compliance information
 - [Privacy Measures](docs/PRIVACY.md) - Privacy protection measures
 
@@ -216,7 +216,7 @@ Welcome to the Anya Core documentation. This index will help you navigate the va
 
 ## Compliance and Governance
 
-- [Governance](GOVERNANCE.md) - Project governance structure
+- [Governance](docs/GOVERNANCE.md) - Project governance structure
 - [Contributing](CONTRIBUTING.md) - Contribution guidelines
 - [Code of Conduct](CODE_OF_CONDUCT.md) - Community code of conduct
 - [License](LICENSE.md) - License information
@@ -275,7 +275,14 @@ The repository is organized into the following main directories:
 ## Mobile Integration
 
 - [React Native SDK](https://github.com/anya-org/anya-mobile) - Bitcoin-compliant mobile components
-- [Mobile Security Guide](docs/mobile/SECURITY.md) - Secure mobile implementation
+- [Mobile Security Guide](docs/SECURITY.md) - Secure mobile implementation
 - [Taproot Mobile Demo](docs/mobile/TAPROOT_DEMO.md) - Mobile Taproot examples
 
 *Last updated: June 10, 2025*
+
+<!-- AI Labeling references -->
+[AIR-3]: ./docs/standards/AI_LABELING.md
+[AIS-3]: ./docs/standards/AI_LABELING.md
+[BPC-3]: ./docs/standards/AI_LABELING.md
+[AIT-3]: ./docs/standards/AI_LABELING.md
+[RES-3]: ./docs/standards/AI_LABELING.md

@@ -87,6 +87,12 @@ struct SignatureRequirement {
     requires_bitcoin_anchor: bool,
 }
 
+impl Default for LegalWrapper {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl LegalWrapper {
     /// Create a new legal wrapper
     pub fn new() -> Self {

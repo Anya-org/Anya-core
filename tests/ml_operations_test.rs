@@ -2,7 +2,6 @@ use anya_core::ml::agents::FederatedAgent;
 use anya_core::ml::federated_agent::FederatedAgentConfig;
 
 use std::error::Error;
-use std::time::Duration;
 use tokio;
 
 #[tokio::test]
@@ -39,7 +38,7 @@ async fn test_model_training() -> Result<(), Box<dyn Error>> {
 
 #[tokio::test]
 async fn test_model_aggregation() -> Result<(), Box<dyn Error>> {
-    let mut fl = setup_test_environment().await?;
+    let fl = setup_test_environment().await?;
 
     // Train multiple local models
     let test_users = vec!["user1", "user2", "user3"];
@@ -73,7 +72,7 @@ async fn test_model_aggregation() -> Result<(), Box<dyn Error>> {
 
 #[tokio::test]
 async fn test_model_versioning() -> Result<(), Box<dyn Error>> {
-    let mut fl = setup_test_environment().await?;
+    let fl = setup_test_environment().await?;
 
     // This test expects train_local_model and update_model_version, which are missing. Commenting out for now.
     /*

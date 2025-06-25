@@ -176,5 +176,5 @@ cargo test --package anya-core --lib -- security::hsm::tests
 
 For detailed documentation, refer to:
 
-- [HSM Bitcoin Integration](../../docs/hsm_bitcoin_integration.md)
+- [HSM Bitcoin Integration](../../../docs/hsm_bitcoin_integration.md)
 - [API Reference](./mod.rs) (code documentation)

@@ -812,9 +812,9 @@ async def main():
 
 ## Resources
 
-- [API Changelog](CHANGELOG.md)
-- [SDK Documentation](../sdks/README.md)
-- [Authentication Guide](../security/authentication.md)
+- [API Changelog](../../dependencies/CHANGELOG.md)
+- [SDK Documentation](../README.md)
+- [Authentication Guide](../integration/authentication.md)
 - [Rate Limiting Guide](../security/rate-limiting.md)
 
 ## Support

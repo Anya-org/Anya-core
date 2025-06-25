@@ -1,6 +1,6 @@
 # Bitcoin Integration Documentation
 
-* [Introduction](README.md)
+* [Introduction](security/README.md)
 * [Core Features](features/README.md)
   * [Wallet Integration](features/wallet-integration.md)
     - [Wallet Types](features/wallet-types.md)

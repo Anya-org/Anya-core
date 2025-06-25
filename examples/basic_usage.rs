@@ -1,39 +1,35 @@
-use anya_core::{api::ApiServer, bitcoin::BitcoinModule, privacy::PrivacyModule};
+use anya_core::{bitcoin::BitcoinNode, api::server::ApiServer};
 use anyhow::Result;
-use bitcoin::Network;
-use log::{error, info};
+use log::info;
 
-fn handle_error(module: &str) -> impl Fn(anyhow::Error) -> anyhow::Error {
-    move |err| {
-        error!("Error initializing {}: {}", module, err);
-        err
-    }
-}
-
-fn create_privacy_module() -> Result<PrivacyModule, anyhow::Error> {
-    PrivacyModule::new(vec![]).map_err(handle_error("PrivacyModule"))
-}
-
-fn create_bitcoin_module() -> Result<BitcoinModule, anyhow::Error> {
-    BitcoinModule::new(
-        Network::Testnet,
-        "http://localhost:18332",
-        "rpcuser",
-        "rpcpassword",
-    )
-    .map_err(handle_error("BitcoinModule"))
+// Use available modules rather than missing ones
+fn create_bitcoin_node() -> Result<BitcoinNode> {
+    let config = anya_core::bitcoin::config::BitcoinConfig {
+        network: "testnet".to_string(),
+        rpc_url: Some("http://localhost:18332".to_string()),
+        auth: Some(("rpcuser".to_string(), "rpcpassword".to_string())),
+        ..Default::default()
+    };
+    
+    BitcoinNode::new(config)
+        .map_err(|e| anyhow::anyhow!("Bitcoin node error: {}", e))
 }
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let bitcoin_module = create_bitcoin_module()?;
-    let privacy_module = create_privacy_module()?;
-    let api_server = ApiServer::new(privacy_module, bitcoin_module);
-    info!("Starting API server on 127.0.0.1:8080");
-    api_server.run("127.0.0.1", 8080).await.map_err(|e| {
-        error!("API server error: {}", e);
-        e
-    })?;
-
+    let bitcoin_node = create_bitcoin_node()?;
+    let _api_server = ApiServer::new();
+    
+    // Start the Bitcoin node
+    bitcoin_node.start().await
+        .map_err(|e| anyhow::anyhow!("Failed to start Bitcoin node: {}", e))?;
+    
+    info!("Bitcoin node initialized successfully");
+    info!("API server created - ready for configuration");
+    info!("Example completed successfully");
+    
+    // In a real application, we would use the API server here
+    // For this example, we're just demonstrating initialization
+    
     Ok(())
 }

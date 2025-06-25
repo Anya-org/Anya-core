@@ -253,11 +253,10 @@ impl SystemHardening {
                 components
             }
             Err(e) => {
-                // Return an empty vec with the error if we can't get the lock
+                // Return a vec with the error if we can't get the lock
                 let error_msg = format!("Mutex lock error: {}", e);
-                let mut results = Vec::new();
-                results.push(("general".to_string(), Err(error_msg)));
-                return results;
+                // Using vec![] macro as suggested by Clippy
+                return vec![("general".to_string(), Err(error_msg))];
             }
         };
 

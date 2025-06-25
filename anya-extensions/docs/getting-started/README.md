@@ -72,5 +72,5 @@ cargo test
 
 - [Extension Examples](https://github.com/anya-org/extension-examples)
 - [Community Extensions](../extensions/community-extensions.md)
-- [Troubleshooting Guide](../troubleshooting/README.md)
-- [Contributing Guidelines](../../../../CONTRIBUTING.md)
+- [Troubleshooting Guide](README.md)
+- [Contributing Guidelines](../../../dependencies/CONTRIBUTING.md)

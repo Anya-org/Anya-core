@@ -1,11 +1,8 @@
-#![feature(test)]
-extern crate test;
-
 use anya_bitcoin::riscv::layer3::{
     Layer3Controls, Layer3Extensions, Layer3Optimizer, VerificationLevel, ZkCapabilities,
 };
 use anyhow::Result;
-use test::Bencher;
+use std::time::Instant;
 
 /// Test suite for Layer 3+ optimizations
 mod layer3_tests {
@@ -64,32 +61,35 @@ mod zk_snark_tests {
     }
 }
 
-/// Performance benchmarks
-mod benchmarks {
+/// Performance tests
+mod performance_tests {
     use super::*;
 
-    #[bench]
-    fn bench_proof_generation(b: &mut Bencher) {
+    #[test]
+    fn test_proof_generation_performance() {
         let optimizer = Layer3Optimizer::new().unwrap();
-        b.iter(|| {
-            optimizer.optimize_proof_generation().unwrap();
-        });
+        let start = Instant::now();
+        optimizer.optimize_proof_generation().unwrap();
+        let duration = start.elapsed();
+        println!("Proof generation optimization completed in: {:?}", duration);
     }
 
-    #[bench]
-    fn bench_proof_verification(b: &mut Bencher) {
+    #[test]
+    fn test_proof_verification_performance() {
         let optimizer = Layer3Optimizer::new().unwrap();
-        b.iter(|| {
-            optimizer.optimize_proof_verification().unwrap();
-        });
+        let start = Instant::now();
+        optimizer.optimize_proof_verification().unwrap();
+        let duration = start.elapsed();
+        println!("Proof verification optimization completed in: {:?}", duration);
     }
 
-    #[bench]
-    fn bench_recursive_proofs(b: &mut Bencher) {
+    #[test]
+    fn test_recursive_proofs_performance() {
         let optimizer = Layer3Optimizer::new().unwrap();
-        b.iter(|| {
-            optimizer.optimize_layer3_protocols().unwrap();
-        });
+        let start = Instant::now();
+        optimizer.optimize_layer3_protocols().unwrap();
+        let duration = start.elapsed();
+        println!("Layer 3 protocol optimization completed in: {:?}", duration);
     }
 }
 

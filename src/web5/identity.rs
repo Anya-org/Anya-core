@@ -403,7 +403,7 @@ mod tests {
         let manager = DIDManager::new("example");
         let did = manager.create_did()?;
         assert!(!did.id.is_empty());
-        assert_eq!(did.id.starts_with("did:example:"), true);
+        assert!(did.id.starts_with("did:example:"));
         assert!(!did.private_keys.is_empty());
         Ok(())
     }

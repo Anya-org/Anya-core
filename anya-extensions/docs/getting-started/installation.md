@@ -391,6 +391,7 @@ anya ml benchmark --all-models
 ### Common Installation Issues
 
 #### Rust Compilation Errors
+
 ```bash
 # Update Rust toolchain
 rustup update
@@ -404,6 +405,7 @@ sudo apt-get install libclang-dev
 ```
 
 #### Bitcoin Node Sync Issues
+
 ```bash
 # Check sync status
 bitcoin-cli getblockchaininfo
@@ -417,6 +419,7 @@ rm -rf ~/.bitcoin/blocks ~/.bitcoin/chainstate
 ```
 
 #### Web5 DID Resolution Failures
+
 ```bash
 # Check network connectivity
 curl -s https://beta.ion.msidentity.com/api/v1.0/identifiers/
@@ -429,6 +432,7 @@ rm -rf ~/.anya/web5-cache
 ```
 
 #### ML Model Loading Issues
+
 ```bash
 # Check model file integrity
 anya ml verify-models
@@ -443,6 +447,7 @@ anya ml system-info
 ### Performance Optimization
 
 #### System Tuning
+
 ```bash
 # Increase file descriptor limits
 echo "* soft nofile 65536" | sudo tee -a /etc/security/limits.conf
@@ -461,6 +466,7 @@ sudo swapon /swapfile
 ```
 
 #### Resource Monitoring
+
 ```bash
 # Monitor system resources
 anya system monitor
@@ -480,6 +486,7 @@ anya ml performance --watch
 - **Discord**: [https://discord.gg/anya](https://discord.gg/anya)
 
 For installation support, please include:
+
 - Operating system and version
 - Anya Core version (`anya --version`)
 - Error messages with full stack traces

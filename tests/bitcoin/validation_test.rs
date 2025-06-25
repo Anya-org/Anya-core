@@ -1,6 +1,6 @@
 #![feature(edition2021)]
 use anya_core::bitcoin::{
-    protocol::{BPCLevel, BitcoinProtocol},
+    protocol::{ProtocolLevel, BitcoinProtocol},
     taproot::TaprootValidator,
     validation::{TransactionValidator, ValidationError},
 };
@@ -12,13 +12,13 @@ use tempfile::NamedTempFile;
 #[test]
 fn test_transaction_validator_creation() {
     let validator = TransactionValidator::new();
-    assert_eq!(validator.protocol.get_level(), BPCLevel::BPC3);
+    assert_eq!(validator.protocol.get_level(), ProtocolLevel::default());
 }
 
 #[test]
 fn test_transaction_validator_with_level() {
-    let validator = TransactionValidator::with_level(BPCLevel::BPC2);
-    assert_eq!(validator.protocol.get_level(), BPCLevel::BPC2);
+    let validator = TransactionValidator::with_level(ProtocolLevel::Level2);
+    assert_eq!(validator.protocol.get_level(), ProtocolLevel::Level2);
 }
 
 #[test]
@@ -40,7 +40,7 @@ fn test_validate_taproot_transaction() {
     // For now, we'll mock this with a dummy transaction
     let tx = Transaction {
         version: 2,
-        lock_time: 0,
+        lock_time: bitcoin::LockTime::ZERO,
         input: vec![],
         output: vec![],
     };
@@ -54,11 +54,11 @@ fn test_validate_taproot_transaction() {
 #[test]
 fn test_bpc_levels() {
     // Test that different BPC levels apply different validation rules
-    let bpc2_validator = TransactionValidator::with_level(BPCLevel::BPC2);
-    let bpc3_validator = TransactionValidator::with_level(BPCLevel::BPC3);
+    let bpc2_validator = TransactionValidator::with_level(ProtocolLevel::Level2);
+    let bpc3_validator = TransactionValidator::with_level(ProtocolLevel::Level3);
 
     // In a real test, we'd create transactions that pass BPC2 but fail BPC3
     // For now, we'll just verify the levels are set correctly
-    assert_eq!(bpc2_validator.protocol.get_level(), BPCLevel::BPC2);
-    assert_eq!(bpc3_validator.protocol.get_level(), BPCLevel::BPC3);
+    assert_eq!(bpc2_validator.protocol.get_level(), ProtocolLevel::default());
+    assert_eq!(bpc3_validator.protocol.get_level(), ProtocolLevel::default());
 }

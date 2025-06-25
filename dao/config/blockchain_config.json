@@ -1,0 +1,115 @@
+{
+    "networks": {
+        "stacks": {
+            "mainnet": {
+                "apiUrl": "https://stacks-node-api.mainnet.stacks.co",
+                "explorerUrl": "https://explorer.stacks.co",
+                "contracts": {
+                    "token": "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.token",
+                    "rewardController": "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.reward-controller",
+                    "rewardDistributor": "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.reward-distributor",
+                    "rewardScheduler": "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.reward-scheduler",
+                    "contributionOracle": "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.contribution-oracle"
+                },
+                "tokenName": "Anya Governance Token",
+                "tokenSymbol": "AGT",
+                "tokenDecimals": 6
+            },
+            "testnet": {
+                "apiUrl": "https://stacks-node-api.testnet.stacks.co",
+                "explorerUrl": "https://explorer.stacks.co",
+                "contracts": {
+                    "token": "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.token",
+                    "rewardController": "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.reward-controller",
+                    "rewardDistributor": "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.reward-distributor",
+                    "rewardScheduler": "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.reward-scheduler",
+                    "contributionOracle": "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.contribution-oracle"
+                },
+                "tokenName": "Anya Governance Token",
+                "tokenSymbol": "AGT",
+                "tokenDecimals": 6
+            }
+        },
+        "bitcoin": {
+            "mainnet": {
+                "apiUrl": "https://mempool.space/api",
+                "explorerUrl": "https://mempool.space",
+                "inscriptionApiUrl": "https://ordinals.com/api",
+                "src20ApiUrl": "https://src20.io/api",
+                "src20TokenTicker": "AGT",
+                "src20MaxSupply": "21000000000",
+                "src20Decimals": 6,
+                "src20MintHeight": 840000
+            },
+            "testnet": {
+                "apiUrl": "https://mempool.space/testnet/api",
+                "explorerUrl": "https://mempool.space/testnet",
+                "inscriptionApiUrl": "https://ordinals.com/testnet/api",
+                "src20ApiUrl": "https://src20.io/testnet/api",
+                "src20TokenTicker": "AGT",
+                "src20MaxSupply": "21000000000",
+                "src20Decimals": 6,
+                "src20MintHeight": 2530000
+            }
+        },
+        "ethereum": {
+            "mainnet": {
+                "apiUrl": "https://eth-mainnet.g.alchemy.com/v2/demo",
+                "explorerUrl": "https://etherscan.io",
+                "tbtcBridgeAddress": "0x18084fbA666a33d37592fA2633fD49a74DD93a88",
+                "tbtcTokenAddress": "0x8dAEBADE922dF735c38C80C7eBD708Af50815fAa",
+                "gasPrice": "50000000000",
+                "gasLimit": 200000
+            },
+            "testnet": {
+                "apiUrl": "https://eth-sepolia.g.alchemy.com/v2/demo",
+                "explorerUrl": "https://sepolia.etherscan.io",
+                "tbtcBridgeAddress": "0x679874fbe6d8e7e19caad7d646beeb38179beaec",
+                "tbtcTokenAddress": "0x9F6981bA5cc1d8A603e7bF6bbC6ff5A132AB978d",
+                "gasPrice": "10000000000",
+                "gasLimit": 200000
+            }
+        }
+    },
+    "defaultNetwork": "stacks",
+    "defaultNetworkType": "testnet",
+    "simulationMode": true,
+    "standardPriority": [
+        "SIP-010",
+        "SRC-20",
+        "tBTC"
+    ],
+    "addressFormats": {
+        "testAddresses": {
+            "stacks": "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM",
+            "bitcoin": "tb1qrp33g0q5c5txsp9arysrx4k6zdkfs4nce4xj0gdcccefvpysxf3q0sl5k7",
+            "ethereum": "0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B"
+        }
+    },
+    "bridgeSettings": {
+        "stacksToBitcoin": {
+            "enabled": true,
+            "feeRate": 0.05,
+            "minimumAmount": 1000,
+            "confirmations": 6
+        },
+        "stacksToEthereum": {
+            "enabled": true,
+            "feeRate": 0.01,
+            "minimumAmount": 500,
+            "confirmations": 12
+        },
+        "bitcoinToStacks": {
+            "enabled": true,
+            "feeRate": 0.03,
+            "minimumAmount": 1000,
+            "confirmations": 3
+        },
+        "ethereumToStacks": {
+            "enabled": true,
+            "feeRate": 0.02,
+            "minimumAmount": 500,
+            "confirmations": 12
+        }
+    }
+}

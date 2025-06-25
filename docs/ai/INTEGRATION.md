@@ -10,13 +10,13 @@ description: "Documentation for Integration"
 - [Section 1](#section-1)
 - [Section 2](#section-2)
 
-
 > **Documentation Version**: 2.0  
 > **Last Updated**: 2025-05-30  
 > **Status**: Active  
 > **AI Label**: [AIR-3][AIS-3][BPC-3]
 
 ## 📖 Table of Contents
+
 - [Overview](#overview)
 - [Related Documentation](#related-documentation)
 - [Architecture](#architecture)
@@ -54,6 +54,7 @@ For a complete understanding of the AI system, please refer to:
 Anya Core provides a flexible framework for integrating AI models and services. This guide covers the end-to-end process of integrating AI capabilities into the platform, from model development to production deployment.
 
 ### Key Features
+
 - **Unified Model Serving**: Consistent interface for deploying and managing ML models
 - **Scalable Architecture**: Built-in support for horizontal scaling
 - **Comprehensive Monitoring**: Real-time metrics and logging

@@ -1287,9 +1287,9 @@ impl IntegrationSecurity {
 
 - [Third-Party Integration](third-party-integration.md) - External system integration
 - [Security Guidelines](security-guidelines.md) - Security best practices
-- [Bitcoin Core](../../bitcoin/README.md) - Bitcoin system integration
-- [Web5 Core](../../web5/README.md) - Web5 system integration
-- [ML Core](../../ml/README.md) - ML system integration
+- [Bitcoin Core](README.md) - Bitcoin system integration
+- [Web5 Core](README.md) - Web5 system integration
+- [ML Core](README.md) - ML system integration
 
 ## Community and Support
 

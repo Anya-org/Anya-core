@@ -171,7 +171,7 @@ pub struct SoftwareHsmProvider {
 
 impl SoftwareHsmProvider {
     /// Create a new software HSM provider
-    pub fn new(
+    pub async fn new(
         config: SoftHsmConfig,
         network: Network,
         audit_logger: Arc<AuditLogger>,
@@ -190,11 +190,11 @@ impl SoftwareHsmProvider {
 
         // Log successful initialization
         provider.audit_logger.log(
-            "SoftwareHsmProvider",
-            "initialize",
+            crate::security::hsm::error::AuditEventType::Initialization,
+            crate::security::hsm::error::AuditEventResult::Success,
+            crate::security::hsm::error::AuditEventSeverity::Info,
             "HSM provider initialized successfully",
-            None,
-        )?;
+        ).await?;
 
         Ok(provider)
     }

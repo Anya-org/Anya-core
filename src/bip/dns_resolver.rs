@@ -215,11 +215,7 @@ pub fn parse_payment_instruction(txt_record: &str) -> Option<String> {
     // According to BIP353, the format should be:
     // bitcoin=<payment-instruction>
 
-    if txt_record.starts_with("bitcoin=") {
-        Some(txt_record[8..].to_string())
-    } else {
-        None
-    }
+    txt_record.strip_prefix("bitcoin=").map(|value| value.to_string())
 }
 
 impl From<ResolveError> for DnsResolverError {

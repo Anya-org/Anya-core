@@ -91,8 +91,8 @@ cargo deny check
 ## Documentation
 
 - [Architecture](docs/ARCHITECTURE.md)
-- [Security](docs/SECURITY.md)
-- [Integration Guide](docs/INTEGRATION.md)
+- [Security](SECURITY.md)
+- [Integration Guide](../docs/ai/INTEGRATION.md)
 - [Dependency Management](docs/DEPENDENCIES.md)
 
 ## Contributing

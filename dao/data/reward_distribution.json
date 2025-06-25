@@ -1,0 +1,23 @@
+{
+  "timestamp": "2025-06-24T09:32:23.343Z",
+  "period": "2025-06-24T08:20:25.619Z",
+  "currentBlock": 210000,
+  "blockReward": 5000,
+  "totalMinedSupply": 2100000000,
+  "communityAllocation": 315000000,
+  "rewardPerPoint": 1050000,
+  "contributors": {
+    "botshelomokoka": {
+      "points": 300,
+      "reward": 315000000,
+      "previouslyRewarded": 0,
+      "activities": {
+        "commits": 30,
+        "pullRequests": 0,
+        "reviews": 0
+      },
+      "success": false
+    }
+  },
+  "totalAwarded": 315000000
+}

@@ -230,7 +230,7 @@ For additional help, please contact:
 ## Implementation Notes
 - The Rust backend is designed for async, cross-platform operation and can be integrated with mobile via FFI.
 - All features listed in the API Reference are either implemented, stubbed, or planned for future releases.
-- For up-to-date status, see [src/mobile/sdk.rs](../../src/mobile/sdk.rs) and the project [ROADMAP.md](../../ROADMAP.md).
+- For up-to-date status, see [src/mobile/sdk.rs](../../src/mobile/sdk.rs) and the project [ROADMAP.md](../ROADMAP.md).
 
 ---
 
@@ -244,6 +244,6 @@ For additional help, please contact:
 ## See Also
 
 - [Rust Mobile SDK Source](../../src/mobile/sdk.rs)
-- [Project Roadmap](../../ROADMAP.md)
+- [Project Roadmap](../ROADMAP.md)
 - [Related Document](#related-document)
 

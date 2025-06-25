@@ -191,6 +191,12 @@ pub struct FederatedLearningManager {
     aggregation_method: String,
 }
 
+impl Default for FederatedLearningManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl FederatedLearningManager {
     /// Create a new federated learning manager
     pub fn new() -> Self {
@@ -259,10 +265,10 @@ mod tests {
 
     #[test]
     fn test_stage_readiness() -> Result<(), Box<dyn Error>> {
-        assert_eq!(is_ready_for_stage(0.55, SystemStage::Development), false);
-        assert_eq!(is_ready_for_stage(0.65, SystemStage::Development), true);
-        assert_eq!(is_ready_for_stage(0.85, SystemStage::Production), false);
-        assert_eq!(is_ready_for_stage(0.95, SystemStage::Production), true);
+        assert!(!is_ready_for_stage(0.55, SystemStage::Development));
+        assert!(is_ready_for_stage(0.65, SystemStage::Development));
+        assert!(!is_ready_for_stage(0.85, SystemStage::Production));
+        assert!(is_ready_for_stage(0.95, SystemStage::Production));
         Ok(())
     }
 }

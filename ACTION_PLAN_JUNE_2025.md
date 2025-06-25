@@ -97,13 +97,15 @@ cargo fix --workspace --allow-dirty
 **Estimated Time: 2 days**
 
 **Completed Actions:**
+
 - Consolidated `anya-bitcoin/docs` → `docs/bitcoin`  
 - Created `scripts/link_checker.py` & `scripts/link_fixer.py` to detect/fix broken links  
 - Ran fixer across repo, resolving >1,000 links  
 - Scaffolding Jekyll site under `/docs`, updated `_config.yml`, and started `jekyll serve`
 
 **Next Steps:**
-- Validate navigation in browser preview (http://localhost:4000)  
+
+- Validate navigation in browser preview (<http://localhost:4000>)  
 - Integrate link-checker into CI workflows (`.github/workflows/docs-link-check.yml`)  
 - Stage modular index updates (`docs/index.md`, module subindexes) and confirm correctness  
 - Review & clean GitHub Actions workflows to ensure docs jobs run on PRs

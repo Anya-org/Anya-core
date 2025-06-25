@@ -73,7 +73,7 @@ impl BitcoinHsmProvider {
         // Create a dummy seed for development/testing
         // In a real implementation, this would be securely generated and stored
         let mut master_seed = [0u8; 32];
-        getrandom::getrandom(&mut master_seed).map_err(|e| {
+        getrandom::fill(&mut master_seed).map_err(|e| {
             HsmError::ProviderError(format!("Failed to generate random seed: {}", e))
         })?;
 
@@ -108,15 +108,15 @@ impl BitcoinHsmProvider {
             .derive_priv(&self.secp, &derivation_path)
             .map_err(|e| HsmError::ProviderError(format!("Failed to derive private key: {}", e)))?;
 
+        // Get the private key bytes
         let secret_key = derived_xpriv.private_key;
-        let public_key = SecretKey::from_slice(&secret_key.key[..])
-            .map_err(|e| HsmError::ProviderError(format!("Invalid secret key: {}", e)))?
-            .public_key(&self.secp);
+        // Convert to a SecretKey - in newer versions of bitcoin, we need to use the secret_bytes method
+        let secret_bytes = secret_key.secret_bytes();
+        let secret_key = SecretKey::from_slice(&secret_bytes)
+            .map_err(|e| HsmError::ProviderError(format!("Invalid secret key: {}", e)))?;
+        let public_key = secret_key.public_key(&self.secp);
 
-        Ok((
-            SecretKey::from_slice(&secret_key.key[..]).unwrap(),
-            public_key,
-        ))
+        Ok((secret_key, public_key))
     }
 
     /// Generate a key pair and store it
@@ -172,9 +172,9 @@ impl BitcoinHsmProvider {
     /// Sign data with a Bitcoin key
     async fn sign_bitcoin(
         &self,
-        _key_id: &str,
-        _data: &[u8],
-        _algorithm: SigningAlgorithm,
+        key_id: &str,
+        data: &[u8],
+        algorithm: SigningAlgorithm,
     ) -> Result<Vec<u8>, HsmError> {
         // Get key info
         let keys = self.keys.lock().await;
@@ -215,10 +215,10 @@ impl BitcoinHsmProvider {
     /// Verify a signature with a Bitcoin key
     async fn verify_bitcoin(
         &self,
-        _key_id: &str,
-        _data: &[u8],
-        _signature: &[u8],
-        _algorithm: SigningAlgorithm,
+        key_id: &str,
+        data: &[u8],
+        signature: &[u8],
+        algorithm: SigningAlgorithm,
     ) -> Result<bool, HsmError> {
         // Get key info
         let keys = self.keys.lock().await;
@@ -277,7 +277,7 @@ impl HsmProvider for BitcoinHsmProvider {
         let master_xpriv = ExtendedPrivKey::new_master(self.network, &self.master_seed)
             .map_err(|e| HsmError::ProviderError(format!("Failed to create master key: {}", e)))?;
 
-        let master_xpub = ExtendedPubKey::from_private(&self.secp, &master_xpriv);
+        let master_xpub = ExtendedPubKey::from_priv(&self.secp, &master_xpriv);
 
         // Store master keys
         let mut master_xpriv_lock = self.master_xpriv.lock().await;
@@ -295,7 +295,7 @@ impl HsmProvider for BitcoinHsmProvider {
         Ok(())
     }
 
-    async fn generate_key(&self, params: KeyGenParams) -> Result<KeyPair, HsmError> {
+    async fn generate_key(&self, params: KeyGenParams) -> Result<(KeyPair, KeyInfo), HsmError> {
         debug!("Generating key with params: {:?}", params);
 
         // Check provider status
@@ -309,15 +309,29 @@ impl HsmProvider for BitcoinHsmProvider {
         drop(status);
 
         // Check key type
-        match &params.key_type {
+        let key_pair =        match &params.key_type {
             KeyType::Ec { curve } if *curve == EcCurve::Secp256k1 => {
-                self.generate_bitcoin_key(&params).await
+                self.generate_bitcoin_key(&params).await?
             }
-            _ => Err(HsmError::InvalidParameters(format!(
+            _ => return Err(HsmError::InvalidParameters(format!(
                 "Unsupported key type: {:?}",
                 params.key_type
             ))),
-        }
+        };
+        
+        // Create key info
+        let key_info = KeyInfo {
+            id: params.id.clone().unwrap_or_else(|| Uuid::new_v4().to_string()),
+            key_type: params.key_type.clone(),
+            attributes: params.attributes.clone(),
+            created_at: Utc::now(),
+            expires_at: params.expires_at,
+            usages: params.usages.clone(),
+            extractable: params.extractable.unwrap_or(false),
+            label: params.label.clone(),
+        };
+        
+        Ok((key_pair, key_info))
     }
 
     async fn sign(
@@ -472,17 +486,18 @@ impl HsmProvider for BitcoinHsmProvider {
 
         match request.operation {
             HsmOperation::GenerateKey => {
-                let _params: KeyGenParams = serde_json::from_value(request.parameters.clone())
+                let params: KeyGenParams = serde_json::from_value(request.parameters.clone())
                     .map_err(|e| {
                         HsmError::InvalidParameters(format!("Invalid parameters: {}", e))
                     })?;
 
-                let key_pair = self.generate_key(params).await?;
+                let (key_pair, key_info) = self.generate_key(params).await?;
 
                 Ok(HsmResponse::success(
                     request.id,
                     Some(json!({
-                        "key_pair": key_pair
+                        "key_pair": key_pair,
+                        "key_info": key_info
                     })),
                 ))
             }
@@ -593,7 +608,7 @@ struct SignParams {
     pub data: String,
 
     /// Signing algorithm
-    pub _algorithm: SigningAlgorithm,
+    pub algorithm: SigningAlgorithm,
 }
 
 /// Parameters for verifying
@@ -609,7 +624,7 @@ struct VerifyParams {
     pub signature: String,
 
     /// Signing algorithm
-    pub _algorithm: SigningAlgorithm,
+    pub algorithm: SigningAlgorithm,
 }
 
 /// Parameters for getting a key
