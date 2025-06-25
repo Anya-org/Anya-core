@@ -4,14 +4,7 @@
 //! for production readiness validation.
 
 use anya_core::layer2::{
-    bob::{BobClient, BobConfig},
     create_protocol_state, create_validation_result, create_verification_result,
-    dlc::DlcProtocol,
-    lightning::{LightningConfig, LightningNetwork},
-    mock::MockLayer2Protocol,
-    rgb::RgbProtocol,
-    stacks::{StacksClient, StacksConfig},
-    state_channels::{CommitmentType, StateChannel, StateChannelConfig},
     AssetParams, AssetTransfer, Layer2ProtocolTrait, Proof, ProtocolState, TransactionStatus,
     TransferResult, ValidationResult, VerificationResult,
 };
