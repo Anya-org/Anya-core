@@ -40,8 +40,8 @@ fn main() -> Result<()> {
         fs::read_to_string(&mod_file).context("Failed to read module registry file")?;
 
     // Check for key BIP implementations
-    verify_bip_file(&bip_dir, "bip341.rs", "BIP-341 (Taproot)")?;
-    verify_bip_file(&bip_dir, "bip342.rs", "BIP-342 (Tapscript)")?;
+    verify_bip_file(bip_dir, "bip341.rs", "BIP-341 (Taproot)")?;
+    verify_bip_file(bip_dir, "bip342.rs", "BIP-342 (Tapscript)")?;
 
     // Verify registry entries
     verify_registry_entry(&mod_content, "BIP-341", "Taproot")?;
