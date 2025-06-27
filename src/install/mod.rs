@@ -1,4 +1,5 @@
 use anyhow::Result;
+use std::cmp::Ordering;
 use std::path::{Path, PathBuf};
 
 /// Installation source configuration
@@ -19,7 +20,8 @@ pub struct BitcoinConfig {
 /// Main installer implementation
 pub struct AnyaInstaller {
     installation_source: InstallationSource,
-    #[allow(dead_code)] // Required for future Bitcoin config extensibility (see docs/INDEX_CORRECTED.md)
+    #[allow(dead_code)]
+    // Required for future Bitcoin config extensibility (see docs/INDEX_CORRECTED.md)
     bitcoin_config: BitcoinConfig,
 }
 
@@ -100,4 +102,10 @@ pub mod protocol {
 
         Ok(())
     }
+}
+
+/// Version comparison utility for installation packages
+pub fn version_compare(v1: &str, v2: &str) -> Ordering {
+    // Simple version comparison - would use a proper semver library in production
+    v1.cmp(v2)
 }

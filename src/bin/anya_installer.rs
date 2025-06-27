@@ -147,15 +147,22 @@ struct EnhancedInstaller {
     profile: InstallProfile,
     hw_profile: HardwareProfile,
     dependencies: DependencyManager,
+    #[allow(dead_code)] // Used by configuration methods, may be needed by external callers
+    bitcoin_config: BitcoinConfig,
+    bitcoin_conf: PathBuf,
+    #[allow(dead_code)] // Used by verbose mode API methods
+    verbose: bool,
 }
 
 impl EnhancedInstaller {
     /// Get Bitcoin configuration
+    #[allow(dead_code)] // Public API method for configuration access
     pub fn get_bitcoin_config(&self) -> &BitcoinConfig {
         &self.bitcoin_config
     }
 
     /// Set verbose mode
+    #[allow(dead_code)] // Public API method for verbose control
     pub fn set_verbose(&mut self, verbose: bool) {
         self.verbose = verbose;
         if verbose {
@@ -164,6 +171,7 @@ impl EnhancedInstaller {
     }
 
     /// Check if installer is in verbose mode
+    #[allow(dead_code)] // Public API method for verbose state checking
     pub fn is_verbose(&self) -> bool {
         self.verbose
     }
@@ -172,6 +180,7 @@ impl EnhancedInstaller {
 struct DependencyManager {
     required_packages: HashMap<String, String>,
     required_crates: HashMap<String, String>,
+    #[allow(dead_code)] // Used by optional package management API
     optional_packages: HashMap<String, String>,
 }
 
@@ -445,11 +454,13 @@ impl DependencyManager {
     }
 
     /// Get optional packages
+    #[allow(dead_code)] // Public API method for optional package access
     pub fn get_optional_packages(&self) -> &HashMap<String, String> {
         &self.optional_packages
     }
 
     /// Add optional package
+    #[allow(dead_code)] // Public API method for optional package management
     pub fn add_optional_package(&mut self, name: String, version: String) {
         self.optional_packages.insert(name, version);
     }
@@ -459,6 +470,7 @@ impl EnhancedInstaller {
     fn new(install_path: &str, verbose: bool) -> Result<Self> {
         let install_dir = PathBuf::from(install_path);
         let audit_path = install_dir.join("audit/v2.6_audit.json");
+        let bitcoin_conf = install_dir.join("bitcoin.conf");
 
         fs::create_dir_all(&install_dir).context("Failed to create installation directory")?;
 
@@ -471,6 +483,9 @@ impl EnhancedInstaller {
             profile: InstallProfile::Auto(hw_profile.clone()),
             hw_profile,
             dependencies,
+            bitcoin_config: BitcoinConfig::default(),
+            bitcoin_conf,
+            verbose,
         })
     }
 
@@ -898,7 +913,7 @@ impl EnhancedInstaller {
 }
 
 // Utility functions for testing and validation
-fn version_compare(v1: &str, v2: &str) -> Ordering {
+pub fn version_compare(v1: &str, v2: &str) -> Ordering {
     // Simple version comparison - would use a proper semver library in production
     v1.cmp(v2)
 }
