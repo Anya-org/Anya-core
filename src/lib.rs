@@ -290,7 +290,7 @@ impl AnyaCore {
     }
 
     /// Initialize the AnyaCore with default configuration
-    pub fn default() -> AnyaResult<Self> {
+    pub fn with_defaults() -> AnyaResult<Self> {
         Self::new(AnyaConfig::default())
     }
 

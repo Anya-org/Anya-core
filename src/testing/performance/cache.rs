@@ -487,6 +487,7 @@ impl PerformanceTestable for CachePerformanceTest {
 }
 
 /// Create a standard set of cache performance tests
+#[allow(clippy::vec_init_then_push)]
 pub fn create_standard_cache_tests() -> Vec<Box<dyn PerformanceTestable>> {
     let mut tests: Vec<Box<dyn PerformanceTestable>> = Vec::new();
 

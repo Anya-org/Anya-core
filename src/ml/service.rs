@@ -23,6 +23,7 @@ pub trait MLModel {
     fn evaluate(&self, test_data: &[u8]) -> AnyaResult<f64>;
 }
 
+#[derive(Debug)]
 pub struct Device {}
 
 #[allow(dead_code)]
@@ -42,6 +43,7 @@ impl Device {
 }
 
 #[allow(dead_code)]
+#[derive(Debug)]
 pub struct RandomForestClassifier<T> {
     features: Vec<String>,
     classes: Vec<String>,
@@ -99,6 +101,7 @@ impl<T> RandomForestClassifier<T> {
 }
 
 /// Machine Learning Service
+#[derive(Debug)]
 pub struct MLService {
     device: Device,
     model: Arc<Mutex<RandomForestClassifier<f64>>>,
@@ -247,7 +250,7 @@ impl MLService {
     }
 
     /// Predict outcomes based on features
-    fn predict(&self, features: &Vec<f64>) -> AnyaResult<HashMap<String, f64>> {
+    fn predict(&self, features: &[f64]) -> AnyaResult<HashMap<String, f64>> {
         // In a real implementation, this would use the actual model for predictions
         let mut predictions = HashMap::new();
 
@@ -268,7 +271,6 @@ impl MLService {
         // In a real implementation, this would be based on model certainty
         // This is a placeholder implementation
         let feature_sum: f64 = features.iter().sum();
-        
 
         (0.5 + (feature_sum / (features.len() as f64 * 10.0))).min(0.99)
     }

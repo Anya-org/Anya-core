@@ -7,6 +7,7 @@ use crate::AnyaResult;
 use secp256k1::{PublicKey as Secp256k1PublicKey, SecretKey as Secp256k1SecretKey};
 use std::collections::HashMap;
 use std::fmt;
+use std::str::FromStr;
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
@@ -24,8 +25,10 @@ impl fmt::Debug for LightningPublicKey {
     }
 }
 
-impl LightningPublicKey {
-    pub fn from_str(s: &str) -> Result<Self, String> {
+impl std::str::FromStr for LightningPublicKey {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
         if s.len() != 66 {
             return Err("Invalid public key length".to_string());
         }
@@ -40,7 +43,9 @@ impl LightningPublicKey {
 
         Ok(LightningPublicKey { bytes })
     }
+}
 
+impl LightningPublicKey {
     // Add a method to create from secp256k1 secret key
     pub fn from_secret_key(
         _secp: &LightningSecp256k1<All>,
@@ -119,7 +124,8 @@ pub struct LightningNode {
     state: Mutex<LightningState>,
 
     /// Secp256k1 context
-    #[allow(dead_code)] // See docs/research/PROTOCOL_UPGRADES.md for details on future cryptographic operations
+    #[allow(dead_code)]
+    // See docs/research/PROTOCOL_UPGRADES.md for details on future cryptographic operations
     secp: LightningSecp256k1<All>,
 
     /// Node public key

@@ -177,6 +177,7 @@ pub fn create_bitcoin_hsm_provider(
 pub fn create_bitcoin_hsm_provider(
     _base_provider: std::sync::Arc<dyn hsm_shim::HsmProvider>,
 ) -> hsm_shim::BitcoinHsmProvider {
+    #[allow(clippy::default_constructed_unit_structs)]
     hsm_shim::BitcoinHsmProvider::default()
 }
 

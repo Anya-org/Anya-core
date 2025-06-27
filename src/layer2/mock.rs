@@ -1,7 +1,7 @@
 //! Mock Layer2 Protocol implementation for testing
 
 use crate::layer2::{
-    AssetParams, AssetTransfer, ProtocolState, Proof, TransactionStatus, TransferResult,
+    AssetParams, AssetTransfer, Proof, ProtocolState, TransactionStatus, TransferResult,
     ValidationResult, VerificationResult,
 };
 
@@ -16,6 +16,12 @@ impl MockLayer2Protocol {
     /// Create a new mock protocol
     pub fn new() -> Self {
         Self { operational: true }
+    }
+}
+
+impl Default for MockLayer2Protocol {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -38,7 +44,10 @@ impl crate::layer2::Layer2Protocol for MockLayer2Protocol {
         ))
     }
 
-    async fn submit_transaction(&self, _tx_data: &[u8]) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+    async fn submit_transaction(
+        &self,
+        _tx_data: &[u8],
+    ) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
         Ok("mock_tx_id_12345".to_string())
     }
 
@@ -53,11 +62,17 @@ impl crate::layer2::Layer2Protocol for MockLayer2Protocol {
         Ok(())
     }
 
-    async fn issue_asset(&self, params: AssetParams) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+    async fn issue_asset(
+        &self,
+        params: AssetParams,
+    ) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
         Ok(format!("mock_asset_{}", params.name))
     }
 
-    async fn transfer_asset(&self, transfer: AssetTransfer) -> Result<TransferResult, Box<dyn std::error::Error + Send + Sync>> {
+    async fn transfer_asset(
+        &self,
+        transfer: AssetTransfer,
+    ) -> Result<TransferResult, Box<dyn std::error::Error + Send + Sync>> {
         Ok(TransferResult {
             tx_id: format!("mock_transfer_{}", transfer.asset_id),
             status: TransactionStatus::Confirmed,
@@ -69,11 +84,17 @@ impl crate::layer2::Layer2Protocol for MockLayer2Protocol {
         })
     }
 
-    async fn verify_proof(&self, _proof: Proof) -> Result<VerificationResult, Box<dyn std::error::Error + Send + Sync>> {
+    async fn verify_proof(
+        &self,
+        _proof: Proof,
+    ) -> Result<VerificationResult, Box<dyn std::error::Error + Send + Sync>> {
         Ok(crate::layer2::create_verification_result(true, None))
     }
 
-    async fn validate_state(&self, _state_data: &[u8]) -> Result<ValidationResult, Box<dyn std::error::Error + Send + Sync>> {
+    async fn validate_state(
+        &self,
+        _state_data: &[u8],
+    ) -> Result<ValidationResult, Box<dyn std::error::Error + Send + Sync>> {
         Ok(crate::layer2::create_validation_result(true, vec![]))
     }
 }
@@ -93,7 +114,10 @@ impl crate::layer2::Layer2ProtocolTrait for MockLayer2Protocol {
         ))
     }
 
-    fn submit_transaction(&self, _tx_data: &[u8]) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+    fn submit_transaction(
+        &self,
+        _tx_data: &[u8],
+    ) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
         Ok("mock_tx_id_12345".to_string())
     }
 
@@ -109,11 +133,17 @@ impl crate::layer2::Layer2ProtocolTrait for MockLayer2Protocol {
         Ok(())
     }
 
-    fn issue_asset(&self, params: AssetParams) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+    fn issue_asset(
+        &self,
+        params: AssetParams,
+    ) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
         Ok(format!("mock_asset_{}", params.asset_id))
     }
 
-    fn transfer_asset(&self, transfer: AssetTransfer) -> Result<TransferResult, Box<dyn std::error::Error + Send + Sync>> {
+    fn transfer_asset(
+        &self,
+        transfer: AssetTransfer,
+    ) -> Result<TransferResult, Box<dyn std::error::Error + Send + Sync>> {
         Ok(TransferResult {
             tx_id: format!("mock_transfer_{}", transfer.asset_id),
             status: TransactionStatus::Confirmed,
@@ -125,7 +155,10 @@ impl crate::layer2::Layer2ProtocolTrait for MockLayer2Protocol {
         })
     }
 
-    fn verify_proof(&self, _proof: Proof) -> Result<VerificationResult, Box<dyn std::error::Error + Send + Sync>> {
+    fn verify_proof(
+        &self,
+        _proof: Proof,
+    ) -> Result<VerificationResult, Box<dyn std::error::Error + Send + Sync>> {
         Ok(VerificationResult {
             valid: true,
             is_valid: true,
@@ -137,7 +170,10 @@ impl crate::layer2::Layer2ProtocolTrait for MockLayer2Protocol {
         })
     }
 
-    fn validate_state(&self, _state_data: &[u8]) -> Result<ValidationResult, Box<dyn std::error::Error + Send + Sync>> {
+    fn validate_state(
+        &self,
+        _state_data: &[u8],
+    ) -> Result<ValidationResult, Box<dyn std::error::Error + Send + Sync>> {
         Ok(ValidationResult {
             is_valid: true,
             violations: vec![],

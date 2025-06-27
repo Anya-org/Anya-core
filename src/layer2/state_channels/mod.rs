@@ -11,8 +11,8 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 use crate::layer2::{
-    AssetParams, AssetTransfer, Layer2Error, Layer2Protocol, Proof, 
-    ProtocolState, TransactionStatus, TransferResult, ValidationResult, VerificationResult,
+    AssetParams, AssetTransfer, Layer2Error, Layer2Protocol, Proof, ProtocolState,
+    TransactionStatus, TransferResult, ValidationResult, VerificationResult,
 };
 
 /// Channel state
@@ -68,7 +68,7 @@ impl Default for StateChannelConfig {
             time_lock: 144,      // ~1 day
             commitment_type: CommitmentType::TaprootKeySpend,
             use_taproot: true,
-            fee_rate: 10,        // 10 sats/vbyte
+            fee_rate: 10, // 10 sats/vbyte
         }
     }
 }
@@ -165,7 +165,7 @@ impl StateChannel {
         let pubkey_a = "02d0de0aaeaefad02b8bdc8a01a1b8b11c696bd3d66a2c5f10780d95b7df42645c";
         let pubkey_b = "03a36339f413da869df12b1ab0def91749413a0dee87f0bfa85ba7196e6cdad102";
         let half_capacity = config.capacity / 2;
-        
+
         match Self::new(config, pubkey_a, pubkey_b, half_capacity, half_capacity) {
             Ok(channel) => channel,
             Err(_) => {
@@ -280,7 +280,9 @@ impl StateChannel {
     }
 
     /// Close the state channel (cooperative close)
-    pub fn close_cooperative(&mut self) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+    pub fn close_cooperative(
+        &mut self,
+    ) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
         if self.state != ChannelState::Open {
             return Err(Box::new(Layer2Error::Protocol(
                 "Channel must be open to close cooperatively".to_string(),
@@ -362,7 +364,10 @@ impl crate::layer2::Layer2ProtocolTrait for StateChannel {
         ))
     }
 
-    fn submit_transaction(&self, tx_data: &[u8]) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+    fn submit_transaction(
+        &self,
+        tx_data: &[u8],
+    ) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
         // Submit transaction to the network
         // In a real implementation, this would broadcast to the Bitcoin network
 
@@ -371,7 +376,10 @@ impl crate::layer2::Layer2ProtocolTrait for StateChannel {
         Ok(tx_id)
     }
 
-    fn check_transaction_status(&self, tx_id: &str) -> Result<TransactionStatus, Box<dyn std::error::Error + Send + Sync>> {
+    fn check_transaction_status(
+        &self,
+        tx_id: &str,
+    ) -> Result<TransactionStatus, Box<dyn std::error::Error + Send + Sync>> {
         // Check if transaction exists
         if self.transactions.contains_key(tx_id) {
             Ok(TransactionStatus::Confirmed)
@@ -386,14 +394,20 @@ impl crate::layer2::Layer2ProtocolTrait for StateChannel {
         Ok(())
     }
 
-    fn issue_asset(&self, _params: AssetParams) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+    fn issue_asset(
+        &self,
+        _params: AssetParams,
+    ) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
         // State channels don't support asset issuance directly
         Err(Box::new(Layer2Error::Protocol(
             "Asset issuance not supported in state channels".to_string(),
         )))
     }
 
-    fn transfer_asset(&self, _transfer: AssetTransfer) -> Result<TransferResult, Box<dyn std::error::Error + Send + Sync>> {
+    fn transfer_asset(
+        &self,
+        _transfer: AssetTransfer,
+    ) -> Result<TransferResult, Box<dyn std::error::Error + Send + Sync>> {
         // State channels don't support asset transfers directly, but we can simulate payments
 
         if self.state != ChannelState::Open {
@@ -416,7 +430,10 @@ impl crate::layer2::Layer2ProtocolTrait for StateChannel {
         })
     }
 
-    fn verify_proof(&self, proof: Proof) -> Result<VerificationResult, Box<dyn std::error::Error + Send + Sync>> {
+    fn verify_proof(
+        &self,
+        proof: Proof,
+    ) -> Result<VerificationResult, Box<dyn std::error::Error + Send + Sync>> {
         // Verify channel state proof
 
         let is_valid = proof.proof_type == "state_update_proof";
@@ -437,7 +454,10 @@ impl crate::layer2::Layer2ProtocolTrait for StateChannel {
         ))
     }
 
-    fn validate_state(&self, _state_data: &[u8]) -> Result<ValidationResult, Box<dyn std::error::Error + Send + Sync>> {
+    fn validate_state(
+        &self,
+        _state_data: &[u8],
+    ) -> Result<ValidationResult, Box<dyn std::error::Error + Send + Sync>> {
         // Validate state data
 
         // In a real implementation, this would deserialize and validate state updates
@@ -467,6 +487,12 @@ impl StateChannelsProtocol {
     }
 }
 
+impl Default for StateChannelsProtocol {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[async_trait::async_trait]
 impl crate::layer2::Layer2Protocol for StateChannelsProtocol {
     async fn initialize(&self) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
@@ -477,7 +503,9 @@ impl crate::layer2::Layer2Protocol for StateChannelsProtocol {
         Ok(())
     }
 
-    async fn get_state(&self) -> Result<crate::layer2::ProtocolState, Box<dyn std::error::Error + Send + Sync>> {
+    async fn get_state(
+        &self,
+    ) -> Result<crate::layer2::ProtocolState, Box<dyn std::error::Error + Send + Sync>> {
         Ok(crate::layer2::create_protocol_state(
             "1.0.0",
             self.channels.len() as u32,
@@ -486,11 +514,17 @@ impl crate::layer2::Layer2Protocol for StateChannelsProtocol {
         ))
     }
 
-    async fn submit_transaction(&self, _tx_data: &[u8]) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+    async fn submit_transaction(
+        &self,
+        _tx_data: &[u8],
+    ) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
         Ok("mock_state_channel_tx_id".to_string())
     }
 
-    async fn check_transaction_status(&self, _tx_id: &str) -> Result<crate::layer2::TransactionStatus, Box<dyn std::error::Error + Send + Sync>> {
+    async fn check_transaction_status(
+        &self,
+        _tx_id: &str,
+    ) -> Result<crate::layer2::TransactionStatus, Box<dyn std::error::Error + Send + Sync>> {
         Ok(crate::layer2::TransactionStatus::Confirmed)
     }
 
@@ -498,11 +532,17 @@ impl crate::layer2::Layer2Protocol for StateChannelsProtocol {
         Ok(())
     }
 
-    async fn issue_asset(&self, _params: crate::layer2::AssetParams) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+    async fn issue_asset(
+        &self,
+        _params: crate::layer2::AssetParams,
+    ) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
         Ok("mock_state_channel_asset_id".to_string())
     }
 
-    async fn transfer_asset(&self, _transfer: crate::layer2::AssetTransfer) -> Result<crate::layer2::TransferResult, Box<dyn std::error::Error + Send + Sync>> {
+    async fn transfer_asset(
+        &self,
+        _transfer: crate::layer2::AssetTransfer,
+    ) -> Result<crate::layer2::TransferResult, Box<dyn std::error::Error + Send + Sync>> {
         Ok(crate::layer2::TransferResult {
             tx_id: "mock_state_channel_transfer_id".to_string(),
             status: crate::layer2::TransactionStatus::Confirmed,
@@ -514,11 +554,17 @@ impl crate::layer2::Layer2Protocol for StateChannelsProtocol {
         })
     }
 
-    async fn verify_proof(&self, _proof: crate::layer2::Proof) -> Result<crate::layer2::VerificationResult, Box<dyn std::error::Error + Send + Sync>> {
+    async fn verify_proof(
+        &self,
+        _proof: crate::layer2::Proof,
+    ) -> Result<crate::layer2::VerificationResult, Box<dyn std::error::Error + Send + Sync>> {
         Ok(crate::layer2::create_verification_result(true, None))
     }
 
-    async fn validate_state(&self, _state_data: &[u8]) -> Result<crate::layer2::ValidationResult, Box<dyn std::error::Error + Send + Sync>> {
+    async fn validate_state(
+        &self,
+        _state_data: &[u8],
+    ) -> Result<crate::layer2::ValidationResult, Box<dyn std::error::Error + Send + Sync>> {
         Ok(crate::layer2::create_validation_result(true, vec![]))
     }
 }
@@ -552,13 +598,25 @@ impl Layer2Protocol for StateChannel {
         })
     }
 
-    async fn submit_transaction(&self, tx_data: &[u8]) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
-        println!("Asynchronously submitting transaction to State Channel: {} bytes", tx_data.len());
+    async fn submit_transaction(
+        &self,
+        tx_data: &[u8],
+    ) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+        println!(
+            "Asynchronously submitting transaction to State Channel: {} bytes",
+            tx_data.len()
+        );
         Ok(format!("tx_{}", hex::encode(&tx_data[0..4])))
     }
 
-    async fn check_transaction_status(&self, tx_id: &str) -> Result<TransactionStatus, Box<dyn std::error::Error + Send + Sync>> {
-        println!("Asynchronously checking State Channel transaction status: {}", tx_id);
+    async fn check_transaction_status(
+        &self,
+        tx_id: &str,
+    ) -> Result<TransactionStatus, Box<dyn std::error::Error + Send + Sync>> {
+        println!(
+            "Asynchronously checking State Channel transaction status: {}",
+            tx_id
+        );
         Ok(TransactionStatus::Confirmed)
     }
 
@@ -567,12 +625,21 @@ impl Layer2Protocol for StateChannel {
         Ok(())
     }
 
-    async fn issue_asset(&self, params: AssetParams) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
-        println!("Asynchronously issuing asset {} on State Channel", params.name);
+    async fn issue_asset(
+        &self,
+        params: AssetParams,
+    ) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+        println!(
+            "Asynchronously issuing asset {} on State Channel",
+            params.name
+        );
         Ok(format!("sc_asset_{}", params.asset_id))
     }
 
-    async fn transfer_asset(&self, transfer: AssetTransfer) -> Result<TransferResult, Box<dyn std::error::Error + Send + Sync>> {
+    async fn transfer_asset(
+        &self,
+        transfer: AssetTransfer,
+    ) -> Result<TransferResult, Box<dyn std::error::Error + Send + Sync>> {
         println!(
             "Asynchronously transferring {} of asset {} to {} on State Channel",
             transfer.amount, transfer.asset_id, transfer.recipient
@@ -589,8 +656,14 @@ impl Layer2Protocol for StateChannel {
         })
     }
 
-    async fn verify_proof(&self, proof: Proof) -> Result<VerificationResult, Box<dyn std::error::Error + Send + Sync>> {
-        println!("Asynchronously verifying {} proof on State Channel", proof.proof_type);
+    async fn verify_proof(
+        &self,
+        proof: Proof,
+    ) -> Result<VerificationResult, Box<dyn std::error::Error + Send + Sync>> {
+        println!(
+            "Asynchronously verifying {} proof on State Channel",
+            proof.proof_type
+        );
 
         Ok(VerificationResult {
             valid: true,
@@ -603,8 +676,14 @@ impl Layer2Protocol for StateChannel {
         })
     }
 
-    async fn validate_state(&self, state_data: &[u8]) -> Result<ValidationResult, Box<dyn std::error::Error + Send + Sync>> {
-        println!("Asynchronously validating state on State Channel: {} bytes", state_data.len());
+    async fn validate_state(
+        &self,
+        state_data: &[u8],
+    ) -> Result<ValidationResult, Box<dyn std::error::Error + Send + Sync>> {
+        println!(
+            "Asynchronously validating state on State Channel: {} bytes",
+            state_data.len()
+        );
 
         Ok(ValidationResult {
             is_valid: true,
@@ -647,7 +726,8 @@ mod tests {
     }
 
     #[test]
-    fn test_state_channel_open_and_update() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+    fn test_state_channel_open_and_update() -> Result<(), Box<dyn std::error::Error + Send + Sync>>
+    {
         let config = StateChannelConfig {
             network: "testnet".to_string(),
             capacity: 1_000_000, // 1M sats

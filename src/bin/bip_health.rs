@@ -79,15 +79,14 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     let output_path = cli.output.unwrap_or_else(|| PathBuf::from(default_output));
 
-    // Initialize BIP health checker
-    let mut config = BitcoinConfig::default();
-
-    // Enable all supported BIPs for checking
-    config.taproot_enabled = true;
-    config.tapscript_enabled = true;
-    config.psbt_version = 2;
-    config.bip353_enabled = true;
-    config.bip353_status = Bip353Status::Beta;
+    // Initialize BIP health checker with all supported BIPs enabled
+    let config = BitcoinConfig {
+        taproot_enabled: true,
+        tapscript_enabled: true,
+        psbt_version: 2,
+        bip353_enabled: true,
+        bip353_status: Bip353Status::Beta,
+    };
 
     // Create BIP353 instance for detailed health checking
     let bip353_config = Bip353Config {

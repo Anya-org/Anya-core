@@ -1,8 +1,13 @@
 use anya_core::layer2::{
-    dlc::DlcProtocol, lightning::{LightningNetwork, LightningConfig}, liquid::{LiquidModule, LiquidConfig},
-    mock::MockLayer2Protocol, rgb::RgbProtocol, rsk::{RskClient, RskConfig}, stacks::{StacksClient, StacksConfig},
-    state_channels::{StateChannel, StateChannelConfig}, AssetParams, AssetTransfer, Layer2Protocol, Proof,
-    TransactionStatus,
+    dlc::DlcProtocol,
+    lightning::{LightningConfig, LightningNetwork},
+    liquid::{LiquidConfig, LiquidModule},
+    mock::MockLayer2Protocol,
+    rgb::RgbProtocol,
+    rsk::{RskClient, RskConfig},
+    stacks::{StacksClient, StacksConfig},
+    state_channels::StateChannelsProtocol,
+    AssetParams, AssetTransfer, Layer2Protocol, Proof, TransactionStatus,
 };
 
 #[tokio::test]

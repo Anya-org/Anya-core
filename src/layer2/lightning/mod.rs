@@ -102,7 +102,7 @@ impl LightningNetwork {
         Self::new(LightningConfig::default())
     }
 }
-    
+
 impl Default for LightningNetwork {
     fn default() -> Self {
         Self::new(LightningConfig::default())
@@ -112,10 +112,14 @@ impl Default for LightningNetwork {
 // Methods for LightningNetwork
 impl LightningNetwork {
     /// Create a payment invoice
-    pub fn create_invoice(&self, amount_sats: u64, description: &str) -> Result<LightningInvoice, Box<dyn std::error::Error + Send + Sync>> {
+    pub fn create_invoice(
+        &self,
+        amount_sats: u64,
+        description: &str,
+    ) -> Result<LightningInvoice, Box<dyn std::error::Error + Send + Sync>> {
         // Create a unique payment hash
         let payment_hash = format!("ph_{}", uuid::Uuid::new_v4());
-        
+
         // Create the invoice
         let invoice = LightningInvoice {
             payment_hash,
@@ -129,31 +133,40 @@ impl LightningNetwork {
             timestamp: std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_secs(),
             expiry: 3600,
         };
-        
+
         Ok(invoice)
     }
 
     /// Pay a lightning invoice
-    pub fn pay_invoice(&self, payment_request: &str) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+    pub fn pay_invoice(
+        &self,
+        payment_request: &str,
+    ) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
         // Simulate payment
         // In real implementation, this would call the LND API
-        
+
         // Extract payment hash from the invoice
         // This is just a simulation - in reality we'd decode the BOLT11 invoice
         let payment_hash = if payment_request.len() > 20 {
             payment_request[20..52].to_string()
         } else {
-            return Err(Box::new(Layer2Error::Protocol("Invalid payment request".to_string())));
+            return Err(Box::new(Layer2Error::Protocol(
+                "Invalid payment request".to_string(),
+            )));
         };
-        
+
         Ok(payment_hash)
     }
-    
+
     /// Open a lightning channel
-    pub fn open_channel(&mut self, remote_pubkey: &str, capacity: u64) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+    pub fn open_channel(
+        &mut self,
+        remote_pubkey: &str,
+        capacity: u64,
+    ) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
         // Create a channel ID
         let channel_id = format!("chan_{}", uuid::Uuid::new_v4());
-        
+
         // Create the channel
         let channel = LightningChannel {
             channel_id: channel_id.clone(),
@@ -163,15 +176,18 @@ impl LightningNetwork {
             capacity,
             active: true,
         };
-        
+
         // Add to channels list
         self.channels.push(channel);
-        
+
         Ok(channel_id)
     }
-    
+
     /// Get channel information
-    pub fn get_channel_info(&self, channel_id: &str) -> Result<&LightningChannel, Box<dyn std::error::Error + Send + Sync>> {
+    pub fn get_channel_info(
+        &self,
+        channel_id: &str,
+    ) -> Result<&LightningChannel, Box<dyn std::error::Error + Send + Sync>> {
         // Find the channel
         match self.channels.iter().find(|c| c.channel_id == channel_id) {
             Some(channel) => Ok(channel),
@@ -183,47 +199,57 @@ impl LightningNetwork {
     }
 
     /// Get balance for an asset
-    pub fn get_balance(&self, _asset_id: &str) -> Result<u64, Box<dyn std::error::Error + Send + Sync>> {
+    pub fn get_balance(
+        &self,
+        _asset_id: &str,
+    ) -> Result<u64, Box<dyn std::error::Error + Send + Sync>> {
         // In Lightning, we just return the sum of channel capacities
-        let total_capacity = self
-            .channels
-            .iter()
-            .map(|c| c.local_balance)
-            .sum::<u64>();
-        
+        let total_capacity = self.channels.iter().map(|c| c.local_balance).sum::<u64>();
+
         Ok(total_capacity)
     }
-    
+
     /// Get the Lightning Network's balance for a specific asset
-    pub fn get_balance_by_asset(&self, asset_id: &str) -> Result<u64, Box<dyn std::error::Error + Send + Sync>> {
+    pub fn get_balance_by_asset(
+        &self,
+        asset_id: &str,
+    ) -> Result<u64, Box<dyn std::error::Error + Send + Sync>> {
         // For Lightning, the asset_id is ignored as we just deal with BTC
         println!("Getting balance for asset_id {}", asset_id);
-        
-        let total_capacity = self
-            .channels
-            .iter()
-            .map(|c| c.local_balance)
-            .sum::<u64>();
-            
+
+        let total_capacity = self.channels.iter().map(|c| c.local_balance).sum::<u64>();
+
         Ok(total_capacity)
     }
-    
+
     /// Send payment
-    pub fn send(&mut self, to: &str, amount: u64, _asset_id: &str) -> Result<TransactionStatus, Box<dyn std::error::Error + Send + Sync>> {
+    pub fn send(
+        &mut self,
+        to: &str,
+        amount: u64,
+        _asset_id: &str,
+    ) -> Result<TransactionStatus, Box<dyn std::error::Error + Send + Sync>> {
         // In Lightning, we would create a payment via BOLT11 invoice
         // This is a mock implementation
         println!("Sending {} sats to {}", amount, to);
         Ok(TransactionStatus::Confirmed)
     }
-    
+
     /// Create a payment channel to a node
-    pub fn create_payment_channel(&mut self, node_id: &str, capacity: u64) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+    pub fn create_payment_channel(
+        &mut self,
+        node_id: &str,
+        capacity: u64,
+    ) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
         // In a real implementation, this would create an actual payment channel via LND API
-        println!("Creating payment channel to {} with capacity {}", node_id, capacity);
-        
+        println!(
+            "Creating payment channel to {} with capacity {}",
+            node_id, capacity
+        );
+
         // Generate a channel ID
         let channel_id = format!("chan_{}", uuid::Uuid::new_v4());
-        
+
         // Create a channel object
         let channel = LightningChannel {
             channel_id: channel_id.clone(),
@@ -233,18 +259,24 @@ impl LightningNetwork {
             capacity,
             active: true,
         };
-        
+
         // Add the channel to our list
         self.channels.push(channel);
-        
+
         Ok(channel_id)
     }
-    
+
     /// Close a payment channel
-    pub fn close_payment_channel(&mut self, channel_id: &str) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+    pub fn close_payment_channel(
+        &mut self,
+        channel_id: &str,
+    ) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
         // Find the channel
-        let channel_index = self.channels.iter().position(|c| c.channel_id == channel_id);
-        
+        let channel_index = self
+            .channels
+            .iter()
+            .position(|c| c.channel_id == channel_id);
+
         match channel_index {
             Some(index) => {
                 // Remove the channel
@@ -253,23 +285,27 @@ impl LightningNetwork {
                 Ok(close_tx_id)
             }
             None => Err(Box::new(Layer2Error::Protocol(format!(
-                "Channel not found with id: {}", channel_id
+                "Channel not found with id: {}",
+                channel_id
             )))),
         }
     }
-    
+
     /// Get the number of active channels
     pub fn get_active_channel_count(&self) -> usize {
         self.channels.iter().filter(|c| c.active).count()
     }
-    
+
     /// Get transaction status
-    pub fn get_transaction_status(&self, txid: &str) -> Result<TransactionStatus, Box<dyn std::error::Error + Send + Sync>> {
+    pub fn get_transaction_status(
+        &self,
+        txid: &str,
+    ) -> Result<TransactionStatus, Box<dyn std::error::Error + Send + Sync>> {
         // Check transaction status, default to confirmed for mock implementation
         println!("Checking status for transaction {}", txid);
         Ok(TransactionStatus::Confirmed)
     }
-    
+
     /// Get address
     pub fn get_address(&self) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
         // In Lightning, this would typically return a node pubkey or BOLT11 invoice
@@ -288,12 +324,8 @@ impl crate::layer2::Layer2ProtocolTrait for LightningNetwork {
     }
 
     fn get_state(&self) -> Result<ProtocolState, Box<dyn std::error::Error + Send + Sync>> {
-        let total_capacity = self
-            .channels
-            .iter()
-            .map(|c| c.capacity)
-            .sum::<u64>();
-        
+        let total_capacity = self.channels.iter().map(|c| c.capacity).sum::<u64>();
+
         // Create state information
         let state = ProtocolState {
             version: "1.0".to_string(),
@@ -302,45 +334,70 @@ impl crate::layer2::Layer2ProtocolTrait for LightningNetwork {
             operational: self.connected,
             height: 0,
             hash: "00000000".to_string(),
-            timestamp: std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_secs(),
+            timestamp: std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_secs(),
         };
-        
+
         Ok(state)
     }
 
-    fn submit_transaction(&self, _tx_data: &[u8]) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+    fn submit_transaction(
+        &self,
+        _tx_data: &[u8],
+    ) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
         // Submit transaction to the Lightning Network
         // In a real implementation, this would use LND API
         Ok(format!("tx_{}", uuid::Uuid::new_v4()))
     }
 
-    fn check_transaction_status(&self, _tx_id: &str) -> Result<TransactionStatus, Box<dyn std::error::Error + Send + Sync>> {
+    fn check_transaction_status(
+        &self,
+        _tx_id: &str,
+    ) -> Result<TransactionStatus, Box<dyn std::error::Error + Send + Sync>> {
         // Check transaction status
         // In a real implementation, this would check via LND API
         Ok(TransactionStatus::Confirmed)
     }
-    
+
     fn sync_state(&mut self) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         // Sync with the Lightning Network
         self.connected = true;
         Ok(())
     }
-    
-    fn issue_asset(&self, _params: AssetParams) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+
+    fn issue_asset(
+        &self,
+        _params: AssetParams,
+    ) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
         // Lightning doesn't support asset issuance
-        Err(Box::new(Layer2Error::Protocol("Asset issuance not supported in Lightning".to_string())))
+        Err(Box::new(Layer2Error::Protocol(
+            "Asset issuance not supported in Lightning".to_string(),
+        )))
     }
-    
-    fn transfer_asset(&self, _transfer: AssetTransfer) -> Result<TransferResult, Box<dyn std::error::Error + Send + Sync>> {
+
+    fn transfer_asset(
+        &self,
+        _transfer: AssetTransfer,
+    ) -> Result<TransferResult, Box<dyn std::error::Error + Send + Sync>> {
         // Lightning doesn't support asset transfer directly
-        Err(Box::new(Layer2Error::Protocol("Asset transfer not supported in Lightning".to_string())))
+        Err(Box::new(Layer2Error::Protocol(
+            "Asset transfer not supported in Lightning".to_string(),
+        )))
     }
-    
-    fn verify_proof(&self, _proof: Proof) -> Result<VerificationResult, Box<dyn std::error::Error + Send + Sync>> {
+
+    fn verify_proof(
+        &self,
+        _proof: Proof,
+    ) -> Result<VerificationResult, Box<dyn std::error::Error + Send + Sync>> {
         Ok(crate::layer2::create_verification_result(true, None))
     }
-    
-    fn validate_state(&self, _state_data: &[u8]) -> Result<ValidationResult, Box<dyn std::error::Error + Send + Sync>> {
+
+    fn validate_state(
+        &self,
+        _state_data: &[u8],
+    ) -> Result<ValidationResult, Box<dyn std::error::Error + Send + Sync>> {
         Ok(crate::layer2::create_validation_result(true, vec![]))
     }
 }
@@ -361,12 +418,8 @@ impl crate::layer2::Layer2Protocol for LightningNetwork {
     }
 
     async fn get_state(&self) -> Result<ProtocolState, Box<dyn std::error::Error + Send + Sync>> {
-        let total_capacity = self
-            .channels
-            .iter()
-            .map(|c| c.capacity)
-            .sum::<u64>();
-        
+        let total_capacity = self.channels.iter().map(|c| c.capacity).sum::<u64>();
+
         // Create state information
         let state = ProtocolState {
             version: "1.0".to_string(),
@@ -375,50 +428,90 @@ impl crate::layer2::Layer2Protocol for LightningNetwork {
             operational: self.connected,
             height: 0,
             hash: "00000000".to_string(),
-            timestamp: std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_secs(),
+            timestamp: std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_secs(),
         };
-        
+
         Ok(state)
     }
 
-    async fn submit_transaction(&self, tx_data: &[u8]) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+    async fn submit_transaction(
+        &self,
+        tx_data: &[u8],
+    ) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
         // Submit transaction to the Lightning Network
-        println!("Asynchronously submitting transaction to Lightning: {} bytes", tx_data.len());
+        println!(
+            "Asynchronously submitting transaction to Lightning: {} bytes",
+            tx_data.len()
+        );
         Ok(format!("tx_{}", uuid::Uuid::new_v4()))
     }
 
-    async fn check_transaction_status(&self, tx_id: &str) -> Result<TransactionStatus, Box<dyn std::error::Error + Send + Sync>> {
+    async fn check_transaction_status(
+        &self,
+        tx_id: &str,
+    ) -> Result<TransactionStatus, Box<dyn std::error::Error + Send + Sync>> {
         // Check transaction status
         println!("Asynchronously checking transaction status for {}", tx_id);
         Ok(TransactionStatus::Confirmed)
     }
-    
+
     async fn sync_state(&mut self) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         // Sync with the Lightning Network
         println!("Asynchronously syncing Lightning Network state");
         self.connected = true;
         Ok(())
     }
-    
-    async fn issue_asset(&self, params: AssetParams) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+
+    async fn issue_asset(
+        &self,
+        params: AssetParams,
+    ) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
         // Lightning doesn't support asset issuance
-        println!("Attempting to issue asset {} on Lightning Network (not supported)", params.name);
-        Err(Box::new(Layer2Error::Protocol("Asset issuance not supported in Lightning".to_string())))
+        println!(
+            "Attempting to issue asset {} on Lightning Network (not supported)",
+            params.name
+        );
+        Err(Box::new(Layer2Error::Protocol(
+            "Asset issuance not supported in Lightning".to_string(),
+        )))
     }
-    
-    async fn transfer_asset(&self, transfer: AssetTransfer) -> Result<TransferResult, Box<dyn std::error::Error + Send + Sync>> {
+
+    async fn transfer_asset(
+        &self,
+        transfer: AssetTransfer,
+    ) -> Result<TransferResult, Box<dyn std::error::Error + Send + Sync>> {
         // Lightning doesn't support asset transfer directly
-        println!("Attempting to transfer asset {} on Lightning Network (not supported)", transfer.asset_id);
-        Err(Box::new(Layer2Error::Protocol("Asset transfer not supported in Lightning".to_string())))
+        println!(
+            "Attempting to transfer asset {} on Lightning Network (not supported)",
+            transfer.asset_id
+        );
+        Err(Box::new(Layer2Error::Protocol(
+            "Asset transfer not supported in Lightning".to_string(),
+        )))
     }
-    
-    async fn verify_proof(&self, proof: Proof) -> Result<VerificationResult, Box<dyn std::error::Error + Send + Sync>> {
-        println!("Asynchronously verifying {} proof on Lightning Network", proof.proof_type);
+
+    async fn verify_proof(
+        &self,
+        proof: Proof,
+    ) -> Result<VerificationResult, Box<dyn std::error::Error + Send + Sync>> {
+        println!(
+            "Asynchronously verifying {} proof on Lightning Network",
+            proof.proof_type
+        );
         Ok(crate::layer2::create_verification_result(true, None))
     }
-    
-    async fn validate_state(&self, state_data: &[u8]) -> Result<ValidationResult, Box<dyn std::error::Error + Send + Sync>> {
-        println!("Asynchronously validating state on Lightning Network: {} bytes", state_data.len());
+
+    async fn validate_state(
+        &self,
+        state_data: &[u8],
+    ) -> Result<ValidationResult, Box<dyn std::error::Error + Send + Sync>> {
+        println!(
+            "Asynchronously validating state on Lightning Network: {} bytes",
+            state_data.len()
+        );
         Ok(crate::layer2::create_validation_result(true, vec![]))
     }
 }
@@ -438,19 +531,25 @@ impl LightningProtocol {
             macaroon: "0201036c6e64022f030a10b493a60e861b6c8a0e0a854355b4320612071f9e0f708e354d9234d6171d7cd0111d1313c7cd088f8ac2cd900101201301".to_string(),
             cert: "".to_string(),
         };
-        
+
         Self {
             network: LightningNetwork::new(config),
         }
     }
-    
+
     /// Get the underlying network
     pub fn get_network(&self) -> &LightningNetwork {
         &self.network
     }
-    
+
     /// Get mutable access to the underlying network
     pub fn get_network_mut(&mut self) -> &mut LightningNetwork {
         &mut self.network
+    }
+}
+
+impl Default for LightningProtocol {
+    fn default() -> Self {
+        Self::new()
     }
 }
