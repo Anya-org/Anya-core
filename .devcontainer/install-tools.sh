@@ -135,7 +135,7 @@ fi
 
 # Install Docker compose plugin if needed
 echo "Ensuring docker compose is installed..."
-if ! command -v docker compose &>/dev/null; then
+if ! docker compose version &>/dev/null; then
     echo "Installing Docker compose plugin..."
     mkdir -p ~/.docker/cli-plugins/
     curl -SL https://github.com/docker/compose/releases/download/v2.24.6/docker-compose-linux-x86_64 -o ~/.docker/cli-plugins/docker-compose
