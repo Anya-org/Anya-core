@@ -95,7 +95,7 @@ pub trait HsmProvider: Send + Sync {}
 pub struct BitcoinHsmProvider;
 
 impl BitcoinHsmProvider {
-    pub fn default() -> Self {
+    pub fn new() -> Self {
         BitcoinHsmProvider
     }
 }

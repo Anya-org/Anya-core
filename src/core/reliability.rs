@@ -32,7 +32,10 @@ impl Watchdog {
 
     /// Trigger an alert for timeout
     pub fn trigger_alert(&self) {
-        error!("Watchdog '{}' triggered alert after {:?}", self.name, self.timeout);
+        error!(
+            "Watchdog '{}' triggered alert after {:?}",
+            self.name, self.timeout
+        );
     }
 
     /// Check if the watchdog has timed out
@@ -134,12 +137,12 @@ impl AiVerification {
     pub async fn verify(&self, data: &[u8]) -> AnyaResult<bool> {
         // Simulate AI verification process
         let confidence = self.calculate_confidence(data).await?;
-        
+
         if confidence >= self.min_confidence {
             Ok(true)
         } else {
             Err(AnyaError::LowConfidence(format!(
-                "Verification confidence {} below threshold {}", 
+                "Verification confidence {} below threshold {}",
                 confidence, self.min_confidence
             )))
         }
@@ -163,13 +166,14 @@ impl Default for AiVerification {
 pub async fn execute_with_monitoring<T, F>(
     operation_name: &str,
     timeout_duration: Duration,
-    operation: F
-) -> AnyaResult<T> 
+    operation: F,
+) -> AnyaResult<T>
 where
-    F: Future<Output = AnyaResult<T>> {
+    F: Future<Output = AnyaResult<T>>,
+{
     // Create watchdog
     let mut watchdog = Watchdog::new(operation_name, timeout_duration);
-    
+
     // Execute with timeout
     match tokio::time::timeout(timeout_duration, operation).await {
         Ok(result) => {
@@ -180,7 +184,10 @@ where
         Err(_) => {
             // Operation timed out
             watchdog.trigger_alert();
-            let error_msg = format!("Operation '{}' timed out after {:?}", operation_name, timeout_duration);
+            let error_msg = format!(
+                "Operation '{}' timed out after {:?}",
+                operation_name, timeout_duration
+            );
             error!("{}", error_msg);
             Err(AnyaError::Timeout(error_msg))
         }
@@ -193,20 +200,24 @@ pub async fn execute_with_recovery<T, F, R>(
     primary_timeout: Duration,
     recovery_timeout: Duration,
     primary_operation: F,
-    recovery_operation: R
+    recovery_operation: R,
 ) -> AnyaResult<T>
 where
     F: Future<Output = AnyaResult<T>>,
-    R: Future<Output = AnyaResult<T>> {
+    R: Future<Output = AnyaResult<T>>,
+{
     // Create watchdog for the entire operation
-    let mut watchdog = Watchdog::new(operation_name, primary_timeout + recovery_timeout + Duration::from_secs(1));
-    
+    let mut watchdog = Watchdog::new(
+        operation_name,
+        primary_timeout + recovery_timeout + Duration::from_secs(1),
+    );
+
     // Try primary operation with timeout
     match tokio::time::timeout(primary_timeout, primary_operation).await {
         Ok(result) => {
             // Primary operation completed within timeout
             watchdog.stop();
-            return result;
+            result
         }
         Err(_) => {
             // Primary operation timed out, try recovery
@@ -214,7 +225,7 @@ where
                 "Operation '{}' timed out after {:?}, attempting recovery",
                 operation_name, primary_timeout
             );
-            
+
             // Try recovery operation with timeout
             match tokio::time::timeout(recovery_timeout, recovery_operation).await {
                 Ok(result) => {

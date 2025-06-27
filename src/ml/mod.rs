@@ -56,6 +56,20 @@ pub struct MLSystem {
     models: HashMap<String, Arc<Mutex<dyn MLModel>>>,
 }
 
+impl std::fmt::Debug for MLSystem {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("MLSystem")
+            .field("config", &self.config)
+            .field("service", &"<MLService>")
+            .field("models", &format!("{} models", self.models.len()))
+            .finish()
+    }
+}
+
+// Implement Send and Sync for MLSystem since its fields are all Send + Sync
+unsafe impl Send for MLSystem {}
+unsafe impl Sync for MLSystem {}
+
 impl MLSystem {
     /// Create a new MLSystem with the given configuration
     pub fn new(config: MLConfig) -> AnyaResult<Self> {

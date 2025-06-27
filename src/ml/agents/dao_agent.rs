@@ -102,9 +102,9 @@ impl GovernanceModel {
         for sample in &self.training_data {
             // Simulate prediction accuracy based on sample complexity
             let sample_accuracy = 1.0 - (sample.complexity * 0.1);
-            total_accuracy += sample_accuracy.max(0.0).min(1.0);
+            total_accuracy += sample_accuracy.clamp(0.0, 1.0);
         }
-        
+
         self.accuracy = total_accuracy / self.training_data.len() as f64;
         Ok(())
     }
@@ -292,7 +292,7 @@ impl DaoAgent {
         deadline: u64,
     ) -> Result<String, AnyaError> {
         let proposal_id = format!("prop_{}", uuid::Uuid::new_v4());
-        
+
         let proposal = Proposal {
             id: proposal_id.clone(),
             title,
@@ -327,7 +327,7 @@ impl DaoAgent {
         weight: f64,
     ) -> Result<(), AnyaError> {
         let mut state = self.state.write().await;
-        
+
         if let Some(proposal) = state.active_proposals.get_mut(&proposal_id) {
             let vote = Vote {
                 voter: voter.clone(),
@@ -335,7 +335,7 @@ impl DaoAgent {
                 weight,
                 timestamp: chrono::Utc::now().timestamp() as u64,
             };
-            
+
             proposal.votes.insert(voter.clone(), vote);
 
             // Record governance event
@@ -353,7 +353,10 @@ impl DaoAgent {
 
             Ok(())
         } else {
-            Err(AnyaError::NotFound(format!("Proposal {} not found", proposal_id)))
+            Err(AnyaError::NotFound(format!(
+                "Proposal {} not found",
+                proposal_id
+            )))
         }
     }
 
@@ -366,7 +369,10 @@ impl DaoAgent {
             let analysis = model.analyze_proposal(proposal)?;
             Ok(analysis)
         } else {
-            Err(AnyaError::NotFound(format!("Proposal {} not found", proposal_id)))
+            Err(AnyaError::NotFound(format!(
+                "Proposal {} not found",
+                proposal_id
+            )))
         }
     }
 
@@ -374,11 +380,11 @@ impl DaoAgent {
     pub async fn update_governance_rules(&self) -> Result<(), AnyaError> {
         let model = self.model.read().await;
         let _insights = model.generate_governance_insights()?;
-        
+
         // Apply insights to update rules
         // This would involve updating the governance parameters
         // based on ML model recommendations
-        
+
         Ok(())
     }
 
@@ -427,7 +433,7 @@ impl GovernanceModel {
     pub fn analyze_proposal(&self, proposal: &Proposal) -> Result<ProposalAnalysis, AnyaError> {
         // Extract features from the proposal
         let features = self.extract_features(proposal)?;
-        
+
         // Use ML model to predict outcome
         let predicted_outcome = self.predict_outcome(&features)?;
         let confidence = self.calculate_confidence(&features)?;
@@ -457,9 +463,9 @@ impl GovernanceModel {
             proposal.description.len() as f64, // Description length
             proposal.votes.len() as f64,       // Current vote count
         ];
-        
+
         // Add more sophisticated feature extraction here
-        
+
         Ok(features)
     }
 
@@ -553,13 +559,16 @@ mod tests {
         };
 
         let agent = DaoAgent::new("test_dao".to_string(), config);
-        
-        let proposal_id = agent.create_proposal(
-            "Test Proposal".to_string(),
-            "A test proposal for unit testing".to_string(),
-            "test_proposer".to_string(),
-            chrono::Utc::now().timestamp() as u64 + 86400, // 1 day from now
-        ).await.unwrap();
+
+        let proposal_id = agent
+            .create_proposal(
+                "Test Proposal".to_string(),
+                "A test proposal for unit testing".to_string(),
+                "test_proposer".to_string(),
+                chrono::Utc::now().timestamp() as u64 + 86400, // 1 day from now
+            )
+            .await
+            .unwrap();
 
         assert!(!proposal_id.is_empty());
     }
