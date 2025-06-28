@@ -506,7 +506,7 @@ impl SoftwareHsmProvider {
             secret,
             public_key.clone(),
             params.key_type,
-            *params.key_usage.first().unwrap_or(&KeyUsage::Sign),
+            *params.usages.first().unwrap_or(&KeyUsage::Sign),
         )?;
 
         // Create and return both the key pair and key info
@@ -1157,4 +1157,24 @@ impl HsmProvider for SoftwareHsmProvider {
             ))),
         }
     }
+}
+
+/// Parameters for rotating a key
+#[derive(Debug, serde::Deserialize)]
+struct RotateKeyParams {
+    key_id: String,
+}
+
+/// Parameters for Bitcoin transaction signing
+#[derive(Debug, serde::Deserialize)]
+struct BitcoinTxSignParams {
+    key_id: String,
+    psbt: String,
+}
+
+/// Response for signature in base64 format
+#[derive(Debug, serde::Serialize)]
+struct Base64SignatureResponse {
+    signature: String,
+    algorithm: SigningAlgorithm,
 }
