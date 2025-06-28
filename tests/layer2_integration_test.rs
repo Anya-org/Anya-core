@@ -13,7 +13,7 @@ mod tests {
         AssetTransfer, Layer2Protocol, Layer2ProtocolTrait, Proof, ProtocolState,
         TransactionStatus, TransferResult, ValidationResult, VerificationResult,
     };
-    use std::path::PathBuf;
+    
     use std::sync::Arc;
 
     // Simple test implementation for the Layer2ProtocolTrait

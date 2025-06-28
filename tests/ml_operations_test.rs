@@ -38,11 +38,11 @@ async fn test_model_training() -> Result<(), Box<dyn Error>> {
 
 #[tokio::test]
 async fn test_model_aggregation() -> Result<(), Box<dyn Error>> {
-    let fl = setup_test_environment().await?;
+    let _fl = setup_test_environment().await?;
 
     // Train multiple local models
-    let test_users = vec!["user1", "user2", "user3"];
-    let test_inputs = vec![
+    let _test_users = vec!["user1", "user2", "user3"];
+    let _test_inputs = vec![
         vec![0.1, 0.2, 0.3],
         vec![0.2, 0.3, 0.4],
         vec![0.3, 0.4, 0.5],
@@ -72,7 +72,7 @@ async fn test_model_aggregation() -> Result<(), Box<dyn Error>> {
 
 #[tokio::test]
 async fn test_model_versioning() -> Result<(), Box<dyn Error>> {
-    let fl = setup_test_environment().await?;
+    let _fl = setup_test_environment().await?;
 
     // This test expects train_local_model and update_model_version, which are missing. Commenting out for now.
     /*
@@ -91,7 +91,7 @@ async fn test_model_versioning() -> Result<(), Box<dyn Error>> {
 
 #[tokio::test]
 async fn test_performance_benchmarks() -> Result<(), Box<dyn Error>> {
-    let fl = setup_test_environment().await?;
+    let _fl = setup_test_environment().await?;
 
     // This test expects train_local_model and get_convergence_rate, which are missing. Commenting out for now.
     /*
@@ -114,7 +114,7 @@ async fn test_performance_benchmarks() -> Result<(), Box<dyn Error>> {
 
 #[tokio::test]
 async fn test_security_features() -> Result<(), Box<dyn Error>> {
-    let fl = setup_test_environment().await?;
+    let _fl = setup_test_environment().await?;
 
     // This test expects encrypt_web5_data, decrypt_web5_data, and verify_data_provenance, which are missing. Commenting out for now.
     /*

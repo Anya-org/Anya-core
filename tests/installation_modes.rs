@@ -9,12 +9,16 @@ mod tests {
     #[tokio::test]
     async fn test_local_installation() {
         let temp_dir = TempDir::new().unwrap();
-        let source = InstallationSource::Local {
-            path: PathBuf::from("test-data/valid.pkg"),
-            checksum: "aabbcc".to_string(),
-        };
+        let source = InstallationSource::LocalBuild;
 
-        let handler = AnyaInstaller::new(source, BitcoinConfig::default()).unwrap();
+        let handler = AnyaInstaller::new(
+            source,
+            anya_core::install::BitcoinConfig {
+                network: "testnet".to_string(),
+                data_dir: temp_dir.path().to_path_buf(),
+            },
+        )
+        .unwrap();
 
         assert!(handler.install(temp_dir.path().to_path_buf()).await.is_ok());
     }
@@ -33,11 +37,9 @@ mod tests {
             }
         };
 
-        let source = InstallationSource::EnterpriseCluster {
-            license_key: "valid-license".into(),
-            cluster_url: "cluster.anya.org".into(),
-            psbt_contract: None, // Using None to bypass validation
-        };
+        let source = InstallationSource::GitRepository(
+            "https://github.com/example/anya-core.git".to_string(),
+        );
 
         // Skip actual validation since we don't have a valid PSBT
         // assert!(source.validate().is_ok());
