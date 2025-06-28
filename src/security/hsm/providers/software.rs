@@ -51,7 +51,7 @@ use rand::{rngs::OsRng, Rng};
 use crate::security::hsm::{
     error::HsmError,
     provider::{
-        EcCurve, EncryptionAlgorithm, HsmProvider, HsmProviderStatus, HsmRequest, HsmResponse,
+        EcCurve, EncryptionAlgorithm, HsmOperation, HsmProvider, HsmProviderStatus, HsmRequest, HsmResponse,
         KeyGenParams, KeyInfo, KeyPair, KeyType, KeyUsage, SigningAlgorithm,
     },
     types::{
@@ -840,75 +840,7 @@ impl SoftwareHsmProvider {
     }
 }
 
-#[derive(Debug, serde::Deserialize)]
-struct SignParams {
-    key_id: String,
-    algorithm: SigningAlgorithm,
-    data: Vec<u8>,
-}
 
-/// Parameters for signature verification
-#[derive(Debug, serde::Deserialize)]
-struct VerifyParams {
-    key_id: String,
-    algorithm: SigningAlgorithm,
-    data: Vec<u8>,
-    signature: Vec<u8>,
-}
-
-/// Parameters for exporting a public key
-#[derive(Debug, serde::Deserialize)]
-struct ExportPublicKeyParams {
-    key_id: String,
-}
-
-/// Parameters for retrieving key info
-#[derive(Debug, serde::Deserialize)]
-struct GetKeyParams {
-    key_id: String,
-}
-
-/// Parameters for deleting a key
-#[derive(Debug, serde::Deserialize)]
-struct DeleteKeyParams {
-    key_id: String,
-}
-
-/// Parameters for rotating a key
-#[derive(Debug, serde::Deserialize)]
-struct RotateKeyParams {
-    key_id: String,
-}
-
-/// Parameters for encryption
-#[derive(Debug, serde::Deserialize)]
-struct EncryptParams {
-    key_id: String,
-    algorithm: EncryptionAlgorithm,
-    data: Vec<u8>,
-}
-
-/// Parameters for decryption
-#[derive(Debug, serde::Deserialize)]
-struct DecryptParams {
-    key_id: String,
-    algorithm: EncryptionAlgorithm,
-    data: Vec<u8>,
-}
-
-/// Parameters for Bitcoin transaction signing
-#[derive(Debug, serde::Deserialize)]
-struct BitcoinTxSignParams {
-    key_id: String,
-    psbt: String,
-}
-
-/// Response for signature in base64 format
-#[derive(Debug, serde::Serialize)]
-struct Base64SignatureResponse {
-    signature: String,
-    algorithm: SigningAlgorithm,
-}
 
 #[async_trait]
 impl HsmProvider for SoftwareHsmProvider {
