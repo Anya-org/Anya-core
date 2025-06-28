@@ -4,9 +4,9 @@
 //! for production readiness validation.
 
 use anya_core::layer2::{
-    create_protocol_state, create_validation_result, create_verification_result,
-    AssetParams, AssetTransfer, Layer2ProtocolTrait, Proof, ProtocolState, TransactionStatus,
-    TransferResult, ValidationResult, VerificationResult,
+    create_protocol_state, create_validation_result, create_verification_result, AssetParams,
+    AssetTransfer, Layer2ProtocolTrait, Proof, ProtocolState, TransactionStatus, TransferResult,
+    ValidationResult, VerificationResult,
 };
 use std::sync::Arc;
 
