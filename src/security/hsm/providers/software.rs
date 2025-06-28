@@ -51,8 +51,8 @@ use rand::{rngs::OsRng, Rng};
 use crate::security::hsm::{
     error::HsmError,
     provider::{
-        EcCurve, EncryptionAlgorithm, HsmOperation, HsmProvider, HsmProviderStatus, HsmRequest, HsmResponse,
-        KeyGenParams, KeyInfo, KeyPair, KeyType, KeyUsage, SigningAlgorithm,
+        EcCurve, EncryptionAlgorithm, HsmOperation, HsmProvider, HsmProviderStatus, HsmRequest,
+        HsmResponse, KeyGenParams, KeyInfo, KeyPair, KeyType, KeyUsage, SigningAlgorithm,
     },
     types::{
         DeleteKeyParams, GetKeyParams, HsmRequest as TypesHsmRequest,
@@ -839,8 +839,6 @@ impl SoftwareHsmProvider {
         }
     }
 }
-
-
 
 #[async_trait]
 impl HsmProvider for SoftwareHsmProvider {
