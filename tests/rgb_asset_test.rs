@@ -51,8 +51,8 @@ mod rgb_tests {
 
         // Get a new address for the transfer recipient
         // Get a new address for the transfer recipient
-        let sender_address = "tb1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh".to_string();
-        let recipient_address = "tb1qm8kg3l0c45tdn3hgxl7c3c2eej5n3v2x7pwy48".to_string();
+        let sender_address = SENDER_ADDRESS.to_string();
+        let recipient_address = RECIPIENT_ADDRESS.to_string();
 
         // Create a transfer using the contract manager
         println!("Creating RGB asset transfer...");
