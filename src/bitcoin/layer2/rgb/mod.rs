@@ -21,11 +21,15 @@ pub use node::{RGBNode, NodeConfig};
 pub use wallet::{RGBWallet, AssetBalance};
 pub use state::{StateTransfer, StateValidator, StateTransition};
 
+// Export the RGBManager trait and related types
+pub use RGBManager;
+pub use RGBFactory;
+
 use std::collections::HashMap;
 use std::path::PathBuf;
 use bitcoin::Txid;
 
-use crate::common::error::AnyaResult;
+use crate::AnyaResult;
 use crate::bitcoin::wallet::TxOptions;
 
 /// RGB asset data
@@ -111,10 +115,10 @@ pub trait RGBManager {
 /// Factory for creating RGB managers
 pub struct RGBFactory;
 
-impl RGBFactory  -> Result<(), Box<dyn Error>> {
+impl RGBFactory {
     /// Creates a new RGB manager
-    pub fn create_manager(config: RGBConfig) -> Box<dyn RGBManager>  -> Result<(), Box<dyn Error>> {
-        Box::new(DefaultRGBManager::new(config))
+    pub fn create_manager(config: RGBConfig) -> Result<Box<dyn RGBManager>, Box<dyn Error>> {
+        Ok(Box::new(DefaultRGBManager::new(config)))
     }
 }
 
@@ -138,7 +142,7 @@ pub struct RGBConfig {
 }
 
 impl Default for RGBConfig {
-    fn default() -> Self  -> Result<(), Box<dyn Error>> {
+    fn default() -> Self {
         Self {
             data_dir: PathBuf::from("./rgb_data"),
             network: "testnet".to_string(),
@@ -227,7 +231,7 @@ struct DefaultRGBManager {
 
 impl DefaultRGBManager {
     /// Creates a new default RGB manager
-    fn new(config: RGBConfig) -> Self  -> Result<(), Box<dyn Error>> {
+    fn new(config: RGBConfig) -> Self {
         Self {
             config,
             client: None,
@@ -236,52 +240,52 @@ impl DefaultRGBManager {
 }
 
 impl RGBManager for DefaultRGBManager {
-    fn init(&self, config: RGBConfig) -> AnyaResult<()>  -> Result<(), Box<dyn Error>> {
+    fn init(&self, _config: RGBConfig) -> AnyaResult<()> {
         // Implementation goes here
         unimplemented!("RGB initialization not yet implemented")
     }
     
-    fn create_asset(&self, params: AssetCreationParams) -> AnyaResult<RGBAsset>  -> Result<(), Box<dyn Error>> {
+    fn create_asset(&self, _params: AssetCreationParams) -> AnyaResult<RGBAsset> {
         // Implementation goes here
         unimplemented!("Asset creation not yet implemented")
     }
     
-    fn list_assets(&self) -> AnyaResult<Vec<RGBAsset>>  -> Result<(), Box<dyn Error>> {
+    fn list_assets(&self) -> AnyaResult<Vec<RGBAsset>> {
         // Implementation goes here
         unimplemented!("Asset listing not yet implemented")
     }
     
-    fn get_asset_balance(&self, asset_id: &str) -> AnyaResult<u64>  -> Result<(), Box<dyn Error>> {
+    fn get_asset_balance(&self, _asset_id: &str) -> AnyaResult<u64> {
         // Implementation goes here
         unimplemented!("Asset balance querying not yet implemented")
     }
     
-    fn create_invoice(&self, asset_id: &str, amount: u64) -> AnyaResult<String>  -> Result<(), Box<dyn Error>> {
+    fn create_invoice(&self, _asset_id: &str, _amount: u64) -> AnyaResult<String> {
         // Implementation goes here
         unimplemented!("Invoice creation not yet implemented")
     }
     
-    fn transfer_asset(&self, _transfer: AssetTransfer) -> AnyaResult<String>  -> Result<(), Box<dyn Error>> {
+    fn transfer_asset(&self, _transfer: AssetTransfer) -> AnyaResult<String> {
         // Implementation goes here
         unimplemented!("Asset transfer not yet implemented")
     }
     
-    fn get_transfer_status(&self, transfer_id: &str) -> AnyaResult<TransferStatus>  -> Result<(), Box<dyn Error>> {
+    fn get_transfer_status(&self, _transfer_id: &str) -> AnyaResult<TransferStatus> {
         // Implementation goes here
         unimplemented!("Transfer status querying not yet implemented")
     }
     
-    fn validate_transfer(&self, transfer_id: &str) -> AnyaResult<bool>  -> Result<(), Box<dyn Error>> {
+    fn validate_transfer(&self, _transfer_id: &str) -> AnyaResult<bool> {
         // Implementation goes here
         unimplemented!("Transfer validation not yet implemented")
     }
     
-    fn get_asset_metadata(&self, asset_id: &str) -> AnyaResult<HashMap<String, String>>  -> Result<(), Box<dyn Error>> {
+    fn get_asset_metadata(&self, _asset_id: &str) -> AnyaResult<HashMap<String, String>> {
         // Implementation goes here
         unimplemented!("Asset metadata querying not yet implemented")
     }
     
-    fn get_asset_history(&self, asset_id: &str) -> AnyaResult<Vec<HistoryEntry>>  -> Result<(), Box<dyn Error>> {
+    fn get_asset_history(&self, _asset_id: &str) -> AnyaResult<Vec<HistoryEntry>> {
         // Implementation goes here
         unimplemented!("Asset history querying not yet implemented")
     }
