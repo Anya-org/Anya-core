@@ -294,7 +294,7 @@ fn test_invariant_violations(checker: &BitcoinCoreInvariantChecker) {
     // Test version invariant
     let invalid_version_tx = Transaction {
         version: Version(0), // Invalid version
-        lock_time: bitcoin::LockTime::ZERO,
+        lock_time: LockTime::ZERO,
         input: vec![TxIn {
             previous_output: OutPoint::null(),
             script_sig: ScriptBuf::new().into(),
@@ -314,7 +314,7 @@ fn test_invariant_violations(checker: &BitcoinCoreInvariantChecker) {
     // Test empty inputs invariant
     let empty_inputs_tx = Transaction {
         version: Version(1),
-        lock_time: bitcoin::LockTime::ZERO,
+        lock_time: LockTime::ZERO,
         input: vec![], // No inputs
         output: vec![TxOut {
             value: Amount::from_sat(1000),
@@ -329,7 +329,7 @@ fn test_invariant_violations(checker: &BitcoinCoreInvariantChecker) {
     // Test empty outputs invariant
     let empty_outputs_tx = Transaction {
         version: Version(1),
-        lock_time: bitcoin::LockTime::ZERO,
+        lock_time: LockTime::ZERO,
         input: vec![TxIn {
             previous_output: OutPoint::null(),
             script_sig: ScriptBuf::new().into(),
@@ -355,7 +355,7 @@ fn test_invariant_violations(checker: &BitcoinCoreInvariantChecker) {
 fn create_valid_transaction() -> Transaction {
     Transaction {
         version: Version(1),
-        lock_time: bitcoin::LockTime::ZERO,
+        lock_time: LockTime::ZERO,
         input: vec![TxIn {
             previous_output: OutPoint::null(),
             script_sig: ScriptBuf::new().into(),
@@ -375,7 +375,7 @@ fn create_duplicate_inputs_transaction() -> Transaction {
 
     Transaction {
         version: Version(1),
-        lock_time: bitcoin::LockTime::ZERO,
+        lock_time: LockTime::ZERO,
         input: vec![
             TxIn {
                 previous_output: outpoint,
@@ -401,7 +401,7 @@ fn create_duplicate_inputs_transaction() -> Transaction {
 fn create_value_overflow_transaction() -> Transaction {
     Transaction {
         version: Version(1),
-        lock_time: bitcoin::LockTime::ZERO,
+        lock_time: LockTime::ZERO,
         input: vec![TxIn {
             previous_output: OutPoint::null(),
             script_sig: ScriptBuf::new().into(),
@@ -430,7 +430,7 @@ fn create_op_eval_transaction() -> Transaction {
 
     Transaction {
         version: Version(1),
-        lock_time: bitcoin::LockTime::ZERO,
+        lock_time: LockTime::ZERO,
         input: vec![TxIn {
             previous_output: OutPoint::null(),
             script_sig: script,
