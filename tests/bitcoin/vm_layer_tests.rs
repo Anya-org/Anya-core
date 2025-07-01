@@ -208,7 +208,7 @@ mod integration_tests {
         // Test layer shutdown order
         assert!(manager.stop_zk_layer().await.is_ok());
         assert!(manager.stop_l3_layer().await.is_ok());
-        assert!(manager.stop_l2_layer().await is_ok());
+        assert!(manager.stop_l2_layer().await.is_ok());
         assert!(manager.stop_l1_layer().await.is_ok());
     }
 }
@@ -261,8 +261,8 @@ mod stress_tests {
 
         for _ in 0..100 {
             assert!(manager.initialize_layers().await.is_ok());
-            assert!(manager.start_layers().await is_ok());
-            assert!(manager.stop_layers().await is_ok());
+            assert!(manager.start_layers().await.is_ok());
+            assert!(manager.stop_layers().await.is_ok());
         }
     }
 
@@ -275,9 +275,9 @@ mod stress_tests {
         for _ in 0..10 {
             let manager_clone = manager.clone();
             handles.push(tokio::spawn(async move {
-                assert!(manager_clone.initialize_layers().await is_ok());
-                assert!(manager_clone.start_layers().await is_ok());
-                assert!(manager_clone.stop_layers().await is_ok());
+                assert!(manager_clone.initialize_layers().await.is_ok());
+                assert!(manager_clone.start_layers().await.is_ok());
+                assert!(manager_clone.stop_layers().await.is_ok());
             }));
         }
 
@@ -522,7 +522,7 @@ mod system_stress_tests {
         for _ in 0..100 {
             // Rapid pause/resume cycles
             assert!(manager.pause_system().await.is_ok());
-            assert!(manager.resume_system().await is_ok());
+            assert!(manager.resume_system().await.is_ok());
 
             // Check system state after each cycle
             let state = manager.get_system_state().await.unwrap();

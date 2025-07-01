@@ -76,14 +76,11 @@ fn verify_bip_file(dir: &Path, filename: &str, description: &str) -> Result<()> 
 
     // Read file content and check for required elements
     let content =
-        fs::read_to_string(&file_path).context(format!("Failed to read {} file", description))?;
+        fs::read_to_string(&file_path).context(format!("Failed to read {description} file"))?;
 
     // Check for AI labeling
     if !content.contains("[AIR-3][AIS-3][BPC-3]") {
-        println!(
-            "⚠️ Warning: {} file missing proper AI labeling",
-            description
-        );
+        println!("⚠️ Warning: {description} file missing proper AI labeling");
     }
 
     println!(
@@ -96,18 +93,11 @@ fn verify_bip_file(dir: &Path, filename: &str, description: &str) -> Result<()> 
 
 fn verify_registry_entry(content: &str, bip: &str, description: &str) -> Result<()> {
     if !content.contains(&format!(
-        "registry.register(\"{}\", BIPStatus::Complete)",
-        bip
+        "registry.register(\"{bip}\", BIPStatus::Complete)"
     )) {
-        println!(
-            "⚠️ Warning: BIP registry missing entry for {} ({})",
-            bip, description
-        );
+        println!("⚠️ Warning: BIP registry missing entry for {bip} ({description})");
     } else {
-        println!(
-            "✅ BIP registry contains {} ({}) with Complete status",
-            bip, description
-        );
+        println!("✅ BIP registry contains {bip} ({description}) with Complete status");
     }
 
     Ok(())
@@ -119,7 +109,7 @@ fn verify_module_structure(content: &str) -> Result<()> {
 
     for module in required_modules {
         if !content.contains(module) {
-            println!("❌ Error: Module registry missing export for {}", module);
+            println!("❌ Error: Module registry missing export for {module}");
             process::exit(1);
         }
     }

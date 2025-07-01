@@ -192,7 +192,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 
             // Run initial check
             let timestamp = Utc::now().format("%Y%m%d%H%M%S").to_string();
-            let output_file = output_dir.join(format!("bip-health-{}.md", timestamp));
+            let output_file = output_dir.join(format!("bip-health-{timestamp}.md"));
 
             health_checker.generate_report_file(output_file.to_str().unwrap())?;
 

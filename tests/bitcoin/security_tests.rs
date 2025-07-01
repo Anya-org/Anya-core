@@ -14,7 +14,10 @@ use anya_core::{
     hardware_optimization::HardwareOptimizationManager,
 };
 
-use bitcoin::{Block, BlockHeader, OutPoint, Script, Transaction, TxIn, TxOut};
+use bitcoin::{
+    Amount, Block, BlockHeader, OutPoint, Script, ScriptBuf, Transaction, TxIn, TxOut,
+    Witness, absolute::LockTime, transaction::Version, Sequence,
+};
 use std::collections::HashMap;
 use std::sync::Arc;
 

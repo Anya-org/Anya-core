@@ -2,9 +2,7 @@
 //!
 //! This file provides mock implementations for needed test utilities.
 
-use std::collections::HashMap;
-use bitcoin::{Transaction, TxIn, TxOut, OutPoint, ScriptBuf, Witness};
-use bitcoin::hashes::Hash;
+use bitcoin::{TxIn, TxOut, OutPoint, ScriptBuf, Witness};
 
 // Mock implementations
 pub struct MockFactory;

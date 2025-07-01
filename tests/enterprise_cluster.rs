@@ -1,6 +1,5 @@
 // Import required modules directly
 use anya_core::enterprise::NostrConfig;
-use std::collections::HashMap;
 
 #[tokio::test]
 async fn test_psbt_validation() {
@@ -34,7 +33,7 @@ async fn test_taproot_validation() {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    
     // use bitcoin::blockdata::transaction::Transaction;
 
     #[tokio::test]

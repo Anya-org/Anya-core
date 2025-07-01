@@ -57,7 +57,7 @@ fn test_proposal_execution() -> Result<(), String> {
 }
 
 #[cfg(test)]
-mod tests {
+mod dao_tests {
     use super::*;
 
     #[test]

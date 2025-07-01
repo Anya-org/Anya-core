@@ -65,7 +65,7 @@ fn test_psbt_handling() -> Result<(), String> {
 }
 
 #[cfg(test)]
-mod tests {
+mod bitcoin_tests {
     use super::*;
 
     #[test]

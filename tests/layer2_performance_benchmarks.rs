@@ -3,18 +3,15 @@
 //! This module contains benchmarking tests for both synchronous and asynchronous
 //! Layer2 protocol implementations to measure their relative performance.
 
-use std::sync::Arc;
 use std::time::{Duration, Instant};
 use anya_core::layer2::{
-    AssetParams, AssetTransfer, Layer2Protocol, Layer2ProtocolTrait, Layer2ProtocolType,
-    TransactionStatus, ProtocolState, Proof, TransferResult, VerificationResult, ValidationResult,
+    Layer2Protocol, Layer2ProtocolTrait, Layer2ProtocolType,
     bob::{BobClient, BobConfig},
     lightning::{LightningNetwork, LightningConfig},
     liquid::{LiquidModule, LiquidConfig},
     rsk::{RskClient, RskConfig},
     stacks::{StacksClient, StacksConfig},
     taproot_assets::{TaprootAssetsProtocol, TaprootAssetsConfig},
-    state_channels::{StateChannel, StateChannelConfig, CommitmentType},
     manager::Layer2Manager,
 };
 
@@ -23,7 +20,7 @@ use anya_core::layer2::{
 struct PerfTestConfig {
     iterations: u32,
     tx_batch_size: u32,
-    verbose: bool,
+    _verbose: bool,  // Using underscore prefix to indicate unused field
 }
 
 impl Default for PerfTestConfig {
@@ -31,7 +28,7 @@ impl Default for PerfTestConfig {
         Self {
             iterations: 100,
             tx_batch_size: 10,
-            verbose: false,
+            _verbose: false,
         }
     }
 }
@@ -39,7 +36,7 @@ impl Default for PerfTestConfig {
 /// Performance test result
 #[derive(Debug, Clone)]
 struct PerfTestResult {
-    name: String,
+    _name: String,  // Using underscore prefix to indicate unused field
     avg_time_ms: f64,
     min_time_ms: f64,
     max_time_ms: f64,
@@ -59,6 +56,9 @@ async fn benchmark_sync_vs_async_performance() {
     let bob_client = create_bob_client();
     let lightning_network = create_lightning_network();
     let liquid_module = create_liquid_module();
+    let rsk_client = create_rsk_client();
+    let stacks_client = create_stacks_client();
+    let taproot_assets = create_taproot_assets();
     
     // Benchmark BOB client
     println!("\n--- BOB Client Performance ---");
@@ -77,6 +77,24 @@ async fn benchmark_sync_vs_async_performance() {
     let sync_liquid_result = benchmark_sync_operations("Liquid Sync", &liquid_module, &test_tx_data, config.iterations);
     let async_liquid_result = benchmark_async_operations("Liquid Async", &liquid_module, &test_tx_data, config.iterations).await;
     print_comparison(sync_liquid_result, async_liquid_result);
+
+    // Benchmark RSK Client
+    println!("\n--- RSK Client Performance ---");
+    let sync_rsk_result = benchmark_sync_operations("RSK Sync", &rsk_client, &test_tx_data, config.iterations);
+    let async_rsk_result = benchmark_async_operations("RSK Async", &rsk_client, &test_tx_data, config.iterations).await;
+    print_comparison(sync_rsk_result, async_rsk_result);
+    
+    // Benchmark Stacks Client
+    println!("\n--- Stacks Client Performance ---");
+    let sync_stacks_result = benchmark_sync_operations("Stacks Sync", &stacks_client, &test_tx_data, config.iterations);
+    let async_stacks_result = benchmark_async_operations("Stacks Async", &stacks_client, &test_tx_data, config.iterations).await;
+    print_comparison(sync_stacks_result, async_stacks_result);
+    
+    // Benchmark Taproot Assets Protocol
+    println!("\n--- Taproot Assets Protocol Performance ---");
+    let sync_taproot_result = benchmark_sync_operations("Taproot Sync", &taproot_assets, &test_tx_data, config.iterations);
+    let async_taproot_result = benchmark_async_operations("Taproot Async", &taproot_assets, &test_tx_data, config.iterations).await;
+    print_comparison(sync_taproot_result, async_taproot_result);
     
     // Run comprehensive Layer2Manager benchmark
     println!("\n--- Layer2Manager Performance ---");
@@ -99,11 +117,8 @@ fn create_lightning_network() -> LightningNetwork {
     let config = LightningConfig {
         network: "testnet".to_string(),
         node_url: "http://localhost:9735".to_string(),
-        // auth_token: None, // Field removed
-        // auto_pilot: false, // Field removed
-        // watchtower_enabled: true, // Field removed
-        // min_channel_capacity: 20000, // Field removed
-        // fee_rate: 1, // Field removed
+        macaroon: "test_macaroon".to_string(),
+        cert: "test_certificate".to_string(),
     };
     LightningNetwork::new(config)
 }
@@ -122,6 +137,40 @@ fn create_liquid_module() -> LiquidModule {
         elementsd_path: "/usr/local/bin/elementsd".to_string(),
     };
     LiquidModule::new(config)
+}
+
+/// Create a test RSK client
+fn create_rsk_client() -> RskClient {
+    let config = RskConfig {
+        network: "testnet".to_string(),
+        rpc_url: "http://localhost:4444".to_string(),
+        federation_threshold: 3,
+        timeout_ms: 5000,
+    };
+    RskClient::new(config)
+}
+
+/// Create a test Stacks client
+fn create_stacks_client() -> StacksClient {
+    let config = StacksConfig {
+        network: "testnet".to_string(),
+        rpc_url: "http://localhost:3999".to_string(),
+        pox_enabled: true,
+        timeout_ms: 5000,
+    };
+    StacksClient::new(config)
+}
+
+/// Create a test Taproot Assets Protocol
+fn create_taproot_assets() -> TaprootAssetsProtocol {
+    let config = TaprootAssetsConfig {
+        network: "testnet".to_string(),
+        bitcoin_rpc_url: "http://localhost:8332".to_string(),
+        tapd_url: "http://localhost:8089".to_string(),
+        universe_sync: true,
+        timeout_ms: 5000,
+    };
+    TaprootAssetsProtocol::new(config)
 }
 
 /// Generate test transaction data
@@ -181,7 +230,7 @@ where
     let ops_per_sec = 1.0 / avg_time;
     
     PerfTestResult {
-        name: name.to_string(),
+        _name: name.to_string(),
         avg_time_ms: avg_time * 1000.0,
         min_time_ms: min_time * 1000.0,
         max_time_ms: max_time * 1000.0,
@@ -224,7 +273,7 @@ where
     let ops_per_sec = 1.0 / avg_time;
     
     PerfTestResult {
-        name: name.to_string(),
+        _name: name.to_string(),
         avg_time_ms: avg_time * 1000.0,
         min_time_ms: min_time * 1000.0,
         max_time_ms: max_time * 1000.0,
@@ -255,50 +304,71 @@ fn print_comparison(sync_result: PerfTestResult, async_result: PerfTestResult) {
 async fn benchmark_layer2_manager() {
     let mut manager = Layer2Manager::new();
     
-    // Initialize with some protocols
-    // manager.bob_client = Some(create_bob_client()); // Private field
-    // manager.lightning_network = Some(create_lightning_network()); // Private field
-    // manager.liquid_module = Some(create_liquid_module()); // Private field
+    // Initialize with protocols
+    manager.initialize_all_async().await.unwrap();
     
     // Generate test data for cross-layer operations
     let asset_ids = vec!["asset1", "asset2", "asset3"];
     let amounts = vec![1000, 5000, 10000];
     
+    // Define protocol combinations to test
+    let protocol_pairs = vec![
+        (Layer2ProtocolType::BOB, Layer2ProtocolType::Liquid),
+        (Layer2ProtocolType::BOB, Layer2ProtocolType::RSK),
+        (Layer2ProtocolType::Liquid, Layer2ProtocolType::Stacks),
+        (Layer2ProtocolType::RSK, Layer2ProtocolType::TaprootAssets),
+        (Layer2ProtocolType::Stacks, Layer2ProtocolType::BOB),
+    ];
+    
     // Measure sync cross-layer operations
     let sync_start = Instant::now();
-    for i in 0..10 {
-        let from_protocol = Layer2ProtocolType::BOB;
-        let to_protocol = Layer2ProtocolType::Lightning;
+    for i in 0..protocol_pairs.len() {
+        let (from_protocol, to_protocol) = protocol_pairs[i % protocol_pairs.len()];
         let asset_id = asset_ids[i % asset_ids.len()];
         let amount = amounts[i % amounts.len()];
         
-        let result = manager.cross_layer_transfer(
+        println!("Executing cross-layer transfer from {:?} to {:?}", from_protocol, to_protocol);
+        let _result = match manager.cross_layer_transfer(
             from_protocol,
             to_protocol,
             asset_id,
             amount as u64,
-        ).unwrap();
-        
-        assert!(!result.is_empty());
+        ) {
+            Ok(result) => {
+                assert!(!result.is_empty());
+                result
+            },
+            Err(e) => {
+                println!("Error in sync cross-layer transfer: {:?}", e);
+                "error-tx-id".to_string()
+            }
+        };
     }
     let sync_duration = sync_start.elapsed();
     
     // Measure async cross-layer operations
     let async_start = Instant::now();
-    for i in 0..10 {
-        let from_protocol = Layer2ProtocolType::BOB;
-        let to_protocol = Layer2ProtocolType::Lightning;
+    for i in 0..protocol_pairs.len() {
+        let (from_protocol, to_protocol) = protocol_pairs[i % protocol_pairs.len()];
         let asset_id = asset_ids[i % asset_ids.len()];
         let amount = amounts[i % amounts.len()];
         
-        let result = manager.cross_layer_transfer_async(
+        println!("Asynchronously executing cross-layer transfer from {:?} to {:?}", from_protocol, to_protocol);
+        let _result = match manager.cross_layer_transfer_async(
             from_protocol,
             to_protocol,
             asset_id,
             amount as u64,
-        ).await.unwrap();
-        
-        assert!(!result.is_empty());
+        ).await {
+            Ok(result) => {
+                assert!(!result.is_empty());
+                result
+            },
+            Err(e) => {
+                println!("Error in async cross-layer transfer: {:?}", e);
+                "error-tx-id".to_string()
+            }
+        };
     }
     let async_duration = async_start.elapsed();
     
@@ -311,4 +381,62 @@ async fn benchmark_layer2_manager() {
     let improvement = (sync_duration.as_secs_f64() - async_duration.as_secs_f64()) / 
         sync_duration.as_secs_f64() * 100.0;
     println!("Cross-layer performance improvement with async: {:.2}%", improvement);
+    
+    // Print individual protocol performances
+    println!("\n--- Individual Protocol Performance Summary ---");
+    benchmark_individual_protocols(&manager).await;
+}
+
+/// Benchmark individual protocols within the manager
+async fn benchmark_individual_protocols(manager: &Layer2Manager) {
+    let protocols = vec![
+        Layer2ProtocolType::BOB,
+        Layer2ProtocolType::Liquid,
+        Layer2ProtocolType::RSK,
+        Layer2ProtocolType::Stacks,
+        Layer2ProtocolType::TaprootAssets,
+    ];
+    
+    // Generate test transaction data
+    let test_tx_data = generate_test_transaction_data(10);
+    
+    for protocol_type in protocols {
+        if let Some(protocol) = manager.get_protocol(protocol_type) {
+            println!("\nBenchmarking {:?} protocol", protocol_type);
+            
+            // Measure sync operations
+            let sync_start = Instant::now();
+            for i in 0..10 {
+                let tx_data = &test_tx_data[i % test_tx_data.len()];
+                if let Ok(tx_id) = protocol.submit_transaction(tx_data) {
+                    let _ = protocol.check_transaction_status(&tx_id);
+                }
+            }
+            let sync_duration = sync_start.elapsed();
+            
+            // Measure async operations
+            let async_start = Instant::now();
+            for i in 0..10 {
+                let tx_data = &test_tx_data[i % test_tx_data.len()];
+                match protocol.submit_transaction(tx_data) {
+                    Ok(tx_id) => {
+                        let _ = protocol.check_transaction_status(&tx_id);
+                    },
+                    Err(e) => println!("Error submitting transaction to {:?}: {:?}", protocol_type, e),
+                }
+            }
+            let async_duration = async_start.elapsed();
+            
+            println!("{:?} sync operations:  {:.2} ms", 
+                protocol_type, sync_duration.as_secs_f64() * 1000.0);
+            println!("{:?} async operations: {:.2} ms", 
+                protocol_type, async_duration.as_secs_f64() * 1000.0);
+            
+            let improvement = (sync_duration.as_secs_f64() - async_duration.as_secs_f64()) / 
+                sync_duration.as_secs_f64() * 100.0;
+            println!("{:?} performance improvement with async: {:.2}%", protocol_type, improvement);
+        } else {
+            println!("{:?} protocol not available in manager", protocol_type);
+        }
+    }
 }

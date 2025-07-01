@@ -858,7 +858,6 @@ mod tests {
             psbt_version: 2,
             bip353_enabled: true,
             bip353_status: Bip353Status::Beta,
-            ..BitcoinConfig::default()
         };
 
         let mut checker = BipHealthChecker::new(config, None);
