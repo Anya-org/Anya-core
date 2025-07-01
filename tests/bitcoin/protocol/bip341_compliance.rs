@@ -4,13 +4,11 @@
 // Tests the implementation of BIP-341 (Taproot) features according to
 // Bitcoin Development Framework v2.5 requirements
 
-use anyhow::{bail, Context, Result};
-use bitcoin::ecdsa::Signature;
-use bitcoin::schnorr::SchnorrSignature;
+use anyhow::{bail, Result};
 use bitcoin::secp256k1::{Secp256k1, XOnlyPublicKey};
-use bitcoin::taproot::{LeafVersion, TapBranchHash, TaprootBuilder, ControlBlock, TapLeaf};
-use bitcoin::{PrivateKey, PublicKey, ScriptBuf, TapLeafHash, TapNodeHash, TapTweakHash};
-use anya_bitcoin::bip::bip341::TaprootVerifier;
+use bitcoin::taproot::{LeafVersion, TaprootBuilder, ControlBlock, TapLeaf, TapNodeHash};
+use bitcoin::{ScriptBuf, TapTweakHash};
+use anya_core::bitcoin::bip341::TaprootVerifier;
 use std::str::FromStr;
 
 /// Test complete Taproot key path spending flow
@@ -45,7 +43,7 @@ pub fn test_taproot_key_path_spending() -> Result<()> {
     )?;
 
     // Convert tap_output_key to XOnlyPublicKey for comparison
-    let tap_output_xonly = tap_output_key.to_inner();
+    let tap_output_xonly = tap_output_key.to_x_only_public_key();
 
     if tap_output_xonly != expected_key {
         bail!("Taproot output key doesn't match expected value");
@@ -231,13 +229,13 @@ pub fn test_taproot_compliance_vectors() -> Result<()> {
     let internal_pubkey = XOnlyPublicKey::from_str(
         "d6889cb081036e0faefa3a35157ad71086b123b2b144b649798b494c300a961d",
     )?;
-    let merkle_root = TapBranchHash::from_str(
+    let merkle_root = TapNodeHash::from_str(
         "53a1f6e454df1aa2776a2814a721372d6258050de330b3c6d10ee8f4e0dda343",
     )?;
 
-    // Compute taptweak
+    // Compute taptweak using API as of Bitcoin 0.32
     let tweak = TapTweakHash::from_key_and_tweak(
-        internal_pubkey,
+        internal_pubkey.into(),
         Some(merkle_root),
     );
 
