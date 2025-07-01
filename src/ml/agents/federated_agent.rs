@@ -253,8 +253,7 @@ impl FederatedAgent {
                 state.performance = performance;
             } else {
                 return Err(AgentError::ProcessingError(format!(
-                    "Participant {} not registered",
-                    participant_id
+                    "Participant {participant_id} not registered"
                 )));
             }
         }

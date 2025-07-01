@@ -94,7 +94,7 @@ impl Layer2ProtocolTrait for BobClient {
 
     /// Check transaction status
     fn check_transaction_status(&self, tx_id: &str) -> Result<TransactionStatus, Box<dyn std::error::Error + Send + Sync>> {
-        println!("Checking BOB transaction status: {}", tx_id);
+        println!("Checking BOB transaction status: {tx_id}");
         Ok(TransactionStatus::Confirmed)
     }
 

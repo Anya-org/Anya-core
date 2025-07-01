@@ -99,7 +99,7 @@ impl QuadraticVoting {
     /// Calculate quadratic voting results for a proposal
     pub fn tally_votes(&self, proposal_id: &str) -> Result<VoteTally, VotingError> {
         let proposal_votes = self.votes.get(proposal_id).ok_or_else(|| {
-            VotingError::InvalidVote(format!("No votes found for proposal {}", proposal_id))
+            VotingError::InvalidVote(format!("No votes found for proposal {proposal_id}"))
         })?;
 
         let mut for_votes = 0.0;

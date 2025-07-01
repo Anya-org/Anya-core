@@ -190,7 +190,7 @@ impl DIDManager {
 
         // Create verification method
         let verification_method = VerificationMethod {
-            id: format!("{}#key-1", id),
+            id: format!("{id}#key-1"),
             vm_type: "JsonWebKey2020".to_string(),
             controller: id.clone(),
             public_key_jwk: Some(public_key_jwk),
@@ -221,7 +221,7 @@ impl DIDManager {
             let mut dids = self
                 .dids
                 .lock()
-                .map_err(|e| format!("Mutex lock error: {}", e))?;
+                .map_err(|e| format!("Mutex lock error: {e}"))?;
             dids.insert(id.clone(), did.clone());
         }
 
@@ -234,13 +234,13 @@ impl DIDManager {
         let dids = self
             .dids
             .lock()
-            .map_err(|e| format!("Mutex lock error: {}", e))?;
+            .map_err(|e| format!("Mutex lock error: {e}"))?;
         if let Some(did_obj) = dids.get(did) {
             return Ok(did_obj.document.clone());
         }
 
         // If not found locally, return an error (future: implement remote resolution)
-        Err(format!("DID not found: {}", did).into())
+        Err(format!("DID not found: {did}").into())
     }
 
     /// Set the default DID
@@ -248,12 +248,12 @@ impl DIDManager {
         let dids = self
             .dids
             .lock()
-            .map_err(|e| format!("Mutex lock error: {}", e))?;
+            .map_err(|e| format!("Mutex lock error: {e}"))?;
         if dids.contains_key(did) {
             self.default_did = Some(did.to_string());
             Ok(())
         } else {
-            Err(format!("DID {} not found", did).into())
+            Err(format!("DID {did} not found").into())
         }
     }
 
@@ -268,16 +268,16 @@ impl DIDManager {
         let dids = self
             .dids
             .lock()
-            .map_err(|e| format!("Mutex lock error: {}", e))?;
+            .map_err(|e| format!("Mutex lock error: {e}"))?;
         let did_obj = dids
             .get(did)
-            .ok_or_else(|| format!("DID not found: {}", did))?;
+            .ok_or_else(|| format!("DID not found: {did}"))?;
 
         // Get the first private key for signing
         if let Some((_, private_key_bytes)) = did_obj.private_keys.iter().next() {
             // Parse the private key
             let private_key = secp256k1::SecretKey::from_slice(private_key_bytes)
-                .map_err(|e| format!("Invalid private key: {}", e))?;
+                .map_err(|e| format!("Invalid private key: {e}"))?;
 
             // Create secp256k1 context
             let secp = secp256k1::Secp256k1::signing_only();
@@ -292,7 +292,7 @@ impl DIDManager {
 
             // Create message from hash
             let message = secp256k1::Message::from_digest_slice(&hash)
-                .map_err(|e| format!("Failed to create message: {}", e))?;
+                .map_err(|e| format!("Failed to create message: {e}"))?;
 
             // Sign the message
             let signature = secp.sign_ecdsa(&message, &private_key);
@@ -309,7 +309,7 @@ impl DIDManager {
         let dids = self
             .dids
             .lock()
-            .map_err(|e| format!("Mutex lock error: {}", e))?;
+            .map_err(|e| format!("Mutex lock error: {e}"))?;
         Ok(dids.keys().cloned().collect())
     }
 
@@ -318,7 +318,7 @@ impl DIDManager {
         let dids = self
             .dids
             .lock()
-            .map_err(|e| Web5Error::Storage(format!("Mutex lock error: {}", e)))?;
+            .map_err(|e| Web5Error::Storage(format!("Mutex lock error: {e}")))?;
         Ok(dids.get(did_id).cloned())
     }
 
@@ -366,7 +366,7 @@ fn generate_random_id() -> String {
         .unwrap_or_default()
         .as_secs();
 
-    format!("{:x}", now)
+    format!("{now:x}")
 }
 
 /// Generate a private key for cryptographic operations

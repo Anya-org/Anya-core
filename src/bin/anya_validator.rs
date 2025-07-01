@@ -114,11 +114,11 @@ fn main() -> Result<(), DocError> {
             }
         }
         Commands::ValidateBitcoin { tx_file: _, level } => {
-            println!("Bitcoin validation at BPC-{}", level);
+            println!("Bitcoin validation at BPC-{level}");
             println!("✅ Bitcoin protocol validation passed (simulated)");
         }
         Commands::ValidateSystem { dir, level, fix } => {
-            println!("System validation at BPC-{}", level);
+            println!("System validation at BPC-{level}");
 
             // First validate documentation
             let validator = DocumentationValidator::new(&dir);
@@ -127,8 +127,7 @@ fn main() -> Result<(), DocError> {
 
             // Then validate bitcoin protocol compliance
             println!(
-                "\nValidating Bitcoin Protocol Compliance (BPC-{})...",
-                level
+                "\nValidating Bitcoin Protocol Compliance (BPC-{level})..."
             );
             println!("✅ All Bitcoin protocol requirements satisfied");
 
@@ -140,7 +139,7 @@ fn main() -> Result<(), DocError> {
             let system_map = dir.join("SYSTEM_MAP.md");
             if system_map.exists() {
                 update_system_map(&system_map, adherence)?;
-                println!("\nUpdated system map with adherence: {:.2}%", adherence);
+                println!("\nUpdated system map with adherence: {adherence:.2}%");
             }
 
             if report.issue_count() > 0 && !fix {

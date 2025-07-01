@@ -97,7 +97,7 @@ impl AgentChecker {
         {
             let mut buffer = match self.input_buffer.lock() {
                 Ok(guard) => guard,
-                Err(e) => return Err(format!("Failed to lock input buffer: {}", e)),
+                Err(e) => return Err(format!("Failed to lock input buffer: {e}")),
             };
             buffer.push(input.to_string());
         }
@@ -106,7 +106,7 @@ impl AgentChecker {
         let should_save = {
             let mut counter = match self.input_counter.lock() {
                 Ok(guard) => guard,
-                Err(e) => return Err(format!("Failed to lock input counter: {}", e)),
+                Err(e) => return Err(format!("Failed to lock input counter: {e}")),
             };
             *counter += 1;
             *counter % self.auto_save_frequency == 0
@@ -130,7 +130,7 @@ impl AgentChecker {
                 *last_save = Instant::now();
             }
             Err(e) => {
-                log::error!("Failed to update last save time: {}", e);
+                log::error!("Failed to update last save time: {e}");
             }
         }
     }
@@ -140,7 +140,7 @@ impl AgentChecker {
         // Simplified implementation for demo purposes
         let mut health = match self.health.lock() {
             Ok(guard) => guard,
-            Err(e) => return Err(format!("Failed to acquire health lock: {}", e)),
+            Err(e) => return Err(format!("Failed to acquire health lock: {e}")),
         };
 
         // Update overall system health based on input
@@ -206,7 +206,7 @@ impl AgentChecker {
         let mut health = match self.health.lock() {
             Ok(health) => health,
             Err(e) => {
-                log::error!("Failed to acquire health lock: {}", e);
+                log::error!("Failed to acquire health lock: {e}");
                 return;
             }
         };
@@ -251,7 +251,7 @@ impl AgentChecker {
         let health = match self.health.lock() {
             Ok(health) => health,
             Err(e) => {
-                log::error!("Failed to acquire health lock: {}", e);
+                log::error!("Failed to acquire health lock: {e}");
                 return (
                     false,
                     SystemStage::Unavailable,
@@ -315,14 +315,14 @@ mod tests {
         // Process 25 inputs
         for i in 0..25 {
             let input = if i % 5 == 0 {
-                format!("success message {}", i)
+                format!("success message {i}")
             } else {
-                format!("normal message {}", i)
+                format!("normal message {i}")
             };
 
             checker
                 .process_input(&input)
-                .map_err(|e| format!("Failed to process input: {}", e))?;
+                .map_err(|e| format!("Failed to process input: {e}"))?;
         }
 
         // Check the stats

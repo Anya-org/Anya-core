@@ -99,7 +99,7 @@ impl ProgressTracker {
 
     /// Update progress with completion percentage
     pub fn update(&self, progress: f64) -> AnyaResult<()> {
-        if progress < 0.0 || progress > 1.0 {
+        if !(0.0..=1.0).contains(&progress) {
             return Err(AnyaError::InvalidInput(
                 "Progress must be between 0.0 and 1.0".to_string(),
             ));
@@ -216,10 +216,9 @@ where
             // Operation timed out
             watchdog.trigger_alert();
             let error_msg = format!(
-                "Operation '{}' timed out after {:?}",
-                operation_name, timeout_duration
+                "Operation '{operation_name}' timed out after {timeout_duration:?}"
             );
-            error!("{}", error_msg);
+            error!("{error_msg}");
             Err(AnyaError::Timeout(error_msg))
         }
     }
@@ -253,8 +252,7 @@ where
         Err(_) => {
             // Primary operation timed out, try recovery
             warn!(
-                "Operation '{}' timed out after {:?}, attempting recovery",
-                operation_name, primary_timeout
+                "Operation '{operation_name}' timed out after {primary_timeout:?}, attempting recovery"
             );
 
             // Try recovery operation with timeout
@@ -262,17 +260,16 @@ where
                 Ok(result) => {
                     // Recovery completed within timeout
                     watchdog.stop();
-                    info!("Recovery for '{}' succeeded", operation_name);
+                    info!("Recovery for '{operation_name}' succeeded");
                     result
                 }
                 Err(_) => {
                     // Recovery also timed out
                     watchdog.trigger_alert();
                     let error_msg = format!(
-                        "Operation '{}' and recovery both timed out (after {:?} and {:?})",
-                        operation_name, primary_timeout, recovery_timeout
+                        "Operation '{operation_name}' and recovery both timed out (after {primary_timeout:?} and {recovery_timeout:?})"
                     );
-                    error!("{}", error_msg);
+                    error!("{error_msg}");
                     Err(AnyaError::Timeout(error_msg))
                 }
             }

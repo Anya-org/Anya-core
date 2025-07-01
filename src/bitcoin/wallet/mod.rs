@@ -164,7 +164,7 @@ impl Wallet {
         let mut seed_guard = self
             .seed
             .lock()
-            .map_err(|e| format!("Mutex lock error: {}", e))?;
+            .map_err(|e| format!("Mutex lock error: {e}"))?;
         *seed_guard = Some(seed);
 
         // Generate initial addresses
@@ -177,7 +177,7 @@ impl Wallet {
         let mut addresses = self
             .addresses
             .lock()
-            .map_err(|e| format!("Mutex lock error: {}", e))?;
+            .map_err(|e| format!("Mutex lock error: {e}"))?;
 
         // Generate 20 addresses of each type
         for address_type in [
@@ -192,10 +192,10 @@ impl Wallet {
 
             for i in 0..20 {
                 let path = match address_type {
-                    AddressType::Legacy => format!("m/44'/0'/0'/0/{}", i),
-                    AddressType::SegWit => format!("m/84'/0'/0'/0/{}", i),
-                    AddressType::NestedSegWit => format!("m/49'/0'/0'/0/{}", i),
-                    AddressType::Taproot => format!("m/86'/0'/0'/0/{}", i),
+                    AddressType::Legacy => format!("m/44'/0'/0'/0/{i}"),
+                    AddressType::SegWit => format!("m/84'/0'/0'/0/{i}"),
+                    AddressType::NestedSegWit => format!("m/49'/0'/0'/0/{i}"),
+                    AddressType::Taproot => format!("m/86'/0'/0'/0/{i}"),
                 };
 
                 let secret_key = self.derive_key(&path)?;
@@ -236,7 +236,7 @@ impl KeyManager for Wallet {
         let seed_guard = self
             .seed
             .lock()
-            .map_err(|e| format!("Mutex lock error: {}", e))?;
+            .map_err(|e| format!("Mutex lock error: {e}"))?;
         let seed = seed_guard
             .as_ref()
             .ok_or_else(|| BitcoinError::Wallet("Wallet not initialized".to_string()))?;
@@ -270,7 +270,7 @@ impl KeyManager for Wallet {
         let message_hash = bitcoin::secp256k1::Message::from_digest(hash.to_byte_array());
 
         let signature = bitcoin::secp256k1::ecdsa::Signature::from_der(signature)
-            .map_err(|e| BitcoinError::Wallet(format!("Invalid signature: {}", e)))?;
+            .map_err(|e| BitcoinError::Wallet(format!("Invalid signature: {e}")))?;
 
         Ok(self
             .secp
@@ -284,17 +284,17 @@ impl AddressManager for Wallet {
         let mut addresses = self
             .addresses
             .lock()
-            .map_err(|e| format!("Mutex lock error: {}", e))?;
+            .map_err(|e| format!("Mutex lock error: {e}"))?;
 
         let type_addresses = addresses.entry(address_type).or_insert_with(Vec::new);
 
         let index = type_addresses.len() as u32;
 
         let path = match address_type {
-            AddressType::Legacy => format!("m/44'/0'/0'/0/{}", index),
-            AddressType::SegWit => format!("m/84'/0'/0'/0/{}", index),
-            AddressType::NestedSegWit => format!("m/49'/0'/0'/0/{}", index),
-            AddressType::Taproot => format!("m/86'/0'/0'/0/{}", index),
+            AddressType::Legacy => format!("m/44'/0'/0'/0/{index}"),
+            AddressType::SegWit => format!("m/84'/0'/0'/0/{index}"),
+            AddressType::NestedSegWit => format!("m/49'/0'/0'/0/{index}"),
+            AddressType::Taproot => format!("m/86'/0'/0'/0/{index}"),
         };
 
         let secret_key = self.derive_key(&path)?;
@@ -325,7 +325,7 @@ impl AddressManager for Wallet {
         let addresses = self
             .addresses
             .lock()
-            .map_err(|e| format!("Mutex lock error: {}", e))?;
+            .map_err(|e| format!("Mutex lock error: {e}"))?;
 
         if let Some(type_addresses) = addresses.get(&address_type) {
             if let Some(address) = type_addresses.get(index as usize) {
@@ -335,10 +335,10 @@ impl AddressManager for Wallet {
 
         // Address not found, derive it
         let path = match address_type {
-            AddressType::Legacy => format!("m/44'/0'/0'/0/{}", index),
-            AddressType::SegWit => format!("m/84'/0'/0'/0/{}", index),
-            AddressType::NestedSegWit => format!("m/49'/0'/0'/0/{}", index),
-            AddressType::Taproot => format!("m/86'/0'/0'/0/{}", index),
+            AddressType::Legacy => format!("m/44'/0'/0'/0/{index}"),
+            AddressType::SegWit => format!("m/84'/0'/0'/0/{index}"),
+            AddressType::NestedSegWit => format!("m/49'/0'/0'/0/{index}"),
+            AddressType::Taproot => format!("m/86'/0'/0'/0/{index}"),
         };
 
         let secret_key = self.derive_key(&path)?;
@@ -367,7 +367,7 @@ impl AddressManager for Wallet {
         let addresses = self
             .addresses
             .lock()
-            .map_err(|e| format!("Mutex lock error: {}", e))?;
+            .map_err(|e| format!("Mutex lock error: {e}"))?;
 
         for type_addresses in addresses.values() {
             for addr in type_addresses {
@@ -384,7 +384,7 @@ impl AddressManager for Wallet {
         let addresses = self
             .addresses
             .lock()
-            .map_err(|e| format!("Mutex lock error: {}", e))?;
+            .map_err(|e| format!("Mutex lock error: {e}"))?;
 
         let mut result = Vec::new();
         for type_addresses in addresses.values() {
@@ -407,9 +407,9 @@ impl TransactionManager for Wallet {
 
         for (addr, amount) in outputs {
             let script_pubkey = Address::from_str(&addr)
-                .map_err(|e| BitcoinError::Wallet(format!("Invalid address: {}", e)))?
+                .map_err(|e| BitcoinError::Wallet(format!("Invalid address: {e}")))?
                 .require_network(self.config.network)
-                .map_err(|e| BitcoinError::Wallet(format!("Network mismatch: {}", e)))?
+                .map_err(|e| BitcoinError::Wallet(format!("Network mismatch: {e}")))?
                 .script_pubkey();
 
             tx_outs.push(TxOut {
@@ -464,12 +464,12 @@ impl BalanceManager for Wallet {
         let assets = self
             .assets
             .lock()
-            .map_err(|e| format!("Mutex lock error: {}", e))?;
+            .map_err(|e| format!("Mutex lock error: {e}"))?;
 
         if let Some(asset) = assets.get(asset_id) {
             Ok(asset.balance)
         } else {
-            Err(BitcoinError::Wallet(format!("Asset not found: {}", asset_id)).into())
+            Err(BitcoinError::Wallet(format!("Asset not found: {asset_id}")).into())
         }
     }
 
@@ -477,7 +477,7 @@ impl BalanceManager for Wallet {
         let assets = self
             .assets
             .lock()
-            .map_err(|e| format!("Mutex lock error: {}", e))?;
+            .map_err(|e| format!("Mutex lock error: {e}"))?;
 
         let mut balances = HashMap::new();
         for (id, asset) in assets.iter() {
@@ -532,10 +532,10 @@ impl UnifiedWallet for Wallet {
         let mut assets = self
             .assets
             .lock()
-            .map_err(|e| format!("Mutex lock error: {}", e))?;
+            .map_err(|e| format!("Mutex lock error: {e}"))?;
 
         if assets.contains_key(asset_id) {
-            return Err(BitcoinError::Wallet(format!("Asset already exists: {}", asset_id)).into());
+            return Err(BitcoinError::Wallet(format!("Asset already exists: {asset_id}")).into());
         }
 
         let asset = Asset {
@@ -556,10 +556,10 @@ impl UnifiedWallet for Wallet {
         let mut assets = self
             .assets
             .lock()
-            .map_err(|e| format!("Mutex lock error: {}", e))?;
+            .map_err(|e| format!("Mutex lock error: {e}"))?;
 
         if assets.remove(asset_id).is_none() {
-            return Err(BitcoinError::Wallet(format!("Asset not found: {}", asset_id)).into());
+            return Err(BitcoinError::Wallet(format!("Asset not found: {asset_id}")).into());
         }
 
         Ok(())
@@ -569,7 +569,7 @@ impl UnifiedWallet for Wallet {
         let assets = self
             .assets
             .lock()
-            .map_err(|e| format!("Mutex lock error: {}", e))?;
+            .map_err(|e| format!("Mutex lock error: {e}"))?;
         Ok(assets.values().cloned().collect())
     }
 

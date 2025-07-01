@@ -372,8 +372,7 @@ impl AgentSystem {
 
         if agents.remove(agent_id).is_none() {
             return Err(AgentError::ProcessingError(format!(
-                "Agent {} not found",
-                agent_id
+                "Agent {agent_id} not found"
             )));
         }
 
@@ -395,7 +394,7 @@ impl AgentSystem {
             
             let agent = agents
                 .get(agent_id)
-                .ok_or_else(|| AgentError::ProcessingError(format!("Agent {} not found", agent_id)))?
+                .ok_or_else(|| AgentError::ProcessingError(format!("Agent {agent_id} not found")))?
                 .clone();
                 
             // Get config value

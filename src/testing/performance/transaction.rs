@@ -107,7 +107,7 @@ impl TransactionPerformanceTest {
         for i in 0..self.config.transaction_count {
             let inputs = (0..self.config.inputs_per_tx)
                 .map(|j| MockInput {
-                    prev_tx_id: format!("prev_tx_{}_{}", i, j),
+                    prev_tx_id: format!("prev_tx_{i}_{j}"),
                     output_index: rng.gen_range(0..10),
                     script_sig: vec![0u8; rng.gen_range(50..200)],
                 })
@@ -121,7 +121,7 @@ impl TransactionPerformanceTest {
                 .collect();
 
             let transaction = MockTransaction {
-                id: format!("tx_{}", i),
+                id: format!("tx_{i}"),
                 inputs,
                 outputs,
                 fee: rng.gen_range(100..10000),

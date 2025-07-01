@@ -103,13 +103,13 @@ impl ProtocolManager {
     pub fn get_protocol(&self, protocol_id: &str) -> Web5Result<&ProtocolDefinition> {
         self.protocols
             .get(protocol_id)
-            .ok_or_else(|| Web5Error::Protocol(format!("Protocol not found: {}", protocol_id)))
+            .ok_or_else(|| Web5Error::Protocol(format!("Protocol not found: {protocol_id}")))
     }
 
     /// Handle a message for a specific protocol
     pub fn handle_message(&self, protocol_id: &str, message: &[u8]) -> Web5Result<Vec<u8>> {
         let handler = self.handlers.get(protocol_id).ok_or_else(|| {
-            Web5Error::Protocol(format!("No handler found for protocol: {}", protocol_id))
+            Web5Error::Protocol(format!("No handler found for protocol: {protocol_id}"))
         })?;
 
         handler.handle_message(message)

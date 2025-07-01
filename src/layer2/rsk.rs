@@ -118,7 +118,7 @@ impl Layer2ProtocolTrait for RskClient {
 
     /// Check transaction status
     fn check_transaction_status(&self, tx_id: &str) -> Result<TransactionStatus, Box<dyn std::error::Error + Send + Sync>> {
-        println!("Checking RSK transaction status: {}", tx_id);
+        println!("Checking RSK transaction status: {tx_id}");
         Ok(TransactionStatus::Confirmed)
     }
 

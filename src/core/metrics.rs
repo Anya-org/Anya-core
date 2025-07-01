@@ -54,7 +54,7 @@ impl PrometheusMetrics {
         // Add counters
         for (name, value) in &self.counters {
             result.insert(
-                format!("counter_{}", name),
+                format!("counter_{name}"),
                 serde_json::json!({
                     "value": value,
                     "type": "counter",
@@ -66,7 +66,7 @@ impl PrometheusMetrics {
         // Add gauges
         for (name, value) in &self.gauges {
             result.insert(
-                format!("gauge_{}", name),
+                format!("gauge_{name}"),
                 serde_json::json!({
                     "value": value,
                     "type": "gauge",

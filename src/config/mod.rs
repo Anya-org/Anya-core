@@ -38,9 +38,8 @@ impl ConfigManager {
         let content = format!(
             "network=mainnet\n\
             taproot=1\n\
-            silent_leaf={}\n\
-            psbt_version=2",
-            BIP341_SILENT_LEAF
+            silent_leaf={BIP341_SILENT_LEAF}\n\
+            psbt_version=2"
         );
         fs::write(&self.path, content)
     }

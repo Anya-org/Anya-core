@@ -239,7 +239,7 @@ impl LiquidModule {
         for (i, _output) in outputs.iter().enumerate() {
             let uuid_str = uuid::Uuid::new_v4().to_string();
             blinding_factors.insert(
-                format!("output_{}", i),
+                format!("output_{i}"),
                 format!("blind_{}", &uuid_str[..16]),
             );
         }
@@ -377,7 +377,7 @@ impl Layer2ProtocolTrait for LiquidModule {
 
     /// Check transaction status
     fn check_transaction_status(&self, tx_id: &str) -> Result<TransactionStatus, Box<dyn std::error::Error + Send + Sync>> {
-        println!("Checking Liquid transaction status: {}", tx_id);
+        println!("Checking Liquid transaction status: {tx_id}");
         Ok(TransactionStatus::Confirmed)
     }
 

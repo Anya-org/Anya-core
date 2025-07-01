@@ -289,7 +289,7 @@ impl CachePerformanceTest {
         let mut keys = Vec::with_capacity(config.key_space_size);
 
         for i in 0..config.key_space_size {
-            keys.push(format!("key_{}", i));
+            keys.push(format!("key_{i}"));
         }
 
         Self { config, keys }
@@ -401,7 +401,7 @@ impl PerformanceTestable for CachePerformanceTest {
         }
 
         // Warmup (this initializes the system and JIT compiler)
-        println!("Warming up cache for {} iterations...", warmup_iterations);
+        println!("Warming up cache for {warmup_iterations} iterations...");
         if warmup_iterations > 0 {
             let _ = self.run_algorithm_test(warmup_iterations);
         }

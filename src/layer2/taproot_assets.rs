@@ -103,15 +103,14 @@ impl TaprootAssetsProtocol {
         asset_type: &str,
     ) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
         println!(
-            "Minting {} asset '{}' with supply {}",
-            asset_type, name, supply
+            "Minting {asset_type} asset '{name}' with supply {supply}"
         );
-        Ok(format!("taproot_asset_{}_{}", asset_type, name))
+        Ok(format!("taproot_asset_{asset_type}_{name}"))
     }
 
     /// Create asset universe proof
     pub fn create_universe_proof(&self, asset_id: &str) -> Result<Vec<u8>, Box<dyn std::error::Error + Send + Sync>> {
-        println!("Creating universe proof for asset {}", asset_id);
+        println!("Creating universe proof for asset {asset_id}");
         Ok(vec![0x01, 0x02, 0x03, 0x04]) // Mock proof
     }
 }
@@ -145,7 +144,7 @@ impl Layer2ProtocolTrait for TaprootAssetsProtocol {
 
     /// Check transaction status
     fn check_transaction_status(&self, tx_id: &str) -> Result<TransactionStatus, Box<dyn std::error::Error + Send + Sync>> {
-        println!("Checking Taproot Assets transaction status: {}", tx_id);
+        println!("Checking Taproot Assets transaction status: {tx_id}");
         Ok(TransactionStatus::Confirmed)
     }
 
@@ -304,9 +303,9 @@ pub enum Error {
 impl std::fmt::Display for Error {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Error::InvalidMetadata(msg) => write!(f, "Invalid metadata: {}", msg),
-            Error::NetworkError(msg) => write!(f, "Network error: {}", msg),
-            Error::AssetCreationFailed(msg) => write!(f, "Asset creation failed: {}", msg),
+            Error::InvalidMetadata(msg) => write!(f, "Invalid metadata: {msg}"),
+            Error::NetworkError(msg) => write!(f, "Network error: {msg}"),
+            Error::AssetCreationFailed(msg) => write!(f, "Asset creation failed: {msg}"),
         }
     }
 }
@@ -346,14 +345,14 @@ pub async fn create_taproot_asset_mobile(
 ) -> Result<String, Error> {
     // Parse metadata
     let metadata: AssetMetadata = serde_json::from_str(metadata_json)
-        .map_err(|e| Error::InvalidMetadata(format!("Failed to parse metadata: {}", e)))?;
+        .map_err(|e| Error::InvalidMetadata(format!("Failed to parse metadata: {e}")))?;
 
     // Parse network
     let network = match network_str.to_lowercase().as_str() {
         "mainnet" => Network::Mainnet,
         "testnet" => Network::Testnet,
         "regtest" => Network::Regtest,
-        _ => return Err(Error::NetworkError(format!("Unknown network: {}", network_str))),
+        _ => return Err(Error::NetworkError(format!("Unknown network: {network_str}"))),
     };
 
     // Create asset
@@ -361,7 +360,7 @@ pub async fn create_taproot_asset_mobile(
 
     // Return JSON result
     serde_json::to_string(&issuance_tx)
-        .map_err(|e| Error::AssetCreationFailed(format!("Failed to serialize result: {}", e)))
+        .map_err(|e| Error::AssetCreationFailed(format!("Failed to serialize result: {e}")))
 }
 
 fn network_to_string(network: &Network) -> &'static str {

@@ -264,22 +264,22 @@ impl BipHealthReport {
                 ));
 
                 if let Some(coverage) = bip.test_coverage {
-                    md.push_str(&format!("- **Test Coverage**: {}%\n", coverage));
+                    md.push_str(&format!("- **Test Coverage**: {coverage}%\n"));
                 }
 
                 if let Some(audit) = &bip.audit_status {
-                    md.push_str(&format!("- **Audit Status**: {}\n", audit));
+                    md.push_str(&format!("- **Audit Status**: {audit}\n"));
                 }
 
                 if let Some(refs) = &bip.references {
                     md.push_str("- **References**:\n");
                     for reference in refs {
-                        md.push_str(&format!("  - {}\n", reference));
+                        md.push_str(&format!("  - {reference}\n"));
                     }
                 }
 
                 if let Some(updated) = &bip.last_updated {
-                    md.push_str(&format!("- **Last Updated**: {}\n", updated));
+                    md.push_str(&format!("- **Last Updated**: {updated}\n"));
                 }
 
                 md.push_str(&format!(
@@ -309,22 +309,22 @@ impl BipHealthReport {
                     ));
 
                     if let Some(coverage) = prop.test_coverage {
-                        md.push_str(&format!("- **Test Coverage**: {}%\n", coverage));
+                        md.push_str(&format!("- **Test Coverage**: {coverage}%\n"));
                     }
 
                     if let Some(audit) = &prop.audit_status {
-                        md.push_str(&format!("- **Audit Status**: {}\n", audit));
+                        md.push_str(&format!("- **Audit Status**: {audit}\n"));
                     }
 
                     if let Some(refs) = &prop.references {
                         md.push_str("- **References**:\n");
                         for reference in refs {
-                            md.push_str(&format!("  - {}\n", reference));
+                            md.push_str(&format!("  - {reference}\n"));
                         }
                     }
 
                     if let Some(updated) = &prop.last_updated {
-                        md.push_str(&format!("- **Last Updated**: {}\n", updated));
+                        md.push_str(&format!("- **Last Updated**: {updated}\n"));
                     }
 
                     md.push_str(&format!(

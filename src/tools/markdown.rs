@@ -50,7 +50,7 @@ impl MarkdownDocument {
     /// Check if document has all required compliance labels
     pub fn has_compliance_labels(&self) -> bool {
         for label in REQUIRED_LABELS {
-            if !self.content.contains(&format!("[{}]", label)) {
+            if !self.content.contains(&format!("[{label}]")) {
                 return false;
             }
         }
@@ -61,7 +61,7 @@ impl MarkdownDocument {
     pub fn missing_labels(&self) -> Vec<String> {
         REQUIRED_LABELS
             .iter()
-            .filter(|&&label| !self.content.contains(&format!("[{}]", label)))
+            .filter(|&&label| !self.content.contains(&format!("[{label}]")))
             .map(|&label| label.to_string())
             .collect()
     }
@@ -75,7 +75,7 @@ impl MarkdownDocument {
 
         let labels_to_add = missing
             .iter()
-            .map(|label| format!("[{}]", label))
+            .map(|label| format!("[{label}]"))
             .collect::<Vec<_>>()
             .join("");
 
@@ -260,8 +260,7 @@ impl DocumentationValidator {
             // Check line length
             if doc.has_long_lines() {
                 file_report.issues.push(format!(
-                    "Contains lines longer than {} characters",
-                    MAX_LINE_LENGTH
+                    "Contains lines longer than {MAX_LINE_LENGTH} characters"
                 ));
             }
 
@@ -315,7 +314,7 @@ impl ValidationReport {
         for file in &self.files {
             println!("\n📄 File: {}", file.path);
             for issue in &file.issues {
-                println!("  ❌ {}", issue);
+                println!("  ❌ {issue}");
             }
             if file.fixed {
                 println!("  ✅ Issues fixed automatically");

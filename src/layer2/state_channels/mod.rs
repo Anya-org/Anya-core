@@ -423,7 +423,7 @@ impl crate::layer2::Layer2ProtocolTrait for StateChannel {
             .as_secs();
 
         Ok(TransferResult {
-            tx_id: format!("sc_transfer_{}", timestamp),
+            tx_id: format!("sc_transfer_{timestamp}"),
             status: TransactionStatus::Confirmed,
             fee: Some(0), // No fee for in-channel transfers
             timestamp,

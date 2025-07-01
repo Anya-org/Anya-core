@@ -23,7 +23,7 @@ async fn main() -> AnyaResult<()> {
     // Set up API server
     let host = "127.0.0.1";
     let port = 8080;
-    let addr = format!("{}:{}", host, port);
+    let addr = format!("{host}:{port}");
 
     info!("Starting API server on {}", addr);
     let listener = TcpListener::bind(&addr)

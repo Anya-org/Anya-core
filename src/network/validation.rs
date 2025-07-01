@@ -297,7 +297,7 @@ impl NetworkValidator {
             if port == 0 {
                 return false;
             }
-            let addr = format!("{}:{}", host, port);
+            let addr = format!("{host}:{port}");
             matches!(timeout(Duration::from_secs(5), TcpStream::connect(&addr)).await, Ok(Ok(_)))
         } else {
             false
@@ -469,7 +469,7 @@ impl NetworkValidator {
 
         for _ in 0..3 {
             let start = Instant::now();
-            let result = TcpStream::connect(format!("{}:443", host)).await;
+            let result = TcpStream::connect(format!("{host}:443")).await;
             let elapsed = start.elapsed();
 
             if result.is_ok() {
@@ -523,7 +523,7 @@ impl NetworkValidator {
     }
 
     async fn is_port_open(&self, host: &str, port: u16) -> bool {
-        let addr = format!("{}:{}", host, port);
+        let addr = format!("{host}:{port}");
         matches!(timeout(Duration::from_secs(3), TcpStream::connect(&addr)).await, Ok(Ok(_)))
     }
 
@@ -560,7 +560,7 @@ impl NetworkValidator {
                         Err(e) => {
                             endpoints_secure.push((endpoint.clone(), false));
                             certificate_issues
-                                .push((endpoint.clone(), format!("Connection error: {}", e)));
+                                .push((endpoint.clone(), format!("Connection error: {e}")));
                         }
                     }
                 }
@@ -729,7 +729,7 @@ impl NetworkValidator {
                 let stdout = String::from_utf8_lossy(&output.stdout);
                 for line in stdout.lines().skip(1) {
                     if line.contains("* * *") {
-                        problematic.push(format!("Hop timeout: {}", line));
+                        problematic.push(format!("Hop timeout: {line}"));
                     } else {
                         hops.push(line.to_string());
                     }

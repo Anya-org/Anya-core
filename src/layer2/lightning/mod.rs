@@ -192,8 +192,7 @@ impl LightningNetwork {
         match self.channels.iter().find(|c| c.channel_id == channel_id) {
             Some(channel) => Ok(channel),
             None => Err(Box::new(Layer2Error::Protocol(format!(
-                "Channel not found with id: {}",
-                channel_id
+                "Channel not found with id: {channel_id}"
             )))),
         }
     }
@@ -215,7 +214,7 @@ impl LightningNetwork {
         asset_id: &str,
     ) -> Result<u64, Box<dyn std::error::Error + Send + Sync>> {
         // For Lightning, the asset_id is ignored as we just deal with BTC
-        println!("Getting balance for asset_id {}", asset_id);
+        println!("Getting balance for asset_id {asset_id}");
 
         let total_capacity = self.channels.iter().map(|c| c.local_balance).sum::<u64>();
 
@@ -231,7 +230,7 @@ impl LightningNetwork {
     ) -> Result<TransactionStatus, Box<dyn std::error::Error + Send + Sync>> {
         // In Lightning, we would create a payment via BOLT11 invoice
         // This is a mock implementation
-        println!("Sending {} sats to {}", amount, to);
+        println!("Sending {amount} sats to {to}");
         Ok(TransactionStatus::Confirmed)
     }
 
@@ -243,8 +242,7 @@ impl LightningNetwork {
     ) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
         // In a real implementation, this would create an actual payment channel via LND API
         println!(
-            "Creating payment channel to {} with capacity {}",
-            node_id, capacity
+            "Creating payment channel to {node_id} with capacity {capacity}"
         );
 
         // Generate a channel ID
@@ -285,8 +283,7 @@ impl LightningNetwork {
                 Ok(close_tx_id)
             }
             None => Err(Box::new(Layer2Error::Protocol(format!(
-                "Channel not found with id: {}",
-                channel_id
+                "Channel not found with id: {channel_id}"
             )))),
         }
     }
@@ -302,7 +299,7 @@ impl LightningNetwork {
         txid: &str,
     ) -> Result<TransactionStatus, Box<dyn std::error::Error + Send + Sync>> {
         // Check transaction status, default to confirmed for mock implementation
-        println!("Checking status for transaction {}", txid);
+        println!("Checking status for transaction {txid}");
         Ok(TransactionStatus::Confirmed)
     }
 

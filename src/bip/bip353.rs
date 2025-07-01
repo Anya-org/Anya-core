@@ -100,12 +100,12 @@ pub enum Bip353Error {
 impl fmt::Display for Bip353Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Bip353Error::ResolutionError(msg) => write!(f, "DNS resolution error: {}", msg),
-            Bip353Error::DnssecError(msg) => write!(f, "DNSSEC validation error: {}", msg),
-            Bip353Error::ParseError(msg) => write!(f, "Parse error: {}", msg),
-            Bip353Error::FeatureNotEnabled(msg) => write!(f, "Feature not enabled: {}", msg),
-            Bip353Error::CacheError(msg) => write!(f, "Cache error: {}", msg),
-            Bip353Error::AuthError(msg) => write!(f, "Authorization error: {}", msg),
+            Bip353Error::ResolutionError(msg) => write!(f, "DNS resolution error: {msg}"),
+            Bip353Error::DnssecError(msg) => write!(f, "DNSSEC validation error: {msg}"),
+            Bip353Error::ParseError(msg) => write!(f, "Parse error: {msg}"),
+            Bip353Error::FeatureNotEnabled(msg) => write!(f, "Feature not enabled: {msg}"),
+            Bip353Error::CacheError(msg) => write!(f, "Cache error: {msg}"),
+            Bip353Error::AuthError(msg) => write!(f, "Authorization error: {msg}"),
         }
     }
 }
@@ -238,8 +238,7 @@ impl Bip353 {
             Ok(records) => records,
             Err(e) => {
                 return Err(Bip353Error::ResolutionError(format!(
-                    "DNS lookup failed: {}",
-                    e
+                    "DNS lookup failed: {e}"
                 )));
             }
         };

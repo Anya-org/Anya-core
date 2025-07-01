@@ -379,11 +379,11 @@ pub enum Layer2Error {
 impl std::fmt::Display for Layer2Error {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            Layer2Error::General(msg) => write!(f, "Layer2 General Error: {}", msg),
-            Layer2Error::Connection(msg) => write!(f, "Layer2 Connection Error: {}", msg),
-            Layer2Error::Protocol(msg) => write!(f, "Layer2 Protocol Error: {}", msg),
-            Layer2Error::Authentication(msg) => write!(f, "Layer2 Authentication Error: {}", msg),
-            Layer2Error::Transaction(msg) => write!(f, "Layer2 Transaction Error: {}", msg),
+            Layer2Error::General(msg) => write!(f, "Layer2 General Error: {msg}"),
+            Layer2Error::Connection(msg) => write!(f, "Layer2 Connection Error: {msg}"),
+            Layer2Error::Protocol(msg) => write!(f, "Layer2 Protocol Error: {msg}"),
+            Layer2Error::Authentication(msg) => write!(f, "Layer2 Authentication Error: {msg}"),
+            Layer2Error::Transaction(msg) => write!(f, "Layer2 Transaction Error: {msg}"),
         }
     }
 }

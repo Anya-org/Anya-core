@@ -198,7 +198,7 @@ impl MLService {
         let mut model_guard = match self.model.lock() {
             Ok(guard) => guard,
             // [AIR-3][AIS-3][BPC-3][RES-3]
-            Err(e) => return Err(AnyaError::ML(format!("Mutex lock error: {}", e))),
+            Err(e) => return Err(AnyaError::ML(format!("Mutex lock error: {e}"))),
         };
 
         // Would typically load a pre-trained model here
@@ -234,7 +234,7 @@ impl MLService {
         // Add federated consensus
         let consensus = self.get_federated_consensus()?;
         for (key, value) in consensus {
-            predictions.insert(format!("consensus_{}", key), value);
+            predictions.insert(format!("consensus_{key}"), value);
         }
 
         Ok(predictions)
@@ -329,7 +329,7 @@ impl MLService {
         // Properly handle mutex lock error by converting to AnyaError::ML
         let mut model = match self.model.lock() {
             Ok(guard) => guard,
-            Err(e) => return Err(AnyaError::ML(format!("Mutex lock error: {}", e))),
+            Err(e) => return Err(AnyaError::ML(format!("Mutex lock error: {e}"))),
         };
 
         // Call the fit method which returns a bool

@@ -15,25 +15,25 @@ pub fn run_all() -> Result<(), Box<dyn Error>> {
     // Test Bitcoin Core connection
     match test_bitcoin_core_connection() {
         Ok(_) => info!("✅ Bitcoin Core connection test passed"),
-        Err(e) => error!("❌ Bitcoin Core connection test failed: {}", e),
+        Err(e) => error!("❌ Bitcoin Core connection test failed: {e}"),
     }
 
     // Test Taproot support (BIP-341)
     match test_taproot_support() {
         Ok(_) => info!("✅ Taproot support test passed"),
-        Err(e) => error!("❌ Taproot support test failed: {}", e),
+        Err(e) => error!("❌ Taproot support test failed: {e}"),
     }
 
     // Test transaction validation
     match test_transaction_validation() {
         Ok(_) => info!("✅ Transaction validation test passed"),
-        Err(e) => error!("❌ Transaction validation test failed: {}", e),
+        Err(e) => error!("❌ Transaction validation test failed: {e}"),
     }
 
     // Test PSBT handling (BIP-174)
     match test_psbt_handling() {
         Ok(_) => info!("✅ PSBT handling test passed"),
-        Err(e) => error!("❌ PSBT handling test failed: {}", e),
+        Err(e) => error!("❌ PSBT handling test failed: {e}"),
     }
 
     info!("Bitcoin tests completed");

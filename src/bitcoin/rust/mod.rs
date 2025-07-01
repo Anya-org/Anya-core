@@ -33,8 +33,7 @@ impl RustBitcoinImplementation {
             "regtest" => Network::Regtest,
             _ => {
                 return Err(Box::new(BitcoinError::InvalidConfiguration(format!(
-                    "Invalid network: {}",
-                    network_str
+                    "Invalid network: {network_str}"
                 ))))
             }
         };
