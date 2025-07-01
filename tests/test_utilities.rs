@@ -33,7 +33,7 @@ impl MockFactory {
     pub fn new() -> Self {
         Self
     }
-    
+
     pub fn create_mock_transaction(&self) -> bitcoin::Transaction {
         TestTransactionFactory::create_dummy_transaction()
     }
@@ -43,7 +43,7 @@ impl TestAssertions {
     pub fn new() -> Self {
         Self
     }
-    
+
     pub fn assert_valid_transaction(&self, _tx: &bitcoin::Transaction) -> bool {
         true
     }
@@ -53,7 +53,7 @@ impl TestEnvironmentFactory {
     pub fn new() -> Self {
         Self
     }
-    
+
     pub fn create_test_environment(&self) -> String {
         "test_environment".to_string()
     }

@@ -35,7 +35,7 @@ mod tests {
         };
 
         let temp_dir = TempDir::new().unwrap();
-        let source = InstallationSource::GitRepository("https://github.com/example/repo.git".to_string());
+        let source = InstallationSource::GitRepository("https://github.com/anya-org/anya-core.git".to_string());
 
         let bitcoin_config = BitcoinConfig {
             network: "testnet".to_string(),
