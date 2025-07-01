@@ -84,6 +84,8 @@ system-alignment = [
 web5 = []
 # Memory tracking for performance monitoring
 memory_tracking = []
+# Chaos visualization for network testing
+chaos-viz = []
 
 [dependencies]
 # API dependencies

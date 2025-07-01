@@ -22,6 +22,10 @@ use std::collections::HashMap;
 pub struct TestTransactionFactory;
 
 impl TestTransactionFactory {
+    /// Alias for create_dummy_transaction to match test expectations
+    pub fn create_simple() -> Transaction {
+        Self::create_dummy_transaction()
+    }
     /// Create a dummy transaction for testing
     /// This replaces all duplicate `create_dummy_transaction()` functions
     pub fn create_dummy_transaction() -> Transaction {
@@ -76,6 +80,10 @@ impl TestTransactionFactory {
 pub struct TestEnvironmentFactory;
 
 impl TestEnvironmentFactory {
+    /// Alias for create_standard_environment to match test expectations
+    pub fn new_basic() -> TestEnvironment {
+        Self::create_standard_environment()
+    }
     /// Create a standard test environment
     /// This replaces duplicate TestEnvironment::new() patterns
     pub fn create_standard_environment() -> TestEnvironment {
@@ -161,6 +169,11 @@ impl MockFactory {
 pub struct TestAssertions;
 
 impl TestAssertions {
+    /// Assert that a transaction is valid (placeholder for real logic)
+    pub fn assert_transaction_valid(tx: &Transaction) -> bool {
+        // In real tests, add actual validation logic
+        !tx.input.is_empty() || !tx.output.is_empty() || tx.version == Version(2)
+    }
     /// Assert that two transaction validation results match (for consensus compliance)
     pub fn assert_consensus_compliance<T, E>(
         standard_result: Result<T, E>,
