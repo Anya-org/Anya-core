@@ -8,6 +8,33 @@ use crate::layer2::{
     TransferResult, ValidationResult, VerificationResult,
 };
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
+
+/// Network type for Taproot Assets
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub enum Network {
+    Mainnet,
+    Testnet,
+    Regtest,
+}
+
+/// Asset metadata for Taproot Assets
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AssetMetadata {
+    pub name: String,
+    pub supply: u64,
+    pub precision: u8,
+    pub issuer: String,
+    pub additional_fields: HashMap<String, String>,
+}
+
+/// Issuance transaction result
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct IssuanceTx {
+    pub txid: String,
+    pub asset_id: String,
+    pub taproot_script: String,
+}
 
 /// Taproot Assets configuration
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -263,5 +290,84 @@ impl Layer2Protocol for TaprootAssetsProtocol {
         println!("Asynchronously validating Taproot Assets state: {} bytes", state_data.len());
         // Reuse existing sync implementation
         <TaprootAssetsProtocol as Layer2ProtocolTrait>::validate_state(self, state_data)
+    }
+}
+
+/// Taproot Assets specific error
+#[derive(Debug, Clone)]
+pub enum Error {
+    InvalidMetadata(String),
+    NetworkError(String),
+    AssetCreationFailed(String),
+}
+
+impl std::fmt::Display for Error {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Error::InvalidMetadata(msg) => write!(f, "Invalid metadata: {}", msg),
+            Error::NetworkError(msg) => write!(f, "Network error: {}", msg),
+            Error::AssetCreationFailed(msg) => write!(f, "Asset creation failed: {}", msg),
+        }
+    }
+}
+
+impl std::error::Error for Error {}
+
+/// Create a Taproot asset
+pub async fn create_taproot_asset(
+    metadata: &AssetMetadata,
+    network: &Network,
+) -> Result<IssuanceTx, Error> {
+    // Validate metadata
+    if metadata.name.is_empty() {
+        return Err(Error::InvalidMetadata("Asset name cannot be empty".to_string()));
+    }
+    
+    if metadata.supply == 0 {
+        return Err(Error::InvalidMetadata("Asset supply must be greater than 0".to_string()));
+    }
+
+    // Generate mock transaction (in real implementation, this would create actual Taproot Assets)
+    let txid = format!("{}_{}_txid", metadata.name, network_to_string(network));
+    let asset_id = format!("{}_{}_asset_id", metadata.name, network_to_string(network));
+    let taproot_script = "tr(KEY,{SILENT_LEAF})".to_string();
+
+    Ok(IssuanceTx {
+        txid,
+        asset_id,
+        taproot_script,
+    })
+}
+
+/// Create a Taproot asset for mobile (JSON interface)
+pub async fn create_taproot_asset_mobile(
+    metadata_json: &str,
+    network_str: &str,
+) -> Result<String, Error> {
+    // Parse metadata
+    let metadata: AssetMetadata = serde_json::from_str(metadata_json)
+        .map_err(|e| Error::InvalidMetadata(format!("Failed to parse metadata: {}", e)))?;
+
+    // Parse network
+    let network = match network_str.to_lowercase().as_str() {
+        "mainnet" => Network::Mainnet,
+        "testnet" => Network::Testnet,
+        "regtest" => Network::Regtest,
+        _ => return Err(Error::NetworkError(format!("Unknown network: {}", network_str))),
+    };
+
+    // Create asset
+    let issuance_tx = create_taproot_asset(&metadata, &network).await?;
+
+    // Return JSON result
+    serde_json::to_string(&issuance_tx)
+        .map_err(|e| Error::AssetCreationFailed(format!("Failed to serialize result: {}", e)))
+}
+
+fn network_to_string(network: &Network) -> &'static str {
+    match network {
+        Network::Mainnet => "mainnet",
+        Network::Testnet => "testnet",
+        Network::Regtest => "regtest",
     }
 }

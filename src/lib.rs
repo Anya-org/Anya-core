@@ -138,7 +138,7 @@ pub mod tools;
 
 /// Core error type for the Anya system
 /// [AIR-3][AIS-3][BPC-3][RES-3]
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum AnyaError {
     /// ML-related errors
     ML(String),
@@ -160,6 +160,10 @@ pub enum AnyaError {
     LowConfidence(String),
     /// Resource not found errors
     NotFound(String),
+    /// Invalid input errors
+    InvalidInput(String),
+    /// Performance-related errors
+    PerformanceError(String),
 }
 
 impl fmt::Display for AnyaError {
@@ -175,6 +179,8 @@ impl fmt::Display for AnyaError {
             AnyaError::Timeout(msg) => write!(f, "Timeout error: {}", msg),
             AnyaError::LowConfidence(msg) => write!(f, "Low confidence error: {}", msg),
             AnyaError::NotFound(msg) => write!(f, "Not found error: {}", msg),
+            AnyaError::InvalidInput(msg) => write!(f, "Invalid input error: {}", msg),
+            AnyaError::PerformanceError(msg) => write!(f, "Performance error: {}", msg),
         }
     }
 }

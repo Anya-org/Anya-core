@@ -5,6 +5,15 @@ use log::{error, info, warn};
 use std::future::Future;
 use std::time::{Duration, Instant};
 
+/// Confidence assessment for AI verification
+#[derive(Debug, Clone)]
+pub struct ConfidenceAssessment<T> {
+    pub output: AnyaResult<T>,
+    pub confidence: f64,
+    pub verification_steps: Vec<String>,
+    pub reasoning: String,
+}
+
 /// Watchdog timer for monitoring operations
 #[derive(Debug, Clone)]
 pub struct Watchdog {
@@ -86,6 +95,28 @@ impl ProgressTracker {
     /// Get elapsed time since start
     pub fn elapsed(&self) -> Duration {
         self.start_time.elapsed()
+    }
+
+    /// Update progress with completion percentage
+    pub fn update(&self, progress: f64) -> AnyaResult<()> {
+        if progress < 0.0 || progress > 1.0 {
+            return Err(AnyaError::InvalidInput(
+                "Progress must be between 0.0 and 1.0".to_string(),
+            ));
+        }
+
+        if self.verbose {
+            info!("[{}] Progress: {:.1}%", self.name, progress * 100.0);
+        }
+
+        Ok(())
+    }
+
+    /// Mark operation as complete
+    pub fn complete(&self) {
+        if self.verbose {
+            info!("[{}] Operation completed in {:?}", self.name, self.elapsed());
+        }
     }
 }
 

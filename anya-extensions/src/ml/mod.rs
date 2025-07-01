@@ -5,7 +5,9 @@ pub mod bip_monitor;
 pub mod research;
 
 pub struct MLManager {
+    #[allow(dead_code)]
     research: research::ResearchManager,
+    #[allow(dead_code)]
     analysis: analysis::AnalysisManager,
     bip_monitor: bip_monitor::BipMonitor,
 }
