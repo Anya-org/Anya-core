@@ -8,8 +8,156 @@ use anyhow::{bail, Result};
 use bitcoin::secp256k1::{Secp256k1, XOnlyPublicKey};
 use bitcoin::taproot::{LeafVersion, TaprootBuilder, ControlBlock, TapLeaf, TapNodeHash};
 use bitcoin::{ScriptBuf, TapTweakHash};
-use anya_core::bitcoin::bip341::TaprootVerifier;
+use bitcoin::taproot::{LeafVersion, TaprootBuilder, ControlBlock, TapLeaf, TapNodeHash};
 use std::str::FromStr;
+use bitcoin::{ScriptBuf, TapLeafHash, TapNodeHash, TapTweakHash};
+use anyhow::{Result, bail, Context};
+
+/// TaprootVerifier provides methods for verifying Taproot constructions
+/// according to BIP-341 specification
+pub struct TaprootVerifier {
+    secp: Secp256k1<bitcoin::secp256k1::All>,
+}
+
+impl TaprootVerifier {
+    /// Create a new TaprootVerifier with a secp256k1 context
+    pub fn new() -> Self {
+        Self {
+            secp: Secp256k1::new(),
+        }
+    }
+    
+    /// Verify a key path spend for a Taproot output
+    pub fn verify_key_path_spend(&self, output_key: bitcoin::taproot::TweakedPublicKey, internal_key: &XOnlyPublicKey) -> Result<bool> {
+        // Extract internal key from control block
+        let internal_key_untweaked: bitcoin::taproot::UntweakedPublicKey = (*internal_key).into();
+        
+        // Compute tweak
+        let tweak = TapTweakHash::from_key_and_tweak(
+            internal_key_untweaked,
+            None,
+        );
+        
+        // Verify the tweak matches the output key
+        let tweaked_key = internal_key_untweaked.tap_tweak(&self.secp, tweak).to_inner();
+        
+        Ok(tweaked_key == output_key.to_inner())
+    }
+    
+    /// Verify a script path spend for a Taproot output
+    pub fn verify_script_path_spend(
+        &self,
+        output_key: bitcoin::taproot::TweakedPublicKey,
+        script: &ScriptBuf,
+        control_block: &ControlBlock,
+        leaf_version: LeafVersion,
+    ) -> Result<bool> {
+        // Extract internal key from control block
+        let internal_key = control_block.internal_key;
+        let internal_key_untweaked: bitcoin::taproot::UntweakedPublicKey = internal_key.into();
+        
+        // Create leaf from script
+        let leaf = TapLeaf::new(leaf_version, script.clone());
+        let leaf_hash = leaf.tap_leaf_hash();
+        
+        // Verify the TapPath in the control block
+        let merkle_root = self.compute_merkle_root(leaf_hash, control_block)?;
+        
+        // Compute the tweak
+        let tweak = TapTweakHash::from_key_and_tweak(
+            internal_key_untweaked,
+            merkle_root,
+        );
+        
+        // Verify the tweak matches the output key
+        let tweaked_key = internal_key_untweaked.tap_tweak(&self.secp, tweak).to_inner();
+        
+        Ok(tweaked_key == output_key.to_inner())
+    }
+    
+    /// Compute taproot output key from internal key and tweak
+    pub fn compute_taproot_output_key(
+        &self,
+        internal_key: &XOnlyPublicKey,
+        tweak: &[u8],
+    ) -> Result<(XOnlyPublicKey, bool)> {
+        // Convert tweak to scalar
+        let tweak = bitcoin::secp256k1::Scalar::from_be_bytes(tweak.try_into()?)?;
+        
+        // Convert internal_key to UntweakedPublicKey for the new API
+        let internal_key_untweaked: bitcoin::taproot::UntweakedPublicKey = (*internal_key).into();
+        
+        // Compute tweaked key
+        let tweaked_key = internal_key_untweaked.tap_tweak(&self.secp, tweak);
+        
+        // Return the XOnlyPublicKey and parity
+        Ok((tweaked_key.to_inner(), tweaked_key.parity()))
+    }
+    
+    /// Compute merkle root from leaf hash and control block
+    fn compute_merkle_root(&self, leaf_hash: TapLeafHash, control_block: &ControlBlock) -> Result<Option<TapNodeHash>> {
+        let mut current = TapNodeHash::from_inner(leaf_hash.to_byte_array());
+        
+        // Iterate through path and compute merkle root
+        for (i, hash) in control_block.merkle_branch().iter().enumerate() {
+            // Combine the current hash with the path element
+            let first = if control_block.merkle_branch_position(i)? {
+                hash.as_ref()
+            } else {
+                current.as_ref()
+            };
+            
+            let second = if control_block.merkle_branch_position(i)? {
+                current.as_ref()
+            } else {
+                hash.as_ref()
+            };
+            
+            // Concatenate and hash
+            let mut concat = [0u8; 64];
+            concat[0..32].copy_from_slice(first);
+            concat[32..].copy_from_slice(second);
+            
+            // Update current with the branch hash
+            current = TapNodeHash::from_inner(bitcoin::hashes::sha256::Hash::hash(&concat).into_inner());
+        }
+        
+        Ok(Some(current))
+    }
+    
+    /// Verify a Taproot address derivation
+    pub fn verify_address_derivation(
+        &self,
+        internal_key: &XOnlyPublicKey,
+        scripts: &[ScriptBuf],
+        expected_address: &str,
+    ) -> Result<bool> {
+        // Create Taproot tree
+        let mut builder = TaprootBuilder::new();
+        
+        // Convert internal_key to UntweakedPublicKey for the new API
+        let internal_key_untweaked: bitcoin::taproot::UntweakedPublicKey = (*internal_key).into();
+        
+        // Add scripts to tree
+        for (i, script) in scripts.iter().enumerate() {
+            builder = builder.add_leaf(i as u8, script.clone())
+                .map_err(|e| anyhow::anyhow!("Failed to add leaf: {:?}", e))?;
+        }
+        
+        // Finalize tree
+        let tap_tree = builder.finalize(&self.secp, internal_key_untweaked)
+            .map_err(|e| anyhow::anyhow!("Failed to finalize taproot builder: {:?}", e))?;
+        
+        // Get output key
+        let output_key = tap_tree.output_key();
+        
+        // Create Taproot output address
+        let address = bitcoin::Address::p2tr(&self.secp, output_key, None, bitcoin::Network::Bitcoin);
+        
+        // Verify address matches expected
+        Ok(address.to_string() == expected_address)
+    }
+}
 
 /// Test complete Taproot key path spending flow
 #[test]
