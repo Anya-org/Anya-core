@@ -39,7 +39,7 @@ impl std::str::FromStr for LightningPublicKey {
         // Parse hex string to bytes
         let mut bytes = [0u8; 33];
         hex::decode_to_slice(hex_str, &mut bytes)
-            .map_err(|e| format!("Invalid hex format: {}", e))?;
+            .map_err(|e| format!("Invalid hex format: {e}"))?;
 
         Ok(LightningPublicKey { bytes })
     }
@@ -373,7 +373,7 @@ impl LightningNode {
 
         // Generate a node key (in a real implementation this would be read from storage)
         let node_secret = Secp256k1SecretKey::from_slice(&[0x42; 32]).map_err(|e| {
-            AnyaError::Bitcoin(format!("Failed to create Lightning node key: {}", e))
+            AnyaError::Bitcoin(format!("Failed to create Lightning node key: {e}"))
         })?;
         let node_id = LightningPublicKey::from_secret_key(&secp, &node_secret);
 
@@ -412,18 +412,17 @@ impl LightningNode {
     /// Connect to a remote node
     pub fn connect_peer(&self, node_pubkey: &str, host: &str, port: u16) -> AnyaResult<()> {
         let pubkey = LightningPublicKey::from_str(node_pubkey)
-            .map_err(|e| AnyaError::Bitcoin(format!("Invalid node pubkey: {}", e)))?;
+            .map_err(|e| AnyaError::Bitcoin(format!("Invalid node pubkey: {e}")))?;
 
         let mut state = self
             .state
             .lock()
-            .map_err(|e| format!("Mutex lock error: {}", e))?;
+            .map_err(|e| format!("Mutex lock error: {e}"))?;
 
         // Check if already connected
         if state.peers.contains_key(node_pubkey) {
             return Err(AnyaError::Bitcoin(format!(
-                "Already connected to {}",
-                node_pubkey
+                "Already connected to {node_pubkey}"
             )));
         }
 
@@ -448,7 +447,7 @@ impl LightningNode {
         let state = self
             .state
             .lock()
-            .map_err(|e| format!("Mutex lock error: {}", e))?;
+            .map_err(|e| format!("Mutex lock error: {e}"))?;
         Ok(state.peers.values().cloned().collect())
     }
 
@@ -461,18 +460,17 @@ impl LightningNode {
         is_private: bool,
     ) -> AnyaResult<Channel> {
         let pubkey = LightningPublicKey::from_str(node_pubkey)
-            .map_err(|e| AnyaError::Bitcoin(format!("Invalid node pubkey: {}", e)))?;
+            .map_err(|e| AnyaError::Bitcoin(format!("Invalid node pubkey: {e}")))?;
 
         let mut state = self
             .state
             .lock()
-            .map_err(|e| format!("Mutex lock error: {}", e))?;
+            .map_err(|e| format!("Mutex lock error: {e}"))?;
 
         // Check if connected to peer
         if !state.peers.contains_key(node_pubkey) {
             return Err(AnyaError::Bitcoin(format!(
-                "Not connected to peer {}",
-                node_pubkey
+                "Not connected to peer {node_pubkey}"
             )));
         }
 
@@ -481,7 +479,7 @@ impl LightningNode {
 
         // Generate funding transaction ID
         let funding_txid = LightningTxid::from_slice(&[0x42; 32])
-            .map_err(|e| AnyaError::Bitcoin(format!("Failed to create txid: {}", e)))?;
+            .map_err(|e| AnyaError::Bitcoin(format!("Failed to create txid: {e}")))?;
 
         // Calculate balance split
         let push_amount = push_msat.unwrap_or(0) / 1000; // Convert to sats
@@ -513,7 +511,7 @@ impl LightningNode {
         let state = self
             .state
             .lock()
-            .map_err(|e| format!("Mutex lock error: {}", e))?;
+            .map_err(|e| format!("Mutex lock error: {e}"))?;
         Ok(state.channels.values().cloned().collect())
     }
 
@@ -522,17 +520,17 @@ impl LightningNode {
         let mut state = self
             .state
             .lock()
-            .map_err(|e| format!("Mutex lock error: {}", e))?;
+            .map_err(|e| format!("Mutex lock error: {e}"))?;
 
         // Find channel
         let channel = state
             .channels
             .get_mut(channel_id)
-            .ok_or_else(|| AnyaError::Bitcoin(format!("Channel not found: {}", channel_id)))?;
+            .ok_or_else(|| AnyaError::Bitcoin(format!("Channel not found: {channel_id}")))?;
 
         // Generate closing transaction ID
         let closing_txid = LightningTxid::from_slice(&[0x24; 32])
-            .map_err(|e| AnyaError::Bitcoin(format!("Failed to create closing txid: {}", e)))?;
+            .map_err(|e| AnyaError::Bitcoin(format!("Failed to create closing txid: {e}")))?;
 
         // Update channel state
         channel.is_active = false;
@@ -552,7 +550,7 @@ impl LightningNode {
         let mut state = self
             .state
             .lock()
-            .map_err(|e| format!("Mutex lock error: {}", e))?;
+            .map_err(|e| format!("Mutex lock error: {e}"))?;
         let now = current_time();
 
         // Generate payment hash
@@ -603,7 +601,7 @@ impl LightningNode {
         let mut state = self
             .state
             .lock()
-            .map_err(|e| format!("Mutex lock error: {}", e))?;
+            .map_err(|e| format!("Mutex lock error: {e}"))?;
         let now = current_time();
 
         // Parse invoice (simplified)
@@ -626,7 +624,7 @@ impl LightningNode {
             status: PaymentStatus::Succeeded, // Simplified: always succeeds
             created_at: now,
             resolved_at: Some(now),
-            description: Some(format!("Payment for invoice {}", bolt11)),
+            description: Some(format!("Payment for invoice {bolt11}")),
         };
 
         state.payments.insert(payment_id, payment.clone());
@@ -658,7 +656,7 @@ impl LightningNode {
         let state = self
             .state
             .lock()
-            .map_err(|e| format!("Mutex lock error: {}", e))?;
+            .map_err(|e| format!("Mutex lock error: {e}"))?;
 
         // Find payment by hash
         let payment = state
@@ -675,7 +673,7 @@ impl LightningNode {
         let state = self
             .state
             .lock()
-            .map_err(|e| format!("Mutex lock error: {}", e))?;
+            .map_err(|e| format!("Mutex lock error: {e}"))?;
         Ok(state.payments.values().cloned().collect())
     }
 }
@@ -696,7 +694,7 @@ impl BitcoinLightningBridge {
         let mut last_height = self
             .last_scanned_height
             .lock()
-            .map_err(|e| format!("Mutex lock error: {}", e))?;
+            .map_err(|e| format!("Mutex lock error: {e}"))?;
         *last_height = current_height;
         Ok(())
     }
@@ -712,14 +710,13 @@ impl BitcoinLightningBridge {
         // Check if connected to peer
         let peers = self.lightning_node.list_peers()?;
         let pubkey = LightningPublicKey::from_str(peer_pubkey)
-            .map_err(|e| AnyaError::Bitcoin(format!("Invalid node pubkey: {}", e)))?;
+            .map_err(|e| AnyaError::Bitcoin(format!("Invalid node pubkey: {e}")))?;
 
         let is_connected = peers.iter().any(|p| p.pubkey.to_string() == peer_pubkey);
 
         if !is_connected {
             return Err(AnyaError::Bitcoin(format!(
-                "Not connected to peer {}",
-                peer_pubkey
+                "Not connected to peer {peer_pubkey}"
             )));
         }
 
@@ -744,7 +741,7 @@ impl BitcoinLightningBridge {
         let mut funding_addresses = self
             .funding_addresses
             .lock()
-            .map_err(|e| format!("Mutex lock error: {}", e))?;
+            .map_err(|e| format!("Mutex lock error: {e}"))?;
         funding_addresses.insert(address.clone(), funding_address);
 
         Ok(address)
@@ -782,7 +779,7 @@ impl BitcoinLightningBridge {
         let mut channel_txs = self
             .channel_transactions
             .lock()
-            .map_err(|e| format!("Mutex lock error: {}", e))?;
+            .map_err(|e| format!("Mutex lock error: {e}"))?;
 
         match channel_txs.get_mut(channel_id) {
             Some(tx_info) => {
@@ -792,8 +789,7 @@ impl BitcoinLightningBridge {
                 Ok(())
             }
             None => Err(AnyaError::Bitcoin(format!(
-                "Channel not found: {}",
-                channel_id
+                "Channel not found: {channel_id}"
             ))),
         }
     }
@@ -806,7 +802,7 @@ impl BitcoinLightningBridge {
         let channel_txs = self
             .channel_transactions
             .lock()
-            .map_err(|e| format!("Mutex lock error: {}", e))?;
+            .map_err(|e| format!("Mutex lock error: {e}"))?;
         Ok(channel_txs.get(channel_id).cloned())
     }
 
@@ -815,7 +811,7 @@ impl BitcoinLightningBridge {
         let channel_txs = self
             .channel_transactions
             .lock()
-            .map_err(|e| format!("Mutex lock error: {}", e))?;
+            .map_err(|e| format!("Mutex lock error: {e}"))?;
         Ok(channel_txs.values().cloned().collect())
     }
 }

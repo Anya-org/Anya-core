@@ -47,7 +47,6 @@ async fn test_all_protocols() {
         // Test state management
         let state = protocol.get_state().await.unwrap();
         assert!(!state.version.is_empty());
-        assert!(state.connections >= 0);
         assert!(state.operational);
 
         assert!(protocol.sync_state().await.is_ok());
@@ -79,7 +78,6 @@ async fn test_all_protocols() {
             transfer_result.status,
             TransactionStatus::Confirmed | TransactionStatus::Pending
         ));
-        assert!(transfer_result.timestamp >= 0);
 
         // Test proof verification
         let proof = Proof {

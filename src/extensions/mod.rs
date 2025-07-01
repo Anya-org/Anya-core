@@ -5,7 +5,6 @@
 ///
 /// This module provides extension capabilities for Anya Core,
 /// allowing for customizable functionality beyond the core system.
-
 // [AIR-3][AIS-3][BPC-3][RES-3] Error trait is used in trait bounds throughout the module
 // but not directly, so we'll comment it out to avoid unused import warnings
 // use std::error::Error;

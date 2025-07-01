@@ -54,15 +54,14 @@ impl SectionRunner {
     pub fn run_section(&self, name: &str) -> Result<(), String> {
         if let Some(section) = self.sections.get(name) {
             if !section.enabled {
-                return Err(format!("Section '{}' is disabled", name));
+                return Err(format!("Section '{name}' is disabled"));
             }
 
             // Check dependencies
             for dep in &section.dependencies {
                 if !self.sections.contains_key(dep) {
                     return Err(format!(
-                        "Missing dependency '{}' for section '{}'",
-                        dep, name
+                        "Missing dependency '{dep}' for section '{name}'"
                     ));
                 }
             }
@@ -71,7 +70,7 @@ impl SectionRunner {
             // Actual test execution would go here
             Ok(())
         } else {
-            Err(format!("Section '{}' not found", name))
+            Err(format!("Section '{name}' not found"))
         }
     }
 

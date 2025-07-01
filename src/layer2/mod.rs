@@ -43,6 +43,23 @@ pub struct ProtocolState {
     pub timestamp: u64,
 }
 
+impl Default for ProtocolState {
+    fn default() -> Self {
+        Self {
+            version: "1.0.0".to_string(),
+            connections: 0,
+            capacity: None,
+            operational: false,
+            height: 0,
+            hash: "default_hash".to_string(),
+            timestamp: std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap_or_default()
+                .as_secs(),
+        }
+    }
+}
+
 /// Asset parameters for Layer2 protocols
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AssetParams {
@@ -75,6 +92,20 @@ pub struct TransferResult {
     pub timestamp: u64,
 }
 
+impl Default for TransferResult {
+    fn default() -> Self {
+        Self {
+            tx_id: String::new(),
+            status: TransactionStatus::Pending,
+            fee: None,
+            timestamp: std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap_or_default()
+                .as_secs(),
+        }
+    }
+}
+
 /// Proof for Layer2 operations
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Proof {
@@ -87,6 +118,20 @@ pub struct Proof {
     pub block_header: String,
 }
 
+impl Default for Proof {
+    fn default() -> Self {
+        Self {
+            proof_type: "default".to_string(),
+            data: Vec::new(),
+            block_height: None,
+            witness: None,
+            merkle_root: String::new(),
+            merkle_proof: Vec::new(),
+            block_header: String::new(),
+        }
+    }
+}
+
 /// Result of a verification operation
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct VerificationResult {
@@ -96,12 +141,39 @@ pub struct VerificationResult {
     pub timestamp: u64,
 }
 
+impl Default for VerificationResult {
+    fn default() -> Self {
+        Self {
+            valid: false,
+            is_valid: false,
+            error: None,
+            timestamp: std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap_or_default()
+                .as_secs(),
+        }
+    }
+}
+
 /// Result of a validation operation
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ValidationResult {
     pub is_valid: bool,
     pub violations: Vec<String>,
     pub timestamp: u64,
+}
+
+impl Default for ValidationResult {
+    fn default() -> Self {
+        Self {
+            is_valid: false,
+            violations: Vec::new(),
+            timestamp: std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap_or_default()
+                .as_secs(),
+        }
+    }
 }
 
 /// Legacy Layer2 protocol interface for synchronous implementations
@@ -307,11 +379,11 @@ pub enum Layer2Error {
 impl std::fmt::Display for Layer2Error {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            Layer2Error::General(msg) => write!(f, "Layer2 General Error: {}", msg),
-            Layer2Error::Connection(msg) => write!(f, "Layer2 Connection Error: {}", msg),
-            Layer2Error::Protocol(msg) => write!(f, "Layer2 Protocol Error: {}", msg),
-            Layer2Error::Authentication(msg) => write!(f, "Layer2 Authentication Error: {}", msg),
-            Layer2Error::Transaction(msg) => write!(f, "Layer2 Transaction Error: {}", msg),
+            Layer2Error::General(msg) => write!(f, "Layer2 General Error: {msg}"),
+            Layer2Error::Connection(msg) => write!(f, "Layer2 Connection Error: {msg}"),
+            Layer2Error::Protocol(msg) => write!(f, "Layer2 Protocol Error: {msg}"),
+            Layer2Error::Authentication(msg) => write!(f, "Layer2 Authentication Error: {msg}"),
+            Layer2Error::Transaction(msg) => write!(f, "Layer2 Transaction Error: {msg}"),
         }
     }
 }

@@ -150,7 +150,7 @@ impl ContractManager {
             .unwrap()
             .as_secs();
         Ok(DlcContract {
-            id: format!("dlc-{}", now),
+            id: format!("dlc-{now}"),
             collateral,
             oracle_event_id: oracle_info.id.clone(),
             outcomes,
@@ -343,13 +343,13 @@ pub enum DlcError {
 impl From<&DlcError> for String {
     fn from(error: &DlcError) -> Self {
         match error {
-            DlcError::InvalidParameters(e) => format!("Invalid parameters: {}", e),
-            DlcError::InvalidSignature(e) => format!("Invalid signature: {}", e),
-            DlcError::BitcoinError(e) => format!("Bitcoin error: {}", e),
-            DlcError::ContractError(e) => format!("Contract error: {}", e),
-            DlcError::OracleError(e) => format!("Oracle error: {}", e),
-            DlcError::SerializationError(e) => format!("Serialization error: {}", e),
-            DlcError::InternalError(e) => format!("Internal error: {}", e),
+            DlcError::InvalidParameters(e) => format!("Invalid parameters: {e}"),
+            DlcError::InvalidSignature(e) => format!("Invalid signature: {e}"),
+            DlcError::BitcoinError(e) => format!("Bitcoin error: {e}"),
+            DlcError::ContractError(e) => format!("Contract error: {e}"),
+            DlcError::OracleError(e) => format!("Oracle error: {e}"),
+            DlcError::SerializationError(e) => format!("Serialization error: {e}"),
+            DlcError::InternalError(e) => format!("Internal error: {e}"),
         }
     }
 }
@@ -501,7 +501,7 @@ impl OracleClient {
     /// Create DLC contract with oracle
     pub async fn create_contract(&mut self, _contract_id: &str, _contract_info: DlcContractInfo) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
         // Stub implementation for creating DLC contract
-        Ok(format!("contract_{}", _contract_id))
+        Ok(format!("contract_{_contract_id}"))
     }
 
     /// Close DLC contract
@@ -513,7 +513,7 @@ impl OracleClient {
     /// Get oracle signature for event
     pub async fn get_signature(&self, event_id: &str) -> Result<Vec<u8>, Box<dyn std::error::Error + Send + Sync>> {
         // Stub implementation for getting oracle signature
-        Ok(format!("sig_{}", event_id).into_bytes())
+        Ok(format!("sig_{event_id}").into_bytes())
     }
 
     /// Check if oracle is connected
@@ -640,8 +640,7 @@ impl DlcManager {
         // Verify that the outcome is valid for this contract
         if !contract.outcomes.contains(&outcome) {
             return Err(DlcError::ContractError(format!(
-                "Invalid outcome: {}",
-                outcome
+                "Invalid outcome: {outcome}"
             )));
         }
 
@@ -722,8 +721,7 @@ impl OracleClient {
         }
 
         Err(DlcError::OracleError(format!(
-            "Attestation for event {} not found",
-            event_id
+            "Attestation for event {event_id} not found"
         )))
     }
 }

@@ -60,7 +60,7 @@ impl BitcoinProtocol {
 
         for bip in required_bips {
             if !self.supported_bips.contains(&bip) {
-                return Err(format!("Missing required BIP-{}", bip).into());
+                return Err(format!("Missing required BIP-{bip}").into());
             }
         }
 

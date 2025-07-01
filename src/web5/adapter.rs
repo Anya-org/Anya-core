@@ -18,13 +18,13 @@ impl Web5Adapter {
     pub async fn build(config: Web5Config) -> AnyaResult<Self> {
         // Create a new Web5Manager
         let manager = Web5Manager::new(config)
-            .map_err(|e| AnyaError::Web5(format!("Failed to create Web5Manager: {}", e)))?;
+            .map_err(|e| AnyaError::Web5(format!("Failed to create Web5Manager: {e}")))?;
 
         // Initialize the manager
         let mut manager_instance = manager;
         manager_instance
             .initialize()
-            .map_err(|e| AnyaError::Web5(format!("Failed to initialize Web5Manager: {}", e)))?;
+            .map_err(|e| AnyaError::Web5(format!("Failed to initialize Web5Manager: {e}")))?;
 
         Ok(Self {
             manager: Arc::new(manager_instance),
@@ -42,7 +42,7 @@ impl Web5Adapter {
             .manager
             .did_manager()
             .create_did()
-            .map_err(|e| AnyaError::Web5(format!("Failed to create DID: {}", e)))?;
+            .map_err(|e| AnyaError::Web5(format!("Failed to create DID: {e}")))?;
 
         Ok(did.id)
     }
@@ -52,7 +52,7 @@ impl Web5Adapter {
         let status = self
             .manager
             .status()
-            .map_err(|e| AnyaError::Web5(format!("Failed to get Web5 status: {}", e)))?;
+            .map_err(|e| AnyaError::Web5(format!("Failed to get Web5 status: {e}")))?;
 
         Ok(status.enabled)
     }

@@ -165,8 +165,7 @@ mod core_issuance {
             // Fail the test if memory usage is too high
             assert!(
                 passed,
-                "Memory usage ({} bytes) exceeds threshold",
-                memory_usage
+                "Memory usage ({memory_usage} bytes) exceeds threshold"
             );
         }
     }

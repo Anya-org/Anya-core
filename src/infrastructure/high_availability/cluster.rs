@@ -46,7 +46,7 @@ impl ClusterManager {
             .discovery_service
             .discover_nodes()
             .await
-            .map_err(|e| HaError::ClusterError(format!("Failed to discover nodes: {}", e)))?;
+            .map_err(|e| HaError::ClusterError(format!("Failed to discover nodes: {e}")))?;
 
         // Initialize node list
         let mut nodes = self.nodes.write().await;
@@ -66,7 +66,7 @@ impl ClusterManager {
         let self_node = NodeInfo {
             id: self.node_id.clone(),
             address: self.membership_service.get_local_address().map_err(|e| {
-                HaError::ClusterError(format!("Failed to get local address: {}", e))
+                HaError::ClusterError(format!("Failed to get local address: {e}"))
             })?,
             status: NodeStatus::Starting,
             role: NodeRole::Follower, // Start as follower
@@ -77,7 +77,7 @@ impl ClusterManager {
 
         // Initialize membership service
         self.membership_service.initialize().await.map_err(|e| {
-            HaError::ClusterError(format!("Failed to initialize membership service: {}", e))
+            HaError::ClusterError(format!("Failed to initialize membership service: {e}"))
         })?;
 
         *self.status.write().await = ClusterStatus::Initializing;
@@ -94,7 +94,7 @@ impl ClusterManager {
         self.membership_service
             .join(self.node_id.clone())
             .await
-            .map_err(|e| HaError::ClusterError(format!("Failed to join cluster: {}", e)))?;
+            .map_err(|e| HaError::ClusterError(format!("Failed to join cluster: {e}")))?;
 
         // Update node status
         let mut nodes = self.nodes.write().await;
@@ -129,7 +129,7 @@ impl ClusterManager {
         self.membership_service
             .leave(self.node_id.clone())
             .await
-            .map_err(|e| HaError::ClusterError(format!("Failed to leave cluster: {}", e)))?;
+            .map_err(|e| HaError::ClusterError(format!("Failed to leave cluster: {e}")))?;
 
         // Update node status
         let mut nodes = self.nodes.write().await;
@@ -176,18 +176,18 @@ impl ClusterManager {
                 .leave(self.node_id.clone())
                 .await
                 .map_err(|e| {
-                    HaError::ClusterError(format!("Failed to leave old membership: {}", e))
+                    HaError::ClusterError(format!("Failed to leave old membership: {e}"))
                 })?;
 
             self.membership_service.initialize().await.map_err(|e| {
-                HaError::ClusterError(format!("Failed to initialize new membership: {}", e))
+                HaError::ClusterError(format!("Failed to initialize new membership: {e}"))
             })?;
 
             self.membership_service
                 .join(self.node_id.clone())
                 .await
                 .map_err(|e| {
-                    HaError::ClusterError(format!("Failed to join with new membership: {}", e))
+                    HaError::ClusterError(format!("Failed to join with new membership: {e}"))
                 })?;
         }
 

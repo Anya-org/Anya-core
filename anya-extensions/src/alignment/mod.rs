@@ -41,6 +41,7 @@ impl SystemMonitor {
 /// Post-quantum cryptography verifier
 #[derive(Debug, Clone)]
 pub struct PostQuantumVerifier {
+    #[allow(dead_code)]
     enabled: bool,
 }
 
@@ -63,6 +64,7 @@ impl PostQuantumVerifier {
 /// Audit logger for security and compliance events
 #[derive(Debug, Clone)]
 pub struct AuditLogger {
+    #[allow(dead_code)]
     events: Vec<String>,
 }
 
@@ -88,6 +90,7 @@ impl AuditLogger {
 /// Protocol handler for managing protocol-level operations
 #[derive(Debug, Clone)]
 pub struct ProtocolHandler {
+    #[allow(dead_code)]
     version: String,
 }
 

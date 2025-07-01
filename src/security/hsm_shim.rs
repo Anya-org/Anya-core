@@ -36,7 +36,7 @@ impl std::error::Error for HsmStubError {}
 /// Create an HSM stub error
 pub fn hsm_stub_error(msg: &str) -> HsmStubError {
     HsmStubError {
-        message: format!("HSM support disabled: {}", msg),
+        message: format!("HSM support disabled: {msg}"),
     }
 }
 

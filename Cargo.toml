@@ -84,6 +84,8 @@ system-alignment = [
 web5 = []
 # Memory tracking for performance monitoring
 memory_tracking = []
+# Chaos visualization for network testing
+chaos-viz = []
 
 [dependencies]
 # API dependencies
@@ -197,7 +199,6 @@ chacha20poly1305 = "0.10.1"
 regex = "1.9.6"
 futures = "0.3.31"
 lazy_static = "1.5.0"
-
 [dev-dependencies]
 did-key = "0.2.1"
 mockall = "=0.13.1"

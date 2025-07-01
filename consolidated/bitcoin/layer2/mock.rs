@@ -1,17 +1,13 @@
-use std::error::Error;
-use crate::{
-    AnyaResult,
-    layer2::{
-        Layer2Protocol,
-        ProtocolState,
-        TransactionStatus,
-        AssetParams,
-        AssetTransfer,
-        TransferResult,
-        Proof,
-        VerificationResult,
-        ValidationResult,
-    },
+use crate::layer2::{
+    Layer2Protocol,
+    ProtocolState,
+    TransactionStatus,
+    AssetParams,
+    AssetTransfer,
+    TransferResult,
+    Proof,
+    VerificationResult,
+    ValidationResult,
 };
 use async_trait::async_trait;
 
@@ -22,7 +18,7 @@ pub struct MockLayer2Protocol {
 }
 
 impl Default for MockLayer2Protocol {
-    fn default() -> Self  -> Result<(), Box<dyn Error>> {
+    fn default() -> Self {
         Self {
             initialized: false,
             connected: false,
@@ -31,34 +27,22 @@ impl Default for MockLayer2Protocol {
 }
 
 impl MockLayer2Protocol {
-    pub fn new() -> Self  -> Result<(), Box<dyn Error>> {
+    pub fn new() -> Self {
         Self::default()
     }
 }
 
 #[async_trait]
 impl Layer2Protocol for MockLayer2Protocol {
-    async fn initialize(&self) -> AnyaResult<()>  -> Result<(), Box<dyn Error>> {
+    async fn initialize(&self) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         Ok(())
     }
 
-    async fn connect(&self) -> AnyaResult<()>  -> Result<(), Box<dyn Error>> {
+    async fn connect(&self) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         Ok(())
     }
 
-    async fn disconnect(&self) -> AnyaResult<()>  -> Result<(), Box<dyn Error>> {
-        Ok(())
-    }
-
-    async fn submit_transaction(&self, __tx: tx: &[u8][u8]) -> AnyaResult<String>  -> Result<(), Box<dyn Error>> {
-        Ok("mock_tx_id".to_string())
-    }
-
-    async fn get_transaction_status(&self, __tx_id: tx_id: &strstr) -> AnyaResult<TransactionStatus>  -> Result<(), Box<dyn Error>> {
-        Ok(TransactionStatus::Confirmed)
-    }
-
-    async fn get_state(&self) -> AnyaResult<ProtocolState>  -> Result<(), Box<dyn Error>> {
+    async fn get_state(&self) -> Result<ProtocolState, Box<dyn std::error::Error + Send + Sync>> {
         Ok(ProtocolState {
             height: 0,
             hash: "mock_hash".to_string(),
@@ -66,15 +50,23 @@ impl Layer2Protocol for MockLayer2Protocol {
         })
     }
 
-    async fn sync_state(&self) -> AnyaResult<()>  -> Result<(), Box<dyn Error>> {
+    async fn submit_transaction(&self, _tx_data: &[u8]) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+        Ok("mock_tx_id".to_string())
+    }
+
+    async fn check_transaction_status(&self, _tx_id: &str) -> Result<TransactionStatus, Box<dyn std::error::Error + Send + Sync>> {
+        Ok(TransactionStatus::Confirmed)
+    }
+
+    async fn sync_state(&mut self) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         Ok(())
     }
 
-    async fn issue_asset(&self, __params: AssetParams) -> AnyaResult<String>  -> Result<(), Box<dyn Error>> {
+    async fn issue_asset(&self, _params: AssetParams) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
         Ok("mock_asset_id".to_string())
     }
 
-    async fn transfer_asset(&self, __transfer: AssetTransfer) -> AnyaResult<TransferResult>  -> Result<(), Box<dyn Error>> {
+    async fn transfer_asset(&self, _transfer: AssetTransfer) -> Result<TransferResult, Box<dyn std::error::Error + Send + Sync>> {
         Ok(TransferResult {
             tx_id: "mock_tx_id".to_string(),
             status: TransactionStatus::Confirmed,
@@ -82,14 +74,14 @@ impl Layer2Protocol for MockLayer2Protocol {
         })
     }
 
-    async fn verify_proof(&self, __proof: proof: &ProofProof) -> AnyaResult<VerificationResult>  -> Result<(), Box<dyn Error>> {
+    async fn verify_proof(&self, _proof: Proof) -> Result<VerificationResult, Box<dyn std::error::Error + Send + Sync>> {
         Ok(VerificationResult {
             valid: true,
             error: None,
         })
     }
 
-    async fn validate_state(&self, __state: state: &ProtocolStateProtocolState) -> AnyaResult<ValidationResult>  -> Result<(), Box<dyn Error>> {
+    async fn validate_state(&self, _state_data: &[u8]) -> Result<ValidationResult, Box<dyn std::error::Error + Send + Sync>> {
         Ok(ValidationResult {
             valid: true,
             error: None,

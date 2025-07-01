@@ -354,8 +354,7 @@ impl DaoAgent {
             Ok(())
         } else {
             Err(AnyaError::NotFound(format!(
-                "Proposal {} not found",
-                proposal_id
+                "Proposal {proposal_id} not found"
             )))
         }
     }
@@ -370,8 +369,7 @@ impl DaoAgent {
             Ok(analysis)
         } else {
             Err(AnyaError::NotFound(format!(
-                "Proposal {} not found",
-                proposal_id
+                "Proposal {proposal_id} not found"
             )))
         }
     }

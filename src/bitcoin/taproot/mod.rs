@@ -39,14 +39,14 @@ pub enum TaprootError {
 impl fmt::Display for TaprootError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::KeyError(e) => write!(f, "Key error: {}", e),
-            Self::ScriptError(e) => write!(f, "Script error: {}", e),
-            Self::TaprootError(e) => write!(f, "Taproot error: {}", e),
-            Self::BuilderError(e) => write!(f, "Builder error: {}", e),
-            Self::BitcoinError(e) => write!(f, "Bitcoin error: {}", e),
-            Self::Secp256k1Error(e) => write!(f, "Secp256k1 error: {}", e),
-            Self::HexError(e) => write!(f, "Hex error: {}", e),
-            Self::ValidationError(e) => write!(f, "Validation error: {}", e),
+            Self::KeyError(e) => write!(f, "Key error: {e}"),
+            Self::ScriptError(e) => write!(f, "Script error: {e}"),
+            Self::TaprootError(e) => write!(f, "Taproot error: {e}"),
+            Self::BuilderError(e) => write!(f, "Builder error: {e}"),
+            Self::BitcoinError(e) => write!(f, "Bitcoin error: {e}"),
+            Self::Secp256k1Error(e) => write!(f, "Secp256k1 error: {e}"),
+            Self::HexError(e) => write!(f, "Hex error: {e}"),
+            Self::ValidationError(e) => write!(f, "Validation error: {e}"),
         }
     }
 }
@@ -375,12 +375,12 @@ pub fn issue_asset(asset: &TaprootAsset, issuer_secret_key: &[u8]) -> Result<Str
     // Add the asset script as a leaf with depth 1 (SILENT_LEAF)
     builder = builder
         .add_leaf(1, asset_script.clone())
-        .map_err(|e| TaprootError::BuilderError(format!("Failed to add leaf: {}", e)))?;
+        .map_err(|e| TaprootError::BuilderError(format!("Failed to add leaf: {e}")))?;
 
     // Finalize the Taproot tree with the internal key (KEY)
     let taproot_spend_info = builder
         .finalize(&secp, x_only_pubkey)
-        .map_err(|e| TaprootError::TaprootError(format!("Failed to finalize builder: {:?}", e)))?;
+        .map_err(|e| TaprootError::TaprootError(format!("Failed to finalize builder: {e:?}")))?;
 
     // Get the Taproot output script
     let output_key = taproot_spend_info.output_key();

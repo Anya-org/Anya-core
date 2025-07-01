@@ -143,10 +143,10 @@ pub enum EnterpriseError {
 impl fmt::Display for EnterpriseError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            EnterpriseError::Connection(msg) => write!(f, "Connection error: {}", msg),
-            EnterpriseError::Authentication(msg) => write!(f, "Authentication error: {}", msg),
-            EnterpriseError::Message(msg) => write!(f, "Message error: {}", msg),
-            EnterpriseError::Relay(msg) => write!(f, "Relay error: {}", msg),
+            EnterpriseError::Connection(msg) => write!(f, "Connection error: {msg}"),
+            EnterpriseError::Authentication(msg) => write!(f, "Authentication error: {msg}"),
+            EnterpriseError::Message(msg) => write!(f, "Message error: {msg}"),
+            EnterpriseError::Relay(msg) => write!(f, "Relay error: {msg}"),
         }
     }
 }

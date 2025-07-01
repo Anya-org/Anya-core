@@ -53,9 +53,9 @@ mod tests {
 
         for i in 0..25 {
             let input = if i % 5 == 0 {
-                format!("success message {}", i)
+                format!("success message {i}")
             } else {
-                format!("normal message {}", i)
+                format!("normal message {i}")
             };
             core.process_input(&input)?;
         }

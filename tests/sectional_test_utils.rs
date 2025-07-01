@@ -128,14 +128,14 @@ pub mod sectional {
         let _ = writeln!(file, "Duration: {:?}", result.duration);
 
         if let Some(memory) = result.memory_usage {
-            let _ = writeln!(file, "Memory usage: {} bytes", memory);
+            let _ = writeln!(file, "Memory usage: {memory} bytes");
         }
 
         // Write details
         if !result.details.is_empty() {
             let _ = writeln!(file, "\nDetails:");
             for (key, value) in &result.details {
-                let _ = writeln!(file, "  {}: {}", key, value);
+                let _ = writeln!(file, "  {key}: {value}");
             }
         }
     }

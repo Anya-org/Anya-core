@@ -13,8 +13,8 @@ pub enum RandomError {
 impl fmt::Display for RandomError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            RandomError::Generation(msg) => write!(f, "Random generation error: {}", msg),
-            RandomError::Range(msg) => write!(f, "Random range error: {}", msg),
+            RandomError::Generation(msg) => write!(f, "Random generation error: {msg}"),
+            RandomError::Range(msg) => write!(f, "Random range error: {msg}"),
         }
     }
 }

@@ -45,7 +45,7 @@ impl Layer2Manager {
         self.bob_client = Some(BobClient::default());
         if let Some(client) = &mut self.bob_client {
             if let Err(e) = client.initialize() {
-                eprintln!("Failed to initialize BobClient: {}", e);
+                eprintln!("Failed to initialize BobClient: {e}");
                 return Err(e);
             }
             println!("BobClient initialized successfully");
@@ -55,7 +55,7 @@ impl Layer2Manager {
         self.liquid_module = Some(LiquidModule::default());
         if let Some(module) = &mut self.liquid_module {
             if let Err(e) = module.initialize() {
-                eprintln!("Failed to initialize LiquidModule: {}", e);
+                eprintln!("Failed to initialize LiquidModule: {e}");
                 return Err(e);
             }
             println!("LiquidModule initialized successfully");
@@ -65,7 +65,7 @@ impl Layer2Manager {
         self.rsk_client = Some(RskClient::default());
         if let Some(client) = &mut self.rsk_client {
             if let Err(e) = client.initialize() {
-                eprintln!("Failed to initialize RskClient: {}", e);
+                eprintln!("Failed to initialize RskClient: {e}");
                 return Err(e);
             }
             println!("RskClient initialized successfully");
@@ -75,7 +75,7 @@ impl Layer2Manager {
         self.stacks_client = Some(StacksClient::default());
         if let Some(client) = &mut self.stacks_client {
             if let Err(e) = client.initialize() {
-                eprintln!("Failed to initialize StacksClient: {}", e);
+                eprintln!("Failed to initialize StacksClient: {e}");
                 return Err(e);
             }
             println!("StacksClient initialized successfully");
@@ -85,7 +85,7 @@ impl Layer2Manager {
         self.taproot_assets = Some(TaprootAssetsProtocol::default());
         if let Some(protocol) = &mut self.taproot_assets {
             if let Err(e) = protocol.initialize() {
-                eprintln!("Failed to initialize TaprootAssetsProtocol: {}", e);
+                eprintln!("Failed to initialize TaprootAssetsProtocol: {e}");
                 return Err(e);
             }
             println!("TaprootAssetsProtocol initialized successfully");
@@ -229,8 +229,7 @@ impl Layer2Manager {
         amount: u64,
     ) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
         println!(
-            "Executing cross-layer transfer from {:?} to {:?}",
-            from_protocol, to_protocol
+            "Executing cross-layer transfer from {from_protocol:?} to {to_protocol:?}"
         );
 
         let transfer_id = format!(
@@ -253,8 +252,7 @@ impl Layer2Manager {
         amount: u64,
     ) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
         println!(
-            "Asynchronously executing cross-layer transfer from {:?} to {:?}",
-            from_protocol, to_protocol
+            "Asynchronously executing cross-layer transfer from {from_protocol:?} to {to_protocol:?}"
         );
 
         let source = self.get_protocol_async(from_protocol);
@@ -322,7 +320,7 @@ impl Layer2Manager {
             } else {
                 return Err(Box::new(std::io::Error::new(
                     std::io::ErrorKind::NotFound,
-                    format!("{:?} protocol not found", protocol_type),
+                    format!("{protocol_type:?} protocol not found"),
                 )));
             }
         }

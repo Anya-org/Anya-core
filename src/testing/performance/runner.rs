@@ -39,8 +39,7 @@ pub fn run_comprehensive_test_suite(output_dir: &Path) -> Result<()> {
     let report_path = output_dir.join("performance_report.md");
     fs::write(&report_path, report).map_err(|e| {
         crate::testing::performance::PerfTestError::TestError(format!(
-            "Failed to write report: {}",
-            e
+            "Failed to write report: {e}"
         ))
     })?;
 
@@ -59,13 +58,12 @@ pub fn run_targeted_test(test_name: &str, iterations: usize, output_dir: &Path) 
     match test_name {
         "performance_test" => {
             // Note: Add specific performance test components here
-            println!("Running performance test: {}", test_name);
+            println!("Running performance test: {test_name}");
         }
         _ => {
             return Err(
                 crate::testing::performance::PerfTestError::ConfigurationError(format!(
-                    "Unknown test name: {}",
-                    test_name
+                    "Unknown test name: {test_name}"
                 )),
             );
         }
@@ -81,11 +79,10 @@ pub fn run_targeted_test(test_name: &str, iterations: usize, output_dir: &Path) 
     fs::create_dir_all(output_dir)?;
 
     // Write the report to a file
-    let report_path = output_dir.join(format!("{}_report.md", test_name));
+    let report_path = output_dir.join(format!("{test_name}_report.md"));
     fs::write(&report_path, report).map_err(|e| {
         crate::testing::performance::PerfTestError::TestError(format!(
-            "Failed to write report: {}",
-            e
+            "Failed to write report: {e}"
         ))
     })?;
 

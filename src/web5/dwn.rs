@@ -125,7 +125,7 @@ impl DWNClient {
             let mut storage = self
                 .local_storage
                 .lock()
-                .map_err(|e| format!("Mutex lock error: {}", e))?;
+                .map_err(|e| format!("Mutex lock error: {e}"))?;
             let message_for_storage = message.clone();
             storage.insert(id.clone(), message_for_storage);
         }
@@ -134,7 +134,7 @@ impl DWNClient {
         if let Some(endpoint) = &self.config.endpoint {
             // In a real implementation, this would send the message to the DWN
             // For this example, we're just logging
-            println!("Would send message to DWN at {}: {:?}", endpoint, message);
+            println!("Would send message to DWN at {endpoint}: {message:?}");
         }
 
         Ok(id)
@@ -151,7 +151,7 @@ impl DWNClient {
         let storage = self
             .local_storage
             .lock()
-            .map_err(|e| format!("Mutex lock error: {}", e))?;
+            .map_err(|e| format!("Mutex lock error: {e}"))?;
 
         // Filter messages by recipient and optionally by protocol
         let messages: Vec<DWNMessage> = storage
@@ -172,7 +172,7 @@ fn generate_id() -> String {
         .unwrap_or_default()
         .as_secs();
 
-    format!("{:x}", now)
+    format!("{now:x}")
 }
 
 /// Get current time in seconds
@@ -325,7 +325,7 @@ impl DWNManager {
         let mut storage = self
             .records
             .lock()
-            .map_err(|e| Web5Error::Storage(format!("Failed to acquire lock: {}", e)))?;
+            .map_err(|e| Web5Error::Storage(format!("Failed to acquire lock: {e}")))?;
         let record_id = record.id.clone();
         storage.insert(record_id.clone(), record);
         Ok(record_id)
@@ -336,7 +336,7 @@ impl DWNManager {
         let storage = self
             .records
             .lock()
-            .map_err(|e| Web5Error::Storage(format!("Failed to acquire lock: {}", e)))?;
+            .map_err(|e| Web5Error::Storage(format!("Failed to acquire lock: {e}")))?;
         let records: Vec<DWNRecord> = storage
             .values()
             .filter(|r| r.owner == owner && r.schema == schema)
@@ -368,7 +368,7 @@ impl DWNManager {
         let storage = self
             .records
             .lock()
-            .map_err(|e| Web5Error::Storage(format!("Failed to acquire lock: {}", e)))?;
+            .map_err(|e| Web5Error::Storage(format!("Failed to acquire lock: {e}")))?;
         storage
             .get(id)
             .cloned()
@@ -380,7 +380,7 @@ impl DWNManager {
         let mut storage = self
             .records
             .lock()
-            .map_err(|e| Web5Error::Storage(format!("Failed to acquire lock: {}", e)))?;
+            .map_err(|e| Web5Error::Storage(format!("Failed to acquire lock: {e}")))?;
         // [AIR-3][AIS-3][BPC-3][RES-3] Remove unnecessary mut keyword
         // This follows official Bitcoin Improvement Proposals (BIPs) standards for clean code
         if let Some(record) = storage.get_mut(id) {
@@ -433,7 +433,7 @@ impl DWNManager {
                         return Ok(response);
                     }
                 }
-                Err(Web5Error::DWNError(format!("Record not found: {}", id)))
+                Err(Web5Error::DWNError(format!("Record not found: {id}")))
             }
             "Update" => {
                 // Implementation for Update message type
@@ -449,7 +449,7 @@ impl DWNManager {
                         return Ok(message);
                     }
                 }
-                Err(Web5Error::DWNError(format!("Record not found: {}", id)))
+                Err(Web5Error::DWNError(format!("Record not found: {id}")))
             }
             "Delete" => {
                 // Implementation for Delete message type

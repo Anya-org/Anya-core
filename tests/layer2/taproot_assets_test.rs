@@ -1,5 +1,5 @@
 use anya_core::layer2::taproot_assets::{
-    create_taproot_asset, create_taproot_asset_mobile, AssetMetadata, Error, IssuanceTx, Network,
+    create_taproot_asset, create_taproot_asset_mobile, AssetMetadata, Network,
 };
 use std::collections::HashMap;
 use tokio;

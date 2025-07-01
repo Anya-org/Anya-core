@@ -165,7 +165,7 @@ impl FailoverManager {
         let event = FailoverEvent {
             id: event_id,
             timestamp: chrono::Utc::now(),
-            trigger_reason: format!("{:?}", trigger),
+            trigger_reason: format!("{trigger:?}"),
             source_node,
             target_node,
             phase: *self.current_phase.read().await,
@@ -241,8 +241,7 @@ impl FailoverManager {
                 // Verify the node is actually down
                 if !self.verify_node_failure(node).await? {
                     return Err(HaError::FailoverError(format!(
-                        "Node {} appears to be healthy",
-                        node
+                        "Node {node} appears to be healthy"
                     )));
                 }
             }
@@ -250,8 +249,7 @@ impl FailoverManager {
                 // Verify health check failure is critical
                 if !self.verify_health_failure(component).await? {
                     return Err(HaError::FailoverError(format!(
-                        "Component {} health check not critical",
-                        component
+                        "Component {component} health check not critical"
                     )));
                 }
             }

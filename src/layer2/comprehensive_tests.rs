@@ -54,7 +54,7 @@ mod comprehensive_layer2_tests {
                 assert_eq!(state.capacity, Some(21000000), "Capacity mismatch");
             },
             Err(e) => {
-                panic!("Failed to get state: {:?}", e);
+                panic!("Failed to get state: {e:?}");
             }
         }
 

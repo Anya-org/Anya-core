@@ -82,7 +82,7 @@ impl DnsResolver {
         domain: &str,
     ) -> DnsResult<Vec<String>> {
         // Check cache first
-        let cache_key = format!("{}@{}", user, domain);
+        let cache_key = format!("{user}@{domain}");
 
         // Check for cached entry
         if let Some(cached) = self.check_cache(&cache_key) {
@@ -101,8 +101,7 @@ impl DnsResolver {
             match timeout(Duration::from_secs(DNS_TIMEOUT_SECS), lookup_future).await {
                 Ok(result) => result.map_err(|e| DnsResolverError::Resolution(e.to_string())),
                 Err(_) => Err(DnsResolverError::Timeout(format!(
-                    "DNS lookup for {} timed out",
-                    name
+                    "DNS lookup for {name} timed out"
                 ))),
             }?;
 
@@ -140,7 +139,7 @@ impl DnsResolver {
     /// Format the DNS name according to BIP353
     fn format_dns_name(&self, user: &str, domain: &str) -> DnsResult<Name> {
         // Format: _bitcoin._wallet.<user>.<domain>
-        let dns_name = format!("{}.{}.{}.{}", BITCOIN_SERVICE, WALLET_SERVICE, user, domain);
+        let dns_name = format!("{BITCOIN_SERVICE}.{WALLET_SERVICE}.{user}.{domain}");
 
         Name::from_ascii(&dns_name).map_err(|e| DnsResolverError::RecordFormat(e.to_string()))
     }

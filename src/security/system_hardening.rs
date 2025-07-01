@@ -66,7 +66,7 @@ impl SystemHardening {
             let mut configs = self
                 .configs
                 .lock()
-                .map_err(|e| format!("Mutex lock error: {}", e))?;
+                .map_err(|e| format!("Mutex lock error: {e}"))?;
 
             let config = HardeningConfig {
                 name: name.to_string(),
@@ -91,7 +91,7 @@ impl SystemHardening {
         let mut counter = self
             .input_counter
             .lock()
-            .map_err(|e| format!("Mutex lock error: {}", e))?;
+            .map_err(|e| format!("Mutex lock error: {e}"))?;
         *counter += 1;
 
         // Auto-save every Nth input (e.g., every 20th input)
@@ -101,7 +101,7 @@ impl SystemHardening {
                     "Auto-saved security configuration after {} changes",
                     *counter
                 ),
-                Err(e) => eprintln!("Failed to auto-save security configuration: {}", e),
+                Err(e) => eprintln!("Failed to auto-save security configuration: {e}"),
             }
         }
 
@@ -115,7 +115,7 @@ impl SystemHardening {
         let configs = self
             .configs
             .lock()
-            .map_err(|e| format!("Mutex lock error: {}", e))?;
+            .map_err(|e| format!("Mutex lock error: {e}"))?;
         println!(
             "In-memory security configuration snapshot created: {} components",
             configs.len()
@@ -131,14 +131,13 @@ impl SystemHardening {
             let mut configs = self
                 .configs
                 .lock()
-                .map_err(|e| format!("Mutex lock error: {}", e))?;
+                .map_err(|e| format!("Mutex lock error: {e}"))?;
 
             let config = match configs.get_mut(component_name) {
                 Some(config) => config,
                 None => {
                     return Err(format!(
-                        "No configuration found for component {}",
-                        component_name
+                        "No configuration found for component {component_name}"
                     ))
                 }
             };
@@ -173,14 +172,13 @@ impl SystemHardening {
             let mut configs = self
                 .configs
                 .lock()
-                .map_err(|e| format!("Mutex lock error: {}", e))?;
+                .map_err(|e| format!("Mutex lock error: {e}"))?;
 
             let config = match configs.get_mut(component_name) {
                 Some(config) => config,
                 None => {
                     return Err(format!(
-                        "No configuration found for component {}",
-                        component_name
+                        "No configuration found for component {component_name}"
                     ))
                 }
             };
@@ -254,7 +252,7 @@ impl SystemHardening {
             }
             Err(e) => {
                 // Return a vec with the error if we can't get the lock
-                let error_msg = format!("Mutex lock error: {}", e);
+                let error_msg = format!("Mutex lock error: {e}");
                 // Using vec![] macro as suggested by Clippy
                 return vec![("general".to_string(), Err(error_msg))];
             }
@@ -289,7 +287,7 @@ mod tests {
             settings.insert("port_scanning".to_string(), "block".to_string());
 
             hardening.configure_component(
-                &format!("component_{}", i),
+                &format!("component_{i}"),
                 SecurityLevel::Enhanced,
                 settings,
                 true,

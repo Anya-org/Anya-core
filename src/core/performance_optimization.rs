@@ -86,7 +86,7 @@ impl PerformanceOptimizer {
             let mut resources = self
                 .resources
                 .lock()
-                .map_err(|e| format!("Mutex lock error: {}", e))?;
+                .map_err(|e| format!("Mutex lock error: {e}"))?;
 
             let config = OptimizationConfig {
                 resource_type,
@@ -122,13 +122,13 @@ impl PerformanceOptimizer {
             let resources = self
                 .resources
                 .lock()
-                .map_err(|e| format!("Mutex lock error: {}", e))?;
+                .map_err(|e| format!("Mutex lock error: {e}"))?;
             if !resources.contains_key(resource_name) {
-                return Err(format!("Resource not found: {}", resource_name));
+                return Err(format!("Resource not found: {resource_name}"));
             }
             resources
                 .get(resource_name)
-                .ok_or(format!("Resource not found: {}", resource_name))?
+                .ok_or(format!("Resource not found: {resource_name}"))?
                 .resource_type
         };
 
@@ -137,7 +137,7 @@ impl PerformanceOptimizer {
             let mut metrics_map = self
                 .metrics
                 .lock()
-                .map_err(|e| format!("Mutex lock error: {}", e))?;
+                .map_err(|e| format!("Mutex lock error: {e}"))?;
 
             let metrics = PerformanceMetrics {
                 resource_type,
@@ -162,14 +162,14 @@ impl PerformanceOptimizer {
         let mut counter = self
             .input_counter
             .lock()
-            .map_err(|e| format!("Mutex lock error: {}", e))?;
+            .map_err(|e| format!("Mutex lock error: {e}"))?;
         *counter += 1;
 
         // Auto-save every Nth input (e.g., every 20th input)
         if *counter % self.auto_save_frequency == 0 {
             match self.save_state_to_memory() {
                 Ok(_) => println!("Auto-saved performance state after {} changes", *counter),
-                Err(e) => eprintln!("Failed to auto-save: {}", e),
+                Err(e) => eprintln!("Failed to auto-save: {e}"),
             }
         }
 
@@ -183,11 +183,11 @@ impl PerformanceOptimizer {
         let resources = self
             .resources
             .lock()
-            .map_err(|e| format!("Mutex lock error: {}", e))?;
+            .map_err(|e| format!("Mutex lock error: {e}"))?;
         let metrics = self
             .metrics
             .lock()
-            .map_err(|e| format!("Mutex lock error: {}", e))?;
+            .map_err(|e| format!("Mutex lock error: {e}"))?;
 
         println!(
             "In-memory performance snapshot created: {} resources, {} metrics",
@@ -206,11 +206,11 @@ impl PerformanceOptimizer {
             let mut resources = self
                 .resources
                 .lock()
-                .map_err(|e| format!("Mutex lock error: {}", e))?;
+                .map_err(|e| format!("Mutex lock error: {e}"))?;
 
             let config = match resources.get_mut(resource_name) {
                 Some(config) => config,
-                None => return Err(format!("Resource not found: {}", resource_name)),
+                None => return Err(format!("Resource not found: {resource_name}")),
             };
 
             // Check if metrics exist
@@ -218,13 +218,12 @@ impl PerformanceOptimizer {
                 let metrics_map = self
                     .metrics
                     .lock()
-                    .map_err(|e| format!("Mutex lock error: {}", e))?;
+                    .map_err(|e| format!("Mutex lock error: {e}"))?;
                 match metrics_map.get(resource_name) {
                     Some(metrics) => metrics.clone(),
                     None => {
                         return Err(format!(
-                            "No metrics available for resource: {}",
-                            resource_name
+                            "No metrics available for resource: {resource_name}"
                         ))
                     }
                 }
@@ -296,7 +295,7 @@ impl PerformanceOptimizer {
                 let mut map = HashMap::new();
                 map.insert(
                     "general".to_string(),
-                    Err(format!("Mutex lock error: {}", e)),
+                    Err(format!("Mutex lock error: {e}")),
                 );
                 return map;
             }
@@ -316,7 +315,7 @@ impl PerformanceOptimizer {
         match self.resources.lock() {
             Ok(resources) => resources.get(resource_name).cloned(),
             Err(e) => {
-                eprintln!("Mutex lock error: {}", e);
+                eprintln!("Mutex lock error: {e}");
                 None
             }
         }
@@ -327,7 +326,7 @@ impl PerformanceOptimizer {
         match self.metrics.lock() {
             Ok(metrics) => metrics.get(resource_name).cloned(),
             Err(e) => {
-                eprintln!("Mutex lock error: {}", e);
+                eprintln!("Mutex lock error: {e}");
                 None
             }
         }
@@ -338,7 +337,7 @@ impl PerformanceOptimizer {
         match self.resources.lock() {
             Ok(resources) => resources.values().cloned().collect(),
             Err(e) => {
-                eprintln!("Mutex lock error: {}", e);
+                eprintln!("Mutex lock error: {e}");
                 Vec::new()
             }
         }
@@ -349,7 +348,7 @@ impl PerformanceOptimizer {
         match self.metrics.lock() {
             Ok(metrics) => metrics.values().cloned().collect(),
             Err(e) => {
-                eprintln!("Mutex lock error: {}", e);
+                eprintln!("Mutex lock error: {e}");
                 Vec::new()
             }
         }
@@ -360,7 +359,7 @@ impl PerformanceOptimizer {
         let counter = match self.input_counter.lock() {
             Ok(counter) => *counter,
             Err(e) => {
-                eprintln!("Mutex lock error for counter: {}", e);
+                eprintln!("Mutex lock error for counter: {e}");
                 0
             }
         };
@@ -368,7 +367,7 @@ impl PerformanceOptimizer {
         let resources_len = match self.resources.lock() {
             Ok(resources) => resources.len(),
             Err(e) => {
-                eprintln!("Mutex lock error for resources: {}", e);
+                eprintln!("Mutex lock error for resources: {e}");
                 0
             }
         };
@@ -376,7 +375,7 @@ impl PerformanceOptimizer {
         let metrics_len = match self.metrics.lock() {
             Ok(metrics) => metrics.len(),
             Err(e) => {
-                eprintln!("Mutex lock error for metrics: {}", e);
+                eprintln!("Mutex lock error for metrics: {e}");
                 0
             }
         };
@@ -401,7 +400,7 @@ mod tests {
             settings.insert("timeout".to_string(), "5000".to_string());
 
             optimizer.configure_resource(
-                &format!("resource_{}", i),
+                &format!("resource_{i}"),
                 ResourceType::CPU,
                 settings,
                 0.7,

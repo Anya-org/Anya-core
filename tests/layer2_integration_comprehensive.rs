@@ -66,7 +66,7 @@ async fn test_layer2_protocol_initialization() {
         }
         Err(e) => {
             // Protocol may not be available in test environment
-            println!("Stacks protocol not available for testing: {}", e);
+            println!("Stacks protocol not available for testing: {e}");
         }
     }
 
@@ -77,7 +77,7 @@ async fn test_layer2_protocol_initialization() {
         }
         Err(e) => {
             // Protocol may not be available in test environment
-            println!("BOB protocol not available for testing: {}", e);
+            println!("BOB protocol not available for testing: {e}");
         }
     }
 }
@@ -117,18 +117,17 @@ async fn test_lightning_network_operations() {
             match lightning.issue_asset(asset_params).await {
                 Ok(asset_id) => {
                     assert!(!asset_id.is_empty(), "Asset ID should not be empty");
-                    println!("Lightning asset issued: {}", asset_id);
+                    println!("Lightning asset issued: {asset_id}");
                 }
                 Err(e) => {
                     println!(
-                        "Lightning asset issuance failed (expected in test env): {}",
-                        e
+                        "Lightning asset issuance failed (expected in test env): {e}"
                     );
                 }
             }
         }
         Err(e) => {
-            println!("Lightning Network not available for testing: {}", e);
+            println!("Lightning Network not available for testing: {e}");
         }
     }
 }
@@ -153,10 +152,10 @@ async fn test_stacks_contract_operations() {
     match stacks.deploy_clarity_contract("test_contract", contract_code) {
         Ok(tx_id) => {
             assert!(!tx_id.is_empty(), "Transaction ID should not be empty");
-            println!("Contract deployment successful: {}", tx_id);
+            println!("Contract deployment successful: {tx_id}");
         }
         Err(e) => {
-            println!("Contract deployment failed (expected in test env): {}", e);
+            println!("Contract deployment failed (expected in test env): {e}");
         }
     }
 }
@@ -188,7 +187,7 @@ async fn test_state_channel_operations() {
             match channel.open() {
                 Ok(channel_id) => {
                     assert!(!channel_id.is_empty(), "Channel ID should not be empty");
-                    println!("State channel opened: {}", channel_id);
+                    println!("State channel opened: {channel_id}");
 
                     // Test state update
                     let signatures = vec!["sig_alice".to_string(), "sig_bob".to_string()];
@@ -201,17 +200,17 @@ async fn test_state_channel_operations() {
                             );
                         }
                         Err(e) => {
-                            println!("State update failed: {}", e);
+                            println!("State update failed: {e}");
                         }
                     }
                 }
                 Err(e) => {
-                    println!("Channel opening failed: {}", e);
+                    println!("Channel opening failed: {e}");
                 }
             }
         }
         Err(e) => {
-            println!("State channel creation failed: {}", e);
+            println!("State channel creation failed: {e}");
         }
     }
 }
@@ -236,7 +235,7 @@ async fn test_liquid_sidechain_operations() {
             println!("Liquid sidechain operational: version {}", state.version);
         }
         Err(e) => {
-            println!("Liquid sidechain not available for testing: {}", e);
+            println!("Liquid sidechain not available for testing: {e}");
         }
     }
 }
@@ -253,20 +252,20 @@ async fn test_transaction_submission() {
     match Layer2Protocol::submit_transaction(&mock_protocol, tx_data).await {
         Ok(tx_id) => {
             assert!(!tx_id.is_empty(), "Transaction ID should not be empty");
-            println!("Mock protocol transaction submitted: {}", tx_id);
+            println!("Mock protocol transaction submitted: {tx_id}");
 
             // Test transaction status check
             match Layer2Protocol::check_transaction_status(&mock_protocol, &tx_id).await {
                 Ok(status) => {
-                    println!("Transaction status: {:?}", status);
+                    println!("Transaction status: {status:?}");
                 }
                 Err(e) => {
-                    println!("Status check failed: {}", e);
+                    println!("Status check failed: {e}");
                 }
             }
         }
         Err(e) => {
-            println!("Transaction submission failed: {}", e);
+            println!("Transaction submission failed: {e}");
         }
     }
 }
@@ -285,7 +284,7 @@ async fn test_layer2_performance_benchmarks() {
     let mut successful_txs = 0;
 
     for i in 0..num_transactions {
-        let tx_data = format!("test_transaction_{}", i);
+        let tx_data = format!("test_transaction_{i}");
 
         // Test mock protocol transaction
         if Layer2Protocol::submit_transaction(&mock_protocol, tx_data.as_bytes())
@@ -308,8 +307,7 @@ async fn test_layer2_performance_benchmarks() {
     );
 
     println!(
-        "Performance test completed: {} successful transactions, avg {} ms per tx",
-        successful_txs, avg_time_per_tx
+        "Performance test completed: {successful_txs} successful transactions, avg {avg_time_per_tx} ms per tx"
     );
 }
 
@@ -332,7 +330,7 @@ async fn test_error_handling_and_recovery() {
             println!("Unexpected success with invalid config");
         }
         Err(e) => {
-            println!("Expected error with invalid config: {}", e);
+            println!("Expected error with invalid config: {e}");
             assert!(
                 !e.to_string().is_empty(),
                 "Error message should not be empty"
@@ -355,7 +353,7 @@ async fn test_error_handling_and_recovery() {
             println!("Unexpected success with invalid BOB config");
         }
         Err(e) => {
-            println!("Expected error with invalid BOB config: {}", e);
+            println!("Expected error with invalid BOB config: {e}");
             assert!(
                 !e.to_string().is_empty(),
                 "BOB error message should not be empty"
@@ -386,7 +384,7 @@ async fn test_protocol_state_synchronization() {
             );
         }
         Err(e) => {
-            println!("Protocol state sync failed: {}", e);
+            println!("Protocol state sync failed: {e}");
         }
     }
 }

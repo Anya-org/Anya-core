@@ -51,6 +51,7 @@ impl ProtocolConfig for BobConfig {
 
 /// Main BOB integration client
 pub struct BobClient {
+    #[allow(dead_code)]
     config: BobConfig,
     relay_monitor: BitcoinRelayMonitor,
     evm_adapter: EvmAdapter,
@@ -109,7 +110,9 @@ impl BobClient {
 
 /// Bitcoin relay monitoring component
 pub struct BitcoinRelayMonitor {
+    #[allow(dead_code)]
     config: BobConfig,
+    #[allow(dead_code)]
     last_status: Arc<Mutex<Option<RelayStatus>>>,
 }
 
@@ -138,6 +141,7 @@ impl BitcoinRelayMonitor {
 
 /// EVM adapter for interacting with BOB's EVM compatibility layer
 pub struct EvmAdapter {
+    #[allow(dead_code)]
     config: BobConfig,
 }
 

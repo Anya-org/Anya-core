@@ -572,7 +572,7 @@ impl Bip341Taproot {
             .ok_or_else(|| BitcoinError::TaprootError("No script tree".to_string()))?;
 
         let leaf = tree.leaves.get(&script_index).ok_or_else(|| {
-            BitcoinError::TaprootError(format!("Script at position {} not found", script_index))
+            BitcoinError::TaprootError(format!("Script at position {script_index} not found"))
         })?;
 
         // Create script for control block

@@ -31,7 +31,7 @@ pub fn generate_seed(_password: &str) -> BitcoinResult<[u8; 64]> {
 pub fn seed_from_mnemonic(mnemonic_phrase: &str, password: &str) -> BitcoinResult<[u8; 64]> {
     // For now, return a deterministic seed based on mnemonic
     // In a real implementation, this would use BIP39 mnemonic to seed conversion
-    let combined = format!("{}{}", mnemonic_phrase, password);
+    let combined = format!("{mnemonic_phrase}{password}");
     let mut seed = [0u8; 64];
     let bytes = combined.as_bytes();
     for (i, &byte) in bytes.iter().enumerate() {
@@ -49,16 +49,16 @@ pub fn derive_key_from_seed(seed: &[u8; 64], path: &str) -> BitcoinResult<Secret
 
     // Create master key from seed
     let master_key = Xpriv::new_master(Network::Bitcoin, seed)
-        .map_err(|e| BitcoinError::KeyDerivation(format!("Failed to create master key: {}", e)))?;
+        .map_err(|e| BitcoinError::KeyDerivation(format!("Failed to create master key: {e}")))?;
 
     // Parse derivation path
     let derivation_path = DerivationPath::from_str(path)
-        .map_err(|e| BitcoinError::KeyDerivation(format!("Invalid derivation path: {}", e)))?;
+        .map_err(|e| BitcoinError::KeyDerivation(format!("Invalid derivation path: {e}")))?;
 
     // Derive key at path
     let derived_key = master_key
         .derive_priv(&secp, &derivation_path)
-        .map_err(|e| BitcoinError::KeyDerivation(format!("Failed to derive key: {}", e)))?;
+        .map_err(|e| BitcoinError::KeyDerivation(format!("Failed to derive key: {e}")))?;
 
     Ok(derived_key.private_key)
 }
@@ -68,7 +68,7 @@ pub fn derive_master_key(seed: &[u8], network: Network) -> BitcoinResult<Extende
     let secp = Secp256k1::new();
 
     let xpriv = Xpriv::new_master(network, seed)
-        .map_err(|e| BitcoinError::KeyDerivation(format!("Failed to create master key: {}", e)))?;
+        .map_err(|e| BitcoinError::KeyDerivation(format!("Failed to create master key: {e}")))?;
 
     let xpub = Xpub::from_priv(&secp, &xpriv);
 
@@ -82,7 +82,7 @@ pub fn derive_child_key(parent: &ExtendedKey, path: &DerivationPath) -> BitcoinR
     let xpriv = parent
         .xpriv
         .derive_priv(&secp, path)
-        .map_err(|e| BitcoinError::KeyDerivation(format!("Failed to derive child key: {}", e)))?;
+        .map_err(|e| BitcoinError::KeyDerivation(format!("Failed to derive child key: {e}")))?;
 
     let xpub = Xpub::from_priv(&secp, &xpriv);
 

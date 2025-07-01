@@ -76,7 +76,7 @@ impl StacksClient {
             contract_name,
             contract_code.len()
         );
-        Ok(format!("stacks_contract_{}", contract_name))
+        Ok(format!("stacks_contract_{contract_name}"))
     }
 
     /// Call a Clarity contract function
@@ -92,7 +92,7 @@ impl StacksClient {
             contract_id,
             args.len()
         );
-        Ok(format!("stacks_call_{}_{}", contract_id, function_name))
+        Ok(format!("stacks_call_{contract_id}_{function_name}"))
     }
 }
 
@@ -116,7 +116,7 @@ impl Layer2ProtocolTrait for StacksClient {
 
     /// Check transaction status
     fn check_transaction_status(&self, tx_id: &str) -> Result<TransactionStatus, Box<dyn std::error::Error + Send + Sync>> {
-        println!("Checking Stacks transaction status: {}", tx_id);
+        println!("Checking Stacks transaction status: {tx_id}");
         Ok(TransactionStatus::Confirmed)
     }
 

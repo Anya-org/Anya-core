@@ -85,7 +85,7 @@ pub fn verify_bpc3() -> Result<(), Box<dyn Error>> {
             }
         }
         Err(e) => {
-            error!("❌ BPC-3 compliance verification error: {}", e);
+            error!("❌ BPC-3 compliance verification error: {e}");
             Err(e)
         }
     }
@@ -110,7 +110,7 @@ pub fn verify_dao4() -> Result<(), Box<dyn Error>> {
             }
         }
         Err(e) => {
-            error!("❌ DAO-4 compliance verification error: {}", e);
+            error!("❌ DAO-4 compliance verification error: {e}");
             Err(e)
         }
     }
@@ -135,7 +135,7 @@ pub fn verify_ais3() -> Result<(), Box<dyn Error>> {
             }
         }
         Err(e) => {
-            error!("❌ AIS-3 compliance verification error: {}", e);
+            error!("❌ AIS-3 compliance verification error: {e}");
             Err(e)
         }
     }
@@ -159,13 +159,12 @@ pub fn verify_all() -> Result<(), Box<dyn Error>> {
     );
 
     std::fs::write(
-        format!("{}/compliance_report.md", report_dir),
+        format!("{report_dir}/compliance_report.md"),
         report_content,
     )?;
 
     info!(
-        "Comprehensive compliance report generated in {}/compliance_report.md",
-        report_dir
+        "Comprehensive compliance report generated in {report_dir}/compliance_report.md"
     );
     Ok(())
 }

@@ -49,7 +49,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             Arc::new(node)
         }
         Err(e) => {
-            println!("   Error creating Lightning node: {:?}", e);
+            println!("   Error creating Lightning node: {e:?}");
             return Err(e.into());
         }
     };
@@ -63,7 +63,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             bridge
         }
         Err(e) => {
-            println!("   Error creating bridge: {:?}", e);
+            println!("   Error creating bridge: {e:?}");
             return Err(e.into());
         }
     };
@@ -72,8 +72,8 @@ fn main() -> Result<(), Box<dyn Error>> {
     println!("\n4. Initializing bridge...");
     let current_height = 750000; // Example block height
     match bridge.init(current_height) {
-        Ok(_) => println!("   Bridge initialized at block height {}", current_height),
-        Err(e) => println!("   Error initializing bridge: {:?}", e),
+        Ok(_) => println!("   Bridge initialized at block height {current_height}"),
+        Err(e) => println!("   Error initializing bridge: {e:?}"),
     }
 
     // Step 5: Demonstrate Lightning Network concepts
@@ -91,10 +91,10 @@ fn main() -> Result<(), Box<dyn Error>> {
     println!("\n6. Creating funding address for channel...");
     match bridge.create_funding_address(peer_pubkey, 100_000, None, false) {
         Ok(address) => {
-            println!("   Created funding address: {}", address);
+            println!("   Created funding address: {address}");
             println!("   Send 100,000 sats to this address to open a channel");
         }
-        Err(e) => println!("   Error creating funding address: {:?}", e),
+        Err(e) => println!("   Error creating funding address: {e:?}"),
     }
 
     // Step 7: Demonstrate conceptual Lightning operations
@@ -107,7 +107,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     // Step 8: Simulate channel management
     println!("\n8. Channel Management Simulation:");
-    println!("   - Opening channel with peer {}", peer_pubkey);
+    println!("   - Opening channel with peer {peer_pubkey}");
     println!("   - Channel capacity: 100,000 sats");
     println!("   - Local balance: 80,000 sats");
     println!("   - Remote balance: 20,000 sats");
@@ -139,11 +139,11 @@ fn main() -> Result<(), Box<dyn Error>> {
                 println!("     Funding txid: {}", tx.funding_txid);
                 println!("     Status: {:?}", tx.status);
                 if let Some(txid) = tx.closing_txid {
-                    println!("     Closing txid: {}", txid);
+                    println!("     Closing txid: {txid}");
                 }
             }
         }
-        Err(e) => println!("   Error listing channel transactions: {:?}", e),
+        Err(e) => println!("   Error listing channel transactions: {e:?}"),
     }
 
     // Step 12: Cleanup

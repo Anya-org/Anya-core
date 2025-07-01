@@ -138,7 +138,7 @@ pub mod tools;
 
 /// Core error type for the Anya system
 /// [AIR-3][AIS-3][BPC-3][RES-3]
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum AnyaError {
     /// ML-related errors
     ML(String),
@@ -160,21 +160,27 @@ pub enum AnyaError {
     LowConfidence(String),
     /// Resource not found errors
     NotFound(String),
+    /// Invalid input errors
+    InvalidInput(String),
+    /// Performance-related errors
+    PerformanceError(String),
 }
 
 impl fmt::Display for AnyaError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            AnyaError::ML(msg) => write!(f, "ML error: {}", msg),
-            AnyaError::Web5(msg) => write!(f, "Web5 error: {}", msg),
-            AnyaError::Bitcoin(msg) => write!(f, "Bitcoin error: {}", msg),
-            AnyaError::DAO(msg) => write!(f, "DAO error: {}", msg),
-            AnyaError::System(msg) => write!(f, "System error: {}", msg),
-            AnyaError::Generic(msg) => write!(f, "Generic error: {}", msg),
-            AnyaError::Custom(msg) => write!(f, "Custom error: {}", msg),
-            AnyaError::Timeout(msg) => write!(f, "Timeout error: {}", msg),
-            AnyaError::LowConfidence(msg) => write!(f, "Low confidence error: {}", msg),
-            AnyaError::NotFound(msg) => write!(f, "Not found error: {}", msg),
+            AnyaError::ML(msg) => write!(f, "ML error: {msg}"),
+            AnyaError::Web5(msg) => write!(f, "Web5 error: {msg}"),
+            AnyaError::Bitcoin(msg) => write!(f, "Bitcoin error: {msg}"),
+            AnyaError::DAO(msg) => write!(f, "DAO error: {msg}"),
+            AnyaError::System(msg) => write!(f, "System error: {msg}"),
+            AnyaError::Generic(msg) => write!(f, "Generic error: {msg}"),
+            AnyaError::Custom(msg) => write!(f, "Custom error: {msg}"),
+            AnyaError::Timeout(msg) => write!(f, "Timeout error: {msg}"),
+            AnyaError::LowConfidence(msg) => write!(f, "Low confidence error: {msg}"),
+            AnyaError::NotFound(msg) => write!(f, "Not found error: {msg}"),
+            AnyaError::InvalidInput(msg) => write!(f, "Invalid input error: {msg}"),
+            AnyaError::PerformanceError(msg) => write!(f, "Performance error: {msg}"),
         }
     }
 }
@@ -196,14 +202,14 @@ impl From<String> for AnyaError {
 // Use the secp256k1 crate directly
 impl From<secp256k1::Error> for AnyaError {
     fn from(err: secp256k1::Error) -> Self {
-        AnyaError::Bitcoin(format!("Secp256k1 error: {}", err))
+        AnyaError::Bitcoin(format!("Secp256k1 error: {err}"))
     }
 }
 
 // Add conversion from serde_json::Error to AnyaError
 impl From<serde_json::Error> for AnyaError {
     fn from(err: serde_json::Error) -> Self {
-        AnyaError::System(format!("JSON error: {}", err))
+        AnyaError::System(format!("JSON error: {err}"))
     }
 }
 
@@ -273,8 +279,7 @@ impl AnyaCore {
                 Ok(manager) => Some(manager),
                 Err(e) => {
                     return Err(AnyaError::Custom(format!(
-                        "Failed to initialize DAO manager: {}",
-                        e
+                        "Failed to initialize DAO manager: {e}"
                     )))
                 }
             }

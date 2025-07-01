@@ -321,9 +321,9 @@ impl DependencyManager {
 
         // Check if crate is in Cargo.toml dependencies
         if let Ok(cargo_toml) = fs::read_to_string("Cargo.toml") {
-            if cargo_toml.contains(&format!("{} ", crate_name))
-                || cargo_toml.contains(&format!("{}=", crate_name))
-                || cargo_toml.contains(&format!("{} =", crate_name))
+            if cargo_toml.contains(&format!("{crate_name} "))
+                || cargo_toml.contains(&format!("{crate_name}="))
+                || cargo_toml.contains(&format!("{crate_name} ="))
             {
                 return Ok("In Cargo.toml".to_string());
             }
@@ -339,17 +339,17 @@ impl DependencyManager {
 
         println!("🦀 Installing missing Rust crates...");
         for (crate_name, description) in crates {
-            println!("  - {} ({})", crate_name, description);
+            println!("  - {crate_name} ({description})");
 
             // Install crate
             let install_output = Command::new("cargo")
                 .args(["install", crate_name])
                 .output()
-                .context(format!("Failed to install crate {}", crate_name))?;
+                .context(format!("Failed to install crate {crate_name}"))?;
 
             if !install_output.status.success() {
                 let stderr = String::from_utf8_lossy(&install_output.stderr);
-                println!("⚠️  Warning: Failed to install {}: {}", crate_name, stderr);
+                println!("⚠️  Warning: Failed to install {crate_name}: {stderr}");
                 // Continue with other crates even if one fails
             }
         }
@@ -366,11 +366,11 @@ impl DependencyManager {
 
         if output.status.success() {
             let stdout = String::from_utf8_lossy(&output.stdout);
-            if stdout.contains(&format!("ii  {}", package)) {
+            if stdout.contains(&format!("ii  {package}")) {
                 // Extract version from dpkg output
                 let version = stdout
                     .lines()
-                    .find(|line| line.contains(&format!("ii  {}", package)))
+                    .find(|line| line.contains(&format!("ii  {package}")))
                     .and_then(|line| line.split_whitespace().nth(2))
                     .unwrap_or("unknown")
                     .to_string();
@@ -388,7 +388,7 @@ impl DependencyManager {
 
         println!("🔧 Installing missing system dependencies...");
         for (package, description) in packages {
-            println!("  - {} ({})", package, description);
+            println!("  - {package} ({description})");
         }
 
         // Update package list
@@ -641,7 +641,7 @@ impl EnhancedInstaller {
 
         // Set appropriate worker thread counts
         let optimal_threads = (self.hw_profile.cpu_cores / 2).clamp(2, 16);
-        println!("  - Configured {} worker threads", optimal_threads);
+        println!("  - Configured {optimal_threads} worker threads");
 
         Ok(())
     }
@@ -952,7 +952,7 @@ fn main() -> Result<()> {
     match cli.command {
         Some(Commands::Install { profile }) => {
             if cli.verbose {
-                println!("Installing with profile: {}", profile);
+                println!("Installing with profile: {profile}");
             }
             let installer = if cli.non_interactive {
                 EnhancedInstaller::new(&cli.install_dir, cli.verbose)?

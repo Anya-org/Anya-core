@@ -163,7 +163,7 @@ impl ContractManager {
         // This follows official Bitcoin Improvement Proposals (BIPs) standards for asset ID generation
         // [AIR-3][AIS-3][BPC-3][RES-3] Specify type for hex::encode to resolve ambiguity
         let hex_string = hex::encode::<&[u8]>(hash.as_ref());
-        let asset_id = format!("rgb1{}", hex_string);
+        let asset_id = format!("rgb1{hex_string}");
 
         Ok(asset_id)
     }
@@ -200,7 +200,7 @@ impl ContractManager {
         Ok(RgbAsset {
             id: asset_id.clone(), // Use the same value for both id and asset_id fields
             asset_id,
-            ticker: format!("RGB{}", precision),
+            ticker: format!("RGB{precision}"),
             name: metadata.to_string(),
             precision,
             issued_supply: 0,
@@ -316,7 +316,7 @@ pub fn generate_asset_id(
     // This follows official Bitcoin Improvement Proposals (BIPs) standards for asset ID generation
     // [AIR-3][AIS-3][BPC-3][RES-3] Specify type for hex::encode to resolve ambiguity
     let hex_string = hex::encode::<&[u8]>(hash.as_ref());
-    let asset_id = format!("rgb1{}", hex_string);
+    let asset_id = format!("rgb1{hex_string}");
 
     Ok(asset_id)
 }

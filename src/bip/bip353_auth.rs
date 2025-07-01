@@ -102,11 +102,11 @@ pub enum BetaAccessError {
 impl fmt::Display for BetaAccessError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            BetaAccessError::AuthError(msg) => write!(f, "Authentication error: {}", msg),
-            BetaAccessError::InvalidSession(msg) => write!(f, "Invalid session: {}", msg),
+            BetaAccessError::AuthError(msg) => write!(f, "Authentication error: {msg}"),
+            BetaAccessError::InvalidSession(msg) => write!(f, "Invalid session: {msg}"),
             BetaAccessError::ExpiredSession => write!(f, "Expired session"),
             BetaAccessError::NotAuthorized => write!(f, "Not authorized"),
-            BetaAccessError::ConfigError(msg) => write!(f, "Configuration error: {}", msg),
+            BetaAccessError::ConfigError(msg) => write!(f, "Configuration error: {msg}"),
         }
     }
 }
@@ -190,15 +190,14 @@ impl BetaAccessManager {
             Ok(bytes) => bytes,
             Err(e) => {
                 return Err(BetaAccessError::AuthError(format!(
-                    "Invalid signature: {}",
-                    e
+                    "Invalid signature: {e}"
                 )))
             }
         };
 
         let pubkey_bytes = match hex::decode(pubkey) {
             Ok(bytes) => bytes,
-            Err(e) => return Err(BetaAccessError::AuthError(format!("Invalid pubkey: {}", e))),
+            Err(e) => return Err(BetaAccessError::AuthError(format!("Invalid pubkey: {e}"))),
         };
 
         // Create message from k1
@@ -210,8 +209,7 @@ impl BetaAccessManager {
             Ok(msg) => msg,
             Err(e) => {
                 return Err(BetaAccessError::AuthError(format!(
-                    "Invalid message: {}",
-                    e
+                    "Invalid message: {e}"
                 )))
             }
         };
@@ -221,23 +219,21 @@ impl BetaAccessManager {
             Ok(pk) => pk,
             Err(e) => {
                 return Err(BetaAccessError::AuthError(format!(
-                    "Invalid public key: {}",
-                    e
+                    "Invalid public key: {e}"
                 )))
             }
         };
 
         // The signature format is zbase32 with recovery ID prefix
         let recovery_id = RecoveryId::from_i32(signature_bytes[0] as i32 - 31)
-            .map_err(|e| BetaAccessError::AuthError(format!("Invalid recovery ID: {}", e)))?;
+            .map_err(|e| BetaAccessError::AuthError(format!("Invalid recovery ID: {e}")))?;
 
         let signature = match RecoverableSignature::from_compact(&signature_bytes[1..], recovery_id)
         {
             Ok(sig) => sig,
             Err(e) => {
                 return Err(BetaAccessError::AuthError(format!(
-                    "Invalid signature: {}",
-                    e
+                    "Invalid signature: {e}"
                 )))
             }
         };
@@ -261,8 +257,7 @@ impl BetaAccessManager {
                 Ok(session.clone())
             }
             Err(e) => Err(BetaAccessError::AuthError(format!(
-                "Signature verification failed: {}",
-                e
+                "Signature verification failed: {e}"
             ))),
         }
     }
@@ -351,15 +346,14 @@ impl BetaAuthToken {
     pub fn decode(token: &str) -> Result<Self, BetaAccessError> {
         let bytes = match general_purpose::STANDARD.decode(token) {
             Ok(bytes) => bytes,
-            Err(e) => return Err(BetaAccessError::AuthError(format!("Invalid token: {}", e))),
+            Err(e) => return Err(BetaAccessError::AuthError(format!("Invalid token: {e}"))),
         };
 
         let json = match String::from_utf8(bytes) {
             Ok(json) => json,
             Err(e) => {
                 return Err(BetaAccessError::AuthError(format!(
-                    "Invalid token data: {}",
-                    e
+                    "Invalid token data: {e}"
                 )))
             }
         };
@@ -368,8 +362,7 @@ impl BetaAuthToken {
             Ok(token) => token,
             Err(e) => {
                 return Err(BetaAccessError::AuthError(format!(
-                    "Invalid token format: {}",
-                    e
+                    "Invalid token format: {e}"
                 )))
             }
         };

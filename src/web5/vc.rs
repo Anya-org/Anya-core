@@ -156,7 +156,7 @@ impl CredentialManager {
         self.credentials
             .get(id)
             .cloned()
-            .ok_or_else(|| Web5Error::Credential(format!("Credential not found: {}", id)))
+            .ok_or_else(|| Web5Error::Credential(format!("Credential not found: {id}")))
     }
 
     /// List all credentials
@@ -175,7 +175,7 @@ impl CredentialManager {
 
         // Serialize credential without proof
         let credential_json = serde_json::to_string(&credential)
-            .map_err(|e| Web5Error::Credential(format!("Failed to serialize credential: {}", e)))?;
+            .map_err(|e| Web5Error::Credential(format!("Failed to serialize credential: {e}")))?;
 
         // Sign with issuer DID
         let signature = self
@@ -186,7 +186,7 @@ impl CredentialManager {
         let proof = CredentialProof {
             proof_type: "Ed25519Signature2020".to_string(),
             created: current_iso_date(),
-            verification_method: format!("{}#keys-1", issuer_did),
+            verification_method: format!("{issuer_did}#keys-1"),
             proof_purpose: "assertionMethod".to_string(),
             jws: hex::encode(signature),
         };
@@ -229,7 +229,7 @@ pub enum VCError {
 
 impl Display for VCError {
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
-        write!(f, "{:?}", self)
+        write!(f, "{self:?}")
     }
 }
 

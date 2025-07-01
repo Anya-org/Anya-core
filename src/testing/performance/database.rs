@@ -337,8 +337,7 @@ impl PerformanceTestable for DatabaseAccessTest {
 
         // Warmup
         println!(
-            "Warming up database for {} iterations...",
-            warmup_iterations
+            "Warming up database for {warmup_iterations} iterations..."
         );
         // Populate some data for reads/updates/deletes
         for _ in 0..warmup_iterations / 10 {
@@ -351,7 +350,7 @@ impl PerformanceTestable for DatabaseAccessTest {
         test.db.reset_stats();
 
         // Actual test
-        println!("Running database test for {} iterations...", iterations);
+        println!("Running database test for {iterations} iterations...");
 
         let mut timer = Timer::new();
         timer.start();
@@ -363,7 +362,7 @@ impl PerformanceTestable for DatabaseAccessTest {
         let operations = test.operations.clone();
 
         for operation in &operations {
-            println!("Testing {:?} operations...", operation);
+            println!("Testing {operation:?} operations...");
             let ops_per_second =
                 test.run_operation_test(*operation, iterations / operations.len())?;
 

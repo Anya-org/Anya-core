@@ -176,8 +176,7 @@ impl PerformanceTestRunner {
             .find(|c| c.name == test_name)
             .ok_or_else(|| {
                 PerfTestError::ConfigurationError(format!(
-                    "Test configuration not found: {}",
-                    test_name
+                    "Test configuration not found: {test_name}"
                 ))
             })?;
 
@@ -232,12 +231,12 @@ impl PerformanceTestRunner {
                     None => "",
                 };
 
-                markdown.push_str(&format!("  - **{}:** {:.2} {}\n", name, value, type_str));
+                markdown.push_str(&format!("  - **{name}:** {value:.2} {type_str}\n"));
             }
 
             markdown.push_str("- **Parameters:**\n");
             for (name, value) in &result.parameters {
-                markdown.push_str(&format!("  - **{}:** {}\n", name, value));
+                markdown.push_str(&format!("  - **{name}:** {value}\n"));
             }
 
             markdown.push('\n');
