@@ -33,7 +33,7 @@ impl TaprootVerifier {
         // we need to compute all possible tweaks and see if any matches
         
         // Simplest case: no scripts, just key path spending
-        let tweak = TapTweakHash::from_key_and_tweak(*internal_key, []);
+        let tweak = TapTweakHash::from_key_and_merkle_root(*internal_key, None);
         let (tweaked_key, _parity) = internal_key.tap_tweak(&self.secp, tweak);
         
         if tweaked_key == output_key {
@@ -93,8 +93,13 @@ impl TaprootVerifier {
     }
     
     /// Compute merkle root from leaf hash and control block
-    fn compute_merkle_root(&self, leaf_hash: TapLeafHash, control_block: &ControlBlock) -> Result<TapNodeHash> {
+    fn compute_merkle_root(&self, leaf_hash: TapLeafHash, control_block: &ControlBlock) -> Result<Option<TapNodeHash>> {
         let mut current = TapNodeHash::from_inner(leaf_hash.into_inner());
+        
+        // Check if merkle branch is empty
+        if control_block.merkle_branch.is_empty() {
+            return Ok(None);
+        }
         
         // Traverse the path and compute the root
         for node in &control_block.merkle_branch {
@@ -114,7 +119,7 @@ impl TaprootVerifier {
             current = TapNodeHash::from_inner(bitcoin::hashes::sha256::Hash::hash(&concat).into_inner());
         }
         
-        Ok(current)
+        Ok(Some(current))
     }
     
     /// Verify a Taproot address derivation

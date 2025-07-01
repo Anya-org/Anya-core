@@ -4,7 +4,9 @@ use anya_core::bitcoin::{
     taproot::TaprootValidator,
     validation::{TransactionValidator, ValidationError},
 };
-use bitcoin::{Script, Transaction};
+use bitcoin::{
+    ScriptBuf, Transaction, absolute::LockTime, transaction::Version
+};
 use std::io::Write;
 use std::path::Path;
 use tempfile::NamedTempFile;
@@ -39,8 +41,8 @@ fn test_validate_taproot_transaction() {
     // In a real test, we would create a valid Taproot transaction
     // For now, we'll mock this with a dummy transaction
     let tx = Transaction {
-        version: 2,
-        lock_time: bitcoin::LockTime::ZERO,
+        version: Version::ONE,  // Use Version::ONE instead of hardcoded 2
+        lock_time: LockTime::ZERO,  // Use imported LockTime
         input: vec![],
         output: vec![],
     };

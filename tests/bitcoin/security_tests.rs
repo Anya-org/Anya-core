@@ -293,11 +293,11 @@ fn calculate_std_dev(times: &[std::time::Duration], avg_ns: f64) -> f64 {
 fn test_invariant_violations(checker: &BitcoinCoreInvariantChecker) {
     // Test version invariant
     let invalid_version_tx = Transaction {
-        version: Version(0), // Invalid version
+        version: Version::from_consensus(0), // Invalid version
         lock_time: LockTime::ZERO,
         input: vec![TxIn {
             previous_output: OutPoint::null(),
-            script_sig: ScriptBuf::new().into(),
+            script_sig: ScriptBuf::new(),
             sequence: Sequence(0),
             witness: Witness::default(),
         }],
@@ -313,7 +313,7 @@ fn test_invariant_violations(checker: &BitcoinCoreInvariantChecker) {
 
     // Test empty inputs invariant
     let empty_inputs_tx = Transaction {
-        version: Version(1),
+        version: Version::ONE,
         lock_time: LockTime::ZERO,
         input: vec![], // No inputs
         output: vec![TxOut {
@@ -328,7 +328,7 @@ fn test_invariant_violations(checker: &BitcoinCoreInvariantChecker) {
 
     // Test empty outputs invariant
     let empty_outputs_tx = Transaction {
-        version: Version(1),
+        version: Version::ONE,
         lock_time: LockTime::ZERO,
         input: vec![TxIn {
             previous_output: OutPoint::null(),
@@ -354,17 +354,17 @@ fn test_invariant_violations(checker: &BitcoinCoreInvariantChecker) {
 // Create a valid minimal transaction
 fn create_valid_transaction() -> Transaction {
     Transaction {
-        version: Version(1),
+        version: Version::ONE,
         lock_time: LockTime::ZERO,
         input: vec![TxIn {
             previous_output: OutPoint::null(),
-            script_sig: ScriptBuf::new().into(),
+            script_sig: ScriptBuf::new(),
             sequence: Sequence(0),
             witness: Witness::default(),
         }],
         output: vec![TxOut {
             value: Amount::from_sat(1000),
-            script_pubkey: ScriptBuf::new().into(),
+            script_pubkey: ScriptBuf::new(),
         }],
     }
 }
@@ -374,25 +374,25 @@ fn create_duplicate_inputs_transaction() -> Transaction {
     let outpoint = OutPoint::null();
 
     Transaction {
-        version: Version(1),
+        version: Version::ONE,
         lock_time: LockTime::ZERO,
         input: vec![
             TxIn {
                 previous_output: outpoint,
-                script_sig: ScriptBuf::new().into(),
+                script_sig: ScriptBuf::new(),
                 sequence: Sequence(0),
                 witness: Witness::default(),
             },
             TxIn {
                 previous_output: outpoint, // Same as above, this is the duplicate
-                script_sig: ScriptBuf::new().into(),
+                script_sig: ScriptBuf::new(),
                 sequence: Sequence(0),
                 witness: Witness::default(),
             },
         ],
         output: vec![TxOut {
             value: Amount::from_sat(1000),
-            script_pubkey: ScriptBuf::new().into(),
+            script_pubkey: ScriptBuf::new(),
         }],
     }
 }
@@ -400,11 +400,11 @@ fn create_duplicate_inputs_transaction() -> Transaction {
 // Create a transaction that attempts value overflow (CVE-2010-5139)
 fn create_value_overflow_transaction() -> Transaction {
     Transaction {
-        version: Version(1),
+        version: Version::ONE,
         lock_time: LockTime::ZERO,
         input: vec![TxIn {
             previous_output: OutPoint::null(),
-            script_sig: ScriptBuf::new().into(),
+            script_sig: ScriptBuf::new(),
             sequence: Sequence(0),
             witness: Witness::default(),
         }],
@@ -412,11 +412,11 @@ fn create_value_overflow_transaction() -> Transaction {
             // Two outputs with maximum Bitcoin value could cause overflow
             TxOut {
                 value: Amount::from_sat(21_000_000 * 100_000_000), // Max BTC supply in satoshis
-                script_pubkey: ScriptBuf::new().into(),
+                script_pubkey: ScriptBuf::new(),
             },
             TxOut {
                 value: Amount::from_sat(21_000_000 * 100_000_000), // Max BTC supply in satoshis
-                script_pubkey: ScriptBuf::new().into(),
+                script_pubkey: ScriptBuf::new(),
             },
         ],
     }
@@ -429,7 +429,7 @@ fn create_op_eval_transaction() -> Transaction {
     let script = ScriptBuf::from(script_bytes);
 
     Transaction {
-        version: Version(1),
+        version: Version::ONE,
         lock_time: LockTime::ZERO,
         input: vec![TxIn {
             previous_output: OutPoint::null(),
@@ -439,7 +439,7 @@ fn create_op_eval_transaction() -> Transaction {
         }],
         output: vec![TxOut {
             value: Amount::from_sat(1000),
-            script_pubkey: ScriptBuf::new().into(),
+            script_pubkey: ScriptBuf::new(),
         }],
     }
 }

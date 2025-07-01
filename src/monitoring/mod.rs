@@ -1,5 +1,5 @@
-//! MonitoringSystem, NetworkMetric, FeeMetric API [TEMPLATE]
-//! [AIR-3][AIS-3][BPC-3][RES-3]
+//! MonitoringSystem, NetworkMetric, FeeMetric API \[TEMPLATE\]
+//! \[AIR-3\]\[AIS-3\]\[BPC-3\]\[RES-3\]
 
 use std::collections::HashMap;
 

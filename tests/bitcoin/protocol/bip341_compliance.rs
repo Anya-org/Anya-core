@@ -8,7 +8,7 @@ use anyhow::{bail, Context, Result};
 use bitcoin::ecdsa::Signature;
 use bitcoin::schnorr::SchnorrSignature;
 use bitcoin::secp256k1::{Secp256k1, XOnlyPublicKey};
-use bitcoin::taproot::{LeafVersion, TapBranchHash, TapLeaf, TapTree, TaprootBuilder};
+use bitcoin::taproot::{LeafVersion, TapBranchHash, TaprootBuilder, ControlBlock, TapLeaf};
 use bitcoin::{PrivateKey, PublicKey, ScriptBuf, TapLeafHash, TapNodeHash, TapTweakHash};
 use anya_bitcoin::bip::bip341::TaprootVerifier;
 use std::str::FromStr;
@@ -28,12 +28,13 @@ pub fn test_taproot_key_path_spending() -> Result<()> {
     let script = ScriptBuf::from_hex(
         "5121030681b3e0d62e8455f48c657bf8b2556e1c6c89be232f57f1f53a88b0a9986cc751ae",
     )?;
-    let leaf = TapLeaf::new(LeafVersion::TapScript, script);
-
+    
     // Create Taproot tree
-    let tap_tree = TapTree::builder()
-        .add_leaf(0, leaf.clone())
-        .finalize(&secp, internal_key)?;
+    let mut builder = TaprootBuilder::new();
+    builder = builder.add_leaf(0, script.clone())
+        .map_err(|e| anyhow::anyhow!("Failed to add leaf: {:?}", e))?;
+    let tap_tree = builder.finalize(&secp, internal_key)
+        .map_err(|e| anyhow::anyhow!("Failed to finalize taproot builder: {:?}", e))?;
 
     // Get Taproot output key
     let tap_output_key = tap_tree.output_key();
@@ -43,7 +44,10 @@ pub fn test_taproot_key_path_spending() -> Result<()> {
         "ee4fe085983462a184015d1f782d6a5f8b9c2b60130aff050ce221aff7cc6b47",
     )?;
 
-    if tap_output_key != expected_key {
+    // Convert tap_output_key to XOnlyPublicKey for comparison
+    let tap_output_xonly = tap_output_key.to_inner();
+
+    if tap_output_xonly != expected_key {
         bail!("Taproot output key doesn't match expected value");
     }
 
@@ -73,21 +77,21 @@ pub fn test_taproot_script_path_spending() -> Result<()> {
         "5121036e34cc5ee5558b925045f968e834316d8c90c8d0dd850cc3f990d56755abfa0751ae",
     )?;
 
-    let leaf1 = TapLeaf::new(LeafVersion::TapScript, script1);
-    let leaf2 = TapLeaf::new(LeafVersion::TapScript, script2);
-
     // Build complex Taproot tree with multiple spending paths
-    let builder = TaprootBuilder::new();
-    let tree = builder
-        .add_leaf(0, leaf1.clone())?
-        .add_leaf(1, leaf2.clone())?
-        .finalize(&secp, internal_key)?;
+    let mut builder = TaprootBuilder::new();
+    builder = builder.add_leaf(0, script1.clone())
+        .map_err(|e| anyhow::anyhow!("Failed to add first leaf: {:?}", e))?;
+    builder = builder.add_leaf(1, script2.clone())
+        .map_err(|e| anyhow::anyhow!("Failed to add second leaf: {:?}", e))?;
+    let tree = builder.finalize(&secp, internal_key)
+        .map_err(|e| anyhow::anyhow!("Failed to finalize taproot builder: {:?}", e))?;
 
     // Get Taproot output key
     let tap_output_key = tree.output_key();
 
     // Get control block and verify it
-    let control_block = tree.control_block(&leaf1)?;
+    let control_block = tree.control_block(&(script1.clone(), LeafVersion::TapScript))
+        .ok_or(anyhow::anyhow!("Failed to get control block"))?;
 
     // Verify control block is valid
     let verifier = TaprootVerifier::new();
@@ -120,13 +124,11 @@ pub fn test_taproot_multisig_schnorr() -> Result<()> {
 
     // Create 2-of-3 multisig script
     let script = ScriptBuf::from_hex(
-        "202079be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798ac".to_string()
-            + "20c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5ac"
-            + "20e493dbf1c10d80f3581e4904930b1404cc6c13900ee0758474fa94abe8c4cd13ac"
-            + "53ae",
+        "202079be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798ac\
+         20c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5ac\
+         20e493dbf1c10d80f3581e4904930b1404cc6c13900ee0758474fa94abe8c4cd13ac\
+         53ae"
     )?;
-
-    let leaf = TapLeaf::new(LeafVersion::TapScript, script);
 
     // Create internal key for key path spending
     let internal_key = XOnlyPublicKey::from_str(
@@ -134,9 +136,11 @@ pub fn test_taproot_multisig_schnorr() -> Result<()> {
     )?;
 
     // Create Taproot tree
-    let tap_tree = TapTree::builder()
-        .add_leaf(0, leaf.clone())
-        .finalize(&secp, internal_key)?;
+    let mut builder = TaprootBuilder::new();
+    builder = builder.add_leaf(0, script.clone())
+        .map_err(|e| anyhow::anyhow!("Failed to add leaf: {:?}", e))?;
+    let tap_tree = builder.finalize(&secp, internal_key)
+        .map_err(|e| anyhow::anyhow!("Failed to finalize taproot builder: {:?}", e))?;
 
     // Get output key
     let output_key = tap_tree.output_key();
@@ -145,7 +149,8 @@ pub fn test_taproot_multisig_schnorr() -> Result<()> {
     let verifier = TaprootVerifier::new();
 
     // Get control block
-    let control_block = tap_tree.control_block(&leaf)?;
+    let control_block = tap_tree.control_block(&(script.clone(), LeafVersion::TapScript))
+        .ok_or(anyhow::anyhow!("Failed to get control block"))?;
 
     // Verify script path
     assert!(verifier.verify_script_path_spend(
@@ -166,22 +171,23 @@ pub fn test_taproot_edge_cases() -> Result<()> {
 
     // Test empty script
     let empty_script = ScriptBuf::new();
-    let leaf = TapLeaf::new(LeafVersion::TapScript, empty_script);
-
     // Create internal key
     let internal_key = XOnlyPublicKey::from_str(
         "93c7378d96518a75448821c4f7c8f4bae7ce60f804d03d1f0628dd5dd0f5de51",
     )?;
 
     // Verify we can still create taproot output with empty script
-    let tap_tree = TapTree::builder()
-        .add_leaf(0, leaf.clone())
-        .finalize(&secp, internal_key)?;
+    let mut builder = TaprootBuilder::new();
+    builder = builder.add_leaf(0, empty_script.clone())
+        .map_err(|e| anyhow::anyhow!("Failed to add empty script leaf: {:?}", e))?;
+    let tap_tree = builder.finalize(&secp, internal_key)
+        .map_err(|e| anyhow::anyhow!("Failed to finalize taproot builder: {:?}", e))?;
     let output_key = tap_tree.output_key();
 
     // Verify with TaprootVerifier
     let verifier = TaprootVerifier::new();
-    let control_block = tap_tree.control_block(&leaf)?;
+    let control_block = tap_tree.control_block(&(empty_script.clone(), LeafVersion::TapScript))
+        .ok_or(anyhow::anyhow!("Failed to get control block"))?;
 
     // Should still verify with empty script
     assert!(verifier.verify_script_path_spend(
@@ -193,16 +199,18 @@ pub fn test_taproot_edge_cases() -> Result<()> {
 
     // Test maximum allowed script size
     let max_script = ScriptBuf::from(vec![0x51; 520]); // Just under the limit
-    let max_leaf = TapLeaf::new(LeafVersion::TapScript, max_script.clone());
-
+    
     // Verify we can create taproot output with max size script
-    let tap_tree_max = TapTree::builder()
-        .add_leaf(0, max_leaf.clone())
-        .finalize(&secp, internal_key)?;
+    let mut builder_max = TaprootBuilder::new();
+    builder_max = builder_max.add_leaf(0, max_script.clone())
+        .map_err(|e| anyhow::anyhow!("Failed to add max script leaf: {:?}", e))?;
+    let tap_tree_max = builder_max.finalize(&secp, internal_key)
+        .map_err(|e| anyhow::anyhow!("Failed to finalize taproot builder: {:?}", e))?;
     let output_key_max = tap_tree_max.output_key();
 
     // Get control block
-    let control_block_max = tap_tree_max.control_block(&max_leaf)?;
+    let control_block_max = tap_tree_max.control_block(&(max_script.clone(), LeafVersion::TapScript))
+        .ok_or(anyhow::anyhow!("Failed to get control block"))?;
 
     // Should verify with max script
     assert!(verifier.verify_script_path_spend(
@@ -228,9 +236,9 @@ pub fn test_taproot_compliance_vectors() -> Result<()> {
     )?;
 
     // Compute taptweak
-    let tweak = TapTweakHash::from_merkle_root_and_internal(
-        merkle_root.as_ref().try_into().expect("Invalid length"),
-        internal_pubkey.serialize(),
+    let tweak = TapTweakHash::from_key_and_tweak(
+        internal_pubkey,
+        Some(merkle_root),
     );
 
     // Expected output key after tweaking
