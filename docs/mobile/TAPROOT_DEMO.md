@@ -73,7 +73,7 @@ Add the following dependencies to your mobile project:
 
 ```toml
 [dependencies]
-bitcoin = "0.30"
+bitcoin = "0.32.6"
 secp256k1 = "0.27"
 anya-core = { path = "../../" }
 ```

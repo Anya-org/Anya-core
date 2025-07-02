@@ -10,7 +10,7 @@ repository.workspace = true
 [dependencies]
 # Inherited from workspace
 secp256k1.workspace = true
-bitcoin = { version = "0.32", features = ["std", "serde", "rand", "bitcoinconsensus", "secp-recovery", "base64", "rand-std", "bitcoinconsensus-std"], optional = true }
+bitcoin = { version = "=0.32.6", features = ["std", "serde", "rand", "bitcoinconsensus", "secp-recovery", "base64", "rand-std", "bitcoinconsensus-std"], optional = true }
 bitcoincore-rpc.workspace = true
 web5.workspace = true
 bdk.workspace = true

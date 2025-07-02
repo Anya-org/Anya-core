@@ -3,6 +3,7 @@
 ## Overview
 
 This document outlines research-based best practices for maintaining optimal system alignment based on:
+
 - Rust API Guidelines
 - Bitcoin rust-bitcoin library standards  
 - Clean Architecture principles (Uncle Bob)
@@ -12,6 +13,7 @@ This document outlines research-based best practices for maintaining optimal sys
 ## 1. Dependency Management Best Practices
 
 ### Current Strengths
+
 - ✅ Precise version pinning for reproducible builds
 - ✅ Feature flag organization with logical groupings
 - ✅ Workspace-based architecture
@@ -20,12 +22,13 @@ This document outlines research-based best practices for maintaining optimal sys
 ### Recommendations
 
 #### A. Version Management Strategy
+
 ```toml
 # Follow rust-bitcoin approach with explicit MSRV
 rust-version = "1.63.0"
 
 # Use precise versions for critical dependencies
-bitcoin = "0.32"      # Core consensus library
+bitcoin = "0.32.6"      # Core consensus library
 secp256k1 = "0.29"    # Cryptographic operations
 
 # Allow patch updates for development tools
@@ -33,6 +36,7 @@ tracing = "0.1.41"    # Logging and observability
 ```
 
 #### B. Feature Flag Organization
+
 ```toml
 [features]
 default = ["std", "rust-bitcoin"]
@@ -56,12 +60,14 @@ complete = ["enterprise"]
 ## 2. Hexagonal Architecture Alignment
 
 ### Core Principles (Alistair Cockburn)
+
 1. **Inside-Outside Asymmetry**: Business logic in center, external concerns on outside
 2. **Port Definition**: Purposeful conversations independent of technology
 3. **Adapter Implementation**: Technology-specific implementations of ports
 4. **Dependency Rule**: Dependencies point inward only
 
 ### Current Implementation Status
+
 - ✅ Proper port/adapter separation in `anya-bitcoin/src/ports/`
 - ✅ Clean domain logic isolation
 - ✅ Technology-agnostic interfaces
@@ -70,6 +76,7 @@ complete = ["enterprise"]
 ### Enhancement Recommendations
 
 #### A. Port Interface Standardization
+
 ```rust
 // Define consistent port interfaces following hexagonal principles
 pub trait BitcoinPort: Send + Sync {
@@ -85,6 +92,7 @@ pub struct TestnetAdapter { /* ... */ }
 ```
 
 #### B. Dependency Injection Container
+
 ```rust
 // Enhanced container following hexagonal architecture
 pub struct SystemContainer {
@@ -118,11 +126,13 @@ impl SystemContainer {
 ## 3. Clean Architecture Compliance (Uncle Bob)
 
 ### The Dependency Rule
+
 - ✅ Source code dependencies point inward only
 - ✅ Inner circles know nothing about outer circles
 - ✅ Data crossing boundaries uses simple structures
 
 ### Layer Organization
+
 ```
 Frameworks & Drivers (Outermost)
     ↓
@@ -134,6 +144,7 @@ Enterprise Business Rules (Entities) (Innermost)
 ```
 
 ### Current Alignment Assessment
+
 - ✅ **Entities**: Bitcoin domain objects isolated in core
 - ✅ **Use Cases**: Application logic in application layer
 - ✅ **Interface Adapters**: Clean adapter implementations
@@ -142,6 +153,7 @@ Enterprise Business Rules (Entities) (Innermost)
 ## 4. Bitcoin-Specific Alignment Standards
 
 ### A. Consensus Compatibility
+
 ```rust
 // Following rust-bitcoin patterns for consensus validation
 #[cfg(consensus)]
@@ -156,6 +168,7 @@ pub fn validate_transaction_consensus(tx: &Transaction) -> Result<(), ConsensusE
 ```
 
 ### B. BIP Compliance Tracking
+
 ```rust
 // BIP implementation registry
 pub struct BipRegistry {
@@ -180,11 +193,13 @@ impl BipRegistry {
 ## 5. Performance Optimization Alignment
 
 ### A. Hardware Optimization Framework
+
 - ✅ Multi-architecture support (Intel, AMD, ARM, RISC-V)
 - ✅ Progressive enhancement based on available hardware
 - ✅ Fallback support for minimum specifications
 
 ### B. Benchmarking Standards
+
 ```rust
 // Hardware-aware performance testing
 #[cfg(bench)]
@@ -205,6 +220,7 @@ mod benchmarks {
 ## 6. Testing Strategy Alignment
 
 ### A. Multi-Layer Testing
+
 ```rust
 // Unit tests for domain logic (inner layers)
 #[cfg(test)]
@@ -230,6 +246,7 @@ mod integration_tests {
 ```
 
 ### B. Property-Based Testing
+
 ```rust
 // Following rust-bitcoin testing patterns
 #[cfg(test)]
@@ -250,6 +267,7 @@ mod property_tests {
 ## 7. Monitoring & Observability
 
 ### A. Metrics Following Prometheus Standards
+
 ```rust
 // System alignment metrics
 lazy_static! {
@@ -267,6 +285,7 @@ lazy_static! {
 ```
 
 ### B. Health Checks
+
 ```rust
 // Comprehensive health checking
 pub struct SystemHealthChecker {
@@ -295,6 +314,7 @@ impl SystemHealthChecker {
 ## 8. Documentation Standards
 
 ### A. API Documentation
+
 ```rust
 /// Bitcoin transaction validation following BIP-341 (Taproot)
 /// 
@@ -335,6 +355,7 @@ pub fn validate_taproot_transaction(
 ## 9. Continuous Alignment Monitoring
 
 ### A. Automated Alignment Checks
+
 ```bash
 #!/bin/bash
 # scripts/check_system_alignment.sh
@@ -358,6 +379,7 @@ python3 scripts/generate_alignment_report.py
 ```
 
 ### B. CI/CD Integration
+
 ```yaml
 # .github/workflows/system-alignment.yml
 name: System Alignment Check
@@ -385,11 +407,13 @@ jobs:
 ## 10. Future-Proofing Strategies
 
 ### A. Version Compatibility
+
 - Follow semantic versioning strictly
 - Maintain backward compatibility for public APIs
 - Document breaking changes with migration guides
 
 ### B. Extensibility Points
+
 ```rust
 // Plugin architecture for future extensions
 pub trait SystemExtension: Send + Sync {
@@ -408,6 +432,7 @@ pub struct ExtensionRegistry {
 Current system alignment score of 9.40/10.0 demonstrates excellent architecture and implementation. These best practices will help achieve perfect alignment while maintaining the high-quality standards already established.
 
 The combination of:
+
 - Rust API Guidelines compliance
 - Bitcoin ecosystem standards
 - Clean Architecture principles

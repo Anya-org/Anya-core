@@ -149,7 +149,7 @@ edition = "2021"
 
 [dependencies]
 bdk = "0.28.0"
-bitcoin = "0.30.0"
+bitcoin = "0.32.6"
 miniscript = "10.0.0"
 "@ | Out-File -FilePath $CargoToml -Encoding utf8
         
