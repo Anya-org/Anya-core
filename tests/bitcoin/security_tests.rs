@@ -297,7 +297,7 @@ fn test_invariant_violations(checker: &BitcoinCoreInvariantChecker) {
         lock_time: LockTime::ZERO,
         input: vec![TxIn {
             previous_output: OutPoint::null(),
-            script_sig: ScriptBuf::new().into(),
+            script_sig: ScriptBuf::new(),
             sequence: Sequence(0),
             witness: Witness::default(),
         }],
@@ -358,13 +358,13 @@ fn create_valid_transaction() -> Transaction {
         lock_time: LockTime::ZERO,
         input: vec![TxIn {
             previous_output: OutPoint::null(),
-            script_sig: ScriptBuf::new().into(),
+            script_sig: ScriptBuf::new(),
             sequence: Sequence(0),
             witness: Witness::default(),
         }],
         output: vec![TxOut {
             value: Amount::from_sat(1000),
-            script_pubkey: ScriptBuf::new().into(),
+            script_pubkey: ScriptBuf::new(),
         }],
     }
 }
@@ -379,20 +379,20 @@ fn create_duplicate_inputs_transaction() -> Transaction {
         input: vec![
             TxIn {
                 previous_output: outpoint,
-                script_sig: ScriptBuf::new().into(),
+                script_sig: ScriptBuf::new(),
                 sequence: Sequence(0),
                 witness: Witness::default(),
             },
             TxIn {
                 previous_output: outpoint, // Same as above, this is the duplicate
-                script_sig: ScriptBuf::new().into(),
+                script_sig: ScriptBuf::new(),
                 sequence: Sequence(0),
                 witness: Witness::default(),
             },
         ],
         output: vec![TxOut {
             value: Amount::from_sat(1000),
-            script_pubkey: ScriptBuf::new().into(),
+            script_pubkey: ScriptBuf::new(),
         }],
     }
 }
@@ -404,7 +404,7 @@ fn create_value_overflow_transaction() -> Transaction {
         lock_time: LockTime::ZERO,
         input: vec![TxIn {
             previous_output: OutPoint::null(),
-            script_sig: ScriptBuf::new().into(),
+            script_sig: ScriptBuf::new(),
             sequence: Sequence(0),
             witness: Witness::default(),
         }],
@@ -412,11 +412,11 @@ fn create_value_overflow_transaction() -> Transaction {
             // Two outputs with maximum Bitcoin value could cause overflow
             TxOut {
                 value: Amount::from_sat(21_000_000 * 100_000_000), // Max BTC supply in satoshis
-                script_pubkey: ScriptBuf::new().into(),
+                script_pubkey: ScriptBuf::new(),
             },
             TxOut {
                 value: Amount::from_sat(21_000_000 * 100_000_000), // Max BTC supply in satoshis
-                script_pubkey: ScriptBuf::new().into(),
+                script_pubkey: ScriptBuf::new(),
             },
         ],
     }
@@ -439,7 +439,7 @@ fn create_op_eval_transaction() -> Transaction {
         }],
         output: vec![TxOut {
             value: Amount::from_sat(1000),
-            script_pubkey: ScriptBuf::new().into(),
+            script_pubkey: ScriptBuf::new(),
         }],
     }
 }

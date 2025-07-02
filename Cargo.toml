@@ -20,7 +20,8 @@ anyhow = { version = "1.0.98", features = ["std", "backtrace"] }
 tracing = { version = "0.1.41", features = ["std", "attributes"] }
 
 # Bitcoin dependencies for workspace
-bitcoin = { version = "0.32", features = [
+# Use 0.32.6 as our standard version
+bitcoin = { version = "=0.32.6", features = [
     "std",
     "serde",
     "rand",
@@ -28,7 +29,7 @@ bitcoin = { version = "0.32", features = [
     "base64",
     "rand-std",
 ] }
-secp256k1 = { version = "0.29", features = [
+secp256k1 = { version = "=0.29.1", features = [
     "rand-std",
     "global-context",
     "recovery",
@@ -109,8 +110,9 @@ secp256k1 = { version = "0.29", features = [
     "global-context",
     "recovery",
 ] }
+# Note: bdk 0.30.x depends on bitcoin 0.30.x, so we must allow both bitcoin versions in the project
 bdk = { version = "0.30", optional = true, features = ["std", "compiler"] }
-miniscript = { version = "12.3", features = [
+miniscript = { version = "=12.3.0", features = [
     "std",
     "compiler",
 ] } # Enhanced for better policy compilation
@@ -193,12 +195,14 @@ rayon = "1.10.0"
 blake3 = "1.8.2"
 semver = "1.0.26"
 syn = { version = "2.0.101", features = ["parsing", "full"] }
-trust-dns-resolver = "0.22.0"
+trust-dns-resolver = "0.23.2"
 aes-gcm = "0.10.3"
 chacha20poly1305 = "0.10.1"
 regex = "1.9.6"
 futures = "0.3.31"
 lazy_static = "1.5.0"
+mockall = "=0.13.1"  # Added here for use in non-test code
+
 [dev-dependencies]
 did-key = "0.2.1"
 mockall = "=0.13.1"

@@ -1,11 +1,11 @@
 use std::error::Error;
 // src/bitcoin/layer2/rgb/mod.rs
 
-//! RGB Layer 2 implementation
-//!
-//! This module provides an implementation of RGB protocol, a client-side
-//! validation solution for Bitcoin assets. It allows for the creation
-//! and transfer of complex assets on top of Bitcoin's blockchain.
+/// RGB Layer 2 implementation
+///
+/// This module provides an implementation of RGB protocol, a client-side
+/// validation solution for Bitcoin assets. It allows for the creation
+/// and transfer of complex assets on top of Bitcoin's blockchain.
 
 mod schema;
 mod contract;
