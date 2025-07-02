@@ -293,7 +293,7 @@ fn calculate_std_dev(times: &[std::time::Duration], avg_ns: f64) -> f64 {
 fn test_invariant_violations(checker: &BitcoinCoreInvariantChecker) {
     // Test version invariant
     let invalid_version_tx = Transaction {
-        version: Version::from_consensus(0), // Invalid version
+        version: Version(0), // Invalid version
         lock_time: LockTime::ZERO,
         input: vec![TxIn {
             previous_output: OutPoint::null(),
@@ -313,7 +313,7 @@ fn test_invariant_violations(checker: &BitcoinCoreInvariantChecker) {
 
     // Test empty inputs invariant
     let empty_inputs_tx = Transaction {
-        version: Version::ONE,
+        version: Version(1),
         lock_time: LockTime::ZERO,
         input: vec![], // No inputs
         output: vec![TxOut {
@@ -328,7 +328,7 @@ fn test_invariant_violations(checker: &BitcoinCoreInvariantChecker) {
 
     // Test empty outputs invariant
     let empty_outputs_tx = Transaction {
-        version: Version::ONE,
+        version: Version(1),
         lock_time: LockTime::ZERO,
         input: vec![TxIn {
             previous_output: OutPoint::null(),
@@ -354,7 +354,7 @@ fn test_invariant_violations(checker: &BitcoinCoreInvariantChecker) {
 // Create a valid minimal transaction
 fn create_valid_transaction() -> Transaction {
     Transaction {
-        version: Version::ONE,
+        version: Version(1),
         lock_time: LockTime::ZERO,
         input: vec![TxIn {
             previous_output: OutPoint::null(),
@@ -374,7 +374,7 @@ fn create_duplicate_inputs_transaction() -> Transaction {
     let outpoint = OutPoint::null();
 
     Transaction {
-        version: Version::ONE,
+        version: Version(1),
         lock_time: LockTime::ZERO,
         input: vec![
             TxIn {
@@ -400,7 +400,7 @@ fn create_duplicate_inputs_transaction() -> Transaction {
 // Create a transaction that attempts value overflow (CVE-2010-5139)
 fn create_value_overflow_transaction() -> Transaction {
     Transaction {
-        version: Version::ONE,
+        version: Version(1),
         lock_time: LockTime::ZERO,
         input: vec![TxIn {
             previous_output: OutPoint::null(),
@@ -429,7 +429,7 @@ fn create_op_eval_transaction() -> Transaction {
     let script = ScriptBuf::from(script_bytes);
 
     Transaction {
-        version: Version::ONE,
+        version: Version(1),
         lock_time: LockTime::ZERO,
         input: vec![TxIn {
             previous_output: OutPoint::null(),

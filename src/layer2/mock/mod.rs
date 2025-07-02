@@ -3,11 +3,12 @@ use crate::layer2::{
     AssetParams, AssetTransfer, Proof, ProtocolState, TransactionStatus, TransferResult,
     ValidationResult, VerificationResult, Layer2Protocol
 };
+use async_trait::async_trait;
 
 mock! {
     pub Layer2Protocol {}
 
-    #[async_trait::async_trait]
+    #[async_trait]
     impl Layer2Protocol for Layer2Protocol {
         async fn initialize(&self) -> Result<(), Box<dyn std::error::Error + Send + Sync>>;
         async fn connect(&self) -> Result<(), Box<dyn std::error::Error + Send + Sync>>;
