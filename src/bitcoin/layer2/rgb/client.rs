@@ -37,6 +37,7 @@ pub struct RGBClientBuilder {
 /// RGB Client
 #[derive(Debug)]
 pub struct RGBClient {
+    #[allow(dead_code)]
     config: ClientConfig,
     wallet: Arc<Mutex<RGBWallet>>,
 }
@@ -78,7 +79,7 @@ impl RGBClient {
     }
     
     /// Issue a new RGB asset
-    pub fn issue_asset(&self, schema: &Schema, amount: u64) -> Result<Contract, &'static str> {
+    pub fn issue_asset(&self, _schema: &Schema, amount: u64) -> Result<Contract, &'static str> {
         // Implementation would interact with RGB node
         // This is a stub implementation
         
@@ -95,7 +96,7 @@ impl RGBClient {
     }
     
     /// Transfer RGB asset
-    pub fn transfer_asset(&self, contract_id: &str, recipient: &str, amount: u64) -> Result<String, &'static str> {
+    pub fn transfer_asset(&self, contract_id: &str, _recipient: &str, amount: u64) -> Result<String, &'static str> {
         // Implementation would interact with RGB node
         // This is a stub implementation
         

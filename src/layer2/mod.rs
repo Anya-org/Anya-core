@@ -8,6 +8,10 @@ use serde::{Deserialize, Serialize};
 use std::error::Error;
 use std::sync::Arc;
 
+// async_trait is used in trait definitions below
+#[allow(unused_imports)]
+use async_trait::async_trait;
+
 /// Layer2 protocol types supported by the implementation
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub enum Layer2ProtocolType {
