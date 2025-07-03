@@ -9,6 +9,7 @@ The Anya-core testing framework provides multi-layered validation for extensions
 ## Testing Architecture
 
 ### Test Categories
+
 - **Unit Tests**: Component-level validation
 - **Integration Tests**: Cross-system compatibility
 - **Performance Tests**: Load and stress testing
@@ -17,6 +18,7 @@ The Anya-core testing framework provides multi-layered validation for extensions
 - **ML Tests**: Machine learning model validation
 
 ### Testing Stack
+
 ```rust
 // Example test structure
 #[cfg(test)]
@@ -40,6 +42,7 @@ mod tests {
 ## Test Environment Setup
 
 ### Prerequisites
+
 ```bash
 # Install test dependencies
 cargo install cargo-nextest
@@ -48,6 +51,7 @@ npm install -g @bitcoin/test-utils
 ```
 
 ### Configuration
+
 ```toml
 # Cargo.toml test configuration
 [dev-dependencies]
@@ -59,6 +63,7 @@ proptest = "1.0"
 ```
 
 ### Environment Variables
+
 ```bash
 export BITCOIN_NETWORK=testnet
 export WEB5_TEST_MODE=true
@@ -69,6 +74,7 @@ export ANYA_LOG_LEVEL=debug
 ## Running Tests
 
 ### Quick Test Suite
+
 ```bash
 # Run all tests
 cargo nextest run
@@ -80,6 +86,7 @@ cargo test --features ml-tests
 ```
 
 ### Comprehensive Testing
+
 ```bash
 # Full test suite with coverage
 cargo test --all-features
@@ -91,6 +98,7 @@ cargo clippy -- -D warnings
 ```
 
 ### Network Testing
+
 ```bash
 # Bitcoin testnet integration
 cargo test --features testnet-integration
@@ -102,6 +110,7 @@ cargo test --features mainnet-validation
 ## Test Data Management
 
 ### Bitcoin Test Data
+
 ```rust
 // Test transaction creation
 pub fn create_test_transaction() -> Transaction {
@@ -123,6 +132,7 @@ pub fn create_test_transaction() -> Transaction {
 ```
 
 ### Web5 Test Fixtures
+
 ```typescript
 // DID test data
 export const testDID = {
@@ -137,6 +147,7 @@ export const testDID = {
 ```
 
 ### ML Test Models
+
 ```python
 # Lightweight test model
 def create_test_model():
@@ -151,6 +162,7 @@ def create_test_model():
 ## Test Organization
 
 ### Directory Structure
+
 ```
 tests/
 ├── unit/
@@ -173,6 +185,7 @@ tests/
 ```
 
 ### Test Naming Convention
+
 ```rust
 // Format: test_[component]_[scenario]_[expected_outcome]
 #[test]
@@ -189,6 +202,7 @@ fn test_web5_did_resolution_valid_did_returns_document() {
 ## Continuous Integration
 
 ### GitHub Actions Integration
+
 ```yaml
 # .github/workflows/test.yml
 name: Test Suite
@@ -205,6 +219,7 @@ jobs:
 ```
 
 ### Test Coverage Requirements
+
 - **Unit Tests**: Minimum 90% coverage
 - **Integration Tests**: All critical paths covered
 - **Security Tests**: All attack vectors validated
@@ -213,6 +228,7 @@ jobs:
 ## Best Practices
 
 ### Test Quality
+
 1. **Isolation**: Each test should be independent
 2. **Determinism**: Tests must produce consistent results
 3. **Speed**: Unit tests should complete in milliseconds
@@ -220,6 +236,7 @@ jobs:
 5. **Coverage**: Aim for comprehensive edge case testing
 
 ### Security Testing
+
 ```rust
 #[test]
 fn test_private_key_never_logged() {
@@ -232,6 +249,7 @@ fn test_private_key_never_logged() {
 ```
 
 ### Performance Benchmarking
+
 ```rust
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
 
@@ -245,12 +263,14 @@ fn benchmark_bitcoin_validation(c: &mut Criterion) {
 ## Troubleshooting
 
 ### Common Issues
+
 1. **Network Timeouts**: Increase timeout values for testnet operations
 2. **Resource Limits**: Ensure sufficient memory for ML model tests
 3. **Race Conditions**: Use proper synchronization in async tests
 4. **Flaky Tests**: Implement retry mechanisms for network-dependent tests
 
 ### Debug Tools
+
 ```bash
 # Verbose test output
 RUST_LOG=debug cargo test -- --nocapture

@@ -21,6 +21,8 @@ pub enum BPCLevel {
     /// Full Bitcoin protocol compliance with all BIPs
     #[default]
     Full = 3,
+    /// BPC-3 compliant protocol (highest level)
+    BPC3 = 4,
 }
 
 
@@ -31,12 +33,13 @@ impl fmt::Display for BPCLevel {
             BPCLevel::Basic => write!(f, "Basic"),
             BPCLevel::Enhanced => write!(f, "Enhanced"),
             BPCLevel::Full => write!(f, "Full"),
+            BPCLevel::BPC3 => write!(f, "BPC3"),
         }
     }
 }
 
 /// Bitcoin Protocol Validator [BPC-3]
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct BitcoinProtocol {
     /// Protocol compliance level
     pub level: BPCLevel,
@@ -79,6 +82,27 @@ impl BitcoinProtocol {
                 "Schnorr Signatures (BIP-340)".to_string(),
             ],
         }
+    }
+    
+    /// Validate a Bitcoin transaction according to protocol rules
+    pub fn validate_transaction(&self, tx: &bitcoin::Transaction) -> Result<(), crate::bitcoin::error::BitcoinError> {
+        // Basic transaction validation - placeholder implementation
+        if tx.output.is_empty() {
+            return Err(crate::bitcoin::error::BitcoinError::ValidationError("Transaction has no outputs".to_string()));
+        }
+        
+        // Additional validation logic would go here
+        Ok(())
+    }
+    
+    /// Check if Taproot is enabled for this protocol instance
+    pub fn is_taproot_enabled(&self) -> bool {
+        self.supported_bips.contains(&341) // BIP-341 is Taproot
+    }
+    
+    /// Get the current protocol level
+    pub fn get_level(&self) -> BPCLevel {
+        self.level
     }
 }
 

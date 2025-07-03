@@ -1,6 +1,17 @@
-// [AIR-3][AIS-3][BPC-3][RES-3] Removed unused import: std::error::Error
+//! Layer 2 Bitcoin Protocol Implementations [AIR-3][AIS-3][BPC-3][RES-3]
+//!
+//! This module contains implementations of various Layer 2 protocols
+//! that can be used with Bitcoin.
+
 use crate::bitcoin::error::BitcoinResult;
 use bitcoin::Transaction;
+
+pub mod rgb;
+
+// Re-export commonly used items
+pub use rgb::{
+    AssetCreationParams, AssetTransfer, RGBAsset, RGBFactory, RGBManager, TransferStatus,
+};
 
 /// Layer2Protocol trait defines the interface for Bitcoin Layer 2 protocols
 pub trait Layer2Protocol {
@@ -50,18 +61,20 @@ impl Layer2Registry {
         Self(Vec::new())
     }
 
-    /// Register a Layer 2 protocol
-    pub fn register(&mut self, name: &str, protocol: Box<dyn Layer2Protocol>) {
-        self.0.push((name.to_string(), protocol));
+    /// Register a new Layer 2 protocol
+    pub fn register(&mut self, name: String, protocol: Box<dyn Layer2Protocol>) {
+        self.0.push((name, protocol));
     }
 
-    /// Get a Layer 2 protocol by name
+    /// Get a reference to a registered protocol by name
     pub fn get(&self, name: &str) -> Option<&dyn Layer2Protocol> {
-        self.0.iter().find(|(n, _)| n == name).map(|(_, p)| p.as_ref())
+        self.0.iter()
+            .find(|(n, _)| n == name)
+            .map(|(_, p)| p.as_ref())
     }
 
-    /// List all registered Layer 2 protocols
-    pub fn list_protocols(&self) -> Vec<String> {
-        self.0.iter().map(|(n, _)| n.clone()).collect()
+    /// List all registered protocol names
+    pub fn list_protocols(&self) -> Vec<&str> {
+        self.0.iter().map(|(name, _)| name.as_str()).collect()
     }
 }

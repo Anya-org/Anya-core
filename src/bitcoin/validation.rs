@@ -8,9 +8,24 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use super::protocol::{BitcoinProtocol, BPCLevel};
 use std::fmt;
 
-// Global verification history - using RwLock::new() directly
-use std::sync::OnceLock;
-static VERIFICATION_HISTORY: OnceLock<RwLock<HistoricalTransactionDB>> = OnceLock::new();
+// Import required types
+use crate::bitcoin::error::BitcoinError;
+use crate::hardware_optimization::{HardwareOptimizationManager, intel::BatchVerificationConfig};
+
+// For now, create a simple TaprootValidator until we can properly import it
+#[derive(Debug, Clone)]
+struct TaprootValidator;
+
+impl TaprootValidator {
+    fn new() -> Self {
+        Self
+    }
+}
+
+// Global verification history - using once_cell::sync::Lazy for MSRV compatibility
+use once_cell::sync::Lazy;
+pub static VERIFICATION_HISTORY: Lazy<RwLock<HistoricalTransactionDB>> = 
+    Lazy::new(|| RwLock::new(HistoricalTransactionDB::new()));
 
 /// Record of a transaction verification operation for historical testing
 #[derive(Debug, Clone)]
@@ -117,18 +132,19 @@ pub struct HistoricalBlock {
     pub verification_results: HashMap<String, bool>,
 }
 
-/// Global verification history for maintaining immutability across all nodes
-pub static VERIFICATION_HISTORY: RwLock<HistoricalTransactionDB> = RwLock::new(HistoricalTransactionDB::new());
+// Global verification history is already defined at the top of the file
 
 /// Validates Bitcoin transactions according to BPC-3 standard
 /// Optimized for minimum hardware requirements (Intel i3-7020U)
 #[derive(Clone)]
 pub struct TransactionValidator {
     protocol: BitcoinProtocol,
+    #[allow(dead_code)]
     taproot: TaprootValidator,
     /// Hardware optimization manager for transaction validation
     hw_manager: Arc<HardwareOptimizationManager>,
     /// Batch verification queue for signature validation
+    #[allow(dead_code)]
     batch_queue: Arc<Mutex<VecDeque<Transaction>>>,
     /// Maximum batch size based on hardware capabilities
     max_batch_size: usize,
@@ -163,7 +179,11 @@ impl TransactionValidator {
         };
         
         Self {
-            protocol: BitcoinProtocol::new(BPCLevel::BPC3),
+            protocol: {
+                let mut p = BitcoinProtocol::new();
+                p.level = BPCLevel::BPC3;
+                p
+            },
             taproot: TaprootValidator::new(),
             hw_manager,
             batch_queue: Arc::new(Mutex::new(VecDeque::with_capacity(max_batch_size))),
@@ -177,7 +197,11 @@ impl TransactionValidator {
     /// Create a validator with specific protocol level
     pub fn with_level(level: BPCLevel) -> Self {
         let mut validator = Self::new();
-        validator.protocol = BitcoinProtocol::new(level);
+        validator.protocol = {
+            let mut p = BitcoinProtocol::new();
+            p.level = level;
+            p
+        };
         validator
     }
     
@@ -195,7 +219,7 @@ impl TransactionValidator {
     
     /// Validate a transaction from a file
     pub fn validate_from_file(&self, path: &std::path::Path) -> Result<(), ValidationError> {
-        let data = std::fs::read(path)?;
+        let _data = std::fs::read(path)?;
         
         // This is simplified - in reality, we'd parse the transaction
         // from the file data using bitcoin::consensus::deserialize
@@ -283,7 +307,7 @@ impl TransactionValidator {
     /// This ensures consensus compatibility across all optimizations
     pub fn verify_consensus_compatibility(&self, tx: &Transaction) -> Result<bool, ValidationError> {
         // Get transaction hash for logging
-        let tx_hash = tx.txid().to_string();
+        let tx_hash = tx.compute_txid().to_string();
         
         // Standard validation without hardware optimization
         let validator_standard = Self::new().with_optimization(false);
@@ -325,14 +349,14 @@ impl TransactionValidator {
     pub fn verify_historical_transaction(
         &self, 
         tx: &Transaction,
-        block_height: u32,
+        _block_height: u32,
     ) -> Result<bool, ValidationError> {
         // First verify current consensus compatibility
         self.verify_consensus_compatibility(tx)?;
         
         // Check in historical records if we've seen this transaction before
         if let Ok(db) = VERIFICATION_HISTORY.read() {
-            let tx_hash = tx.txid().to_string();
+            let tx_hash = tx.compute_txid().to_string();
             let previous_records = db.find_by_tx_hash(&tx_hash);
             
             // If we have records, check that our current validation matches historical
@@ -354,7 +378,7 @@ impl TransactionValidator {
     /// Validate a Bitcoin transaction
     pub fn validate(&self, transaction: &Transaction) -> Result<(), ValidationError> {
         // Get transaction hash for logging
-        let tx_hash = transaction.txid().to_string();
+        let tx_hash = transaction.compute_txid().to_string();
         
         // Standard validation path (always executed)
         let standard_result = self.validate_standard(transaction);
@@ -465,7 +489,7 @@ impl TransactionValidator {
         if !self.optimization_active || self.hw_manager.intel_optimizer().is_none() {
             if let Ok(_) = &standard_result {
                 // Log the successful verification for historical testing
-                let tx_hash = tx.txid().to_string();
+                let tx_hash = tx.compute_txid().to_string();
                 self.log_verification(tx_hash, "taproot_standard", true);
             }
             return standard_result;
@@ -481,7 +505,7 @@ impl TransactionValidator {
         };
         
         // Log the verification for historical compatibility testing
-        let tx_hash = tx.txid().to_string();
+        let tx_hash = tx.compute_txid().to_string();
         self.log_verification(
             tx_hash,
             "taproot_optimized",
@@ -514,13 +538,14 @@ impl TransactionValidator {
     }
     
     /// Stub method for validating taproot standard
-    fn validate_taproot_standard(&self, tx: &Transaction) -> Result<(), ValidationError> {
+    fn validate_taproot_standard(&self, _tx: &Transaction) -> Result<(), ValidationError> {
         // Implementation would validate according to BIP-341 standard
         // For now, we'll just return Ok
         Ok(())
     }
     
     /// Check Taproot specific conditions according to BIP-341
+    #[allow(dead_code)]
     fn check_taproot_conditions(&self, tx: &Transaction) -> Result<(), ValidationError> {
         // Implementation of BIP-341 specific checks
         // This is a placeholder for the actual implementation
@@ -537,13 +562,20 @@ impl TransactionValidator {
     }
 }
 
-/// Extension to BitcoinProtocol to access level
-impl BitcoinProtocol {
-    /// Get current protocol level
+
+impl TransactionValidator {
+    /// Get the current protocol level
     pub fn get_level(&self) -> BPCLevel {
-        // Assuming this is the proper way to access the level field
-        // This fixes the linter error from accessing a private field
-        self.level()
+        self.protocol.get_level()
+    }
+
+    /// Get verification history for testing
+    pub fn get_verification_history(&self) -> Vec<VerificationRecord> {
+        if let Ok(history) = self.verification_history.lock() {
+            history.clone()
+        } else {
+            Vec::new()
+        }
     }
 }
 
@@ -564,6 +596,18 @@ pub enum ValidationError {
     
     #[error("Consensus error: {0}")]
     ConsensusError(String),
+}
+
+impl Clone for ValidationError {
+    fn clone(&self) -> Self {
+        match self {
+            ValidationError::Failed(msg) => ValidationError::Failed(msg.clone()),
+            ValidationError::Protocol(err) => ValidationError::Protocol(err.clone()),
+            ValidationError::IoError(_) => ValidationError::Failed("IO Error (not cloneable)".to_string()),
+            ValidationError::Taproot(msg) => ValidationError::Taproot(msg.clone()),
+            ValidationError::ConsensusError(msg) => ValidationError::ConsensusError(msg.clone()),
+        }
+    }
 }
 
 /// Get global verification statistics for system monitoring
@@ -688,9 +732,9 @@ impl MempoolBatchVerifier {
             // Configure batch verification optimized for Kaby Lake
             let config = BatchVerificationConfig {
                 batch_size,
-                use_avx2: intel_opt.capabilities().avx2_support,
-                kaby_lake_optimized: intel_opt.capabilities().kaby_lake_optimized,
-                parallel: true, // Enable parallel processing
+                timeout: std::time::Duration::from_secs(30),
+                use_avx: intel_opt.capabilities().avx2_support,
+                use_sse: true, // Enable SSE processing
             };
             
             // Execute batch verification
@@ -714,7 +758,7 @@ impl MempoolBatchVerifier {
             }
             
             if any_invalid {
-                Err("Batch contains invalid transactions".to_string())
+                Err("Batch contains invalid transactions".into())
             } else {
                 Ok(())
             }

@@ -7,7 +7,7 @@
 pub mod common;
 
 // Test modules
-pub mod bitcoin;
+pub mod bitcoin; // Refers to tests/bitcoin/ directory
 pub mod core;
 pub mod dao;
 pub mod hardware;

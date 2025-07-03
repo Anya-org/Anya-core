@@ -49,13 +49,17 @@ pub struct HardwareHsmProvider {
 
 impl HardwareHsmProvider {
     /// Create a new hardware HSM provider
-    pub fn new(config: &HardwareConfig) -> Result<Self, HsmError> {
+    pub async fn new(
+        config: &HardwareConfig,
+        network: Network,
+        _audit_logger: Arc<crate::security::hsm::audit::AuditLogger>
+    ) -> Result<Self, HsmError> {
         Ok(Self {
             config: config.clone(),
             device_info: Mutex::new(None),
             connection_state: Mutex::new(ConnectionState::Disconnected),
             keys: Mutex::new(HashMap::new()),
-            network: Network::Testnet, // Always use testnet for real implementations
+            network, // Use the provided network
             secp: Secp256k1::new(),
         })
     }

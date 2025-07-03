@@ -65,7 +65,8 @@ impl DnsResolver {
         let mut opts = ResolverOpts::default();
         opts.validate = validate_dnssec;
 
-        let resolver = TokioAsyncResolver::tokio(ResolverConfig::default(), opts)?;
+        // TokioAsyncResolver::tokio returns the resolver directly, not a Result
+        let resolver = TokioAsyncResolver::tokio(ResolverConfig::default(), opts);
 
         Ok(Self {
             resolver,
@@ -194,7 +195,8 @@ impl DnsResolver {
             let mut opts = ResolverOpts::default();
             opts.validate = validate_dnssec;
 
-            let resolver = TokioAsyncResolver::tokio(ResolverConfig::default(), opts)?;
+            // TokioAsyncResolver::tokio returns the resolver directly, not a Result
+            let resolver = TokioAsyncResolver::tokio(ResolverConfig::default(), opts);
 
             self.resolver = resolver;
             self.validate_dnssec = validate_dnssec;
@@ -258,8 +260,7 @@ mod tests {
     async fn test_format_dns_name() {
         // We'll use the real implementation for this test
         let resolver = DnsResolver {
-            resolver: TokioAsyncResolver::tokio(ResolverConfig::default(), ResolverOpts::default())
-                .unwrap(),
+            resolver: TokioAsyncResolver::tokio(ResolverConfig::default(), ResolverOpts::default()),
             cache: Arc::new(Mutex::new(HashMap::new())),
             validate_dnssec: false,
             cache_duration: 3600,

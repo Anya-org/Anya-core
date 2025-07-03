@@ -5,6 +5,7 @@
 // Core modules for Bitcoin functionality
 pub mod adapters;
 pub mod bip341;
+pub mod compat; // Compatibility module for older import patterns
 pub mod config;
 pub mod error;
 pub mod interface;
@@ -15,6 +16,7 @@ pub mod node; // Bitcoin node management
 pub mod protocol; // Bitcoin protocol compliance module
 pub mod rust;
 pub mod taproot;
+pub mod validation; // Legacy validation module for tests
 pub mod validation_new; // Transaction validation module
 pub mod wallet; // Bitcoin wallet management // Lightning Network implementation
 
@@ -32,6 +34,9 @@ pub use bitcoin::{Address, Block, BlockHash, Network, Transaction, Txid};
 // Export our manager and config for easier access
 pub use config::BitcoinConfig;
 pub use manager::BitcoinManager;
+
+// Re-export compatibility modules for tests
+pub use compat::anya_bitcoin;
 
 #[cfg(test)]
 mod tests;
