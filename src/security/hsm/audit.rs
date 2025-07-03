@@ -1,13 +1,13 @@
 use crate::security::hsm::error::{
-    AuditEventResult, AuditEventSeverity, AuditEventType, HsmAuditEvent, HsmError,
+    AuditEventResult, AuditEventSeverity, AuditEventType, HsmError,
 };
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
-use serde::{Deserialize, Deserializer, Serialize, Serializer};
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fs;
 use std::fs::{File, OpenOptions};
-use std::io::{Seek, SeekFrom, Write};
+use std::io::Write;
 use std::path::Path;
 use std::sync::Arc;
 use tokio::sync::Mutex;

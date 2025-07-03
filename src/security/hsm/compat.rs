@@ -96,7 +96,7 @@ impl From<&TypesHsmAuditEvent> for Result<ErrorHsmAuditEvent, crate::security::h
             }
         }
         
-        Ok(audit_event)
+        Ok(audit_event);
         let mut audit_event = ErrorHsmAuditEvent::new(
             event_type,
             result,
