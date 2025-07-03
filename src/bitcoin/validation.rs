@@ -357,17 +357,11 @@ impl TransactionValidator {
         // Check in historical records if we've seen this transaction before
         if let Ok(db) = VERIFICATION_HISTORY.read() {
             let tx_hash = tx.compute_txid().to_string();
-            let previous_records = db.find_by_tx_hash(&tx_hash);
-            
-            // If we have records, check that our current validation matches historical
-            if !previous_records.is_empty() {
-                // Validate against historical records
-                for record in previous_records {
-                    if record.result == false {
-                        return Err(ValidationError::ConsensusError(
-                            "Historical standard verification failed".into()
-                        ));
-                    }
+            if let Some(record) = db.get_record(&tx_hash) {
+                if !record.result {
+                    return Err(ValidationError::ConsensusError(
+                        "Historical standard verification failed".into(),
+                    ));
                 }
             }
         }
@@ -443,7 +437,7 @@ impl TransactionValidator {
     fn validate_standard(&self, tx: &Transaction) -> Result<(), ValidationError> {
         // Validate protocol requirements
         self.protocol.validate_transaction(tx)
-            .map_err(|e| ValidationError::Protocol(e))?;
+            .map_err(ValidationError::Protocol)?;
         
         // BIP-341 Taproot validation (standard path)
         if self.protocol.is_taproot_enabled() {
@@ -457,7 +451,7 @@ impl TransactionValidator {
     fn validate_optimized(&self, tx: &Transaction) -> Result<(), ValidationError> {
         // Validate protocol requirements
         self.protocol.validate_transaction(tx)
-            .map_err(|e| ValidationError::Protocol(e))?;
+            .map_err(ValidationError::Protocol)?;
         
         // BIP-341 Taproot validation (optimized path)
         if self.protocol.is_taproot_enabled() {
@@ -487,7 +481,7 @@ impl TransactionValidator {
         
         // If optimization is disabled, return the standard result
         if !self.optimization_active || self.hw_manager.intel_optimizer().is_none() {
-            if let Ok(_) = &standard_result {
+            if standard_result.is_ok() {
                 // Log the successful verification for historical testing
                 let tx_hash = tx.compute_txid().to_string();
                 self.log_verification(tx_hash, "taproot_standard", true);
