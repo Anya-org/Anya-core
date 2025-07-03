@@ -19,7 +19,7 @@ use crate::common::test_utilities::{
 /// Test that demonstrates full alignment with Bitcoin's Immutability principle
 /// by verifying that hardware optimizations maintain consistent historical validation results
 #[tokio::test]
-async fn test_immutability_historical_compatibility() {
+pub async fn test_immutability_historical_compatibility() {
     println!("\n🔍 Testing IMMUTABILITY alignment through historical compatibility...");
 
     // Create test transactions for historical periods
@@ -152,7 +152,7 @@ async fn test_immutability_historical_compatibility() {
 
 /// Test immutability across different hardware optimization paths
 #[tokio::test]
-async fn test_immutability_across_hardware_paths() {
+pub async fn test_immutability_across_hardware_paths() {
     println!("\n🔍 Testing IMMUTABILITY across hardware optimization paths...");
 
     // Create transactions with known verification results
@@ -226,7 +226,7 @@ async fn test_immutability_across_hardware_paths() {
 
 /// Test complete end-to-end alignment with all Bitcoin Core principles
 #[tokio::test]
-async fn test_full_bitcoin_principles_alignment() {
+pub async fn test_full_bitcoin_principles_alignment() {
     println!("\n🔍 Testing COMPLETE ALIGNMENT with all Bitcoin Core principles...");
 
     // Create hardware optimization manager

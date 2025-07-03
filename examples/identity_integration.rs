@@ -65,7 +65,7 @@ fn issue_credential(
 }
 
 fn verify_credential(
-    credential: &serde_json::Value,
+    _credential: &serde_json::Value,
     verifier: &DID
 ) -> Result<bool, Box<dyn std::error::Error>> {
     // In a real implementation, this would perform cryptographic verification
@@ -75,7 +75,7 @@ fn verify_credential(
 }
 
 fn share_credential(
-    credential: &serde_json::Value,
+    _credential: &serde_json::Value,
     holder_did: &str,
     recipient_did: &str,
 ) -> Result<bool, Box<dyn std::error::Error>> {

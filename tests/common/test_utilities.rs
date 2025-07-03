@@ -23,6 +23,7 @@ pub struct TestTransactionFactory;
 
 impl TestTransactionFactory {
     /// Alias for create_dummy_transaction to match test expectations
+    #[allow(dead_code)]
     pub fn create_simple() -> Transaction {
         Self::create_dummy_transaction()
     }
@@ -46,6 +47,7 @@ impl TestTransactionFactory {
     }
 
     /// Create a transaction with specific properties for testing
+    #[allow(dead_code)]
     pub fn create_test_transaction_with_properties(
         version: i32,
         input_count: usize,
@@ -81,6 +83,7 @@ pub struct TestEnvironmentFactory;
 
 impl TestEnvironmentFactory {
     /// Alias for create_standard_environment to match test expectations
+    #[allow(dead_code)]
     pub fn new_basic() -> TestEnvironment {
         Self::create_standard_environment()
     }

@@ -8,8 +8,6 @@
 use std::collections::HashMap;
 use std::path::PathBuf;
 use bitcoin::Txid;
-// async_trait is implemented at trait definition level
-// use async_trait::async_trait;
 
 use crate::AnyaResult;
 use crate::bitcoin::wallet::transactions::TxOptions;
@@ -65,8 +63,7 @@ pub struct AssetTransfer {
 }
 
 /// Main interface for RGB operations
-#[async_trait::async_trait]
-pub trait RGBManager: Send + Sync {
+pub trait RGBManager {
     /// Create a new asset
     async fn create_asset(&self, params: AssetCreationParams) -> AnyaResult<RGBAsset>;
     
@@ -250,7 +247,6 @@ impl RGBClient {
 }
 
 /// Default implementation of the RGB manager
-#[allow(dead_code)]
 struct DefaultRGBManager {
     /// RGB client
     client: Option<RGBClient>,
@@ -285,7 +281,6 @@ impl Default for DefaultRGBManager {
     }
 }
 
-#[async_trait::async_trait]
 impl RGBManager for DefaultRGBManager {
     async fn create_asset(&self, _params: AssetCreationParams) -> AnyaResult<RGBAsset> {
         // Placeholder implementation

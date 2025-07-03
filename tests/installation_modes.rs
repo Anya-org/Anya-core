@@ -25,7 +25,7 @@ mod tests {
         // Create a dummy PSBT by deserializing an empty vector
         // This will fail in real validation, but works for the test structure
         let bytes = vec![0x70, 0x73, 0x62, 0x74, 0xff, 0x01, 0x00, 0x00, 0x00]; // Basic PSBT header
-        let valid_psbt = match Psbt::deserialize(&bytes) {
+        let _valid_psbt = match Psbt::deserialize(&bytes) {
             Ok(psbt) => psbt,
             Err(_) => {
                 // Just log the error - test will be skipped
@@ -43,7 +43,7 @@ mod tests {
         };
 
         // Test with GitRepository instead of EnterpriseCluster
-        let handler = AnyaInstaller::new(source, bitcoin_config).unwrap();
+        let _handler = AnyaInstaller::new(source, bitcoin_config).unwrap();
         assert!(true); // Placeholder test
     }
 

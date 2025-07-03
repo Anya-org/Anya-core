@@ -202,6 +202,7 @@ regex = "1.9.6"
 futures = "0.3.31"
 lazy_static = "1.5.0"
 mockall = "=0.13.1"  # Added here for use in non-test code
+clarinet-utils = "1.0.0"
 
 [dev-dependencies]
 did-key = "0.2.1"
@@ -210,3 +211,11 @@ tempfile = "3.20.0"
 tokio-test = "=0.4.4"
 tower-test = "=0.4.0"
 uuid = { version = "1.17.0", features = ["v4"] }
+# Added for DAO tests - temporarily commented out due to repository structure issues
+# clarity_repl = { version = "1.0.0", git = "https://github.com/hirosystems/clarity-repl", branch = "main" }
+# clarinet = { version = "1.0.0", git = "https://github.com/hirosystems/clarinet", branch = "main" }
+# Criterion for benchmarking without nightly
+criterion = { version = "0.6.0", features = ["html_reports", "async"] }
+# Added for Lightning tests
+lightning = { version = "0.0.118", features = ["std"] }
+lightning-invoice = { version = "0.29.0" }

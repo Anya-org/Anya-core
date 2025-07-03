@@ -13,6 +13,7 @@ use std::error::Error;
 // DAO Module for Anya Core
 // Implements governance and voting mechanisms
 
+pub mod compat;
 pub mod governance;
 pub mod legal;
 pub mod voting;

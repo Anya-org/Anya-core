@@ -1,9 +1,9 @@
 // Decentralized Reporting System Tests
-use clarity_repl::vm::test_util::{TEST_HEADER_DB, TEST_BURN_STATE_DB};
-use clarity_repl::vm::{Value, execute, StacksTransaction};
-use clarity_repl::clarity::ClarityInstance;
-use clarity_repl::repl::Session;
-use clarity_repl::repl::TestEnvironment;
+use anya_core::dao::compat::clarity_repl::vm::test_util::{TEST_HEADER_DB, TEST_BURN_STATE_DB};
+use anya_core::dao::compat::clarity_repl::vm::{Value, execute, StacksTransaction};
+use anya_core::dao::compat::clarity_repl::clarity::ClarityInstance;
+use anya_core::dao::compat::clarity_repl::repl::Session;
+use anya_core::dao::compat::clarity_repl::repl::TestEnvironment;
 use std::env;
 
 #[test]

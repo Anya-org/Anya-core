@@ -427,32 +427,63 @@ mod enhanced_metrics_tests {
     }
 }
 
-/// Performance benchmarks for layer interactions
-mod interaction_benchmarks {
+/// Performance tests for layer interactions (converted from benchmarks)
+mod interaction_performance_tests {
     use super::*;
+    use std::time::Instant;
 
-    #[bench]
-    fn bench_l1_l2_bridge(b: &mut Bencher) {
+    #[test]
+    fn test_l1_l2_bridge_performance() {
         let optimizer = CrossLayerOptimizer::new().unwrap();
-        b.iter(|| {
+        
+        // Run a few iterations and measure time
+        let iterations = 10;
+        let start = Instant::now();
+        
+        for _ in 0..iterations {
             optimizer.optimize_layer_interactions().unwrap();
-        });
+        }
+        
+        let elapsed = start.elapsed();
+        println!("L1-L2 bridge: {:?} per operation", elapsed / iterations as u32);
+        
+        // No hard assertions, just informational
     }
 
-    #[bench]
-    fn bench_l2_l3_bridge(b: &mut Bencher) {
+    #[test]
+    fn test_l2_l3_bridge_performance() {
         let optimizer = CrossLayerOptimizer::new().unwrap();
-        b.iter(|| {
+        
+        // Run a few iterations and measure time
+        let iterations = 10;
+        let start = Instant::now();
+        
+        for _ in 0..iterations {
             optimizer.optimize_layer_interactions().unwrap();
-        });
+        }
+        
+        let elapsed = start.elapsed();
+        println!("L2-L3 bridge: {:?} per operation", elapsed / iterations as u32);
+        
+        // No hard assertions, just informational
     }
 
-    #[bench]
-    fn bench_l3_zk_bridge(b: &mut Bencher) {
+    #[test]
+    fn test_l3_zk_bridge_performance() {
         let optimizer = CrossLayerOptimizer::new().unwrap();
-        b.iter(|| {
+        
+        // Run a few iterations and measure time
+        let iterations = 10;
+        let start = Instant::now();
+        
+        for _ in 0..iterations {
             optimizer.optimize_layer_interactions().unwrap();
-        });
+        }
+        
+        let elapsed = start.elapsed();
+        println!("L3-ZK bridge: {:?} per operation", elapsed / iterations as u32);
+        
+        // No hard assertions, just informational
     }
 }
 

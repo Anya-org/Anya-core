@@ -1,4 +1,4 @@
-use clarinet::{
+use anya_core::dao::compat::clarinet::{
     clarity::{
         types::{BuffData, Value},
         Address, Clarity, StacksAddress,

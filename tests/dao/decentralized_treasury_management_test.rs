@@ -1,10 +1,10 @@
 #[cfg(test)]
 mod decentralized_treasury_management_tests {
-    use clarinet::test_runner::*;
-    use clarinet::types::*;
-    use clarinet::contract_helpers::*;
-    use clarinet::macros::*;
-    use clarinet::client::contracts::Contract;
+    use anya_core::dao::compat::clarinet::test_runner::*;
+    use anya_core::dao::compat::clarinet::types::*;
+    use anya_core::dao::compat::clarinet::contract_helpers::*;
+    use anya_core::dao::compat::clarinet::macros::*;
+    use anya_core::dao::compat::clarinet::client::contracts::Contract;
     
     #[test]
     fn test_decentralized_treasury_management() {

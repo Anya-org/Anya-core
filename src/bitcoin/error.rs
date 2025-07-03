@@ -20,7 +20,7 @@ use hex::FromHexError;
 use thiserror::Error;
 
 /// Bitcoin operation errors
-#[derive(Debug, Error)]
+#[derive(Debug, Error, Clone)]
 pub enum BitcoinError {
     #[error("Failed to sign transaction")]
     SigningError,

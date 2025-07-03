@@ -10,7 +10,7 @@ mod rgb_simple_tests {
     async fn test_rgb_asset_functionality() {
         // Create temp directory for the test
         let temp_dir = tempdir().expect("Failed to create temp directory");
-        let data_dir = temp_dir.path().to_path_buf();
+        let _data_dir = temp_dir.path().to_path_buf(); // Prefix with underscore to indicate intentionally unused
 
         // Log the start of the test
         println!("Starting RGB asset functionality test");
@@ -58,7 +58,7 @@ mod web5_simple_tests {
     async fn test_web5_functionality() {
         // Create temp directory for the test
         let temp_dir = tempdir().expect("Failed to create temp directory");
-        let data_dir = temp_dir.path().to_path_buf();
+        let _data_dir = temp_dir.path().to_path_buf();
 
         // Log the start of the test
         println!("Starting Web5 functionality test");
