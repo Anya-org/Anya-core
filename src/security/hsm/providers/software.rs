@@ -91,9 +91,8 @@ impl SecureString {
         }
     }
 
-    async fn lock(&self) -> SecureString {
-        // Return a clone to match expected behavior
-        self.clone()
+    async fn lock(&self) -> tokio::sync::MutexGuard<'_, Vec<u8>> {
+        self.data.lock().await
     }
 
     fn as_bytes(&self) -> Vec<u8> {
@@ -112,7 +111,7 @@ impl SecureString {
 
 impl Drop for SecureString {
     fn drop(&mut self) {
-        // Best effort to zeroize on drop without locking
+        // Best effort to zeroize on drop, even though we can't guarantee all clones are gone
         if let Ok(mut data) = self.data.try_lock() {
             zeroize::Zeroize::zeroize(&mut *data);
         }
@@ -396,8 +395,7 @@ impl SoftwareHsmProvider {
                 let sighash = sighash_cache.legacy_signature_hash(
                     i,
                     &script_code,
-                    value,
-                    bitcoin::sighash::EcdsaSighashType::All,
+                    bitcoin::sighash::EcdsaSighashType::All.to_u32(),
                 )?;
 
                 let message = Message::from_digest_slice(&sighash[..])
@@ -442,9 +440,13 @@ impl SoftwareHsmProvider {
                     .filter_map(|i| i.witness_utxo.clone())
                     .collect();
                 let mut sighash_cache = bitcoin::sighash::SighashCache::new(&psbt.unsigned_tx);
-                let sighash = sighash_cache.taproot_signature_hash(
+                // Create a Prevouts struct from the collected UTXOs
+                let prevouts = bitcoin::sighash::Prevouts::All(&prevouts);
+                
+                let sighash = sighash_cache.taproot_key_spend_signature_hash(
                     i,
                     &prevouts,
+                    None, // No annex
                     bitcoin::TapSighashType::All,
                 )?;
 
