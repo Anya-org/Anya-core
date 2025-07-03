@@ -19,6 +19,12 @@ pub struct StateValidator {
     transfers: HashMap<String, StateTransfer>, // transition_id -> transfer
 }
 
+impl Default for StateValidator {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// RGB State Transition
 #[derive(Debug, Clone)]
 pub struct StateTransition {

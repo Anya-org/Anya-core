@@ -105,7 +105,7 @@ impl RGBClient {
         }
         
         // Return a dummy transfer ID
-        Ok(format!("transfer:{}", contract_id))
+        Ok(format!("transfer:{contract_id}"))
     }
     
     /// Get asset balance

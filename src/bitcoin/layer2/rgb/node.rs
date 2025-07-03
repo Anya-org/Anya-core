@@ -31,6 +31,12 @@ pub struct RGBNode {
     contracts: Arc<RwLock<HashMap<String, String>>>, // contract_id -> contract_data
 }
 
+impl Default for RGBNode {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl RGBNode {
     /// Create a new RGB node with default configuration
     pub fn new() -> Self {
