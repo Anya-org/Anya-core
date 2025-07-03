@@ -3,10 +3,9 @@ use anya_core::{
     bitcoin::protocol::{BPCLevel as ProtocolLevel, BitcoinProtocol},
     bitcoin::validation::{TransactionValidator, ValidationError},
 };
-use tests::common::bitcoin_compat::*;
-use bitcoin::{
-    ScriptBuf, Transaction, absolute::LockTime, transaction::Version
-};
+
+// Fix import from tests - this will need to be adjusted based on how tests is made available
+// use tests::common::bitcoin_compat::*;
 
 use bitcoin::{
     ScriptBuf, Transaction, absolute::LockTime, transaction::Version

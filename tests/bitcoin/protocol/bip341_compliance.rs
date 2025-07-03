@@ -4,16 +4,16 @@
 // Tests the implementation of BIP-341 (Taproot) features according to
 // Bitcoin Development Framework v2.5 requirements
 
-use anyhow::{anyhow, bail, Error, Result};
+use anyhow::{anyhow, bail, Result};
 use bitcoin::secp256k1::{Secp256k1, SecretKey, XOnlyPublicKey};
 use bitcoin::taproot::{
-    LeafVersion, TaprootBuilder, ControlBlock, TapNodeHash,
-    TapBranchHash, TapLeafHash, TapTweak,
-    merkle::Branch
+    LeafVersion, TaprootBuilder, ControlBlock, TapNodeHash, 
+    TapLeafHash, TapBranchTag  // Use TapBranchTag instead of TapBranchHash
 };
-use bitcoin::{ScriptBuf, TapLeafHash};
-use bitcoin::key::{TapTweak, TweakedPublicKey, UntweakedPublicKey, Parity};
+use bitcoin::ScriptBuf;
+use bitcoin::key::{TapTweak, TweakedPublicKey, UntweakedPublicKey};
 use bitcoin::hashes::{Hash, sha256};
+use rand;
 use std::str::FromStr;
 
 /// TaprootVerifier provides methods for verifying Taproot constructions
@@ -38,11 +38,12 @@ impl TaprootVerifier {
         // Compute tweak
         let merkle_root = None;
         
-        // Use the tap_tweak method with the merkle_root option
+        // Use the add_tweak method with the merkle_root option
         let (tweaked_key, _parity) = internal_key_untweaked.tap_tweak(&self.secp, merkle_root);
         
         // Compare the tweaked key with the output key
-        Ok(TweakedPublicKey::from_inner(tweaked_key) == output_key)
+        // In Bitcoin 0.32.6, we need to pass an XOnlyPublicKey to dangerous_assume_tweaked
+        Ok(TweakedPublicKey::dangerous_assume_tweaked(tweaked_key.into()) == output_key)
     }
     
     /// Verify a script path spend for a Taproot output
@@ -67,7 +68,8 @@ impl TaprootVerifier {
         let (tweaked_key, _parity) = internal_key_untweaked.tap_tweak(&self.secp, merkle_root);
         
         // Compare the tweaked key with the output key
-        Ok(TweakedPublicKey::from_inner(tweaked_key) == output_key)
+        // In Bitcoin 0.32.6, we need to pass an XOnlyPublicKey to dangerous_assume_tweaked
+        Ok(TweakedPublicKey::dangerous_assume_tweaked(tweaked_key.into()) == output_key)
     }
     
     /// Compute taproot output key from internal key and tweak
@@ -92,8 +94,9 @@ impl TaprootVerifier {
         // Use the tap_tweak method with the merkle_root option
         let (tweaked_key, parity) = internal_key_untweaked.tap_tweak(&self.secp, merkle_root);
         
-        // Return the XOnlyPublicKey and convert parity to bool
-        Ok((tweaked_key, parity.to_bool()))
+        // Return the XOnlyPublicKey and convert parity
+        // In Bitcoin 0.32.6, Parity doesn't have to_bool method, so we convert manually
+        Ok((tweaked_key.into(), parity == bitcoin::key::Parity::Odd))
     }
     
     /// Compute merkle root from leaf hash and control block
@@ -108,7 +111,7 @@ impl TaprootVerifier {
         // In Bitcoin 0.32, we need to manually recreate the Merkle proof path from the control block
         // Get merkle proof from control block (branches are now a field, not a method)
         let merkle_branches = &control_block.merkle_branch;
-        let path = control_block.branch_parity.unwrap_or(0); // If no parity, use 0
+        let path = control_block.output_key_parity as u8; // In Bitcoin 0.32.6, use output_key_parity
         
         // Calculate merkle root
         for (i, branch) in merkle_branches.iter().enumerate() {
@@ -122,7 +125,7 @@ impl TaprootVerifier {
                 (&current, branch)
             };
             
-            // Compute parent hash
+            // Compute parent hash using the from_node_hashes method
             current = TapNodeHash::from_node_hashes(*left, *right);
         }
         
@@ -233,7 +236,8 @@ impl BIP341Checker {
         
         // Compare the tweaked key with the output key
         // In Bitcoin 0.32.6, we use dangerous_assume_tweaked instead of from_inner
-        Ok(TweakedPublicKey::dangerous_assume_tweaked(tweaked_key) == output_key)
+        // Must convert tweaked_key to XOnlyPublicKey first
+        Ok(TweakedPublicKey::dangerous_assume_tweaked(tweaked_key.into()) == output_key)
     }
     
     /// Verify a script path spend for a Taproot output
@@ -242,7 +246,7 @@ impl BIP341Checker {
         internal_key_untweaked: &XOnlyPublicKey,
         merkle_root: Option<TapNodeHash>,
         script_hash: TapLeafHash,
-        merkle_proof: &[TapBranchHash],
+        merkle_proof: &[TapBranchTag],
         output_key: TweakedPublicKey,
     ) -> Result<bool> {
         // Verify that script_hash is included in the merkle tree
@@ -255,7 +259,8 @@ impl BIP341Checker {
         
         // Compare the tweaked key with the output key
         // In Bitcoin 0.32.6, we use dangerous_assume_tweaked instead of from_inner
-        Ok(TweakedPublicKey::dangerous_assume_tweaked(tweaked_key) == output_key)
+        // Must convert tweaked_key to XOnlyPublicKey first
+        Ok(TweakedPublicKey::dangerous_assume_tweaked(tweaked_key.into()) == output_key)
     }
     
     /// Compute taproot output key from internal key and tweak
@@ -268,7 +273,8 @@ impl BIP341Checker {
         let (tweaked_key, parity) = internal_key_untweaked.tap_tweak(&self.secp, merkle_root);
         
         // Return the XOnlyPublicKey and parity
-        Ok((tweaked_key, parity))
+        // Convert TweakedPublicKey to XOnlyPublicKey and Parity to bool
+        Ok((tweaked_key.into(), parity == bitcoin::key::Parity::Odd))
     }
     
     /// Compute merkle root from leaf hash and control block
@@ -287,11 +293,18 @@ impl BIP341Checker {
         
         // Process each branch element
         for (i, element) in control_block.merkle_branch.iter().enumerate() {
-            merkle_root = Branch::node_hash(
-                path & (1 << i) != 0,
-                &merkle_root,
-                element,
-            )?;
+            // In 0.32.6, the Branch::node_hash takes different arguments - get the is_right value
+            let is_right = (path & (1 << i)) != 0;
+            
+            // Compute the next node hash based on the branch direction
+            let (left, right) = if is_right {
+                (element, &merkle_root)
+            } else {
+                (&merkle_root, element)
+            };
+            
+            // Use from_node_hashes which is the current API
+            merkle_root = TapNodeHash::from_node_hashes(*left, *right);
         }
         
         Ok(Some(merkle_root))
@@ -301,7 +314,7 @@ impl BIP341Checker {
     fn verify_merkle_proof(
         &self,
         leaf_hash: TapLeafHash,
-        merkle_proof: &[TapBranchHash],
+        merkle_proof: &[TapBranchTag],
         expected_root: Option<TapNodeHash>,
     ) -> Result<bool> {
         let expected_root = match expected_root {
@@ -331,7 +344,7 @@ impl BIP341Checker {
     }
     
     /// Compute parent hash in merkle tree
-    fn parent_hash(left: &TapBranchHash, right: &TapBranchHash) -> Result<TapNodeHash> {
+    fn parent_hash(left: &TapBranchTag, right: &TapBranchTag) -> Result<TapNodeHash> {
         // Concatenate hashes and hash the result
         let mut hasher = sha256::HashEngine::default();
         hasher.input(&[0]); // Prefix with 0x00 for internal nodes
@@ -346,6 +359,28 @@ impl BIP341Checker {
         bytes.copy_from_slice(hash_result.as_ref());
         
         Ok(TapNodeHash::from_byte_array(bytes))
+    }
+
+    /// Test BIP-341 key path spend with test vectors
+    pub fn test_vector_key_path_spend(
+        &self,
+        internal_key: &str,
+        output_key: &str,
+    ) -> Result<bool> {
+        // Parse the internal key from hex string
+        let internal_key = XOnlyPublicKey::from_str(internal_key)
+            .map_err(|e| anyhow!("Failed to parse internal key: {}", e))?;
+        
+        // Parse the tweaked output key from hex string
+        // In Bitcoin 0.32.6, we first need to convert it to an XOnlyPublicKey
+        let output_x_only = XOnlyPublicKey::from_str(output_key)
+            .map_err(|e| anyhow!("Failed to parse output key: {}", e))?;
+        
+        // Convert to TweakedPublicKey
+        let tweaked_key = TweakedPublicKey::dangerous_assume_tweaked(output_x_only);
+        
+        // Verify the key path spend with no merkle root
+        self.verify_key_path_spend(&internal_key, None, tweaked_key)
     }
 }
 
@@ -510,6 +545,9 @@ pub fn test_taproot_edge_cases() -> Result<()> {
         &control_block_max,
         LeafVersion::TapScript
     )?);
+    
+    Ok(())
+}
 
 #[allow(dead_code)]
 fn test_bip341_test_vectors() -> Result<()> {
@@ -555,6 +593,9 @@ pub fn test_taproot_compliance_vectors() -> Result<()> {
         output_key.to_x_only_public_key(), expected_output_key,
         "Taproot output key doesn't match expected BIP-341 test vector"
     );
+    
+    Ok(())
+}
 
 // Additional test for tapleaf verification
 #[cfg(test)]
@@ -574,7 +615,7 @@ mod additional_tests {
         
         // Create a simple tap tree with one leaf (for testing)
         let leaf_hash = TapLeafHash::from_byte_array([1u8; 32]);
-        let branch_hash = TapBranchHash::from_byte_array([2u8; 32]);
+        let branch_hash = TapBranchTag::from_byte_array([2u8; 32]);
         
         // Create a simple merkle proof
         let merkle_proof = vec![branch_hash];
@@ -585,11 +626,12 @@ mod additional_tests {
         let leaf_node_hash = TapNodeHash::from_byte_array(bytes);
         
         // Compute parent hash (merkle root)
-        let merkle_root = BIP341Checker::parent_hash(&TapBranchHash::from_byte_array(bytes), &branch_hash).unwrap();
+        let merkle_root = BIP341Checker::parent_hash(&leaf_node_hash, &branch_hash).unwrap();
         
         // Compute tweaked key with merkle root
-        let (tweaked_key, _parity) = x_only.tap_tweak(&secp, Some(merkle_root));
-        let tweaked_public_key = TweakedPublicKey::dangerous_assume_tweaked(tweaked_key);
+        let internal_key_untweaked: UntweakedPublicKey = x_only.into();
+        let (tweaked_key, _parity) = internal_key_untweaked.tap_tweak(&secp, Some(merkle_root));
+        let tweaked_public_key = TweakedPublicKey::dangerous_assume_tweaked(tweaked_key.into());
         
         // Verify script path spend
         let result = checker.verify_script_path_spend(
