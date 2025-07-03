@@ -65,7 +65,12 @@ impl DnsResolver {
         let mut opts = ResolverOpts::default();
         opts.validate = validate_dnssec;
 
-        let resolver = TokioAsyncResolver::tokio(ResolverConfig::default(), opts)?;
+        let (resolver, bg) = TokioAsyncResolver::tokio(ResolverConfig::default(), opts)
+            .await
+            .map_err(|e| DnsResolverError::Resolution(e.to_string()))?;
+
+        // Spawn the background task
+        tokio::spawn(bg);
 
         Ok(Self {
             resolver,
@@ -194,7 +199,12 @@ impl DnsResolver {
             let mut opts = ResolverOpts::default();
             opts.validate = validate_dnssec;
 
-            let resolver = TokioAsyncResolver::tokio(ResolverConfig::default(), opts)?;
+            let (resolver, bg) = TokioAsyncResolver::tokio(ResolverConfig::default(), opts)
+                .await
+                .map_err(|e| DnsResolverError::Resolution(e.to_string()))?;
+
+            // Spawn the background task
+            tokio::spawn(bg);
 
             self.resolver = resolver;
             self.validate_dnssec = validate_dnssec;
