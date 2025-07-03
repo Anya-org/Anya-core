@@ -353,7 +353,7 @@ async fn create_storage(
 
 /// Storage trait for audit events
 #[async_trait]
-pub trait AuditStorage {
+pub trait AuditStorage: std::fmt::Debug {
     /// Initialize the storage
     async fn initialize(&self) -> Result<(), HsmError>;
 
@@ -510,7 +510,8 @@ impl AuditEvent {
             "HsmOperation" => AuditEventType::HsmOperation,
             "KeyGeneration" => AuditEventType::KeyGeneration,
             "Authentication" => AuditEventType::Authentication,
-            "Authorization" => AuditEventType::Authorization,
+            // Fixed: Authorization doesn't exist in AuditEventType, using Custom instead
+            "Authorization" => AuditEventType::Custom("Authorization".to_string()),
             "ConfigChange" => AuditEventType::ConfigChange,
             _ => AuditEventType::Custom(self.event_type.clone()),
         };
@@ -519,8 +520,9 @@ impl AuditEvent {
         let result = match self.result.as_str() {
             "Success" => AuditEventResult::Success,
             "Failure" => AuditEventResult::Failure,
-            "Denied" => AuditEventResult::Denied,
-            "Error" => AuditEventResult::Error,
+            // Fixed: These variants don't exist in AuditEventResult
+            "Denied" => AuditEventResult::Rejected, // Using closest match
+            "Error" => AuditEventResult::Failure,   // Using closest match
             "Timeout" => AuditEventResult::Timeout,
             _ => AuditEventResult::Unknown,
         };
@@ -546,8 +548,8 @@ impl AuditEvent {
         }
 
         if let Some(error) = &self.error {
-            // Since with_error no longer exists, store it in metadata
-            if let Ok(mut event_with_metadata) = event.with_metadata(&serde_json::json!({ "error": error })) {
+            // Store error in metadata
+            if let Ok(event_with_metadata) = event.with_metadata(&serde_json::json!({ "error": error })) {
                 event = event_with_metadata;
             }
         }
@@ -571,6 +573,7 @@ impl AuditEvent {
 }
 
 /// In-memory storage for audit events (for testing)
+#[derive(Debug)]
 pub struct MemoryAuditStorage {
     events: Mutex<Vec<AuditEvent>>,
 }
@@ -689,6 +692,7 @@ impl AuditStorage for MemoryAuditStorage {
 }
 
 /// File-based storage for audit events
+#[derive(Debug)]
 pub struct FileAuditStorage {
     file_path: String,
 }
@@ -886,6 +890,7 @@ impl AuditStorage for FileAuditStorage {
 }
 
 /// Database storage for audit events
+#[derive(Debug)]
 pub struct DbAuditStorage {
     connection_string: String,
     memory_storage: MemoryAuditStorage, // Fallback storage
