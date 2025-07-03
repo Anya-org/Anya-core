@@ -36,6 +36,10 @@ pub enum HsmError {
     /// Invalid key type
     #[error("Invalid key type: {0}")]
     InvalidKeyType(String),
+    
+    /// Invalid key data
+    #[error("Invalid key data: {0}")]
+    InvalidKeyData(String),
 
     /// Key generation error
     #[error("Key generation error: {0}")]
@@ -61,6 +65,10 @@ pub enum HsmError {
     #[error("Provider error: {0}")]
     ProviderError(String),
 
+    /// Provider not found
+    #[error("Provider not found: {0}")]
+    ProviderNotFound(String),
+
     /// Permission denied
     #[error("Permission denied: {0}")]
     PermissionDenied(String),
@@ -68,6 +76,10 @@ pub enum HsmError {
     /// Unsupported operation
     #[error("Unsupported operation: {0}")]
     UnsupportedOperation(String),
+
+    /// Invalid operation
+    #[error("Invalid operation: {0}")]
+    InvalidOperation(String),
 
     /// Unsupported key type
     #[error("Unsupported key type")]
@@ -276,6 +288,9 @@ pub enum AuditEventType {
     /// HSM operation
     HsmOperation,
 
+    /// Health check
+    HealthCheck,
+
     /// Custom event
     Custom(String),
 }
@@ -306,6 +321,8 @@ impl fmt::Display for AuditEventType {
             AuditEventType::AuditLogAccess => write!(f, "audit.access"),
             AuditEventType::OperationRequest => write!(f, "operation.request"),
             AuditEventType::OperationResponse => write!(f, "operation.response"),
+            AuditEventType::HsmOperation => write!(f, "hsm.operation"),
+            AuditEventType::HealthCheck => write!(f, "hsm.health_check"),
             AuditEventType::Custom(name) => write!(f, "custom.{}", name),
         }
     }
@@ -338,6 +355,8 @@ impl std::str::FromStr for AuditEventType {
             "audit.access" => Ok(AuditEventType::AuditLogAccess),
             "operation.request" => Ok(AuditEventType::OperationRequest),
             "operation.response" => Ok(AuditEventType::OperationResponse),
+            "hsm.operation" => Ok(AuditEventType::HsmOperation),
+            "hsm.health_check" => Ok(AuditEventType::HealthCheck),
             _ => {
                 if s.starts_with("custom.") {
                     let custom_name = s.strip_prefix("custom.").unwrap_or(s);
@@ -373,6 +392,9 @@ pub enum AuditEventResult {
 
     /// Operation timed out
     Timeout,
+    
+    /// Unknown result
+    Unknown,
 }
 
 impl fmt::Display for AuditEventResult {

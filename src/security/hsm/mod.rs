@@ -34,8 +34,10 @@ impl Sha256Hash {
 }
 
 pub mod audit;
+pub mod compat;
 pub mod config;
 pub mod error;
+mod error_impls;
 pub mod operations;
 pub mod provider;
 pub mod providers;
@@ -57,7 +59,7 @@ use bitcoin::block::Header as BlockHeader;
 use bitcoin::key::Secp256k1;
 use bitcoin::opcodes::all as opcodes;
 use bitcoin::taproot::TaprootBuilder;
-use bitcoin::{Psbt, Script, Txid, XOnlyPublicKey};
+use bitcoin::{Network, Psbt, Script, Txid, XOnlyPublicKey};
 use chrono::{DateTime, Utc};
 use secp256k1::ecdsa::Signature;
 use std::collections::HashMap;
@@ -135,17 +137,24 @@ impl HsmManager {
                 Box::new(
                     SoftwareHsmProvider::new(
                         config.software.clone(),
-                        config.network,
+                        Network::from(config.bitcoin.network),
                         audit_logger.clone(),
                     )
                     .await?,
                 )
             }
-            HsmProviderType::CloudHsm => Box::new(CloudHsmProvider::new(&config.cloud).await?),
-            HsmProviderType::HardwareHsm => {
-                Box::new(HardwareHsmProvider::new(&config.hardware).await?)
+            HsmProviderType::CloudHsm => {
+                // CloudHsmProvider is not implemented yet
+                return Err(HsmError::ProviderNotFound("CloudHsm provider not implemented".to_string()));
             }
-            HsmProviderType::BitcoinHsm => {
+            HsmProviderType::Hardware => {
+                Box::new(HardwareHsmProvider::new(
+                    &config.hardware,
+                    Network::from(config.bitcoin.network),
+                    Arc::clone(&audit_logger)
+                ).await?)
+            }
+            HsmProviderType::Bitcoin => {
                 Box::new(BitcoinHsmProvider::new(&config.bitcoin).await?)
             }
         };
@@ -169,17 +178,17 @@ impl HsmManager {
             *status = HsmStatus::Initializing;
         }
         self.audit_logger.initialize().await?;
-        self.audit_logger
-            .log_event(
-                "hsm.initialize",
-                &HsmAuditEvent {
-                    event_type: AuditEventType::HsmInitialize,
-                    provider: format!("{:?}", self.config.provider_type),
-                    status: "started".to_string(),
-                    details: None,
-                    operation_id: None,
-                },
-            )
+        self.            audit_logger
+                .log_event(
+                  AuditEventType::HsmInitialize,
+                  AuditEventResult::InProgress,
+                  AuditEventSeverity::Info,
+                  serde_json::json!({
+                      "event": "hsm.initialize",
+                      "provider": format!("{:?}", self.config.provider_type),
+                      "status": "started",
+                  })
+               )
             .await?;
         self.provider
             .initialize()
@@ -189,17 +198,17 @@ impl HsmManager {
             let mut status = self.status.write().await;
             *status = HsmStatus::Ready;
         }
-        self.audit_logger
-            .log_event(
-                "hsm.initialize",
-                &HsmAuditEvent {
-                    event_type: AuditEventType::HsmInitialize,
-                    provider: format!("{:?}", self.config.provider_type),
-                    status: "completed".to_string(),
-                    details: None,
-                    operation_id: None,
-                },
-            )
+        self.            audit_logger
+                .log_event(
+                  AuditEventType::HsmInitialize,
+                  AuditEventResult::Success,
+                  AuditEventSeverity::Info,
+                  serde_json::json!({
+                      "event": "hsm.initialize",
+                      "provider": format!("{:?}", self.config.provider_type),
+                      "status": "completed",
+                  })
+               )
             .await?;
         info!(
             "HSM Manager initialized successfully with provider: {:?}",
@@ -279,17 +288,18 @@ impl HsmManager {
             Ok(false) => "failed",
             Err(_) => "error",
         };
-        self.audit_logger
-            .log_event(
-                "hsm.health_check",
-                &HsmAuditEvent {
-                    event_type: "health_check".to_string(),
-                    provider: format!("{:?}", self.config.provider_type),
-                    status: "completed".to_string(),
-                    details: Some(format!("Result: {}", result_str)),
-                    operation_id: None,
-                },
-            )
+        let success = matches!(check_result, Ok(true));
+        self.audit_logger                .log_event(
+                  AuditEventType::HealthCheck,
+                  if success { AuditEventResult::Success } else { AuditEventResult::Failure },
+                  if success { AuditEventSeverity::Info } else { AuditEventSeverity::Error },
+                  serde_json::json!({
+                      "event": "hsm.health_check",
+                      "provider": format!("{:?}", self.config.provider_type),
+                      "status": "completed",
+                      "details": format!("Result: {}", result_str),
+                  })
+               )
             .await?;
         check_result
     }
@@ -312,34 +322,33 @@ impl HsmManager {
             health_status.user_enabled = true;
             health_status.disabled_reason = None;
         }
-        self.audit_logger
-            .log_event(
-                "hsm.enable",
-                &HsmAuditEvent {
-                    event_type: "enable".to_string(),
-                    provider: format!("{:?}", self.config.provider_type),
-                    status: "started".to_string(),
-                    details: Some("User-initiated enablement".to_string()),
-                    operation_id: None,
-                },
-            )
+        self.audit_logger                .log_event(
+                  AuditEventType::OperationRequest,
+                  AuditEventResult::InProgress,
+                  AuditEventSeverity::Info,
+                  serde_json::json!({
+                      "event": "hsm.enable",
+                      "provider": format!("{:?}", self.config.provider_type),
+                      "status": "started",
+                      "details": "User-initiated enablement",
+                  })
+               )
             .await?;
         self.enabled = true;
         {
             let mut status = self.status.write().await;
             *status = HsmStatus::Ready;
         }
-        self.audit_logger
-            .log_event(
-                "hsm.enable",
-                &HsmAuditEvent {
-                    event_type: "enable".to_string(),
-                    provider: format!("{:?}", self.config.provider_type),
-                    status: "completed".to_string(),
-                    details: None,
-                    operation_id: None,
-                },
-            )
+        self.audit_logger                .log_event(
+                  AuditEventType::OperationRequest,
+                  AuditEventResult::Success,
+                  AuditEventSeverity::Info,
+                  serde_json::json!({
+                      "event": "hsm.enable",
+                      "provider": format!("{:?}", self.config.provider_type),
+                      "status": "completed",
+                  })
+               )
             .await?;
         Ok(())
     }
@@ -348,7 +357,7 @@ impl HsmManager {
         &self,
         operation: HsmOperation,
         params: T,
-    ) -> Result<OperationResult, HsmError> {
+    ) -> Result<operations::OperationResponse, HsmError> {
         let operation_id = format!("{}", uuid::Uuid::new_v4());
         debug!(
             "Executing HSM operation: {:?}, operation_id: {}",
@@ -363,14 +372,16 @@ impl HsmManager {
         };
         self.audit_logger
             .log_event(
-                "hsm.operation",
-                &HsmAuditEvent {
-                    event_type: AuditEventType::HsmOperation,
-                    provider: format!("{:?}", self.config.provider_type),
-                    status: "started".to_string(),
-                    details: Some(format!("operation_id: {}", operation_id.clone())),
-                    operation_id: Some(operation_id.clone()),
-                },
+                AuditEventType::HsmOperation,
+                AuditEventResult::InProgress,
+                AuditEventSeverity::Info,
+                serde_json::json!({
+                    "event": "hsm.operation",
+                    "provider": format!("{:?}", self.config.provider_type),
+                    "status": "started",
+                    "details": format!("operation_id: {}", operation_id.clone()),
+                    "operation_id": operation_id.clone(),
+                })
             )
             .await?;
         {
@@ -380,29 +391,41 @@ impl HsmManager {
                     HsmError::NotReady(format!("HSM is not ready, current status: {:?}", *status));
                 self.audit_logger
                     .log_event(
-                        "hsm.operation",
-                        &HsmAuditEvent {
-                            event_type: AuditEventType::HsmOperation,
-                            result: AuditEventResult::Failure,
-                            severity: AuditEventSeverity::Error,
-                            timestamp: chrono::Utc::now(),
-                            id: Uuid::new_v4().to_string(),
-                            user_id: None,
-                            key_id: None,
-                            parameters: None,
-                            error: Some(format!("{:?}", err)),
-                            metadata: Some(serde_json::json!({
-                                "operation_id": operation_id,
-                                "status": "failed",
-                                "provider": format!("{:?}", self.config.provider_type)
-                            })),
-                        },
+                        AuditEventType::HsmOperation,
+                        AuditEventResult::Failure,
+                        AuditEventSeverity::Error,
+                        serde_json::json!({
+                            "event": "hsm.operation",
+                            "provider": format!("{:?}", self.config.provider_type),
+                            "status": "failed",
+                            "error": format!("{:?}", err),
+                            "operation_id": operation_id,
+                        })
                     )
                     .await?;
                 return Err(err);
             }
         }
-        match self.provider.execute_operation(request).await {
+        // Convert from types::HsmRequest to provider::HsmRequest
+        let provider_request = provider::HsmRequest {
+            id: request.id.clone(),
+            operation: match request.operation {
+                types::HsmOperation::GenerateKey => provider::HsmOperation::GenerateKey,
+                types::HsmOperation::Sign => provider::HsmOperation::Sign,
+                types::HsmOperation::Verify => provider::HsmOperation::Verify,
+                types::HsmOperation::Encrypt => provider::HsmOperation::Encrypt,
+                types::HsmOperation::Decrypt => provider::HsmOperation::Decrypt,
+                types::HsmOperation::ExportPublicKey => provider::HsmOperation::ExportPublicKey,
+                types::HsmOperation::ListKeys => provider::HsmOperation::ListKeys,
+                types::HsmOperation::DeleteKey => provider::HsmOperation::DeleteKey,
+                types::HsmOperation::GetStatus => provider::HsmOperation::GetStatus,
+                types::HsmOperation::Custom(s) => provider::HsmOperation::Custom(s),
+                _ => return Err(HsmError::InvalidOperation("Unsupported operation type".to_string())),
+            },
+            parameters: request.parameters,
+        };
+        
+        match self.provider.execute_operation(provider_request).await {
             Ok(result) => {
                 let event = HsmAuditEvent::success(AuditEventType::HsmOperation)
                     .with_operation_id(operation_id)
@@ -412,23 +435,16 @@ impl HsmManager {
                     }))?;
                 self.audit_logger
                     .log_event(
-                        "hsm.operation",
-                        &HsmAuditEvent {
-                            event_type: AuditEventType::HsmOperation,
-                            result: AuditEventResult::Success,
-                            severity: AuditEventSeverity::Info,
-                            timestamp: chrono::Utc::now(),
-                            id: Uuid::new_v4().to_string(),
-                            user_id: None,
-                            key_id: None,
-                            parameters: Some(serde_json::to_value(&operation).unwrap_or_default()),
-                            error: None,
-                            metadata: Some(serde_json::json!({
-                                "operation_id": operation_id,
-                                "status": "success",
-                                "provider": format!("{:?}", self.config.provider_type)
-                            })),
-                        },
+                        AuditEventType::HsmOperation,
+                        AuditEventResult::Success,
+                        AuditEventSeverity::Info,
+                        serde_json::json!({
+                            "event": "hsm.operation",
+                            "provider": format!("{:?}", self.config.provider_type),
+                            "status": "success",
+                            "operation_id": operation_id,
+                            "operation_data": serde_json::to_value(&operation).unwrap_or_default(),
+                        })
                     )
                     .await?;
                 Ok(result)
@@ -436,23 +452,17 @@ impl HsmManager {
             Err(err) => {
                 self.audit_logger
                     .log_event(
-                        "hsm.operation",
-                        &HsmAuditEvent {
-                            event_type: AuditEventType::HsmOperation,
-                            result: AuditEventResult::Failure,
-                            severity: AuditEventSeverity::Error,
-                            timestamp: chrono::Utc::now(),
-                            id: Uuid::new_v4().to_string(),
-                            user_id: None,
-                            key_id: None,
-                            parameters: Some(serde_json::to_value(&operation).unwrap_or_default()),
-                            error: Some(format!("{:?}", err)),
-                            metadata: Some(serde_json::json!({
-                                "operation_id": operation_id,
-                                "status": "failed",
-                                "provider": format!("{:?}", self.config.provider_type)
-                            })),
-                        },
+                        AuditEventType::HsmOperation,
+                        AuditEventResult::Failure,
+                        AuditEventSeverity::Error,
+                        serde_json::json!({
+                            "event": "hsm.operation",
+                            "provider": format!("{:?}", self.config.provider_type),
+                            "status": "failed",
+                            "error": format!("{:?}", err),
+                            "operation_id": operation_id,
+                            "operation_data": serde_json::to_value(&operation).unwrap_or_default(),
+                        })
                     )
                     .await?;
                 Err(err)
@@ -663,14 +673,15 @@ impl HsmManager {
         *self.status.write().await = HsmStatus::Disabled;
         self.audit_logger
             .log_event(
-                "hsm.disable",
-                &HsmAuditEvent {
-                    event_type: AuditEventType::HsmOperation,
-                    provider: format!("{:?}", self.config.provider_type),
-                    status: "completed".to_string(),
-                    details: Some("HSM disabled by user".to_string()),
-                    operation_id: None,
-                },
+                AuditEventType::HsmOperation, 
+                AuditEventResult::Success,
+                AuditEventSeverity::Info,
+                serde_json::json!({
+                    "event": "hsm.disable",
+                    "provider": format!("{:?}", self.config.provider_type),
+                    "status": "completed",
+                    "details": "HSM disabled by user",
+                })
             )
             .await?;
         Ok(())
@@ -755,7 +766,7 @@ impl SecurityManager {
         &self,
         threshold: usize,
         keys: &[XOnlyPublicKey],
-    ) -> Result<String> {
+    ) -> Result<String, HsmError> {
         let secp = Secp256k1::new();
         let internal_key = keys[0];
         let mut builder = TaprootBuilder::new();
@@ -838,7 +849,7 @@ pub struct HsmBridge {
 }
 
 impl HsmBridge {
-    pub async fn sign_transaction(&mut self, psbt: &mut Psbt) -> Result<()> {
+    pub async fn sign_transaction(&mut self, psbt: &mut Psbt) -> Result<(), HsmError> {
         self.provider.sign_psbt(psbt).await?;
         Ok(())
     }
