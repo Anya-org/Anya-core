@@ -310,7 +310,7 @@ impl HsmProvider for BitcoinHsmProvider {
 
         // Check key type
         let key_pair =        match &params.key_type {
-            KeyType::Ec { curve } if *curve == EcCurve::Secp256k1 => {
+            KeyType::Ec { curve } if *curve == crate::security::hsm::provider::EcCurve::Secp256k1 => {
                 self.generate_bitcoin_key(&params).await?
             }
             _ => return Err(HsmError::InvalidParameters(format!(

@@ -1,35 +1,13 @@
-use std::error::Error;
-// src/bitcoin/layer2/rgb/mod.rs
+// [AIR-3][AIS-3][BPC-3][RES-3] RGB Layer 2 Protocol Implementation
 
 /// RGB Layer 2 implementation
 ///
 /// This module provides an implementation of RGB protocol, a client-side
 /// validation solution for Bitcoin assets. It allows for the creation
 /// and transfer of complex assets on top of Bitcoin's blockchain.
-
-mod schema;
-mod contract;
-mod client;
-mod node;
-mod wallet;
-mod state;
-
-pub use schema::{Schema, SchemaType, Field, FieldType, Validation};
-pub use contract::{Contract, ContractBuilder, ContractType, Witness};
-pub use client::{RGBClient, RGBClientBuilder, ClientConfig};
-pub use node::{RGBNode, NodeConfig};
-pub use wallet::{RGBWallet, AssetBalance};
-pub use state::{StateTransfer, StateValidator, StateTransition};
-
-// Export the RGBManager trait and related types
-pub use RGBManager;
-pub use RGBFactory;
-
 use std::collections::HashMap;
 use std::path::PathBuf;
 use bitcoin::Txid;
-// async_trait is implemented at trait definition level
-// use async_trait::async_trait;
 
 use crate::AnyaResult;
 use crate::bitcoin::wallet::transactions::TxOptions;
@@ -85,8 +63,7 @@ pub struct AssetTransfer {
 }
 
 /// Main interface for RGB operations
-#[async_trait::async_trait]
-pub trait RGBManager: Send + Sync {
+pub trait RGBManager {
     /// Create a new asset
     async fn create_asset(&self, params: AssetCreationParams) -> AnyaResult<RGBAsset>;
     
@@ -270,7 +247,6 @@ impl RGBClient {
 }
 
 /// Default implementation of the RGB manager
-#[allow(dead_code)]
 struct DefaultRGBManager {
     /// RGB client
     client: Option<RGBClient>,
@@ -305,7 +281,6 @@ impl Default for DefaultRGBManager {
     }
 }
 
-#[async_trait::async_trait]
 impl RGBManager for DefaultRGBManager {
     async fn create_asset(&self, _params: AssetCreationParams) -> AnyaResult<RGBAsset> {
         // Placeholder implementation

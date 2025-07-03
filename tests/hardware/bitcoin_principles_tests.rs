@@ -1,10 +1,16 @@
 use anya_core::{
-    bitcoin::{dlc::batch_verification::DLCOracleBatchVerifier, validation::TransactionValidator},
+    bitcoin::validation::{TransactionValidator, MempoolBatchVerifier},
     hardware_optimization::{
         intel::IntelOptimizer,
-        work_scheduling::{DualCoreWorkScheduler, WorkItem, WorkStatus},
-        HardwareOptimizationManager, HardwareType, OptimizableOperation,
+        HardwareOptimizationManager,
     },
+};
+
+// Import our compatibility modules
+use tests::common::{
+    bitcoin_compat::*,
+    hardware_compat::*,
+    test_utilities::{MockFactory, TestAssertions, TestEnvironmentFactory, TestTransactionFactory},
 };
 
 use bitcoin::hashes::{sha256, Hash};
@@ -18,11 +24,6 @@ use std::path::Path;
 use std::sync::Arc;
 use std::thread;
 use std::time::{Duration, Instant};
-
-// Import centralized test utilities
-use crate::common::test_utilities::{
-    MockFactory, TestAssertions, TestEnvironmentFactory, TestTransactionFactory,
-};
 
 /// Test that validates complete 100% alignment with all Bitcoin Core principles
 #[tokio::test]
@@ -491,9 +492,9 @@ fn test_batch_verification_support(hw_manager: &Arc<HardwareOptimizationManager>
         // Configure batch verification
         let config = anya_core::hardware_optimization::intel::BatchVerificationConfig {
             batch_size: 10,
-            use_avx2: intel_opt.capabilities().avx2_support,
-            kaby_lake_optimized: intel_opt.capabilities().kaby_lake_optimized,
-            parallel: true,
+            timeout: std::time::Duration::from_secs(30),
+            use_avx: intel_opt.capabilities().avx2_support,
+            use_sse: true,
         };
 
         // Attempt batch verification
@@ -540,7 +541,7 @@ fn test_transaction_privacy(hw_manager: &Arc<HardwareOptimizationManager>) -> bo
     // For simulation, we'll check if batch verification supports batching of multiple transactions
 
     // Create a batch queue
-    let mut batch_verifier = anya_core::bitcoin::MempoolBatchVerifier::new();
+    let mut batch_verifier = MempoolBatchVerifier::new();
 
     // Add transactions to the queue
     for _ in 0..5 {

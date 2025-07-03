@@ -13,12 +13,14 @@ Anya Core extensions provide a modular way to extend platform functionality whil
 ## Extension Types
 
 ### Core Extensions
+
 - **Bitcoin Protocol Extensions**: Implement additional BIP standards or custom Bitcoin functionality
 - **Web5 Integration Extensions**: Extend decentralized identity and data management capabilities  
 - **AI/ML Extensions**: Add custom machine learning models and analytics
 - **Security Extensions**: Implement additional cryptographic protocols and security measures
 
 ### Community Extensions
+
 - Third-party integrations
 - Custom protocol implementations
 - Specialized analytics tools
@@ -27,6 +29,7 @@ Anya Core extensions provide a modular way to extend platform functionality whil
 ## Development Environment Setup
 
 ### Prerequisites
+
 ```bash
 # Install Rust toolchain
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
@@ -41,6 +44,7 @@ cargo build --release
 ```
 
 ### Extension Template
+
 ```rust
 use anya_core::prelude::*;
 
@@ -65,13 +69,17 @@ impl ExtensionTrait for MyExtension {
 ## Architecture Guidelines
 
 ### Hexagonal Architecture Compliance
+
 All extensions must follow the hexagonal architecture pattern:
+
 - **Domain Logic**: Core business logic isolated from external dependencies
 - **Ports**: Interfaces for external communication
 - **Adapters**: Implementations that connect to external systems
 
 ### BIP Compliance
+
 Extensions integrating with Bitcoin protocols must comply with official Bitcoin Improvement Proposals (BIPs):
+
 - BIP-340: Schnorr signatures
 - BIP-341: Taproot
 - BIP-342: Tapscript  
@@ -80,6 +88,7 @@ Extensions integrating with Bitcoin protocols must comply with official Bitcoin 
 ## Testing Requirements
 
 ### Unit Tests
+
 ```rust
 #[cfg(test)]
 mod tests {
@@ -94,7 +103,9 @@ mod tests {
 ```
 
 ### Integration Tests
+
 Extensions must include integration tests that verify:
+
 - Proper initialization and shutdown
 - API contract compliance
 - Error handling
@@ -103,13 +114,16 @@ Extensions must include integration tests that verify:
 ## Security Considerations
 
 ### Code Review Process
+
 1. All extensions undergo security review
 2. Static analysis with CodeQL
 3. Dependency audit
 4. Performance impact assessment
 
 ### Sandboxing
+
 Extensions run in isolated environments with:
+
 - Limited system access
 - Resource constraints
 - Network isolation options
@@ -118,6 +132,7 @@ Extensions run in isolated environments with:
 ## Documentation Standards
 
 All extensions must include:
+
 - README with clear description and usage
 - API documentation with examples
 - Architecture diagrams

@@ -24,7 +24,7 @@ use std::sync::Arc;
 /// [SECURITY SENSITIVE] Test full Bitcoin Core security alignment
 /// Tests our implementation against CVE-2010-5139 (value overflow)
 #[test]
-fn test_cve_2010_5139_value_overflow() {
+pub fn test_cve_2010_5139_value_overflow() {
     println!("Testing CVE-2010-5139 (Value Overflow) protection...");
 
     // Create a transaction that tries to exploit the value overflow bug
@@ -55,7 +55,7 @@ fn test_cve_2010_5139_value_overflow() {
 
 /// [SECURITY SENSITIVE] Test protection against CVE-2018-17144 (inflation bug)
 #[test]
-fn test_cve_2018_17144_duplicate_inputs() {
+pub fn test_cve_2018_17144_duplicate_inputs() {
     println!("Testing CVE-2018-17144 (Duplicate Inputs) protection...");
 
     // Create a transaction with duplicate inputs to simulate the bug
@@ -82,7 +82,7 @@ fn test_cve_2018_17144_duplicate_inputs() {
 
 /// [SECURITY SENSITIVE] Test differential fuzzing for consensus compatibility
 #[test]
-fn test_differential_fuzzing() {
+pub fn test_differential_fuzzing() {
     println!("Testing differential fuzzing for consensus compatibility...");
 
     // Create clients
@@ -116,7 +116,7 @@ fn test_differential_fuzzing() {
 
 /// [SECURITY SENSITIVE] Test invariant checker
 #[test]
-fn test_consensus_invariant_checker() {
+pub fn test_consensus_invariant_checker() {
     println!("Testing consensus invariant checker...");
 
     let checker = BitcoinCoreInvariantChecker::new();
@@ -144,7 +144,7 @@ fn test_consensus_invariant_checker() {
 
 /// [SECURITY SENSITIVE] Test hardware optimizations don't affect consensus
 #[test]
-fn test_hardware_optimizations_consensus() {
+pub fn test_hardware_optimizations_consensus() {
     println!("Testing hardware optimizations maintain consensus...");
 
     // Create validators with and without optimization
@@ -175,7 +175,7 @@ fn test_hardware_optimizations_consensus() {
 
 /// [SECURITY SENSITIVE] Test for timing side channels
 #[test]
-fn test_timing_side_channels() {
+pub fn test_timing_side_channels() {
     println!("Testing for timing side channels...");
 
     // Create validator
@@ -238,7 +238,7 @@ fn test_timing_side_channels() {
 
 /// Test a collection of Bitcoin historical consensus bugs
 #[test]
-fn test_historical_consensus_bugs() {
+pub fn test_historical_consensus_bugs() {
     println!("Testing protection against historical consensus bugs...");
 
     let validator = TransactionValidator::new();
