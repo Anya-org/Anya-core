@@ -1,10 +1,30 @@
-// [AIR-3][AIS-3][BPC-3][RES-3] RGB Layer 2 Protocol Implementation
+use std::error::Error;
+// src/bitcoin/layer2/rgb/mod.rs
 
 /// RGB Layer 2 implementation
 ///
 /// This module provides an implementation of RGB protocol, a client-side
 /// validation solution for Bitcoin assets. It allows for the creation
 /// and transfer of complex assets on top of Bitcoin's blockchain.
+
+mod schema;
+mod contract;
+mod client;
+mod node;
+mod wallet;
+mod state;
+
+pub use schema::{Schema, SchemaType, Field, FieldType, Validation};
+pub use contract::{Contract, ContractBuilder, ContractType, Witness};
+pub use client::{RGBClient, RGBClientBuilder, ClientConfig};
+pub use node::{RGBNode, NodeConfig};
+pub use wallet::{RGBWallet, AssetBalance};
+pub use state::{StateTransfer, StateValidator, StateTransition};
+
+// Export the RGBManager trait and related types
+pub use RGBManager;
+pub use RGBFactory;
+
 use std::collections::HashMap;
 use std::path::PathBuf;
 use bitcoin::Txid;

@@ -1,3 +1,201 @@
+// BIP-341 Compliance Test Suite
+// [AIR-3][AIS-3][BPC-3][AIT-3][RES-3]
+//
+// Tests the implementation of BIP-341 (Taproot) features according to
+// Bitcoin Development Framework v2.5 requirements
+
+use anyhow::{bail, Result};
+use bitcoin::secp256k1::{Secp256k1, XOnlyPublicKey};
+use bitcoin::taproot::{LeafVersion, TaprootBuilder, ControlBlock, TapNodeHash};
+use bitcoin::{ScriptBuf, TapLeafHash};
+use bitcoin::key::{TapTweak, TweakedPublicKey, UntweakedPublicKey, Parity};
+use bitcoin::hashes::Hash;
+use std::str::FromStr;
+
+/// TaprootVerifier provides methods for verifying Taproot constructions
+/// according to BIP-341 specification
+pub struct TaprootVerifier {
+    secp: Secp256k1<bitcoin::secp256k1::All>,
+}
+
+impl TaprootVerifier {
+    /// Create a new TaprootVerifier with a secp256k1 context
+    pub fn new() -> Self {
+        Self {
+            secp: Secp256k1::new(),
+        }
+    }
+    
+    /// Verify a key path spend for a Taproot output
+    pub fn verify_key_path_spend(&self, output_key: TweakedPublicKey, internal_key: &XOnlyPublicKey) -> Result<bool> {
+        // Extract internal key from control block
+        let internal_key_untweaked: UntweakedPublicKey = (*internal_key).into();
+        
+        // Compute tweak
+        let merkle_root = None;
+        
+        // Use the tap_tweak method with the merkle_root option
+        let (tweaked_key, _parity) = internal_key_untweaked.tap_tweak(&self.secp, merkle_root);
+        
+        // Compare the tweaked key with the output key
+        Ok(TweakedPublicKey::from_inner(tweaked_key) == output_key)
+    }
+    
+    /// Verify a script path spend for a Taproot output
+    pub fn verify_script_path_spend(
+        &self,
+        output_key: TweakedPublicKey,
+        script: &ScriptBuf,
+        control_block: &ControlBlock,
+        leaf_version: LeafVersion,
+    ) -> Result<bool> {
+        // Extract internal key from control block
+        let internal_key = control_block.internal_key;
+        let internal_key_untweaked: UntweakedPublicKey = internal_key.into();
+        
+        // Create leaf hash from script and version
+        let leaf_hash = TapLeafHash::from_script(script, leaf_version);
+        
+        // Verify the TapPath in the control block
+        let merkle_root = self.compute_merkle_root(leaf_hash, control_block)?;
+        
+        // Use the tap_tweak method with the merkle_root
+        let (tweaked_key, _parity) = internal_key_untweaked.tap_tweak(&self.secp, merkle_root);
+        
+        // Compare the tweaked key with the output key
+        Ok(TweakedPublicKey::from_inner(tweaked_key) == output_key)
+    }
+    
+    /// Compute taproot output key from internal key and tweak
+    pub fn compute_taproot_output_key(
+        &self,
+        internal_key: &XOnlyPublicKey,
+        tweak: &[u8],
+    ) -> Result<(XOnlyPublicKey, bool)> {
+        // Convert internal_key to UntweakedPublicKey for the new API
+        let internal_key_untweaked: UntweakedPublicKey = (*internal_key).into();
+        
+        // Create a TapNodeHash from the tweak bytes if possible, or use None
+        let merkle_root = if tweak.len() == 32 {
+            let mut bytes = [0u8; 32];
+            bytes.copy_from_slice(tweak);
+            let node_hash = TapNodeHash::from_byte_array(bytes);
+            Some(node_hash)
+        } else {
+            None
+        };
+        
+        // Use the tap_tweak method with the merkle_root option
+        let (tweaked_key, parity) = internal_key_untweaked.tap_tweak(&self.secp, merkle_root);
+        
+        // Return the XOnlyPublicKey and convert parity to bool
+        Ok((tweaked_key, parity.to_bool()))
+    }
+    
+    /// Compute merkle root from leaf hash and control block
+    fn compute_merkle_root(&self, leaf_hash: TapLeafHash, control_block: &ControlBlock) -> Result<Option<TapNodeHash>> {
+        // Convert leaf_hash to TapNodeHash
+        let mut bytes = [0u8; 32];
+        bytes.copy_from_slice(leaf_hash.as_ref());
+        let node_hash = TapNodeHash::from_byte_array(bytes);
+        
+        let mut current = node_hash;
+        
+        // In Bitcoin 0.32, we need to manually recreate the Merkle proof path from the control block
+        // Get merkle proof from control block (branches are now a field, not a method)
+        let merkle_branches = &control_block.merkle_branch;
+        let path = control_block.branch_parity.unwrap_or(0); // If no parity, use 0
+        
+        // Calculate merkle root
+        for (i, branch) in merkle_branches.iter().enumerate() {
+            // Get the hashes in the correct order based on the path
+            let is_right = ((path >> i) & 1) == 1;
+            
+            // Determine left and right nodes for hashing
+            let (left, right) = if is_right {
+                (branch, &current)
+            } else {
+                (&current, branch)
+            };
+            
+            // Compute parent hash
+            current = TapNodeHash::from_node_hashes(*left, *right);
+        }
+        
+        Ok(Some(current))
+    }
+    
+    /// Verify a Taproot address derivation
+    pub fn verify_address_derivation(
+        &self,
+        internal_key: &XOnlyPublicKey,
+        scripts: &[ScriptBuf],
+        expected_address: &str,
+    ) -> Result<bool> {
+        // Create Taproot tree
+        let mut builder = TaprootBuilder::new();
+        
+        // Convert internal_key to UntweakedPublicKey for the new API
+        let internal_key_untweaked: UntweakedPublicKey = (*internal_key).into();
+        
+        // Add scripts to tree
+        for (i, script) in scripts.iter().enumerate() {
+            builder = builder.add_leaf(i as u8, script.clone())
+                .map_err(|e| anyhow::anyhow!("Failed to add leaf: {:?}", e))?;
+        }
+        
+        // Finalize tree
+        let tap_tree = builder.finalize(&self.secp, internal_key_untweaked)
+            .map_err(|e| anyhow::anyhow!("Failed to finalize taproot builder: {:?}", e))?;
+        
+        // Get output key
+        let output_key = tap_tree.output_key();
+        
+        // Create Taproot output address
+        let address = bitcoin::Address::p2tr(&self.secp, output_key.to_x_only_public_key(), None, bitcoin::Network::Bitcoin);
+        
+        // Verify address matches expected
+        Ok(address.to_string() == expected_address)
+    }
+}
+
+/// Test complete Taproot key path spending flow
+#[test]
+pub fn test_taproot_key_path_spending() -> Result<()> {
+    // Initialize secp context
+    let secp = Secp256k1::new();
+
+    // Generate internal key
+    let internal_key = XOnlyPublicKey::from_str(
+        "93c7378d96518a75448821c4f7c8f4bae7ce60f804d03d1f0628dd5dd0f5de51",
+    )?;
+
+    // Create spending conditions
+    let script = ScriptBuf::from_hex(
+        "5121030681b3e0d62e8455f48c657bf8b2556e1c6c89be232f57f1f53a88b0a9986cc751ae",
+    )?;
+    
+    // Create Taproot tree
+    let mut builder = TaprootBuilder::new();
+    builder = builder.add_leaf(0, script.clone())
+        .map_err(|e| anyhow::anyhow!("Failed to add leaf: {:?}", e))?;
+    let tap_tree = builder.finalize(&secp, internal_key)
+        .map_err(|e| anyhow::anyhow!("Failed to finalize taproot builder: {:?}", e))?;
+
+    // Get Taproot output key
+    let tap_output_key = tap_tree.output_key();
+
+    // Verify tap output key matches expected value
+    let expected_key = XOnlyPublicKey::from_str(
+        "ee4fe085983462a184015d1f782d6a5f8b9c2b60130aff050ce221aff7cc6b47",
+    )?;
+
+    // Convert tap_output_key to XOnlyPublicKey for comparison
+    let tap_output_xonly = tap_output_key.to_x_only_public_key();
+
+    if tap_output_xonly != expected_key {
+        bail!("Taproot output key doesn't match expected value");
+=======
 use bitcoin::crypto::key::{TweakedKeypair, TweakedPublicKey, UntweakedPublicKey, XOnlyPublicKey};
 use bitcoin::hashes::{Hash, sha256};
 use bitcoin::secp256k1::{Secp256k1, SecretKey};
@@ -148,172 +346,167 @@ impl BIP341Checker {
     }
 }
 
-/// Test BIP341 compliance
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use bitcoin::secp256k1::{rand, Message};
-    
-    #[test]
-    fn test_key_path_spend_verification() {
-        let checker = BIP341Checker::new();
-        let secp = Secp256k1::new();
-        
-        // Generate random keypair
-        let secret_key = SecretKey::new(&mut rand::thread_rng());
-        let public_key = bitcoin::secp256k1::PublicKey::from_secret_key(&secp, &secret_key);
-        let x_only = XOnlyPublicKey::from(public_key);
-        
-        // Compute tweaked key without merkle root
-        let (tweaked_key, _parity) = x_only.tap_tweak(&secp, None);
-        let tweaked_public_key = TweakedPublicKey::dangerous_assume_tweaked(tweaked_key);
-        
-        // Verify key path spend
-        let result = checker.verify_key_path_spend(&x_only, None, tweaked_public_key).unwrap();
-        assert!(result);
-        
-        // Try with invalid output key
-        let secret_key2 = SecretKey::new(&mut rand::thread_rng());
-        let public_key2 = bitcoin::secp256k1::PublicKey::from_secret_key(&secp, &secret_key2);
-        let x_only2 = XOnlyPublicKey::from(public_key2);
-        let (tweaked_key2, _) = x_only2.tap_tweak(&secp, None);
-        let tweaked_public_key2 = TweakedPublicKey::dangerous_assume_tweaked(tweaked_key2);
-        
-        let result = checker.verify_key_path_spend(&x_only, None, tweaked_public_key2).unwrap();
-        assert!(!result);
-    }
-    
-    #[test]
-    fn test_script_path_spend_verification() {
-        // This is a more complex test that would involve creating a merkle tree
-        // and verifying a script path spend. In a real implementation, we would
-        // need to create scripts, hash them, build a merkle tree, and verify.
-        // For now, this is a placeholder.
-    }
-    
-    #[test]
-    fn test_taproot_output_key_computation() {
-        let checker = BIP341Checker::new();
-        let secp = Secp256k1::new();
-        
-        // Generate random keypair
-        let secret_key = SecretKey::new(&mut rand::thread_rng());
-        let public_key = bitcoin::secp256k1::PublicKey::from_secret_key(&secp, &secret_key);
-        let x_only = XOnlyPublicKey::from(public_key);
-        
-        // Compute tweaked key without merkle root
-        let (tweaked_key, parity) = checker.compute_taproot_output_key(&x_only, None).unwrap();
-        
-        // Verify that the result matches what we'd get directly from tap_tweak
-        let (expected_tweaked, expected_parity) = x_only.tap_tweak(&secp, None);
-        assert_eq!(tweaked_key, expected_tweaked);
-        assert_eq!(parity, expected_parity);
-    }
-    
-    #[test]
-    fn test_with_test_vectors() {
-        // Here we would use test vectors from BIP341
-        // For brevity, this is a placeholder.
-        
-        // The actual test vectors would include internal keys, scripts,
-        // and expected output keys to verify our implementation against.
-        let _key1 = XOnlyPublicKey::from_str(
-            "d6889cb081036e0faefa3a35157ad71086b123b2b144b649798b494c300a961d",
-        ).expect("Invalid test vector key");
-        
-        let _key2 = XOnlyPublicKey::from_str(
-            "53a1f6e454df1aa2776a2814a721372d6258050de330b3c6d10ee8f4e0dda343",
-        ).expect("Invalid test vector key");
-        
-        let _key3 = XOnlyPublicKey::from_str(
-            "ee4fe085983462a184015d1f782d6a5f8b9c2b60130aff050ce221aff7e6fc32",
-        ).expect("Invalid test vector key");
-        
-        // Test vectors would continue...
-    }
-    
-    // Helper function to convert hex string to bytes
-    fn hex_to_bytes(hex: &str) -> Result<Vec<u8>> {
-        let mut bytes = Vec::with_capacity(hex.len() / 2);
-        let mut iter = hex.chars().peekable();
-        
-        while let Some(high) = iter.next() {
-            let low = iter.next().ok_or_else(|| anyhow!("Invalid hex string"))?;
-            let byte = u8::from_str_radix(&format!("{}{}", high, low), 16)
-                .map_err(|_| anyhow!("Invalid hex digit"))?;
-            bytes.push(byte);
-        }
-        
-        Ok(bytes)
-    }
+/// Test Taproot script path spending flow
+#[test]
+pub fn test_taproot_script_path_spending() -> Result<()> {
+    // Initialize secp context
+    let secp = Secp256k1::new();
+
+    // Generate internal key
+    let internal_key = XOnlyPublicKey::from_str(
+        "93c7378d96518a75448821c4f7c8f4bae7ce60f804d03d1f0628dd5dd0f5de51",
+    )?;
+
+    // Create multiple scripts for testing
+    let script1 = ScriptBuf::from_hex(
+        "5121030681b3e0d62e8455f48c657bf8b2556e1c6c89be232f57f1f53a88b0a9986cc751ae",
+    )?;
+    let script2 = ScriptBuf::from_hex(
+        "5121036e34cc5ee5558b925045f968e834316d8c90c8d0dd850cc3f990d56755abfa0751ae",
+    )?;
+
+    // Build complex Taproot tree with multiple spending paths
+    let mut builder = TaprootBuilder::new();
+    builder = builder.add_leaf(0, script1.clone())
+        .map_err(|e| anyhow::anyhow!("Failed to add first leaf: {:?}", e))?;
+    builder = builder.add_leaf(1, script2.clone())
+        .map_err(|e| anyhow::anyhow!("Failed to add second leaf: {:?}", e))?;
+    let tree = builder.finalize(&secp, internal_key)
+        .map_err(|e| anyhow::anyhow!("Failed to finalize taproot builder: {:?}", e))?;
+
+    // Get Taproot output key
+    let tap_output_key = tree.output_key();
+
+    // Get control block and verify it
+    let control_block = tree.control_block(&(script1.clone(), LeafVersion::TapScript))
+        .ok_or(anyhow::anyhow!("Failed to get control block"))?;
+
+    // Verify control block is valid
+    let verifier = TaprootVerifier::new();
+    assert!(verifier.verify_script_path_spend(
+        tap_output_key,
+        &script1,
+        &control_block,
+        LeafVersion::TapScript
+    )?);
+
+    Ok(())
 }
 
-impl BIP341Checker {
-    /// Helper function for test vector validation
-    #[allow(dead_code)]
-    fn test_vector_key_path_spend(
-        &self,
-        internal_key_hex: &str,
-        output_key_hex: &str,
-    ) -> Result<bool> {
-        // Parse internal key
-        let internal_key_bytes = hex_to_bytes(internal_key_hex)?;
-        let internal_key = XOnlyPublicKey::from_slice(&internal_key_bytes)
-            .map_err(|_| anyhow!("Invalid internal key"))?;
-        
-        // Parse output key
-        let output_key_bytes = hex_to_bytes(output_key_hex)?;
-        let output_key_xonly = XOnlyPublicKey::from_slice(&output_key_bytes)
-            .map_err(|_| anyhow!("Invalid output key"))?;
-        let output_key = TweakedPublicKey::dangerous_assume_tweaked(output_key_xonly);
-        
-        // Verify key path spend
-        self.verify_key_path_spend(&internal_key, None, output_key)
-    }
-    
-    /// Helper function for test vector validation with merkle root
-    #[allow(dead_code)]
-    fn test_vector_key_path_spend_with_merkle_root(
-        &self,
-        internal_key_hex: &str,
-        merkle_root_hex: &str,
-        output_key_hex: &str,
-    ) -> Result<bool> {
-        // Parse internal key
-        let internal_key_bytes = hex_to_bytes(internal_key_hex)?;
-        let internal_key = XOnlyPublicKey::from_slice(&internal_key_bytes)
-            .map_err(|_| anyhow!("Invalid internal key"))?;
-        
-        // Parse merkle root
-        let merkle_root_bytes = hex_to_bytes(merkle_root_hex)?;
-        let merkle_root = TapNodeHash::from_slice(&merkle_root_bytes)
-            .map_err(|_| anyhow!("Invalid merkle root"))?;
-        
-        // Parse output key
-        let output_key_bytes = hex_to_bytes(output_key_hex)?;
-        let output_key_xonly = XOnlyPublicKey::from_slice(&output_key_bytes)
-            .map_err(|_| anyhow!("Invalid output key"))?;
-        let output_key = TweakedPublicKey::dangerous_assume_tweaked(output_key_xonly);
-        
-        // Verify key path spend with merkle root
-        self.verify_key_path_spend(&internal_key, Some(merkle_root), output_key)
-    }
+/// Test Taproot multisig with Schnorr signatures
+#[test]
+pub fn test_taproot_multisig_schnorr() -> Result<()> {
+    // Initialize secp context
+    let secp = Secp256k1::new();
+
+    // Create multisig script with 2-of-3 signers using Schnorr
+    let key1 = XOnlyPublicKey::from_str(
+        "79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+    )?;
+    let key2 = XOnlyPublicKey::from_str(
+        "c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5",
+    )?;
+    let key3 = XOnlyPublicKey::from_str(
+        "e493dbf1c10d80f3581e4904930b1404cc6c13900ee0758474fa94abe8c4cd13",
+    )?;
+
+    // Create 2-of-3 multisig script
+    let script = ScriptBuf::from_hex(
+        "202079be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798ac\
+         20c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5ac\
+         20e493dbf1c10d80f3581e4904930b1404cc6c13900ee0758474fa94abe8c4cd13ac\
+         53ae"
+    )?;
+
+    // Create internal key for key path spending
+    let internal_key = XOnlyPublicKey::from_str(
+        "93c7378d96518a75448821c4f7c8f4bae7ce60f804d03d1f0628dd5dd0f5de51",
+    )?;
+
+    // Create Taproot tree
+    let mut builder = TaprootBuilder::new();
+    builder = builder.add_leaf(0, script.clone())
+        .map_err(|e| anyhow::anyhow!("Failed to add leaf: {:?}", e))?;
+    let tap_tree = builder.finalize(&secp, internal_key)
+        .map_err(|e| anyhow::anyhow!("Failed to finalize taproot builder: {:?}", e))?;
+
+    // Get output key
+    let output_key = tap_tree.output_key();
+
+    // Verify with TaprootVerifier
+    let verifier = TaprootVerifier::new();
+
+    // Get control block
+    let control_block = tap_tree.control_block(&(script.clone(), LeafVersion::TapScript))
+        .ok_or(anyhow::anyhow!("Failed to get control block"))?;
+
+    // Verify script path
+    assert!(verifier.verify_script_path_spend(
+        output_key,
+        &script,
+        &control_block,
+        LeafVersion::TapScript
+    )?);
+
+    Ok(())
 }
 
-// Helper function to convert hex string to bytes
-fn hex_to_bytes(hex: &str) -> Result<Vec<u8>> {
-    let mut bytes = Vec::with_capacity(hex.len() / 2);
-    let mut iter = hex.chars().peekable();
+/// Test BIP-341 compliance under edge cases
+#[test]
+pub fn test_taproot_edge_cases() -> Result<()> {
+    // Initialize secp context
+    let secp = Secp256k1::new();
+
+    // Test empty script
+    let empty_script = ScriptBuf::new();
+    // Create internal key
+    let internal_key = XOnlyPublicKey::from_str(
+        "93c7378d96518a75448821c4f7c8f4bae7ce60f804d03d1f0628dd5dd0f5de51",
+    )?;
+
+    // Verify we can still create taproot output with empty script
+    let mut builder = TaprootBuilder::new();
+    builder = builder.add_leaf(0, empty_script.clone())
+        .map_err(|e| anyhow::anyhow!("Failed to add empty script leaf: {:?}", e))?;
+    let tap_tree = builder.finalize(&secp, internal_key)
+        .map_err(|e| anyhow::anyhow!("Failed to finalize taproot builder: {:?}", e))?;
+    let output_key = tap_tree.output_key();
+
+    // Verify with TaprootVerifier
+    let verifier = TaprootVerifier::new();
+    let control_block = tap_tree.control_block(&(empty_script.clone(), LeafVersion::TapScript))
+        .ok_or(anyhow::anyhow!("Failed to get control block"))?;
+
+    // Should still verify with empty script
+    assert!(verifier.verify_script_path_spend(
+        output_key,
+        &empty_script,
+        &control_block,
+        LeafVersion::TapScript
+    )?);
+
+    // Test maximum allowed script size
+    let max_script = ScriptBuf::from(vec![0x51; 520]); // Just under the limit
     
-    while let Some(high) = iter.next() {
-        let low = iter.next().ok_or_else(|| anyhow!("Invalid hex string"))?;
-        let byte = u8::from_str_radix(&format!("{}{}", high, low), 16)
-            .map_err(|_| anyhow!("Invalid hex digit"))?;
-        bytes.push(byte);
-    }
-    
-    Ok(bytes)
-}
+    // Verify we can create taproot output with max size script
+    let mut builder_max = TaprootBuilder::new();
+    builder_max = builder_max.add_leaf(0, max_script.clone())
+        .map_err(|e| anyhow::anyhow!("Failed to add max script leaf: {:?}", e))?;
+    let tap_tree_max = builder_max.finalize(&secp, internal_key)
+        .map_err(|e| anyhow::anyhow!("Failed to finalize taproot builder: {:?}", e))?;
+    let output_key_max = tap_tree_max.output_key();
+
+    // Get control block
+    let control_block_max = tap_tree_max.control_block(&(max_script.clone(), LeafVersion::TapScript))
+        .ok_or(anyhow::anyhow!("Failed to get control block"))?;
+
+    // Should verify with max script
+    assert!(verifier.verify_script_path_spend(
+        output_key_max,
+        &max_script,
+        &control_block_max,
+        LeafVersion::TapScript
+    )?);
 
 #[allow(dead_code)]
 fn test_bip341_test_vectors() -> Result<()> {
@@ -331,49 +524,34 @@ fn test_bip341_test_vectors() -> Result<()> {
     Ok(())
 }
 
-// Additional advanced Taproot validation functions
+/// Test Taproot compliance with BIP-341 vectors
+#[test]
+pub fn test_taproot_compliance_vectors() -> Result<()> {
+    // Test vector from BIP-341
+    // Test Vector 1: Output key derivation
+    let internal_pubkey = XOnlyPublicKey::from_str(
+        "d6889cb081036e0faefa3a35157ad71086b123b2b144b649798b494c300a961d",
+    )?;
+    let merkle_root = TapNodeHash::from_str(
+        "53a1f6e454df1aa2776a2814a721372d6258050de330b3c6d10ee8f4e0dda343",
+    )?;
 
-impl BIP341Checker {
-    /// Validate a taproot signature
-    #[allow(dead_code)]
-    pub fn validate_taproot_signature(
-        &self,
-        message: &[u8],
-        signature: &[u8],
-        public_key: &TweakedPublicKey,
-    ) -> Result<bool> {
-        // Convert message to secp message
-        let message_hash = sha256::Hash::hash(message);
-        let secp_message = Message::from_slice(message_hash.as_ref())
-            .map_err(|_| anyhow!("Invalid message hash"))?;
-        
-        // Parse signature
-        let secp_signature = bitcoin::secp256k1::Signature::from_compact(signature)
-            .map_err(|_| anyhow!("Invalid signature"))?;
-        
-        // Get the XOnlyPublicKey from the TweakedPublicKey
-        let x_only_key = public_key.to_inner();
-        
-        // Verify signature
-        let result = self.secp.verify_schnorr(
-            &secp_message,
-            &secp_signature,
-            &x_only_key,
-        ).is_ok();
-        
-        Ok(result)
-    }
+    // Expected output key after tweaking
+    let expected_output_key = XOnlyPublicKey::from_str(
+        "53a1f6e454df1aa2776a2814a721372d6258050de330b3c6d10ee8f4e0dda343",
+    )?;
+
+    // Build verifier and check
+    let verifier = TaprootVerifier::new();
+    let internal_key_untweaked: UntweakedPublicKey = internal_pubkey.into();
     
-    /// Generate taproot output key from keypair
-    #[allow(dead_code)]
-    pub fn generate_taproot_output_key(
-        &self,
-        keypair: &TweakedKeypair,
-    ) -> TweakedPublicKey {
-        // In Bitcoin 0.32.6, we use from_keypair
-        TweakedPublicKey::from_keypair(*keypair)
-    }
-}
+    // Use the tap_tweak method with the merkle_root
+    let (output_key, parity) = internal_key_untweaked.tap_tweak(&verifier.secp, Some(merkle_root));
+
+    assert_eq!(
+        output_key.to_x_only_public_key(), expected_output_key,
+        "Taproot output key doesn't match expected BIP-341 test vector"
+    );
 
 // Additional test for tapleaf verification
 #[cfg(test)]

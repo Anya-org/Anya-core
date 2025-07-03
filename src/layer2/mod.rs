@@ -7,6 +7,7 @@
 use serde::{Deserialize, Serialize};
 use std::error::Error;
 use std::sync::Arc;
+use async_trait::async_trait;
 
 /// Layer2 protocol types supported by the implementation
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]

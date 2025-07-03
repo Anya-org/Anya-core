@@ -1,4 +1,3 @@
-#![allow(dead_code, unused_imports)]
 // Fix imports to match current module structure
 use anya_core::{
     bitcoin::protocol::{BPCLevel as ProtocolLevel, BitcoinProtocol},
@@ -8,6 +7,11 @@ use tests::common::bitcoin_compat::*;
 use bitcoin::{
     ScriptBuf, Transaction, absolute::LockTime, transaction::Version
 };
+
+use bitcoin::{
+    ScriptBuf, Transaction, absolute::LockTime, transaction::Version
+};
+
 use std::io::Write;
 use std::path::Path;
 use tempfile::NamedTempFile;
