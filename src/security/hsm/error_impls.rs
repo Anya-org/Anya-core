@@ -36,20 +36,4 @@ impl From<TaprootBuilderError> for HsmError {
     }
 }
 
-impl From<InputsIndexError> for HsmError {
-    fn from(err: InputsIndexError) -> Self {
-        HsmError::SigningError(format!("Bitcoin input index error: {:?}", err))
-    }
-}
-
-impl From<TaprootError> for HsmError {
-    fn from(err: TaprootError) -> Self {
-        HsmError::SigningError(format!("Bitcoin taproot error: {:?}", err))
-    }
-}
-
-impl From<TaprootBuilderError> for HsmError {
-    fn from(err: TaprootBuilderError) -> Self {
-        HsmError::SigningError(format!("Bitcoin taproot builder error: {:?}", err))
-    }
-}
+// Removed duplicate implementations for InputsIndexError, TaprootError, and TaprootBuilderError

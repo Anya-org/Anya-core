@@ -1,6 +1,26 @@
 //! Compatibility module for HSM types
 //!
-//! This module provides compatibility between types used in the HSM module.
+//! This module provides compatibi        let mut audit_event = error::HsmAuditEvent::new(
+            event_type,
+            result,
+            severity,
+        );
+        
+        // Add details if available using with_metadata instead of with_details
+        if let Some(details) = &event.details {
+            if let Ok(event_with_metadata) = audit_event.with_metadata(&serde_json::json!({ "details": details })) {
+                audit_event = event_with_metadata;
+            }
+        }
+        
+        // Add operation_id if available using with_parameters instead of with_operation_id
+        if let Some(op_id) = &event.operation_id {
+            if let Ok(event_with_params) = audit_event.with_parameters(&serde_json::json!({ "operation_id": op_id })) {
+                audit_event = event_with_params;
+            }
+        }
+        
+        Ok(audit_event)s used in the HSM module.
 //! [AIR-3][AIS-3][BPC-3][RES-3]
 
 use bitcoin::Network;
@@ -81,14 +101,18 @@ impl From<&TypesHsmAuditEvent> for Result<ErrorHsmAuditEvent, crate::security::h
             severity,
         );
         
-        // Add details if available
+        // Add details if available using with_metadata
         if let Some(details) = &event.details {
-            audit_event = audit_event.with_details(details);
+            if let Ok(event_with_metadata) = audit_event.with_metadata(&serde_json::json!({ "details": details })) {
+                audit_event = event_with_metadata;
+            }
         }
         
-        // Add operation_id if available
+        // Add operation_id if available using with_parameters
         if let Some(op_id) = &event.operation_id {
-            audit_event = audit_event.with_operation_id(op_id);
+            if let Ok(event_with_params) = audit_event.with_parameters(&serde_json::json!({ "operation_id": op_id })) {
+                audit_event = event_with_params;
+            }
         }
         
         Ok(audit_event)

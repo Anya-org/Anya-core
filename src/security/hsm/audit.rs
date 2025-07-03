@@ -502,27 +502,68 @@ impl AuditEvent {
     }
 
     /// Convert to HsmAuditEvent
-    pub fn to_hsm_audit_event(&self) -> HsmAuditEvent {
-        let mut event = HsmAuditEvent::new(self.event_type, self.result, self.severity);
+    pub fn to_hsm_audit_event(&self) -> crate::security::hsm::error::HsmAuditEvent {
+        use crate::security::hsm::error::{AuditEventType, AuditEventResult, AuditEventSeverity, HsmAuditEvent};
+        
+        // Convert the string type to AuditEventType enum
+        let event_type = match self.event_type.as_str() {
+            "HsmOperation" => AuditEventType::HsmOperation,
+            "KeyGeneration" => AuditEventType::KeyGeneration,
+            "Authentication" => AuditEventType::Authentication,
+            "Authorization" => AuditEventType::Authorization,
+            "ConfigChange" => AuditEventType::ConfigChange,
+            _ => AuditEventType::Custom(self.event_type.clone()),
+        };
+        
+        // Convert the string result to AuditEventResult enum
+        let result = match self.result.as_str() {
+            "Success" => AuditEventResult::Success,
+            "Failure" => AuditEventResult::Failure,
+            "Denied" => AuditEventResult::Denied,
+            "Error" => AuditEventResult::Error,
+            "Timeout" => AuditEventResult::Timeout,
+            _ => AuditEventResult::Unknown,
+        };
+        
+        // Convert the string severity to AuditEventSeverity enum
+        let severity = match self.severity.as_str() {
+            "Critical" => AuditEventSeverity::Critical,
+            "Error" => AuditEventSeverity::Error,
+            "Warning" => AuditEventSeverity::Warning,
+            "Info" => AuditEventSeverity::Info,
+            "Debug" => AuditEventSeverity::Debug,
+            _ => AuditEventSeverity::Info,
+        };
+        
+        let mut event = HsmAuditEvent::new(event_type, result, severity);
 
         if let Some(actor) = &self.actor {
             event = event.with_user(actor.clone());
         }
 
-        if let Some(operation_id) = &self.operation_id {
-            event = event.with_operation_id(operation_id.clone());
-        }
-
         if let Some(key_id) = &self.key_id {
-            event = event.with_key_id(key_id.clone());
+            event = event.with_key(key_id.clone());
         }
 
         if let Some(error) = &self.error {
-            event = event.with_error(error.clone());
+            // Since with_error no longer exists, store it in metadata
+            if let Ok(mut event_with_metadata) = event.with_metadata(&serde_json::json!({ "error": error })) {
+                event = event_with_metadata;
+            }
         }
 
         if !self.details.is_empty() {
-            event = event.with_metadata(serde_json::to_value(&self.details).unwrap_or_default());
+            // Use with_metadata safely, ignoring any errors
+            if let Ok(event_with_metadata) = event.with_metadata(&self.details) {
+                event = event_with_metadata;
+            }
+        }
+
+        // Handle operation_id through parameters
+        if let Some(operation_id) = &self.operation_id {
+            if let Ok(event_with_params) = event.with_parameters(&serde_json::json!({ "operation_id": operation_id })) {
+                event = event_with_params;
+            }
         }
 
         event

@@ -160,17 +160,23 @@ pub async fn initialize() -> Result<(), Box<dyn std::error::Error>> {
 /// # Returns
 /// BitcoinHsmProvider configured for Bitcoin operations
 #[cfg(feature = "hsm")]
-pub fn create_bitcoin_hsm_provider(
+pub async fn create_bitcoin_hsm_provider(
     base_provider: std::sync::Arc<dyn hsm::provider::HsmProvider>,
-) -> hsm::providers::bitcoin::BitcoinHsmProvider {
+) -> Result<hsm::providers::bitcoin::BitcoinHsmProvider, hsm::error::HsmError> {
     #[cfg(feature = "hsm")]
     let config = hsm::config::BitcoinConfig {
-        base_provider,
         network: hsm::config::BitcoinNetworkType::Testnet, // Default to testnet for safety
-        ..Default::default()
+        rpc_url: "http://127.0.0.1:8332".to_string(),
+        rpc_username: "user".to_string(),
+        rpc_password: "password".to_string(),
+        derivation_path_template: "m/84'/0'/0'/{account}/{index}".to_string(),
+        use_segwit: true,
+        segwit_version: 0,
+        wallet_path: None,
+        default_fee_rate: 1,
     };
 
-    hsm::providers::bitcoin::BitcoinHsmProvider::new(config)
+    hsm::providers::bitcoin::BitcoinHsmProvider::new(&config).await
 }
 
 #[cfg(not(feature = "hsm"))]
@@ -231,18 +237,23 @@ pub async fn create_taproot_asset(
     metadata: &str,
     supply: u64,
 ) -> Result<String, hsm::error::HsmError> {
-    // Generate a key for the asset
+    // Generate a key for the asset using the correct KeyGenParams structure
     let key_params = hsm::provider::KeyGenParams {
-        key_name: "asset".to_string(),
-        key_type: hsm::provider::KeyType::EcdsaSecp256k1,
-        key_usage: Some(hsm::provider::KeyUsage::Signing),
-        algorithm: None,
-        exportable: false,
+        id: Some("asset".to_string()),
+        label: Some(format!("Asset key for {}", metadata)),
+        key_type: hsm::provider::KeyType::Ec { curve: hsm::provider::EcCurve::Secp256k1 },
+        extractable: false,
+        usages: vec![hsm::provider::KeyUsage::Sign],
+        expires_at: None,
+        attributes: Some(serde_json::json!({
+            "metadata": metadata,
+            "supply": supply
+        })),
     };
 
     // [AIR-3][AIS-3][BPC-3][RES-3] Generate the key and return its ID
-    let asset_key = bitcoin_provider.generate_key(key_params).await?;
-    Ok(asset_key.key_id)
+    let (key_pair, key_info) = bitcoin_provider.generate_key(key_params).await?;
+    Ok(key_pair.id)
 }
 
 #[cfg(not(feature = "hsm"))]
