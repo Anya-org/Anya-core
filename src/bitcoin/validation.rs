@@ -157,6 +157,12 @@ pub struct TransactionValidator {
     verification_history: Arc<Mutex<Vec<VerificationRecord>>>,
 }
 
+impl Default for TransactionValidator {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl TransactionValidator {
     /// Create a new transaction validator with BPC-3 level
     /// Hardware-optimized for Intel i3-7020U or better
@@ -266,13 +272,9 @@ impl TransactionValidator {
         block_height: Option<u32>,
     ) {
         // Get hardware info if available
-        let hardware_info = if let Some(intel) = self.hw_manager.intel_optimizer() {
-            Some(format!("{}|{}", 
+        let hardware_info = self.hw_manager.intel_optimizer().map(|intel| format!("{}|{}", 
                         intel.capabilities().vendor.clone(),
-                        intel.capabilities().model.clone()))
-        } else {
-            None
-        };
+                        intel.capabilities().model.clone()));
         
         // Get current timestamp
         let timestamp = SystemTime::now()
@@ -333,11 +335,9 @@ impl TransactionValidator {
         }
         
         // Verify results match to ensure consensus compatibility
-        if standard_result != optimized_result {
-            return Err(ValidationError::ConsensusError(
-                format!("Consensus violation: standard={} optimized={}", 
-                        standard_result, optimized_result)
-            ));
+        if standard_result != optimized_result {                return Err(ValidationError::ConsensusError(
+                    format!("Consensus violation: standard={standard_result} optimized={optimized_result}")
+                ));
         }
         
         Ok(standard_result)
