@@ -16,8 +16,7 @@ pub mod node; // Bitcoin node management
 pub mod protocol; // Bitcoin protocol compliance module
 pub mod rust;
 pub mod taproot;
-pub mod validation; // Legacy validation module for tests
-pub mod validation_new; // Transaction validation module
+pub mod validation; // Consolidated validation module
 pub mod wallet; // Bitcoin wallet management // Lightning Network implementation
 
 // Re-export key interfaces for easier access

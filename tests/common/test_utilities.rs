@@ -130,6 +130,43 @@ impl TestEnvironment {
     }
 }
 
+/// File-based test environment for tests requiring temporary files
+#[derive(Debug)]
+pub struct FileTestEnvironment {
+    pub test_dir: std::path::PathBuf,
+}
+
+impl FileTestEnvironment {
+    /// Create a new file-based test environment with a temporary directory
+    pub fn new() -> Self {
+        use std::fs;
+        
+        // Create a temporary directory for the test
+        let timestamp = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_secs();
+
+        let test_dir = std::env::temp_dir().join(format!("anya_test_{}", timestamp));
+
+        // Create the directory if it doesn't exist
+        if !test_dir.exists() {
+            fs::create_dir_all(&test_dir).expect("Failed to create test directory");
+        }
+
+        Self { test_dir }
+    }
+    
+    /// Clean up the test environment
+    pub fn cleanup(&self) {
+        use std::fs;
+        if self.test_dir.exists() {
+            fs::remove_dir_all(&self.test_dir).expect("Failed to clean up test directory");
+        }
+    }
+}
+
+/// Common mock factory for tests
 /// Common mock factory for tests
 pub struct MockFactory;
 
@@ -138,7 +175,47 @@ impl MockFactory {
     pub fn create_mock_secp_context() -> Secp256k1<secp256k1::All> {
         Secp256k1::new()
     }
+    
+    /// Simulate a Bitcoin transaction ID for testing
+    pub fn simulate_bitcoin_txid() -> String {
+        let timestamp = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_secs();
 
+        format!("txid{:x}", timestamp)
+    }
+
+    /// Simulate a Bitcoin address for testing
+    pub fn simulate_bitcoin_address() -> String {
+        let timestamp = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_secs();
+
+        format!("bc1q{:x}qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq", timestamp % 10000)
+    }
+
+    /// Simulate a DID (Decentralized Identifier) for testing
+    pub fn simulate_did() -> String {
+        let timestamp = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_secs();
+
+        format!("did:key:z{:x}", timestamp)
+    }
+
+    /// Simulate an RGB asset ID for testing
+    pub fn simulate_rgb_asset_id() -> String {
+        let timestamp = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_secs();
+
+        format!("rgb1{:x}", timestamp)
+    }
+    
     /// Create mock key pair for testing
     pub fn create_mock_keypair() -> (SecretKey, PublicKey) {
         let secp = Self::create_mock_secp_context();

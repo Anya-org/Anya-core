@@ -1,11 +1,8 @@
-use std::error::Error;
-// src/bitcoin/layer2/rgb/mod.rs
-
-/// RGB Layer 2 implementation
-///
-/// This module provides an implementation of RGB protocol, a client-side
-/// validation solution for Bitcoin assets. It allows for the creation
-/// and transfer of complex assets on top of Bitcoin's blockchain.
+// RGB Layer 2 implementation
+//
+// This module provides an implementation of RGB protocol, a client-side
+// validation solution for Bitcoin assets. It allows for the creation
+// and transfer of complex assets on top of Bitcoin's blockchain.
 
 mod schema;
 mod contract;
@@ -14,16 +11,13 @@ mod node;
 mod wallet;
 mod state;
 
-pub use schema::{Schema, SchemaType, Field, FieldType, Validation};
-pub use contract::{Contract, ContractBuilder, ContractType, Witness};
-pub use client::{RGBClient, RGBClientBuilder, ClientConfig};
-pub use node::{RGBNode, NodeConfig};
-pub use wallet::{RGBWallet, AssetBalance};
-pub use state::{StateTransfer, StateValidator, StateTransition};
-
-// Export the RGBManager trait and related types
-pub use RGBManager;
-pub use RGBFactory;
+// Export RGB types from submodules
+pub use self::schema::{Schema, SchemaType, Field, FieldType, Validation};
+pub use self::contract::{Contract, ContractBuilder, ContractType, Witness};
+pub use self::client::{RGBClient, RGBClientBuilder, ClientConfig};
+pub use self::node::{RGBNode, NodeConfig};
+pub use self::wallet::{RGBWallet, AssetBalance};
+pub use self::state::{StateTransfer, StateValidator, StateTransition};
 
 use std::collections::HashMap;
 use std::path::PathBuf;
@@ -237,37 +231,7 @@ pub enum OperationType {
     Reissue,
 }
 
-/// Simple RGB Client placeholder
-#[derive(Debug, Clone)]
-pub struct RGBClient {
-    /// Client configuration
-    pub config: RGBConfig,
-    
-    /// Connection status
-    pub connected: bool,
-}
 
-impl RGBClient {
-    /// Create a new RGB client
-    pub fn new(config: RGBConfig) -> Self {
-        Self {
-            config,
-            connected: false,
-        }
-    }
-    
-    /// Connect to RGB node
-    pub async fn connect(&mut self) -> AnyaResult<()> {
-        self.connected = true;
-        Ok(())
-    }
-    
-    /// Disconnect from RGB node
-    pub async fn disconnect(&mut self) -> AnyaResult<()> {
-        self.connected = false;
-        Ok(())
-    }
-}
 
 /// Default implementation of the RGB manager
 #[allow(dead_code)]
@@ -290,9 +254,11 @@ impl DefaultRGBManager {
     
     /// Initialize the RGB client
     async fn _init_client(&mut self) -> AnyaResult<()> {
+        use crate::bitcoin::layer2::rgb::RGBWallet;
         if self.client.is_none() {
-            let mut client = RGBClient::new(self.config.clone());
-            client.connect().await?;
+            // Create a dummy wallet for now (should be replaced with real wallet logic)
+            let wallet = RGBWallet::new("dummy-address");
+            let client = RGBClient::new(wallet);
             self.client = Some(client);
         }
         Ok(())
