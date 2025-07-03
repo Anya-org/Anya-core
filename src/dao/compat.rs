@@ -7,7 +7,7 @@
 #[cfg(test)]
 pub mod clarity_repl {
     //! Placeholder module for clarity_repl functionality
-    use std::collections::HashMap;
+    
     
     pub fn execute_clarity_code(_code: &str) -> Result<String, String> {
         Ok("Mock clarity execution result".to_string())
@@ -102,7 +102,7 @@ pub mod clarity_repl {
 #[cfg(test)]
 pub mod clarinet {
     //! Placeholder module for clarinet functionality
-    use super::clarity_repl::vm::{Value, PrincipalData};
+    use super::clarity_repl::vm::Value;
     
     pub fn setup_test_env() -> Result<(), String> {
         Ok(())
