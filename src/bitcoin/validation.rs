@@ -458,7 +458,7 @@ impl TransactionValidator {
             if let Some(intel_opt) = self.hw_manager.intel_optimizer() {
                 // Use hardware-optimized Taproot validation
                 intel_opt.verify_taproot_transaction(tx)
-                    .map_err(|e| ValidationError::Taproot(e.to_string()))?;
+                    .map_err(|e| ValidationError::Taproot(format!("Hardware optimized verification failed: {e}")))?;
             } else {
                 // Fallback to standard if no optimizer available
                 self.validate_taproot_standard(tx)?;
@@ -492,7 +492,7 @@ impl TransactionValidator {
         // Try hardware-optimized validation if enabled
         let optimized_result = if let Some(intel_opt) = self.hw_manager.intel_optimizer() {
             intel_opt.verify_taproot_transaction(tx)
-                .map_err(|e| ValidationError::Taproot(format!("Hardware optimized verification failed: {}", e)))
+                .map_err(|e| ValidationError::Taproot(format!("Hardware optimized verification failed: {e}")))
         } else {
             // This branch shouldn't be reached due to the check above, but included for completeness
             standard_result.clone()
@@ -635,14 +635,14 @@ pub fn validate_historical_batch(
             Err(e) => {
                 consensus_errors += 1;
                 all_valid = false;
-                eprintln!("Historical validation error: {:?}", e);
+                eprintln!("Historical validation error: {e:?}");
             }
         }
     }
     
     if consensus_errors > 0 {
         Err(ValidationError::ConsensusError(
-            format!("Historical batch validation failed with {} consensus errors", consensus_errors)
+            format!("Historical batch validation failed with {consensus_errors} consensus errors")
         ))
     } else if all_valid {
         Ok(true)
@@ -675,6 +675,12 @@ pub struct VerificationStats {
     pub invalid_count: usize,
     /// Average verification time per transaction (microseconds)
     pub avg_verification_time_us: f64,
+}
+
+impl Default for MempoolBatchVerifier {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl MempoolBatchVerifier {
@@ -792,7 +798,7 @@ pub fn validate_mempool_batch(
     
     // Process each transaction
     for tx in transactions {
-        if let Err(_) = validator.validate(tx) {
+        if validator.validate(tx).is_err() {
             all_valid = false;
         }
     }

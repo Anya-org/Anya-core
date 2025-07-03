@@ -182,7 +182,7 @@ impl ProtocolManager {
         })
     }
     
-    pub fn default() -> Result<Self> {
+    pub fn with_defaults() -> Result<Self> {
         Self::new(ProtocolConfig::default())
     }
 }

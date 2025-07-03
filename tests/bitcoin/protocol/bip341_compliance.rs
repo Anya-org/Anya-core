@@ -4,12 +4,16 @@
 // Tests the implementation of BIP-341 (Taproot) features according to
 // Bitcoin Development Framework v2.5 requirements
 
-use anyhow::{bail, Result};
-use bitcoin::secp256k1::{Secp256k1, XOnlyPublicKey};
-use bitcoin::taproot::{LeafVersion, TaprootBuilder, ControlBlock, TapNodeHash};
+use anyhow::{anyhow, bail, Error, Result};
+use bitcoin::secp256k1::{Secp256k1, SecretKey, XOnlyPublicKey};
+use bitcoin::taproot::{
+    LeafVersion, TaprootBuilder, ControlBlock, TapNodeHash,
+    TapBranchHash, TapLeafHash, TapTweak,
+    merkle::Branch
+};
 use bitcoin::{ScriptBuf, TapLeafHash};
 use bitcoin::key::{TapTweak, TweakedPublicKey, UntweakedPublicKey, Parity};
-use bitcoin::hashes::Hash;
+use bitcoin::hashes::{Hash, sha256};
 use std::str::FromStr;
 
 /// TaprootVerifier provides methods for verifying Taproot constructions
@@ -195,15 +199,14 @@ pub fn test_taproot_key_path_spending() -> Result<()> {
 
     if tap_output_xonly != expected_key {
         bail!("Taproot output key doesn't match expected value");
-=======
-use bitcoin::crypto::key::{TweakedKeypair, TweakedPublicKey, UntweakedPublicKey, XOnlyPublicKey};
-use bitcoin::hashes::{Hash, sha256};
-use bitcoin::secp256k1::{Secp256k1, SecretKey};
-use bitcoin::taproot::{
-    TapBranchHash, TapLeafHash, TapNodeHash, TapTweak,
-    merkle::Branch, ControlBlock,
-};
-use anyhow::{anyhow, Error, Result};
+    }
+
+    // Verify using TaprootVerifier
+    let verifier = TaprootVerifier::new();
+    assert!(verifier.verify_key_path_spend(tap_output_key, &internal_key)?);
+
+    Ok(())
+}
 
 /// BIP341 compliance checker for Taproot
 pub struct BIP341Checker {
