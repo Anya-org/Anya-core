@@ -23,7 +23,6 @@ pub struct TestTransactionFactory;
 
 impl TestTransactionFactory {
     /// Alias for create_dummy_transaction to match test expectations
-    #[allow(dead_code)]
     pub fn create_simple() -> Transaction {
         Self::create_dummy_transaction()
     }
