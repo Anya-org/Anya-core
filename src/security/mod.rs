@@ -166,14 +166,14 @@ pub async fn create_bitcoin_hsm_provider(
     #[cfg(feature = "hsm")]
     let config = hsm::config::BitcoinConfig {
         network: hsm::config::BitcoinNetworkType::Testnet, // Default to testnet for safety
-        rpc_url: "http://127.0.0.1:8332".to_string(),
-        rpc_username: "user".to_string(),
-        rpc_password: "password".to_string(),
-        derivation_path_template: "m/84'/0'/0'/{account}/{index}".to_string(),
+        rpc_url: Some("http://127.0.0.1:18332".to_string()),
+        rpc_username: Some("user".to_string()),
+        rpc_password: Some("password".to_string()),
+        derivation_path_template: "m/84'/0'/0'/{index}".to_string(),
         use_segwit: true,
-        segwit_version: 0,
-        wallet_path: None,
-        default_fee_rate: 1,
+        use_taproot: true,
+        confirm_transactions: false,
+        default_fee_rate: 5,
     };
 
     hsm::providers::bitcoin::BitcoinHsmProvider::new(&config).await

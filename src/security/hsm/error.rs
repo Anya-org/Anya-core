@@ -406,6 +406,7 @@ impl fmt::Display for AuditEventResult {
             AuditEventResult::Canceled => write!(f, "canceled"),
             AuditEventResult::Rejected => write!(f, "rejected"),
             AuditEventResult::Timeout => write!(f, "timeout"),
+            AuditEventResult::Unknown => write!(f, "unknown"),
         }
     }
 }
