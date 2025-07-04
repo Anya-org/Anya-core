@@ -4,8 +4,11 @@
 // Module organization for Bitcoin protocol tests according to
 // Bitcoin Development Framework v2.5 requirements
 
-/// BIP-341 (Taproot) Compliance Tests
+/// BIP-341 (Taproot) Compliance Tests (full implementation)
 pub mod bip341_compliance;
+
+/// BIP-341 (Taproot) Compliance Tests (simplified for compilation)
+pub mod bip341_compliance_simple;
 
 /// Test runner for all protocol tests
 pub mod test_runner;
