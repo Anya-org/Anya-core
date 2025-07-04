@@ -85,22 +85,20 @@ get_unsigned_commits() {
     local commits=()
     local git_log
     
-    git_log=$(git log --format="%h %G? %an %s" -n "$count")
+    git_log=$(git log --format="%h %G?" -n "$count")
     
     while IFS= read -r line; do
         local hash
         local sign_status
-        local rest
         
         hash=$(echo "$line" | cut -d' ' -f1)
         sign_status=$(echo "$line" | cut -d' ' -f2)
-        rest=$(echo "$line" | cut -d' ' -f3-)
         
         # N = no signature
         # B = bad signature
         # U = unknown signature
         if [[ "$sign_status" == "N" || "$sign_status" == "B" || "$sign_status" == "U" ]]; then
-            commits+=("$hash $sign_status $rest")
+            commits+=("$hash")
         fi
     done <<< "$git_log"
     
@@ -136,7 +134,8 @@ fi
 
 # Display unsigned commits
 echo -e "\e[33mFound $unsigned_count unsigned commits in the last $COMMIT_COUNT commits:\e[0m"
-for commit_info in "${unsigned_commits[@]}"; do
+for commit_hash in "${unsigned_commits[@]}"; do
+    commit_info=$(git log --format="%h %G? %an %s" -n 1 "$commit_hash")
     echo -e "\e[37m$commit_info\e[0m"
 done
 
@@ -155,7 +154,7 @@ if [[ "$DRY_RUN" != "true" ]]; then
     fi
     
     # Get the oldest commit hash to start rebasing from
-    oldest_commit=$(echo "${unsigned_commits[$((unsigned_count-1))]}" | cut -d' ' -f1)
+    oldest_commit="${unsigned_commits[$((unsigned_count-1))]}"
     
     echo -e "\e[36mStarting interactive rebase to sign commits...\e[0m"
     echo -e "\e[36mIf Git opens an editor, save and close it to continue.\e[0m"
@@ -173,7 +172,7 @@ else
     # Dry run mode
     echo ""
     echo -e "\e[36mDRY RUN: The following actions would be taken:\e[0m"
-    oldest_commit=$(echo "${unsigned_commits[$((unsigned_count-1))]}" | cut -d' ' -f1)
+    oldest_commit="${unsigned_commits[$((unsigned_count-1))]}"
     echo -e "\e[37m - Interactive rebase would be started from commit ${oldest_commit}~1\e[0m"
     echo -e "\e[37m - Each commit would be amended with your GPG signature\e[0m"
     echo -e "\e[37m - You would need to force push after completion\e[0m"
