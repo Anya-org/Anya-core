@@ -4,7 +4,6 @@
 //! particularly for Clarity and Stacks blockchain testing.
 
 // Placeholder implementations for when the actual dependencies are not available
-#[cfg(test)]
 pub mod clarity_repl {
     //! Placeholder module for clarity_repl functionality
     
@@ -56,31 +55,38 @@ pub mod clarity_repl {
     pub mod clarity {
         #[derive(Debug)]
         pub struct ClarityInstance {
-            pub contracts: std::collections::HashMap<String, String>,
+            pub name: String,
         }
         
         impl ClarityInstance {
-            pub fn new() -> Self {
-                Self {
-                    contracts: std::collections::HashMap::new(),
-                }
+            pub fn new(name: &str) -> Self {
+                Self { name: name.to_string() }
             }
         }
     }
     
     pub mod repl {
         use super::vm::Value;
+        use std::collections::HashMap;
         
         #[derive(Debug)]
         pub struct Session {
-            pub state: std::collections::HashMap<String, Value>,
+            pub contracts: HashMap<String, String>,
         }
         
         impl Session {
-            pub fn new() -> Self {
+            pub fn new(_accounts: Vec<String>, _default_address: String) -> Self {
                 Self {
-                    state: std::collections::HashMap::new(),
+                    contracts: HashMap::new(),
                 }
+            }
+            
+            pub fn deploy_contract(&mut self, _name: &str, _code: &str) -> Result<(), String> {
+                Ok(())
+            }
+            
+            pub fn call_contract(&self, _contract: &str, _function: &str, _args: &[Value]) -> Result<Value, String> {
+                Ok(Value::Bool(true))
             }
         }
         
@@ -92,14 +98,57 @@ pub mod clarity_repl {
         impl TestEnvironment {
             pub fn new() -> Self {
                 Self {
-                    session: Session::new(),
+                    session: Session::new(vec![], "default".to_string()),
                 }
             }
+            
+            pub fn execute_transaction(&mut self, _request: TransactionRequest) -> Result<Value, String> {
+                Ok(Value::Bool(true))
+            }
+            
+            pub fn execute_read_only(&self, _request: ReadOnlyRequest) -> Result<Value, String> {
+                Ok(Value::Bool(true))
+            }
+        }
+        
+        #[derive(Debug)]
+        pub struct TransactionRequest {
+            pub contract: String,
+            pub function: String,
+            pub args: Vec<Value>,
+        }
+        
+        #[derive(Debug)]
+        pub struct ReadOnlyRequest {
+            pub contract: String,
+            pub function: String,
+            pub args: Vec<Value>,
+        }
+    }
+    
+    #[derive(Debug, Clone)]
+    pub struct QualifiedContractIdentifier {
+        pub name: String,
+    }
+    
+    impl QualifiedContractIdentifier {
+        pub fn local(name: &str) -> Result<Self, String> {
+            Ok(Self { name: name.to_string() })
+        }
+    }
+    
+    #[derive(Debug)]
+    pub struct ClarityWasmSession {
+        pub accounts: Vec<String>,
+    }
+    
+    impl ClarityWasmSession {
+        pub fn new(accounts: Vec<String>, _default_address: String) -> Self {
+            Self { accounts }
         }
     }
 }
 
-#[cfg(test)]
 pub mod clarinet {
     //! Placeholder module for clarinet functionality
     use super::clarity_repl::vm::Value;
@@ -165,6 +214,68 @@ pub mod clarinet {
                 Ok(super::Value::Bool(true))
             }
         }
+        
+        pub mod clarity {
+            // Use a mock type instead of re-exporting private Value
+            #[derive(Debug, Clone)]
+            pub struct BuffData {
+                pub value: String,
+            }
+        }
+        
+        #[derive(Debug, Clone)]
+        pub struct Address {
+            pub value: String,
+        }
+        
+        #[derive(Debug)]
+        pub struct Clarity;
+        
+        pub type StacksAddress = Address;
+    }
+    
+    pub mod utils {
+        pub use super::*;
+    }
+    
+    pub mod client {
+        
+        
+        pub mod clarity_wasm {
+            
+            
+            pub mod test {
+                pub use super::*;
+            }
+            
+            #[derive(Debug)]
+            pub struct ClarityWasmSession;
+        }
+        
+        // Merge the contracts module here
+        pub mod contracts {
+            #[derive(Debug)]
+            pub struct Contract {
+                pub name: String,
+            }
+            
+            impl Contract {
+                pub fn new(name: &str) -> Self {
+                    Self { name: name.to_string() }
+                }
+            }
+        }
+        
+        // Other client types
+        #[derive(Debug)]
+        pub struct Tx;
+        
+        #[derive(Debug)]
+        pub enum Error {
+            TestError(String),
+        }
+        
+        pub type NetworkKeyCompression = u8;
     }
     
     pub mod contract_helpers {
@@ -173,16 +284,6 @@ pub mod clarinet {
     
     pub mod macros {
         pub use super::*;
-    }
-    
-    pub mod client {
-        pub mod contracts {
-            #[derive(Debug)]
-            pub struct Contract {
-                pub name: String,
-                pub code: String,
-            }
-        }
     }
 }
 
