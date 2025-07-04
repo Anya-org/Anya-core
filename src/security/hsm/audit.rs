@@ -115,7 +115,7 @@ impl AuditLogger {
         debug!("Initializing HSM audit logger");
 
         // Initialize the storage
-        let mut storage = self.storage.lock().await;
+        let storage = self.storage.lock().await;
         storage.initialize().await?;
 
         // Log initialization event
@@ -178,7 +178,7 @@ impl AuditLogger {
             event = event.with_detail(key, value);
         }
 
-        let mut storage = self.storage.lock().await;
+        let storage = self.storage.lock().await;
         storage.store_event(event).await
     }
 
@@ -537,35 +537,50 @@ impl AuditEvent {
             _ => AuditEventSeverity::Info,
         };
         
+        // Create the base event
         let mut event = HsmAuditEvent::new(event_type, result, severity);
-
+        
+        // Build up parameters and metadata for a single call
+        let mut metadata = serde_json::Map::new();
+        let mut params = serde_json::Map::new();
+        
+        // Add actor and key_id directly without moving event
         if let Some(actor) = &self.actor {
             event = event.with_user(actor.clone());
         }
-
+        
         if let Some(key_id) = &self.key_id {
             event = event.with_key(key_id.clone());
         }
-
+        
+        // Add error to metadata if present
         if let Some(error) = &self.error {
-            // Store error in metadata
-            if let Ok(event_with_metadata) = event.with_metadata(&serde_json::json!({ "error": error })) {
-                event = event_with_metadata;
-            }
+            metadata.insert("error".to_string(), serde_json::Value::String(error.clone()));
         }
-
-        if !self.details.is_empty() {
-            // Use with_metadata safely, ignoring any errors
-            if let Ok(event_with_metadata) = event.with_metadata(&self.details) {
-                event = event_with_metadata;
-            }
+        
+        // Add all details to metadata
+        for (key, value) in &self.details {
+            metadata.insert(key.clone(), serde_json::Value::String(value.clone()));
         }
-
-        // Handle operation_id through parameters
+        
+        // Add operation_id to parameters if present
         if let Some(operation_id) = &self.operation_id {
-            if let Ok(event_with_params) = event.with_parameters(&serde_json::json!({ "operation_id": operation_id })) {
-                event = event_with_params;
-            }
+            params.insert("operation_id".to_string(), serde_json::Value::String(operation_id.clone()));
+        }
+        
+        // Apply metadata and parameters at the end - avoiding multiple moves
+        if !metadata.is_empty() {
+            event = match event.with_metadata(&serde_json::Value::Object(metadata)) {
+                Ok(updated_event) => updated_event,
+                Err(_) => event, // Keep original event if metadata application fails
+            };
+        }
+        
+        if !params.is_empty() {
+            event = match event.with_parameters(&serde_json::Value::Object(params)) {
+                Ok(updated_event) => updated_event,
+                Err(_) => event, // Keep original event if parameters application fails
+            };
         }
 
         event

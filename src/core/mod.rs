@@ -140,6 +140,7 @@ pub struct Config {
 
 #[allow(dead_code)]
 pub struct AnyaCore {
+    #[cfg(feature = "rust-bitcoin")]
     bitcoin_adapter: Arc<dyn crate::bitcoin::interface::BitcoinInterface>,
     web5_adapter: Arc<Web5Adapter>,
     ml_agent_system: Arc<MLAgentSystem>,
@@ -148,6 +149,7 @@ pub struct AnyaCore {
 }
 
 impl AnyaCore {
+    #[cfg(feature = "rust-bitcoin")]
     pub async fn new(config: Config) -> Result<Self, Box<dyn std::error::Error>> {
         let bitcoin_config = crate::bitcoin::config::BitcoinConfig {
             enabled: true,
@@ -185,6 +187,36 @@ impl AnyaCore {
 
         Ok(Self {
             bitcoin_adapter: bitcoin,
+            web5_adapter: web5,
+            ml_agent_system: agents,
+            dao_governance: dao,
+            tokenomics: tokens,
+        })
+    }
+
+    #[cfg(not(feature = "rust-bitcoin"))]
+    pub async fn new(config: Config) -> Result<Self, Box<dyn std::error::Error>> {
+        let web5_config = crate::web5::Web5Config {
+            enabled: true,
+            did_method: "ion".to_string(),
+            dwn_url: Some(config.web5.endpoint.clone()),
+            use_local_storage: true,
+        };
+        let web5 = Arc::new(Web5Adapter::build(web5_config).await?);
+
+        let ml_config = crate::ml::MLConfig {
+            enabled: true,
+            model_path: Some(config.ml.model_path.clone()),
+            use_gpu: true,
+            federated_learning: true,
+            max_model_size: 100 * 1024 * 1024,
+        };
+        let agents = Arc::new(MLAgentSystem::init(ml_config).await?);
+
+        let dao = Arc::new(crate::dao::DaoGovernance::default());
+        let tokens = TokenomicsEngine::setup(config.tokenomics).await?;
+
+        Ok(Self {
             web5_adapter: web5,
             ml_agent_system: agents,
             dao_governance: dao,

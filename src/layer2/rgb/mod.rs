@@ -9,17 +9,32 @@ use chrono;
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use uuid::Uuid;
+#[cfg(feature = "rust-bitcoin")]
 use crate::bitcoin::wallet::Asset;
 // [AIR-3][AIS-3][BPC-3][RES-3] Removed unused import: async_trait::async_trait
+#[cfg(feature = "rust-bitcoin")]
 use bitcoin::hashes::{Hash, HashEngine};
+#[cfg(feature = "rust-bitcoin")]
 use bitcoin::secp256k1::Secp256k1;
 // [AIR-3][AIS-3][BPC-3][RES-3] Use bitcoin's hashing functionality
 // This follows official Bitcoin Improvement Proposals (BIPs) standards for cryptographic operations
+#[cfg(feature = "rust-bitcoin")]
 use bitcoin::hashes::sha256;
 // [AIR-3][AIS-3][BPC-3][RES-3] Import hex for encoding/decoding
+#[cfg(feature = "rust-bitcoin")]
 use hex;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
+
+// Fallback Asset type when bitcoin feature is disabled
+#[cfg(not(feature = "rust-bitcoin"))]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Asset {
+    pub id: String,
+    pub name: String,
+    pub amount: u64,
+    pub metadata: std::collections::HashMap<String, String>,
+}
 
 // [AIR-3][AIS-3][BPC-3][RES-3] Asset Registry implementation
 /// Configuration for the Asset Registry
@@ -129,12 +144,16 @@ impl AssetRegistry {
 #[derive(Debug, Clone)]
 pub struct ContractManager {
     #[allow(dead_code)] // Required for future cryptographic operations (see docs/research/PROTOCOL_UPGRADES.md)
+    #[cfg(feature = "rust-bitcoin")]
     secp: Secp256k1<bitcoin::secp256k1::All>,
+    #[cfg(not(feature = "rust-bitcoin"))]
+    _placeholder: (),
 }
 
 impl ContractManager {
     /// [AIR-3][AIS-3][BPC-3][RES-3] Generate a unique asset ID using Taproot-compatible hashing
     /// This follows official Bitcoin Improvement Proposals (BIPs) standards for asset ID generation
+    #[cfg(feature = "rust-bitcoin")]
     fn generate_asset_id(
         issuer_address: &str,
         total_supply: u64,
@@ -167,11 +186,45 @@ impl ContractManager {
 
         Ok(asset_id)
     }
+
+    /// Fallback asset ID generation when bitcoin features are disabled
+    #[cfg(not(feature = "rust-bitcoin"))]
+    fn generate_asset_id(
+        issuer_address: &str,
+        total_supply: u64,
+        precision: u8,
+        metadata: &str,
+    ) -> RgbResult<String> {
+        // Simple fallback using Rust standard library hashing
+        use std::collections::hash_map::DefaultHasher;
+        use std::hash::{Hash, Hasher};
+
+        let mut hasher = DefaultHasher::new();
+        issuer_address.hash(&mut hasher);
+        total_supply.hash(&mut hasher);
+        precision.hash(&mut hasher);
+        metadata.hash(&mut hasher);
+        chrono::Utc::now().timestamp().hash(&mut hasher);
+
+        let hash = hasher.finish();
+        Ok(format!("rgb1{:x}", hash))
+    }
+
     /// Create a new Contract Manager
     /// [AIR-3][AIS-3][BPC-3][RES-3]
+    #[cfg(feature = "rust-bitcoin")]
     pub fn new() -> Self {
         Self {
             secp: Secp256k1::new(),
+        }
+    }
+
+    /// Create a new Contract Manager (without bitcoin features)
+    /// [AIR-3][AIS-3][BPC-3][RES-3]
+    #[cfg(not(feature = "rust-bitcoin"))]
+    pub fn new() -> Self {
+        Self {
+            _placeholder: (),
         }
     }
 
@@ -276,6 +329,7 @@ pub enum RgbError {
     NetworkError(String),
 }
 
+#[cfg(feature = "rust-bitcoin")]
 impl From<bitcoin::consensus::encode::Error> for RgbError {
     fn from(err: bitcoin::consensus::encode::Error) -> Self {
         RgbError::SerializationError(err.to_string())
@@ -288,6 +342,7 @@ pub type RgbResult<T> = Result<T, RgbError>;
 
 /// [AIR-3][AIS-3][BPC-3][RES-3] Generate a unique asset ID using Taproot-compatible approach
 /// This follows official Bitcoin Improvement Proposals (BIPs) standards for asset identification
+#[cfg(feature = "rust-bitcoin")]
 pub fn generate_asset_id(
     issuer_address: &str,
     total_supply: u64,
@@ -319,6 +374,29 @@ pub fn generate_asset_id(
     let asset_id = format!("rgb1{hex_string}");
 
     Ok(asset_id)
+}
+
+/// Fallback asset ID generation when bitcoin features are disabled
+#[cfg(not(feature = "rust-bitcoin"))]
+pub fn generate_asset_id(
+    issuer_address: &str,
+    total_supply: u64,
+    precision: u8,
+    metadata: &str,
+) -> RgbResult<String> {
+    // Simple fallback using Rust standard library hashing
+    use std::collections::hash_map::DefaultHasher;
+    use std::hash::{Hash, Hasher};
+
+    let mut hasher = DefaultHasher::new();
+    issuer_address.hash(&mut hasher);
+    total_supply.hash(&mut hasher);
+    precision.hash(&mut hasher);
+    metadata.hash(&mut hasher);
+    chrono::Utc::now().timestamp().hash(&mut hasher);
+
+    let hash = hasher.finish();
+    Ok(format!("rgb1{:x}", hash))
 }
 
 /// [AIR-3][AIS-3][BPC-3][RES-3] RGB Asset structure following BDF v2.5 standards

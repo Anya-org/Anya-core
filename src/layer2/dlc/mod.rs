@@ -8,7 +8,9 @@
 
 // [AIR-3][AIS-3][BPC-3][RES-3] Import necessary dependencies for DLC implementation
 // This follows official Bitcoin Improvement Proposals (BIPs) for non-interactive oracle patterns
+#[cfg(feature = "rust-bitcoin")]
 use bitcoin::hashes::sha256;
+#[cfg(feature = "rust-bitcoin")]
 use bitcoin::hashes::{Hash, HashEngine};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -16,6 +18,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use uuid;
 // [AIR-3][AIS-3][BPC-3][RES-3] Removed unused import: PublicKey
 // [AIR-3][AIS-3][BPC-3][RES-3] Removed unused PublicKey import
+#[cfg(feature = "rust-bitcoin")]
 use bitcoin::secp256k1::{Message, Secp256k1, SecretKey};
 use thiserror::Error;
 use uuid::Uuid;
@@ -103,7 +106,10 @@ pub struct OracleAttestation {
 /// Contract Manager for DLC contracts
 /// [AIR-3][AIS-3][BPC-3][RES-3]
 pub struct ContractManager {
+    #[cfg(feature = "rust-bitcoin")]
     secp: Secp256k1<bitcoin::secp256k1::All>,
+    #[cfg(not(feature = "rust-bitcoin"))]
+    _placeholder: (),
 }
 
 impl Default for ContractManager {
@@ -115,9 +121,19 @@ impl Default for ContractManager {
 impl ContractManager {
     /// Create a new Contract Manager
     /// [AIR-3][AIS-3][BPC-3][RES-3]
+    #[cfg(feature = "rust-bitcoin")]
     pub fn new() -> Self {
         Self {
             secp: Secp256k1::new(),
+        }
+    }
+
+    /// Create a new Contract Manager (without bitcoin features)
+    /// [AIR-3][AIS-3][BPC-3][RES-3]
+    #[cfg(not(feature = "rust-bitcoin"))]
+    pub fn new() -> Self {
+        Self {
+            _placeholder: (),
         }
     }
 
@@ -165,6 +181,7 @@ impl ContractManager {
 
     /// Sign a DLC contract
     /// [AIR-3][AIS-3][BPC-3][RES-3]
+    #[cfg(feature = "rust-bitcoin")]
     pub fn sign_contract(
         &self,
         contract: &DlcContract,
@@ -223,6 +240,7 @@ impl ContractManager {
 
     /// Hash a contract for signing
     /// [AIR-3][AIS-3][BPC-3][RES-3]
+    #[cfg(feature = "rust-bitcoin")]
     fn hash_contract(&self, contract: &DlcContract) -> Result<[u8; 32], DlcError> {
         let mut engine = sha256::HashEngine::default();
 
@@ -250,6 +268,7 @@ impl ContractManager {
 
     /// Convert byte array to sha256::Hash
     /// [AIR-3][AIS-3][BPC-3][RES-3]
+    #[cfg(feature = "rust-bitcoin")]
     pub fn into_inner(hash_bytes: &[u8; 32]) -> sha256::Hash {
         sha256::Hash::from_slice(hash_bytes).unwrap()
     }
@@ -583,6 +602,7 @@ impl DlcManager {
 
     /// Sign a DLC contract
     /// [AIR-3][AIS-3][BPC-3][RES-3]
+    #[cfg(feature = "rust-bitcoin")]
     pub async fn sign_contract(&self, contract: &DlcContract) -> DlcResult<DlcSignature> {
         // [AIR-3][AIS-3][BPC-3][RES-3] Using the private key from the config
         // This follows official Bitcoin Improvement Proposals (BIPs) standards for key handling
@@ -704,7 +724,10 @@ pub struct NonInteractiveOracleAttestation {
     pub event_id: String,
     pub outcome: String,
     pub signature: Vec<u8>,
+    #[cfg(feature = "rust-bitcoin")]
     pub r_point: bitcoin::secp256k1::PublicKey,
+    #[cfg(not(feature = "rust-bitcoin"))]
+    pub r_point: Vec<u8>, // fallback to bytes when bitcoin feature is disabled
 }
 
 /// [AIR-3][AIS-3][BPC-3][RES-3] Additional methods for OracleClient

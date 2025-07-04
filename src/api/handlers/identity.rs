@@ -23,12 +23,28 @@ pub async fn create_credential() -> Result<Json<Value>, StatusCode> {
 
 pub async fn get_credential() -> Result<Json<Value>, StatusCode> {
     Ok(Json(json!({
-        "credential": {}
+        "credential_id": "cred_123",
+        "status": "valid"
+    })))
+}
+
+pub async fn resolve_identity() -> Result<Json<Value>, StatusCode> {
+    Ok(Json(json!({
+        "did": "did:example:123",
+        "resolved": true
+    })))
+}
+
+pub async fn issue_credential() -> Result<Json<Value>, StatusCode> {
+    Ok(Json(json!({
+        "credential_id": "cred_456",
+        "issued": true
     })))
 }
 
 pub async fn verify_credential() -> Result<Json<Value>, StatusCode> {
     Ok(Json(json!({
-        "valid": true
+        "valid": true,
+        "verified": true
     })))
 }

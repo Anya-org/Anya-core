@@ -134,14 +134,20 @@ impl SidechainBridge {
 // Configuration and result types
 #[derive(Debug, Clone)]
 pub struct ProtocolConfig {
+    #[cfg(feature = "rust-bitcoin")]
     pub network: bitcoin::Network,
+    #[cfg(not(feature = "rust-bitcoin"))]
+    pub network: String, // fallback to string representation
     // Add more configuration fields as needed
 }
 
 impl Default for ProtocolConfig {
     fn default() -> Self {
         Self {
+            #[cfg(feature = "rust-bitcoin")]
             network: bitcoin::Network::Bitcoin,
+            #[cfg(not(feature = "rust-bitcoin"))]
+            network: "bitcoin".to_string(),
         }
     }
 }

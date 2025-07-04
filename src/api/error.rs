@@ -6,6 +6,7 @@ use axum::{
 use serde_json::json;
 use thiserror::Error;
 
+#[cfg(feature = "rust-bitcoin")]
 use crate::bitcoin::error::BitcoinError;
 
 #[derive(Error, Debug)]
@@ -22,6 +23,7 @@ pub enum ApiError {
     #[error("Invalid request: {0}")]
     BadRequest(String),
 
+    #[cfg(feature = "rust-bitcoin")]
     #[error("Bitcoin operation failed: {0}")]
     BitcoinError(#[from] BitcoinError),
 
@@ -36,6 +38,7 @@ impl IntoResponse for ApiError {
             ApiError::AuthorizationFailed(msg) => (StatusCode::FORBIDDEN, msg),
             ApiError::NotFound(msg) => (StatusCode::NOT_FOUND, msg),
             ApiError::BadRequest(msg) => (StatusCode::BAD_REQUEST, msg),
+            #[cfg(feature = "rust-bitcoin")]
             ApiError::BitcoinError(e) => match e {
                 BitcoinError::WalletNotFound(_) => (StatusCode::NOT_FOUND, e.to_string()),
                 BitcoinError::InvalidAddress(_) => (StatusCode::BAD_REQUEST, e.to_string()),

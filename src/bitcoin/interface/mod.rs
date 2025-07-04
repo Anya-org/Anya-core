@@ -17,6 +17,7 @@ use std::sync::Arc;
 
 // Re-export bitcoin types for use by other modules
 pub use crate::bitcoin::error::{BitcoinError, BitcoinResult};
+#[cfg(feature = "rust-bitcoin")]
 pub use bitcoin::{Address, Block, Network, Transaction};
 
 // [AIR-3][AIS-3][BPC-3][RES-3] Import Bitcoin configuration

@@ -28,6 +28,7 @@ pub use wallet::{AddressInfo, BitcoinWallet, WalletConfig};
 
 // [AIR-3][AIS-3][BPC-3][RES-3] Re-export Bitcoin types for convenience
 // This follows official Bitcoin Improvement Proposals (BIPs) standards for type consistency
+#[cfg(feature = "rust-bitcoin")]
 pub use bitcoin::{Address, Block, BlockHash, Network, Transaction, Txid};
 
 // Export our manager and config for easier access

@@ -44,6 +44,7 @@ use std::fmt;
 
 pub mod api;
 pub mod bip;
+#[cfg(feature = "rust-bitcoin")]
 pub mod bitcoin;
 pub mod compliance;
 pub mod dao;
@@ -241,6 +242,7 @@ pub mod hardware_optimization {
             }
             
             /// Verify a batch of transactions using Intel optimizations
+            #[cfg(feature = "rust-bitcoin")]
             pub fn verify_transaction_batch(
                 &self, 
                 transactions: &[bitcoin::Transaction], 
@@ -267,6 +269,7 @@ pub mod hardware_optimization {
             }
             
             /// Verify a single Taproot transaction using Intel optimizations
+            #[cfg(feature = "rust-bitcoin")]
             pub fn verify_taproot_transaction(
                 &self,
                 tx: &bitcoin::Transaction
@@ -294,7 +297,9 @@ pub mod hardware_optimization {
 
 // Re-export key types for crate-wide visibility
 // [AIR-3][BPC-3] Following official Bitcoin Improvement Proposals (BIPs)
+#[cfg(feature = "rust-bitcoin")]
 pub use crate::bitcoin::adapters::BitcoinAdapter;
+#[cfg(feature = "rust-bitcoin")]
 pub use crate::bitcoin::interface::BitcoinInterface;
 pub use crate::dao::DaoLevel;
 pub use crate::types::compliance::*;
@@ -360,6 +365,7 @@ impl fmt::Display for AnyaError {
 
 impl Error for AnyaError {}
 
+#[cfg(feature = "rust-bitcoin")]
 impl From<crate::bitcoin::error::BitcoinError> for AnyaError {
     fn from(err: crate::bitcoin::error::BitcoinError) -> Self {
         AnyaError::Bitcoin(err.to_string())
@@ -649,6 +655,7 @@ pub mod prelude {
     pub use crate::dao::governance::DaoGovernance;
     // pub use crate::dao::DaoLevel; // Now re-exported at crate root
     // pub use crate::bitcoin::interface::BitcoinInterface;
+    #[cfg(feature = "rust-bitcoin")]
     pub use crate::bitcoin::adapters::BitcoinAdapter; // Now re-exported at crate root
                                                       // pub use crate::tools::markdown::DocumentationValidator;
                                                       // pub use crate::security::hsm::TaprootValidator;

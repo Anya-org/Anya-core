@@ -4,11 +4,14 @@
 //! This module implements BIP-341 (Taproot) for Bitcoin Core integration.
 //! Compliant with official Bitcoin Improvement Proposals (BIPs).
 
+#[cfg(feature = "rust-bitcoin")]
 use crate::bitcoin::error::{BitcoinError, BitcoinResult};
+#[cfg(feature = "rust-bitcoin")]
 use bitcoin::{
     hashes::{sha256, Hash, HashEngine},
     Transaction, TxOut,
 };
+#[cfg(feature = "rust-bitcoin")]
 use bitcoin::{
     secp256k1::{Secp256k1, XOnlyPublicKey},
     taproot::{TaprootBuilder, TaprootSpendInfo},
