@@ -1,23 +1,16 @@
 use anya_core::{
     bitcoin::{
-        consensus::{
-            differential_fuzzer::{
-                BitcoinReferenceClient, DifferentialFuzzer, DifferentialFuzzerConfig,
-            },
-            invariant_checker::{
-                verify_transaction_consensus_invariants, BitcoinCoreInvariantChecker,
-            },
-            ConsensusError,
-        },
-        validation::{TransactionValidator, ValidationError},
+        validation::{TransactionValidator},
     },
     hardware_optimization::HardwareOptimizationManager,
 };
 
 use bitcoin::{
-    Amount, Block, BlockHeader, OutPoint, Script, ScriptBuf, Transaction, TxIn, TxOut,
+    Amount, Block, OutPoint, ScriptBuf, Transaction, TxIn, TxOut,
     Witness, absolute::LockTime, transaction::Version, Sequence,
 };
+#[cfg(feature = "rust-bitcoin")]
+use anya_core::bitcoin::interface::BlockHeader;
 use std::collections::HashMap;
 use std::sync::Arc;
 

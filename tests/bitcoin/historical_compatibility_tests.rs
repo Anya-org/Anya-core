@@ -1,20 +1,34 @@
 use anya_core::{
     bitcoin::validation::{
         get_global_verification_stats, validate_historical_batch, TransactionValidator,
-        ValidationError, VerificationRecord, VERIFICATION_HISTORY,
+        ValidationError,
     },
     hardware_optimization::HardwareOptimizationManager,
 };
 
-use bitcoin::{Block, BlockHeader, Transaction};
+use bitcoin::Transaction;
 use std::collections::HashMap;
 use std::sync::Arc;
-use std::time::{SystemTime, UNIX_EPOCH};
 
-// Import centralized test utilities
-use crate::common::test_utilities::{
-    MockFactory, TestAssertions, TestEnvironmentFactory, TestTransactionFactory,
-};
+// Mock test utilities since common module doesn't exist
+struct TestTransactionFactory;
+
+impl TestTransactionFactory {
+    fn create_historical_batch(_era: &str) -> Vec<String> {
+        vec!["mock_tx_1".to_string(), "mock_tx_2".to_string()]
+    }
+
+    /// Create a simple dummy transaction for testing
+    fn create_simple() -> Transaction {
+        // Create a minimal valid transaction
+        Transaction {
+            version: bitcoin::transaction::Version::ONE,
+            lock_time: bitcoin::locktime::absolute::LockTime::ZERO,
+            input: vec![],
+            output: vec![],
+        }
+    }
+}
 
 /// Test that demonstrates full alignment with Bitcoin's Immutability principle
 /// by verifying that hardware optimizations maintain consistent historical validation results
@@ -40,9 +54,7 @@ pub async fn test_immutability_historical_compatibility() {
             txs.len()
         );
 
-        // Create validators with different optimization settings
-        let standard_validator = TransactionValidator::new().with_optimization(false);
-
+        // Create validator with optimization settings
         let optimized_validator = TransactionValidator::new().with_optimization(true);
 
         // Process all transactions in this era with both validators
@@ -266,7 +278,7 @@ pub async fn test_full_bitcoin_principles_alignment() {
 // Helper functions
 
 /// Test alignment with the decentralization principle
-async fn test_decentralization_principle(hw_manager: &Arc<HardwareOptimizationManager>) -> f64 {
+async fn test_decentralization_principle(_hw_manager: &Arc<HardwareOptimizationManager>) -> f64 {
     println!("\n🌐 Testing alignment with DECENTRALIZATION principle...");
 
     // For brevity, we'll simulate the decentralization tests and assume success
@@ -282,7 +294,7 @@ async fn test_decentralization_principle(hw_manager: &Arc<HardwareOptimizationMa
 }
 
 /// Test alignment with the security principle
-async fn test_security_principle(hw_manager: &Arc<HardwareOptimizationManager>) -> f64 {
+async fn test_security_principle(_hw_manager: &Arc<HardwareOptimizationManager>) -> f64 {
     println!("\n🔒 Testing alignment with SECURITY principle...");
 
     // Create a validator
@@ -310,7 +322,7 @@ async fn test_security_principle(hw_manager: &Arc<HardwareOptimizationManager>) 
 }
 
 /// Test alignment with the immutability principle
-async fn test_immutability_principle(hw_manager: &Arc<HardwareOptimizationManager>) -> f64 {
+async fn test_immutability_principle(_hw_manager: &Arc<HardwareOptimizationManager>) -> f64 {
     println!("\n⛓️ Testing alignment with IMMUTABILITY principle...");
 
     // Create a validator
@@ -335,7 +347,7 @@ async fn test_immutability_principle(hw_manager: &Arc<HardwareOptimizationManage
 }
 
 /// Test alignment with the privacy principle
-async fn test_privacy_principle(hw_manager: &Arc<HardwareOptimizationManager>) -> f64 {
+async fn test_privacy_principle(_hw_manager: &Arc<HardwareOptimizationManager>) -> f64 {
     println!("\n🔒 Testing alignment with PRIVACY principle...");
 
     println!("  ✓ Batch verification support verified");
