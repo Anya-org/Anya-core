@@ -32,17 +32,23 @@ show_usage() {
 # Parse command line arguments
 while getopts "c:b:dh" opt; do
     case $opt in
-        c) COMMIT_COUNT=$OPTARG ;;
-        b) BRANCH_NAME=$OPTARG ;;
-        d) DRY_RUN=true ;;
-        h) show_usage; exit 0 ;;
-        *) show_usage; exit 1 ;;
+    c) COMMIT_COUNT=$OPTARG ;;
+    b) BRANCH_NAME=$OPTARG ;;
+    d) DRY_RUN=true ;;
+    h)
+        show_usage
+        exit 0
+        ;;
+    *)
+        show_usage
+        exit 1
+        ;;
     esac
 done
 
 # Function to check if Git is installed
 check_git_installed() {
-    if ! command -v git &> /dev/null; then
+    if ! command -v git &>/dev/null; then
         echo -e "\e[31mGit is not installed or not in PATH.\e[0m"
         return 1
     fi
@@ -51,7 +57,7 @@ check_git_installed() {
 
 # Function to check if we're in a git repository
 check_git_repository() {
-    if ! git rev-parse --is-inside-work-tree &> /dev/null; then
+    if ! git rev-parse --is-inside-work-tree &>/dev/null; then
         echo -e "\e[31mCurrent directory is not a Git repository.\e[0m"
         return 1
     fi
@@ -62,10 +68,10 @@ check_git_repository() {
 check_git_signing_configured() {
     local signing_key
     local gpg_sign
-    
+
     signing_key=$(git config --get user.signingkey 2>/dev/null || echo "")
     gpg_sign=$(git config --get commit.gpgsign 2>/dev/null || echo "")
-    
+
     if [[ -z "$signing_key" || "$gpg_sign" != "true" ]]; then
         echo -e "\e[31mGit GPG signing is not properly configured.\e[0m"
         echo -e "\e[33mPlease run ./configure-git-signing.sh first.\e[0m"
@@ -84,24 +90,24 @@ get_unsigned_commits() {
     local count=$1
     local commits=()
     local git_log
-    
+
     git_log=$(git log --format="%h %G?" -n "$count")
-    
+
     while IFS= read -r line; do
         local hash
         local sign_status
-        
+
         hash=$(echo "$line" | cut -d' ' -f1)
         sign_status=$(echo "$line" | cut -d' ' -f2)
-        
+
         # N = no signature
         # B = bad signature
         # U = unknown signature
         if [[ "$sign_status" == "N" || "$sign_status" == "B" || "$sign_status" == "U" ]]; then
             commits+=("$hash")
         fi
-    done <<< "$git_log"
-    
+    done <<<"$git_log"
+
     echo "${commits[@]}"
 }
 
@@ -147,18 +153,18 @@ if [[ "$DRY_RUN" != "true" ]]; then
     echo -e "\e[31mThis can cause problems for other contributors if they've based work on these commits.\e[0m"
     echo ""
     read -p "Do you want to proceed? (y/N): " confirmation
-    
+
     if [[ "$confirmation" != "y" && "$confirmation" != "Y" ]]; then
         echo -e "\e[33mOperation cancelled.\e[0m"
         exit 0
     fi
-    
+
     # Get the oldest commit hash to start rebasing from
-    oldest_commit="${unsigned_commits[$((unsigned_count-1))]}"
-    
+    oldest_commit="${unsigned_commits[$((unsigned_count - 1))]}"
+
     echo -e "\e[36mStarting interactive rebase to sign commits...\e[0m"
     echo -e "\e[36mIf Git opens an editor, save and close it to continue.\e[0m"
-    
+
     # Execute the rebase
     if git rebase -i "${oldest_commit}~1" --exec "git commit --amend --no-edit -S"; then
         echo -e "\e[32mSuccessfully signed commits!\e[0m"
@@ -172,10 +178,10 @@ else
     # Dry run mode
     echo ""
     echo -e "\e[36mDRY RUN: The following actions would be taken:\e[0m"
-    oldest_commit="${unsigned_commits[$((unsigned_count-1))]}"
+    oldest_commit="${unsigned_commits[$((unsigned_count - 1))]}"
     echo -e "\e[37m - Interactive rebase would be started from commit ${oldest_commit}~1\e[0m"
     echo -e "\e[37m - Each commit would be amended with your GPG signature\e[0m"
     echo -e "\e[37m - You would need to force push after completion\e[0m"
     echo ""
     echo -e "\e[33mTo execute these actions, run without the -d parameter.\e[0m"
-fi 
+fi
