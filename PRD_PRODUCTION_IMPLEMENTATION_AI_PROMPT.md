@@ -10,6 +10,89 @@
 **Architecture**: Hexagonal, Modular, Enterprise-Grade
 **Enforcement**: Evidence-based implementation with verification script integration
 
+## 🚨 STRICT ADHERENCE REQUIREMENTS - NON-NEGOTIABLE
+
+### **COMMIT RULES ENFORCEMENT** - ALL WORK REJECTED IF NOT FOLLOWED
+
+**MANDATORY COMMIT FORMAT**:
+```
+<type>[optional scope]: <description>
+
+[optional body]
+
+Labels: [AIR-X][AIS-X][AIT-X][Component-Specific-Labels]
+```
+
+**EXAMPLE COMPLIANT COMMIT**:
+```
+feat(bitcoin): implement DLC oracle real cryptography
+
+Replace unimplemented!() macros with production secp256k1 operations
+- Add real signature verification and key generation
+- Implement deterministic nonce creation
+- Add comprehensive error handling
+
+Labels: [AIR-3][AIS-2][AIT-3][BPC-2][PFM-2][SCL-1][RES-2]
+```
+
+**AUTOMATIC REJECTION CRITERIA**:
+- ❌ Missing conventional commit format
+- ❌ Missing required labels based on component type
+- ❌ Incorrect label scoring (must match actual implementation level)
+- ❌ Missing scope for multi-component changes
+- ❌ Aspirational claims without verification evidence
+
+### **REPOSITORY RULES ENFORCEMENT** - ZERO TOLERANCE
+
+**BRANCH STRATEGY - MANDATORY**:
+- ✅ **feature/xxx**: All new features must use feature branches
+- ✅ **fix/xxx**: All bug fixes must use fix branches  
+- ✅ **NO DIRECT PUSHES TO MAIN**: All changes via pull requests
+- ✅ **CODE REVIEW REQUIRED**: Minimum 1 maintainer approval
+- ✅ **CI CHECKS MUST PASS**: All automated checks mandatory
+
+**PULL REQUEST REQUIREMENTS**:
+```markdown
+## Pull Request Template - MANDATORY FIELDS
+
+### Description
+[Detailed description of changes]
+
+### Component Labels
+**Modified Components**: [List all affected components]
+**Required Labels**: [All labels based on component type]
+**Verification Evidence**: [Link to verification script output]
+
+### Checklist
+- [ ] Conventional commit format used
+- [ ] All required labels included
+- [ ] Component requirements met for assigned labels
+- [ ] CI checks passing
+- [ ] Documentation updated
+- [ ] Verification script executed
+```
+
+### **LABELING SYSTEM ENFORCEMENT** - COMPONENT-BASED VALIDATION
+
+**BITCOIN COMPONENTS** - Must include:
+- **Core**: AIR, AIS, AIT, BPC (Bitcoin Protocol Compliance)
+- **Performance**: PFM, SCL, RES where applicable
+- **Example**: `Labels: [AIR-3][AIS-2][AIT-3][BPC-2][PFM-2][SCL-1]`
+
+**WEB5 COMPONENTS** - Must include:
+- **Core**: AIR, AIS, AIT, W5C (Web5 Compliance), DID
+- **Performance**: PFM, SCL, RES where applicable
+- **Example**: `Labels: [AIR-2][AIS-3][AIT-2][W5C-2][DID-2][PFM-1]`
+
+**ML COMPONENTS** - Must include:
+- **Core**: AIR, AIS, AIT, AIM (AI/ML), AIP (AI/Performance), AIE (AI/Ethics)
+- **Performance**: PFM, SCL, RES where applicable
+- **Example**: `Labels: [AIR-3][AIS-2][AIT-3][AIM-3][AIP-2][AIE-1][PFM-2]`
+
+**CORE COMPONENTS** - Must include:
+- **All Core**: AIR, AIS, AIT, PFM, RES, SCL
+- **Example**: `Labels: [AIR-3][AIS-3][AIT-3][PFM-3][RES-2][SCL-2]`
+
 ## 🏆 VERIFIED SYSTEM CONTEXT (July 5, 2025 12:17 PM)
 
 ### 📊 **ANYA CORE SYSTEM OVERVIEW - VERIFIED STATUS**
@@ -275,35 +358,116 @@ fn test_implementation_completeness() {
 }
 ```
 
-## 📋 **IMPLEMENTATION CHECKLIST**
+## 📋 **IMPLEMENTATION CHECKLIST** - STRICT COMPLIANCE REQUIRED
+
+### **PRE-IMPLEMENTATION VALIDATION**
+- [ ] **Commit format validated**: Conventional Commits specification followed
+- [ ] **Labels determined**: All required labels identified based on component type  
+- [ ] **Branch created**: Proper feature/fix branch created from main
+- [ ] **Verification baseline**: Current unimplemented!() count documented
 
 ### Phase 1: Complete Layer 2 Protocols (Priority 1)
 
+**COMMIT REQUIREMENTS PER FUNCTION**:
+```
+feat(bitcoin): implement DLC adaptor signature verification
+
+Replace unimplemented!() macro with secp256k1 cryptographic verification
+
+Labels: [AIR-3][AIS-2][AIT-3][BPC-2][PFM-2][SCL-1]
+```
+
 - [ ] **DLC Protocol**: Replace 21+ unimplemented!() functions
+  - [ ] Each function: Separate commit with proper labels
+  - [ ] Component type: Bitcoin (requires AIR, AIS, AIT, BPC)  
+  - [ ] Verification: Script must show macro count reduction
 - [ ] **Lightning Network**: Complete payment channel implementations
+  - [ ] Component type: Bitcoin (requires AIR, AIS, AIT, BPC)
+  - [ ] Labels: Must include PFM for performance-critical code
 - [ ] **RGB Protocol**: Already 11/11 core functions implemented ✅
 - [ ] **Cross-chain**: Stacks, RSK integration
+  - [ ] Component type: Bitcoin (requires AIR, AIS, AIT, BPC)
+  - [ ] Labels: Must include SCL for scalability features
 
 ### Phase 2: Production Storage Backend (Priority 2)
 
+**COMMIT REQUIREMENTS**:
+```
+feat(core): replace DWN HashMap storage with SQLite backend
+
+Implement production SQLite database with connection pooling
+- Add sqlx integration with prepared statements
+- Implement encryption at rest with ChaCha20-Poly1305
+- Add comprehensive error handling and recovery
+
+Labels: [AIR-3][AIS-3][AIT-3][PFM-3][RES-2][SCL-2][SEC-2]
+```
+
 - [ ] **DWN Storage**: Replace HashMap with SQLite/IPFS backend
+  - [ ] Component type: Core (requires AIR, AIS, AIT, PFM, RES, SCL)
+  - [ ] Security: Must include SEC labels for encryption features
 - [ ] **Encryption**: Implement ChaCha20-Poly1305 encryption
+  - [ ] Component type: Security (requires SEC, AIR, AIS, AIT)
 - [ ] **HSM Integration**: Use existing HSM framework for keys
+  - [ ] Component type: Security (requires SEC, HSM labels)
 - [ ] **Schema Validation**: JSON Schema validation for all data
+  - [ ] Component type: Core (requires AIR, AIS, AIT)
 
 ### Phase 3: Network & Performance (Priority 3)
 
+**COMMIT REQUIREMENTS**:
+```
+refactor(bitcoin): replace mock oracle with production HTTP client
+
+Remove mock implementations and add real oracle communication
+- Implement HTTP client with authentication
+- Add retry logic and connection pooling  
+- Replace 15 mock functions with real implementations
+
+Labels: [AIR-2][AIS-3][AIT-2][BPC-2][PFM-2][SCL-1][RES-2]
+```
+
 - [ ] **Mock Replacement**: Replace 141 mock implementations
+  - [ ] Each component: Proper labels based on component type
+  - [ ] Performance: Include PFM labels for network operations
 - [ ] **Performance Optimization**: Achieve cache hit rate >90%
+  - [ ] Component type: Performance (requires PFM, SCL)
 - [ ] **Security Hardening**: Implement all security requirements
+  - [ ] Component type: Security (requires SEC, AIR, AIS, AIT)
 - [ ] **Documentation**: Update all docs with verification evidence
+  - [ ] Component type: Documentation (requires AIR)
 
-### Release Gates (ALL REQUIRED)
+### **FINAL RELEASE GATES** - ALL REQUIRED WITH EVIDENCE
 
-- [ ] **unimplemented!() count = 0** (currently 62)
+**VERIFICATION COMMANDS**:
+```bash
+# Each gate must be verified with these exact commands
+grep -r "unimplemented!" --include="*.rs" . | wc -l  # Must = 0
+grep -r "todo!" --include="*.rs" . | wc -l           # Must = 0  
+grep -r "TODO.*SQLite" --include="*.rs" . | wc -l    # Must = 0
+grep -r "MockImpl\|placeholder" --include="*.rs" . | wc -l # Must < 10
+cargo check --all-features 2>&1 | grep "warning:" | wc -l  # Must < 10
+```
+
+**RELEASE COMMIT REQUIREMENTS**:
+```
+release: v1.0.0 - production ready implementation
+
+All unimplemented!() macros eliminated, production storage implemented
+- 0 unimplemented!() macros (verified)
+- 0 todo!() stubs (verified)  
+- 0 SQLite TODOs (verified)
+- <10 mock implementations (verified)
+- <10 compilation warnings (verified)
+
+Labels: [AIR-3][AIS-3][AIT-3][BPC-3][W5C-3][PFM-3][SCL-3][RES-3][SEC-3]
+Verification: ./scripts/verify_implementation_status.sh output attached
+```
+
+- [ ] **unimplemented!() count = 0** (currently varies)
 - [ ] **todo!() count = 0** (currently 18)
-- [ ] **SQLite TODOs = 0** (currently 15)
-- [ ] **Mock implementations < 10** (currently 141)
+- [ ] **SQLite TODOs = 0** (currently 18)
+- [ ] **Mock implementations < 10** (currently 143)
 - [ ] **Compilation warnings < 10** (currently 64)
 - [ ] **All workflows passing** with verification enforcement
 

@@ -9,6 +9,36 @@
 - **Priority**: P1 (Critical - System Production Readiness)
 - **AI Prompt Reference**: See `PRD_PRODUCTION_IMPLEMENTATION_AI_PROMPT.md` for detailed AI instructions
 
+## 🚨 STRICT ADHERENCE REQUIREMENTS - NON-NEGOTIABLE
+
+### **ALL WORK REJECTED WITHOUT PROPER ADHERENCE**
+
+**COMMIT RULES ENFORCEMENT**:
+- ✅ **Conventional Commits MANDATORY**: `<type>[scope]: description`
+- ✅ **Labels MANDATORY**: Based on component type (Core: AIR, AIS, AIT, PFM, RES, SCL)
+- ✅ **Evidence MANDATORY**: Verification script output required
+- ✅ **Branch Strategy MANDATORY**: feature/fix branches only, NO direct main pushes
+
+**EXAMPLE COMPLIANT COMMITS**:
+```
+fix(core): remove unused import warnings in HSM modules
+
+Clean up 15 unused import statements across HSM provider implementations
+- Remove unused std::collections imports
+- Clean up test-only imports in production code
+- Organize imports consistently across modules
+
+Labels: [AIR-1][AIS-2][AIT-1][PFM-1][RES-1][SCL-1]
+Verification: cargo check warnings reduced from 64 to 49
+```
+
+**AUTOMATIC REJECTION CRITERIA**:
+- ❌ Non-conventional commit messages
+- ❌ Missing component-appropriate labels  
+- ❌ No verification evidence provided
+- ❌ Direct pushes to main branch
+- ❌ Missing pull request with proper review
+
 ## Executive Summary
 
 🎉 **HISTORIC BREAKTHROUGH ACHIEVED**: Layer 2 protocols (RGB + DLC) represent the first complete implementation of these Bitcoin Layer 2 technologies, with all 20 core functions operational and zero compilation errors.
@@ -278,33 +308,62 @@ pub fn create_did(&self, _identity: &str) -> AnyaResult<String> {
 - [ ] Proper error message formatting
 - [ ] Consistent naming conventions
 
-## Quality Gates
+## Quality Gates - STRICT ADHERENCE REQUIRED
 
-### Completion Criteria
+### **COMMIT COMPLIANCE VALIDATION**
+
+**EVERY COMMIT MUST INCLUDE**:
+```
+<type>(scope): description
+
+Detailed body explaining changes and impact
+
+Labels: [AIR-X][AIS-X][AIT-X][Component-Specific-Labels]
+Verification: cargo check warnings reduced from X to Y
+```
+
+**COMPONENT-BASED LABEL REQUIREMENTS**:
+- **Core/HSM Components**: Must include AIR, AIS, AIT, PFM, RES, SCL
+- **Security Components**: Must include AIR, AIS, AIT, SEC, PFM
+- **Documentation**: Must include AIR, DOC
+- **Testing**: Must include AIR, AIS, AIT, TEST
+
+### Completion Criteria - EVIDENCE REQUIRED
 
 #### Phase 1 Complete When
 
 - [ ] No unused import warnings remain
 - [ ] Unused variables properly handled (prefixed with `_` or removed)
 - [ ] Import statements organized consistently
+- [ ] **Evidence**: `cargo check` output showing warning reduction
+- [ ] **Commits**: Conventional format with appropriate labels
+- [ ] **Pull Request**: Approved by minimum 1 maintainer
 
 #### Phase 2 Complete When
 
 - [ ] All dead code either removed or properly documented
 - [ ] Provider stubs have clear documentation
 - [ ] Configuration fields have usage documentation
+- [ ] **Evidence**: `cargo check` output showing warning reduction
+- [ ] **Documentation**: All `#[allow(dead_code)]` attributes justified
+- [ ] **Pull Request**: Code review confirms intentional design
 
 #### Phase 3 Complete When
 
 - [ ] No deprecated API usage warnings
 - [ ] Modern API patterns used consistently
 - [ ] Code follows current Rust best practices
+- [ ] **Evidence**: `cargo check` output showing warning reduction
+- [ ] **Testing**: All API updates tested
+- [ ] **Security**: Deprecated crypto APIs replaced with SEC-labeled alternatives
 
 #### Phase 4 Complete When
 
 - [ ] All public APIs documented
 - [ ] Code style consistent across modules
 - [ ] Warning count <10 total
+- [ ] **Evidence**: `cargo doc` generates complete documentation
+- [ ] **Verification**: `./scripts/verify_implementation_status.sh` output shows <10 warnings
 
 ### Final Acceptance Criteria
 
