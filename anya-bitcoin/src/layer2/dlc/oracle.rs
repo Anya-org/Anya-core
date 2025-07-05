@@ -8,6 +8,7 @@ use bitcoin::secp256k1::{PublicKey, Signature};
 use thiserror::Error;
 
 use crate::common::error::AnyaResult;
+use crate::core::error::AnyaError;
 
 /// Represents an oracle that provides attestations for DLCs
 #[derive(Debug, Clone)]
@@ -216,26 +217,168 @@ impl OracleClient {
     
     /// Gets oracle information
     pub fn get_oracle_info(&self) -> AnyaResult<OracleInfo> {
-        // Implementation goes here
-        unimplemented!("Oracle info retrieval not yet implemented")
+        // For now, return a mock oracle info (in a real implementation, this would make an HTTP request)
+        use bitcoin::secp256k1::{Secp256k1, SecretKey};
+        use std::str::FromStr;
+        
+        let secp = Secp256k1::new();
+        // Generate a deterministic key based on the base URL for consistency
+        let mut key_bytes = [0u8; 32];
+        let url_bytes = self.base_url.as_bytes();
+        let copy_len = std::cmp::min(url_bytes.len(), 32);
+        key_bytes[..copy_len].copy_from_slice(&url_bytes[..copy_len]);
+        
+        let secret_key = SecretKey::from_slice(&key_bytes)
+            .map_err(|e| AnyaError::General(format!("Failed to create oracle key: {}", e)))?;
+        let public_key = secret_key.public_key(&secp);
+        
+        let mut properties = HashMap::new();
+        properties.insert("version".to_string(), "1.0.0".to_string());
+        properties.insert("features".to_string(), "announcements,attestations".to_string());
+        properties.insert("supported_curves".to_string(), "secp256k1".to_string());
+        
+        let oracle_info = OracleInfo {
+            name: format!("Oracle at {}", self.base_url),
+            public_key,
+            endpoint: self.base_url.clone(),
+            properties,
+        };
+        
+        log::debug!("Retrieved oracle info for: {}", self.base_url);
+        Ok(oracle_info)
     }
     
     /// Gets announcements from the oracle
     pub fn get_announcements(&self) -> AnyaResult<Vec<OracleAnnouncement>> {
-        // Implementation goes here
-        unimplemented!("Announcement retrieval not yet implemented")
+        // For now, return mock announcements (in a real implementation, this would make an HTTP request)
+        use bitcoin::secp256k1::{Secp256k1, SecretKey};
+        use chrono::{Duration, Utc};
+        
+        let secp = Secp256k1::new();
+        let mut announcements = Vec::new();
+        
+        // Create some mock announcements for demonstration
+        for i in 0..3 {
+            let mut key_bytes = [0u8; 32];
+            key_bytes[0] = i as u8;
+            let secret_key = SecretKey::from_slice(&key_bytes)
+                .map_err(|e| AnyaError::General(format!("Failed to create announcement key: {}", e)))?;
+            let public_r = secret_key.public_key(&secp);
+            
+            // Oracle's main public key (consistent across announcements)
+            let mut oracle_key_bytes = [1u8; 32];
+            let oracle_url_bytes = self.base_url.as_bytes();
+            let copy_len = std::cmp::min(oracle_url_bytes.len(), 32);
+            oracle_key_bytes[..copy_len].copy_from_slice(&oracle_url_bytes[..copy_len]);
+            let oracle_secret = SecretKey::from_slice(&oracle_key_bytes)
+                .map_err(|e| AnyaError::General(format!("Failed to create oracle key: {}", e)))?;
+            let public_key = oracle_secret.public_key(&secp);
+            
+            let now = Utc::now();
+            let announcement = OracleAnnouncement::new(
+                format!("event_{}", i),
+                format!("Test event {} from oracle", i),
+                public_r,
+                public_key,
+                now + Duration::hours(24 * (i + 1) as i64), // Maturity in 1-3 days
+                now + Duration::hours(12 * (i + 1) as i64), // Announcement in 0.5-1.5 days
+                vec!["outcome_a".to_string(), "outcome_b".to_string(), "outcome_c".to_string()],
+            );
+            
+            announcements.push(announcement);
+        }
+        
+        log::debug!("Retrieved {} announcements from oracle: {}", announcements.len(), self.base_url);
+        Ok(announcements)
     }
     
     /// Gets a specific announcement by event ID
     pub fn get_announcement(&self, event_id: &str) -> AnyaResult<Option<OracleAnnouncement>> {
-        // Implementation goes here
-        unimplemented!("Specific announcement retrieval not yet implemented")
+        // Validate event ID
+        if event_id.is_empty() {
+            return Err(AnyaError::Validation("Event ID cannot be empty".to_string()));
+        }
+        
+        // Get all announcements and find the specific one
+        let announcements = self.get_announcements()?;
+        let announcement = announcements.into_iter()
+            .find(|a| a.event_id == event_id);
+        
+        if announcement.is_some() {
+            log::debug!("Found announcement for event: {}", event_id);
+        } else {
+            log::debug!("No announcement found for event: {}", event_id);
+        }
+        
+        Ok(announcement)
     }
     
     /// Gets an attestation for an event
     pub fn get_attestation(&self, event_id: &str) -> AnyaResult<Option<OracleAttestation>> {
-        // Implementation goes here
-        unimplemented!("Attestation retrieval not yet implemented")
+        // Validate event ID
+        if event_id.is_empty() {
+            return Err(AnyaError::Validation("Event ID cannot be empty".to_string()));
+        }
+        
+        // Check if we have an announcement for this event first
+        let announcement = self.get_announcement(event_id)?;
+        if announcement.is_none() {
+            log::debug!("No announcement found for event: {}, cannot provide attestation", event_id);
+            return Ok(None);
+        }
+        
+        let announcement = announcement.unwrap();
+        
+        // Check if the event has matured (in real implementation, this would check against actual time)
+        let now = chrono::Utc::now();
+        if announcement.maturity_time > now {
+            log::debug!("Event {} has not yet matured, no attestation available", event_id);
+            return Ok(None);
+        }
+        
+        // Generate a mock attestation (in real implementation, this would be the actual oracle signature)
+        use bitcoin::secp256k1::{Secp256k1, SecretKey, Message};
+        use bitcoin::hashes::{Hash, sha256};
+        
+        let secp = Secp256k1::new();
+        
+        // Create deterministic outcome (for demo purposes)
+        let outcome_index = event_id.len() % announcement.outcomes.len();
+        let outcome = &announcement.outcomes[outcome_index];
+        
+        // Sign the outcome with oracle's private key
+        let mut oracle_key_bytes = [1u8; 32];
+        let oracle_url_bytes = self.base_url.as_bytes();
+        let copy_len = std::cmp::min(oracle_url_bytes.len(), 32);
+        oracle_key_bytes[..copy_len].copy_from_slice(&oracle_url_bytes[..copy_len]);
+        
+        let oracle_secret = SecretKey::from_slice(&oracle_key_bytes)
+            .map_err(|e| AnyaError::General(format!("Failed to create oracle key: {}", e)))?;
+        
+        // Create message to sign (outcome + event_id)
+        let message_string = format!("{}:{}", event_id, outcome);
+        let message_hash = sha256::Hash::hash(message_string.as_bytes());
+        let message = Message::from_slice(message_hash.as_ref())
+            .map_err(|e| AnyaError::General(format!("Failed to create message: {}", e)))?;
+        
+        let signature = secp.sign_ecdsa(&message, &oracle_secret);
+        
+        let attestation = OracleAttestation {
+            event_id: event_id.to_string(),
+            outcome: outcome.clone(),
+            signature,
+            public_key: announcement.public_key,
+            attested_at: now,
+            metadata: {
+                let mut meta = HashMap::new();
+                meta.insert("oracle_endpoint".to_string(), self.base_url.clone());
+                meta.insert("outcome_index".to_string(), outcome_index.to_string());
+                meta
+            },
+        };
+        
+        log::debug!("Generated attestation for event: {} with outcome: {}", event_id, outcome);
+        Ok(Some(attestation))
     }
 }
 

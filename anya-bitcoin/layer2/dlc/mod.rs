@@ -10,6 +10,10 @@ use std::error::Error;
 // This module meets DLC Oracle Integration requirements with non-interactive pattern
 // implementation and comprehensive security measures.
 
+// Module declarations
+pub mod oracle;
+pub mod adaptor;
+
 use bitcoin::{Transaction, TxIn, TxOut, Script, OutPoint, Witness, ScriptBuf, Sequence, Amount, WitnessProgram, WitnessVersion};
 use bitcoin::secp256k1::{Secp256k1, SecretKey, PublicKey, Message};
 use bitcoin::secp256k1::ecdsa::Signature;

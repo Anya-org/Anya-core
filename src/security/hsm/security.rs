@@ -16,7 +16,7 @@ impl fmt::Display for Argon2ErrorWrapper {
 
 impl Error for Argon2ErrorWrapper {}
 
-use crate::security::hsm::{HsmManager, HsmOperation};
+use crate::security::hsm::HsmManager;
 use crate::AnyaResult;
 use bitcoin::{Txid, XOnlyPublicKey};
 use secp256k1::ecdsa::Signature;

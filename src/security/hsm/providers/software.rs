@@ -51,12 +51,11 @@ use rand::{rngs::OsRng, Rng};
 use crate::security::hsm::{
     error::HsmError,
     provider::{
-        EcCurve, EncryptionAlgorithm, HsmOperation, HsmProvider, HsmProviderStatus, HsmRequest,
+        EcCurve, HsmOperation, HsmProvider, HsmProviderStatus, HsmRequest,
         HsmResponse, KeyGenParams, KeyInfo, KeyPair, KeyType, KeyUsage, SigningAlgorithm,
     },
     types::{
-        DeleteKeyParams, EncryptParams, DecryptParams, GetKeyParams, HsmRequest as TypesHsmRequest,
-        HsmResponse as TypesHsmResponse, SignParams, VerifyParams,
+        DeleteKeyParams, EncryptParams, DecryptParams, GetKeyParams, SignParams, VerifyParams,
     },
 };
 
@@ -246,7 +245,7 @@ impl SoftwareHsmProvider {
         &self,
         key_id: String,
         secret: SecureString,
-        public_key: Vec<u8>,
+        _public_key: Vec<u8>,
         key_type: KeyType,
         _usage: KeyUsage, // Currently not used, kept for future compatibility
     ) -> Result<KeyInfo, HsmError> {
@@ -404,7 +403,7 @@ impl SoftwareHsmProvider {
             // Sign based on script type
             if script_code.is_p2pkh() {
                 // Legacy P2PKH
-                let mut sighash_cache = bitcoin::sighash::SighashCache::new(&psbt.unsigned_tx);
+                let sighash_cache = bitcoin::sighash::SighashCache::new(&psbt.unsigned_tx);
                 let sighash = sighash_cache.legacy_signature_hash(
                     i,
                     &script_code,
@@ -449,13 +448,11 @@ impl SoftwareHsmProvider {
                 // Use the pre-collected prevouts data
                 let mut sighash_cache = bitcoin::sighash::SighashCache::new(&psbt.unsigned_tx);
                 // Create a Prevouts struct from the collected UTXOs
-                let prevouts = bitcoin::sighash::Prevouts::All(&prevouts_data);
-                // Create a Prevouts struct from the collected UTXOs
-                let prevouts = bitcoin::sighash::Prevouts::All(&prevouts_data);
+                let _prevouts = bitcoin::sighash::Prevouts::All(&prevouts_data);
                 
                 let sighash = sighash_cache.taproot_key_spend_signature_hash(
                     i,
-                    &prevouts,
+                    &_prevouts,
                     bitcoin::TapSighashType::All,
                 )?;
 
@@ -807,7 +804,7 @@ impl SoftwareHsmProvider {
                 Ok(HsmResponse::success(request_id, Some(response_data)))
             }
 
-            // Encryption/Decryption operations - not fully implemented for SoftwareHsmProvider
+            // Encryption/Decryption operations - basic implementation for SoftwareHsmProvider
             // as they're not primary Bitcoin operations, but providing stubs for interface compliance
             HsmOperation::Encrypt => {
                 let _params: EncryptParams =

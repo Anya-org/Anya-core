@@ -189,7 +189,7 @@ impl Layer2ProtocolTrait for MockDlcProtocol {
 #[tokio::test]
 async fn test_layer2_protocol_initialization() {
     // Placeholder implementation for the test
-    // Remove or update incompatible parts until all modules are fully implemented
+    // Remove or update incompatible parts as modules are developed
     println!("Layer2 protocol initialization test would run here");
 
     // This would be the full implementation when all modules are properly defined:

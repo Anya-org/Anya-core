@@ -4,7 +4,7 @@ use std::collections::HashMap;
 use async_trait::async_trait;
 use base64::Engine;
 use bitcoin::secp256k1::{PublicKey, Secp256k1, SecretKey};
-use bitcoin::{psbt::Psbt, Address, Network, Script, ScriptBuf, CompressedPublicKey};
+use bitcoin::{psbt::Psbt, Address, Network, CompressedPublicKey};
 use chrono::Utc;
 use rand::prelude::*;
 use rand::rngs::OsRng;
@@ -167,7 +167,7 @@ impl SimulatorHsmProvider {
     /// Generate testnet Bitcoin key
     async fn generate_bitcoin_key(
         &self,
-        params: &KeyGenParams,
+        _params: &KeyGenParams,
     ) -> Result<(Vec<u8>, Vec<u8>), HsmError> {
         self.simulate_conditions().await?;
 

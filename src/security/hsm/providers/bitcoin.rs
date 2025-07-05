@@ -9,13 +9,12 @@ use chrono::Utc;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use std::collections::HashMap;
-use std::sync::Arc;
 use tokio::sync::Mutex;
 use tracing::{debug, info};
 use uuid::Uuid;
 
 use bitcoin::{
-    bip32::{ChildNumber, DerivationPath, Xpriv as ExtendedPrivKey, Xpub as ExtendedPubKey},
+    bip32::{DerivationPath, Xpriv as ExtendedPrivKey, Xpub as ExtendedPubKey},
     hashes::{sha256, Hash},
     secp256k1::{ecdsa::Signature, Message, PublicKey as SepcPublicKey, Secp256k1, SecretKey},
     Network,

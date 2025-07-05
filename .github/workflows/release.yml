@@ -1,27 +1,59 @@
-name: Release
+name: Release & Deployment
 
 on:
   push:
-    tags:
-      - 'v*'
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version'
+        required: true
+        type: string
+
+env:
+  RUST_BACKTRACE: 1
 
 jobs:
-  release:
-    name: Create Release
+  pre-release-validation:
+    name: Pre-Release Validation
     runs-on: ubuntu-latest
+    
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
           
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
-        with:
-          components: rustfmt, clippy
+        
+      - name: Pre-release Verification
+        run: |
+          echo "🔍 Running pre-release verification..."
+          chmod +x scripts/verify_implementation_status.sh
+          ./scripts/verify_implementation_status.sh
           
-      - name: Build
-        run: cargo build --release
+          # Strict release requirements
+          UNIMPL_COUNT=$(grep -r "unimplemented!" --include="*.rs" . | wc -l)
+          TODO_COUNT=$(grep -r "todo!" --include="*.rs" . | wc -l)
+          MOCK_COUNT=$(grep -r "MockImpl\|placeholder\|FIXME" --include="*.rs" . | wc -l)
+          
+          echo "Unimplemented functions: $UNIMPL_COUNT"
+          echo "TODO stubs: $TODO_COUNT"
+          echo "Mock implementations: $MOCK_COUNT"
+          
+          # Release gate - no unimplemented functions allowed
+          if [ "$UNIMPL_COUNT" -gt 0 ]; then
+            echo "❌ Cannot release with $UNIMPL_COUNT unimplemented functions"
+            echo "❌ All unimplemented!() macros must be replaced with real code"
+            exit 1
+          fi
+          
+          echo "✅ Pre-release validation passed"
+          
+      - name: Build Release
+        run: |
+          cargo build --release --all-features
+          cargo test --release --all-features
         
       - name: Create Release
         uses: softprops/action-gh-release@v2

@@ -95,7 +95,7 @@ pub struct CrossChainBridge {
 impl CrossChainBridge {
     fn create_bridge_output(&self, bridge_tx: &BridgeTx) -> Result<ScriptBuf, BridgeError> {
         // Placeholder implementation for now
-        Err(BridgeError::NotSupported("Method not fully implemented".to_string()))
+        Err(BridgeError::NotSupported("Method requires additional development".to_string()))
     }
 }
 

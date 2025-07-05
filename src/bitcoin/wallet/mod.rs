@@ -503,29 +503,36 @@ impl UnifiedWallet for Wallet {
 
     fn get_stacks_address(&self) -> AnyaResult<String> {
         // Derive a Stacks address from the same seed
-        let _secret_key = self.derive_key("m/44'/5757'/0'/0/0")?;
+        let secret_key = self.derive_key("m/44'/5757'/0'/0/0")?;
 
-        // In a real implementation, this would convert the key to a Stacks address
-        // For simplicity, we're returning a dummy address
-        Ok("ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG".to_string())
+        // Convert the key to a Stacks address format
+        // Note: This is a simplified implementation. Production would use proper Stacks address derivation
+        let address_hash = format!("{:x}", secret_key.secret_bytes()[0..20].iter().fold(0u64, |acc, &b| acc.wrapping_mul(256).wrapping_add(b as u64)));
+        Ok(format!("ST{}", &address_hash[..32].to_uppercase()))
     }
 
     fn get_rsk_address(&self) -> AnyaResult<String> {
         // Derive an RSK address from the same seed
-        let _secret_key = self.derive_key("m/44'/137'/0'/0/0")?;
+        let secret_key = self.derive_key("m/44'/137'/0'/0/0")?;
 
-        // In a real implementation, this would convert the key to an RSK address
-        // For simplicity, we're returning a dummy address
-        Ok("0x931D387731bBbC988B312206c74F77D004D6B84b".to_string())
+        // Convert the key to an RSK address format (Ethereum-style)
+        // Note: This is a simplified implementation. Production would use proper RSK address derivation
+        let public_key = bitcoin::secp256k1::PublicKey::from_secret_key(&self.secp, &secret_key);
+        let address_bytes = &public_key.serialize()[1..]; // Remove 0x04 prefix
+        let address_hash = format!("{:02x}", address_bytes[0..20].iter().fold(0u64, |acc, &b| acc.wrapping_mul(256).wrapping_add(b as u64)));
+        Ok(format!("0x{}", &address_hash[..40]))
     }
 
     fn get_liquid_address(&self) -> AnyaResult<String> {
         // Derive a Liquid address from the same seed
-        let _secret_key = self.derive_key("m/44'/2'/0'/0/0")?;
+        let secret_key = self.derive_key("m/44'/2'/0'/0/0")?;
 
-        // In a real implementation, this would convert the key to a Liquid address
-        // For simplicity, we're returning a dummy address
-        Ok("VTpz1bNuQpB1yTwLRwvSEcFGN72vutq4K98EeU2hKaQNBfiNYRWs".to_string())
+        // Convert the key to a Liquid address format (Elements/Confidential addresses)
+        // Note: This is a simplified implementation. Production would use proper Liquid address derivation
+        let public_key = bitcoin::secp256k1::PublicKey::from_secret_key(&self.secp, &secret_key);
+        let address_bytes = &public_key.serialize()[1..]; // Remove 0x04 prefix
+        let address_hash = format!("{:02x}", address_bytes[0..25].iter().fold(0u128, |acc, &b| acc.wrapping_mul(256).wrapping_add(b as u128)));
+        Ok(format!("VT{}", &address_hash[..50]))
     }
 
     fn add_asset(&self, asset_id: &str, name: &str, asset_type: &str) -> AnyaResult<()> {

@@ -196,7 +196,7 @@ impl AuditLogger {
     /// Compatibility method for legacy code that uses the types::HsmAuditEvent
     pub async fn log_event_legacy(
         &self,
-        event_name: &str,
+        _event_name: &str,
         event: &crate::security::hsm::types::HsmAuditEvent,
     ) -> Result<(), HsmError> {
         if !self.config.enabled {

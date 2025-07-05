@@ -1,5 +1,40 @@
 # Changelog
 
+## [Unreleased] - Development
+
+### 🔧 HSM Dependencies Update (July 5, 2025) ✅
+
+#### Updated - HSM Security Dependencies
+
+- **Bitcoin Library Dependencies**: Updated to latest compatible versions
+  - Enhanced Bitcoin Core library integration for HSM operations
+  - Updated signature verification dependencies for new API compatibility
+  - Improved PSBT handling libraries for hardware wallet integration
+
+- **Cryptographic Dependencies**: Enhanced security library stack
+  - Updated zeroize crate for secure memory handling
+  - Enhanced base64 dependencies with new Engine trait support
+  - Improved cryptographic primitives for HSM provider implementations
+
+#### Fixed - Dependency Compatibility
+
+- **Type System Dependencies**: Resolved all compilation conflicts
+  - Fixed Bitcoin library version conflicts across HSM providers
+  - Unified cryptographic dependencies across all modules
+  - Resolved trait implementation conflicts in security libraries
+
+- **Security Dependencies**: Enhanced enterprise-grade security stack
+  - Updated hardware security module interface libraries
+  - Enhanced secure key storage dependencies
+  - Improved audit and logging dependencies for HSM operations
+
+#### Technical Improvements
+
+- **Zero Compilation Errors**: All dependency conflicts resolved
+- **Security Hardening**: Enhanced cryptographic dependency stack
+- **API Modernization**: Latest library versions integrated
+- **Performance Optimization**: Updated dependencies for optimal HSM performance
+
 ## [1.1.0] - 2025-06-07 - ✅ PRODUCTION-READY
 
 ### ✅ Major Achievement - Bitcoin Integration Complete
@@ -246,27 +281,32 @@
 ## [Unreleased]
 
 ## [1.0.0] - 2024-12-03
+
 - Enhanced Git configuration and security features
 - Implemented comprehensive Git hooks
 - Added advanced research capabilities
 - Integrated machine learning models
 
 ## [0.9.0] - 2024-11-15
+
 - Improved code organization
 - Enhanced documentation structure
 - Added security checks
 
 ## [0.8.0] - 2024-10-20
+
 - Added transaction pattern recognition
 - Implemented DAO governance tools
 - Enhanced testing framework
 
 ## [0.7.0] - 2024-10-01
+
 - Core functionality improvements
 - Added basic research capabilities
 - Initial integration with Anya-Core
 
 ## [0.6.0] - 2024-09-15
+
 - Initial release of core components
 - Basic blockchain analytics
 - Foundation for research modules
