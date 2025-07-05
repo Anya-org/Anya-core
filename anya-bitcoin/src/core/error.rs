@@ -64,6 +64,18 @@ pub enum AnyaError {
     /// Feature not implemented
     #[error("Not implemented: {0}")]
     NotImplemented(String),
+
+    /// Storage error
+    #[error("Storage error: {0}")]
+    Storage(String),
+
+    /// Serialization error
+    #[error("Serialization error: {0}")]
+    Serialization(String),
+
+    /// Not found error
+    #[error("Not found: {0}")]
+    NotFound(String),
 }
 
 impl From<secp256k1::Error> for AnyaError {
