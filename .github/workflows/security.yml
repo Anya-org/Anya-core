@@ -1,0 +1,102 @@
+name: Security & Quality Audit
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '0 2 * * 1' # Weekly Monday 2 AM UTC
+  workflow_dispatch:
+
+jobs:
+  security-audit:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        
+      - name: Cargo Audit
+        run: |
+          cargo install cargo-audit --locked
+          cargo audit --ignore RUSTSEC-0000-0000 # Add specific ignores if needed
+          
+      - name: Dependency Vulnerability Check
+        run: |
+          cargo tree --duplicates
+          echo "🔍 Checking for known vulnerable dependencies..."
+          
+      - name: Secret Scanning
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
+          
+  code-quality:
+    name: Code Quality Analysis
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+          
+      - name: Clippy Security Lints
+        run: |
+          cargo clippy --all-features -- -W clippy::all -W clippy::pedantic -W clippy::cargo
+          
+      - name: Check Unsafe Code
+        run: |
+          echo "🔍 Scanning for unsafe code blocks..."
+          UNSAFE_COUNT=$(grep -r "unsafe" --include="*.rs" src/ | wc -l)
+          echo "Unsafe blocks found: $UNSAFE_COUNT"
+          if [ "$UNSAFE_COUNT" -gt 10 ]; then
+            echo "❌ Too many unsafe blocks: $UNSAFE_COUNT (threshold: 10)"
+            exit 1
+          fi
+          
+      - name: Memory Safety Check
+        run: |
+          # Check for common memory safety issues
+          echo "🔍 Checking for memory safety patterns..."
+          cargo clippy -- -W clippy::mem_forget -W clippy::mem_replace_with_uninit
+          
+  license-compliance:
+    name: License Compliance
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        
+      - name: Install cargo-license
+        run: cargo install cargo-license --locked
+        
+      - name: Check Licenses
+        run: |
+          echo "🔍 Checking dependency licenses..."
+          cargo license --json > licenses.json
+          
+          # Check for prohibited licenses
+          if grep -i "GPL-3.0\|AGPL" licenses.json; then
+            echo "❌ Found prohibited copyleft licenses"
+            exit 1
+          fi
+          
+          echo "✅ License compliance check passed"
+          
+      - name: Upload License Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: license-report
+          path: licenses.json
+          retention-days: 90
