@@ -176,6 +176,7 @@ pub struct DWNPerformanceConfig {
 **Current Issue**: `Arc<Mutex<HashMap<String, DWNRecord>>>` in `/src/web5/dwn.rs:313`
 
 **Solution**:
+
 ```rust
 // Replace with production storage
 pub struct ProductionDWNManager {
@@ -190,6 +191,7 @@ pub struct ProductionDWNManager {
 **Current Issue**: No encryption implementation
 
 **Solution**:
+
 ```rust
 impl DWNManager {
     pub fn store_encrypted_record(&self, record: DWNRecord, encryption_key: &SecretKey) -> Web5Result<String> {
@@ -205,6 +207,7 @@ impl DWNManager {
 **Current Issue**: Local-only storage
 
 **Solution**:
+
 ```rust
 pub struct DWNSyncEngine {
     pub local_store: DWNManager,
