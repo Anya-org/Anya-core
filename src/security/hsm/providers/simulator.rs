@@ -4,7 +4,7 @@ use std::collections::HashMap;
 use async_trait::async_trait;
 use base64::Engine;
 use bitcoin::secp256k1::{PublicKey, Secp256k1, SecretKey};
-use bitcoin::{psbt::Psbt, Address, Network, Script, ScriptBuf};
+use bitcoin::{psbt::Psbt, Address, Network, Script, ScriptBuf, CompressedPublicKey};
 use chrono::Utc;
 use rand::prelude::*;
 use rand::rngs::OsRng;
@@ -176,9 +176,8 @@ impl SimulatorHsmProvider {
         let public_key = PublicKey::from_secret_key(&self.secp, &secret_key);
 
         // Generate testnet address
-        let address = Address::p2wpkh(&public_key, self.network).map_err(|e| {
-            HsmError::KeyGenerationError(format!("Failed to create testnet address: {}", e))
-        })?;
+        let compressed_key = CompressedPublicKey::from_slice(&public_key.serialize()).unwrap();
+        let address = Address::p2wpkh(&compressed_key, self.network);
 
         tracing::info!("Generated new testnet address: {}", address);
 
@@ -200,16 +199,27 @@ impl SimulatorHsmProvider {
         let secret_key = SecretKey::from_slice(secret_data)
             .map_err(|e| HsmError::SigningError(format!("Invalid key data: {}", e)))?;
 
-        // Sign the transaction for testnet
-        let success = tx.sign(&secret_key, &self.secp);
-        if !success {
-            return Err(HsmError::SigningError(
-                "Failed to sign transaction".to_string(),
-            ));
-        }
+        // Generate public key from secret key
+        let public_key = PublicKey::from_secret_key(&self.secp, &secret_key);
 
-        tracing::info!("Successfully signed testnet transaction");
-        Ok(())
+        // Sign the transaction for testnet
+        let mut signing_keys = std::collections::BTreeMap::new();
+        let bitcoin_public_key = bitcoin::PublicKey::new(public_key);
+        signing_keys.insert(bitcoin_public_key, bitcoin::PrivateKey::new(secret_key, self.network));
+        
+        let result = tx.sign(&signing_keys, &self.secp);
+        match result {
+            Ok(_) => {
+                tracing::info!("Successfully signed testnet transaction");
+                Ok(())
+            }
+            Err((_, errors)) => {
+                tracing::error!("Failed to sign transaction: {:?}", errors);
+                Err(HsmError::SigningError(
+                    "Failed to sign transaction".to_string(),
+                ))
+            }
+        }
     }
 
     /// Get device diagnostics
@@ -255,7 +265,7 @@ impl HsmProvider for SimulatorHsmProvider {
     async fn generate_key(&self, params: KeyGenParams) -> Result<(KeyPair, KeyInfo), HsmError> {
         self.simulate_conditions().await?;
 
-        let key_id = params.id.unwrap_or_else(|| self.generate_key_id());
+        let key_id = params.id.clone().unwrap_or_else(|| self.generate_key_id());
 
         // Generate key pair based on key type with real testnet support
         let (public_key, private_key) = match &params.key_type {
@@ -286,7 +296,7 @@ impl HsmProvider for SimulatorHsmProvider {
         key_data.insert(key_id.clone(), private_key);
 
         let key_pair = KeyPair {
-            id: key_id,
+            id: key_id.clone(),
             key_type: params.key_type,
             public_key,
             private_key_handle: key_id.clone(),

@@ -570,14 +570,14 @@ impl AuditEvent {
         
         // Apply metadata and parameters at the end - avoiding multiple moves
         if !metadata.is_empty() {
-            event = match event.with_metadata(&serde_json::Value::Object(metadata)) {
+            event = match event.clone().with_metadata(&serde_json::Value::Object(metadata)) {
                 Ok(updated_event) => updated_event,
                 Err(_) => event, // Keep original event if metadata application fails
             };
         }
         
         if !params.is_empty() {
-            event = match event.with_parameters(&serde_json::Value::Object(params)) {
+            event = match event.clone().with_parameters(&serde_json::Value::Object(params)) {
                 Ok(updated_event) => updated_event,
                 Err(_) => event, // Keep original event if parameters application fails
             };

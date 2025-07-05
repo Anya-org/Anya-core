@@ -113,7 +113,15 @@ impl Drop for SecureString {
     fn drop(&mut self) {
         // Best effort to zeroize on drop, even though we can't guarantee all clones are gone
         if let Ok(mut data) = self.data.try_lock() {
-            zeroize::Zeroize::zeroize(&mut *data);
+            data.fill(0);
+        }
+    }
+}
+
+impl zeroize::Zeroize for SecureString {
+    fn zeroize(&mut self) {
+        if let Ok(mut data) = self.data.try_lock() {
+            data.zeroize();
         }
     }
 }
@@ -363,6 +371,13 @@ impl SoftwareHsmProvider {
         // Get the public key
         let public_key = bitcoin::secp256k1::PublicKey::from_secret_key(&self.secp, &secret_key);
 
+        // Pre-collect prevouts for Taproot case to avoid borrow conflicts
+        let prevouts_data: Vec<_> = psbt
+            .inputs
+            .iter()
+            .filter_map(|i| i.witness_utxo.clone())
+            .collect();
+        
         // Sign each input in the PSBT
         for (i, input) in psbt.inputs.iter_mut().enumerate() {
             // Skip if already signed
@@ -377,12 +392,10 @@ impl SoftwareHsmProvider {
             } else if let Some(non_wit_utxo) = &input.non_witness_utxo {
                 // Legacy or P2SH-wrapped SegWit
                 let prevout_index = psbt.unsigned_tx.input[i].previous_output.vout as usize;
-                let prevout = &input.non_witness_utxo.as_ref().unwrap().output[prevout_index];
+                let prevout = &non_wit_utxo.output[prevout_index];
                 (
-                    non_wit_utxo.output[prevout.vout as usize]
-                        .script_pubkey
-                        .clone(),
-                    non_wit_utxo.output[prevout.vout as usize].value,
+                    prevout.script_pubkey.clone(),
+                    prevout.value,
                 )
             } else {
                 return Err(HsmError::SigningError("No UTXO provided for input".into()));
@@ -408,10 +421,10 @@ impl SoftwareHsmProvider {
                     bitcoin::PublicKey::new(public_key),
                     bitcoin::ecdsa::Signature::sighash_all(signature),
                 );
-            } else if script_code.is_v0_p2wpkh() {
+            } else if script_code.is_p2wpkh() {
                 // Native SegWit P2WPKH
                 let mut sighash_cache = bitcoin::sighash::SighashCache::new(&psbt.unsigned_tx);
-                let sighash = sighash_cache.segwitv0_signature_hash(
+                let sighash = sighash_cache.p2wpkh_signature_hash(
                     i,
                     &bitcoin::blockdata::script::Builder::new()
                         .push_slice(&bitcoin::PubkeyHash::hash(&public_key.serialize()))
@@ -431,22 +444,18 @@ impl SoftwareHsmProvider {
                     sig.to_vec(),
                     public_key.serialize().to_vec(),
                 ]));
-            } else if script_code.is_v1_p2tr() {
+            } else if script_code.is_p2tr() {
                 // Taproot (BIP 341/342)
-                // For Taproot, use the witness_utxo for each input to construct the prevouts
-                let prevouts: Vec<_> = psbt
-                    .inputs
-                    .iter()
-                    .filter_map(|i| i.witness_utxo.clone())
-                    .collect();
+                // Use the pre-collected prevouts data
                 let mut sighash_cache = bitcoin::sighash::SighashCache::new(&psbt.unsigned_tx);
                 // Create a Prevouts struct from the collected UTXOs
-                let prevouts = bitcoin::sighash::Prevouts::All(&prevouts);
+                let prevouts = bitcoin::sighash::Prevouts::All(&prevouts_data);
+                // Create a Prevouts struct from the collected UTXOs
+                let prevouts = bitcoin::sighash::Prevouts::All(&prevouts_data);
                 
                 let sighash = sighash_cache.taproot_key_spend_signature_hash(
                     i,
                     &prevouts,
-                    None, // No annex
                     bitcoin::TapSighashType::All,
                 )?;
 
@@ -513,7 +522,7 @@ impl SoftwareHsmProvider {
         let key_info = KeyInfo {
             id: key_id.clone(),
             label: Some(key_id.clone()),
-            key_type: params.key_type,
+            key_type: params.key_type.clone(),
             extractable: false,
             usages: vec![KeyUsage::Sign, KeyUsage::Verify],
             created_at: Utc::now(),
@@ -526,7 +535,7 @@ impl SoftwareHsmProvider {
             key_id.clone(),
             secret,
             public_key.clone(),
-            params.key_type,
+            params.key_type.clone(),
             *params.usages.first().unwrap_or(&KeyUsage::Sign),
         ).await?;
 
@@ -562,8 +571,8 @@ impl SoftwareHsmProvider {
         // Perform real signing based on algorithm
         match algorithm {
             SigningAlgorithm::EcdsaSha256 => {
-                let secret_bytes = secret_key.as_bytes();
-                let secret_key = SecretKey::from_slice(&secret_bytes)
+                let secret_bytes = &*secret_key; // secret_key is already Vec<u8>
+                let secret_key = SecretKey::from_slice(secret_bytes)
                     .map_err(|e| HsmError::SigningError(format!("Invalid key data: {}", e)))?;
 
                 // Create message hash
@@ -582,8 +591,8 @@ impl SoftwareHsmProvider {
             SigningAlgorithm::EcdsaSha384 => {
                 // For ECDSA with SHA-384, we need to use the secp256k1 curve
                 // but note that Bitcoin typically uses SHA256d for signatures
-                let secret_bytes = secret_key.as_bytes();
-                let secret_key = SecretKey::from_slice(&secret_bytes)
+                let secret_bytes = &*secret_key; // secret_key is already Vec<u8>
+                let secret_key = SecretKey::from_slice(secret_bytes)
                     .map_err(|e| HsmError::SigningError(format!("Invalid key data: {}", e)))?;
 
                 // Create message hash using SHA-384
@@ -682,7 +691,7 @@ impl SoftwareHsmProvider {
                 curve: EcCurve::Secp256k1,
             } => {
                 let secret_key = key_info.key_data.lock().await;
-                let secret_key = SecretKey::from_slice(secret_key).map_err(|e| {
+                let secret_key = SecretKey::from_slice(&*secret_key).map_err(|e| {
                     HsmError::KeyGenerationError(format!("Invalid key data: {}", e))
                 })?;
                 let public_key = PublicKey::from_secret_key(&self.secp, &secret_key);
@@ -946,10 +955,9 @@ impl HsmProvider for SoftwareHsmProvider {
         match algorithm {
             SigningAlgorithm::EcdsaSha256 => {
                 // Get the private key data securely
-                let secret_bytes = hex::decode(&String::from_utf8_lossy(
-                    key_info.key_data.as_bytes(),
-                ))
-                .map_err(|e| HsmError::InvalidKeyData(format!("Failed to decode key: {}", e)))?;
+                let key_data = key_info.key_data.lock().await;
+                let secret_bytes = hex::decode(&*String::from_utf8_lossy(&key_data))
+                    .map_err(|e| HsmError::InvalidKeyData(format!("Failed to decode key: {}", e)))?;
 
                 let secret_key = SecretKey::from_slice(&secret_bytes)
                     .map_err(|e| HsmError::InvalidKeyData(format!("Invalid secret key: {}", e)))?;
@@ -1039,10 +1047,9 @@ impl HsmProvider for SoftwareHsmProvider {
             KeyType::Ec {
                 curve: EcCurve::Secp256k1,
             } => {
-                let secret_bytes = hex::decode(&String::from_utf8_lossy(
-                    key_info.key_data.as_bytes(),
-                ))
-                .map_err(|e| HsmError::InvalidKeyData(format!("Failed to decode key: {}", e)))?;
+                let key_data = key_info.key_data.lock().await;
+                let secret_bytes = hex::decode(&*String::from_utf8_lossy(&key_data))
+                    .map_err(|e| HsmError::InvalidKeyData(format!("Failed to decode key: {}", e)))?;
 
                 let secret_key = SecretKey::from_slice(&secret_bytes).map_err(|e| {
                     HsmError::KeyGenerationError(format!("Invalid key data: {}", e))
@@ -1104,7 +1111,7 @@ impl HsmProvider for SoftwareHsmProvider {
                     })?;
 
                 let signature = self
-                    .sign(&params.key_id, params.algorithm, &params.data)
+                    .sign(&params.key_name, params.algorithm.into(), &params.data.as_bytes())
                     .await?;
 
                 Ok(HsmResponse::success(
@@ -1122,10 +1129,10 @@ impl HsmProvider for SoftwareHsmProvider {
 
                 let valid = self
                     .verify(
-                        &params.key_id,
-                        params.algorithm,
-                        &params.data,
-                        &params.signature,
+                        &params.key_name,
+                        params.algorithm.into(),
+                        &params.data.as_bytes(),
+                        &params.signature.as_bytes(),
                     )
                     .await?;
 
@@ -1164,7 +1171,7 @@ impl HsmProvider for SoftwareHsmProvider {
                         HsmError::InvalidParameters(format!("Invalid delete key parameters: {}", e))
                     })?;
 
-                self.delete_key(&params.key_id).await?;
+                self.delete_key(&params.key_name).await?;
 
                 Ok(HsmResponse::success(request.id, None))
             }

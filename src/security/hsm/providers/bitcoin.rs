@@ -327,7 +327,7 @@ impl HsmProvider for BitcoinHsmProvider {
             created_at: Utc::now(),
             expires_at: params.expires_at,
             usages: params.usages.clone(),
-            extractable: params.extractable.unwrap_or(false),
+            extractable: params.extractable,
             label: params.label.clone(),
         };
         

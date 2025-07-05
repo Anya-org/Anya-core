@@ -238,6 +238,10 @@ pub async fn create_taproot_asset(
     supply: u64,
 ) -> Result<String, hsm::error::HsmError> {
     // Generate a key for the asset using the correct KeyGenParams structure
+    let mut attributes = std::collections::HashMap::new();
+    attributes.insert("metadata".to_string(), metadata.to_string());
+    attributes.insert("supply".to_string(), supply.to_string());
+    
     let key_params = hsm::provider::KeyGenParams {
         id: Some("asset".to_string()),
         label: Some(format!("Asset key for {}", metadata)),
@@ -245,10 +249,7 @@ pub async fn create_taproot_asset(
         extractable: false,
         usages: vec![hsm::provider::KeyUsage::Sign],
         expires_at: None,
-        attributes: Some(serde_json::json!({
-            "metadata": metadata,
-            "supply": supply
-        })),
+        attributes,
     };
 
     // [AIR-3][AIS-3][BPC-3][RES-3] Generate the key and return its ID

@@ -69,6 +69,14 @@ pub enum HsmError {
     #[error("Provider not found: {0}")]
     ProviderNotFound(String),
 
+    /// Provider not supported
+    #[error("Provider not supported: {0}")]
+    ProviderNotSupported(String),
+
+    /// Invalid data provided
+    #[error("Invalid data: {0}")]
+    InvalidData(String),
+
     /// Permission denied
     #[error("Permission denied: {0}")]
     PermissionDenied(String),
@@ -204,12 +212,23 @@ pub enum HsmError {
     /// Operation not supported
     #[error("Operation not supported: {0}")]
     OperationNotSupported(String),
+
+    /// Invalid key
+    #[error("Invalid key: {0}")]
+    InvalidKey(String),
 }
 
 // Implement From<std::io::Error> since we changed IoError to use String
 impl From<std::io::Error> for HsmError {
     fn from(error: std::io::Error) -> Self {
         HsmError::IoError(error.to_string())
+    }
+}
+
+// Implement From<bitcoin::sighash::P2wpkhError> for HsmError
+impl From<bitcoin::sighash::P2wpkhError> for HsmError {
+    fn from(error: bitcoin::sighash::P2wpkhError) -> Self {
+        HsmError::BitcoinError(format!("P2WPKH sighash error: {}", error))
     }
 }
 

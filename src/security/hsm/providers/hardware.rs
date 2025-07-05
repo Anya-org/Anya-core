@@ -2,6 +2,8 @@ use std::collections::HashMap;
 
 // This follows official Bitcoin Improvement Proposals (BIPs) standards for secure HSM implementation
 use async_trait::async_trait;
+use base64::Engine;
+use std::str::FromStr;
 use tokio::sync::Mutex;
 use uuid::Uuid;
 
@@ -188,16 +190,18 @@ impl HardwareHsmProvider {
         let secret_key = SecretKey::new(&mut rand::thread_rng());
         let public_key = PublicKey::from_secret_key(&self.secp, &secret_key);
 
+        // Convert to CompressedPublicKey for Bitcoin address generation
+        let compressed_pubkey = bitcoin::key::CompressedPublicKey::from_private_key(&self.secp, &bitcoin::PrivateKey::new(secret_key, self.network))
+            .map_err(|e| HsmError::KeyGenerationError(format!("Failed to create compressed public key: {}", e)))?;
+
         // Generate testnet address
-        let address = Address::p2wpkh(&public_key, self.network).map_err(|e| {
-            HsmError::KeyGenerationError(format!("Failed to create testnet address: {}", e))
-        })?;
+        let address = Address::p2wpkh(&compressed_pubkey, self.network);
 
         tracing::info!("Generated new testnet address on hardware: {}", address);
 
         // In a real hardware implementation, we wouldn't have access to the private key material
         // It would remain on the device
-        let key_id = params.id.unwrap_or_else(|| self.generate_key_id());
+        let key_id = params.id.clone().unwrap_or_else(|| self.generate_key_id());
 
         // Store key info but not the private key (hardware keeps it)
         let key_info = KeyInfo {
@@ -270,12 +274,26 @@ impl HsmProvider for HardwareHsmProvider {
         Ok(())
     }
 
-    async fn generate_key(&self, params: KeyGenParams) -> Result<KeyPair, HsmError> {
+    async fn generate_key(&self, params: KeyGenParams) -> Result<(KeyPair, KeyInfo), HsmError> {
         match &params.key_type {
             KeyType::Ec { curve }
                 if *curve == crate::security::hsm::provider::EcCurve::Secp256k1 =>
             {
-                self.generate_bitcoin_key(&params).await
+                let key_pair = self.generate_bitcoin_key(&params).await?;
+                
+                // Create KeyInfo for the generated key
+                let key_info = KeyInfo {
+                    id: params.id.unwrap_or_else(|| self.generate_key_id()),
+                    label: params.label.clone(),
+                    key_type: params.key_type.clone(),
+                    usages: params.usages.clone(),
+                    extractable: params.extractable,
+                    expires_at: params.expires_at,
+                    created_at: chrono::Utc::now(),
+                    attributes: params.attributes.clone(),
+                };
+                
+                Ok((key_pair, key_info))
             }
             _ => Err(HsmError::UnsupportedKeyType),
         }
@@ -433,13 +451,13 @@ impl HsmProvider for HardwareHsmProvider {
 
                 // [AIR-3][AIS-3][BPC-3][RES-3] Sign data using hardware HSM
                 let signature = self
-                    .sign(&params.key_id, params.algorithm, &params.data)
+                    .sign(&params.key_id, params._algorithm, &params.data)
                     .await?;
                 // [AIR-3][AIS-3][BPC-3][RES-3] Use base64 Engine for encoding
                 // This follows official Bitcoin Improvement Proposals (BIPs) standards for secure data handling
                 let response_data = serde_json::to_value(Base64SignatureResponse {
                     signature: base64::engine::general_purpose::STANDARD.encode(&signature),
-                    algorithm: params.algorithm,
+                    _algorithm: params._algorithm,
                 })
                 .map_err(|e| HsmError::SerializationError(e.to_string()))?;
 

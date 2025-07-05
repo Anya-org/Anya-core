@@ -20,6 +20,7 @@ use crate::security::hsm::provider::{
     HsmProvider, KeyGenParams, KeyInfo, KeyPair, SigningAlgorithm,
 };
 use crate::security::hsm::types::{HsmRequest, HsmResponse};
+use crate::security::hsm::provider;
 use uuid::Uuid;
 
 /// PKCS#11 HSM Provider for hardware security devices
@@ -125,7 +126,7 @@ impl HsmProvider for Pkcs11HsmProvider {
         Ok(())
     }
 
-    async fn execute_operation(&self, request: HsmRequest) -> Result<HsmResponse, HsmError> {
+    async fn execute_operation(&self, request: provider::HsmRequest) -> Result<provider::HsmResponse, HsmError> {
         // Just return an unsupported operation error for now
         let request_id = request.id.clone();
         Err(HsmError::UnsupportedOperation(format!(

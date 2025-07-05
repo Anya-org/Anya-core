@@ -84,35 +84,14 @@ impl From<&TypesHsmAuditEvent> for Result<ErrorHsmAuditEvent, crate::security::h
         
         // Add details if available
         if let Some(details) = &event.details {
-            if let Ok(event_with_metadata) = audit_event.with_metadata(&serde_json::json!({ "details": details })) {
+            if let Ok(event_with_metadata) = audit_event.clone().with_metadata(&serde_json::json!({ "details": details })) {
                 audit_event = event_with_metadata;
             }
         }
         
         // Add operation_id if available
         if let Some(op_id) = &event.operation_id {
-            if let Ok(event_with_params) = audit_event.with_parameters(&serde_json::json!({ "operation_id": op_id })) {
-                audit_event = event_with_params;
-            }
-        }
-        
-        Ok(audit_event);
-        let mut audit_event = ErrorHsmAuditEvent::new(
-            event_type,
-            result,
-            severity,
-        );
-        
-        // Add details if available using with_metadata
-        if let Some(details) = &event.details {
-            if let Ok(event_with_metadata) = audit_event.with_metadata(&serde_json::json!({ "details": details })) {
-                audit_event = event_with_metadata;
-            }
-        }
-        
-        // Add operation_id if available using with_parameters
-        if let Some(op_id) = &event.operation_id {
-            if let Ok(event_with_params) = audit_event.with_parameters(&serde_json::json!({ "operation_id": op_id })) {
+            if let Ok(event_with_params) = audit_event.clone().with_parameters(&serde_json::json!({ "operation_id": op_id })) {
                 audit_event = event_with_params;
             }
         }

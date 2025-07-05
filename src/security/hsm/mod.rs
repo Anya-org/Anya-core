@@ -157,6 +157,15 @@ impl HsmManager {
             HsmProviderType::Bitcoin => {
                 Box::new(BitcoinHsmProvider::new(&config.bitcoin).await?)
             }
+            HsmProviderType::Tpm => {
+                return Err(HsmError::ProviderNotSupported("TPM provider not yet implemented".to_string()));
+            }
+            HsmProviderType::Pkcs11 => {
+                return Err(HsmError::ProviderNotSupported("PKCS#11 provider not yet implemented".to_string()));
+            }
+            HsmProviderType::Custom => {
+                return Err(HsmError::ProviderNotSupported("Custom provider not yet implemented".to_string()));
+            }
         };
 
         Ok(Self {
@@ -427,11 +436,11 @@ impl HsmManager {
         
         match self.provider.execute_operation(provider_request).await {
             Ok(result) => {
-                let event = HsmAuditEvent::success(AuditEventType::HsmOperation)
-                    .with_operation_id(operation_id)
+                let event = error::HsmAuditEvent::success(AuditEventType::HsmOperation)
                     .with_metadata(&serde_json::json!({
                         "provider": format!("{:?}", self.config.provider_type),
-                        "action": "EXECUTE_OPERATION_SUCCESS"
+                        "action": "EXECUTE_OPERATION_SUCCESS",
+                        "operation_id": operation_id
                     }))?;
                 self.audit_logger
                     .log_event(
@@ -447,7 +456,13 @@ impl HsmManager {
                         })
                     )
                     .await?;
-                Ok(result)
+                // Convert HsmResponse to OperationResponse
+                let operation_response = OperationResponse {
+                    status: operations::OperationStatus::Success,
+                    data: result.data.map(|v| serde_json::to_vec(&v).unwrap_or_default()),
+                    error: None,
+                };
+                Ok(operation_response)
             }
             Err(err) => {
                 self.audit_logger
@@ -482,7 +497,8 @@ impl HsmManager {
             store_in_hsm: true,
         };
         let result = self.execute(HsmOperation::GenerateKeyPair, params).await?;
-        let key_info: KeyInfo = serde_json::from_value(result.data)
+        let data = result.data.ok_or_else(|| HsmError::InvalidData("No data in response".to_string()))?;
+        let key_info: KeyInfo = serde_json::from_slice(&data)
             .map_err(|e| HsmError::DeserializationError(e.to_string()))?;
         Ok(key_info)
     }
@@ -503,10 +519,13 @@ impl HsmManager {
             algorithm,
         };
         let result = self.execute(HsmOperation::SignData, params).await?;
+        let data = result.data.ok_or_else(|| {
+            HsmError::DeserializationError("No signature data in response".to_string())
+        })?;
+        let signature_str = String::from_utf8(data)
+            .map_err(|e| HsmError::DeserializationError(format!("Invalid UTF-8 in signature: {}", e)))?;
         let signature = BASE64
-            .decode(result.data.as_str().ok_or_else(|| {
-                HsmError::DeserializationError("Expected string for signature".to_string())
-            })?)
+            .decode(signature_str.trim())
             .map_err(|e| HsmError::DeserializationError(e.to_string()))?;
         Ok(signature)
     }
@@ -532,9 +551,15 @@ impl HsmManager {
             algorithm,
         };
         let result = self.execute(HsmOperation::VerifySignature, params).await?;
-        let verified = result.data.as_bool().ok_or_else(|| {
-            HsmError::DeserializationError("Expected boolean for verification result".to_string())
+        let data = result.data.ok_or_else(|| {
+            HsmError::DeserializationError("No verification result in response".to_string())
         })?;
+        // Assume the result is a single byte representing boolean (0 = false, 1 = true)
+        let verified = match data.first() {
+            Some(0) => false,
+            Some(1) => true,
+            _ => return Err(HsmError::DeserializationError("Invalid verification result format".to_string())),
+        };
         Ok(verified)
     }
 
@@ -557,10 +582,14 @@ impl HsmManager {
             algorithm,
         };
         let result = self.execute(HsmOperation::EncryptData, params).await?;
+        let data_bytes = result.data.ok_or_else(|| {
+            HsmError::DeserializationError("No encrypted data in response".to_string())
+        })?;
+        let data_str = String::from_utf8(data_bytes).map_err(|e| {
+            HsmError::DeserializationError(format!("Invalid UTF-8 in encrypted data: {}", e))
+        })?;
         let encrypted = BASE64
-            .decode(result.data.as_str().ok_or_else(|| {
-                HsmError::DeserializationError("Expected string for encrypted data".to_string())
-            })?)
+            .decode(data_str.trim())
             .map_err(|e| HsmError::DeserializationError(e.to_string()))?;
         Ok(encrypted)
     }
@@ -584,10 +613,14 @@ impl HsmManager {
             algorithm,
         };
         let result = self.execute(HsmOperation::DecryptData, params).await?;
+        let data_bytes = result.data.ok_or_else(|| {
+            HsmError::DeserializationError("No decrypted data in response".to_string())
+        })?;
+        let data_str = String::from_utf8(data_bytes).map_err(|e| {
+            HsmError::DeserializationError(format!("Invalid UTF-8 in decrypted data: {}", e))
+        })?;
         let decrypted = BASE64
-            .decode(result.data.as_str().ok_or_else(|| {
-                HsmError::DeserializationError("Expected string for decrypted data".to_string())
-            })?)
+            .decode(data_str.trim())
             .map_err(|e| HsmError::DeserializationError(e.to_string()))?;
         Ok(decrypted)
     }
@@ -606,7 +639,10 @@ impl HsmManager {
             key_name: key_name.to_string(),
         };
         let result = self.execute(HsmOperation::GetKeyInfo, params).await?;
-        let key_info: KeyInfo = serde_json::from_value(result.data)
+        let data_bytes = result.data.ok_or_else(|| {
+            HsmError::DeserializationError("No key info in response".to_string())
+        })?;
+        let key_info: KeyInfo = serde_json::from_slice(&data_bytes)
             .map_err(|e| HsmError::DeserializationError(e.to_string()))?;
         Ok(key_info)
     }
@@ -617,7 +653,10 @@ impl HsmManager {
         }
         debug!("Listing all keys");
         let result = self.execute(HsmOperation::ListKeys, ()).await?;
-        let keys: Vec<KeyInfo> = serde_json::from_value(result.data)
+        let data_bytes = result.data.ok_or_else(|| {
+            HsmError::DeserializationError("No keys data in response".to_string())
+        })?;
+        let keys: Vec<KeyInfo> = serde_json::from_slice(&data_bytes)
             .map_err(|e| HsmError::DeserializationError(e.to_string()))?;
         Ok(keys)
     }
@@ -639,7 +678,7 @@ impl HsmManager {
         start_time: Option<chrono::DateTime<chrono::Utc>>,
         end_time: Option<chrono::DateTime<chrono::Utc>>,
         limit: Option<usize>,
-    ) -> Result<Vec<HsmAuditEvent>, HsmError> {
+    ) -> Result<Vec<crate::security::hsm::error::HsmAuditEvent>, HsmError> {
         if !self.enabled {
             return Err(HsmError::Disabled("HSM is not enabled".to_string()));
         }
@@ -663,7 +702,10 @@ impl HsmManager {
             key_name: key_name.to_string(),
         };
         let result = self.execute(HsmOperation::RotateKey, params).await?;
-        let key_info: KeyInfo = serde_json::from_value(result.data)
+        let data_bytes = result.data.ok_or_else(|| {
+            HsmError::DeserializationError("No key info in response".to_string())
+        })?;
+        let key_info: KeyInfo = serde_json::from_slice(&data_bytes)
             .map_err(|e| HsmError::DeserializationError(e.to_string()))?;
         Ok(key_info)
     }
@@ -778,7 +820,9 @@ impl SecurityManager {
                 .into_script();
             builder = builder.add_leaf(i as u8, script)?;
         }
-        let spend_info = builder.finalize(&secp, internal_key)?;
+        let spend_info = builder.finalize(&secp, internal_key).map_err(|_| {
+            HsmError::InvalidKey("Failed to finalize taproot builder".to_string())
+        })?;
         Ok(spend_info.output_key().to_string())
     }
 
@@ -822,18 +866,17 @@ impl MobileSDK {
         let mut nonce = [0u8; 32];
         rand::thread_rng().fill_bytes(&mut nonce);
 
+        // The SecurityManager doesn't have sign_data, we should use the HSM manager directly
+        // or implement the sign_data method on SecurityManager
         let partial_sig_bytes = self
             .security
-            .sign_data(
-                "repudiation_key",
-                &nonce,
-                SignatureAlgorithm::EcdsaSecp256k1Sha256,
-            )
-            .await?;
+            .sign_repudiation(txid, &nonce)
+            .await?
+            .serialize_compact();
 
         let merkle_proof = self.network.get_merkle_proof(txid).await?;
 
-        let partial_sig = Signature::from_slice(&partial_sig_bytes)?;
+        let partial_sig = Signature::from_compact(&partial_sig_bytes)?;
 
         Ok(RepudiationProof {
             nonce,
