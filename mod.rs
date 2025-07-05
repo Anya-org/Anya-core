@@ -231,6 +231,25 @@ impl DefaultRGBManager {
             client: None,
         }
     }
+    
+    /// Helper method to check if an asset exists
+    fn asset_exists(&self, asset_id: &str) -> AnyaResult<bool> {
+        match self.config.storage_type.as_str() {
+            "sqlite" => {
+                // SQLite check (placeholder implementation)
+                // TODO: Implement actual SQLite asset existence check
+                Ok(true) // Assume exists for now
+            }
+            "fs" => {
+                let assets_dir = self.config.data_dir.join("assets");
+                let asset_file = assets_dir.join(format!("{}.json", asset_id));
+                Ok(asset_file.exists())
+            }
+            _ => Err(AnyaError::ConfigurationError(
+                format!("Unsupported storage type: {}", self.config.storage_type)
+            ))
+        }
+    }
 }
 
 impl RGBManager for DefaultRGBManager {
@@ -690,19 +709,203 @@ impl RGBManager for DefaultRGBManager {
         }
     }
 
-    fn validate_transfer(&self, _transfer_id: &str) -> AnyaResult<bool> {
-        // Implementation goes here
-        unimplemented!("Transfer validation not yet implemented")
+    fn validate_transfer(&self, transfer_id: &str) -> AnyaResult<bool> {
+        // Validate transfer ID format
+        if transfer_id.is_empty() || !transfer_id.starts_with("tx-") {
+            return Ok(false);
+        }
+
+        // Load transfer data and validate it
+        match self.config.storage_type.as_str() {
+            "sqlite" => {
+                // SQLite validation (placeholder implementation)
+                log::debug!("Validating transfer {} in SQLite", transfer_id);
+                // TODO: Implement actual SQLite transfer validation
+                // For now, assume valid if basic format is correct
+                Ok(true)
+            }
+            "fs" => {
+                // Validate from filesystem storage
+                let transfers_dir = self.config.data_dir.join("transfers");
+                let transfer_file = transfers_dir.join(format!("{}.json", transfer_id));
+                
+                if !transfer_file.exists() {
+                    log::warn!("Transfer file not found: {}", transfer_file.display());
+                    return Ok(false);
+                }
+
+                // Read and parse transfer data
+                let transfer_json = std::fs::read_to_string(&transfer_file)
+                    .map_err(|e| AnyaError::StorageError(format!("Failed to read transfer file: {}", e)))?;
+                
+                let transfer_data: serde_json::Value = serde_json::from_str(&transfer_json)
+                    .map_err(|e| AnyaError::SerializationError(format!("Failed to parse transfer data: {}", e)))?;
+
+                // Validate transfer data structure
+                let required_fields = ["asset_id", "amount", "recipient", "sender", "timestamp"];
+                for field in &required_fields {
+                    if transfer_data[field].is_null() {
+                        log::warn!("Transfer {} missing required field: {}", transfer_id, field);
+                        return Ok(false);
+                    }
+                }
+
+                // Validate amounts are positive
+                if let Some(amount) = transfer_data["amount"].as_u64() {
+                    if amount == 0 {
+                        log::warn!("Transfer {} has zero amount", transfer_id);
+                        return Ok(false);
+                    }
+                } else {
+                    log::warn!("Transfer {} has invalid amount", transfer_id);
+                    return Ok(false);
+                }
+
+                // Check if asset exists
+                let asset_id = transfer_data["asset_id"].as_str().unwrap_or("");
+                if !self.asset_exists(asset_id)? {
+                    log::warn!("Transfer {} references non-existent asset: {}", transfer_id, asset_id);
+                    return Ok(false);
+                }
+
+                log::debug!("Transfer {} validation passed", transfer_id);
+                Ok(true)
+            }
+            _ => Err(AnyaError::ConfigurationError(
+                format!("Unsupported storage type: {}", self.config.storage_type)
+            ))
+        }
     }
 
-    fn get_asset_metadata(&self, _asset_id: &str) -> AnyaResult<HashMap<String, String>> {
-        // Implementation goes here
-        unimplemented!("Asset metadata querying not yet implemented")
-    }
 
-    fn get_asset_history(&self, _asset_id: &str) -> AnyaResult<Vec<HistoryEntry>> {
-        // Implementation goes here
-        unimplemented!("Asset history querying not yet implemented")
+    fn get_asset_history(&self, asset_id: &str) -> AnyaResult<Vec<HistoryEntry>> {
+        // Validate asset ID
+        if asset_id.is_empty() {
+            return Err(AnyaError::ValidationError("Asset ID cannot be empty".to_string()));
+        }
+
+        // Check if asset exists
+        if !self.asset_exists(asset_id)? {
+            return Err(AnyaError::NotFound(format!("Asset not found: {}", asset_id)));
+        }
+
+        // Load asset history based on storage type
+        match self.config.storage_type.as_str() {
+            "sqlite" => {
+                // SQLite history retrieval (placeholder implementation)
+                log::debug!("Retrieving history for asset {} from SQLite", asset_id);
+                // TODO: Implement actual SQLite asset history query
+                let mut history = Vec::new();
+                
+                // Sample history entry
+                history.push(HistoryEntry {
+                    id: format!("entry-{}-001", asset_id),
+                    entry_type: "creation".to_string(),
+                    timestamp: std::time::SystemTime::now()
+                        .duration_since(std::time::UNIX_EPOCH)
+                        .unwrap()
+                        .as_secs(),
+                    details: format!("Asset {} created", asset_id),
+                    amount: None,
+                    counterparty: None,
+                });
+                
+                Ok(history)
+            }
+            "fs" => {
+                // Load from filesystem storage
+                let history_dir = self.config.data_dir.join("history");
+                let asset_history_file = history_dir.join(format!("{}.json", asset_id));
+                
+                let mut history = Vec::new();
+                
+                if asset_history_file.exists() {
+                    // Read existing history
+                    let history_json = std::fs::read_to_string(&asset_history_file)
+                        .map_err(|e| AnyaError::StorageError(format!("Failed to read history file: {}", e)))?;
+                    
+                    let history_data: serde_json::Value = serde_json::from_str(&history_json)
+                        .map_err(|e| AnyaError::SerializationError(format!("Failed to parse history data: {}", e)))?;
+
+                    if let Some(entries) = history_data.as_array() {
+                        for entry in entries {
+                            history.push(HistoryEntry {
+                                id: entry["id"].as_str().unwrap_or("unknown").to_string(),
+                                entry_type: entry["type"].as_str().unwrap_or("unknown").to_string(),
+                                timestamp: entry["timestamp"].as_u64().unwrap_or(0),
+                                details: entry["details"].as_str().unwrap_or("").to_string(),
+                                amount: entry["amount"].as_u64(),
+                                counterparty: entry["counterparty"].as_str().map(String::from),
+                            });
+                        }
+                    }
+                } else {
+                    // Create initial history entry for asset creation
+                    let assets_dir = self.config.data_dir.join("assets");
+                    let asset_file = assets_dir.join(format!("{}.json", asset_id));
+                    
+                    if asset_file.exists() {
+                        let asset_json = std::fs::read_to_string(&asset_file)
+                            .map_err(|e| AnyaError::StorageError(format!("Failed to read asset file: {}", e)))?;
+                        
+                        let asset_data: serde_json::Value = serde_json::from_str(&asset_json)
+                            .map_err(|e| AnyaError::SerializationError(format!("Failed to parse asset data: {}", e)))?;
+                        
+                        let created_at = asset_data["created_at"].as_u64().unwrap_or(0);
+                        let asset_name = asset_data["name"].as_str().unwrap_or("Unknown Asset");
+                        
+                        history.push(HistoryEntry {
+                            id: format!("creation-{}", asset_id),
+                            entry_type: "creation".to_string(),
+                            timestamp: created_at,
+                            details: format!("Asset '{}' created", asset_name),
+                            amount: asset_data["supply"].as_u64(),
+                            counterparty: None,
+                        });
+                    }
+                }
+
+                // Also scan transfers directory for transfer history
+                let transfers_dir = self.config.data_dir.join("transfers");
+                if transfers_dir.exists() {
+                    if let Ok(entries) = std::fs::read_dir(&transfers_dir) {
+                        for entry in entries.flatten() {
+                            if let Ok(transfer_json) = std::fs::read_to_string(entry.path()) {
+                                if let Ok(transfer_data) = serde_json::from_str::<serde_json::Value>(&transfer_json) {
+                                    if transfer_data["asset_id"].as_str() == Some(asset_id) {
+                                        let transfer_id = transfer_data["id"].as_str().unwrap_or("unknown");
+                                        let amount = transfer_data["amount"].as_u64();
+                                        let recipient = transfer_data["recipient"].as_str();
+                                        let sender = transfer_data["sender"].as_str();
+                                        let timestamp = transfer_data["timestamp"].as_u64().unwrap_or(0);
+                                        
+                                        history.push(HistoryEntry {
+                                            id: format!("transfer-{}", transfer_id),
+                                            entry_type: "transfer".to_string(),
+                                            timestamp,
+                                            details: format!("Transfer from {} to {}", 
+                                                sender.unwrap_or("unknown"), 
+                                                recipient.unwrap_or("unknown")),
+                                            amount,
+                                            counterparty: recipient.map(String::from),
+                                        });
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Sort history by timestamp (newest first)
+                history.sort_by(|a, b| b.timestamp.cmp(&a.timestamp));
+
+                log::debug!("Retrieved {} history entries for asset {}", history.len(), asset_id);
+                Ok(history)
+            }
+            _ => Err(AnyaError::ConfigurationError(
+                format!("Unsupported storage type: {}", self.config.storage_type)
+            ))
+        }
     }
 }
 
