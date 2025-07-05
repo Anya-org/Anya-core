@@ -333,6 +333,97 @@ generate_report() {
 }
 
 # ========================================================================
+# CANONICAL LABEL VALIDATION - STRICT ENFORCEMENT
+# ========================================================================
+validate_canonical_labels() {
+    echo -e "${BLUE}🏷️  VALIDATING CANONICAL LABELS${NC}"
+    echo "--------------------------------"
+
+    if [ "$MODE" = "--pre-commit" ]; then
+        if [ -f ".git/COMMIT_EDITMSG" ]; then
+            COMMIT_MSG=$(cat .git/COMMIT_EDITMSG)
+        else
+            echo -e "${YELLOW}⚠️  No commit message found (interactive commit)${NC}"
+            return 0
+        fi
+    else
+        COMMIT_MSG=$(git log -1 --pretty=%B)
+    fi
+
+    # Extract labels line
+    LABELS_LINE=$(echo "$COMMIT_MSG" | grep "Labels:" | head -1)
+
+    if [ -z "$LABELS_LINE" ]; then
+        echo -e "${RED}❌ LABEL VALIDATION FAILED: Missing Labels: line${NC}"
+        exit 1
+    fi
+
+    echo "Validating labels: $LABELS_LINE"
+
+    # Define canonical label patterns
+    MANDATORY_CORE="AIR-[123]|AIS-[123]|AIT-[123]"
+    STORAGE_LABELS="STORAGE-[123]|DWN-[123]|IPFS-[123]|BTC-[123]|SEC-[123]"
+    BITCOIN_LABELS="BTC-[123]|L2-[123]|RGB-[123]|DLC-[123]|LN-[123]"
+    WEB5_LABELS="W5-[123]|DID-[123]|VC-[123]"
+    PERFORMANCE_LABELS="PFM-[123]|SCL-[123]|RES-[123]"
+    INFRA_LABELS="CI-[123]|DOC-[123]|TEST-[123]|BUILD-[123]"
+
+    ALL_VALID_LABELS="$MANDATORY_CORE|$STORAGE_LABELS|$BITCOIN_LABELS|$WEB5_LABELS|$PERFORMANCE_LABELS|$INFRA_LABELS"
+
+    # Check mandatory core labels (AIR-X, AIS-X, AIT-X)
+    if ! echo "$LABELS_LINE" | grep -qE "\[AIR-[123]\]"; then
+        echo -e "${RED}❌ LABEL VALIDATION FAILED: Missing mandatory [AIR-X] label${NC}"
+        exit 1
+    fi
+
+    if ! echo "$LABELS_LINE" | grep -qE "\[AIS-[123]\]"; then
+        echo -e "${RED}❌ LABEL VALIDATION FAILED: Missing mandatory [AIS-X] label${NC}"
+        exit 1
+    fi
+
+    if ! echo "$LABELS_LINE" | grep -qE "\[AIT-[123]\]"; then
+        echo -e "${RED}❌ LABEL VALIDATION FAILED: Missing mandatory [AIT-X] label${NC}"
+        exit 1
+    fi
+
+    # Extract all labels from the line
+    LABELS=$(echo "$LABELS_LINE" | grep -oE '\[[A-Z0-9-]+\]' | tr -d '[]')
+
+    # Validate each label format and content
+    for label in $LABELS; do
+        if ! echo "$label" | grep -qE "^($ALL_VALID_LABELS)$"; then
+            echo -e "${RED}❌ LABEL VALIDATION FAILED: Invalid label [$label]${NC}"
+            echo "Valid formats: [CATEGORY-LEVEL] where LEVEL is 1-3"
+            echo "Valid categories: AIR, AIS, AIT, STORAGE, DWN, IPFS, BTC, SEC, L2, RGB, DLC, LN, W5, DID, VC, PFM, SCL, RES, CI, DOC, TEST, BUILD"
+            exit 1
+        fi
+    done
+
+    # Check label format (must be [CATEGORY-LEVEL] with square brackets)
+    if echo "$LABELS_LINE" | grep -qE '\([A-Z0-9-]+\)|\{[A-Z0-9-]+\}'; then
+        echo -e "${RED}❌ LABEL VALIDATION FAILED: Labels must use square brackets [CATEGORY-LEVEL]${NC}"
+        exit 1
+    fi
+
+    # Check for component-specific requirements based on file changes
+    if git diff --cached --name-only 2>/dev/null | grep -qE "(storage|dwn|ipfs)" || git show --name-only --pretty="" HEAD 2>/dev/null | grep -qE "(storage|dwn|ipfs)"; then
+        if ! echo "$LABELS_LINE" | grep -qE "\[(STORAGE|DWN|IPFS)-[123]\]"; then
+            echo -e "${RED}❌ LABEL VALIDATION FAILED: Storage-related changes require STORAGE/DWN/IPFS labels${NC}"
+            exit 1
+        fi
+    fi
+
+    if git diff --cached --name-only 2>/dev/null | grep -qE "(bitcoin|layer2|rgb|dlc)" || git show --name-only --pretty="" HEAD 2>/dev/null | grep -qE "(bitcoin|layer2|rgb|dlc)"; then
+        if ! echo "$LABELS_LINE" | grep -qE "\[(BTC|L2|RGB|DLC)-[123]\]"; then
+            echo -e "${RED}❌ LABEL VALIDATION FAILED: Bitcoin-related changes require BTC/L2/RGB/DLC labels${NC}"
+            exit 1
+        fi
+    fi
+
+    echo -e "${GREEN}✅ All labels are canonical and properly formatted${NC}"
+}
+
+# ========================================================================
 # MAIN EXECUTION
 # ========================================================================
 main() {
@@ -341,6 +432,7 @@ main() {
 
     # Core validations (always run)
     validate_commit_message
+    validate_canonical_labels
     check_compilation
     check_unimplemented_macros
     check_warnings

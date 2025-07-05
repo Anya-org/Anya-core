@@ -1,0 +1,16 @@
+{
+    "id": "WI-2025-07-05-1",
+    "title": "Update PRD with checkin work tracking",
+    "status": "Completed",
+    "component": "documentation",
+    "files_modified": [],
+    "duplication_check": "NotChecked",
+    "source_of_truth_updated": false,
+    "verification_hash": "",
+    "completion_timestamp": null,
+    "evidence_link": "",
+    "dependencies": [],
+    "blockers": [],
+    "created": "2025-07-05T20:19:55Z",
+    "last_updated": "2025-07-05T20:20:51Z"
+}
