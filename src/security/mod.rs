@@ -161,7 +161,7 @@ pub async fn initialize() -> Result<(), Box<dyn std::error::Error>> {
 /// BitcoinHsmProvider configured for Bitcoin operations
 #[cfg(feature = "hsm")]
 pub async fn create_bitcoin_hsm_provider(
-    base_provider: std::sync::Arc<dyn hsm::provider::HsmProvider>,
+    _base_provider: std::sync::Arc<dyn hsm::provider::HsmProvider>,
 ) -> Result<hsm::providers::bitcoin::BitcoinHsmProvider, hsm::error::HsmError> {
     #[cfg(feature = "hsm")]
     let config = hsm::config::BitcoinConfig {
@@ -200,8 +200,8 @@ pub fn create_bitcoin_hsm_provider(
 /// `Ok(true)` if payment is valid, `Ok(false)` if not, `Err` on failure
 #[cfg(feature = "hsm")]
 pub async fn verify_bitcoin_payment(
-    bitcoin_provider: &hsm::providers::bitcoin::BitcoinHsmProvider,
-    proof_data: Vec<u8>,
+    _bitcoin_provider: &hsm::providers::bitcoin::BitcoinHsmProvider,
+    _proof_data: Vec<u8>,
 ) -> Result<bool, hsm::error::HsmError> {
     // This would normally verify an SPV proof
     // For now, it simply returns success as a placeholder
@@ -253,7 +253,7 @@ pub async fn create_taproot_asset(
     };
 
     // [AIR-3][AIS-3][BPC-3][RES-3] Generate the key and return its ID
-    let (key_pair, key_info) = bitcoin_provider.generate_key(key_params).await?;
+    let (key_pair, _key_info) = bitcoin_provider.generate_key(key_params).await?;
     Ok(key_pair.id)
 }
 

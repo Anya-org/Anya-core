@@ -20,7 +20,6 @@ use crate::security::hsm::provider::HsmProviderStatus;
 use crate::security::hsm::provider::{
     HsmProvider, KeyGenParams, KeyInfo, KeyPair, SigningAlgorithm,
 };
-use crate::security::hsm::types::{HsmRequest, HsmResponse};
 use crate::security::hsm::provider;
 use std::collections::HashMap;
 

@@ -19,7 +19,6 @@ use bitcoin::Network;
 use bitcoin::{psbt::Psbt, Address};
 use chrono::Utc;
 use std::sync::Arc;
-use tracing::debug;
 
 /// Hardware connection state
 #[derive(Debug, Clone, PartialEq)]

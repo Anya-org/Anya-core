@@ -14,7 +14,6 @@ use bitcoin::ScriptBuf;
 use serde::{Deserialize, Serialize};
 use std::error::Error;
 use std::sync::Arc;
-use uuid::Uuid;
 use crate::security::hsm::audit::AuditLogger;
 
 pub use providers::{
@@ -55,7 +54,6 @@ pub mod tests;
 
 use base64::{engine::general_purpose::STANDARD as BASE64, Engine as _};
 use bitcoin::bip32::Xpriv;
-use bitcoin::block::Header as BlockHeader;
 use bitcoin::key::Secp256k1;
 use bitcoin::opcodes::all as opcodes;
 use bitcoin::taproot::TaprootBuilder;
@@ -63,7 +61,6 @@ use bitcoin::{Network, Psbt, Script, Txid, XOnlyPublicKey};
 use chrono::{DateTime, Utc};
 use secp256k1::ecdsa::Signature;
 use std::collections::HashMap;
-use std::convert::TryInto;
 use tokio::sync::{Mutex, RwLock};
 use tracing::{debug, error, info};
 
@@ -436,7 +433,7 @@ impl HsmManager {
         
         match self.provider.execute_operation(provider_request).await {
             Ok(result) => {
-                let event = error::HsmAuditEvent::success(AuditEventType::HsmOperation)
+                let _event = error::HsmAuditEvent::success(AuditEventType::HsmOperation)
                     .with_metadata(&serde_json::json!({
                         "provider": format!("{:?}", self.config.provider_type),
                         "action": "EXECUTE_OPERATION_SUCCESS",

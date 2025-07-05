@@ -13,7 +13,6 @@ use crate::security::hsm::provider::HsmProviderStatus;
 use crate::security::hsm::provider::{
     HsmProvider, KeyGenParams, KeyInfo, KeyPair, SigningAlgorithm,
 };
-use crate::security::hsm::types::{HsmRequest, HsmResponse};
 use async_trait::async_trait;
 use std::collections::HashMap;
 use std::sync::Arc;
