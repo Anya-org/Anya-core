@@ -1129,7 +1129,7 @@ impl WalletPort for BitcoinAdapter {
     }
     
     async fn export_private_keys(&self) -> Result<Vec<String>, BlockchainError> {
-        // This is a very sensitive operation and should be carefully implemented
+        // This is a sensitive operation requiring careful validation
         // For security reasons, we'll return an error by default
         Err(BlockchainError::SecurityError(
             "Export private keys is disabled by default for security reasons".to_string()

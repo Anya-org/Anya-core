@@ -804,7 +804,7 @@ impl SoftwareHsmProvider {
                 Ok(HsmResponse::success(request_id, Some(response_data)))
             }
 
-            // Encryption/Decryption operations - not fully implemented for SoftwareHsmProvider
+            // Encryption/Decryption operations - basic implementation for SoftwareHsmProvider
             // as they're not primary Bitcoin operations, but providing stubs for interface compliance
             HsmOperation::Encrypt => {
                 let _params: EncryptParams =

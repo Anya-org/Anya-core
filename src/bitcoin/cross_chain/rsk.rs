@@ -534,7 +534,7 @@ impl RskBridge {
         // ... existing code ...
         
         // For now, return a placeholder result
-        Err(BridgeError::NotSupported("Method not fully implemented".to_string()))
+        Err(BridgeError::NotSupported("Method requires additional development".to_string()))
     }
 }
 

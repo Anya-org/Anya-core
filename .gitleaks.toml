@@ -1,0 +1,98 @@
+# Gitleaks configuration for Anya Core
+# Detects secrets, passwords, and sensitive information
+
+[allowlist]
+description = "Allowlist for test data and documentation"
+paths = [
+    '''(.*?)(jpg|gif|doc|pdf|bin)$''',
+    '''(.*?)\.md$''',  # Documentation files
+    '''tests/.*''',   # Test files
+    '''examples/.*''' # Example files
+]
+
+regexes = [
+    '''219-09-9999''',  # Fake SSN in documentation
+    '''xoxp-FAKE-TOKEN-EXAMPLE-FOR-DOCS''' # Example token pattern in docs
+]
+
+commits = [
+    '''commitsha''',  # Specific commit to ignore
+]
+
+[[rules]]
+id = "generic-api-key"
+description = "Generic API Key"
+regex = '''(?i)(?:key|api|token|secret|password)\s*[:=]\s*['\"]?([a-z0-9]{20,})['\"]?'''
+keywords = ["key", "api", "token", "secret", "password"]
+
+[[rules]]
+id = "bitcoin-private-key"
+description = "Bitcoin Private Key"
+regex = '''[5KL][1-9A-HJ-NP-Za-km-z]{50,51}'''
+keywords = ["bitcoin", "btc", "private"]
+
+[[rules]]
+id = "ethereum-private-key"
+description = "Ethereum Private Key"
+regex = '''0x[a-fA-F0-9]{64}'''
+keywords = ["ethereum", "eth", "private"]
+
+[[rules]]
+id = "aws-access-key"
+description = "AWS Access Key ID"
+regex = '''AKIA[0-9A-Z]{16}'''
+keywords = ["aws", "access"]
+
+[[rules]]
+id = "aws-secret-key"
+description = "AWS Secret Access Key"
+regex = '''[0-9a-zA-Z/+]{40}'''
+keywords = ["aws", "secret"]
+
+[[rules]]
+id = "github-token"
+description = "GitHub Token"
+regex = '''ghp_[0-9a-zA-Z]{36}'''
+keywords = ["github", "token"]
+
+[[rules]]
+id = "slack-token"
+description = "Slack Token"
+regex = '''xox[baprs]-([0-9a-zA-Z]{10,48})?'''
+keywords = ["slack", "token"]
+
+[[rules]]
+id = "generic-password"
+description = "Generic Password"
+regex = '''(?i)password\s*[:=]\s*['\"]?([^'\"\\s]{6,})['\"]?'''
+keywords = ["password"]
+
+[[rules]]
+id = "database-url"
+description = "Database Connection String"
+regex = '''(?i)(?:database|db)_?url\s*[:=]\s*['\"]?([^'\"\\s]+)['\"]?'''
+keywords = ["database", "db_url", "connection"]
+
+[[rules]]
+id = "jwt-token"
+description = "JWT Token"
+regex = '''eyJ[A-Za-z0-9_-]*\.eyJ[A-Za-z0-9_-]*\.[A-Za-z0-9_-]*'''
+keywords = ["jwt", "token"]
+
+[[rules]]
+id = "rsa-private-key"
+description = "RSA Private Key"
+regex = '''-----BEGIN RSA PRIVATE KEY-----'''
+keywords = ["rsa", "private", "key"]
+
+[[rules]]
+id = "ssh-private-key"
+description = "SSH Private Key"
+regex = '''-----BEGIN OPENSSH PRIVATE KEY-----'''
+keywords = ["ssh", "private", "key"]
+
+[[rules]]
+id = "pgp-private-key"
+description = "PGP Private Key"
+regex = '''-----BEGIN PGP PRIVATE KEY BLOCK-----'''
+keywords = ["pgp", "private", "key"]

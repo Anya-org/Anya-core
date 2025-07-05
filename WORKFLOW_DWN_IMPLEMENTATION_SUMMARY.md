@@ -12,6 +12,7 @@
 ### **ALL FUTURE WORK REJECTED WITHOUT COMPLIANCE**
 
 **COMMIT RULES ENFORCEMENT**:
+
 ```
 feat(ci): implement evidence-based workflow consolidation  
 
@@ -25,12 +26,14 @@ Verification: Workflow count reduced from 18 to 4, all CI checks passing
 ```
 
 **BRANCH STRATEGY MANDATORY**:
+
 - ✅ Feature branches: All work via feature/fix branches
 - ✅ Pull requests: Required with maintainer review
 - ✅ CI validation: All workflows must pass before merge
 - ❌ Direct main pushes: Automatically rejected
 
 **LABELING REQUIREMENTS**:
+
 - **CI/CD Components**: Must include AIR, AIS, AIT, CI, PFM, SCL, RES
 - **Documentation**: Must include AIR, DOC
 - **Security**: Must include AIR, AIS, AIT, SEC

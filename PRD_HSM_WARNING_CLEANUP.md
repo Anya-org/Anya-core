@@ -14,12 +14,14 @@
 ### **ALL WORK REJECTED WITHOUT PROPER ADHERENCE**
 
 **COMMIT RULES ENFORCEMENT**:
+
 - ✅ **Conventional Commits MANDATORY**: `<type>[scope]: description`
 - ✅ **Labels MANDATORY**: Based on component type (Core: AIR, AIS, AIT, PFM, RES, SCL)
 - ✅ **Evidence MANDATORY**: Verification script output required
 - ✅ **Branch Strategy MANDATORY**: feature/fix branches only, NO direct main pushes
 
 **EXAMPLE COMPLIANT COMMITS**:
+
 ```
 fix(core): remove unused import warnings in HSM modules
 
@@ -33,6 +35,7 @@ Verification: cargo check warnings reduced from 64 to 49
 ```
 
 **AUTOMATIC REJECTION CRITERIA**:
+
 - ❌ Non-conventional commit messages
 - ❌ Missing component-appropriate labels  
 - ❌ No verification evidence provided
@@ -313,6 +316,7 @@ pub fn create_did(&self, _identity: &str) -> AnyaResult<String> {
 ### **COMMIT COMPLIANCE VALIDATION**
 
 **EVERY COMMIT MUST INCLUDE**:
+
 ```
 <type>(scope): description
 
@@ -323,6 +327,7 @@ Verification: cargo check warnings reduced from X to Y
 ```
 
 **COMPONENT-BASED LABEL REQUIREMENTS**:
+
 - **Core/HSM Components**: Must include AIR, AIS, AIT, PFM, RES, SCL
 - **Security Components**: Must include AIR, AIS, AIT, SEC, PFM
 - **Documentation**: Must include AIR, DOC

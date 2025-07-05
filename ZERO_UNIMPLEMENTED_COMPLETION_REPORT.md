@@ -12,6 +12,7 @@
 ### **ALL FUTURE WORK REJECTED WITHOUT COMPLIANCE**
 
 **COMMIT RULES MANDATORY**:
+
 ```
 feat(bitcoin): implement DLC oracle real cryptography
 
@@ -25,6 +26,7 @@ Verification: unimplemented!() count reduced from 4 to 0 in oracle.rs
 ```
 
 **BRANCH STRATEGY MANDATORY**:
+
 - ✅ Feature branches only: `feature/eliminate-unimplemented-macros`
 - ✅ Pull requests required with maintainer review
 - ✅ CI checks must pass before merge
@@ -186,6 +188,7 @@ grep -r "MockImpl\|placeholder" --include="*.rs" . | wc -l # Mock implementation
 ## 🚀 NEXT ACTIONS - STRICT COMPLIANCE REQUIRED
 
 ### **PRE-WORK VALIDATION CHECKLIST**
+
 - [ ] **Commit format validation**: Conventional Commits format confirmed
 - [ ] **Component labels identified**: Required labels based on component type determined
 - [ ] **Branch strategy**: Proper feature/fix branch created  
@@ -194,6 +197,7 @@ grep -r "MockImpl\|placeholder" --include="*.rs" . | wc -l # Mock implementation
 ### 1. **Focus on Storage Layer** - Replace 18 SQLite TODOs with real database operations
 
 **MANDATORY COMMIT FORMAT**:
+
 ```
 feat(core): implement SQLite connection pooling for DWN storage
 
@@ -209,6 +213,7 @@ Verification: SQLite TODOs reduced from 18 to 12
 ### 2. **Network Layer Integration** - Replace mock implementations with production networking
 
 **MANDATORY COMMIT FORMAT**:
+
 ```
 refactor(bitcoin): replace mock oracle HTTP client with production client
 
@@ -224,6 +229,7 @@ Verification: Mock count reduced from 143 to 128
 ### 3. **Code Quality Improvements** - Reduce compilation warnings from 64 to <10
 
 **MANDATORY COMMIT FORMAT**:
+
 ```
 style(core): remove unused imports in HSM security modules
 
@@ -239,6 +245,7 @@ Verification: cargo check warnings reduced from 64 to 56
 ### 4. **Testing Integration** - Use the new UnifiedTester framework for comprehensive validation
 
 **MANDATORY COMMIT FORMAT**:
+
 ```
 test(core): integrate UnifiedTester for complete system validation
 
@@ -259,6 +266,7 @@ Verification: Test coverage increased and all tests passing
 - ✅ **Command verification** - Automated script validation enforced with commit evidence
 
 **NEXT PHASE REQUIREMENTS**: All future work MUST follow the same strict adherence to:
+
 1. **Conventional Commits** with appropriate component labels
 2. **Feature branch workflow** with pull request reviews  
 3. **Evidence-based progress** with verification script output

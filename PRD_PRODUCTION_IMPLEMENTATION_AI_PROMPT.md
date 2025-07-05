@@ -1,5 +1,35 @@
 # Anya Core Production Implementation: AI Development Prompt
 
+## 🚨 QUALITY GATE ENFORCEMENT - MANDATORY FOR ALL DEVELOPERS
+
+### **AUTO-REJECTION SYSTEM ACTIVE**
+
+**INSTALLATION REQUIRED FOR ALL DEVELOPERS**:
+
+```bash
+# MANDATORY: Install quality gate pre-commit hook
+./scripts/install_hooks.sh
+
+# VERIFICATION: Test the quality gate
+./scripts/quality_gate.sh --full
+```
+
+**AUTOMATIC REJECTION CRITERIA** (Enforced by `quality_gate.sh`):
+
+- ❌ **unimplemented!() macros > 0**: Immediate commit rejection
+- ❌ **Compilation failures**: Automatic CI failure
+- ❌ **Warnings > 10**: Quality gate failure
+- ❌ **Non-conventional commits**: Pre-commit hook rejection
+- ❌ **Missing labels**: Required [AIR-X][AIS-X][AIT-X] labeling
+- ❌ **Aspirational claims**: Must include "Evidence:" or "Verification:"
+- ❌ **Hardcoded secrets**: Gitleaks scanning rejection
+
+**ENFORCEMENT LEVELS**:
+
+- 🔴 **Level 1**: Pre-commit hook (Local blocking)
+- 🔴 **Level 2**: CI pipeline (PR blocking) 
+- 🔴 **Level 3**: Release gate (Main branch protection)
+
 ## 🎯 AI PROMPT HEADER
 
 **Task Type**: Production System Implementation  
@@ -8,22 +38,33 @@
 **Approach**: Incremental, Test-Driven, Documentation-Parallel, Decentralized-First  
 **Timeline**: Evidence-based completion (no aspirational deadlines)
 **Architecture**: Hexagonal, Modular, Enterprise-Grade
-**Enforcement**: Evidence-based implementation with verification script integration
+**Enforcement**: Quality gate script integration with zero-tolerance policy
 
 ## 🚨 STRICT ADHERENCE REQUIREMENTS - NON-NEGOTIABLE
 
-### **COMMIT RULES ENFORCEMENT** - ALL WORK REJECTED IF NOT FOLLOWED
+### **QUALITY GATE SCRIPT ENFORCEMENT** - `./scripts/quality_gate.sh`
 
-**MANDATORY COMMIT FORMAT**:
+**AUTOMATED VALIDATION**:
+
+- 🔍 **Commit message format**: Conventional Commits with required labels
+- 🔍 **Code quality**: Zero unimplemented!() macros allowed
+- 🔍 **Compilation**: Must pass with warnings ≤ 10
+- 🔍 **Security**: No hardcoded secrets or unsafe patterns
+- 🔍 **Documentation**: Evidence-based claims only
+
+**MANDATORY COMMIT FORMAT** (Enforced by pre-commit hook):
+
 ```
 <type>[optional scope]: <description>
 
 [optional body]
 
 Labels: [AIR-X][AIS-X][AIT-X][Component-Specific-Labels]
+Verification: <command output or evidence>
 ```
 
 **EXAMPLE COMPLIANT COMMIT**:
+
 ```
 feat(bitcoin): implement DLC oracle real cryptography
 
@@ -33,18 +74,21 @@ Replace unimplemented!() macros with production secp256k1 operations
 - Add comprehensive error handling
 
 Labels: [AIR-3][AIS-2][AIT-3][BPC-2][PFM-2][SCL-1][RES-2]
+Verification: unimplemented!() count reduced from 4 to 0 in oracle.rs
 ```
 
 **AUTOMATIC REJECTION CRITERIA**:
+
 - ❌ Missing conventional commit format
 - ❌ Missing required labels based on component type
-- ❌ Incorrect label scoring (must match actual implementation level)
-- ❌ Missing scope for multi-component changes
-- ❌ Aspirational claims without verification evidence
+- ❌ Missing verification evidence
+- ❌ Aspirational claims without proof
+- ❌ Code quality violations (detected by quality gate)
 
 ### **REPOSITORY RULES ENFORCEMENT** - ZERO TOLERANCE
 
 **BRANCH STRATEGY - MANDATORY**:
+
 - ✅ **feature/xxx**: All new features must use feature branches
 - ✅ **fix/xxx**: All bug fixes must use fix branches  
 - ✅ **NO DIRECT PUSHES TO MAIN**: All changes via pull requests
@@ -52,6 +96,7 @@ Labels: [AIR-3][AIS-2][AIT-3][BPC-2][PFM-2][SCL-1][RES-2]
 - ✅ **CI CHECKS MUST PASS**: All automated checks mandatory
 
 **PULL REQUEST REQUIREMENTS**:
+
 ```markdown
 ## Pull Request Template - MANDATORY FIELDS
 
@@ -75,21 +120,25 @@ Labels: [AIR-3][AIS-2][AIT-3][BPC-2][PFM-2][SCL-1][RES-2]
 ### **LABELING SYSTEM ENFORCEMENT** - COMPONENT-BASED VALIDATION
 
 **BITCOIN COMPONENTS** - Must include:
+
 - **Core**: AIR, AIS, AIT, BPC (Bitcoin Protocol Compliance)
 - **Performance**: PFM, SCL, RES where applicable
 - **Example**: `Labels: [AIR-3][AIS-2][AIT-3][BPC-2][PFM-2][SCL-1]`
 
 **WEB5 COMPONENTS** - Must include:
+
 - **Core**: AIR, AIS, AIT, W5C (Web5 Compliance), DID
 - **Performance**: PFM, SCL, RES where applicable
 - **Example**: `Labels: [AIR-2][AIS-3][AIT-2][W5C-2][DID-2][PFM-1]`
 
 **ML COMPONENTS** - Must include:
+
 - **Core**: AIR, AIS, AIT, AIM (AI/ML), AIP (AI/Performance), AIE (AI/Ethics)
 - **Performance**: PFM, SCL, RES where applicable
 - **Example**: `Labels: [AIR-3][AIS-2][AIT-3][AIM-3][AIP-2][AIE-1][PFM-2]`
 
 **CORE COMPONENTS** - Must include:
+
 - **All Core**: AIR, AIS, AIT, PFM, RES, SCL
 - **Example**: `Labels: [AIR-3][AIS-3][AIT-3][PFM-3][RES-2][SCL-2]`
 
@@ -361,6 +410,7 @@ fn test_implementation_completeness() {
 ## 📋 **IMPLEMENTATION CHECKLIST** - STRICT COMPLIANCE REQUIRED
 
 ### **PRE-IMPLEMENTATION VALIDATION**
+
 - [ ] **Commit format validated**: Conventional Commits specification followed
 - [ ] **Labels determined**: All required labels identified based on component type  
 - [ ] **Branch created**: Proper feature/fix branch created from main
@@ -369,6 +419,7 @@ fn test_implementation_completeness() {
 ### Phase 1: Complete Layer 2 Protocols (Priority 1)
 
 **COMMIT REQUIREMENTS PER FUNCTION**:
+
 ```
 feat(bitcoin): implement DLC adaptor signature verification
 
@@ -392,6 +443,7 @@ Labels: [AIR-3][AIS-2][AIT-3][BPC-2][PFM-2][SCL-1]
 ### Phase 2: Production Storage Backend (Priority 2)
 
 **COMMIT REQUIREMENTS**:
+
 ```
 feat(core): replace DWN HashMap storage with SQLite backend
 
@@ -416,6 +468,7 @@ Labels: [AIR-3][AIS-3][AIT-3][PFM-3][RES-2][SCL-2][SEC-2]
 ### Phase 3: Network & Performance (Priority 3)
 
 **COMMIT REQUIREMENTS**:
+
 ```
 refactor(bitcoin): replace mock oracle with production HTTP client
 
@@ -440,6 +493,7 @@ Labels: [AIR-2][AIS-3][AIT-2][BPC-2][PFM-2][SCL-1][RES-2]
 ### **FINAL RELEASE GATES** - ALL REQUIRED WITH EVIDENCE
 
 **VERIFICATION COMMANDS**:
+
 ```bash
 # Each gate must be verified with these exact commands
 grep -r "unimplemented!" --include="*.rs" . | wc -l  # Must = 0
@@ -450,6 +504,7 @@ cargo check --all-features 2>&1 | grep "warning:" | wc -l  # Must < 10
 ```
 
 **RELEASE COMMIT REQUIREMENTS**:
+
 ```
 release: v1.0.0 - production ready implementation
 
