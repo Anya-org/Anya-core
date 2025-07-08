@@ -162,7 +162,10 @@ impl LiquidModule {
     }
 
     /// Initiate peg-in from Bitcoin to Liquid
-    pub async fn peg_in(&mut self, request: PegInRequest) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+    pub async fn peg_in(
+        &mut self,
+        request: PegInRequest,
+    ) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
         println!(
             "Initiating peg-in for {} satoshis from Bitcoin tx {}",
             request.amount, request.bitcoin_tx_id
@@ -182,7 +185,10 @@ impl LiquidModule {
     }
 
     /// Initiate peg-out from Liquid to Bitcoin  
-    pub async fn peg_out(&mut self, request: PegOutRequest) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+    pub async fn peg_out(
+        &mut self,
+        request: PegOutRequest,
+    ) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
         println!(
             "Initiating peg-out for {} satoshis to Bitcoin address {}",
             request.amount, request.bitcoin_address
@@ -238,10 +244,7 @@ impl LiquidModule {
         let mut blinding_factors = HashMap::new();
         for (i, _output) in outputs.iter().enumerate() {
             let uuid_str = uuid::Uuid::new_v4().to_string();
-            blinding_factors.insert(
-                format!("output_{i}"),
-                format!("blind_{}", &uuid_str[..16]),
-            );
+            blinding_factors.insert(format!("output_{i}"), format!("blind_{}", &uuid_str[..16]));
         }
 
         let tx_uuid_str = uuid::Uuid::new_v4().to_string();
@@ -282,8 +285,11 @@ impl LiquidModule {
         &self.assets
     }
 
-/// Validate Elements opcodes in script
-    pub fn validate_elements_script(&self, script: &[u8]) -> Result<bool, Box<dyn std::error::Error + Send + Sync>> {
+    /// Validate Elements opcodes in script
+    pub fn validate_elements_script(
+        &self,
+        script: &[u8],
+    ) -> Result<bool, Box<dyn std::error::Error + Send + Sync>> {
         println!("Validating Elements script with {} bytes", script.len());
 
         // Basic script validation (would implement full Elements opcode validation)
@@ -325,24 +331,37 @@ impl LiquidModule {
     }
 
     // Private helper methods
-    fn validate_bitcoin_transaction(&self, _tx_id: &str) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+    fn validate_bitcoin_transaction(
+        &self,
+        _tx_id: &str,
+    ) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         // In production: verify Bitcoin transaction exists and is confirmed
         Ok(())
     }
 
-    fn validate_liquid_balance(&self, _amount: u64) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+    fn validate_liquid_balance(
+        &self,
+        _amount: u64,
+    ) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         // In production: check L-BTC balance
         Ok(())
     }
 
-    fn validate_asset_params(&self, asset: &LiquidAsset) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+    fn validate_asset_params(
+        &self,
+        asset: &LiquidAsset,
+    ) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         if asset.name.is_empty() || asset.ticker.is_empty() {
             return Err("Asset name and ticker cannot be empty".into());
         }
         Ok(())
     }
 
-    fn validate_swap_secret(&self, hash: &str, secret: &str) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+    fn validate_swap_secret(
+        &self,
+        hash: &str,
+        secret: &str,
+    ) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         // In production: validate SHA256(secret) == hash
         if hash.len() != 64 || secret.is_empty() {
             return Err("Invalid secret or hash".into());
@@ -370,13 +389,19 @@ impl Layer2ProtocolTrait for LiquidModule {
     }
 
     /// Submit a transaction to Liquid
-    fn submit_transaction(&self, tx_data: &[u8]) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+    fn submit_transaction(
+        &self,
+        tx_data: &[u8],
+    ) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
         println!("Submitting transaction to Liquid: {} bytes", tx_data.len());
         Ok("liquid_tx_".to_string() + &hex::encode(&tx_data[..8]))
     }
 
     /// Check transaction status
-    fn check_transaction_status(&self, tx_id: &str) -> Result<TransactionStatus, Box<dyn std::error::Error + Send + Sync>> {
+    fn check_transaction_status(
+        &self,
+        tx_id: &str,
+    ) -> Result<TransactionStatus, Box<dyn std::error::Error + Send + Sync>> {
         println!("Checking Liquid transaction status: {tx_id}");
         Ok(TransactionStatus::Confirmed)
     }
@@ -390,13 +415,19 @@ impl Layer2ProtocolTrait for LiquidModule {
     }
 
     /// Issue an asset on Liquid
-    fn issue_asset(&self, params: AssetParams) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+    fn issue_asset(
+        &self,
+        params: AssetParams,
+    ) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
         println!("Issuing asset {} on Liquid", params.name);
         Ok(format!("liquid_asset_{}", params.asset_id))
     }
 
     /// Transfer an asset on Liquid
-    fn transfer_asset(&self, transfer: AssetTransfer) -> Result<TransferResult, Box<dyn std::error::Error + Send + Sync>> {
+    fn transfer_asset(
+        &self,
+        transfer: AssetTransfer,
+    ) -> Result<TransferResult, Box<dyn std::error::Error + Send + Sync>> {
         println!(
             "Transferring {} of asset {} to {} on Liquid",
             transfer.amount, transfer.asset_id, transfer.recipient
@@ -414,7 +445,10 @@ impl Layer2ProtocolTrait for LiquidModule {
     }
 
     /// Verify a proof on Liquid
-    fn verify_proof(&self, proof: Proof) -> Result<VerificationResult, Box<dyn std::error::Error + Send + Sync>> {
+    fn verify_proof(
+        &self,
+        proof: Proof,
+    ) -> Result<VerificationResult, Box<dyn std::error::Error + Send + Sync>> {
         println!("Verifying {} proof on Liquid", proof.proof_type);
 
         Ok(VerificationResult {
@@ -429,7 +463,10 @@ impl Layer2ProtocolTrait for LiquidModule {
     }
 
     /// Validate state on Liquid
-    fn validate_state(&self, state_data: &[u8]) -> Result<ValidationResult, Box<dyn std::error::Error + Send + Sync>> {
+    fn validate_state(
+        &self,
+        state_data: &[u8],
+    ) -> Result<ValidationResult, Box<dyn std::error::Error + Send + Sync>> {
         println!("Validating state on Liquid: {} bytes", state_data.len());
 
         Ok(ValidationResult {
@@ -445,7 +482,7 @@ impl Layer2ProtocolTrait for LiquidModule {
 
 // Import Layer2Protocol trait and helper functions
 use crate::layer2::{
-    Layer2Protocol, create_protocol_state, create_verification_result, create_validation_result
+    create_protocol_state, create_validation_result, create_verification_result, Layer2Protocol,
 };
 use async_trait::async_trait;
 use uuid;
@@ -485,7 +522,10 @@ impl LiquidProtocol {
     }
 
     /// Create liquid asset
-    pub async fn create_asset(&mut self, _params: &str) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+    pub async fn create_asset(
+        &mut self,
+        _params: &str,
+    ) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
         // Stub implementation for asset creation
         let asset_id = format!("asset_{}", Uuid::new_v4());
         Ok(asset_id)
@@ -514,12 +554,18 @@ impl Layer2Protocol for LiquidProtocol {
         Ok(create_protocol_state("1.0", 0, None, true))
     }
 
-    async fn submit_transaction(&self, _tx_data: &[u8]) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+    async fn submit_transaction(
+        &self,
+        _tx_data: &[u8],
+    ) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
         let tx_id = format!("liquid_tx_{}", uuid::Uuid::new_v4());
         Ok(tx_id)
     }
 
-    async fn check_transaction_status(&self, _tx_id: &str) -> Result<TransactionStatus, Box<dyn std::error::Error + Send + Sync>> {
+    async fn check_transaction_status(
+        &self,
+        _tx_id: &str,
+    ) -> Result<TransactionStatus, Box<dyn std::error::Error + Send + Sync>> {
         Ok(TransactionStatus::Confirmed)
     }
 
@@ -528,12 +574,18 @@ impl Layer2Protocol for LiquidProtocol {
         Ok(())
     }
 
-    async fn issue_asset(&self, _params: AssetParams) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+    async fn issue_asset(
+        &self,
+        _params: AssetParams,
+    ) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
         let asset_id = format!("liquid_asset_{}", uuid::Uuid::new_v4());
         Ok(asset_id)
     }
 
-    async fn transfer_asset(&self, _transfer: AssetTransfer) -> Result<TransferResult, Box<dyn std::error::Error + Send + Sync>> {
+    async fn transfer_asset(
+        &self,
+        _transfer: AssetTransfer,
+    ) -> Result<TransferResult, Box<dyn std::error::Error + Send + Sync>> {
         Ok(TransferResult {
             tx_id: format!("liquid_transfer_{}", uuid::Uuid::new_v4()),
             status: TransactionStatus::Pending,
@@ -545,12 +597,18 @@ impl Layer2Protocol for LiquidProtocol {
         })
     }
 
-    async fn verify_proof(&self, _proof: Proof) -> Result<VerificationResult, Box<dyn std::error::Error + Send + Sync>> {
+    async fn verify_proof(
+        &self,
+        _proof: Proof,
+    ) -> Result<VerificationResult, Box<dyn std::error::Error + Send + Sync>> {
         // Liquid proof verification logic
         Ok(create_verification_result(true, None))
     }
 
-    async fn validate_state(&self, _state_data: &[u8]) -> Result<ValidationResult, Box<dyn std::error::Error + Send + Sync>> {
+    async fn validate_state(
+        &self,
+        _state_data: &[u8],
+    ) -> Result<ValidationResult, Box<dyn std::error::Error + Send + Sync>> {
         // Liquid state validation logic
         Ok(create_validation_result(true, vec![]))
     }
@@ -574,14 +632,26 @@ impl Layer2Protocol for LiquidModule {
         <LiquidModule as Layer2ProtocolTrait>::get_state(self)
     }
 
-    async fn submit_transaction(&self, tx_data: &[u8]) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
-        println!("Asynchronously submitting transaction to Liquid: {} bytes", tx_data.len());
+    async fn submit_transaction(
+        &self,
+        tx_data: &[u8],
+    ) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+        println!(
+            "Asynchronously submitting transaction to Liquid: {} bytes",
+            tx_data.len()
+        );
         // Reuse existing sync implementation with logging
         <LiquidModule as Layer2ProtocolTrait>::submit_transaction(self, tx_data)
     }
 
-    async fn check_transaction_status(&self, tx_id: &str) -> Result<TransactionStatus, Box<dyn std::error::Error + Send + Sync>> {
-        println!("Asynchronously checking Liquid transaction status: {}", tx_id);
+    async fn check_transaction_status(
+        &self,
+        tx_id: &str,
+    ) -> Result<TransactionStatus, Box<dyn std::error::Error + Send + Sync>> {
+        println!(
+            "Asynchronously checking Liquid transaction status: {}",
+            tx_id
+        );
         // Reuse existing sync implementation
         <LiquidModule as Layer2ProtocolTrait>::check_transaction_status(self, tx_id)
     }
@@ -592,13 +662,19 @@ impl Layer2Protocol for LiquidModule {
         <LiquidModule as Layer2ProtocolTrait>::sync_state(self)
     }
 
-    async fn issue_asset(&self, params: AssetParams) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+    async fn issue_asset(
+        &self,
+        params: AssetParams,
+    ) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
         println!("Asynchronously issuing asset {} on Liquid", params.name);
         // Reuse existing sync implementation
         <LiquidModule as Layer2ProtocolTrait>::issue_asset(self, params)
     }
 
-    async fn transfer_asset(&self, transfer: AssetTransfer) -> Result<TransferResult, Box<dyn std::error::Error + Send + Sync>> {
+    async fn transfer_asset(
+        &self,
+        transfer: AssetTransfer,
+    ) -> Result<TransferResult, Box<dyn std::error::Error + Send + Sync>> {
         println!(
             "Asynchronously transferring {} of asset {} to {} on Liquid",
             transfer.amount, transfer.asset_id, transfer.recipient
@@ -607,14 +683,26 @@ impl Layer2Protocol for LiquidModule {
         <LiquidModule as Layer2ProtocolTrait>::transfer_asset(self, transfer)
     }
 
-    async fn verify_proof(&self, proof: Proof) -> Result<VerificationResult, Box<dyn std::error::Error + Send + Sync>> {
-        println!("Asynchronously verifying {} proof on Liquid", proof.proof_type);
+    async fn verify_proof(
+        &self,
+        proof: Proof,
+    ) -> Result<VerificationResult, Box<dyn std::error::Error + Send + Sync>> {
+        println!(
+            "Asynchronously verifying {} proof on Liquid",
+            proof.proof_type
+        );
         // Reuse existing sync implementation
         <LiquidModule as Layer2ProtocolTrait>::verify_proof(self, proof)
     }
 
-    async fn validate_state(&self, state_data: &[u8]) -> Result<ValidationResult, Box<dyn std::error::Error + Send + Sync>> {
-        println!("Asynchronously validating state on Liquid: {} bytes", state_data.len());
+    async fn validate_state(
+        &self,
+        state_data: &[u8],
+    ) -> Result<ValidationResult, Box<dyn std::error::Error + Send + Sync>> {
+        println!(
+            "Asynchronously validating state on Liquid: {} bytes",
+            state_data.len()
+        );
         // Reuse existing sync implementation
         <LiquidModule as Layer2ProtocolTrait>::validate_state(self, state_data)
     }

@@ -228,9 +228,7 @@ impl Layer2Manager {
         asset_id: &str,
         amount: u64,
     ) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
-        println!(
-            "Executing cross-layer transfer from {from_protocol:?} to {to_protocol:?}"
-        );
+        println!("Executing cross-layer transfer from {from_protocol:?} to {to_protocol:?}");
 
         let transfer_id = format!(
             "cross_{}_{}_{}_{}",

@@ -241,9 +241,7 @@ impl LightningNetwork {
         capacity: u64,
     ) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
         // In a real implementation, this would create an actual payment channel via LND API
-        println!(
-            "Creating payment channel to {node_id} with capacity {capacity}"
-        );
+        println!("Creating payment channel to {node_id} with capacity {capacity}");
 
         // Generate a channel ID
         let channel_id = format!("chan_{}", uuid::Uuid::new_v4());
