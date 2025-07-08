@@ -332,7 +332,6 @@ impl super::Mempool for MempoolImpl {
 
 #[cfg(test)]
 mod tests {
-    
 
     #[tokio::test]
     async fn test_add_transaction() {

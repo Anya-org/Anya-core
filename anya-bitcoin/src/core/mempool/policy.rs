@@ -75,7 +75,8 @@ pub struct MempoolPolicy {
     max_descendants: RwLock<usize>,
 
     /// Maximum accumulated size of ancestor transactions (bytes)
-    #[allow(dead_code)] // Preserved for compatibility with upstream mempool policy and future upgrades (see docs/INDEX_CORRECTED.md)
+    #[allow(dead_code)]
+    // Preserved for compatibility with upstream mempool policy and future upgrades (see docs/INDEX_CORRECTED.md)
     max_ancestor_size: RwLock<usize>,
 
     /// Whether to allow replacement transactions (RBF)
@@ -273,7 +274,6 @@ impl Default for MempoolPolicy {
 
 #[cfg(test)]
 mod tests {
-    
 
     #[test]
     fn test_dust_detection() {

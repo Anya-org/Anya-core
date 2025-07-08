@@ -132,14 +132,16 @@ pub struct PeerManager {
     /// Maximum outbound connections
     max_outbound: usize,
     /// Connection timeout
-    #[allow(dead_code)] // Preserved for upstream compatibility and future peer management features (see docs/INDEX_CORRECTED.md)
+    #[allow(dead_code)]
+    // Preserved for upstream compatibility and future peer management features (see docs/INDEX_CORRECTED.md)
     connect_timeout: Duration,
     /// Whether we're running on testnet
     is_testnet: bool,
     /// Our local services
     services: ServiceFlags,
     /// Taproot enabled (BIP341)
-    #[allow(dead_code)] // Preserved for Taproot support and future upgrades (see docs/INDEX_CORRECTED.md)
+    #[allow(dead_code)]
+    // Preserved for Taproot support and future upgrades (see docs/INDEX_CORRECTED.md)
     taproot_enabled: bool,
 }
 
@@ -473,7 +475,6 @@ impl PeerManager {
 
 #[cfg(test)]
 mod tests {
-    
 
     #[tokio::test]
     async fn test_peer_connection() {
