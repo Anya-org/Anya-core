@@ -4,7 +4,7 @@ use std::collections::HashMap;
 use async_trait::async_trait;
 use base64::Engine;
 use bitcoin::secp256k1::{PublicKey, Secp256k1, SecretKey};
-use bitcoin::{psbt::Psbt, Address, Network, CompressedPublicKey};
+use bitcoin::{psbt::Psbt, Address, CompressedPublicKey, Network};
 use chrono::Utc;
 use rand::prelude::*;
 use rand::rngs::OsRng;
@@ -205,8 +205,11 @@ impl SimulatorHsmProvider {
         // Sign the transaction for testnet
         let mut signing_keys = std::collections::BTreeMap::new();
         let bitcoin_public_key = bitcoin::PublicKey::new(public_key);
-        signing_keys.insert(bitcoin_public_key, bitcoin::PrivateKey::new(secret_key, self.network));
-        
+        signing_keys.insert(
+            bitcoin_public_key,
+            bitcoin::PrivateKey::new(secret_key, self.network),
+        );
+
         let result = tx.sign(&signing_keys, &self.secp);
         match result {
             Ok(_) => {

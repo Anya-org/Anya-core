@@ -241,11 +241,13 @@ pub async fn create_taproot_asset(
     let mut attributes = std::collections::HashMap::new();
     attributes.insert("metadata".to_string(), metadata.to_string());
     attributes.insert("supply".to_string(), supply.to_string());
-    
+
     let key_params = hsm::provider::KeyGenParams {
         id: Some("asset".to_string()),
         label: Some(format!("Asset key for {}", metadata)),
-        key_type: hsm::provider::KeyType::Ec { curve: hsm::provider::EcCurve::Secp256k1 },
+        key_type: hsm::provider::KeyType::Ec {
+            curve: hsm::provider::EcCurve::Secp256k1,
+        },
         extractable: false,
         usages: vec![hsm::provider::KeyUsage::Sign],
         expires_at: None,

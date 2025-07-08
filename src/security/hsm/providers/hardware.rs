@@ -53,7 +53,7 @@ impl HardwareHsmProvider {
     pub async fn new(
         config: &HardwareConfig,
         network: Network,
-        _audit_logger: Arc<crate::security::hsm::audit::AuditLogger>
+        _audit_logger: Arc<crate::security::hsm::audit::AuditLogger>,
     ) -> Result<Self, HsmError> {
         Ok(Self {
             config: config.clone(),
@@ -190,8 +190,13 @@ impl HardwareHsmProvider {
         let public_key = PublicKey::from_secret_key(&self.secp, &secret_key);
 
         // Convert to CompressedPublicKey for Bitcoin address generation
-        let compressed_pubkey = bitcoin::key::CompressedPublicKey::from_private_key(&self.secp, &bitcoin::PrivateKey::new(secret_key, self.network))
-            .map_err(|e| HsmError::KeyGenerationError(format!("Failed to create compressed public key: {}", e)))?;
+        let compressed_pubkey = bitcoin::key::CompressedPublicKey::from_private_key(
+            &self.secp,
+            &bitcoin::PrivateKey::new(secret_key, self.network),
+        )
+        .map_err(|e| {
+            HsmError::KeyGenerationError(format!("Failed to create compressed public key: {}", e))
+        })?;
 
         // Generate testnet address
         let address = Address::p2wpkh(&compressed_pubkey, self.network);
@@ -279,7 +284,7 @@ impl HsmProvider for HardwareHsmProvider {
                 if *curve == crate::security::hsm::provider::EcCurve::Secp256k1 =>
             {
                 let key_pair = self.generate_bitcoin_key(&params).await?;
-                
+
                 // Create KeyInfo for the generated key
                 let key_info = KeyInfo {
                     id: params.id.unwrap_or_else(|| self.generate_key_id()),
@@ -291,7 +296,7 @@ impl HsmProvider for HardwareHsmProvider {
                     created_at: chrono::Utc::now(),
                     attributes: params.attributes.clone(),
                 };
-                
+
                 Ok((key_pair, key_info))
             }
             _ => Err(HsmError::UnsupportedKeyType),

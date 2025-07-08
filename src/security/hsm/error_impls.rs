@@ -1,8 +1,8 @@
 use crate::security::hsm::error::HsmError;
-use serde_json::Error as JsonError;
 use bitcoin::sighash::{PrevoutsIndexError, TaprootError};
 use bitcoin::taproot::TaprootBuilderError;
 use bitcoin::transaction::InputsIndexError;
+use serde_json::Error as JsonError;
 
 // Don't implement From<std::io::Error> since it already exists
 

@@ -1,6 +1,4 @@
-use crate::security::hsm::error::{
-    AuditEventResult, AuditEventSeverity, AuditEventType, HsmError,
-};
+use crate::security::hsm::error::{AuditEventResult, AuditEventSeverity, AuditEventType, HsmError};
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
@@ -503,8 +501,10 @@ impl AuditEvent {
 
     /// Convert to HsmAuditEvent
     pub fn to_hsm_audit_event(&self) -> crate::security::hsm::error::HsmAuditEvent {
-        use crate::security::hsm::error::{AuditEventType, AuditEventResult, AuditEventSeverity, HsmAuditEvent};
-        
+        use crate::security::hsm::error::{
+            AuditEventResult, AuditEventSeverity, AuditEventType, HsmAuditEvent,
+        };
+
         // Convert the string type to AuditEventType enum
         let event_type = match self.event_type.as_str() {
             "HsmOperation" => AuditEventType::HsmOperation,
@@ -515,7 +515,7 @@ impl AuditEvent {
             "ConfigChange" => AuditEventType::ConfigChange,
             _ => AuditEventType::Custom(self.event_type.clone()),
         };
-        
+
         // Convert the string result to AuditEventResult enum
         let result = match self.result.as_str() {
             "Success" => AuditEventResult::Success,
@@ -526,7 +526,7 @@ impl AuditEvent {
             "Timeout" => AuditEventResult::Timeout,
             _ => AuditEventResult::Unknown,
         };
-        
+
         // Convert the string severity to AuditEventSeverity enum
         let severity = match self.severity.as_str() {
             "Critical" => AuditEventSeverity::Critical,
@@ -536,48 +536,60 @@ impl AuditEvent {
             "Debug" => AuditEventSeverity::Debug,
             _ => AuditEventSeverity::Info,
         };
-        
+
         // Create the base event
         let mut event = HsmAuditEvent::new(event_type, result, severity);
-        
+
         // Build up parameters and metadata for a single call
         let mut metadata = serde_json::Map::new();
         let mut params = serde_json::Map::new();
-        
+
         // Add actor and key_id directly without moving event
         if let Some(actor) = &self.actor {
             event = event.with_user(actor.clone());
         }
-        
+
         if let Some(key_id) = &self.key_id {
             event = event.with_key(key_id.clone());
         }
-        
+
         // Add error to metadata if present
         if let Some(error) = &self.error {
-            metadata.insert("error".to_string(), serde_json::Value::String(error.clone()));
+            metadata.insert(
+                "error".to_string(),
+                serde_json::Value::String(error.clone()),
+            );
         }
-        
+
         // Add all details to metadata
         for (key, value) in &self.details {
             metadata.insert(key.clone(), serde_json::Value::String(value.clone()));
         }
-        
+
         // Add operation_id to parameters if present
         if let Some(operation_id) = &self.operation_id {
-            params.insert("operation_id".to_string(), serde_json::Value::String(operation_id.clone()));
+            params.insert(
+                "operation_id".to_string(),
+                serde_json::Value::String(operation_id.clone()),
+            );
         }
-        
+
         // Apply metadata and parameters at the end - avoiding multiple moves
         if !metadata.is_empty() {
-            event = match event.clone().with_metadata(&serde_json::Value::Object(metadata)) {
+            event = match event
+                .clone()
+                .with_metadata(&serde_json::Value::Object(metadata))
+            {
                 Ok(updated_event) => updated_event,
                 Err(_) => event, // Keep original event if metadata application fails
             };
         }
-        
+
         if !params.is_empty() {
-            event = match event.clone().with_parameters(&serde_json::Value::Object(params)) {
+            event = match event
+                .clone()
+                .with_parameters(&serde_json::Value::Object(params))
+            {
                 Ok(updated_event) => updated_event,
                 Err(_) => event, // Keep original event if parameters application fails
             };

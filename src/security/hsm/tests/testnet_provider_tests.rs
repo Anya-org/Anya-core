@@ -7,7 +7,7 @@ use std::sync::Arc;
 #[cfg(test)]
 mod tests {
     use std::collections::HashMap;
-    
+
     use crate::security::hsm::config::{
         HardwareConfig, HardwareDeviceType, HsmConfig, SimulatorConfig,
     };
@@ -22,11 +22,10 @@ mod tests {
 
     // Mock audit logger for testing
     #[cfg(feature = "audit_logger")]
-    
     #[cfg(not(feature = "audit_logger"))]
     #[derive(Clone)]
     struct AuditLogger;
-    
+
     #[cfg(not(feature = "audit_logger"))]
     impl AuditLogger {
         fn new(_path: &str) -> Result<Self, Box<dyn std::error::Error>> {
@@ -38,7 +37,7 @@ mod tests {
     #[ignore = "Requires AuditLogger implementation"]
     async fn test_software_provider_bitcoin_testnet() {
         println!("Testing software provider for Bitcoin testnet");
-        
+
         // Test implementation goes here - commented out until AuditLogger is available
         // let provider = SoftwareHsmProvider::new(...);
         // provider.initialize().await.unwrap();
@@ -116,7 +115,7 @@ mod tests {
     #[ignore = "Requires AuditLogger implementation and hardware device"]
     async fn test_hardware_provider_bitcoin_testnet() {
         println!("Hardware provider test requires AuditLogger implementation");
-        
+
         // Test implementation - enabled with feature flag
         #[cfg(feature = "audit_logger")]
         {

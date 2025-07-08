@@ -16,11 +16,11 @@ use uuid::Uuid;
 // [AIR-3][AIS-3][BPC-3][RES-3] Import HSM module types following BDF v2.5 standards
 use crate::security::hsm::audit::AuditLogger;
 use crate::security::hsm::error::HsmError;
+use crate::security::hsm::provider;
 use crate::security::hsm::provider::HsmProviderStatus;
 use crate::security::hsm::provider::{
     HsmProvider, KeyGenParams, KeyInfo, KeyPair, SigningAlgorithm,
 };
-use crate::security::hsm::provider;
 use std::collections::HashMap;
 
 /// Configuration for Ledger devices
@@ -67,12 +67,14 @@ impl LedgerHsmProvider {
 impl HsmProvider for LedgerHsmProvider {
     async fn initialize(&self) -> Result<(), HsmError> {
         // In a real implementation, this would initialize the connection to the Ledger device
-        self.audit_logger.log(
-            crate::security::hsm::error::AuditEventType::Initialization,
-            crate::security::hsm::error::AuditEventResult::Success,
-            crate::security::hsm::error::AuditEventSeverity::Info,
-            "Ledger provider initialized (stub implementation)",
-        ).await?;
+        self.audit_logger
+            .log(
+                crate::security::hsm::error::AuditEventType::Initialization,
+                crate::security::hsm::error::AuditEventResult::Success,
+                crate::security::hsm::error::AuditEventSeverity::Info,
+                "Ledger provider initialized (stub implementation)",
+            )
+            .await?;
 
         Ok(())
     }
@@ -142,7 +144,10 @@ impl HsmProvider for LedgerHsmProvider {
         Ok(())
     }
 
-    async fn execute_operation(&self, request: provider::HsmRequest) -> Result<provider::HsmResponse, HsmError> {
+    async fn execute_operation(
+        &self,
+        request: provider::HsmRequest,
+    ) -> Result<provider::HsmResponse, HsmError> {
         // Just return an unsupported operation error for now
         let request_id = request.id.clone();
         Err(HsmError::UnsupportedOperation(format!(
