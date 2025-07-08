@@ -1,17 +1,17 @@
 // [AIR-3][AIS-3][BPC-3][AIT-3] BIP353 DNS Resolver Implementation
 
+use hickory_resolver::{
+    config::{ResolverConfig, ResolverOpts},
+    error::ResolveError,
+    proto::rr::Name,
+    TokioAsyncResolver,
+};
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use thiserror::Error;
 use tokio::time::timeout;
 use tracing::{debug, error};
-use trust_dns_resolver::{
-    config::{ResolverConfig, ResolverOpts},
-    error::ResolveError,
-    proto::rr::Name,
-    TokioAsyncResolver,
-};
 
 // BIP353 record format: _bitcoin._wallet.example.org
 const BITCOIN_SERVICE: &str = "_bitcoin";
@@ -65,7 +65,7 @@ impl DnsResolver {
         let mut opts = ResolverOpts::default();
         opts.validate = validate_dnssec;
 
-        // TokioAsyncResolver::tokio returns the resolver directly, not a Result
+        // TokioAsyncResolver::tokio returns the resolver directly in hickory-resolver
         let resolver = TokioAsyncResolver::tokio(ResolverConfig::default(), opts);
 
         Ok(Self {
@@ -195,7 +195,7 @@ impl DnsResolver {
             let mut opts = ResolverOpts::default();
             opts.validate = validate_dnssec;
 
-            // TokioAsyncResolver::tokio returns the resolver directly, not a Result
+            // TokioAsyncResolver::tokio returns the resolver directly in hickory-resolver
             let resolver = TokioAsyncResolver::tokio(ResolverConfig::default(), opts);
 
             self.resolver = resolver;
@@ -216,7 +216,9 @@ pub fn parse_payment_instruction(txt_record: &str) -> Option<String> {
     // According to BIP353, the format should be:
     // bitcoin=<payment-instruction>
 
-    txt_record.strip_prefix("bitcoin=").map(|value| value.to_string())
+    txt_record
+        .strip_prefix("bitcoin=")
+        .map(|value| value.to_string())
 }
 
 impl From<ResolveError> for DnsResolverError {

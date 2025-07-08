@@ -84,9 +84,8 @@ impl MLSystem {
         // Create model directory if it doesn't exist
         if let Some(path) = &config.model_path {
             if !Path::new(path).exists() {
-                std::fs::create_dir_all(path).map_err(|e| {
-                    AnyaError::ML(format!("Failed to create model directory: {e}"))
-                })?;
+                std::fs::create_dir_all(path)
+                    .map_err(|e| AnyaError::ML(format!("Failed to create model directory: {e}")))?;
             }
         }
 

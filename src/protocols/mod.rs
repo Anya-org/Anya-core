@@ -138,7 +138,7 @@ pub struct ProtocolConfig {
     pub network: bitcoin::Network,
     #[cfg(not(feature = "rust-bitcoin"))]
     pub network: String, // fallback to string representation
-    // Add more configuration fields as needed
+                         // Add more configuration fields as needed
 }
 
 impl Default for ProtocolConfig {
@@ -162,12 +162,12 @@ pub struct ProtocolManager {
     segwit_verifier: SegwitValidator,
     #[allow(dead_code)]
     taproot_engine: TaprootEngine,
-    
+
     // Lightning Protocols (commented out until lightning dependency is available)
     // ldk_node: LdkNode,
     #[allow(dead_code)]
     bolt_processor: BoltProtocolHandler,
-    
+
     // Cross-chain Protocols
     #[allow(dead_code)]
     spv_verifier: SpvCrossChainVerifier,
@@ -187,7 +187,7 @@ impl ProtocolManager {
             sidechain_bridge: SidechainBridge::new(),
         })
     }
-    
+
     pub fn with_defaults() -> Result<Self> {
         Self::new(ProtocolConfig::default())
     }

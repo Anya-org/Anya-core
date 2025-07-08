@@ -207,11 +207,7 @@ impl BetaAccessManager {
 
         let message = match Message::from_digest_slice(&message_hash) {
             Ok(msg) => msg,
-            Err(e) => {
-                return Err(BetaAccessError::AuthError(format!(
-                    "Invalid message: {e}"
-                )))
-            }
+            Err(e) => return Err(BetaAccessError::AuthError(format!("Invalid message: {e}"))),
         };
 
         // Parse public key and signature

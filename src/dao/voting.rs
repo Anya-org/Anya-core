@@ -85,10 +85,7 @@ impl QuadraticVoting {
         }
 
         // Get or create proposal votes
-        let proposal_votes = self
-            .votes
-            .entry(vote.proposal_id.clone())
-            .or_default();
+        let proposal_votes = self.votes.entry(vote.proposal_id.clone()).or_default();
 
         // Store the vote
         proposal_votes.insert(vote.voter.clone(), vote);

@@ -336,9 +336,7 @@ impl PerformanceTestable for DatabaseAccessTest {
         parameters.insert("value_size".to_string(), test.value_size.to_string());
 
         // Warmup
-        println!(
-            "Warming up database for {warmup_iterations} iterations..."
-        );
+        println!("Warming up database for {warmup_iterations} iterations...");
         // Populate some data for reads/updates/deletes
         for _ in 0..warmup_iterations / 10 {
             let key = test.random_key();

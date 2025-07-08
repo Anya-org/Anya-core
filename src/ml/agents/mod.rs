@@ -391,17 +391,17 @@ impl AgentSystem {
             let agents = self.agents.read().map_err(|_| {
                 AgentError::InternalError("Failed to acquire read lock on agents".to_string())
             })?;
-            
+
             let agent = agents
                 .get(agent_id)
                 .ok_or_else(|| AgentError::ProcessingError(format!("Agent {agent_id} not found")))?
                 .clone();
-                
+
             // Get config value
             let config = self.config.read().map_err(|_| {
                 AgentError::InternalError("Failed to acquire read lock on config".to_string())
             })?;
-            
+
             (agent, config.enforce_read_first)
         };
 
@@ -473,7 +473,7 @@ impl AgentSystem {
                 Ok(agents) => agents,
                 Err(_) => return HashMap::new(),
             };
-            
+
             // Collect agent IDs to process after releasing the lock
             agents.keys().cloned().collect::<Vec<_>>()
         };
@@ -481,7 +481,9 @@ impl AgentSystem {
         let mut results = HashMap::new();
 
         for agent_id in agent_ids {
-            let result = self.process_with_agent(&agent_id, observation.clone()).await;
+            let result = self
+                .process_with_agent(&agent_id, observation.clone())
+                .await;
             results.insert(agent_id, result);
         }
 

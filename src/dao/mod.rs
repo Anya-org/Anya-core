@@ -164,9 +164,7 @@ impl DAOManager {
         amount: u64,
     ) -> Result<(), Box<dyn Error>> {
         let proposal = self.proposals.get_mut(proposal_id).ok_or_else(|| {
-            Box::new(AnyaError::DAO(format!(
-                "Proposal not found: {proposal_id}"
-            )))
+            Box::new(AnyaError::DAO(format!("Proposal not found: {proposal_id}")))
         })?;
 
         if proposal.status != ProposalStatus::Active {
@@ -190,9 +188,7 @@ impl DAOManager {
     /// Get a proposal by ID
     pub fn get_proposal(&self, proposal_id: &str) -> Result<Proposal, Box<dyn Error>> {
         Ok(self.proposals.get(proposal_id).cloned().ok_or_else(|| {
-            Box::new(AnyaError::DAO(format!(
-                "Proposal not found: {proposal_id}"
-            )))
+            Box::new(AnyaError::DAO(format!("Proposal not found: {proposal_id}")))
         })?)
     }
 
@@ -204,9 +200,7 @@ impl DAOManager {
     /// Execute a proposal
     pub fn execute_proposal(&mut self, proposal_id: &str) -> Result<(), Box<dyn Error>> {
         let proposal = self.proposals.get_mut(proposal_id).ok_or_else(|| {
-            Box::new(AnyaError::DAO(format!(
-                "Proposal not found: {proposal_id}"
-            )))
+            Box::new(AnyaError::DAO(format!("Proposal not found: {proposal_id}")))
         })?;
 
         if proposal.status != ProposalStatus::Active {

@@ -1,14 +1,14 @@
 // [AIR-3][AIS-3][BPC-3][AIT-3] BIP353 DNS Payment Instructions implementation
 // Based on BIP353: https://github.com/bitcoin/bips/blob/master/bip-0353.mediawiki
 
+use hickory_resolver::config::{ResolverConfig, ResolverOpts};
+use hickory_resolver::Resolver;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::error::Error;
 use std::fmt;
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
-use trust_dns_resolver::config::{ResolverConfig, ResolverOpts};
-use trust_dns_resolver::Resolver;
 
 // Use the core config type instead
 
@@ -49,8 +49,7 @@ pub struct Bip353Config {
 }
 
 /// Beta features configuration
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[derive(Default)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct BetaFeatures {
     /// Support for non-ASCII identifiers (punycode)
     pub non_ascii_identifiers: bool,
@@ -61,7 +60,6 @@ pub struct BetaFeatures {
     /// Enhanced privacy routing
     pub enhanced_privacy: bool,
 }
-
 
 impl Default for Bip353Config {
     fn default() -> Self {
@@ -195,8 +193,7 @@ impl Bip353 {
         let domain = parts[1].to_string();
 
         // Check for non-ASCII identifiers
-        let has_non_ascii =
-            !user.is_ascii() || !domain.is_ascii();
+        let has_non_ascii = !user.is_ascii() || !domain.is_ascii();
         if has_non_ascii && !self.is_feature_enabled("non_ascii_identifiers") {
             return Err(Bip353Error::FeatureNotEnabled(
                 "Non-ASCII identifiers not enabled".to_string(),

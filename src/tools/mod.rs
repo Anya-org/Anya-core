@@ -12,7 +12,6 @@ pub mod source_of_truth_registry;
 pub use commit_tracker::{update_ai_labelling_file, CommitInfo};
 pub use markdown::{DocError, DocumentationValidator};
 pub use source_of_truth_registry::{
-    SourceOfTruthRegistry, WorkItem, WorkStatus, DuplicationCheckStatus,
-    CanonicalDocument, CanonicalStatus, SourceOfTruthError,
-    initialize_global_registry, get_global_registry,
+    get_global_registry, initialize_global_registry, CanonicalDocument, CanonicalStatus,
+    DuplicationCheckStatus, SourceOfTruthError, SourceOfTruthRegistry, WorkItem, WorkStatus,
 };

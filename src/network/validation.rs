@@ -1,3 +1,5 @@
+use hickory_resolver::config::{NameServerConfig, Protocol, ResolverConfig, ResolverOpts};
+use hickory_resolver::Resolver;
 use log::info;
 use serde::{Deserialize, Serialize};
 use std::net::{IpAddr, SocketAddr};
@@ -5,8 +7,6 @@ use std::process::Command;
 use std::time::{Duration, Instant};
 use tokio::net::TcpStream;
 use tokio::time::timeout;
-use trust_dns_resolver::config::{NameServerConfig, Protocol, ResolverConfig, ResolverOpts};
-use trust_dns_resolver::Resolver;
 
 /// Network validation configuration
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -298,7 +298,10 @@ impl NetworkValidator {
                 return false;
             }
             let addr = format!("{host}:{port}");
-            matches!(timeout(Duration::from_secs(5), TcpStream::connect(&addr)).await, Ok(Ok(_)))
+            matches!(
+                timeout(Duration::from_secs(5), TcpStream::connect(&addr)).await,
+                Ok(Ok(_))
+            )
         } else {
             false
         }
@@ -524,7 +527,10 @@ impl NetworkValidator {
 
     async fn is_port_open(&self, host: &str, port: u16) -> bool {
         let addr = format!("{host}:{port}");
-        matches!(timeout(Duration::from_secs(3), TcpStream::connect(&addr)).await, Ok(Ok(_)))
+        matches!(
+            timeout(Duration::from_secs(3), TcpStream::connect(&addr)).await,
+            Ok(Ok(_))
+        )
     }
 
     async fn validate_ssl(&self) -> SslValidationResult {
@@ -721,9 +727,7 @@ impl NetworkValidator {
 
         #[cfg(any(target_os = "linux", target_os = "macos"))]
         {
-            let output = Command::new("traceroute")
-                .args(["-m", "15", host])
-                .output();
+            let output = Command::new("traceroute").args(["-m", "15", host]).output();
 
             if let Ok(output) = output {
                 let stdout = String::from_utf8_lossy(&output.stdout);
@@ -815,15 +819,27 @@ impl NetworkValidator {
         let mut recommendations = Vec::new();
 
         if !results.connectivity.internet_available {
-            recommendations.push("Check your internet connection, it appears to be offline".to_string());
-        } else if !results.connectivity.endpoints_reachable.iter().all(|(_, reachable)| *reachable) {
-            recommendations.push("Some Bitcoin RPC endpoints are unreachable, check your network configuration".to_string());
+            recommendations
+                .push("Check your internet connection, it appears to be offline".to_string());
+        } else if !results
+            .connectivity
+            .endpoints_reachable
+            .iter()
+            .all(|(_, reachable)| *reachable)
+        {
+            recommendations.push(
+                "Some Bitcoin RPC endpoints are unreachable, check your network configuration"
+                    .to_string(),
+            );
         }
 
         if results.dns.status == ValidationStatus::Fail {
             recommendations.push("DNS resolution is failing, check your DNS servers or try using alternative DNS like 1.1.1.1 or 8.8.8.8".to_string());
         } else if results.dns.status == ValidationStatus::Warning {
-            recommendations.push("Some DNS servers are not responding, consider using more reliable DNS servers".to_string());
+            recommendations.push(
+                "Some DNS servers are not responding, consider using more reliable DNS servers"
+                    .to_string(),
+            );
         }
 
         if results.bandwidth.status == ValidationStatus::Fail {
@@ -839,7 +855,10 @@ impl NetworkValidator {
         }
 
         if results.latency.status == ValidationStatus::Fail {
-            recommendations.push("Network latency could not be measured, your network connection may be unstable".to_string());
+            recommendations.push(
+                "Network latency could not be measured, your network connection may be unstable"
+                    .to_string(),
+            );
         } else if results.latency.status == ValidationStatus::Warning {
             recommendations.push(format!(
                 "Network latency is high (Average: {} ms). For optimal performance, latency should be below {} ms",
@@ -872,15 +891,24 @@ impl NetworkValidator {
                 ));
             }
             if firewall_result.blocks_required_ports.contains(&174) {
-                recommendations.push("PSBT (BIP-174) port 174 is blocked. Required for partial transactions".to_string());
+                recommendations.push(
+                    "PSBT (BIP-174) port 174 is blocked. Required for partial transactions"
+                        .to_string(),
+                );
             }
         }
 
         if let Some(route_result) = &results.route {
             if route_result.status == ValidationStatus::Fail {
-                recommendations.push("Network route tracing failed. Your network may be blocking ICMP traffic".to_string());
+                recommendations.push(
+                    "Network route tracing failed. Your network may be blocking ICMP traffic"
+                        .to_string(),
+                );
             } else if route_result.status == ValidationStatus::Warning {
-                recommendations.push("Network routes contain problematic hops, which may cause connection issues".to_string());
+                recommendations.push(
+                    "Network routes contain problematic hops, which may cause connection issues"
+                        .to_string(),
+                );
             }
         }
 
@@ -907,13 +935,16 @@ impl NetworkValidator {
             || results.latency.status == ValidationStatus::Warning
             || results.ports.status == ValidationStatus::Warning;
 
-        let optional_warnings = results.ssl
+        let optional_warnings = results
+            .ssl
             .as_ref()
             .map_or(false, |r| r.status == ValidationStatus::Warning)
-            || results.firewall
+            || results
+                .firewall
                 .as_ref()
                 .map_or(false, |r| r.status == ValidationStatus::Warning)
-            || results.route
+            || results
+                .route
                 .as_ref()
                 .map_or(false, |r| r.status == ValidationStatus::Warning);
 

@@ -20,8 +20,8 @@ pub struct CommitInfo {
 /// [AIS-3][BPC-3] Update AI labelling file with new commit information
 /// Implements secure commit tracking with validation
 pub fn update_ai_labelling_file(commit_info: &CommitInfo) -> Result<(), DocError> {
-    let mut content = std::fs::read_to_string("docs/standards/AI_LABELING.md")
-        .map_err(DocError::IoError)?;
+    let mut content =
+        std::fs::read_to_string("docs/standards/AI_LABELING.md").map_err(DocError::IoError)?;
 
     // Add new commit entry in chronological order
     let entry = format!(

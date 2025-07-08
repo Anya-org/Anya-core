@@ -87,7 +87,10 @@ pub fn configure_routes(identity: Arc<IdentityManager>) -> Router {
     let identity_routes = Router::new()
         .route("/identity", post(handlers::identity::create_identity))
         .route("/identity/:id", get(handlers::identity::get_identity))
-        .route("/identity/resolve", post(handlers::identity::resolve_identity))
+        .route(
+            "/identity/resolve",
+            post(handlers::identity::resolve_identity),
+        )
         .route(
             "/credentials/issue",
             post(handlers::identity::issue_credential),

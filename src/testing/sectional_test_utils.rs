@@ -60,9 +60,7 @@ impl SectionRunner {
             // Check dependencies
             for dep in &section.dependencies {
                 if !self.sections.contains_key(dep) {
-                    return Err(format!(
-                        "Missing dependency '{dep}' for section '{name}'"
-                    ));
+                    return Err(format!("Missing dependency '{dep}' for section '{name}'"));
                 }
             }
 
