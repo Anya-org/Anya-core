@@ -57,12 +57,12 @@ impl Schema {
             version: "1.0".to_string(),
         }
     }
-    
+
     /// Add field to schema
     pub fn add_field(&mut self, field: Field) {
         self.fields.push(field);
     }
-    
+
     /// Validate schema
     pub fn validate(&self) -> bool {
         // Simple validation: must have at least one field

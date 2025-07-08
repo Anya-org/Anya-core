@@ -17,12 +17,12 @@ pub use schema::{Field, FieldType, Schema, SchemaType, Validation};
 pub use state::{StateTransfer, StateTransition, StateValidator};
 pub use wallet::{AssetBalance, RGBWallet};
 
-use bitcoin::Txid;
 use bitcoin::hashes::Hash;
+use bitcoin::Txid;
 use std::collections::HashMap;
 use std::path::PathBuf;
 
-use crate::core::error::{AnyaResult, AnyaError};
+use crate::core::error::{AnyaError, AnyaResult};
 use crate::core::wallet::TxOptions;
 use crate::layer2::traits::{ContractExecutor, FederationMLHook, Proposal};
 
@@ -237,21 +237,23 @@ impl RGBManager for DefaultRGBManager {
     fn init(&self, config: RGBConfig) -> AnyaResult<()> {
         // Create RGB data directory if it doesn't exist
         if !config.data_dir.exists() {
-            std::fs::create_dir_all(&config.data_dir)
-                .map_err(|e| AnyaError::Config(format!("Failed to create RGB data directory: {}", e)))?;
+            std::fs::create_dir_all(&config.data_dir).map_err(|e| {
+                AnyaError::Config(format!("Failed to create RGB data directory: {}", e))
+            })?;
         }
 
         // Validate network configuration
         if !["mainnet", "testnet", "regtest"].contains(&config.network.as_str()) {
-            return Err(AnyaError::Config(
-                format!("Invalid network: {}. Must be mainnet, testnet, or regtest", config.network)
-            ));
+            return Err(AnyaError::Config(format!(
+                "Invalid network: {}. Must be mainnet, testnet, or regtest",
+                config.network
+            )));
         }
 
         // Validate electrum URL format
         if config.electrum_url.is_empty() {
             return Err(AnyaError::Config(
-                "Electrum URL cannot be empty".to_string()
+                "Electrum URL cannot be empty".to_string(),
             ));
         }
 
@@ -263,28 +265,29 @@ impl RGBManager for DefaultRGBManager {
                 // In a full implementation, this would set up the database schema
                 if !storage_path.exists() {
                     // Create empty database file
-                    std::fs::File::create(&storage_path)
-                        .map_err(|e| AnyaError::Config(format!("Failed to create storage file: {}", e)))?;
+                    std::fs::File::create(&storage_path).map_err(|e| {
+                        AnyaError::Config(format!("Failed to create storage file: {}", e))
+                    })?;
                 }
             }
             "fs" => {
                 // Initialize filesystem storage
                 let assets_dir = config.data_dir.join("assets");
-                std::fs::create_dir_all(&assets_dir)
-                    .map_err(|e| AnyaError::Config(format!("Failed to create assets directory: {}", e)))?;
+                std::fs::create_dir_all(&assets_dir).map_err(|e| {
+                    AnyaError::Config(format!("Failed to create assets directory: {}", e))
+                })?;
             }
             _ => {
-                return Err(AnyaError::Config(
-                    format!("Unsupported storage type: {}. Use 'sqlite' or 'fs'", config.storage_type)
-                ));
+                return Err(AnyaError::Config(format!(
+                    "Unsupported storage type: {}. Use 'sqlite' or 'fs'",
+                    config.storage_type
+                )));
             }
         }
 
         // Validate fee rate
         if config.fee_rate <= 0.0 {
-            return Err(AnyaError::Config(
-                "Fee rate must be positive".to_string()
-            ));
+            return Err(AnyaError::Config("Fee rate must be positive".to_string()));
         }
 
         // Log successful initialization
@@ -300,19 +303,26 @@ impl RGBManager for DefaultRGBManager {
     fn create_asset(&self, params: AssetCreationParams) -> AnyaResult<RGBAsset> {
         // Validate asset creation parameters
         if params.name.is_empty() {
-            return Err(AnyaError::Validation("Asset name cannot be empty".to_string()));
+            return Err(AnyaError::Validation(
+                "Asset name cannot be empty".to_string(),
+            ));
         }
 
         if params.total_supply == 0 {
-            return Err(AnyaError::Validation("Total supply must be greater than 0".to_string()));
+            return Err(AnyaError::Validation(
+                "Total supply must be greater than 0".to_string(),
+            ));
         }
 
         if params.precision > 18 {
-            return Err(AnyaError::Validation("Precision cannot exceed 18 decimal places".to_string()));
+            return Err(AnyaError::Validation(
+                "Precision cannot exceed 18 decimal places".to_string(),
+            ));
         }
 
         // Generate unique asset ID (using current timestamp + random component for uniqueness)
-        let asset_id = format!("rgb-{}-{}", 
+        let asset_id = format!(
+            "rgb-{}-{}",
             std::time::SystemTime::now()
                 .duration_since(std::time::UNIX_EPOCH)
                 .unwrap()
@@ -321,7 +331,10 @@ impl RGBManager for DefaultRGBManager {
         );
 
         // Generate contract ID (in RGB, each asset has an associated contract)
-        let contract_id = format!("contract-{}", uuid::Uuid::new_v4().to_string().replace("-", "")[..12].to_string());
+        let contract_id = format!(
+            "contract-{}",
+            uuid::Uuid::new_v4().to_string().replace("-", "")[..12].to_string()
+        );
 
         // Use provided schema ID or default
         let schema_id = params.schema_id.unwrap_or_else(|| "rgb20".to_string());
@@ -345,33 +358,50 @@ impl RGBManager for DefaultRGBManager {
                 log::info!("Storing asset {} using decentralized storage", asset.id);
                 // In practice, this would use DecentralizedStorage::store_asset()
                 // For now, log the transition to decentralized storage
-                log::info!("Asset {} stored successfully in decentralized storage", asset.id);
+                log::info!(
+                    "Asset {} stored successfully in decentralized storage",
+                    asset.id
+                );
             }
             "fs" => {
                 // Store as JSON file in filesystem
                 let assets_dir = self.config.data_dir.join("assets");
                 let asset_file = assets_dir.join(format!("{}.json", asset.id));
-                
-                let asset_json = serde_json::to_string_pretty(&asset)
-                    .map_err(|e| AnyaError::Serialization(format!("Failed to serialize asset: {}", e)))?;
-                
-                std::fs::write(&asset_file, asset_json)
-                    .map_err(|e| AnyaError::Storage(format!("Failed to write asset file: {}", e)))?;
-                
-                log::debug!("Stored asset {} as file: {}", asset.id, asset_file.display());
+
+                let asset_json = serde_json::to_string_pretty(&asset).map_err(|e| {
+                    AnyaError::Serialization(format!("Failed to serialize asset: {}", e))
+                })?;
+
+                std::fs::write(&asset_file, asset_json).map_err(|e| {
+                    AnyaError::Storage(format!("Failed to write asset file: {}", e))
+                })?;
+
+                log::debug!(
+                    "Stored asset {} as file: {}",
+                    asset.id,
+                    asset_file.display()
+                );
             }
             _ => {
-                log::warn!("Legacy SQLite storage is deprecated. Use 'decentralized' storage type.");
-                return Err(AnyaError::Config(
-                    format!("Unsupported storage type: {}. Use 'decentralized' or 'fs'", self.config.storage_type)
-                ))
+                log::warn!(
+                    "Legacy SQLite storage is deprecated. Use 'decentralized' storage type."
+                );
+                return Err(AnyaError::Config(format!(
+                    "Unsupported storage type: {}. Use 'decentralized' or 'fs'",
+                    self.config.storage_type
+                )));
             }
         }
 
         // Log asset creation
         log::info!("Created RGB asset: {} ({})", params.name, asset_id);
-        log::debug!("Asset details - Supply: {}, Precision: {}, Schema: {}, Contract: {}", 
-            params.total_supply, params.precision, schema_id, contract_id);
+        log::debug!(
+            "Asset details - Supply: {}, Precision: {}, Schema: {}, Contract: {}",
+            params.total_supply,
+            params.precision,
+            schema_id,
+            contract_id
+        );
 
         Ok(asset)
     }
@@ -389,38 +419,54 @@ impl RGBManager for DefaultRGBManager {
             "fs" => {
                 // Load from filesystem JSON files
                 let assets_dir = self.config.data_dir.join("assets");
-                
+
                 if assets_dir.exists() {
-                    let entries = std::fs::read_dir(&assets_dir)
-                        .map_err(|e| AnyaError::Storage(format!("Failed to read assets directory: {}", e)))?;
+                    let entries = std::fs::read_dir(&assets_dir).map_err(|e| {
+                        AnyaError::Storage(format!("Failed to read assets directory: {}", e))
+                    })?;
 
                     for entry in entries {
-                        let entry = entry
-                            .map_err(|e| AnyaError::Storage(format!("Failed to read directory entry: {}", e)))?;
-                        
+                        let entry = entry.map_err(|e| {
+                            AnyaError::Storage(format!("Failed to read directory entry: {}", e))
+                        })?;
+
                         let path = entry.path();
                         if path.extension().and_then(|s| s.to_str()) == Some("json") {
-                            let asset_data = std::fs::read_to_string(&path)
-                                .map_err(|e| AnyaError::Storage(format!("Failed to read asset file {}: {}", path.display(), e)))?;
-                            
-                            let asset: RGBAsset = serde_json::from_str(&asset_data)
-                                .map_err(|e| AnyaError::Serialization(format!("Failed to deserialize asset from {}: {}", path.display(), e)))?;
-                            
+                            let asset_data = std::fs::read_to_string(&path).map_err(|e| {
+                                AnyaError::Storage(format!(
+                                    "Failed to read asset file {}: {}",
+                                    path.display(),
+                                    e
+                                ))
+                            })?;
+
+                            let asset: RGBAsset =
+                                serde_json::from_str(&asset_data).map_err(|e| {
+                                    AnyaError::Serialization(format!(
+                                        "Failed to deserialize asset from {}: {}",
+                                        path.display(),
+                                        e
+                                    ))
+                                })?;
+
                             assets.push(asset);
                         }
                     }
                 }
-                
+
                 log::debug!("Loaded {} assets from filesystem", assets.len());
             }
-            _ => return Err(AnyaError::Config(
-                format!("Unsupported storage type: {}", self.config.storage_type)
-            ))
+            _ => {
+                return Err(AnyaError::Config(format!(
+                    "Unsupported storage type: {}",
+                    self.config.storage_type
+                )))
+            }
         }
 
         // Sort assets by name for consistent ordering
         assets.sort_by(|a, b| a.name.cmp(&b.name));
-        
+
         log::info!("Listed {} RGB assets", assets.len());
         Ok(assets)
     }
@@ -428,18 +474,22 @@ impl RGBManager for DefaultRGBManager {
     fn get_asset_balance(&self, asset_id: &str) -> AnyaResult<u64> {
         // Find the asset first to validate it exists
         let assets = self.list_assets()?;
-        let asset = assets.iter()
+        let asset = assets
+            .iter()
             .find(|a| a.id == asset_id)
             .ok_or_else(|| AnyaError::NotFound(format!("Asset not found: {}", asset_id)))?;
 
         // In a full RGB implementation, this would query the actual UTXO set
         // and calculate the balance based on state transitions and commitments.
         // For now, we'll implement a simplified version using storage.
-        
+
         let balance = match self.config.storage_type.as_str() {
             "decentralized" => {
                 // Query decentralized storage for balance
-                log::info!("Querying asset balance from decentralized storage for asset: {}", asset_id);
+                log::info!(
+                    "Querying asset balance from decentralized storage for asset: {}",
+                    asset_id
+                );
                 // In practice, this would use DecentralizedStorage::get_asset_balance()
                 // For now, return the total supply as a placeholder during transition
                 asset.total_supply
@@ -448,23 +498,31 @@ impl RGBManager for DefaultRGBManager {
                 // Load balance from filesystem
                 let balance_dir = self.config.data_dir.join("balances");
                 let balance_file = balance_dir.join(format!("{}.balance", asset_id));
-                
+
                 if balance_file.exists() {
-                    let balance_data = std::fs::read_to_string(&balance_file)
-                        .map_err(|e| AnyaError::Storage(format!("Failed to read balance file: {}", e)))?;
-                    
-                    balance_data.trim().parse::<u64>()
-                        .map_err(|e| AnyaError::Validation(format!("Invalid balance data: {}", e)))?
+                    let balance_data = std::fs::read_to_string(&balance_file).map_err(|e| {
+                        AnyaError::Storage(format!("Failed to read balance file: {}", e))
+                    })?;
+
+                    balance_data.trim().parse::<u64>().map_err(|e| {
+                        AnyaError::Validation(format!("Invalid balance data: {}", e))
+                    })?
                 } else {
                     // If no balance file exists, assume full supply is available
                     // In a real implementation, this would be more sophisticated
-                    log::debug!("No balance file found for asset {}, returning total supply", asset_id);
+                    log::debug!(
+                        "No balance file found for asset {}, returning total supply",
+                        asset_id
+                    );
                     asset.total_supply
                 }
             }
-            _ => return Err(AnyaError::Config(
-                format!("Unsupported storage type: {}", self.config.storage_type)
-            ))
+            _ => {
+                return Err(AnyaError::Config(format!(
+                    "Unsupported storage type: {}",
+                    self.config.storage_type
+                )))
+            }
         };
 
         log::debug!("Asset {} balance: {}", asset_id, balance);
@@ -474,17 +532,21 @@ impl RGBManager for DefaultRGBManager {
     fn create_invoice(&self, asset_id: &str, amount: u64) -> AnyaResult<String> {
         // Validate the asset exists
         let assets = self.list_assets()?;
-        let asset = assets.iter()
+        let asset = assets
+            .iter()
             .find(|a| a.id == asset_id)
             .ok_or_else(|| AnyaError::NotFound(format!("Asset not found: {}", asset_id)))?;
 
         // Validate amount
         if amount == 0 {
-            return Err(AnyaError::Validation("Invoice amount must be greater than 0".to_string()));
+            return Err(AnyaError::Validation(
+                "Invoice amount must be greater than 0".to_string(),
+            ));
         }
 
         // Generate unique invoice ID
-        let invoice_id = format!("inv-{}-{}", 
+        let invoice_id = format!(
+            "inv-{}-{}",
             std::time::SystemTime::now()
                 .duration_since(std::time::UNIX_EPOCH)
                 .unwrap()
@@ -517,55 +579,78 @@ impl RGBManager for DefaultRGBManager {
             "fs" => {
                 // Store as JSON file in filesystem
                 let invoices_dir = self.config.data_dir.join("invoices");
-                std::fs::create_dir_all(&invoices_dir)
-                    .map_err(|e| AnyaError::Storage(format!("Failed to create invoices directory: {}", e)))?;
+                std::fs::create_dir_all(&invoices_dir).map_err(|e| {
+                    AnyaError::Storage(format!("Failed to create invoices directory: {}", e))
+                })?;
 
                 let invoice_file = invoices_dir.join(format!("{}.json", invoice_id));
-                let invoice_json = serde_json::to_string_pretty(&invoice_data)
-                    .map_err(|e| AnyaError::Serialization(format!("Failed to serialize invoice: {}", e)))?;
-                
-                std::fs::write(&invoice_file, invoice_json)
-                    .map_err(|e| AnyaError::Storage(format!("Failed to write invoice file: {}", e)))?;
-                
-                log::debug!("Stored invoice {} as file: {}", invoice_id, invoice_file.display());
+                let invoice_json = serde_json::to_string_pretty(&invoice_data).map_err(|e| {
+                    AnyaError::Serialization(format!("Failed to serialize invoice: {}", e))
+                })?;
+
+                std::fs::write(&invoice_file, invoice_json).map_err(|e| {
+                    AnyaError::Storage(format!("Failed to write invoice file: {}", e))
+                })?;
+
+                log::debug!(
+                    "Stored invoice {} as file: {}",
+                    invoice_id,
+                    invoice_file.display()
+                );
             }
-            _ => return Err(AnyaError::Config(
-                format!("Unsupported storage type: {}", self.config.storage_type)
-            ))
+            _ => {
+                return Err(AnyaError::Config(format!(
+                    "Unsupported storage type: {}",
+                    self.config.storage_type
+                )))
+            }
         }
 
-        log::info!("Created invoice {} for {} units of asset {}", invoice_id, amount, asset.name);
+        log::info!(
+            "Created invoice {} for {} units of asset {}",
+            invoice_id,
+            amount,
+            asset.name
+        );
         Ok(invoice_id)
     }
 
     fn transfer_asset(&self, transfer: AssetTransfer) -> AnyaResult<String> {
         // Validate the asset exists
         let assets = self.list_assets()?;
-        let asset = assets.iter()
+        let asset = assets
+            .iter()
             .find(|a| a.id == transfer.asset_id)
-            .ok_or_else(|| AnyaError::NotFound(format!("Asset not found: {}", transfer.asset_id)))?;
+            .ok_or_else(|| {
+                AnyaError::NotFound(format!("Asset not found: {}", transfer.asset_id))
+            })?;
 
         // Validate transfer amount
         if transfer.amount == 0 {
-            return Err(AnyaError::Validation("Transfer amount must be greater than 0".to_string()));
+            return Err(AnyaError::Validation(
+                "Transfer amount must be greater than 0".to_string(),
+            ));
         }
 
         // Check if we have sufficient balance
         let current_balance = self.get_asset_balance(&transfer.asset_id)?;
         if transfer.amount > current_balance {
             return Err(AnyaError::Validation(format!(
-                "Insufficient balance: requested {} but only {} available", 
+                "Insufficient balance: requested {} but only {} available",
                 transfer.amount, current_balance
             )));
         }
 
         // Validate recipient
         if transfer.recipient.is_empty() {
-            return Err(AnyaError::Validation("Recipient cannot be empty".to_string()));
+            return Err(AnyaError::Validation(
+                "Recipient cannot be empty".to_string(),
+            ));
         }
 
         // Generate unique transfer ID
-        let transfer_id = format!("tx-{}-{}", 
+        let transfer_id = format!(
+            "tx-{}-{}",
             std::time::SystemTime::now()
                 .duration_since(std::time::UNIX_EPOCH)
                 .unwrap()
@@ -594,57 +679,82 @@ impl RGBManager for DefaultRGBManager {
         match self.config.storage_type.as_str() {
             "decentralized" => {
                 // Store using decentralized storage (IPFS + DWN + Bitcoin anchoring)
-                log::info!("Storing transfer {} using decentralized storage", transfer_id);
+                log::info!(
+                    "Storing transfer {} using decentralized storage",
+                    transfer_id
+                );
                 // In practice, this would use DecentralizedStorage::store_transfer_and_update_balance()
             }
             "fs" => {
                 // Store transfer record as JSON file
                 let transfers_dir = self.config.data_dir.join("transfers");
-                std::fs::create_dir_all(&transfers_dir)
-                    .map_err(|e| AnyaError::Storage(format!("Failed to create transfers directory: {}", e)))?;
+                std::fs::create_dir_all(&transfers_dir).map_err(|e| {
+                    AnyaError::Storage(format!("Failed to create transfers directory: {}", e))
+                })?;
 
                 let transfer_file = transfers_dir.join(format!("{}.json", transfer_id));
-                let transfer_json = serde_json::to_string_pretty(&transfer_data)
-                    .map_err(|e| AnyaError::Serialization(format!("Failed to serialize transfer: {}", e)))?;
-                
-                std::fs::write(&transfer_file, transfer_json)
-                    .map_err(|e| AnyaError::Storage(format!("Failed to write transfer file: {}", e)))?;
+                let transfer_json = serde_json::to_string_pretty(&transfer_data).map_err(|e| {
+                    AnyaError::Serialization(format!("Failed to serialize transfer: {}", e))
+                })?;
+
+                std::fs::write(&transfer_file, transfer_json).map_err(|e| {
+                    AnyaError::Storage(format!("Failed to write transfer file: {}", e))
+                })?;
 
                 // Update balance (simplified implementation)
                 let balance_dir = self.config.data_dir.join("balances");
-                std::fs::create_dir_all(&balance_dir)
-                    .map_err(|e| AnyaError::Storage(format!("Failed to create balances directory: {}", e)))?;
+                std::fs::create_dir_all(&balance_dir).map_err(|e| {
+                    AnyaError::Storage(format!("Failed to create balances directory: {}", e))
+                })?;
 
                 let balance_file = balance_dir.join(format!("{}.balance", transfer.asset_id));
                 let new_balance = current_balance - transfer.amount;
-                std::fs::write(&balance_file, new_balance.to_string())
-                    .map_err(|e| AnyaError::Storage(format!("Failed to update balance file: {}", e)))?;
-                
-                log::debug!("Stored transfer {} and updated balance from {} to {}", 
-                    transfer_id, current_balance, new_balance);
+                std::fs::write(&balance_file, new_balance.to_string()).map_err(|e| {
+                    AnyaError::Storage(format!("Failed to update balance file: {}", e))
+                })?;
+
+                log::debug!(
+                    "Stored transfer {} and updated balance from {} to {}",
+                    transfer_id,
+                    current_balance,
+                    new_balance
+                );
             }
-            _ => return Err(AnyaError::Config(
-                format!("Unsupported storage type: {}", self.config.storage_type)
-            ))
+            _ => {
+                return Err(AnyaError::Config(format!(
+                    "Unsupported storage type: {}",
+                    self.config.storage_type
+                )))
+            }
         }
 
-        log::info!("Created transfer {} for {} units of {} to {}", 
-            transfer_id, transfer.amount, asset.name, transfer.recipient);
-        
+        log::info!(
+            "Created transfer {} for {} units of {} to {}",
+            transfer_id,
+            transfer.amount,
+            asset.name,
+            transfer.recipient
+        );
+
         Ok(transfer_id)
     }
 
     fn get_transfer_status(&self, transfer_id: &str) -> AnyaResult<TransferStatus> {
         // Validate transfer ID format
         if transfer_id.is_empty() || !transfer_id.starts_with("tx-") {
-            return Err(AnyaError::Validation("Invalid transfer ID format".to_string()));
+            return Err(AnyaError::Validation(
+                "Invalid transfer ID format".to_string(),
+            ));
         }
 
         // Load transfer status based on storage type
         match self.config.storage_type.as_str() {
             "decentralized" => {
                 // Query decentralized storage for transfer status
-                log::info!("Querying transfer {} status from decentralized storage", transfer_id);
+                log::info!(
+                    "Querying transfer {} status from decentralized storage",
+                    transfer_id
+                );
                 // In practice, this would use DecentralizedStorage::get_transfer_status()
                 // For now, return pending status during transition
                 Ok(TransferStatus::Pending)
@@ -653,20 +763,26 @@ impl RGBManager for DefaultRGBManager {
                 // Load from filesystem
                 let transfers_dir = self.config.data_dir.join("transfers");
                 let transfer_file = transfers_dir.join(format!("{}.json", transfer_id));
-                
+
                 if !transfer_file.exists() {
-                    return Err(AnyaError::NotFound(format!("Transfer not found: {}", transfer_id)));
+                    return Err(AnyaError::NotFound(format!(
+                        "Transfer not found: {}",
+                        transfer_id
+                    )));
                 }
 
-                let transfer_json = std::fs::read_to_string(&transfer_file)
-                    .map_err(|e| AnyaError::Storage(format!("Failed to read transfer file: {}", e)))?;
-                
+                let transfer_json = std::fs::read_to_string(&transfer_file).map_err(|e| {
+                    AnyaError::Storage(format!("Failed to read transfer file: {}", e))
+                })?;
+
                 let transfer_data: serde_json::Value = serde_json::from_str(&transfer_json)
-                    .map_err(|e| AnyaError::Serialization(format!("Failed to parse transfer data: {}", e)))?;
+                    .map_err(|e| {
+                        AnyaError::Serialization(format!("Failed to parse transfer data: {}", e))
+                    })?;
 
                 // Extract status information from transfer data
                 let status = transfer_data["status"].as_str().unwrap_or("unknown");
-                
+
                 let transfer_status = match status {
                     "pending" => TransferStatus::Pending,
                     "confirmed" => TransferStatus::Confirmed,
@@ -674,20 +790,27 @@ impl RGBManager for DefaultRGBManager {
                     _ => TransferStatus::Failed(format!("Unknown status: {}", status)),
                 };
 
-                log::debug!("Retrieved transfer {} status: {:?}", transfer_id, transfer_status);
-                
+                log::debug!(
+                    "Retrieved transfer {} status: {:?}",
+                    transfer_id,
+                    transfer_status
+                );
+
                 Ok(transfer_status)
             }
-            _ => Err(AnyaError::Config(
-                format!("Unsupported storage type: {}", self.config.storage_type)
-            ))
+            _ => Err(AnyaError::Config(format!(
+                "Unsupported storage type: {}",
+                self.config.storage_type
+            ))),
         }
     }
 
     fn validate_transfer(&self, transfer_id: &str) -> AnyaResult<bool> {
         // Validate transfer ID format
         if transfer_id.is_empty() || !transfer_id.starts_with("tx-") {
-            return Err(AnyaError::Validation("Invalid transfer ID format".to_string()));
+            return Err(AnyaError::Validation(
+                "Invalid transfer ID format".to_string(),
+            ));
         }
 
         // Load and validate transfer based on storage type
@@ -703,29 +826,47 @@ impl RGBManager for DefaultRGBManager {
                 // Load transfer from filesystem
                 let transfers_dir = self.config.data_dir.join("transfers");
                 let transfer_file = transfers_dir.join(format!("{}.json", transfer_id));
-                
+
                 if !transfer_file.exists() {
-                    return Err(AnyaError::NotFound(format!("Transfer not found: {}", transfer_id)));
+                    return Err(AnyaError::NotFound(format!(
+                        "Transfer not found: {}",
+                        transfer_id
+                    )));
                 }
 
-                let transfer_json = std::fs::read_to_string(&transfer_file)
-                    .map_err(|e| AnyaError::Storage(format!("Failed to read transfer file: {}", e)))?;
-                
+                let transfer_json = std::fs::read_to_string(&transfer_file).map_err(|e| {
+                    AnyaError::Storage(format!("Failed to read transfer file: {}", e))
+                })?;
+
                 let transfer_data: serde_json::Value = serde_json::from_str(&transfer_json)
-                    .map_err(|e| AnyaError::Serialization(format!("Failed to parse transfer data: {}", e)))?;
+                    .map_err(|e| {
+                        AnyaError::Serialization(format!("Failed to parse transfer data: {}", e))
+                    })?;
 
                 // Perform validation checks
                 let validation_checks = vec![
                     ("asset_id", transfer_data["asset_id"].is_string()),
-                    ("amount", transfer_data["amount"].is_u64() && transfer_data["amount"].as_u64().unwrap_or(0) > 0),
-                    ("recipient", transfer_data["recipient"].is_string() && !transfer_data["recipient"].as_str().unwrap_or("").is_empty()),
+                    (
+                        "amount",
+                        transfer_data["amount"].is_u64()
+                            && transfer_data["amount"].as_u64().unwrap_or(0) > 0,
+                    ),
+                    (
+                        "recipient",
+                        transfer_data["recipient"].is_string()
+                            && !transfer_data["recipient"].as_str().unwrap_or("").is_empty(),
+                    ),
                     ("created_at", transfer_data["created_at"].is_u64()),
                     ("status", transfer_data["status"].is_string()),
                 ];
 
                 let is_valid = validation_checks.iter().all(|(field, check)| {
                     if !check {
-                        log::warn!("Transfer {} validation failed for field: {}", transfer_id, field);
+                        log::warn!(
+                            "Transfer {} validation failed for field: {}",
+                            transfer_id,
+                            field
+                        );
                         false
                     } else {
                         true
@@ -741,12 +882,20 @@ impl RGBManager for DefaultRGBManager {
                             Ok(assets) => {
                                 let asset_exists = assets.iter().any(|a| a.id == asset_id);
                                 if !asset_exists {
-                                    log::warn!("Transfer {} references non-existent asset: {}", transfer_id, asset_id);
+                                    log::warn!(
+                                        "Transfer {} references non-existent asset: {}",
+                                        transfer_id,
+                                        asset_id
+                                    );
                                     return Ok(false);
                                 }
                             }
                             Err(e) => {
-                                log::error!("Failed to validate asset existence for transfer {}: {}", transfer_id, e);
+                                log::error!(
+                                    "Failed to validate asset existence for transfer {}: {}",
+                                    transfer_id,
+                                    e
+                                );
                                 return Ok(false);
                             }
                         }
@@ -756,16 +905,19 @@ impl RGBManager for DefaultRGBManager {
                 log::debug!("Transfer {} validation result: {}", transfer_id, is_valid);
                 Ok(is_valid)
             }
-            _ => Err(AnyaError::Config(
-                format!("Unsupported storage type: {}", self.config.storage_type)
-            ))
+            _ => Err(AnyaError::Config(format!(
+                "Unsupported storage type: {}",
+                self.config.storage_type
+            ))),
         }
     }
 
     fn get_asset_metadata(&self, asset_id: &str) -> AnyaResult<HashMap<String, String>> {
         // Validate asset ID
         if asset_id.is_empty() {
-            return Err(AnyaError::Validation("Asset ID cannot be empty".to_string()));
+            return Err(AnyaError::Validation(
+                "Asset ID cannot be empty".to_string(),
+            ));
         }
 
         // Load asset metadata based on storage type
@@ -783,20 +935,25 @@ impl RGBManager for DefaultRGBManager {
                 // Load from filesystem
                 let assets_dir = self.config.data_dir.join("assets");
                 let asset_file = assets_dir.join(format!("{}.json", asset_id));
-                
+
                 if !asset_file.exists() {
-                    return Err(AnyaError::NotFound(format!("Asset not found: {}", asset_id)));
+                    return Err(AnyaError::NotFound(format!(
+                        "Asset not found: {}",
+                        asset_id
+                    )));
                 }
 
                 let asset_json = std::fs::read_to_string(&asset_file)
                     .map_err(|e| AnyaError::Storage(format!("Failed to read asset file: {}", e)))?;
-                
-                let asset_data: serde_json::Value = serde_json::from_str(&asset_json)
-                    .map_err(|e| AnyaError::Serialization(format!("Failed to parse asset data: {}", e)))?;
+
+                let asset_data: serde_json::Value =
+                    serde_json::from_str(&asset_json).map_err(|e| {
+                        AnyaError::Serialization(format!("Failed to parse asset data: {}", e))
+                    })?;
 
                 // Extract metadata from asset data
                 let mut metadata = HashMap::new();
-                
+
                 // Core asset information
                 if let Some(name) = asset_data["name"].as_str() {
                     metadata.insert("name".to_string(), name.to_string());
@@ -831,24 +988,32 @@ impl RGBManager for DefaultRGBManager {
                 metadata.insert("asset_id".to_string(), asset_id.to_string());
                 metadata.insert("file_path".to_string(), asset_file.display().to_string());
 
-                log::debug!("Retrieved metadata for asset {}: {} fields", asset_id, metadata.len());
+                log::debug!(
+                    "Retrieved metadata for asset {}: {} fields",
+                    asset_id,
+                    metadata.len()
+                );
                 Ok(metadata)
             }
-            _ => Err(AnyaError::Config(
-                format!("Unsupported storage type: {}", self.config.storage_type)
-            ))
+            _ => Err(AnyaError::Config(format!(
+                "Unsupported storage type: {}",
+                self.config.storage_type
+            ))),
         }
     }
 
     fn get_asset_history(&self, asset_id: &str) -> AnyaResult<Vec<HistoryEntry>> {
         // Validate asset ID
         if asset_id.is_empty() {
-            return Err(AnyaError::Validation("Asset ID cannot be empty".to_string()));
+            return Err(AnyaError::Validation(
+                "Asset ID cannot be empty".to_string(),
+            ));
         }
 
         // Verify asset exists
         let assets = self.list_assets()?;
-        let _asset = assets.iter()
+        let _asset = assets
+            .iter()
             .find(|a| a.id == asset_id)
             .ok_or_else(|| AnyaError::NotFound(format!("Asset not found: {}", asset_id)))?;
 
@@ -858,30 +1023,30 @@ impl RGBManager for DefaultRGBManager {
                 // Query SQLite database (placeholder implementation)
                 log::debug!("Querying asset {} history from SQLite", asset_id);
                 // TODO: Implement actual SQLite asset history query
-                Ok(vec![
-                    HistoryEntry {
-                        txid: Txid::from_slice(&[0u8; 32]).unwrap(),
-                        timestamp: std::time::SystemTime::now()
-                            .duration_since(std::time::UNIX_EPOCH)
-                            .unwrap()
-                            .as_secs(),
-                        amount: 0,
-                        from: None,
-                        to: "system".to_string(),
-                        operation: OperationType::Issuance,
-                    }
-                ])
+                Ok(vec![HistoryEntry {
+                    txid: Txid::from_slice(&[0u8; 32]).unwrap(),
+                    timestamp: std::time::SystemTime::now()
+                        .duration_since(std::time::UNIX_EPOCH)
+                        .unwrap()
+                        .as_secs(),
+                    amount: 0,
+                    from: None,
+                    to: "system".to_string(),
+                    operation: OperationType::Issuance,
+                }])
             }
             "fs" => {
                 let mut history = Vec::new();
-                
+
                 // Get asset creation event
                 let assets_dir = self.config.data_dir.join("assets");
                 let asset_file = assets_dir.join(format!("{}.json", asset_id));
-                
+
                 if asset_file.exists() {
                     if let Ok(asset_json) = std::fs::read_to_string(&asset_file) {
-                        if let Ok(asset_data) = serde_json::from_str::<serde_json::Value>(&asset_json) {
+                        if let Ok(asset_data) =
+                            serde_json::from_str::<serde_json::Value>(&asset_json)
+                        {
                             if let Some(created_at) = asset_data["created_at"].as_u64() {
                                 let total_supply = asset_data["total_supply"].as_u64().unwrap_or(0);
                                 history.push(HistoryEntry {
@@ -904,21 +1069,35 @@ impl RGBManager for DefaultRGBManager {
                         for entry in entries.flatten() {
                             if let Some(filename) = entry.file_name().to_str() {
                                 if filename.ends_with(".json") {
-                                    if let Ok(transfer_json) = std::fs::read_to_string(entry.path()) {
-                                        if let Ok(transfer_data) = serde_json::from_str::<serde_json::Value>(&transfer_json) {
-                                            if transfer_data["asset_id"].as_str() == Some(asset_id) {
-                                                let timestamp = transfer_data["created_at"].as_u64().unwrap_or(0);
-                                                let amount = transfer_data["amount"].as_u64().unwrap_or(0);
-                                                let recipient = transfer_data["recipient"].as_str().unwrap_or("unknown");
-                                                let transfer_id = transfer_data["transfer_id"].as_str().unwrap_or("unknown");
-                                                
+                                    if let Ok(transfer_json) = std::fs::read_to_string(entry.path())
+                                    {
+                                        if let Ok(transfer_data) =
+                                            serde_json::from_str::<serde_json::Value>(
+                                                &transfer_json,
+                                            )
+                                        {
+                                            if transfer_data["asset_id"].as_str() == Some(asset_id)
+                                            {
+                                                let timestamp = transfer_data["created_at"]
+                                                    .as_u64()
+                                                    .unwrap_or(0);
+                                                let amount =
+                                                    transfer_data["amount"].as_u64().unwrap_or(0);
+                                                let recipient = transfer_data["recipient"]
+                                                    .as_str()
+                                                    .unwrap_or("unknown");
+                                                let transfer_id = transfer_data["transfer_id"]
+                                                    .as_str()
+                                                    .unwrap_or("unknown");
+
                                                 // Create a placeholder txid from transfer_id
                                                 let mut txid_bytes = [0u8; 32];
                                                 let id_bytes = transfer_id.as_bytes();
                                                 let copy_len = std::cmp::min(id_bytes.len(), 32);
-                                                txid_bytes[..copy_len].copy_from_slice(&id_bytes[..copy_len]);
+                                                txid_bytes[..copy_len]
+                                                    .copy_from_slice(&id_bytes[..copy_len]);
                                                 let txid = Txid::from_slice(&txid_bytes).unwrap();
-                                                
+
                                                 history.push(HistoryEntry {
                                                     txid,
                                                     timestamp,
@@ -943,20 +1122,29 @@ impl RGBManager for DefaultRGBManager {
                         for entry in entries.flatten() {
                             if let Some(filename) = entry.file_name().to_str() {
                                 if filename.ends_with(".json") {
-                                    if let Ok(invoice_json) = std::fs::read_to_string(entry.path()) {
-                                        if let Ok(invoice_data) = serde_json::from_str::<serde_json::Value>(&invoice_json) {
+                                    if let Ok(invoice_json) = std::fs::read_to_string(entry.path())
+                                    {
+                                        if let Ok(invoice_data) =
+                                            serde_json::from_str::<serde_json::Value>(&invoice_json)
+                                        {
                                             if invoice_data["asset_id"].as_str() == Some(asset_id) {
-                                                let timestamp = invoice_data["created_at"].as_u64().unwrap_or(0);
-                                                let amount = invoice_data["amount"].as_u64().unwrap_or(0);
-                                                let invoice_id = invoice_data["invoice_id"].as_str().unwrap_or("unknown");
-                                                
-                                                // Create a placeholder txid from invoice_id  
+                                                let timestamp = invoice_data["created_at"]
+                                                    .as_u64()
+                                                    .unwrap_or(0);
+                                                let amount =
+                                                    invoice_data["amount"].as_u64().unwrap_or(0);
+                                                let invoice_id = invoice_data["invoice_id"]
+                                                    .as_str()
+                                                    .unwrap_or("unknown");
+
+                                                // Create a placeholder txid from invoice_id
                                                 let mut txid_bytes = [0u8; 32];
                                                 let id_bytes = invoice_id.as_bytes();
                                                 let copy_len = std::cmp::min(id_bytes.len(), 32);
-                                                txid_bytes[..copy_len].copy_from_slice(&id_bytes[..copy_len]);
+                                                txid_bytes[..copy_len]
+                                                    .copy_from_slice(&id_bytes[..copy_len]);
                                                 let txid = Txid::from_slice(&txid_bytes).unwrap();
-                                                
+
                                                 history.push(HistoryEntry {
                                                     txid,
                                                     timestamp,
@@ -977,12 +1165,17 @@ impl RGBManager for DefaultRGBManager {
                 // Sort history by timestamp (newest first)
                 history.sort_by(|a, b| b.timestamp.cmp(&a.timestamp));
 
-                log::debug!("Retrieved {} history entries for asset {}", history.len(), asset_id);
+                log::debug!(
+                    "Retrieved {} history entries for asset {}",
+                    history.len(),
+                    asset_id
+                );
                 Ok(history)
             }
-            _ => Err(AnyaError::Config(
-                format!("Unsupported storage type: {}", self.config.storage_type)
-            ))
+            _ => Err(AnyaError::Config(format!(
+                "Unsupported storage type: {}",
+                self.config.storage_type
+            ))),
         }
     }
 }

@@ -5,12 +5,12 @@
 
 // [AIR-3][AIS-3][BPC-3][RES-3] Import necessary dependencies for RGB implementation
 // This follows official Bitcoin Improvement Proposals (BIPs) standards for Taproot-enabled protocols
+#[cfg(feature = "rust-bitcoin")]
+use crate::bitcoin::wallet::Asset;
 use chrono;
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use uuid::Uuid;
-#[cfg(feature = "rust-bitcoin")]
-use crate::bitcoin::wallet::Asset;
 // [AIR-3][AIS-3][BPC-3][RES-3] Removed unused import: async_trait::async_trait
 #[cfg(feature = "rust-bitcoin")]
 use bitcoin::hashes::{Hash, HashEngine};
@@ -127,13 +127,18 @@ impl AssetRegistry {
     }
 
     /// Get asset by ID
-    pub async fn get_asset(&self, _asset_id: &str) -> Result<Option<Asset>, Box<dyn std::error::Error + Send + Sync>> {
+    pub async fn get_asset(
+        &self,
+        _asset_id: &str,
+    ) -> Result<Option<Asset>, Box<dyn std::error::Error + Send + Sync>> {
         // Stub implementation for getting asset
         Ok(None)
     }
 
     /// List all assets
-    pub async fn list_assets(&self) -> Result<Vec<Asset>, Box<dyn std::error::Error + Send + Sync>> {
+    pub async fn list_assets(
+        &self,
+    ) -> Result<Vec<Asset>, Box<dyn std::error::Error + Send + Sync>> {
         // Stub implementation for listing assets
         Ok(Vec::new())
     }
@@ -223,9 +228,7 @@ impl ContractManager {
     /// [AIR-3][AIS-3][BPC-3][RES-3]
     #[cfg(not(feature = "rust-bitcoin"))]
     pub fn new() -> Self {
-        Self {
-            _placeholder: (),
-        }
+        Self { _placeholder: () }
     }
 
     /// Create an RGB asset
@@ -472,9 +475,9 @@ pub enum TransferStatus {
 
 // [AIR-3][AIS-3][BPC-3][RES-3] Import Layer2Protocol trait and related types
 use crate::layer2::{
-    Layer2Protocol, AssetParams, AssetTransfer, Proof, ProtocolState, 
-    VerificationResult, ValidationResult, TransactionStatus, TransferResult,
-    create_protocol_state, create_verification_result, create_validation_result
+    create_protocol_state, create_validation_result, create_verification_result, AssetParams,
+    AssetTransfer, Layer2Protocol, Proof, ProtocolState, TransactionStatus, TransferResult,
+    ValidationResult, VerificationResult,
 };
 use async_trait::async_trait;
 
@@ -492,7 +495,7 @@ impl RgbProtocol {
             storage_path: "/tmp/rgb_assets".to_string(),
             network: "bitcoin".to_string(),
         };
-        
+
         Self {
             asset_registry: AssetRegistry::new(config),
             contract_manager: ContractManager::new(),
@@ -510,17 +513,28 @@ impl RgbProtocol {
     }
 
     /// Register a new asset
-    pub async fn register_asset(&mut self, asset: Asset) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
-        self.asset_registry.register_external_asset(asset).await.map_err(|e| Box::new(e) as Box<dyn std::error::Error + Send + Sync>)
+    pub async fn register_asset(
+        &mut self,
+        asset: Asset,
+    ) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+        self.asset_registry
+            .register_external_asset(asset)
+            .await
+            .map_err(|e| Box::new(e) as Box<dyn std::error::Error + Send + Sync>)
     }
 
     /// Get asset by ID
-    pub async fn get_asset(&self, asset_id: &str) -> Result<Option<Asset>, Box<dyn std::error::Error + Send + Sync>> {
+    pub async fn get_asset(
+        &self,
+        asset_id: &str,
+    ) -> Result<Option<Asset>, Box<dyn std::error::Error + Send + Sync>> {
         self.asset_registry.get_asset(asset_id).await
     }
 
     /// List all assets
-    pub async fn list_assets(&self) -> Result<Vec<Asset>, Box<dyn std::error::Error + Send + Sync>> {
+    pub async fn list_assets(
+        &self,
+    ) -> Result<Vec<Asset>, Box<dyn std::error::Error + Send + Sync>> {
         self.asset_registry.list_assets().await
     }
 }
@@ -547,12 +561,18 @@ impl Layer2Protocol for RgbProtocol {
         Ok(create_protocol_state("1.0", 0, None, true))
     }
 
-    async fn submit_transaction(&self, _tx_data: &[u8]) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+    async fn submit_transaction(
+        &self,
+        _tx_data: &[u8],
+    ) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
         let tx_id = format!("rgb_tx_{}", uuid::Uuid::new_v4());
         Ok(tx_id)
     }
 
-    async fn check_transaction_status(&self, _tx_id: &str) -> Result<TransactionStatus, Box<dyn std::error::Error + Send + Sync>> {
+    async fn check_transaction_status(
+        &self,
+        _tx_id: &str,
+    ) -> Result<TransactionStatus, Box<dyn std::error::Error + Send + Sync>> {
         use crate::layer2::TransactionStatus;
         Ok(TransactionStatus::Confirmed)
     }
@@ -562,25 +582,29 @@ impl Layer2Protocol for RgbProtocol {
         Ok(())
     }
 
-    async fn issue_asset(&self, params: AssetParams) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+    async fn issue_asset(
+        &self,
+        params: AssetParams,
+    ) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
         let asset = self.contract_manager.create_asset(
             &params.metadata,
             params.total_supply,
             params.precision,
-            &params.name
+            &params.name,
         )?;
-        
+
         Ok(asset.id)
     }
 
-    async fn transfer_asset(&self, transfer: AssetTransfer) -> Result<TransferResult, Box<dyn std::error::Error + Send + Sync>> {
-        use crate::layer2::{TransferResult, TransactionStatus};
-        let rgb_transfer = self.contract_manager.transfer_asset(
-            &transfer.from,
-            &transfer.to,
-            transfer.amount,
-        )?;
-        
+    async fn transfer_asset(
+        &self,
+        transfer: AssetTransfer,
+    ) -> Result<TransferResult, Box<dyn std::error::Error + Send + Sync>> {
+        use crate::layer2::{TransactionStatus, TransferResult};
+        let rgb_transfer =
+            self.contract_manager
+                .transfer_asset(&transfer.from, &transfer.to, transfer.amount)?;
+
         Ok(TransferResult {
             tx_id: rgb_transfer.nonce,
             status: TransactionStatus::Pending,
@@ -589,12 +613,18 @@ impl Layer2Protocol for RgbProtocol {
         })
     }
 
-    async fn verify_proof(&self, _proof: Proof) -> Result<VerificationResult, Box<dyn std::error::Error + Send + Sync>> {
+    async fn verify_proof(
+        &self,
+        _proof: Proof,
+    ) -> Result<VerificationResult, Box<dyn std::error::Error + Send + Sync>> {
         // RGB proof verification logic
         Ok(create_verification_result(true, None))
     }
 
-    async fn validate_state(&self, _state_data: &[u8]) -> Result<ValidationResult, Box<dyn std::error::Error + Send + Sync>> {
+    async fn validate_state(
+        &self,
+        _state_data: &[u8],
+    ) -> Result<ValidationResult, Box<dyn std::error::Error + Send + Sync>> {
         // RGB state validation logic
         Ok(create_validation_result(true, vec![]))
     }
