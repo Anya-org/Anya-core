@@ -280,7 +280,10 @@ impl LoadBalancer {
         let mut min_connections = u32::MAX;
 
         for (id, node) in nodes.iter() {
-            if node.enabled && node.health_status == HealthState::Healthy && node.active_connections < min_connections {
+            if node.enabled
+                && node.health_status == HealthState::Healthy
+                && node.active_connections < min_connections
+            {
                 min_connections = node.active_connections;
                 best_node = Some((id, node));
             }
@@ -298,7 +301,10 @@ impl LoadBalancer {
         let mut min_response_time = Duration::from_secs(u64::MAX);
 
         for (id, node) in nodes.iter() {
-            if node.enabled && node.health_status == HealthState::Healthy && node.response_time < min_response_time {
+            if node.enabled
+                && node.health_status == HealthState::Healthy
+                && node.response_time < min_response_time
+            {
                 min_response_time = node.response_time;
                 best_node = Some((id, node));
             }
@@ -631,7 +637,7 @@ mod tests {
         let config = create_test_config();
         // Create the load balancer within the timeout to ensure it's properly bound
         let load_balancer = LoadBalancer::new(&config);
-        
+
         // Enable the load balancer explicitly to prevent waiting in the add_node method
         *load_balancer.enabled.write().await = true;
 
@@ -660,7 +666,8 @@ mod tests {
 
             let nodes = load_balancer.get_nodes().await;
             assert!(!nodes.contains_key("test-node"));
-        }).await;
+        })
+        .await;
 
         // Log and continue even if timed out
         if result.is_err() {

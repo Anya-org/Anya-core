@@ -65,9 +65,10 @@ impl ClusterManager {
         // Add self node
         let self_node = NodeInfo {
             id: self.node_id.clone(),
-            address: self.membership_service.get_local_address().map_err(|e| {
-                HaError::ClusterError(format!("Failed to get local address: {e}"))
-            })?,
+            address: self
+                .membership_service
+                .get_local_address()
+                .map_err(|e| HaError::ClusterError(format!("Failed to get local address: {e}")))?,
             status: NodeStatus::Starting,
             role: NodeRole::Follower, // Start as follower
             last_heartbeat: Some(chrono::Utc::now()),

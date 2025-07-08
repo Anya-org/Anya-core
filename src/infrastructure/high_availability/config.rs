@@ -3,8 +3,7 @@ use std::time::Duration;
 
 /// Configuration for high availability system
 /// [AIR-3][AIS-3][PFM-3][SCL-3][RES-3]
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[derive(Default)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct HighAvailabilityConfig {
     /// General high availability settings
     pub general: GeneralConfig,
@@ -27,7 +26,6 @@ pub struct HighAvailabilityConfig {
     /// Disaster recovery configuration
     pub disaster_recovery: DisasterRecoveryConfig,
 }
-
 
 impl HighAvailabilityConfig {
     /// Creates a new configuration for development environment

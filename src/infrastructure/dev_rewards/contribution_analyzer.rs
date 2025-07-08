@@ -32,5 +32,6 @@ impl ContributionAnalyzer {
     }
 }
 
-#[allow(unused_imports)] // Required for future contribution analysis extensions (see docs/research/PROTOCOL_UPGRADES.md)
+#[allow(unused_imports)]
+// Required for future contribution analysis extensions (see docs/research/PROTOCOL_UPGRADES.md)
 use std::collections::HashMap;
