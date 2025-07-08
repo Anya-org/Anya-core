@@ -7,9 +7,7 @@ use anya_core::{
 // Fix import from tests - this will need to be adjusted based on how tests is made available
 // use tests::common::bitcoin_compat::*;
 
-use bitcoin::{
-    ScriptBuf, Transaction, absolute::LockTime, transaction::Version
-};
+use bitcoin::{absolute::LockTime, transaction::Version, ScriptBuf, Transaction};
 
 use std::io::Write;
 use std::path::Path;
@@ -22,7 +20,7 @@ fn test_transaction_validator_creation() {
     assert!(validator.maintains_consensus);
 }
 
-#[test]  
+#[test]
 fn test_transaction_validator_with_level() {
     let validator = TransactionValidator::with_level(ProtocolLevel::Enhanced);
     // Use public method instead of accessing private field
@@ -47,8 +45,8 @@ fn test_validate_taproot_transaction() {
     // In a real test, we would create a valid Taproot transaction
     // For now, we'll mock this with a dummy transaction
     let tx = Transaction {
-        version: Version::ONE,  // Use Version::ONE instead of hardcoded 2
-        lock_time: LockTime::ZERO,  // Use imported LockTime
+        version: Version::ONE,     // Use Version::ONE instead of hardcoded 2
+        lock_time: LockTime::ZERO, // Use imported LockTime
         input: vec![],
         output: vec![],
     };

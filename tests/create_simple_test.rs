@@ -1,4 +1,4 @@
-use bitcoin::{Transaction};
+use bitcoin::Transaction;
 
 // Mock test utilities since common module doesn't exist
 struct TestTransactionFactory;
@@ -24,12 +24,12 @@ impl TestTransactionFactory {
 fn test_create_simple() {
     // This test should just verify that create_simple creates a valid transaction
     let tx = TestTransactionFactory::create_simple();
-    
+
     // Verify the transaction has the expected properties
     assert_eq!(tx.version, bitcoin::transaction::Version::ONE);
     assert_eq!(tx.lock_time, bitcoin::locktime::absolute::LockTime::ZERO);
     assert_eq!(tx.input.len(), 0);
     assert_eq!(tx.output.len(), 0);
-    
+
     println!("Transaction created successfully");
 }

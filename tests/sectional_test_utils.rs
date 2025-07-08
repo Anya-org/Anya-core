@@ -162,8 +162,8 @@ pub mod sectional {
     where
         F: FnOnce() -> T,
     {
-        use std::mem;
         use std::alloc::GlobalAlloc;
+        use std::mem;
 
         // Force a garbage collection if possible (fixed unsafe call)
         unsafe {

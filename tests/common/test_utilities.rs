@@ -140,7 +140,7 @@ impl FileTestEnvironment {
     /// Create a new file-based test environment with a temporary directory
     pub fn new() -> Self {
         use std::fs;
-        
+
         // Create a temporary directory for the test
         let timestamp = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
@@ -156,7 +156,7 @@ impl FileTestEnvironment {
 
         Self { test_dir }
     }
-    
+
     /// Clean up the test environment
     pub fn cleanup(&self) {
         use std::fs;
@@ -175,7 +175,7 @@ impl MockFactory {
     pub fn create_mock_secp_context() -> Secp256k1<secp256k1::All> {
         Secp256k1::new()
     }
-    
+
     /// Simulate a Bitcoin transaction ID for testing
     pub fn simulate_bitcoin_txid() -> String {
         let timestamp = std::time::SystemTime::now()
@@ -215,7 +215,7 @@ impl MockFactory {
 
         format!("rgb1{:x}", timestamp)
     }
-    
+
     /// Create mock key pair for testing
     pub fn create_mock_keypair() -> (SecretKey, PublicKey) {
         let secp = Self::create_mock_secp_context();
@@ -291,7 +291,6 @@ impl TestAssertions {
         );
     }
 }
-
 
 #[cfg(test)]
 mod tests {

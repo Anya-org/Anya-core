@@ -4,7 +4,9 @@ use anya_core::infrastructure::{Database, Monitoring, MonitoringConfig};
 
 #[tokio::test]
 async fn test_database_new_and_migrations() {
-    let db = Database::new("sqlite://memory").await.expect("Database creation failed");
+    let db = Database::new("sqlite://memory")
+        .await
+        .expect("Database creation failed");
     db.run_migrations().await.expect("Migrations failed");
 }
 

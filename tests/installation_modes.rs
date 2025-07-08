@@ -1,8 +1,8 @@
 #[cfg(test)]
 mod tests {
-    use anya_core::install::{AnyaInstaller, InstallationSource, BitcoinConfig};
+    use anya_core::install::{AnyaInstaller, BitcoinConfig, InstallationSource};
     use bitcoin::psbt::Psbt; // Changed from PartiallySignedTransaction
-    
+
     use tempfile::TempDir;
 
     #[tokio::test]
@@ -35,7 +35,9 @@ mod tests {
         };
 
         let temp_dir = TempDir::new().unwrap();
-        let source = InstallationSource::GitRepository("https://github.com/anya-org/anya-core.git".to_string());
+        let source = InstallationSource::GitRepository(
+            "https://github.com/anya-org/anya-core.git".to_string(),
+        );
 
         let bitcoin_config = BitcoinConfig {
             network: "testnet".to_string(),

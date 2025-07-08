@@ -5,18 +5,15 @@
 
 #[cfg(all(feature = "security-validation", feature = "disabled"))] // Double guard to disable
 use anya_core::{
-    bitcoin::{
-        validation::{TransactionValidator},
-    },
-    hardware_optimization::HardwareOptimizationManager,
+    bitcoin::validation::TransactionValidator, hardware_optimization::HardwareOptimizationManager,
 };
 
-use bitcoin::{
-    Amount, Block, OutPoint, ScriptBuf, Transaction, TxIn, TxOut,
-    Witness, absolute::LockTime, transaction::Version, Sequence,
-};
 #[cfg(feature = "rust-bitcoin")]
 use anya_core::bitcoin::interface::BlockHeader;
+use bitcoin::{
+    absolute::LockTime, transaction::Version, Amount, Block, OutPoint, ScriptBuf, Sequence,
+    Transaction, TxIn, TxOut, Witness,
+};
 use std::collections::HashMap;
 use std::sync::Arc;
 

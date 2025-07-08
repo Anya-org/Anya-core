@@ -40,7 +40,7 @@ mod tests {
     /// Performance tests
     mod performance_tests {
         use super::*;
-        
+
         #[test]
         fn test_performance_measurement() {
             let start = Instant::now();

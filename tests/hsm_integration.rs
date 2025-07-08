@@ -1,10 +1,10 @@
 //! HSM Integration Tests
 #![cfg(feature = "hsm")]
 
-use anya_core::security::hsm::HsmManager;
 use anya_core::security::hsm::config::{HsmConfig, SoftHsmConfig};
-use anya_core::security::hsm::providers::SoftwareHsmProvider;
 use anya_core::security::hsm::provider::{HsmProvider, HsmProviderType};
+use anya_core::security::hsm::providers::SoftwareHsmProvider;
+use anya_core::security::hsm::HsmManager;
 use bitcoin::Network;
 use std::sync::Arc;
 
@@ -12,7 +12,7 @@ use std::sync::Arc;
 async fn test_hsm_basic_functionality() {
     // Simple test that doesn't require complex configuration
     // Just test that HSM types can be imported and instantiated
-    
+
     let config = SoftHsmConfig {
         token_dir: "/tmp/test_tokens".to_string(),
         max_sessions: 5,
@@ -21,7 +21,7 @@ async fn test_hsm_basic_functionality() {
         use_testnet: true,
     };
 
-    // Test that we can create config - actual HSM functionality 
+    // Test that we can create config - actual HSM functionality
     // would require proper audit logger implementation
     println!("HSM config created: {:?}", config);
     assert!(config.token_dir.contains("test"));

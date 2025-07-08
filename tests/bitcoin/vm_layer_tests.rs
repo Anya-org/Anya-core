@@ -8,7 +8,7 @@ use std::time::Instant;
 /// VM layer system tests
 mod vm_layer_tests {
     use super::*;
-    
+
     #[test]
     fn test_vm_initialization() {
         // Mock test for VM layer initialization
@@ -22,21 +22,21 @@ mod vm_layer_tests {
             assert!(true);
         }
     }
-    
+
     #[test]
     fn test_vm_configuration() {
         // Mock test for VM configuration
         let vm_configured = true;
         assert!(vm_configured);
     }
-    
+
     #[test]
     fn test_isolation_levels() {
         // Mock test for isolation levels
         let isolation_enforced = true;
         assert!(isolation_enforced);
     }
-    
+
     #[test]
     fn test_resource_management() {
         // Mock test for resource management
@@ -48,7 +48,7 @@ mod vm_layer_tests {
 /// Performance tests
 mod performance_tests {
     use super::*;
-    
+
     #[test]
     fn test_vm_performance() {
         let start = Instant::now();
@@ -59,7 +59,7 @@ mod performance_tests {
         let duration = start.elapsed();
         assert!(duration.as_nanos() > 0);
     }
-    
+
     #[test]
     fn test_layer_operations() {
         // Mock test for layer operations
@@ -71,14 +71,14 @@ mod performance_tests {
 /// Security tests
 mod security_tests {
     use super::*;
-    
+
     #[test]
     fn test_vm_security() {
         // Mock test for VM security
         let security_validated = true;
         assert!(security_validated);
     }
-    
+
     #[test]
     fn test_system_state() {
         // Mock test for system state
