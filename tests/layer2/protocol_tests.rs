@@ -1,13 +1,13 @@
 use anya_core::{
-    core::reliability::{AiVerification, ProgressTracker, Watchdog, ConfidenceAssessment},
+    core::reliability::{AiVerification, ConfidenceAssessment, ProgressTracker, Watchdog},
     layer2::{
         AssetParams, AssetTransfer, Layer2Protocol, Proof, ProtocolState, TransactionStatus,
         TransferResult, ValidationResult, VerificationResult,
     },
     AnyaError, AnyaResult,
 };
-use std::time::Duration;
 use mockall::{mock, predicate::*};
+use std::time::Duration;
 
 /// Test milestone tracking
 #[derive(Debug, Clone, PartialEq)]
@@ -61,7 +61,10 @@ impl ProtocolTestSuite {
     }
 
     /// Run all test milestones for a protocol
-    pub async fn run_protocol_tests<P: Layer2Protocol>(&mut self, protocol: &mut P) -> AnyaResult<()> {
+    pub async fn run_protocol_tests<P: Layer2Protocol>(
+        &mut self,
+        protocol: &mut P,
+    ) -> AnyaResult<()> {
         let total_milestones = self.milestones.len();
         // To avoid borrow checker issues, collect indices first
         let indices: Vec<usize> = (0..self.milestones.len()).collect();
@@ -118,28 +121,45 @@ impl ProtocolTestSuite {
     /// Test protocol initialization
     async fn test_initialization<P: Layer2Protocol>(&self, protocol: &mut P) -> AnyaResult<()> {
         let result = protocol.initialize().await.map(|_| ());
-        self.verify_result(result.map_err(|e| AnyaError::InvalidInput(e.to_string())), "Protocol initialization")
+        self.verify_result(
+            result.map_err(|e| AnyaError::InvalidInput(e.to_string())),
+            "Protocol initialization",
+        )
     }
 
     /// Test protocol connection
     async fn test_connection<P: Layer2Protocol>(&self, protocol: &mut P) -> AnyaResult<()> {
         let result = protocol.connect().await.map(|_| ());
-        self.verify_result(result.map_err(|e| AnyaError::InvalidInput(e.to_string())), "Protocol connection")
+        self.verify_result(
+            result.map_err(|e| AnyaError::InvalidInput(e.to_string())),
+            "Protocol connection",
+        )
     }
 
     /// Test transaction submission
-    async fn test_transaction_submission<P: Layer2Protocol>(&self, protocol: &mut P) -> AnyaResult<()> {
+    async fn test_transaction_submission<P: Layer2Protocol>(
+        &self,
+        protocol: &mut P,
+    ) -> AnyaResult<()> {
         // Create a test transaction
         let tx = vec![0u8; 100]; // Placeholder transaction data
 
         let result = protocol.submit_transaction(&tx).await.map(|_| ());
-        self.verify_result(result.map_err(|e| AnyaError::InvalidInput(e.to_string())), "Transaction submission")
+        self.verify_result(
+            result.map_err(|e| AnyaError::InvalidInput(e.to_string())),
+            "Transaction submission",
+        )
     }
 
     /// Test state management
     async fn test_state_management<P: Layer2Protocol>(&self, protocol: &mut P) -> AnyaResult<()> {
         let state_result = protocol.get_state().await;
-        self.verify_result(state_result.map_err(|e| AnyaError::InvalidInput(e.to_string())).map(|_| ()), "State retrieval")?;
+        self.verify_result(
+            state_result
+                .map_err(|e| AnyaError::InvalidInput(e.to_string()))
+                .map(|_| ()),
+            "State retrieval",
+        )?;
 
         // Note: in a real implementation, sync_state requires &mut self
         // For testing we're mocking the behavior without actually modifying state
@@ -160,7 +180,10 @@ impl ProtocolTestSuite {
         };
 
         let issue_result = protocol.issue_asset(params).await.map(|_| ());
-        self.verify_result(issue_result.map_err(|e| AnyaError::InvalidInput(e.to_string())), "Asset issuance")?;
+        self.verify_result(
+            issue_result.map_err(|e| AnyaError::InvalidInput(e.to_string())),
+            "Asset issuance",
+        )?;
 
         let transfer = AssetTransfer {
             asset_id: "test_asset".to_string(),
@@ -172,7 +195,10 @@ impl ProtocolTestSuite {
         };
 
         let transfer_result = protocol.transfer_asset(transfer).await.map(|_| ());
-        self.verify_result(transfer_result.map_err(|e| AnyaError::InvalidInput(e.to_string())), "Asset transfer")
+        self.verify_result(
+            transfer_result.map_err(|e| AnyaError::InvalidInput(e.to_string())),
+            "Asset transfer",
+        )
     }
 
     /// Test security features
@@ -180,13 +206,19 @@ impl ProtocolTestSuite {
         let proof = Proof::default(); // Placeholder proof
 
         let verify_result = protocol.verify_proof(proof).await.map(|_| ());
-        self.verify_result(verify_result.map_err(|e| AnyaError::InvalidInput(e.to_string())), "Proof verification")?;
+        self.verify_result(
+            verify_result.map_err(|e| AnyaError::InvalidInput(e.to_string())),
+            "Proof verification",
+        )?;
 
         let _state = ProtocolState::default(); // Placeholder state
-        // The validate_state method expects a &[u8], so serialize state if needed
-        // For now, pass an empty slice or implement serialization as needed
+                                               // The validate_state method expects a &[u8], so serialize state if needed
+                                               // For now, pass an empty slice or implement serialization as needed
         let validate_result = protocol.validate_state(&[]).await.map(|_| ());
-        self.verify_result(validate_result.map_err(|e| AnyaError::InvalidInput(e.to_string())), "State validation")
+        self.verify_result(
+            validate_result.map_err(|e| AnyaError::InvalidInput(e.to_string())),
+            "State validation",
+        )
     }
 
     /// Test performance
@@ -197,7 +229,13 @@ impl ProtocolTestSuite {
 
         for _ in 0..100 {
             let tx = vec![0u8; 100];
-            if protocol.submit_transaction(&tx).await.map(|_| ()).map_err(|e| AnyaError::InvalidInput(e.to_string())).is_ok() {
+            if protocol
+                .submit_transaction(&tx)
+                .await
+                .map(|_| ())
+                .map_err(|e| AnyaError::InvalidInput(e.to_string()))
+                .is_ok()
+            {
                 tx_count += 1;
             }
         }

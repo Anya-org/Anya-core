@@ -4,7 +4,7 @@
 mod rgb_tests {
     use anya_core::layer2::rgb::ContractManager;
     use tempfile::tempdir;
-    
+
     // Test constants
     const SENDER_ADDRESS: &str = "tb1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh";
     const RECIPIENT_ADDRESS: &str = "tb1q6kj3wqj5r7c0h5lt6l5q6vzv8cj3egl2kpmnd7";
