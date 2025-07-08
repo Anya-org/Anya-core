@@ -9,8 +9,7 @@ use std::fmt;
 pub mod testing;
 
 /// Bitcoin Protocol Compliance Level [BPC-3]
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
-#[derive(Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Default)]
 pub enum BPCLevel {
     /// No Bitcoin protocol compliance
     None = 0,
@@ -24,7 +23,6 @@ pub enum BPCLevel {
     /// BPC-3 compliant protocol (highest level)
     BPC3 = 4,
 }
-
 
 impl fmt::Display for BPCLevel {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -83,23 +81,28 @@ impl BitcoinProtocol {
             ],
         }
     }
-    
+
     /// Validate a Bitcoin transaction according to protocol rules
-    pub fn validate_transaction(&self, tx: &bitcoin::Transaction) -> Result<(), crate::bitcoin::error::BitcoinError> {
+    pub fn validate_transaction(
+        &self,
+        tx: &bitcoin::Transaction,
+    ) -> Result<(), crate::bitcoin::error::BitcoinError> {
         // Basic transaction validation - placeholder implementation
         if tx.output.is_empty() {
-            return Err(crate::bitcoin::error::BitcoinError::ValidationError("Transaction has no outputs".to_string()));
+            return Err(crate::bitcoin::error::BitcoinError::ValidationError(
+                "Transaction has no outputs".to_string(),
+            ));
         }
-        
+
         // Additional validation logic would go here
         Ok(())
     }
-    
+
     /// Check if Taproot is enabled for this protocol instance
     pub fn is_taproot_enabled(&self) -> bool {
         self.supported_bips.contains(&341) // BIP-341 is Taproot
     }
-    
+
     /// Get the current protocol level
     pub fn get_level(&self) -> BPCLevel {
         self.level

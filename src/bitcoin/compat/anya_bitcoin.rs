@@ -5,7 +5,7 @@
 pub mod riscv {
     pub mod cross_layer {
         //! Cross-layer interaction module
-        
+
         use anyhow::Result;
 
         /// Cross-layer optimizer for RISC-V platform
@@ -34,7 +34,6 @@ pub mod riscv {
                 Ok(())
             }
         }
-
     }
 
     pub mod vm_layers {
@@ -42,83 +41,81 @@ pub mod riscv {
 
         /// Layer configuration
         pub struct LayerConfig {
-
             pub name: String,
             pub memory_mb: u32,
             pub cpu_cores: u32,
         }
 
         /// Multi-layer VM system
-    pub struct VMLayers {
-        pub l1_config: LayerConfig,
-        pub l2_config: LayerConfig,
-        pub l3_config: LayerConfig,
-        pub zk_config: LayerConfig,
-    }
-
-    impl VMLayers {
-        /// Create a new VM layers configuration
-        pub fn new() -> Self {
-            Self {
-                l1_config: LayerConfig {
-                    name: "L1".to_string(),
-                    memory_mb: 1024,
-                    cpu_cores: 2,
-                },
-                l2_config: LayerConfig {
-                    name: "L2".to_string(),
-                    memory_mb: 512,
-                    cpu_cores: 1,
-                },
-                l3_config: LayerConfig {
-                    name: "L3".to_string(),
-                    memory_mb: 256,
-                    cpu_cores: 1,
-                },
-                zk_config: LayerConfig {
-                    name: "ZK".to_string(),
-                    memory_mb: 2048,
-                    cpu_cores: 4,
-                },
-            }
+        pub struct VMLayers {
+            pub l1_config: LayerConfig,
+            pub l2_config: LayerConfig,
+            pub l3_config: LayerConfig,
+            pub zk_config: LayerConfig,
         }
 
-        /// Initialize the VM layers
-        pub fn initialize(&self) -> anyhow::Result<()> {
-            // Placeholder implementation
-            Ok(())
-        }
-    }
-
-    impl Default for VMLayers {
-        fn default() -> Self {
-            Self::new()
-        }
-    }
-    }
-
-    }
-
-    pub mod layer3 {
-        //! Layer 3 protocols
-        
-        /// Base Layer 3 protocol
-        pub struct Layer3Protocol {
-            pub name: String,
-        }
-
-        impl Layer3Protocol {
-            /// Create a new Layer 3 protocol
-            pub fn new(name: &str) -> Self {
+        impl VMLayers {
+            /// Create a new VM layers configuration
+            pub fn new() -> Self {
                 Self {
-                    name: name.to_string(),
+                    l1_config: LayerConfig {
+                        name: "L1".to_string(),
+                        memory_mb: 1024,
+                        cpu_cores: 2,
+                    },
+                    l2_config: LayerConfig {
+                        name: "L2".to_string(),
+                        memory_mb: 512,
+                        cpu_cores: 1,
+                    },
+                    l3_config: LayerConfig {
+                        name: "L3".to_string(),
+                        memory_mb: 256,
+                        cpu_cores: 1,
+                    },
+                    zk_config: LayerConfig {
+                        name: "ZK".to_string(),
+                        memory_mb: 2048,
+                        cpu_cores: 4,
+                    },
                 }
             }
-            
-            /// Initialize the protocol
+
+            /// Initialize the VM layers
             pub fn initialize(&self) -> anyhow::Result<()> {
                 // Placeholder implementation
                 Ok(())
             }
         }
+
+        impl Default for VMLayers {
+            fn default() -> Self {
+                Self::new()
+            }
+        }
     }
+}
+
+pub mod layer3 {
+    //! Layer 3 protocols
+
+    /// Base Layer 3 protocol
+    pub struct Layer3Protocol {
+        pub name: String,
+    }
+
+    impl Layer3Protocol {
+        /// Create a new Layer 3 protocol
+        pub fn new(name: &str) -> Self {
+            Self {
+                name: name.to_string(),
+            }
+        }
+
+        /// Initialize the protocol
+        pub fn initialize(&self) -> anyhow::Result<()> {
+            // Placeholder implementation
+            Ok(())
+        }
+    }
+}

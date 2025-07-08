@@ -417,14 +417,14 @@ impl Bip341Taproot {
         // When we're testing, use the test internal key directly as output key
         // This avoids the need for proper SECP256k1 cryptographic operations
         // In production, you would use the proper taproot tweaking process
-        
+
         // For testing purposes, we're using a simplified approach
         // If this is a real implementation, use the bitcoin taproot functions
-        
+
         // We'll use the internal key directly, as this is sufficient for the test
         // This simplifies test cases by avoiding cryptographic complexities
         let output_key = internal_key;
-        
+
         Ok(TaprootOutput {
             internal_key,
             merkle_root,

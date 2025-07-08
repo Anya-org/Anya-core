@@ -241,8 +241,7 @@ impl KeyManager for Wallet {
             .as_ref()
             .ok_or_else(|| BitcoinError::Wallet("Wallet not initialized".to_string()))?;
 
-        bip32::derive_key_from_seed(seed, path)
-            .map_err(|e| AnyaError::Bitcoin(e.to_string()))
+        bip32::derive_key_from_seed(seed, path).map_err(|e| AnyaError::Bitcoin(e.to_string()))
     }
 
     fn get_public_key(&self, path: &str) -> AnyaResult<bitcoin::secp256k1::PublicKey> {
@@ -507,7 +506,12 @@ impl UnifiedWallet for Wallet {
 
         // Convert the key to a Stacks address format
         // Note: This is a simplified implementation. Production would use proper Stacks address derivation
-        let address_hash = format!("{:x}", secret_key.secret_bytes()[0..20].iter().fold(0u64, |acc, &b| acc.wrapping_mul(256).wrapping_add(b as u64)));
+        let address_hash = format!(
+            "{:x}",
+            secret_key.secret_bytes()[0..20]
+                .iter()
+                .fold(0u64, |acc, &b| acc.wrapping_mul(256).wrapping_add(b as u64))
+        );
         Ok(format!("ST{}", &address_hash[..32].to_uppercase()))
     }
 
@@ -519,7 +523,12 @@ impl UnifiedWallet for Wallet {
         // Note: This is a simplified implementation. Production would use proper RSK address derivation
         let public_key = bitcoin::secp256k1::PublicKey::from_secret_key(&self.secp, &secret_key);
         let address_bytes = &public_key.serialize()[1..]; // Remove 0x04 prefix
-        let address_hash = format!("{:02x}", address_bytes[0..20].iter().fold(0u64, |acc, &b| acc.wrapping_mul(256).wrapping_add(b as u64)));
+        let address_hash = format!(
+            "{:02x}",
+            address_bytes[0..20]
+                .iter()
+                .fold(0u64, |acc, &b| acc.wrapping_mul(256).wrapping_add(b as u64))
+        );
         Ok(format!("0x{}", &address_hash[..40]))
     }
 
@@ -531,7 +540,12 @@ impl UnifiedWallet for Wallet {
         // Note: This is a simplified implementation. Production would use proper Liquid address derivation
         let public_key = bitcoin::secp256k1::PublicKey::from_secret_key(&self.secp, &secret_key);
         let address_bytes = &public_key.serialize()[1..]; // Remove 0x04 prefix
-        let address_hash = format!("{:02x}", address_bytes[0..25].iter().fold(0u128, |acc, &b| acc.wrapping_mul(256).wrapping_add(b as u128)));
+        let address_hash = format!(
+            "{:02x}",
+            address_bytes[0..25].iter().fold(0u128, |acc, &b| acc
+                .wrapping_mul(256)
+                .wrapping_add(b as u128))
+        );
         Ok(format!("VT{}", &address_hash[..50]))
     }
 
@@ -919,7 +933,8 @@ pub struct WalletInfo {
 /// Bitcoin wallet implementation
 pub struct BitcoinWallet {
     /// Wallet configuration
-    #[allow(dead_code)] // Required for future wallet extensibility and compliance (see docs/INDEX_CORRECTED.md)
+    #[allow(dead_code)]
+    // Required for future wallet extensibility and compliance (see docs/INDEX_CORRECTED.md)
     config: WalletConfig,
 
     /// Wallet data storage
@@ -927,7 +942,8 @@ pub struct BitcoinWallet {
     storage: Arc<Mutex<WalletStorage>>,
 
     /// Secp256k1 context
-    #[allow(dead_code)] // Required for future cryptographic operations (see docs/research/PROTOCOL_UPGRADES.md)
+    #[allow(dead_code)]
+    // Required for future cryptographic operations (see docs/research/PROTOCOL_UPGRADES.md)
     secp: Secp256k1<bitcoin::secp256k1::All>,
 }
 

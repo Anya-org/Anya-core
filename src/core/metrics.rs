@@ -13,7 +13,6 @@ pub struct PrometheusMetrics {
     labels: HashMap<String, Vec<(String, String)>>,
 }
 
-
 impl PrometheusMetrics {
     /// Create new metrics collector
     pub fn new() -> Self {

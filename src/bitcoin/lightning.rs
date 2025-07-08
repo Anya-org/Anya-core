@@ -372,9 +372,8 @@ impl LightningNode {
         let secp = LightningSecp256k1::new();
 
         // Generate a node key (in a real implementation this would be read from storage)
-        let node_secret = Secp256k1SecretKey::from_slice(&[0x42; 32]).map_err(|e| {
-            AnyaError::Bitcoin(format!("Failed to create Lightning node key: {e}"))
-        })?;
+        let node_secret = Secp256k1SecretKey::from_slice(&[0x42; 32])
+            .map_err(|e| AnyaError::Bitcoin(format!("Failed to create Lightning node key: {e}")))?;
         let node_id = LightningPublicKey::from_secret_key(&secp, &node_secret);
 
         // Create initial state
