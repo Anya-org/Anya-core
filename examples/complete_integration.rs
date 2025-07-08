@@ -1,5 +1,5 @@
-use anya_core::bitcoin::BitcoinNode;
 use anya_core::bitcoin::config::BitcoinConfig;
+use anya_core::bitcoin::BitcoinNode;
 use log::info;
 
 #[tokio::main]

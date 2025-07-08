@@ -6,7 +6,7 @@
 //!
 //! TEMPORARILY DISABLED - hardware_optimization module needs to be properly integrated
 
-/* 
+/*
 use rand::{thread_rng, Rng};
 use std::error::Error;
 use std::sync::Arc;

@@ -27,7 +27,10 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     // Send encrypted message
     client
-        .send_message("Hello, this is an encrypted message!", Some("recipient_pubkey"))
+        .send_message(
+            "Hello, this is an encrypted message!",
+            Some("recipient_pubkey"),
+        )
         .await?;
 
     // Publish public note (commented out - API not yet implemented)
@@ -42,7 +45,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     //         client.get_relay_health_score(&relay).await?
     //     );
     // }
-    
+
     println!("Nostr client example completed successfully!");
 
     Ok(())
