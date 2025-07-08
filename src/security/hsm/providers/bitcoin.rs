@@ -308,19 +308,26 @@ impl HsmProvider for BitcoinHsmProvider {
         drop(status);
 
         // Check key type
-        let key_pair =        match &params.key_type {
-            KeyType::Ec { curve } if *curve == crate::security::hsm::provider::EcCurve::Secp256k1 => {
+        let key_pair = match &params.key_type {
+            KeyType::Ec { curve }
+                if *curve == crate::security::hsm::provider::EcCurve::Secp256k1 =>
+            {
                 self.generate_bitcoin_key(&params).await?
             }
-            _ => return Err(HsmError::InvalidParameters(format!(
-                "Unsupported key type: {:?}",
-                params.key_type
-            ))),
+            _ => {
+                return Err(HsmError::InvalidParameters(format!(
+                    "Unsupported key type: {:?}",
+                    params.key_type
+                )))
+            }
         };
-        
+
         // Create key info
         let key_info = KeyInfo {
-            id: params.id.clone().unwrap_or_else(|| Uuid::new_v4().to_string()),
+            id: params
+                .id
+                .clone()
+                .unwrap_or_else(|| Uuid::new_v4().to_string()),
             key_type: params.key_type.clone(),
             attributes: params.attributes.clone(),
             created_at: Utc::now(),
@@ -329,7 +336,7 @@ impl HsmProvider for BitcoinHsmProvider {
             extractable: params.extractable,
             label: params.label.clone(),
         };
-        
+
         Ok((key_pair, key_info))
     }
 

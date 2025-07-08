@@ -451,12 +451,14 @@ pub async fn create_hsm_provider(config: &HsmConfig) -> Result<Arc<dyn HsmProvid
             // Import the SoftwareHsmProvider from providers/software.rs
             // Create a dummy audit logger for now - this function signature needs updating
             let audit_config = crate::security::hsm::audit::AuditLoggerConfig::default();
-            let audit_logger = Arc::new(crate::security::hsm::audit::AuditLogger::new(&audit_config).await?);
+            let audit_logger =
+                Arc::new(crate::security::hsm::audit::AuditLogger::new(&audit_config).await?);
             let provider = SoftwareHsmProvider::new(
                 config.software.clone(),
                 bitcoin::Network::from(config.bitcoin.network),
-                audit_logger
-            ).await?;
+                audit_logger,
+            )
+            .await?;
             Ok(Arc::new(provider))
         }
         HsmProviderType::CloudHsm => {
@@ -486,12 +488,14 @@ pub async fn create_hsm_provider(config: &HsmConfig) -> Result<Arc<dyn HsmProvid
             // Import the HardwareHsmProvider from providers/hardware.rs
             // Create a dummy audit logger for now - this function signature needs updating
             let audit_config = crate::security::hsm::audit::AuditLoggerConfig::default();
-            let audit_logger = Arc::new(crate::security::hsm::audit::AuditLogger::new(&audit_config).await?);
+            let audit_logger =
+                Arc::new(crate::security::hsm::audit::AuditLogger::new(&audit_config).await?);
             let provider = HardwareHsmProvider::new(
                 &config.hardware,
                 bitcoin::Network::from(config.bitcoin.network),
-                audit_logger
-            ).await?;
+                audit_logger,
+            )
+            .await?;
             Ok(Arc::new(provider))
         }
         HsmProviderType::Bitcoin => {
@@ -654,9 +658,12 @@ impl HsmProvider for SoftHsmProvider {
             HsmOperation::Sign => {
                 // Parse the parameters
                 let key_id: String = match request.parameters.get("key_id") {
-                    Some(value) if value.is_string() => value.as_str().ok_or_else(|| {
-                        HsmError::InvalidParameters("key_id is not a valid string".to_string())
-                    })?.to_string(),
+                    Some(value) if value.is_string() => value
+                        .as_str()
+                        .ok_or_else(|| {
+                            HsmError::InvalidParameters("key_id is not a valid string".to_string())
+                        })?
+                        .to_string(),
                     _ => {
                         return Err(HsmError::InvalidParameters(
                             "Missing or invalid key_id parameter".to_string(),
@@ -665,9 +672,12 @@ impl HsmProvider for SoftHsmProvider {
                 };
 
                 let data_base64: String = match request.parameters.get("data") {
-                    Some(value) if value.is_string() => value.as_str().ok_or_else(|| {
-                        HsmError::InvalidParameters("data is not a valid string".to_string())
-                    })?.to_string(),
+                    Some(value) if value.is_string() => value
+                        .as_str()
+                        .ok_or_else(|| {
+                            HsmError::InvalidParameters("data is not a valid string".to_string())
+                        })?
+                        .to_string(),
                     _ => {
                         return Err(HsmError::InvalidParameters(
                             "Missing or invalid data parameter".to_string(),
