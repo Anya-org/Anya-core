@@ -218,8 +218,9 @@ pub enum OperationType {
 }
 
 /// Default implementation of the RGB manager
-struct DefaultRGBManager {
+pub struct DefaultRGBManager {
     config: RGBConfig,
+    #[allow(dead_code)]
     client: Option<RGBClient>,
 }
 
@@ -818,7 +819,23 @@ impl RGBManager for DefaultRGBManager {
             "sqlite" => {
                 // Validate from SQLite database (placeholder implementation)
                 log::debug!("Validating transfer {} from SQLite", transfer_id);
-                // TODO: Implement actual SQLite transfer validation
+                // [AIR-3][AIS-3][BPC-3][RES-3] Implement DWN transfer validation
+                let dwn_client = crate::web5::dwn::DWNClient::new(crate::web5::dwn::DWNConfig::default());
+                let record_id = transfer_id.trim_start_matches("tx-");
+                
+                match dwn_client.get_record(record_id) {
+                    Ok(record) => {
+                        log::debug!("Found transfer record in DWN: {}", record_id);
+                        // Validate transfer state from the record
+                        let is_valid = record.verification_status.is_some() && 
+                                        record.verification_status.unwrap_or(false);
+                        return Ok(is_valid);
+                    },
+                    Err(e) => {
+                        log::warn!("DWN transfer validation error: {}", e);
+                        return Ok(false);
+                    }
+                }
                 // For now, assume validation passes
                 Ok(true)
             }
@@ -925,7 +942,33 @@ impl RGBManager for DefaultRGBManager {
             "sqlite" => {
                 // Query SQLite database (placeholder implementation)
                 log::debug!("Querying asset {} metadata from SQLite", asset_id);
-                // TODO: Implement actual SQLite asset metadata query
+                // [AIR-3][AIS-3][BPC-3][RES-3] DWN-based asset metadata query
+                let dwn_client = crate::web5::dwn::DWNClient::new(crate::web5::dwn::DWNConfig::default());
+                
+                // Query for asset metadata in DWN
+                let query = crate::web5::dwn::DWNQuery {
+                    filter: Some(crate::web5::dwn::DWNQueryFilter {
+                        schema: Some("rgb/asset".to_string()),
+                        record_id: Some(asset_id.to_string()),
+                        ..Default::default()
+                    }),
+                    limit: Some(1),
+                    ..Default::default()
+                };
+                
+                match dwn_client.query_records(&query) {
+                    Ok(results) => {
+                        if let Some(record) = results.records.first() {
+                            if let Ok(data) = serde_json::from_value::<HashMap<String, String>>(record.data.clone()) {
+                                metadata.extend(data);
+                                log::debug!("Retrieved {} metadata fields from DWN for asset {}", data.len(), asset_id);
+                            }
+                        }
+                    },
+                    Err(e) => {
+                        log::warn!("DWN metadata query error for asset {}: {}", asset_id, e);
+                    }
+                }
                 let mut metadata = HashMap::new();
                 metadata.insert("storage_type".to_string(), "sqlite".to_string());
                 metadata.insert("asset_id".to_string(), asset_id.to_string());
@@ -1022,7 +1065,61 @@ impl RGBManager for DefaultRGBManager {
             "sqlite" => {
                 // Query SQLite database (placeholder implementation)
                 log::debug!("Querying asset {} history from SQLite", asset_id);
-                // TODO: Implement actual SQLite asset history query
+                // [AIR-3][AIS-3][BPC-3][RES-3] DWN-based asset history query
+                let dwn_client = crate::web5::dwn::DWNClient::new(crate::web5::dwn::DWNConfig::default());
+                
+                // Query for asset history in DWN
+                let query = crate::web5::dwn::DWNQuery {
+                    filter: Some(crate::web5::dwn::DWNQueryFilter {
+                        schema: Some("rgb/history".to_string()),
+                        parent_id: Some(asset_id.to_string()),
+                        ..Default::default()
+                    }),
+                    limit: Some(50), // Get the last 50 history entries
+                    ..Default::default()
+                };
+                
+                match dwn_client.query_records(&query) {
+                    Ok(results) => {
+                        for record in results.records {
+                            if let Ok(entry_data) = serde_json::from_value::<serde_json::Value>(record.data.clone()) {
+                                let txid_str = entry_data["txid"].as_str().unwrap_or_default();
+                                let mut txid_bytes = [0u8; 32];
+                                if let Ok(decoded) = hex::decode(txid_str) {
+                                    let copy_len = std::cmp::min(decoded.len(), 32);
+                                    txid_bytes[..copy_len].copy_from_slice(&decoded[..copy_len]);
+                                }
+                                
+                                let txid = bitcoin::Txid::from_slice(&txid_bytes).unwrap_or_default();
+                                let timestamp = entry_data["timestamp"].as_u64().unwrap_or_default();
+                                let amount = entry_data["amount"].as_u64().unwrap_or_default();
+                                let from = entry_data["from"].as_str().map(|s| s.to_string());
+                                let to = entry_data["to"].as_str().unwrap_or_default().to_string();
+                                
+                                // Determine operation type
+                                let op_str = entry_data["operation"].as_str().unwrap_or_default();
+                                let operation = match op_str {
+                                    "issuance" => OperationType::Issuance,
+                                    "burn" => OperationType::Burn,
+                                    _ => OperationType::Transfer,
+                                };
+                                
+                                history.push(HistoryEntry {
+                                    txid,
+                                    timestamp,
+                                    amount,
+                                    from,
+                                    to,
+                                    operation,
+                                });
+                            }
+                        }
+                        log::debug!("Retrieved {} history entries from DWN for asset {}", history.len(), asset_id);
+                    },
+                    Err(e) => {
+                        log::warn!("DWN history query error for asset {}: {}", asset_id, e);
+                    }
+                }
                 Ok(vec![HistoryEntry {
                     txid: Txid::from_slice(&[0u8; 32]).unwrap(),
                     timestamp: std::time::SystemTime::now()

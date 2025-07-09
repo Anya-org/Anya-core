@@ -37,6 +37,7 @@ impl Default for NodeConfig {
 #[derive(Debug)]
 pub struct RGBNode {
     /// Node configuration
+    #[allow(dead_code)]
     config: NodeConfig,
     /// Node status
     status: NodeStatus,

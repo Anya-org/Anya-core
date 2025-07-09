@@ -29,7 +29,7 @@ impl Default for ClientConfig {
             data_dir: PathBuf::from("./rgb_data"),
             network: "testnet".to_string(),
             electrum_url: "electrum.blockstream.info:60002".to_string(),
-            storage_type: "sqlite".to_string(),
+            storage_type: "dwn".to_string(), // [AIR-3][AIS-3][BPC-3][RES-3] Migrated from SQLite to DWN as per PRD_SYSTEM_INDEX_DUPLICATION_ELIMINATION.md
             fee_rate: 1.0,
             params: HashMap::new(),
         }
@@ -40,6 +40,7 @@ impl Default for ClientConfig {
 #[derive(Debug)]
 pub struct RGBClient {
     /// Client configuration
+    #[allow(dead_code)]
     config: ClientConfig,
     /// Client status
     status: ClientStatus,

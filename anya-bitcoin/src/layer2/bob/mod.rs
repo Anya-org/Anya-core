@@ -51,7 +51,6 @@ impl ProtocolConfig for BobConfig {
 
 /// Main BOB integration client
 pub struct BobClient {
-    #[allow(dead_code)]
     config: BobConfig,
     relay_monitor: BitcoinRelayMonitor,
     evm_adapter: EvmAdapter,
@@ -61,15 +60,23 @@ pub struct BobClient {
 }
 
 impl BobClient {
-    pub fn new(config: BobConfig) -> Self {
-        Self {
-            relay_monitor: BitcoinRelayMonitor::new(&config),
-            evm_adapter: EvmAdapter::new(&config),
-            bitvm_validator: BitVMValidator::new(&config),
-            cross_layer_manager: CrossLayerTransactionManager::new(&config),
-            analytics_engine: HybridAnalyticsEngine::new(&config),
+    pub async fn new(config: BobConfig) -> Result<Self, BobError> {
+        // Initialize all components
+        let relay_monitor = BitcoinRelayMonitor::new(&config);
+        let evm_adapter = EvmAdapter::new(&config).await?;
+        let bitvm_validator = BitVMValidator::new(&config);
+        let cross_layer_manager = CrossLayerTransactionManager::new(&config);
+        let analytics_engine = HybridAnalyticsEngine::new(&config)
+            .map_err(|e| BobError::InitializationError(format!("Failed to initialize analytics engine: {}", e)))?;
+            
+        Ok(Self {
+            relay_monitor,
+            evm_adapter,
+            bitvm_validator,
+            cross_layer_manager,
+            analytics_engine,
             config,
-        }
+        })
     }
 
     pub async fn check_health(&self) -> Result<bool, BobError> {
@@ -172,6 +179,7 @@ impl EvmAdapter {
 
 /// BitVM validator for optimistic rollup verification
 pub struct BitVMValidator {
+    #[allow(dead_code)]
     config: BobConfig,
 }
 
@@ -189,6 +197,7 @@ impl BitVMValidator {
 
 /// Cross-layer transaction manager
 pub struct CrossLayerTransactionManager {
+    #[allow(dead_code)]
     config: BobConfig,
 }
 
@@ -210,6 +219,7 @@ impl CrossLayerTransactionManager {
 
 /// Hybrid analytics engine for BOB integration
 pub struct HybridAnalyticsEngine {
+    #[allow(dead_code)]
     config: BobConfig,
 }
 
@@ -310,8 +320,11 @@ impl Default for Metrics {
 }
 
 pub struct BobIntegration {
+    #[allow(dead_code)]
     l2_client: BobClient,
+    #[allow(dead_code)]
     bitcoin_relay: BitcoinRelay,
+    #[allow(dead_code)]
     state_manager: StateManager,
 }
 
