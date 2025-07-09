@@ -3,7 +3,7 @@
 // and duplication elimination enforcement
 
 use blake3;
-use dashmap::{DashMap, DashSet};
+use dashmap::DashMap; // Removed unused DashSet import
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::sync::{
@@ -159,8 +159,10 @@ pub struct SourceOfTruthRegistry {
     /// Function signature index
     function_signatures: DashMap<String, FunctionSignature>,
     /// Code fingerprint index
+    #[allow(dead_code)]
     code_fingerprints: DashMap<String, CodeFingerprint>,
     /// Documentation content index
+    #[allow(dead_code)]
     documentation_index: DashMap<String, DocumentationEntry>,
     /// Last registry update
     last_updated: AtomicU64,
@@ -207,7 +209,7 @@ impl SourceOfTruthRegistry {
         // Find next sequence number for today
         let mut sequence = 1;
         loop {
-            let candidate_id = format!("WI-{}-{}", date_prefix, sequence);
+            let candidate_id = format!("WI-{date_prefix}-{sequence}");
             if !self.work_items.contains_key(&candidate_id) {
                 return candidate_id;
             }
@@ -228,8 +230,7 @@ impl SourceOfTruthRegistry {
         let duplication_status = self.check_work_item_duplication(&title, &component).await?;
         if matches!(duplication_status, DuplicationCheckStatus::Failed(_)) {
             return Err(SourceOfTruthError::DuplicationDetected(format!(
-                "Work item title or component already exists: {}",
-                title
+                "Work item title or component already exists: {title}"
             )));
         }
 
@@ -350,8 +351,7 @@ impl SourceOfTruthRegistry {
             let work_item = item.value();
             if work_item.title == title && work_item.component == component {
                 return Ok(DuplicationCheckStatus::Failed(format!(
-                    "Duplicate work item: {} in {}",
-                    title, component
+                    "Duplicate work item: {title} in {component}"
                 )));
             }
         }
@@ -407,18 +407,11 @@ impl SourceOfTruthRegistry {
                             .collect();
 
                         // Extract return type
-                        let return_type = if let Some(arrow_pos) = trimmed.find("->") {
-                            Some(
-                                trimmed[arrow_pos + 2..]
-                                    .trim()
+                        let return_type = trimmed.find("->").map(|arrow_pos| trimmed[arrow_pos + 2..]
                                     .split_whitespace()
                                     .next()
                                     .unwrap_or("")
-                                    .to_string(),
-                            )
-                        } else {
-                            None
-                        };
+                                    .to_string());
 
                         return Some(FunctionSignature {
                             name,
@@ -450,8 +443,7 @@ impl SourceOfTruthRegistry {
             (_, WorkStatus::Blocked(_)) => Ok(()), // Can always be blocked
             (WorkStatus::Blocked(_), _) => Ok(()), // Can transition from blocked to any state
             _ => Err(SourceOfTruthError::InvalidWorkItemId(format!(
-                "Invalid status transition from {:?} to {:?}",
-                current, new
+                "Invalid status transition from {current:?} to {new:?}"
             ))),
         }
     }
