@@ -10,6 +10,11 @@ on:
         required: true
         type: string
 
+# Explicitly define permissions for GITHUB_TOKEN
+permissions:
+  contents: write  # Needed for release creation and file updates
+  pull-requests: write  # Needed for PR creation
+
 env:
   RUST_BACKTRACE: 1
 

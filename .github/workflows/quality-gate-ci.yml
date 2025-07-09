@@ -6,6 +6,12 @@ on:
   pull_request:
     branches: [ main, develop ]
 
+# Explicitly define permissions for GITHUB_TOKEN
+permissions:
+  contents: read
+  pull-requests: write
+  security-events: write
+
 jobs:
   quality-gate:
     runs-on: ubuntu-latest

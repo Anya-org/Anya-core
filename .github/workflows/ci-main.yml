@@ -6,6 +6,10 @@ on:
     branches: [main, develop]
   workflow_dispatch:
 
+# Explicitly define permissions for GITHUB_TOKEN
+permissions:
+  contents: read
+
 env:
   RUST_BACKTRACE: 1
   RUSTFLAGS: "-D warnings"

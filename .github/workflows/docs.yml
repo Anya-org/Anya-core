@@ -7,6 +7,10 @@ on:
     paths: ['**.md', 'docs/**', '**.toml', 'README*']
   workflow_dispatch:
 
+# Explicitly define permissions for GITHUB_TOKEN
+permissions:
+  contents: read
+
 jobs:
   documentation-validation:
     name: Documentation Evidence Check
