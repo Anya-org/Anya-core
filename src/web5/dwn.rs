@@ -409,6 +409,12 @@ pub enum ConflictResolution {
     Custom(String),
 }
 
+impl Default for DWNManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl DWNManager {
     /// Create a new DWN Manager
     pub fn new() -> Self {
@@ -598,8 +604,7 @@ impl DWNManager {
         // In a production implementation, this would create optimized indexes
         // For now, we'll track the index metadata
         println!(
-            "Creating index for schema '{}' on fields: {:?}",
-            schema, fields
+            "Creating index for schema '{schema}' on fields: {fields:?}"
         );
         Ok(())
     }
@@ -703,10 +708,7 @@ impl DWNManager {
         for stage in pipeline {
             match stage {
                 AggregationStage::Match(filter) => {
-                    records = records
-                        .into_iter()
-                        .filter(|record| self.matches_aggregation_filter(record, filter))
-                        .collect();
+                    records.retain(|record| self.matches_aggregation_filter(record, filter));
                 }
                 AggregationStage::Group {
                     id: _id,
@@ -746,8 +748,8 @@ impl DWNManager {
             }
         }
 
-        Ok(serde_json::to_value(records)
-            .map_err(|e| Web5Error::SerializationError(e.to_string()))?)
+        serde_json::to_value(records)
+            .map_err(|e| Web5Error::SerializationError(e.to_string()))
     }
 
     /// Batch store multiple records for performance
@@ -874,7 +876,7 @@ impl DWNManager {
         let base_filter = filter.base.clone();
         
         // First get all matching records using base filter
-        let mut filtered_records = self.filter_records_by_base_filter(base_filter)?;
+        let filtered_records = self.filter_records_by_base_filter(base_filter)?;
 
         // Apply advanced filters
         let all_records = self.apply_advanced_filters(filtered_records, &filter)?;
@@ -898,7 +900,7 @@ impl DWNManager {
 
         // Generate next cursor if there are more records
         let next_cursor = if has_more {
-            Some(format!("cursor_{}", end))
+            Some(format!("cursor_{end}"))
         } else {
             None
         };
@@ -922,34 +924,22 @@ impl DWNManager {
     ) -> Web5Result<Vec<DWNRecord>> {
         // Full-text search
         if let Some(ref search_query) = filter.search {
-            records = records
-                .into_iter()
-                .filter(|record| self.matches_search_query(record, search_query))
-                .collect();
+            records.retain(|record| self.matches_search_query(record, search_query));
         }
 
         // Tag-based filtering
         if let Some(ref tags) = filter.tags {
-            records = records
-                .into_iter()
-                .filter(|record| self.matches_tags(record, tags))
-                .collect();
+            records.retain(|record| self.matches_tags(record, tags));
         }
 
         // Numeric range filtering
         if let Some(ref numeric_ranges) = filter.numeric_ranges {
-            records = records
-                .into_iter()
-                .filter(|record| self.matches_numeric_ranges(record, numeric_ranges))
-                .collect();
+            records.retain(|record| self.matches_numeric_ranges(record, numeric_ranges));
         }
 
         // Geographic filtering
         if let Some(ref geo_bounds) = filter.geo_bounds {
-            records = records
-                .into_iter()
-                .filter(|record| self.matches_geo_bounds(record, geo_bounds))
-                .collect();
+            records.retain(|record| self.matches_geo_bounds(record, geo_bounds));
         }
 
         Ok(records)
@@ -1085,7 +1075,7 @@ impl DWNManager {
         for record_id in record_ids {
             match self.delete_record(&record_id) {
                 Ok(_) => deleted_ids.push(record_id),
-                Err(e) => errors.push(format!("Failed to delete {}: {}", record_id, e)),
+                Err(e) => errors.push(format!("Failed to delete {record_id}: {e}")),
             }
         }
 
@@ -1239,8 +1229,7 @@ impl DWNManager {
                 Ok(xml_output)
             }
             _ => Err(Web5Error::DWNError(format!(
-                "Unsupported export format: {}",
-                format
+                "Unsupported export format: {format}"
             ))),
         }
     }
@@ -1252,8 +1241,7 @@ impl DWNManager {
                 .map_err(|e| Web5Error::SerializationError(e.to_string()))?,
             _ => {
                 return Err(Web5Error::DWNError(format!(
-                    "Unsupported import format: {}",
-                    format
+                    "Unsupported import format: {format}"
                 )))
             }
         };
@@ -1506,6 +1494,7 @@ pub struct SortField {
 }
 
 /// Extension trait for Duration to add convenience methods
+#[allow(dead_code)]
 trait DurationExt {
     fn from_mins(mins: u64) -> Duration;
     fn from_hours(hours: u64) -> Duration;

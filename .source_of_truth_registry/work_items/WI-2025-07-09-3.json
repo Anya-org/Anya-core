@@ -1,0 +1,19 @@
+{
+    "id": "WI-2025-07-09-3",
+    "title": "Web5 DWN Client Enhancements",
+    "status": "InProgress",
+    "component": "core-web5-dwn",
+    "files_modified": [
+        "src/web5/dwn.rs",
+        "tests/web5_anchoring_test.rs"
+    ],
+    "duplication_check": "Passed",
+    "source_of_truth_updated": true,
+    "verification_hash": "",
+    "completion_timestamp": null,
+    "evidence_link": "",
+    "dependencies": [],
+    "blockers": [],
+    "created": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")",
+    "last_updated": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+}
