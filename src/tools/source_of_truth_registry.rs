@@ -407,11 +407,13 @@ impl SourceOfTruthRegistry {
                             .collect();
 
                         // Extract return type
-                        let return_type = trimmed.find("->").map(|arrow_pos| trimmed[arrow_pos + 2..]
-                                    .split_whitespace()
-                                    .next()
-                                    .unwrap_or("")
-                                    .to_string());
+                        let return_type = trimmed.find("->").map(|arrow_pos| {
+                            trimmed[arrow_pos + 2..]
+                                .split_whitespace()
+                                .next()
+                                .unwrap_or("")
+                                .to_string()
+                        });
 
                         return Some(FunctionSignature {
                             name,

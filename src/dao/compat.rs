@@ -101,6 +101,12 @@ pub mod clarity_repl {
             pub session: Session,
         }
 
+        impl Default for TestEnvironment {
+            fn default() -> Self {
+                Self::new()
+            }
+        }
+
         impl TestEnvironment {
             pub fn new() -> Self {
                 Self {

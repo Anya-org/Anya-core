@@ -1,6 +1,5 @@
-use std::collections::HashMap;
-use std::sync::Arc;
-// use crate::security::audit::AuditLogger; // Disabled - missing dependency
+// Only import what is actually used
+// Removed unused imports: HashMap, Arc
 
 /// HSM Testnet Provider Tests
 
@@ -8,28 +7,19 @@ use std::sync::Arc;
 mod tests {
     use std::collections::HashMap;
 
-    use crate::security::hsm::config::{
-        HardwareConfig, HardwareDeviceType, HsmConfig, SimulatorConfig,
-    };
+    use crate::security::hsm::config::{HsmConfig, SimulatorConfig};
     use crate::security::hsm::provider::{
-        create_hsm_provider, EcCurve, HsmProvider, HsmProviderType, KeyGenParams, KeyType,
-        KeyUsage, SigningAlgorithm,
+        create_hsm_provider, EcCurve, HsmProvider, HsmProviderType, KeyGenParams, KeyType, KeyUsage,
     };
-    use crate::security::hsm::providers::{
-        hardware::HardwareHsmProvider, simulator::SimulatorHsmProvider,
-        software::SoftwareHsmProvider,
-    };
+    use crate::security::hsm::providers::simulator::SimulatorHsmProvider;
 
-    // Mock audit logger for testing
-    #[cfg(feature = "audit_logger")]
-    #[cfg(not(feature = "audit_logger"))]
+    // Simple mock structure for tests - no feature flag required
     #[derive(Clone)]
-    struct AuditLogger;
+    struct MockLogger;
 
-    #[cfg(not(feature = "audit_logger"))]
-    impl AuditLogger {
+    impl MockLogger {
         fn new(_path: &str) -> Result<Self, Box<dyn std::error::Error>> {
-            Ok(AuditLogger)
+            Ok(MockLogger)
         }
     }
 
@@ -112,15 +102,11 @@ mod tests {
     }
 
     #[tokio::test]
-    #[ignore = "Requires AuditLogger implementation and hardware device"]
+    #[ignore = "Requires hardware device"]
     async fn test_hardware_provider_bitcoin_testnet() {
-        println!("Hardware provider test requires AuditLogger implementation");
+        println!("Hardware provider test requires hardware device");
 
-        // Test implementation - enabled with feature flag
-        #[cfg(feature = "audit_logger")]
-        {
-            // Hardware provider implementation would go here
-        }
+        // Hardware provider implementation would go here when hardware is available
     }
 
     #[tokio::test]

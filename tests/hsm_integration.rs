@@ -1,12 +1,7 @@
 //! HSM Integration Tests
 #![cfg(feature = "hsm")]
 
-use anya_core::security::hsm::config::{HsmConfig, SoftHsmConfig};
-use anya_core::security::hsm::provider::{HsmProvider, HsmProviderType};
-use anya_core::security::hsm::providers::SoftwareHsmProvider;
-use anya_core::security::hsm::HsmManager;
-use bitcoin::Network;
-use std::sync::Arc;
+use anya_core::security::hsm::config::SoftHsmConfig;
 
 #[tokio::test]
 async fn test_hsm_basic_functionality() {

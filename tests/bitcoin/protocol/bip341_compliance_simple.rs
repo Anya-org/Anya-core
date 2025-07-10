@@ -5,12 +5,9 @@
 // Bitcoin Development Framework v2.5 requirements
 
 use anyhow::{bail, Result};
-use bitcoin::hashes::{sha256, Hash};
 use bitcoin::key::{TapTweak, TweakedPublicKey, UntweakedPublicKey};
 use bitcoin::secp256k1::{Secp256k1, SecretKey, XOnlyPublicKey};
-use bitcoin::taproot::{
-    ControlBlock, LeafVersion, TapBranchTag, TapLeafHash, TapNodeHash, TaprootBuilder,
-};
+use bitcoin::taproot::{ControlBlock, TapLeafHash, TapNodeHash, TaprootBuilder};
 use bitcoin::ScriptBuf;
 use rand;
 use std::str::FromStr;

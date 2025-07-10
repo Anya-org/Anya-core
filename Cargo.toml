@@ -210,6 +210,7 @@ futures = "0.3.31"
 lazy_static = "1.5.0"
 mockall = "=0.13.1"  # Added here for use in non-test code
 clarinet-utils = "1.0.0"
+geiger = "0.5.0"
 
 [dev-dependencies]
 did-key = "0.2.1"

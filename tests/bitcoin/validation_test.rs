@@ -1,16 +1,15 @@
 // Fix imports to match current module structure
 use anya_core::{
-    bitcoin::protocol::{BPCLevel as ProtocolLevel, BitcoinProtocol},
+    bitcoin::protocol::BPCLevel as ProtocolLevel,
     bitcoin::validation::{TransactionValidator, ValidationError},
 };
 
 // Fix import from tests - this will need to be adjusted based on how tests is made available
 // use tests::common::bitcoin_compat::*;
 
-use bitcoin::{absolute::LockTime, transaction::Version, ScriptBuf, Transaction};
+use bitcoin::{absolute::LockTime, transaction::Version, Transaction};
 
 use std::io::Write;
-use std::path::Path;
 use tempfile::NamedTempFile;
 
 #[test]

@@ -1,6 +1,5 @@
 #[cfg(test)]
 mod hardware_tests {
-    use std::collections::HashMap;
 
     // Mock hardware profile for testing
     struct MockHardwareProfile {
@@ -73,7 +72,10 @@ mod hardware_tests {
 
         let config = MockBitcoinConfig::from_hardware_profile(&hw);
 
-        assert!(config.taproot_enabled, "Taproot should be enabled on standard");
+        assert!(
+            config.taproot_enabled,
+            "Taproot should be enabled on standard"
+        );
         assert_eq!(config.psbt_version, 2, "PSBT v2 expected for standard");
         assert_eq!(config.rpc_threads, 8, "8 RPC threads for 8 cores");
     }

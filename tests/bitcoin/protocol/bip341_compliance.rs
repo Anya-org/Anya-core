@@ -4,8 +4,8 @@
 // Tests the implementation of BIP-341 (Taproot) features according to
 // Bitcoin Development Framework v2.5 requirements
 
-use anyhow::{anyhow, bail, Result};
-use bitcoin::hashes::{sha256, Hash, HashEngine};
+use anyhow::{bail, Result};
+use bitcoin::hashes::Hash;
 use bitcoin::key::{TapTweak, TweakedPublicKey, UntweakedPublicKey};
 use bitcoin::secp256k1::{Secp256k1, SecretKey, XOnlyPublicKey};
 use bitcoin::taproot::{

@@ -23,6 +23,7 @@ pub struct TestTransactionFactory;
 
 impl TestTransactionFactory {
     /// Alias for create_dummy_transaction to match test expectations
+    #[allow(dead_code)]
     pub fn create_simple() -> Transaction {
         Self::create_dummy_transaction()
     }
@@ -108,7 +109,9 @@ impl TestEnvironmentFactory {
 #[derive(Debug, Clone, Default)]
 pub struct TestConfig {
     pub enable_hardware_optimization: bool,
+    #[allow(dead_code)]
     pub enable_bitcoin_validation: bool,
+    #[allow(dead_code)]
     pub enable_dao_features: bool,
     pub batch_size: usize,
 }
@@ -117,6 +120,7 @@ pub struct TestConfig {
 #[derive(Debug, Default)]
 pub struct TestEnvironment {
     pub config: TestConfig,
+    #[allow(dead_code)]
     pub state: HashMap<String, String>,
 }
 
@@ -132,12 +136,14 @@ impl TestEnvironment {
 
 /// File-based test environment for tests requiring temporary files
 #[derive(Debug)]
+#[allow(dead_code)]
 pub struct FileTestEnvironment {
     pub test_dir: std::path::PathBuf,
 }
 
 impl FileTestEnvironment {
     /// Create a new file-based test environment with a temporary directory
+    #[allow(dead_code)]
     pub fn new() -> Self {
         use std::fs;
 
@@ -158,6 +164,7 @@ impl FileTestEnvironment {
     }
 
     /// Clean up the test environment
+    #[allow(dead_code)]
     pub fn cleanup(&self) {
         use std::fs;
         if self.test_dir.exists() {
@@ -168,6 +175,7 @@ impl FileTestEnvironment {
 
 /// Common mock factory for tests
 /// Common mock factory for tests
+#[allow(dead_code)]
 pub struct MockFactory;
 
 impl MockFactory {

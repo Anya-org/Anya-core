@@ -13,7 +13,7 @@ mod web5_tests {
     // use anya_core::dependencies::anya_bitcoin::web5::enhanced_dwn::{
     //     EnhancedDwn, EnhancedDwnOptions,
     // };
-    
+
     // Using available types from the main codebase
     use anya_core::bitcoin::wallet::{BitcoinWallet, WalletConfig};
     // Placeholder structs to allow compilation

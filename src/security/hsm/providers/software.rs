@@ -845,10 +845,12 @@ impl SoftwareHsmProvider {
                         ))
                     })?;
 
-                // Decode PSBT
-                let psbt_bytes = base64::decode(&params.psbt).map_err(|e| {
-                    HsmError::InvalidParameters(format!("Invalid PSBT base64: {}", e))
-                })?;
+                // Decode PSBT using the updated base64 Engine API
+                let psbt_bytes = base64::engine::general_purpose::STANDARD
+                    .decode(&params.psbt)
+                    .map_err(|e| {
+                        HsmError::InvalidParameters(format!("Invalid PSBT base64: {}", e))
+                    })?;
 
                 let mut psbt = bitcoin::psbt::Psbt::deserialize(&psbt_bytes)
                     .map_err(|e| HsmError::InvalidParameters(format!("Invalid PSBT: {}", e)))?;

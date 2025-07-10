@@ -184,7 +184,7 @@ impl DecentralizedStorage {
     // ASSET MANAGEMENT OPERATIONS (Replacing SQLite TODOs)
     // ========================================================================
 
-    /// Replace: TODO: Implement actual SQLite asset existence check
+    /// [AIR-3][AIS-3][BPC-3][RES-3] Asset existence check using DWN storage
     pub async fn asset_exists(&self, asset_id: &str) -> AnyaResult<bool> {
         // Check cache first
         if let Ok(cache) = self.cache.lock() {
@@ -218,7 +218,7 @@ impl DecentralizedStorage {
         Ok(exists)
     }
 
-    /// Replace: TODO: Implement actual SQLite storage
+    /// [AIR-3][AIS-3][BPC-3][RES-3] Asset storage using DWN
     pub async fn store_asset(&self, asset: &RGBAsset) -> AnyaResult<String> {
         // 1. Serialize and store asset data in IPFS
         let asset_data = serde_json::to_vec(asset)
@@ -270,7 +270,7 @@ impl DecentralizedStorage {
         Ok(content_id)
     }
 
-    /// Replace: TODO: Implement actual SQLite queries
+    /// [AIR-3][AIS-3][BPC-3][RES-3] Asset queries using DWN storage
     pub async fn query_assets(&self, owner_did: &str) -> AnyaResult<Vec<RGBAsset>> {
         let cache_key = format!("assets_query:{}", owner_did);
 
@@ -304,7 +304,7 @@ impl DecentralizedStorage {
     // FINANCIAL OPERATIONS (Replacing SQLite TODOs)
     // ========================================================================
 
-    /// Replace: TODO: Implement actual SQLite balance queries
+    /// [AIR-3][AIS-3][BPC-3][RES-3] Asset balance queries using DWN storage
     pub async fn get_asset_balance(&self, asset_id: &str) -> AnyaResult<u64> {
         let balance_records = self.dwn_manager.query_records(&self.user_did, "anya/rgb/balance")
             .map_err(|e| AnyaError::Storage(format!("DWN balance query error: {}", e)))?;
@@ -320,7 +320,7 @@ impl DecentralizedStorage {
         Ok(balance_data.amount)
     }
 
-    /// Replace: TODO: Implement actual SQLite invoice storage
+    /// [AIR-3][AIS-3][BPC-3][RES-3] Invoice storage using DWN
     pub async fn store_invoice(&self, invoice: &RGBInvoice) -> AnyaResult<String> {
         // Store invoice in IPFS for immutability
         let invoice_data = serde_json::to_vec(invoice)
@@ -358,7 +358,7 @@ impl DecentralizedStorage {
     // TRANSACTION OPERATIONS (Replacing SQLite TODOs)
     // ========================================================================
 
-    /// Replace: TODO: Implement actual SQLite transfer storage and balance updates
+    /// [AIR-3][AIS-3][BPC-3][RES-3] Transfer storage and balance updates using DWN
     pub async fn store_transfer_and_update_balance(
         &self,
         transfer: &AssetTransfer,
@@ -400,7 +400,7 @@ impl DecentralizedStorage {
         Ok(transfer_id)
     }
 
-    /// Replace: TODO: Implement actual SQLite transfer status query
+    /// [AIR-3][AIS-3][BPC-3][RES-3] Transfer status query using DWN storage
     pub async fn get_transfer_status(&self, transfer_id: &str) -> AnyaResult<TransferStatus> {
         let transfer_records = self.dwn_manager.query_records(&self.user_did, "anya/rgb/transfer")
             .map_err(|e| AnyaError::Storage(format!("DWN transfer query error: {}", e)))?;
@@ -416,7 +416,7 @@ impl DecentralizedStorage {
         Ok(transfer_data.status)
     }
 
-    /// Replace: TODO: Implement actual SQLite transfer validation
+    /// [AIR-3][AIS-3][BPC-3][RES-3] Transfer validation using DWN with Bitcoin anchoring
     pub async fn validate_transfer_with_anchoring(&self, transfer: &AssetTransfer) -> AnyaResult<bool> {
         // 1. Basic validation
         if transfer.amount == 0 {
@@ -466,7 +466,7 @@ impl DecentralizedStorage {
     // HISTORICAL DATA OPERATIONS (Replacing SQLite TODOs)
     // ========================================================================
 
-    /// Replace: TODO: Implement actual SQLite asset history query
+    /// [AIR-3][AIS-3][BPC-3][RES-3] Asset history query using DWN with proofs
     pub async fn get_asset_history_with_proofs(&self, asset_id: &str) -> AnyaResult<Vec<AssetHistoryEntry>> {
         // Query DWN for history entries
         let history_records = self.dwn_manager.query_records("*", "anya/rgb/history")

@@ -4,7 +4,7 @@
 // Test runner for Bitcoin protocol implementations according to
 // Bitcoin Development Framework v2.5 requirements
 
-use anyhow::{Context, Result};
+use anyhow::Result;
 use std::collections::HashMap;
 use std::time::{Duration, Instant};
 

@@ -603,9 +603,7 @@ impl DWNManager {
     pub fn create_index(&self, schema: &str, fields: &[&str]) -> Web5Result<()> {
         // In a production implementation, this would create optimized indexes
         // For now, we'll track the index metadata
-        println!(
-            "Creating index for schema '{schema}' on fields: {fields:?}"
-        );
+        println!("Creating index for schema '{schema}' on fields: {fields:?}");
         Ok(())
     }
 
@@ -748,8 +746,7 @@ impl DWNManager {
             }
         }
 
-        serde_json::to_value(records)
-            .map_err(|e| Web5Error::SerializationError(e.to_string()))
+        serde_json::to_value(records).map_err(|e| Web5Error::SerializationError(e.to_string()))
     }
 
     /// Batch store multiple records for performance
@@ -874,13 +871,13 @@ impl DWNManager {
 
         // Clone the base filter to avoid partial move
         let base_filter = filter.base.clone();
-        
+
         // First get all matching records using base filter
         let filtered_records = self.filter_records_by_base_filter(base_filter)?;
 
         // Apply advanced filters
         let all_records = self.apply_advanced_filters(filtered_records, &filter)?;
-        
+
         let total = all_records.len();
 
         // Apply pagination

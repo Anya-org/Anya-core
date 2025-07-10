@@ -27,7 +27,7 @@ impl BitcoinValidator for DefaultBitcoinValidator {
         // - Block validation
         // - Network consensus
 
-        let checks = vec![
+        let checks = [
             "Bitcoin node connectivity: OK",
             "Transaction pool validation: OK",
             "Block height sync: OK",

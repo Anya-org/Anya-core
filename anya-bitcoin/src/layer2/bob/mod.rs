@@ -66,9 +66,10 @@ impl BobClient {
         let evm_adapter = EvmAdapter::new(&config).await?;
         let bitvm_validator = BitVMValidator::new(&config);
         let cross_layer_manager = CrossLayerTransactionManager::new(&config);
-        let analytics_engine = HybridAnalyticsEngine::new(&config)
-            .map_err(|e| BobError::InitializationError(format!("Failed to initialize analytics engine: {}", e)))?;
-            
+        let analytics_engine = HybridAnalyticsEngine::new(&config).map_err(|e| {
+            BobError::InitializationError(format!("Failed to initialize analytics engine: {}", e))
+        })?;
+
         Ok(Self {
             relay_monitor,
             evm_adapter,
