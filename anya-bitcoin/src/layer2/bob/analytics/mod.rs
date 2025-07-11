@@ -7,6 +7,7 @@ use std::collections::HashMap;
 
 /// Hybrid analytics engine for BOB
 pub struct HybridAnalyticsEngine {
+    #[allow(dead_code)]
     config: BobConfig,
 }
 

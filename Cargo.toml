@@ -128,8 +128,13 @@ multihash = { version = "=0.19.3", features = ["std"] }
 
 # IPFS dependencies for decentralized storage
 ipfs-api-backend-hyper = { version = "0.6", features = ["with-builder"] }
+<<<<<<< HEAD
 ipfs-embed = { version = "0.23" }
 libp2p = { version = "0.53", features = ["kad", "mdns", "noise", "tcp", "websocket", "yamux"] }
+=======
+ipfs-embed = { version = "0.26.1", default-features = true }
+libp2p = { version = "0.56.0", features = ["kad", "mdns", "noise", "tcp", "websocket", "yamux"] }
+>>>>>>> feature/git-workflows-consolidation-evidence-based
 lru = "0.12"
 
 # Serialization with enhanced features for system alignment
@@ -201,7 +206,8 @@ rayon = "1.10.0"
 blake3 = "1.8.2"
 semver = "1.0.26"
 syn = { version = "2.0.101", features = ["parsing", "full"] }
-trust-dns-resolver = "0.23.2"
+# Using hickory-resolver (the successor to trust-dns-resolver) for DNS resolution
+hickory-resolver = "0.24.0"
 aes-gcm = "0.10.3"
 chacha20poly1305 = "0.10.1"
 regex = "1.9.6"
@@ -209,6 +215,7 @@ futures = "0.3.31"
 lazy_static = "1.5.0"
 mockall = "=0.13.1"  # Added here for use in non-test code
 clarinet-utils = "1.0.0"
+geiger = "0.5.0"
 
 [dev-dependencies]
 did-key = "0.2.1"

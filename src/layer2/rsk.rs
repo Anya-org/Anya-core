@@ -67,7 +67,10 @@ impl RskClient {
     }
 
     /// Deploy a smart contract on RSK
-    pub fn deploy_contract(&self, bytecode: &[u8]) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+    pub fn deploy_contract(
+        &self,
+        bytecode: &[u8],
+    ) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
         println!("Deploying smart contract on RSK: {} bytes", bytecode.len());
         Ok(format!("rsk_contract_{}", hex::encode(&bytecode[..8])))
     }
@@ -86,8 +89,16 @@ impl RskClient {
     }
 
     /// Call a smart contract function
-    pub async fn call_contract(&self, contract_address: &str, function_data: &[u8]) -> Result<Vec<u8>, Box<dyn std::error::Error + Send + Sync>> {
-        println!("Calling contract {} on RSK with {} bytes of data", contract_address, function_data.len());
+    pub async fn call_contract(
+        &self,
+        contract_address: &str,
+        function_data: &[u8],
+    ) -> Result<Vec<u8>, Box<dyn std::error::Error + Send + Sync>> {
+        println!(
+            "Calling contract {} on RSK with {} bytes of data",
+            contract_address,
+            function_data.len()
+        );
         Ok(vec![0x01, 0x02, 0x03, 0x04]) // Mock return data
     }
 }
@@ -111,13 +122,19 @@ impl Layer2ProtocolTrait for RskClient {
     }
 
     /// Submit a transaction to RSK
-    fn submit_transaction(&self, tx_data: &[u8]) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+    fn submit_transaction(
+        &self,
+        tx_data: &[u8],
+    ) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
         println!("Submitting transaction to RSK: {} bytes", tx_data.len());
         Ok("rsk_tx_".to_string() + &hex::encode(&tx_data[..8]))
     }
 
     /// Check transaction status
-    fn check_transaction_status(&self, tx_id: &str) -> Result<TransactionStatus, Box<dyn std::error::Error + Send + Sync>> {
+    fn check_transaction_status(
+        &self,
+        tx_id: &str,
+    ) -> Result<TransactionStatus, Box<dyn std::error::Error + Send + Sync>> {
         println!("Checking RSK transaction status: {tx_id}");
         Ok(TransactionStatus::Confirmed)
     }
@@ -131,13 +148,19 @@ impl Layer2ProtocolTrait for RskClient {
     }
 
     /// Issue an asset on RSK
-    fn issue_asset(&self, params: AssetParams) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+    fn issue_asset(
+        &self,
+        params: AssetParams,
+    ) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
         println!("Issuing asset {} on RSK", params.name);
         Ok(format!("rsk_asset_{}", params.asset_id))
     }
 
     /// Transfer an asset on RSK
-    fn transfer_asset(&self, transfer: AssetTransfer) -> Result<TransferResult, Box<dyn std::error::Error + Send + Sync>> {
+    fn transfer_asset(
+        &self,
+        transfer: AssetTransfer,
+    ) -> Result<TransferResult, Box<dyn std::error::Error + Send + Sync>> {
         println!(
             "Transferring {} of asset {} to {} on RSK",
             transfer.amount, transfer.asset_id, transfer.recipient
@@ -155,7 +178,10 @@ impl Layer2ProtocolTrait for RskClient {
     }
 
     /// Verify a proof on RSK
-    fn verify_proof(&self, proof: Proof) -> Result<VerificationResult, Box<dyn std::error::Error + Send + Sync>> {
+    fn verify_proof(
+        &self,
+        proof: Proof,
+    ) -> Result<VerificationResult, Box<dyn std::error::Error + Send + Sync>> {
         println!("Verifying {} proof on RSK", proof.proof_type);
 
         Ok(VerificationResult {
@@ -170,7 +196,10 @@ impl Layer2ProtocolTrait for RskClient {
     }
 
     /// Validate state on RSK
-    fn validate_state(&self, state_data: &[u8]) -> Result<ValidationResult, Box<dyn std::error::Error + Send + Sync>> {
+    fn validate_state(
+        &self,
+        state_data: &[u8],
+    ) -> Result<ValidationResult, Box<dyn std::error::Error + Send + Sync>> {
         println!("Validating state on RSK: {} bytes", state_data.len());
 
         Ok(ValidationResult {
@@ -186,7 +215,7 @@ impl Layer2ProtocolTrait for RskClient {
 
 // Import Layer2Protocol trait and helper functions
 use crate::layer2::{
-    Layer2Protocol, create_protocol_state, create_verification_result, create_validation_result
+    create_protocol_state, create_validation_result, create_verification_result, Layer2Protocol,
 };
 use async_trait::async_trait;
 
@@ -224,14 +253,23 @@ impl RskProtocol {
     }
 
     /// Deploy smart contract on RSK
-    pub async fn deploy_contract(&mut self, contract_code: &str) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+    pub async fn deploy_contract(
+        &mut self,
+        contract_code: &str,
+    ) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
         let bytecode = contract_code.as_bytes();
         self.client.deploy_contract(bytecode)
     }
 
     /// Execute smart contract function
-    pub async fn call_contract(&self, contract_address: &str, function_data: &[u8]) -> Result<Vec<u8>, Box<dyn std::error::Error + Send + Sync>> {
-        self.client.call_contract(contract_address, function_data).await
+    pub async fn call_contract(
+        &self,
+        contract_address: &str,
+        function_data: &[u8],
+    ) -> Result<Vec<u8>, Box<dyn std::error::Error + Send + Sync>> {
+        self.client
+            .call_contract(contract_address, function_data)
+            .await
     }
 }
 
@@ -257,12 +295,18 @@ impl Layer2Protocol for RskProtocol {
         Ok(create_protocol_state("1.0", 0, None, true))
     }
 
-    async fn submit_transaction(&self, _tx_data: &[u8]) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+    async fn submit_transaction(
+        &self,
+        _tx_data: &[u8],
+    ) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
         let tx_id = format!("rsk_tx_{}", uuid::Uuid::new_v4());
         Ok(tx_id)
     }
 
-    async fn check_transaction_status(&self, _tx_id: &str) -> Result<TransactionStatus, Box<dyn std::error::Error + Send + Sync>> {
+    async fn check_transaction_status(
+        &self,
+        _tx_id: &str,
+    ) -> Result<TransactionStatus, Box<dyn std::error::Error + Send + Sync>> {
         Ok(TransactionStatus::Confirmed)
     }
 
@@ -271,12 +315,18 @@ impl Layer2Protocol for RskProtocol {
         Ok(())
     }
 
-    async fn issue_asset(&self, _params: AssetParams) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+    async fn issue_asset(
+        &self,
+        _params: AssetParams,
+    ) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
         let asset_id = format!("rsk_asset_{}", uuid::Uuid::new_v4());
         Ok(asset_id)
     }
 
-    async fn transfer_asset(&self, _transfer: AssetTransfer) -> Result<TransferResult, Box<dyn std::error::Error + Send + Sync>> {
+    async fn transfer_asset(
+        &self,
+        _transfer: AssetTransfer,
+    ) -> Result<TransferResult, Box<dyn std::error::Error + Send + Sync>> {
         Ok(TransferResult {
             tx_id: format!("rsk_transfer_{}", uuid::Uuid::new_v4()),
             status: TransactionStatus::Pending,
@@ -288,12 +338,18 @@ impl Layer2Protocol for RskProtocol {
         })
     }
 
-    async fn verify_proof(&self, _proof: Proof) -> Result<VerificationResult, Box<dyn std::error::Error + Send + Sync>> {
+    async fn verify_proof(
+        &self,
+        _proof: Proof,
+    ) -> Result<VerificationResult, Box<dyn std::error::Error + Send + Sync>> {
         // RSK proof verification logic
         Ok(create_verification_result(true, None))
     }
 
-    async fn validate_state(&self, _state_data: &[u8]) -> Result<ValidationResult, Box<dyn std::error::Error + Send + Sync>> {
+    async fn validate_state(
+        &self,
+        _state_data: &[u8],
+    ) -> Result<ValidationResult, Box<dyn std::error::Error + Send + Sync>> {
         // RSK state validation logic
         Ok(create_validation_result(true, vec![]))
     }
@@ -318,13 +374,22 @@ impl Layer2Protocol for RskClient {
         <RskClient as Layer2ProtocolTrait>::get_state(self)
     }
 
-    async fn submit_transaction(&self, tx_data: &[u8]) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
-        println!("Asynchronously submitting transaction to RSK: {} bytes", tx_data.len());
+    async fn submit_transaction(
+        &self,
+        tx_data: &[u8],
+    ) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+        println!(
+            "Asynchronously submitting transaction to RSK: {} bytes",
+            tx_data.len()
+        );
         // Reuse existing sync implementation with logging
         <RskClient as Layer2ProtocolTrait>::submit_transaction(self, tx_data)
     }
 
-    async fn check_transaction_status(&self, tx_id: &str) -> Result<TransactionStatus, Box<dyn std::error::Error + Send + Sync>> {
+    async fn check_transaction_status(
+        &self,
+        tx_id: &str,
+    ) -> Result<TransactionStatus, Box<dyn std::error::Error + Send + Sync>> {
         println!("Asynchronously checking RSK transaction status: {}", tx_id);
         // Reuse existing sync implementation
         <RskClient as Layer2ProtocolTrait>::check_transaction_status(self, tx_id)
@@ -336,13 +401,19 @@ impl Layer2Protocol for RskClient {
         <RskClient as Layer2ProtocolTrait>::sync_state(self)
     }
 
-    async fn issue_asset(&self, params: AssetParams) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+    async fn issue_asset(
+        &self,
+        params: AssetParams,
+    ) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
         println!("Asynchronously issuing asset {} on RSK", params.name);
         // Reuse existing sync implementation
         <RskClient as Layer2ProtocolTrait>::issue_asset(self, params)
     }
 
-    async fn transfer_asset(&self, transfer: AssetTransfer) -> Result<TransferResult, Box<dyn std::error::Error + Send + Sync>> {
+    async fn transfer_asset(
+        &self,
+        transfer: AssetTransfer,
+    ) -> Result<TransferResult, Box<dyn std::error::Error + Send + Sync>> {
         println!(
             "Asynchronously transferring {} of asset {} to {} on RSK",
             transfer.amount, transfer.asset_id, transfer.recipient
@@ -351,14 +422,23 @@ impl Layer2Protocol for RskClient {
         <RskClient as Layer2ProtocolTrait>::transfer_asset(self, transfer)
     }
 
-    async fn verify_proof(&self, proof: Proof) -> Result<VerificationResult, Box<dyn std::error::Error + Send + Sync>> {
+    async fn verify_proof(
+        &self,
+        proof: Proof,
+    ) -> Result<VerificationResult, Box<dyn std::error::Error + Send + Sync>> {
         println!("Asynchronously verifying {} proof on RSK", proof.proof_type);
         // Reuse existing sync implementation
         <RskClient as Layer2ProtocolTrait>::verify_proof(self, proof)
     }
 
-    async fn validate_state(&self, state_data: &[u8]) -> Result<ValidationResult, Box<dyn std::error::Error + Send + Sync>> {
-        println!("Asynchronously validating state on RSK: {} bytes", state_data.len());
+    async fn validate_state(
+        &self,
+        state_data: &[u8],
+    ) -> Result<ValidationResult, Box<dyn std::error::Error + Send + Sync>> {
+        println!(
+            "Asynchronously validating state on RSK: {} bytes",
+            state_data.len()
+        );
         // Reuse existing sync implementation
         <RskClient as Layer2ProtocolTrait>::validate_state(self, state_data)
     }

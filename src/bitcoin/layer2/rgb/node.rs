@@ -45,7 +45,7 @@ impl RGBNode {
             contracts: Arc::new(RwLock::new(HashMap::new())),
         }
     }
-    
+
     /// Create a new RGB node with custom configuration
     pub fn with_config(config: NodeConfig) -> Self {
         Self {
@@ -53,23 +53,30 @@ impl RGBNode {
             contracts: Arc::new(RwLock::new(HashMap::new())),
         }
     }
-    
+
     /// Start the RGB node
     pub fn start(&self) -> Result<(), &'static str> {
         // Implementation would start a node service
-        println!("Starting RGB node on {}:{}", self.config.bind_address, self.config.bind_port);
+        println!(
+            "Starting RGB node on {}:{}",
+            self.config.bind_address, self.config.bind_port
+        );
         Ok(())
     }
-    
+
     /// Stop the RGB node
     pub fn stop(&self) -> Result<(), &'static str> {
         // Implementation would stop a node service
         println!("Stopping RGB node");
         Ok(())
     }
-    
+
     /// Register a contract with the node
-    pub fn register_contract(&self, contract_id: &str, contract_data: &str) -> Result<(), &'static str> {
+    pub fn register_contract(
+        &self,
+        contract_id: &str,
+        contract_data: &str,
+    ) -> Result<(), &'static str> {
         // Implementation would register a contract with the node
         if let Ok(mut contracts) = self.contracts.write() {
             contracts.insert(contract_id.to_string(), contract_data.to_string());
@@ -78,7 +85,7 @@ impl RGBNode {
             Err("Failed to acquire write lock on contracts")
         }
     }
-    
+
     /// Get contract data
     pub fn get_contract(&self, contract_id: &str) -> Result<String, &'static str> {
         // Implementation would get contract data from the node

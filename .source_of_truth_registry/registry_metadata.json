@@ -1,7 +1,13 @@
 {
     "version": "1.0.0",
+<<<<<<< HEAD
     "created": "2025-07-05T20:19:55Z",
     "last_updated": "2025-07-05T20:19:55Z",
     "total_work_items": 1,
+=======
+    "created": "2025-07-09T09:19:55Z",
+    "last_updated": "2025-07-09T09:19:55Z",
+    "total_work_items": 4,
+>>>>>>> feature/git-workflows-consolidation-evidence-based
     "total_canonical_documents": 0
 }

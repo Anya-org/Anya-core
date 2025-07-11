@@ -132,9 +132,7 @@ impl ContractManager {
     /// [AIR-3][AIS-3][BPC-3][RES-3]
     #[cfg(not(feature = "rust-bitcoin"))]
     pub fn new() -> Self {
-        Self {
-            _placeholder: (),
-        }
+        Self { _placeholder: () }
     }
 
     /// Create a new DLC contract
@@ -518,19 +516,29 @@ impl OracleClient {
     }
 
     /// Create DLC contract with oracle
-    pub async fn create_contract(&mut self, _contract_id: &str, _contract_info: DlcContractInfo) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+    pub async fn create_contract(
+        &mut self,
+        _contract_id: &str,
+        _contract_info: DlcContractInfo,
+    ) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
         // Stub implementation for creating DLC contract
         Ok(format!("contract_{_contract_id}"))
     }
 
     /// Close DLC contract
-    pub async fn close_contract(&mut self, _contract_id: &str) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+    pub async fn close_contract(
+        &mut self,
+        _contract_id: &str,
+    ) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         // Stub implementation for closing DLC contract
         Ok(())
     }
 
     /// Get oracle signature for event
-    pub async fn get_signature(&self, event_id: &str) -> Result<Vec<u8>, Box<dyn std::error::Error + Send + Sync>> {
+    pub async fn get_signature(
+        &self,
+        event_id: &str,
+    ) -> Result<Vec<u8>, Box<dyn std::error::Error + Send + Sync>> {
         // Stub implementation for getting oracle signature
         Ok(format!("sig_{event_id}").into_bytes())
     }
@@ -542,7 +550,10 @@ impl OracleClient {
     }
 
     /// Create DLC with parameters
-    pub async fn create_dlc(&mut self, params: DlcParameters) -> Result<DlcContract, Box<dyn std::error::Error + Send + Sync>> {
+    pub async fn create_dlc(
+        &mut self,
+        params: DlcParameters,
+    ) -> Result<DlcContract, Box<dyn std::error::Error + Send + Sync>> {
         // Stub implementation for creating DLC
         Ok(DlcContract {
             id: uuid::Uuid::new_v4().to_string(),
@@ -551,7 +562,10 @@ impl OracleClient {
             outcomes: vec!["outcome1".to_string(), "outcome2".to_string()],
             payouts: vec![params.funding_amount / 2, params.funding_amount / 2],
             status: DlcContractStatus::Created,
-            created_at: SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs(),
+            created_at: SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .unwrap()
+                .as_secs(),
             updated_at: None,
             signatures: Vec::new(),
             metadata: HashMap::new(),
@@ -619,9 +633,7 @@ impl DlcManager {
             };
 
         // Call the contract manager's sign_contract method with both required arguments
-        self
-            .contract_manager
-            .sign_contract(contract, &private_key)
+        self.contract_manager.sign_contract(contract, &private_key)
     }
 
     /// Broadcast a DLC contract
@@ -751,9 +763,9 @@ impl OracleClient {
 
 // [AIR-3][AIS-3][BPC-3][RES-3] Import Layer2Protocol trait and related types
 use crate::layer2::{
-    Layer2Protocol, AssetParams, AssetTransfer, Proof, ProtocolState, 
-    VerificationResult, ValidationResult, TransactionStatus, TransferResult,
-    create_protocol_state, create_verification_result, create_validation_result
+    create_protocol_state, create_validation_result, create_verification_result, AssetParams,
+    AssetTransfer, Layer2Protocol, Proof, ProtocolState, TransactionStatus, TransferResult,
+    ValidationResult, VerificationResult,
 };
 use async_trait::async_trait;
 
@@ -787,19 +799,30 @@ impl DlcProtocol {
     }
 
     /// Create a new DLC contract
-    pub async fn create_dlc_contract(&mut self, contract_info: DlcContractInfo) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+    pub async fn create_dlc_contract(
+        &mut self,
+        contract_info: DlcContractInfo,
+    ) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
         let contract_id = format!("dlc_{}", uuid::Uuid::new_v4());
-        self.oracle_client.create_contract(&contract_id, contract_info).await?;
+        self.oracle_client
+            .create_contract(&contract_id, contract_info)
+            .await?;
         Ok(contract_id)
     }
 
     /// Close a DLC contract
-    pub async fn close_dlc_contract(&mut self, contract_id: &str) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+    pub async fn close_dlc_contract(
+        &mut self,
+        contract_id: &str,
+    ) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         self.oracle_client.close_contract(contract_id).await
     }
 
     /// Get oracle signature for event
-    pub async fn get_oracle_signature(&self, event_id: &str) -> Result<Vec<u8>, Box<dyn std::error::Error + Send + Sync>> {
+    pub async fn get_oracle_signature(
+        &self,
+        event_id: &str,
+    ) -> Result<Vec<u8>, Box<dyn std::error::Error + Send + Sync>> {
         self.oracle_client.get_signature(event_id).await
     }
 
@@ -809,7 +832,10 @@ impl DlcProtocol {
     }
 
     /// Create new DLC contract
-    pub async fn create_dlc(&mut self, params: DlcParameters) -> Result<DlcContract, Box<dyn std::error::Error + Send + Sync>> {
+    pub async fn create_dlc(
+        &mut self,
+        params: DlcParameters,
+    ) -> Result<DlcContract, Box<dyn std::error::Error + Send + Sync>> {
         self.oracle_client.create_dlc(params).await
     }
 }
@@ -836,12 +862,18 @@ impl Layer2Protocol for DlcProtocol {
         Ok(create_protocol_state("1.0", 0, None, true))
     }
 
-    async fn submit_transaction(&self, _tx_data: &[u8]) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+    async fn submit_transaction(
+        &self,
+        _tx_data: &[u8],
+    ) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
         let tx_id = format!("dlc_tx_{}", Uuid::new_v4());
         Ok(tx_id)
     }
 
-    async fn check_transaction_status(&self, _tx_id: &str) -> Result<TransactionStatus, Box<dyn std::error::Error + Send + Sync>> {
+    async fn check_transaction_status(
+        &self,
+        _tx_id: &str,
+    ) -> Result<TransactionStatus, Box<dyn std::error::Error + Send + Sync>> {
         Ok(TransactionStatus::Confirmed)
     }
 
@@ -850,12 +882,18 @@ impl Layer2Protocol for DlcProtocol {
         Ok(())
     }
 
-    async fn issue_asset(&self, _params: AssetParams) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+    async fn issue_asset(
+        &self,
+        _params: AssetParams,
+    ) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
         let asset_id = format!("dlc_asset_{}", Uuid::new_v4());
         Ok(asset_id)
     }
 
-    async fn transfer_asset(&self, _transfer: AssetTransfer) -> Result<TransferResult, Box<dyn std::error::Error + Send + Sync>> {
+    async fn transfer_asset(
+        &self,
+        _transfer: AssetTransfer,
+    ) -> Result<TransferResult, Box<dyn std::error::Error + Send + Sync>> {
         use crate::layer2::TransferResult;
         Ok(TransferResult {
             tx_id: format!("dlc_transfer_{}", Uuid::new_v4()),
@@ -868,12 +906,18 @@ impl Layer2Protocol for DlcProtocol {
         })
     }
 
-    async fn verify_proof(&self, _proof: Proof) -> Result<VerificationResult, Box<dyn std::error::Error + Send + Sync>> {
+    async fn verify_proof(
+        &self,
+        _proof: Proof,
+    ) -> Result<VerificationResult, Box<dyn std::error::Error + Send + Sync>> {
         // DLC proof verification logic
         Ok(create_verification_result(true, None))
     }
 
-    async fn validate_state(&self, _state_data: &[u8]) -> Result<ValidationResult, Box<dyn std::error::Error + Send + Sync>> {
+    async fn validate_state(
+        &self,
+        _state_data: &[u8],
+    ) -> Result<ValidationResult, Box<dyn std::error::Error + Send + Sync>> {
         // DLC state validation logic
         Ok(create_validation_result(true, vec![]))
     }

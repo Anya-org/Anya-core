@@ -1,5 +1,5 @@
 //! Bitcoin module tests - Validates full alignment with Bitcoin Core principles
-//! 
+//!
 //! This module contains integration tests for Bitcoin functionality with specific
 //! focus on ensuring full compliance with Bitcoin's core principles:
 //! - Decentralization
@@ -7,32 +7,35 @@
 //! - Immutability
 //! - Privacy
 
-mod validation_test;
-mod vm_layer_tests;
 mod cross_layer_tests;
+mod historical_compatibility_tests;
+mod layer3_tests;
 mod riscv_tests;
 mod riscv_vm_tests;
+<<<<<<< HEAD
 mod layer3_tests;
 mod historical_compatibility_tests;
+=======
+mod validation_test;
+mod vm_layer_tests;
+>>>>>>> feature/git-workflows-consolidation-evidence-based
 // mod security_tests;  // Disabled - dependency issues
 
 // Protocol tests module
 pub mod protocol;
 
 // Re-export Bitcoin tests for main test runner
-pub use validation_test::*;
-pub use cross_layer_tests::*;
 pub use historical_compatibility_tests::*;
 // pub use security_tests::*;  // Disabled - dependency issues
 
 // Tests that verify Bitcoin Core principles alignment
 pub mod principles {
     //! Tests specifically focused on verifying alignment with Bitcoin Core principles
-    
+
     pub use super::historical_compatibility_tests::test_full_bitcoin_principles_alignment;
-    pub use super::historical_compatibility_tests::test_immutability_historical_compatibility;
     pub use super::historical_compatibility_tests::test_immutability_across_hardware_paths;
-    
+    pub use super::historical_compatibility_tests::test_immutability_historical_compatibility;
+
     // Security principle tests
     // Disabled until security_tests module is available
     // pub use super::security_tests::test_cve_2010_5139_value_overflow;

@@ -5,14 +5,10 @@
 // Bitcoin Development Framework v2.5 requirements
 
 use anyhow::{bail, Result};
-use bitcoin::secp256k1::{Secp256k1, SecretKey, XOnlyPublicKey};
-use bitcoin::taproot::{
-    LeafVersion, TaprootBuilder, ControlBlock, TapNodeHash, 
-    TapLeafHash, TapBranchTag
-};
-use bitcoin::ScriptBuf;
 use bitcoin::key::{TapTweak, TweakedPublicKey, UntweakedPublicKey};
-use bitcoin::hashes::{Hash, sha256};
+use bitcoin::secp256k1::{Secp256k1, SecretKey, XOnlyPublicKey};
+use bitcoin::taproot::{ControlBlock, TapLeafHash, TapNodeHash, TaprootBuilder};
+use bitcoin::ScriptBuf;
 use rand;
 use std::str::FromStr;
 
@@ -29,25 +25,33 @@ impl TaprootVerifier {
             secp: Secp256k1::new(),
         }
     }
-    
+
     /// Verify a key path spend for a Taproot output
-    pub fn verify_key_path_spend(&self, output_key: TweakedPublicKey, internal_key: &XOnlyPublicKey) -> Result<bool> {
+    pub fn verify_key_path_spend(
+        &self,
+        output_key: TweakedPublicKey,
+        internal_key: &XOnlyPublicKey,
+    ) -> Result<bool> {
         // Extract internal key from control block
         let internal_key_untweaked: UntweakedPublicKey = (*internal_key).into();
-        
+
         // Compute tweak
         let merkle_root = None;
-        
+
         // Use the add_tweak method with the merkle_root option
         let (tweaked_key, _parity) = internal_key_untweaked.tap_tweak(&self.secp, merkle_root);
-        
+
         // Compare the tweaked key with the output key
         // In Bitcoin 0.32.6, we need to pass an XOnlyPublicKey to dangerous_assume_tweaked
         Ok(TweakedPublicKey::dangerous_assume_tweaked(tweaked_key.into()) == output_key)
     }
-    
+
     /// Compute merkle root from leaf hash and control block  
-    fn compute_merkle_root(&self, _leaf_hash: TapLeafHash, _control_block: &ControlBlock) -> Result<Option<TapNodeHash>> {
+    fn compute_merkle_root(
+        &self,
+        _leaf_hash: TapLeafHash,
+        _control_block: &ControlBlock,
+    ) -> Result<Option<TapNodeHash>> {
         // Mock implementation - in real code, this would compute the actual Merkle root
         // from the leaf hash and control block proof path
         Ok(None) // Simplified for compilation
@@ -69,12 +73,14 @@ pub fn test_taproot_key_path_spending_simple() -> Result<()> {
     let script = ScriptBuf::from_hex(
         "5121030681b3e0d62e8455f48c657bf8b2556e1c6c89be232f57f1f53a88b0a9986cc751ae",
     )?;
-    
+
     // Create Taproot tree
     let mut builder = TaprootBuilder::new();
-    builder = builder.add_leaf(0, script.clone())
+    builder = builder
+        .add_leaf(0, script.clone())
         .map_err(|e| anyhow::anyhow!("Failed to add leaf: {:?}", e))?;
-    let tap_tree = builder.finalize(&secp, internal_key)
+    let tap_tree = builder
+        .finalize(&secp, internal_key)
         .map_err(|e| anyhow::anyhow!("Failed to finalize taproot builder: {:?}", e))?;
 
     // Get Taproot output key
@@ -103,28 +109,30 @@ pub fn test_taproot_key_path_spending_simple() -> Result<()> {
 #[cfg(test)]
 mod additional_tests {
     use super::*;
-    
+
     #[test]
     fn test_tapleaf_verification_simple() {
         // Initialize checker
         let checker = TaprootVerifier::new();
         let secp = Secp256k1::new();
-        
+
         // Generate random keypair
         let secret_key = SecretKey::new(&mut rand::thread_rng());
         let public_key = bitcoin::secp256k1::PublicKey::from_secret_key(&secp, &secret_key);
         let x_only = XOnlyPublicKey::from(public_key);
-        
+
         // Compute tweaked key with no merkle root (key-path spending)
         let internal_key_untweaked: UntweakedPublicKey = x_only.into();
         let merkle_root = None; // Using None for key-path spending
         let (tweaked_key, _parity) = internal_key_untweaked.tap_tweak(&secp, merkle_root);
         let tweaked_public_key = TweakedPublicKey::dangerous_assume_tweaked(tweaked_key.into());
-        
+
         // Verify key path spend directly (which doesn't need a control block)
-        let key_path_result = checker.verify_key_path_spend(tweaked_public_key, &x_only).unwrap();
+        let key_path_result = checker
+            .verify_key_path_spend(tweaked_public_key, &x_only)
+            .unwrap();
         assert!(key_path_result, "Key path verification should succeed");
-        
+
         println!("Taproot verification test completed successfully");
     }
 }

@@ -1,24 +1,40 @@
+<<<<<<< HEAD
 use std::collections::HashMap;
 use std::sync::Arc;
 // use crate::security::audit::AuditLogger; // Disabled - missing dependency
+=======
+// Only import what is actually used
+// Removed unused imports: HashMap, Arc
+>>>>>>> feature/git-workflows-consolidation-evidence-based
 
 /// HSM Testnet Provider Tests
 
 #[cfg(test)]
 mod tests {
     use std::collections::HashMap;
+<<<<<<< HEAD
     
     use crate::security::hsm::config::{
         HardwareConfig, HardwareDeviceType, HsmConfig, SimulatorConfig,
     };
+=======
+
+    use crate::security::hsm::config::{HsmConfig, SimulatorConfig};
+>>>>>>> feature/git-workflows-consolidation-evidence-based
     use crate::security::hsm::provider::{
-        create_hsm_provider, EcCurve, HsmProvider, HsmProviderType, KeyGenParams, KeyType,
-        KeyUsage, SigningAlgorithm,
+        create_hsm_provider, EcCurve, HsmProvider, HsmProviderType, KeyGenParams, KeyType, KeyUsage,
     };
-    use crate::security::hsm::providers::{
-        hardware::HardwareHsmProvider, simulator::SimulatorHsmProvider,
-        software::SoftwareHsmProvider,
-    };
+    use crate::security::hsm::providers::simulator::SimulatorHsmProvider;
+
+    // Simple mock structure for tests - no feature flag required
+    #[derive(Clone)]
+    struct MockLogger;
+
+    impl MockLogger {
+        fn new(_path: &str) -> Result<Self, Box<dyn std::error::Error>> {
+            Ok(MockLogger)
+        }
+    }
 
     // Mock audit logger for testing
     #[cfg(feature = "audit_logger")]
@@ -38,7 +54,11 @@ mod tests {
     #[ignore = "Requires AuditLogger implementation"]
     async fn test_software_provider_bitcoin_testnet() {
         println!("Testing software provider for Bitcoin testnet");
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> feature/git-workflows-consolidation-evidence-based
         // Test implementation goes here - commented out until AuditLogger is available
         // let provider = SoftwareHsmProvider::new(...);
         // provider.initialize().await.unwrap();
@@ -113,6 +133,7 @@ mod tests {
     }
 
     #[tokio::test]
+<<<<<<< HEAD
     #[ignore = "Requires AuditLogger implementation and hardware device"]
     async fn test_hardware_provider_bitcoin_testnet() {
         println!("Hardware provider test requires AuditLogger implementation");
@@ -122,6 +143,13 @@ mod tests {
         {
             // Hardware provider implementation would go here
         }
+=======
+    #[ignore = "Requires hardware device"]
+    async fn test_hardware_provider_bitcoin_testnet() {
+        println!("Hardware provider test requires hardware device");
+
+        // Hardware provider implementation would go here when hardware is available
+>>>>>>> feature/git-workflows-consolidation-evidence-based
     }
 
     #[tokio::test]

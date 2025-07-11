@@ -8,7 +8,7 @@ use std::time::Instant;
 /// Layer3 system tests
 mod layer3_tests {
     use super::*;
-    
+
     #[test]
     fn test_layer3_initialization() {
         // Mock test for Layer3 initialization
@@ -22,14 +22,14 @@ mod layer3_tests {
             assert!(true);
         }
     }
-    
+
     #[test]
     fn test_compute_capabilities() {
         // Mock test for compute capabilities
         let compute_available = true;
         assert!(compute_available);
     }
-    
+
     #[test]
     fn test_zk_verification() {
         // Mock test for zero-knowledge verification
@@ -41,7 +41,7 @@ mod layer3_tests {
 /// Performance tests
 mod performance_tests {
     use super::*;
-    
+
     #[test]
     fn test_layer3_performance() {
         let start = Instant::now();
@@ -56,15 +56,14 @@ mod performance_tests {
 
 /// Security tests
 mod security_tests {
-    use super::*;
-    
+
     #[test]
     fn test_layer3_security() {
         // Mock test for Layer3 security
         let security_checks_passed = true;
         assert!(security_checks_passed);
     }
-    
+
     #[test]
     fn test_verification_levels() {
         // Mock test for verification levels

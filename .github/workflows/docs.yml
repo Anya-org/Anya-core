@@ -7,6 +7,13 @@ on:
     paths: ['**.md', 'docs/**', '**.toml', 'README*']
   workflow_dispatch:
 
+<<<<<<< HEAD
+=======
+# Explicitly define permissions for GITHUB_TOKEN
+permissions:
+  contents: read
+
+>>>>>>> feature/git-workflows-consolidation-evidence-based
 jobs:
   documentation-validation:
     name: Documentation Evidence Check

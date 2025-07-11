@@ -4,7 +4,7 @@
 // Test runner for Bitcoin protocol implementations according to
 // Bitcoin Development Framework v2.5 requirements
 
-use anyhow::{Context, Result};
+use anyhow::Result;
 use std::collections::HashMap;
 use std::time::{Duration, Instant};
 
@@ -122,12 +122,12 @@ pub fn run_all_tests() -> Result<HashMap<String, bool>> {
 
     // Import test modules
     use super::bip341_compliance_simple::*;
-    
+
     // Run BIP-341 tests (using simplified implementation for compilation)
     suite.run_test("BIP-341: Key Path Spending (Simple)", || {
         test_taproot_key_path_spending_simple()
     });
-    
+
     // Additional tests can be added once the complete implementation is fixed
     // The original tests are temporarily disabled for compilation
     /*

@@ -7,7 +7,11 @@ use crate::web5::{Web5Error, Web5Result};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
+<<<<<<< HEAD
 use std::time::{SystemTime, UNIX_EPOCH, Duration};
+=======
+use std::time::{Duration, SystemTime, UNIX_EPOCH};
+>>>>>>> feature/git-workflows-consolidation-evidence-based
 // [AIR-3][AIS-3][BPC-3][RES-3] Removed unused imports: DID, Web5Error as IdentityWeb5Error, Web5Result as IdentityWeb5Result
 // [AIR-3][AIS-3][BPC-3][RES-3] Removed unused identity imports
 
@@ -278,6 +282,17 @@ pub struct DWNQuery {
     pub pagination: Option<DWNQueryPagination>,
 }
 
+/// Date Range Filter
+///
+/// Represents a date range for filtering records by timestamp.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct DateRange {
+    /// Start date (timestamp in seconds since UNIX epoch)
+    pub from: Option<u64>,
+    /// End date (timestamp in seconds since UNIX epoch)
+    pub to: Option<u64>,
+}
+
 /// DWN Query Filter
 ///
 /// Represents a filter for DWN queries.
@@ -309,6 +324,99 @@ pub struct DWNQueryPagination {
 }
 
 impl Default for DWNQueryPagination {
+<<<<<<< HEAD
+=======
+    fn default() -> Self {
+        Self {
+            offset: None,
+            limit: Some(100), // Default limit of 100 records
+            cursor: None,
+        }
+    }
+}
+
+/// DWN Query Result with pagination metadata
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct DWNQueryResult {
+    /// Query results
+    pub records: Vec<DWNRecord>,
+    /// Pagination metadata
+    pub pagination: DWNQueryPaginationResult,
+}
+
+/// Pagination result metadata
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct DWNQueryPaginationResult {
+    /// Total number of records available
+    pub total: usize,
+    /// Number of records returned
+    pub count: usize,
+    /// Whether there are more records available
+    pub has_more: bool,
+    /// Cursor for next page (if available)
+    pub next_cursor: Option<String>,
+}
+
+/// Extended DWN Query Filter with advanced filtering capabilities
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AdvancedDWNQueryFilter {
+    /// Base filter
+    pub base: DWNQueryFilter,
+    /// Full-text search query
+    pub search: Option<String>,
+    /// Geographic bounds (lat/lng bounding box)
+    pub geo_bounds: Option<GeoBounds>,
+    /// Tag-based filtering
+    pub tags: Option<Vec<String>>,
+    /// Numeric range filters
+    pub numeric_ranges: Option<HashMap<String, NumericRange>>,
+}
+
+/// Geographic bounding box for location-based queries
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct GeoBounds {
+    pub min_lat: f64,
+    pub max_lat: f64,
+    pub min_lng: f64,
+    pub max_lng: f64,
+}
+
+/// Numeric range filter
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct NumericRange {
+    pub min: Option<f64>,
+    pub max: Option<f64>,
+}
+
+/// Data synchronization status for DWN records
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum SyncStatus {
+    Synced,
+    Pending,
+    Failed(String),
+    Conflicted,
+}
+
+/// Record with sync metadata
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SyncedDWNRecord {
+    pub record: DWNRecord,
+    pub sync_status: SyncStatus,
+    pub last_sync: u64,
+    pub sync_attempts: u32,
+}
+
+/// Conflict resolution strategy
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum ConflictResolution {
+    LastWriteWins,
+    FirstWriteWins,
+    Manual,
+    Custom(String),
+}
+
+impl Default for DWNManager {
+>>>>>>> feature/git-workflows-consolidation-evidence-based
     fn default() -> Self {
         Self {
             offset: None,
@@ -586,11 +694,24 @@ impl DWNManager {
     pub fn create_index(&self, schema: &str, fields: &[&str]) -> Web5Result<()> {
         // In a production implementation, this would create optimized indexes
         // For now, we'll track the index metadata
+<<<<<<< HEAD
         println!("Creating index for schema '{}' on fields: {:?}", schema, fields);
+=======
+        println!("Creating index for schema '{schema}' on fields: {fields:?}");
+>>>>>>> feature/git-workflows-consolidation-evidence-based
         Ok(())
     }
 
     /// Query records with advanced filtering
+<<<<<<< HEAD
+=======
+    /// Filter records by base filter
+    fn filter_records_by_base_filter(&self, filter: DWNQueryFilter) -> Web5Result<Vec<DWNRecord>> {
+        // Simply call query_with_filter as it implements the base filter functionality
+        self.query_with_filter(filter)
+    }
+
+>>>>>>> feature/git-workflows-consolidation-evidence-based
     pub fn query_with_filter(&self, filter: DWNQueryFilter) -> Web5Result<Vec<DWNRecord>> {
         let storage = self
             .records
@@ -655,10 +776,21 @@ impl DWNManager {
 
         // Sort by timestamp (newest first by default)
         filtered_records.sort_by(|a, b| {
+<<<<<<< HEAD
             let a_timestamp = a.metadata.get("created_at")
                 .and_then(|s| s.parse::<u64>().ok())
                 .unwrap_or(0);
             let b_timestamp = b.metadata.get("created_at")
+=======
+            let a_timestamp = a
+                .metadata
+                .get("created_at")
+                .and_then(|s| s.parse::<u64>().ok())
+                .unwrap_or(0);
+            let b_timestamp = b
+                .metadata
+                .get("created_at")
+>>>>>>> feature/git-workflows-consolidation-evidence-based
                 .and_then(|s| s.parse::<u64>().ok())
                 .unwrap_or(0);
             b_timestamp.cmp(&a_timestamp)
@@ -679,12 +811,21 @@ impl DWNManager {
         for stage in pipeline {
             match stage {
                 AggregationStage::Match(filter) => {
+<<<<<<< HEAD
                     records = records
                         .into_iter()
                         .filter(|record| self.matches_aggregation_filter(record, filter))
                         .collect();
                 }
                 AggregationStage::Group { id: _id, fields: _fields } => {
+=======
+                    records.retain(|record| self.matches_aggregation_filter(record, filter));
+                }
+                AggregationStage::Group {
+                    id: _id,
+                    fields: _fields,
+                } => {
+>>>>>>> feature/git-workflows-consolidation-evidence-based
                     // Simplified grouping - in production would implement proper aggregation
                     // For now, just return count
                     return Ok(serde_json::json!({ "count": records.len() }));
@@ -719,16 +860,26 @@ impl DWNManager {
             }
         }
 
+<<<<<<< HEAD
         Ok(serde_json::to_value(records)
             .map_err(|e| Web5Error::SerializationError(e.to_string()))?)
+=======
+        serde_json::to_value(records).map_err(|e| Web5Error::SerializationError(e.to_string()))
+>>>>>>> feature/git-workflows-consolidation-evidence-based
     }
 
     /// Batch store multiple records for performance
     pub async fn batch_store(&self, records: Vec<DWNRecord>) -> Web5Result<Vec<String>> {
         const BATCH_SIZE: usize = 50; // From existing implementation
+<<<<<<< HEAD
         
         let mut results = Vec::new();
         
+=======
+
+        let mut results = Vec::new();
+
+>>>>>>> feature/git-workflows-consolidation-evidence-based
         for chunk in records.chunks(BATCH_SIZE) {
             let mut chunk_results = Vec::new();
             for record in chunk {
@@ -736,11 +887,19 @@ impl DWNManager {
                 chunk_results.push(result);
             }
             results.extend(chunk_results);
+<<<<<<< HEAD
             
             // Small delay between batches to prevent overwhelming the system
             tokio::time::sleep(tokio::time::Duration::from_millis(10)).await;
         }
         
+=======
+
+            // Small delay between batches to prevent overwhelming the system
+            tokio::time::sleep(tokio::time::Duration::from_millis(10)).await;
+        }
+
+>>>>>>> feature/git-workflows-consolidation-evidence-based
         Ok(results)
     }
 
@@ -788,7 +947,15 @@ impl DWNManager {
         }
     }
 
+<<<<<<< HEAD
     fn matches_aggregation_filter(&self, record: &DWNRecord, filter: &HashMap<String, serde_json::Value>) -> bool {
+=======
+    fn matches_aggregation_filter(
+        &self,
+        record: &DWNRecord,
+        filter: &HashMap<String, serde_json::Value>,
+    ) -> bool {
+>>>>>>> feature/git-workflows-consolidation-evidence-based
         for (key, expected_value) in filter {
             match key.as_str() {
                 "owner" => {
@@ -838,6 +1005,7 @@ impl DWNManager {
         pagination: Option<DWNQueryPagination>,
     ) -> Web5Result<DWNQueryResult> {
         let pagination = pagination.unwrap_or_default();
+<<<<<<< HEAD
         
         // First get all matching records using base filter
         let mut all_records = self.query_with_filter(filter.base)?;
@@ -865,6 +1033,42 @@ impl DWNManager {
             None
         };
         
+=======
+
+        // Clone the base filter to avoid partial move
+        let base_filter = filter.base.clone();
+
+        // First get all matching records using base filter
+        let filtered_records = self.filter_records_by_base_filter(base_filter)?;
+
+        // Apply advanced filters
+        let all_records = self.apply_advanced_filters(filtered_records, &filter)?;
+
+        let total = all_records.len();
+
+        // Apply pagination
+        let offset = pagination.offset.unwrap_or(0);
+        let limit = pagination.limit.unwrap_or(100);
+
+        let start = offset.min(total);
+        let end = (offset + limit).min(total);
+
+        let records = all_records
+            .into_iter()
+            .skip(start)
+            .take(end - start)
+            .collect::<Vec<_>>();
+        let count = records.len();
+        let has_more = end < total;
+
+        // Generate next cursor if there are more records
+        let next_cursor = if has_more {
+            Some(format!("cursor_{end}"))
+        } else {
+            None
+        };
+
+>>>>>>> feature/git-workflows-consolidation-evidence-based
         Ok(DWNQueryResult {
             records,
             pagination: DWNQueryPaginationResult {
@@ -875,7 +1079,11 @@ impl DWNManager {
             },
         })
     }
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> feature/git-workflows-consolidation-evidence-based
     /// Apply advanced filtering to records
     fn apply_advanced_filters(
         &self,
@@ -884,6 +1092,7 @@ impl DWNManager {
     ) -> Web5Result<Vec<DWNRecord>> {
         // Full-text search
         if let Some(ref search_query) = filter.search {
+<<<<<<< HEAD
             records = records
                 .into_iter()
                 .filter(|record| self.matches_search_query(record, search_query))
@@ -921,12 +1130,40 @@ impl DWNManager {
     fn matches_search_query(&self, record: &DWNRecord, search_query: &str) -> bool {
         let search_lower = search_query.to_lowercase();
         
+=======
+            records.retain(|record| self.matches_search_query(record, search_query));
+        }
+
+        // Tag-based filtering
+        if let Some(ref tags) = filter.tags {
+            records.retain(|record| self.matches_tags(record, tags));
+        }
+
+        // Numeric range filtering
+        if let Some(ref numeric_ranges) = filter.numeric_ranges {
+            records.retain(|record| self.matches_numeric_ranges(record, numeric_ranges));
+        }
+
+        // Geographic filtering
+        if let Some(ref geo_bounds) = filter.geo_bounds {
+            records.retain(|record| self.matches_geo_bounds(record, geo_bounds));
+        }
+
+        Ok(records)
+    }
+
+    /// Check if record matches search query
+    fn matches_search_query(&self, record: &DWNRecord, search_query: &str) -> bool {
+        let search_lower = search_query.to_lowercase();
+
+>>>>>>> feature/git-workflows-consolidation-evidence-based
         // Search in data
         if let Ok(data_string) = serde_json::to_string(&record.data) {
             if data_string.to_lowercase().contains(&search_lower) {
                 return true;
             }
         }
+<<<<<<< HEAD
         
         // Search in metadata
         for (key, value) in &record.metadata {
@@ -936,27 +1173,62 @@ impl DWNManager {
             }
         }
         
+=======
+
+        // Search in metadata
+        for (key, value) in &record.metadata {
+            if key.to_lowercase().contains(&search_lower)
+                || value.to_lowercase().contains(&search_lower)
+            {
+                return true;
+            }
+        }
+
+>>>>>>> feature/git-workflows-consolidation-evidence-based
         // Search in schema
         if record.schema.to_lowercase().contains(&search_lower) {
             return true;
         }
+<<<<<<< HEAD
         
         false
     }
     
+=======
+
+        false
+    }
+
+>>>>>>> feature/git-workflows-consolidation-evidence-based
     /// Check if record matches tag filters
     fn matches_tags(&self, record: &DWNRecord, required_tags: &[String]) -> bool {
         if let Some(record_tags) = record.metadata.get("tags") {
             let record_tag_list: Result<Vec<String>, _> = serde_json::from_str(record_tags);
             if let Ok(record_tag_list) = record_tag_list {
+<<<<<<< HEAD
                 return required_tags.iter().all(|tag| record_tag_list.contains(tag));
+=======
+                return required_tags
+                    .iter()
+                    .all(|tag| record_tag_list.contains(tag));
+>>>>>>> feature/git-workflows-consolidation-evidence-based
             }
         }
         false
     }
+<<<<<<< HEAD
     
     /// Check if record matches numeric range filters
     fn matches_numeric_ranges(&self, record: &DWNRecord, ranges: &HashMap<String, NumericRange>) -> bool {
+=======
+
+    /// Check if record matches numeric range filters
+    fn matches_numeric_ranges(
+        &self,
+        record: &DWNRecord,
+        ranges: &HashMap<String, NumericRange>,
+    ) -> bool {
+>>>>>>> feature/git-workflows-consolidation-evidence-based
         for (field, range) in ranges {
             // Check in metadata first
             if let Some(value_str) = record.metadata.get(field) {
@@ -967,7 +1239,11 @@ impl DWNManager {
                     continue;
                 }
             }
+<<<<<<< HEAD
             
+=======
+
+>>>>>>> feature/git-workflows-consolidation-evidence-based
             // Check in data
             if let Some(value) = record.data.get(field) {
                 if let Some(value_num) = value.as_f64() {
@@ -977,13 +1253,21 @@ impl DWNManager {
                     continue;
                 }
             }
+<<<<<<< HEAD
             
+=======
+
+>>>>>>> feature/git-workflows-consolidation-evidence-based
             // Field not found or not numeric
             return false;
         }
         true
     }
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> feature/git-workflows-consolidation-evidence-based
     /// Check if value is within numeric range
     fn value_in_range(&self, value: f64, range: &NumericRange) -> bool {
         if let Some(min) = range.min {
@@ -998,6 +1282,7 @@ impl DWNManager {
         }
         true
     }
+<<<<<<< HEAD
     
     /// Check if record matches geographic bounds
     fn matches_geo_bounds(&self, record: &DWNRecord, bounds: &GeoBounds) -> bool {
@@ -1010,11 +1295,33 @@ impl DWNManager {
         if let (Some(lat), Some(lng)) = (lat, lng) {
             lat >= bounds.min_lat && lat <= bounds.max_lat &&
             lng >= bounds.min_lng && lng <= bounds.max_lng
+=======
+
+    /// Check if record matches geographic bounds
+    fn matches_geo_bounds(&self, record: &DWNRecord, bounds: &GeoBounds) -> bool {
+        // Look for latitude and longitude in metadata or data
+        let lat = self
+            .extract_numeric_field(record, "latitude")
+            .or_else(|| self.extract_numeric_field(record, "lat"));
+        let lng = self
+            .extract_numeric_field(record, "longitude")
+            .or_else(|| self.extract_numeric_field(record, "lng"));
+
+        if let (Some(lat), Some(lng)) = (lat, lng) {
+            lat >= bounds.min_lat
+                && lat <= bounds.max_lat
+                && lng >= bounds.min_lng
+                && lng <= bounds.max_lng
+>>>>>>> feature/git-workflows-consolidation-evidence-based
         } else {
             false
         }
     }
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> feature/git-workflows-consolidation-evidence-based
     /// Extract numeric field from record
     fn extract_numeric_field(&self, record: &DWNRecord, field: &str) -> Option<f64> {
         // Check metadata first
@@ -1023,15 +1330,24 @@ impl DWNManager {
                 return Some(value);
             }
         }
+<<<<<<< HEAD
         
         // Check data
         record.data.get(field).and_then(|v| v.as_f64())
     }
     
+=======
+
+        // Check data
+        record.data.get(field).and_then(|v| v.as_f64())
+    }
+
+>>>>>>> feature/git-workflows-consolidation-evidence-based
     /// Batch delete multiple records
     pub async fn batch_delete(&self, record_ids: Vec<String>) -> Web5Result<Vec<String>> {
         let mut deleted_ids = Vec::new();
         let mut errors = Vec::new();
+<<<<<<< HEAD
         
         for record_id in record_ids {
             match self.delete_record(&record_id) {
@@ -1047,16 +1363,44 @@ impl DWNManager {
         Ok(deleted_ids)
     }
     
+=======
+
+        for record_id in record_ids {
+            match self.delete_record(&record_id) {
+                Ok(_) => deleted_ids.push(record_id),
+                Err(e) => errors.push(format!("Failed to delete {record_id}: {e}")),
+            }
+        }
+
+        if !errors.is_empty() {
+            return Err(Web5Error::DWNError(format!(
+                "Batch delete errors: {}",
+                errors.join(", ")
+            )));
+        }
+
+        Ok(deleted_ids)
+    }
+
+>>>>>>> feature/git-workflows-consolidation-evidence-based
     /// Synchronize records with remote DWN nodes
     pub async fn sync_records(&self, remote_endpoint: &str) -> Web5Result<Vec<SyncedDWNRecord>> {
         // In a full implementation, this would connect to remote DWN endpoints
         // and synchronize records bidirectionally
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> feature/git-workflows-consolidation-evidence-based
         let storage = self
             .records
             .lock()
             .map_err(|e| Web5Error::Storage(format!("Failed to acquire lock: {e}")))?;
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> feature/git-workflows-consolidation-evidence-based
         let synced_records: Vec<SyncedDWNRecord> = storage
             .values()
             .map(|record| SyncedDWNRecord {
@@ -1066,12 +1410,25 @@ impl DWNManager {
                 sync_attempts: 1,
             })
             .collect();
+<<<<<<< HEAD
         
         println!("Would sync {} records with remote endpoint: {}", synced_records.len(), remote_endpoint);
         
         Ok(synced_records)
     }
     
+=======
+
+        println!(
+            "Would sync {} records with remote endpoint: {}",
+            synced_records.len(),
+            remote_endpoint
+        );
+
+        Ok(synced_records)
+    }
+
+>>>>>>> feature/git-workflows-consolidation-evidence-based
     /// Resolve conflicts between records
     pub fn resolve_conflicts(
         &self,
@@ -1079,6 +1436,7 @@ impl DWNManager {
         strategy: ConflictResolution,
     ) -> Web5Result<Vec<DWNRecord>> {
         let mut resolved = Vec::new();
+<<<<<<< HEAD
         
         for (local, remote) in conflicts {
             let winner = match strategy {
@@ -1090,6 +1448,23 @@ impl DWNManager {
                         .and_then(|s| s.parse::<u64>().ok())
                         .unwrap_or(0);
                     
+=======
+
+        for (local, remote) in conflicts {
+            let winner = match strategy {
+                ConflictResolution::LastWriteWins => {
+                    let local_timestamp = local
+                        .metadata
+                        .get("updated")
+                        .and_then(|s| s.parse::<u64>().ok())
+                        .unwrap_or(0);
+                    let remote_timestamp = remote
+                        .metadata
+                        .get("updated")
+                        .and_then(|s| s.parse::<u64>().ok())
+                        .unwrap_or(0);
+
+>>>>>>> feature/git-workflows-consolidation-evidence-based
                     if remote_timestamp > local_timestamp {
                         remote
                     } else {
@@ -1097,6 +1472,7 @@ impl DWNManager {
                     }
                 }
                 ConflictResolution::FirstWriteWins => {
+<<<<<<< HEAD
                     let local_timestamp = local.metadata.get("created")
                         .and_then(|s| s.parse::<u64>().ok())
                         .unwrap_or(u64::MAX);
@@ -1104,6 +1480,19 @@ impl DWNManager {
                         .and_then(|s| s.parse::<u64>().ok())
                         .unwrap_or(u64::MAX);
                     
+=======
+                    let local_timestamp = local
+                        .metadata
+                        .get("created")
+                        .and_then(|s| s.parse::<u64>().ok())
+                        .unwrap_or(u64::MAX);
+                    let remote_timestamp = remote
+                        .metadata
+                        .get("created")
+                        .and_then(|s| s.parse::<u64>().ok())
+                        .unwrap_or(u64::MAX);
+
+>>>>>>> feature/git-workflows-consolidation-evidence-based
                     if local_timestamp <= remote_timestamp {
                         local
                     } else {
@@ -1115,11 +1504,16 @@ impl DWNManager {
                     // For now, default to local
                     local
                 }
+<<<<<<< HEAD
                 ConflictResolution::Custom(_strategy) => {
+=======
+                ConflictResolution::Custom(ref _strategy) => {
+>>>>>>> feature/git-workflows-consolidation-evidence-based
                     // Custom conflict resolution logic would be implemented here
                     local
                 }
             };
+<<<<<<< HEAD
             
             resolved.push(winner);
         }
@@ -1127,6 +1521,15 @@ impl DWNManager {
         Ok(resolved)
     }
     
+=======
+
+            resolved.push(winner);
+        }
+
+        Ok(resolved)
+    }
+
+>>>>>>> feature/git-workflows-consolidation-evidence-based
     /// Export records to various formats
     pub fn export_records(
         &self,
@@ -1142,6 +1545,7 @@ impl DWNManager {
                 .map_err(|e| Web5Error::Storage(format!("Failed to acquire lock: {e}")))?;
             storage.values().cloned().collect()
         };
+<<<<<<< HEAD
         
         match format.to_lowercase().as_str() {
             "json" => {
@@ -1154,14 +1558,39 @@ impl DWNManager {
                     let created_at = record.metadata.get("created_at").unwrap_or(&"".to_string());
                     csv_output.push_str(&format!("{},{},{},{}\n", 
                         record.id, record.owner, record.schema, created_at));
+=======
+
+        match format.to_lowercase().as_str() {
+            "json" => serde_json::to_string_pretty(&records)
+                .map_err(|e| Web5Error::SerializationError(e.to_string())),
+            "csv" => {
+                let mut csv_output = String::from("id,owner,schema,created_at\n");
+                for record in records {
+                    let empty_string = "".to_string();
+                    let created_at = record.metadata.get("created_at").unwrap_or(&empty_string);
+                    csv_output.push_str(&format!(
+                        "{},{},{},{}\n",
+                        record.id, record.owner, record.schema, created_at
+                    ));
+>>>>>>> feature/git-workflows-consolidation-evidence-based
                 }
                 Ok(csv_output)
             }
             "xml" => {
+<<<<<<< HEAD
                 let mut xml_output = String::from("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<records>\n");
                 for record in records {
                     xml_output.push_str(&format!("  <record id=\"{}\" owner=\"{}\" schema=\"{}\">\n", 
                         record.id, record.owner, record.schema));
+=======
+                let mut xml_output =
+                    String::from("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<records>\n");
+                for record in records {
+                    xml_output.push_str(&format!(
+                        "  <record id=\"{}\" owner=\"{}\" schema=\"{}\">\n",
+                        record.id, record.owner, record.schema
+                    ));
+>>>>>>> feature/git-workflows-consolidation-evidence-based
                     xml_output.push_str("    <data><![CDATA[");
                     xml_output.push_str(&serde_json::to_string(&record.data).unwrap_or_default());
                     xml_output.push_str("]]></data>\n");
@@ -1170,6 +1599,7 @@ impl DWNManager {
                 xml_output.push_str("</records>");
                 Ok(xml_output)
             }
+<<<<<<< HEAD
             _ => Err(Web5Error::DWNError(format!("Unsupported export format: {}", format)))
         }
     }
@@ -1184,12 +1614,36 @@ impl DWNManager {
             _ => return Err(Web5Error::DWNError(format!("Unsupported import format: {}", format)))
         };
         
+=======
+            _ => Err(Web5Error::DWNError(format!(
+                "Unsupported export format: {format}"
+            ))),
+        }
+    }
+
+    /// Import records from various formats
+    pub fn import_records(&self, data: &str, format: &str) -> Web5Result<Vec<String>> {
+        let records = match format.to_lowercase().as_str() {
+            "json" => serde_json::from_str::<Vec<DWNRecord>>(data)
+                .map_err(|e| Web5Error::SerializationError(e.to_string()))?,
+            _ => {
+                return Err(Web5Error::DWNError(format!(
+                    "Unsupported import format: {format}"
+                )))
+            }
+        };
+
+>>>>>>> feature/git-workflows-consolidation-evidence-based
         let mut imported_ids = Vec::new();
         for record in records {
             let id = self.store_record(record)?;
             imported_ids.push(id);
         }
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> feature/git-workflows-consolidation-evidence-based
         Ok(imported_ids)
     }
 }
@@ -1319,8 +1773,23 @@ mod advanced_tests {
                 }),
                 metadata: {
                     let mut meta = HashMap::new();
+<<<<<<< HEAD
                     meta.insert("created_at".to_string(), (1640000000 + i as u64).to_string());
                     meta.insert("category".to_string(), if i % 2 == 0 { "even".to_string() } else { "odd".to_string() });
+=======
+                    meta.insert(
+                        "created_at".to_string(),
+                        (1640000000 + i as u64).to_string(),
+                    );
+                    meta.insert(
+                        "category".to_string(),
+                        if i % 2 == 0 {
+                            "even".to_string()
+                        } else {
+                            "odd".to_string()
+                        },
+                    );
+>>>>>>> feature/git-workflows-consolidation-evidence-based
                     meta
                 },
                 attestations: Vec::new(),
@@ -1350,7 +1819,11 @@ mod advanced_tests {
         };
 
         let result = dwn_manager.query_with_pagination(filter, Some(pagination))?;
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> feature/git-workflows-consolidation-evidence-based
         assert_eq!(result.records.len(), 5);
         assert_eq!(result.pagination.total, 25);
         assert_eq!(result.pagination.count, 5);
@@ -1388,7 +1861,45 @@ mod advanced_tests {
     }
 }
 
+<<<<<<< HEAD
 /// Extension trait for Duration to add convenience methods
+=======
+/// Aggregation Stage
+///
+/// Represents stages in an aggregation pipeline for data processing.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum AggregationStage {
+    /// Match records based on filter conditions
+    Match(HashMap<String, serde_json::Value>),
+    /// Group records by specified fields
+    Group {
+        /// Group ID field
+        id: String,
+        /// Fields to include in the group
+        fields: HashMap<String, String>,
+    },
+    /// Sort records by specified fields
+    Sort(Vec<SortField>),
+    /// Limit the number of results
+    Limit(usize),
+    /// Skip a number of results
+    Skip(usize),
+}
+
+/// Sort Field
+///
+/// Represents a field to sort by and the sort direction.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SortField {
+    /// Field name to sort by
+    pub field: String,
+    /// Sort direction (true for ascending, false for descending)
+    pub ascending: bool,
+}
+
+/// Extension trait for Duration to add convenience methods
+#[allow(dead_code)]
+>>>>>>> feature/git-workflows-consolidation-evidence-based
 trait DurationExt {
     fn from_mins(mins: u64) -> Duration;
     fn from_hours(hours: u64) -> Duration;
@@ -1398,7 +1909,11 @@ impl DurationExt for Duration {
     fn from_mins(mins: u64) -> Duration {
         Duration::from_secs(mins * 60)
     }
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> feature/git-workflows-consolidation-evidence-based
     fn from_hours(hours: u64) -> Duration {
         Duration::from_secs(hours * 3600)
     }

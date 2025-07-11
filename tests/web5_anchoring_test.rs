@@ -1,5 +1,6 @@
 // Web5 Bitcoin anchoring test
 //! DISABLED: dependencies module not available in current architecture
+<<<<<<< HEAD
 #[cfg(all(feature = "web5", feature = "disabled"))] // Double guard to disable
 mod web5_tests {
     // Module references disabled until proper web5 integration
@@ -10,6 +11,29 @@ mod web5_tests {
     use anya_core::dependencies::anya_bitcoin::web5::enhanced_dwn::{
         EnhancedDwn, EnhancedDwnOptions,
     };
+=======
+// Using standard approach for conditional compilation
+#[cfg(feature = "web5")] // Only compile when web5 feature is enabled
+mod web5_tests {
+    // Module references disabled until proper web5 integration
+    // use anya_core::dependencies::anya_bitcoin::wallet::BitcoinWallet;
+    // Commented out missing dependencies
+    // These paths don't exist in the current architecture
+    // use anya_core::dependencies::anya_bitcoin::wallet::WalletConfig;
+    // use anya_core::dependencies::anya_bitcoin::web5::credential::CredentialManager;
+    // use anya_core::dependencies::anya_bitcoin::web5::did::DidManager;
+    // use anya_core::dependencies::anya_bitcoin::web5::enhanced_dwn::{
+    //     EnhancedDwn, EnhancedDwnOptions,
+    // };
+
+    // Using available types from the main codebase
+    use anya_core::bitcoin::wallet::{BitcoinWallet, WalletConfig};
+    // Placeholder structs to allow compilation
+    struct CredentialManager;
+    struct DidManager;
+    struct EnhancedDwn;
+    struct EnhancedDwnOptions;
+>>>>>>> feature/git-workflows-consolidation-evidence-based
     use bdk::wallet::AddressIndex;
     use bitcoin::Network;
     use serde_json::Value;

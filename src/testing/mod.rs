@@ -26,16 +26,31 @@ impl BitcoinValidator for DefaultBitcoinValidator {
         // - Transaction validation
         // - Block validation
         // - Network consensus
+<<<<<<< HEAD
         
         let checks = vec![
             "Bitcoin node connectivity: OK",
             "Transaction pool validation: OK", 
+=======
+
+        let checks = [
+            "Bitcoin node connectivity: OK",
+            "Transaction pool validation: OK",
+>>>>>>> feature/git-workflows-consolidation-evidence-based
             "Block height sync: OK",
             "Network consensus: OK",
             "Wallet functionality: OK",
         ];
+<<<<<<< HEAD
         
         Ok(format!("Bitcoin validation completed: {}", checks.join(", ")))
+=======
+
+        Ok(format!(
+            "Bitcoin validation completed: {}",
+            checks.join(", ")
+        ))
+>>>>>>> feature/git-workflows-consolidation-evidence-based
     }
 }
 
@@ -78,7 +93,11 @@ impl UnifiedTester {
         let bitcoin_validator = Arc::new(DefaultBitcoinValidator);
         let dao_verifier = DaoComplianceCheck;
         let ai_monitor = AIMetricCollector;
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> feature/git-workflows-consolidation-evidence-based
         Self {
             bitcoin_validator,
             dao_verifier,

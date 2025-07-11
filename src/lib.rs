@@ -118,36 +118,36 @@ pub mod hardware_optimization {
     //! let manager = HardwareOptimizationManager::new();
     //! let config = BatchVerificationConfig::default();
     //! ```
-    
+
     use std::collections::HashMap;
-    
+
     /// Hardware optimization manager for coordinating various optimization strategies
     #[derive(Debug, Clone)]
     pub struct HardwareOptimizationManager {
         optimizations: HashMap<String, bool>,
     }
-    
+
     impl Default for HardwareOptimizationManager {
         fn default() -> Self {
             Self::new()
         }
     }
-    
+
     impl HardwareOptimizationManager {
         pub fn new() -> Self {
             Self {
                 optimizations: HashMap::new(),
             }
         }
-        
+
         pub fn enable_optimization(&mut self, name: &str) {
             self.optimizations.insert(name.to_string(), true);
         }
-        
+
         pub fn is_optimization_enabled(&self, name: &str) -> bool {
             self.optimizations.get(name).copied().unwrap_or(false)
         }
-        
+
         /// Get Intel-specific optimizer if available
         pub fn intel_optimizer(&self) -> Option<intel::IntelOptimizer> {
             if self.is_optimization_enabled("intel") {
@@ -157,11 +157,11 @@ pub mod hardware_optimization {
             }
         }
     }
-    
+
     /// Intel-specific hardware optimizations
     pub mod intel {
         use std::time::Duration;
-        
+
         /// Configuration for batch verification operations on Intel hardware
         #[derive(Debug, Clone)]
         pub struct BatchVerificationConfig {
@@ -170,7 +170,7 @@ pub mod hardware_optimization {
             pub use_avx: bool,
             pub use_sse: bool,
         }
-        
+
         impl Default for BatchVerificationConfig {
             fn default() -> Self {
                 Self {
@@ -181,23 +181,23 @@ pub mod hardware_optimization {
                 }
             }
         }
-        
+
         impl BatchVerificationConfig {
             pub fn new() -> Self {
                 Self::default()
             }
-            
+
             pub fn with_batch_size(mut self, size: usize) -> Self {
                 self.batch_size = size;
                 self
             }
-            
+
             pub fn with_timeout(mut self, timeout: Duration) -> Self {
                 self.timeout = timeout;
                 self
             }
         }
-        
+
         /// Intel CPU capabilities detection
         #[derive(Debug, Clone)]
         pub struct CpuCapabilities {
@@ -206,7 +206,7 @@ pub mod hardware_optimization {
             pub vendor: String,
             pub model: String,
         }
-        
+
         impl Default for CpuCapabilities {
             fn default() -> Self {
                 Self {
@@ -217,46 +217,46 @@ pub mod hardware_optimization {
                 }
             }
         }
-        
+
         /// Intel-specific optimizer
         #[derive(Debug, Clone)]
         pub struct IntelOptimizer {
             capabilities: CpuCapabilities,
         }
-        
+
         impl Default for IntelOptimizer {
             fn default() -> Self {
                 Self::new()
             }
         }
-        
+
         impl IntelOptimizer {
             pub fn new() -> Self {
                 Self {
                     capabilities: CpuCapabilities::default(),
                 }
             }
-            
+
             pub fn capabilities(&self) -> &CpuCapabilities {
                 &self.capabilities
             }
-            
+
             /// Verify a batch of transactions using Intel optimizations
             #[cfg(feature = "rust-bitcoin")]
             pub fn verify_transaction_batch(
-                &self, 
-                transactions: &[bitcoin::Transaction], 
-                config: &BatchVerificationConfig
+                &self,
+                transactions: &[bitcoin::Transaction],
+                config: &BatchVerificationConfig,
             ) -> Result<Vec<usize>, Box<dyn std::error::Error>> {
                 // Placeholder implementation for batch verification
                 // Returns indices of invalid transactions
-                
+
                 if transactions.len() > config.batch_size {
                     return Err("Batch too large".into());
                 }
-                
+
                 let invalid_indices = Vec::new();
-                
+
                 // Simulate verification process
                 for (i, _tx) in transactions.iter().enumerate() {
                     // Basic validation placeholder
@@ -264,30 +264,30 @@ pub mod hardware_optimization {
                     // For now, assume all transactions are valid
                     let _ = i; // Placeholder to avoid unused variable warning
                 }
-                
+
                 Ok(invalid_indices)
             }
-            
+
             /// Verify a single Taproot transaction using Intel optimizations
             #[cfg(feature = "rust-bitcoin")]
             pub fn verify_taproot_transaction(
                 &self,
-                tx: &bitcoin::Transaction
+                tx: &bitcoin::Transaction,
             ) -> Result<(), Box<dyn std::error::Error>> {
                 // Placeholder implementation for Taproot verification
                 // In a real implementation, this would use Intel-specific optimizations
                 // for Schnorr signature verification and Taproot script validation
-                
+
                 if tx.output.is_empty() {
                     return Err("Transaction has no outputs".into());
                 }
-                
+
                 // Simulate Taproot validation process
                 Ok(())
             }
         }
     }
-    
+
     // Basic optimization functions
     pub fn optimize_for_hardware() -> bool {
         // Placeholder implementation

@@ -27,7 +27,8 @@ pub struct IdentityRegistry {
 
 impl IdentityRegistry {
     pub fn register_identity(&mut self, identity: DeveloperIdentity) {
-        self.identities.insert(identity.github_username.clone(), identity);
+        self.identities
+            .insert(identity.github_username.clone(), identity);
     }
 
     pub fn get_identity(&self, github_username: &str) -> Option<&DeveloperIdentity> {

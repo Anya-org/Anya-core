@@ -115,7 +115,11 @@ impl ProgressTracker {
     /// Mark operation as complete
     pub fn complete(&self) {
         if self.verbose {
-            info!("[{}] Operation completed in {:?}", self.name, self.elapsed());
+            info!(
+                "[{}] Operation completed in {:?}",
+                self.name,
+                self.elapsed()
+            );
         }
     }
 }
@@ -215,9 +219,8 @@ where
         Err(_) => {
             // Operation timed out
             watchdog.trigger_alert();
-            let error_msg = format!(
-                "Operation '{operation_name}' timed out after {timeout_duration:?}"
-            );
+            let error_msg =
+                format!("Operation '{operation_name}' timed out after {timeout_duration:?}");
             error!("{error_msg}");
             Err(AnyaError::Timeout(error_msg))
         }

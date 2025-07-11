@@ -1,0 +1,18 @@
+{
+    "id": "WI-2025-07-09-4",
+    "title": "Security HSM Provider Enhancements",
+    "status": "InProgress",
+    "component": "core-security-hsm",
+    "files_modified": [
+        "/home/botshelo/anya-core/src/security/hsm_shim.rs"
+    ],
+    "duplication_check": "Passed",
+    "source_of_truth_updated": false,
+    "verification_hash": "",
+    "completion_timestamp": null,
+    "evidence_link": "",
+    "dependencies": [],
+    "blockers": [],
+    "created": "2025-07-09T10:21:04Z",
+    "last_updated": "2025-07-09T12:45:12Z"
+}

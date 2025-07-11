@@ -33,7 +33,7 @@ async fn test_taproot_validation() {
 
 #[cfg(test)]
 mod tests {
-    
+
     // use bitcoin::blockdata::transaction::Transaction;
 
     #[tokio::test]

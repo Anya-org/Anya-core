@@ -2,8 +2,8 @@
 mod comprehensive_layer2_tests {
     // Removed unused import
     use crate::layer2::{
-        AssetParams, AssetTransfer, BobClient, Layer2ProtocolType,
-        Layer2ProtocolTrait, LiquidModule, Proof, RskClient, StacksClient, TaprootAssetsProtocol,
+        AssetParams, AssetTransfer, BobClient, Layer2ProtocolTrait, Layer2ProtocolType,
+        LiquidModule, Proof, RskClient, StacksClient, TaprootAssetsProtocol,
     };
 
     #[test]
@@ -50,9 +50,13 @@ mod comprehensive_layer2_tests {
         match module.get_state() {
             Ok(state) => {
                 // Verify the exact version from LiquidModule::new
-                assert_eq!(state.version, "23.2.1", "Version mismatch: expected '23.2.1', got '{}'", state.version);
+                assert_eq!(
+                    state.version, "23.2.1",
+                    "Version mismatch: expected '23.2.1', got '{}'",
+                    state.version
+                );
                 assert_eq!(state.capacity, Some(21000000), "Capacity mismatch");
-            },
+            }
             Err(e) => {
                 panic!("Failed to get state: {e:?}");
             }
@@ -61,7 +65,10 @@ mod comprehensive_layer2_tests {
         // Test transaction submission
         let tx_data = b"liquid_transaction";
         let tx_id = module.submit_transaction(tx_data).unwrap();
-        assert!(tx_id.starts_with("liquid_tx_"), "Transaction ID format incorrect");
+        assert!(
+            tx_id.starts_with("liquid_tx_"),
+            "Transaction ID format incorrect"
+        );
 
         // Test asset issuance
         let asset_params = AssetParams {
@@ -74,7 +81,10 @@ mod comprehensive_layer2_tests {
             metadata: "liquid metadata".to_string(),
         };
         let asset_id = module.issue_asset(asset_params).unwrap();
-        assert!(asset_id.starts_with("liquid_asset_"), "Asset ID format incorrect");
+        assert!(
+            asset_id.starts_with("liquid_asset_"),
+            "Asset ID format incorrect"
+        );
     }
 
     #[test]
@@ -227,7 +237,7 @@ mod comprehensive_layer2_tests {
         assert!(taproot_assets.submit_transaction(test_data).is_ok());
     }
 
-    /* 
+    /*
     // Commented out manager tests since manager module is not available
     #[test]
     fn test_layer2_manager_comprehensive() {

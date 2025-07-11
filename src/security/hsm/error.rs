@@ -36,7 +36,7 @@ pub enum HsmError {
     /// Invalid key type
     #[error("Invalid key type: {0}")]
     InvalidKeyType(String),
-    
+
     /// Invalid key data
     #[error("Invalid key data: {0}")]
     InvalidKeyData(String),
@@ -411,7 +411,7 @@ pub enum AuditEventResult {
 
     /// Operation timed out
     Timeout,
-    
+
     /// Unknown result
     Unknown,
 }

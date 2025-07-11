@@ -126,9 +126,7 @@ fn main() -> Result<(), DocError> {
             report.print();
 
             // Then validate bitcoin protocol compliance
-            println!(
-                "\nValidating Bitcoin Protocol Compliance (BPC-{level})..."
-            );
+            println!("\nValidating Bitcoin Protocol Compliance (BPC-{level})...");
             println!("✅ All Bitcoin protocol requirements satisfied");
 
             println!("\nValidating DAO Governance Level (DAO-4)...");

@@ -40,7 +40,7 @@ mod tests {
     /// Performance tests
     mod performance_tests {
         use super::*;
-        
+
         #[test]
         fn test_performance_measurement() {
             let start = Instant::now();
@@ -56,7 +56,6 @@ mod tests {
 
     /// Integration tests
     mod integration_tests {
-        use super::*;
 
         #[test]
         fn test_hardware_integration() {
@@ -67,7 +66,6 @@ mod tests {
 
     /// Security tests
     mod security_tests {
-        use super::*;
 
         #[test]
         fn test_security_compliance() {

@@ -10,7 +10,7 @@ fn test_decentralized_reporting_system() {
     report_data.insert("timestamp".to_string(), "1234567890".to_string());
     report_data.insert("reporter".to_string(), "test_reporter".to_string());
     report_data.insert("data".to_string(), "test_report_data".to_string());
-    
+
     assert!(!report_data.is_empty());
     assert_eq!(report_data.get("reporter").unwrap(), "test_reporter");
 }

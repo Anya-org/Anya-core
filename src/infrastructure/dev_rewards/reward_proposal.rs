@@ -23,7 +23,11 @@ impl RewardProposalGenerator {
     ) -> RewardProposal {
         // Placeholder: distribute equally for now
         let n = reports.len() as u64;
-        let per_contributor = if n > 0 { total_distribution_amount / n } else { 0 };
+        let per_contributor = if n > 0 {
+            total_distribution_amount / n
+        } else {
+            0
+        };
         let contributors = reports
             .into_iter()
             .map(|r| (r.github_username, r.calculated_weight, per_contributor))

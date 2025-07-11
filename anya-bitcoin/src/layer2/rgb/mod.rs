@@ -17,12 +17,17 @@ pub use schema::{Field, FieldType, Schema, SchemaType, Validation};
 pub use state::{StateTransfer, StateTransition, StateValidator};
 pub use wallet::{AssetBalance, RGBWallet};
 
+use bitcoin::hashes::Hash;
 use bitcoin::Txid;
 use bitcoin::hashes::Hash;
 use std::collections::HashMap;
 use std::path::PathBuf;
 
+<<<<<<< HEAD
 use crate::core::error::{AnyaResult, AnyaError};
+=======
+use crate::core::error::{AnyaError, AnyaResult};
+>>>>>>> feature/git-workflows-consolidation-evidence-based
 use crate::core::wallet::TxOptions;
 use crate::layer2::traits::{ContractExecutor, FederationMLHook, Proposal};
 
@@ -218,8 +223,9 @@ pub enum OperationType {
 }
 
 /// Default implementation of the RGB manager
-struct DefaultRGBManager {
+pub struct DefaultRGBManager {
     config: RGBConfig,
+    #[allow(dead_code)]
     client: Option<RGBClient>,
 }
 
@@ -237,21 +243,38 @@ impl RGBManager for DefaultRGBManager {
     fn init(&self, config: RGBConfig) -> AnyaResult<()> {
         // Create RGB data directory if it doesn't exist
         if !config.data_dir.exists() {
+<<<<<<< HEAD
             std::fs::create_dir_all(&config.data_dir)
                 .map_err(|e| AnyaError::Config(format!("Failed to create RGB data directory: {}", e)))?;
+=======
+            std::fs::create_dir_all(&config.data_dir).map_err(|e| {
+                AnyaError::Config(format!("Failed to create RGB data directory: {}", e))
+            })?;
+>>>>>>> feature/git-workflows-consolidation-evidence-based
         }
 
         // Validate network configuration
         if !["mainnet", "testnet", "regtest"].contains(&config.network.as_str()) {
+<<<<<<< HEAD
             return Err(AnyaError::Config(
                 format!("Invalid network: {}. Must be mainnet, testnet, or regtest", config.network)
             ));
+=======
+            return Err(AnyaError::Config(format!(
+                "Invalid network: {}. Must be mainnet, testnet, or regtest",
+                config.network
+            )));
+>>>>>>> feature/git-workflows-consolidation-evidence-based
         }
 
         // Validate electrum URL format
         if config.electrum_url.is_empty() {
             return Err(AnyaError::Config(
+<<<<<<< HEAD
                 "Electrum URL cannot be empty".to_string()
+=======
+                "Electrum URL cannot be empty".to_string(),
+>>>>>>> feature/git-workflows-consolidation-evidence-based
             ));
         }
 
@@ -263,13 +286,20 @@ impl RGBManager for DefaultRGBManager {
                 // In a full implementation, this would set up the database schema
                 if !storage_path.exists() {
                     // Create empty database file
+<<<<<<< HEAD
                     std::fs::File::create(&storage_path)
                         .map_err(|e| AnyaError::Config(format!("Failed to create storage file: {}", e)))?;
+=======
+                    std::fs::File::create(&storage_path).map_err(|e| {
+                        AnyaError::Config(format!("Failed to create storage file: {}", e))
+                    })?;
+>>>>>>> feature/git-workflows-consolidation-evidence-based
                 }
             }
             "fs" => {
                 // Initialize filesystem storage
                 let assets_dir = config.data_dir.join("assets");
+<<<<<<< HEAD
                 std::fs::create_dir_all(&assets_dir)
                     .map_err(|e| AnyaError::Config(format!("Failed to create assets directory: {}", e)))?;
             }
@@ -277,14 +307,29 @@ impl RGBManager for DefaultRGBManager {
                 return Err(AnyaError::Config(
                     format!("Unsupported storage type: {}. Use 'sqlite' or 'fs'", config.storage_type)
                 ));
+=======
+                std::fs::create_dir_all(&assets_dir).map_err(|e| {
+                    AnyaError::Config(format!("Failed to create assets directory: {}", e))
+                })?;
+            }
+            _ => {
+                return Err(AnyaError::Config(format!(
+                    "Unsupported storage type: {}. Use 'sqlite' or 'fs'",
+                    config.storage_type
+                )));
+>>>>>>> feature/git-workflows-consolidation-evidence-based
             }
         }
 
         // Validate fee rate
         if config.fee_rate <= 0.0 {
+<<<<<<< HEAD
             return Err(AnyaError::Config(
                 "Fee rate must be positive".to_string()
             ));
+=======
+            return Err(AnyaError::Config("Fee rate must be positive".to_string()));
+>>>>>>> feature/git-workflows-consolidation-evidence-based
         }
 
         // Log successful initialization
@@ -300,6 +345,7 @@ impl RGBManager for DefaultRGBManager {
     fn create_asset(&self, params: AssetCreationParams) -> AnyaResult<RGBAsset> {
         // Validate asset creation parameters
         if params.name.is_empty() {
+<<<<<<< HEAD
             return Err(AnyaError::Validation("Asset name cannot be empty".to_string()));
         }
 
@@ -313,6 +359,28 @@ impl RGBManager for DefaultRGBManager {
 
         // Generate unique asset ID (using current timestamp + random component for uniqueness)
         let asset_id = format!("rgb-{}-{}", 
+=======
+            return Err(AnyaError::Validation(
+                "Asset name cannot be empty".to_string(),
+            ));
+        }
+
+        if params.total_supply == 0 {
+            return Err(AnyaError::Validation(
+                "Total supply must be greater than 0".to_string(),
+            ));
+        }
+
+        if params.precision > 18 {
+            return Err(AnyaError::Validation(
+                "Precision cannot exceed 18 decimal places".to_string(),
+            ));
+        }
+
+        // Generate unique asset ID (using current timestamp + random component for uniqueness)
+        let asset_id = format!(
+            "rgb-{}-{}",
+>>>>>>> feature/git-workflows-consolidation-evidence-based
             std::time::SystemTime::now()
                 .duration_since(std::time::UNIX_EPOCH)
                 .unwrap()
@@ -321,7 +389,14 @@ impl RGBManager for DefaultRGBManager {
         );
 
         // Generate contract ID (in RGB, each asset has an associated contract)
+<<<<<<< HEAD
         let contract_id = format!("contract-{}", uuid::Uuid::new_v4().to_string().replace("-", "")[..12].to_string());
+=======
+        let contract_id = format!(
+            "contract-{}",
+            uuid::Uuid::new_v4().to_string().replace("-", "")[..12].to_string()
+        );
+>>>>>>> feature/git-workflows-consolidation-evidence-based
 
         // Use provided schema ID or default
         let schema_id = params.schema_id.unwrap_or_else(|| "rgb20".to_string());
@@ -345,12 +420,20 @@ impl RGBManager for DefaultRGBManager {
                 log::info!("Storing asset {} using decentralized storage", asset.id);
                 // In practice, this would use DecentralizedStorage::store_asset()
                 // For now, log the transition to decentralized storage
+<<<<<<< HEAD
                 log::info!("Asset {} stored successfully in decentralized storage", asset.id);
+=======
+                log::info!(
+                    "Asset {} stored successfully in decentralized storage",
+                    asset.id
+                );
+>>>>>>> feature/git-workflows-consolidation-evidence-based
             }
             "fs" => {
                 // Store as JSON file in filesystem
                 let assets_dir = self.config.data_dir.join("assets");
                 let asset_file = assets_dir.join(format!("{}.json", asset.id));
+<<<<<<< HEAD
                 
                 let asset_json = serde_json::to_string_pretty(&asset)
                     .map_err(|e| AnyaError::Serialization(format!("Failed to serialize asset: {}", e)))?;
@@ -365,13 +448,48 @@ impl RGBManager for DefaultRGBManager {
                 return Err(AnyaError::Config(
                     format!("Unsupported storage type: {}. Use 'decentralized' or 'fs'", self.config.storage_type)
                 ))
+=======
+
+                let asset_json = serde_json::to_string_pretty(&asset).map_err(|e| {
+                    AnyaError::Serialization(format!("Failed to serialize asset: {}", e))
+                })?;
+
+                std::fs::write(&asset_file, asset_json).map_err(|e| {
+                    AnyaError::Storage(format!("Failed to write asset file: {}", e))
+                })?;
+
+                log::debug!(
+                    "Stored asset {} as file: {}",
+                    asset.id,
+                    asset_file.display()
+                );
+            }
+            _ => {
+                log::warn!(
+                    "Legacy SQLite storage is deprecated. Use 'decentralized' storage type."
+                );
+                return Err(AnyaError::Config(format!(
+                    "Unsupported storage type: {}. Use 'decentralized' or 'fs'",
+                    self.config.storage_type
+                )));
+>>>>>>> feature/git-workflows-consolidation-evidence-based
             }
         }
 
         // Log asset creation
         log::info!("Created RGB asset: {} ({})", params.name, asset_id);
+<<<<<<< HEAD
         log::debug!("Asset details - Supply: {}, Precision: {}, Schema: {}, Contract: {}", 
             params.total_supply, params.precision, schema_id, contract_id);
+=======
+        log::debug!(
+            "Asset details - Supply: {}, Precision: {}, Schema: {}, Contract: {}",
+            params.total_supply,
+            params.precision,
+            schema_id,
+            contract_id
+        );
+>>>>>>> feature/git-workflows-consolidation-evidence-based
 
         Ok(asset)
     }
@@ -389,6 +507,7 @@ impl RGBManager for DefaultRGBManager {
             "fs" => {
                 // Load from filesystem JSON files
                 let assets_dir = self.config.data_dir.join("assets");
+<<<<<<< HEAD
                 
                 if assets_dir.exists() {
                     let entries = std::fs::read_dir(&assets_dir)
@@ -406,21 +525,69 @@ impl RGBManager for DefaultRGBManager {
                             let asset: RGBAsset = serde_json::from_str(&asset_data)
                                 .map_err(|e| AnyaError::Serialization(format!("Failed to deserialize asset from {}: {}", path.display(), e)))?;
                             
+=======
+
+                if assets_dir.exists() {
+                    let entries = std::fs::read_dir(&assets_dir).map_err(|e| {
+                        AnyaError::Storage(format!("Failed to read assets directory: {}", e))
+                    })?;
+
+                    for entry in entries {
+                        let entry = entry.map_err(|e| {
+                            AnyaError::Storage(format!("Failed to read directory entry: {}", e))
+                        })?;
+
+                        let path = entry.path();
+                        if path.extension().and_then(|s| s.to_str()) == Some("json") {
+                            let asset_data = std::fs::read_to_string(&path).map_err(|e| {
+                                AnyaError::Storage(format!(
+                                    "Failed to read asset file {}: {}",
+                                    path.display(),
+                                    e
+                                ))
+                            })?;
+
+                            let asset: RGBAsset =
+                                serde_json::from_str(&asset_data).map_err(|e| {
+                                    AnyaError::Serialization(format!(
+                                        "Failed to deserialize asset from {}: {}",
+                                        path.display(),
+                                        e
+                                    ))
+                                })?;
+
+>>>>>>> feature/git-workflows-consolidation-evidence-based
                             assets.push(asset);
                         }
                     }
                 }
+<<<<<<< HEAD
                 
                 log::debug!("Loaded {} assets from filesystem", assets.len());
             }
             _ => return Err(AnyaError::Config(
                 format!("Unsupported storage type: {}", self.config.storage_type)
             ))
+=======
+
+                log::debug!("Loaded {} assets from filesystem", assets.len());
+            }
+            _ => {
+                return Err(AnyaError::Config(format!(
+                    "Unsupported storage type: {}",
+                    self.config.storage_type
+                )))
+            }
+>>>>>>> feature/git-workflows-consolidation-evidence-based
         }
 
         // Sort assets by name for consistent ordering
         assets.sort_by(|a, b| a.name.cmp(&b.name));
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> feature/git-workflows-consolidation-evidence-based
         log::info!("Listed {} RGB assets", assets.len());
         Ok(assets)
     }
@@ -428,18 +595,34 @@ impl RGBManager for DefaultRGBManager {
     fn get_asset_balance(&self, asset_id: &str) -> AnyaResult<u64> {
         // Find the asset first to validate it exists
         let assets = self.list_assets()?;
+<<<<<<< HEAD
         let asset = assets.iter()
+=======
+        let asset = assets
+            .iter()
+>>>>>>> feature/git-workflows-consolidation-evidence-based
             .find(|a| a.id == asset_id)
             .ok_or_else(|| AnyaError::NotFound(format!("Asset not found: {}", asset_id)))?;
 
         // In a full RGB implementation, this would query the actual UTXO set
         // and calculate the balance based on state transitions and commitments.
         // For now, we'll implement a simplified version using storage.
+<<<<<<< HEAD
         
         let balance = match self.config.storage_type.as_str() {
             "decentralized" => {
                 // Query decentralized storage for balance
                 log::info!("Querying asset balance from decentralized storage for asset: {}", asset_id);
+=======
+
+        let balance = match self.config.storage_type.as_str() {
+            "decentralized" => {
+                // Query decentralized storage for balance
+                log::info!(
+                    "Querying asset balance from decentralized storage for asset: {}",
+                    asset_id
+                );
+>>>>>>> feature/git-workflows-consolidation-evidence-based
                 // In practice, this would use DecentralizedStorage::get_asset_balance()
                 // For now, return the total supply as a placeholder during transition
                 asset.total_supply
@@ -448,6 +631,7 @@ impl RGBManager for DefaultRGBManager {
                 // Load balance from filesystem
                 let balance_dir = self.config.data_dir.join("balances");
                 let balance_file = balance_dir.join(format!("{}.balance", asset_id));
+<<<<<<< HEAD
                 
                 if balance_file.exists() {
                     let balance_data = std::fs::read_to_string(&balance_file)
@@ -465,6 +649,33 @@ impl RGBManager for DefaultRGBManager {
             _ => return Err(AnyaError::Config(
                 format!("Unsupported storage type: {}", self.config.storage_type)
             ))
+=======
+
+                if balance_file.exists() {
+                    let balance_data = std::fs::read_to_string(&balance_file).map_err(|e| {
+                        AnyaError::Storage(format!("Failed to read balance file: {}", e))
+                    })?;
+
+                    balance_data.trim().parse::<u64>().map_err(|e| {
+                        AnyaError::Validation(format!("Invalid balance data: {}", e))
+                    })?
+                } else {
+                    // If no balance file exists, assume full supply is available
+                    // In a real implementation, this would be more sophisticated
+                    log::debug!(
+                        "No balance file found for asset {}, returning total supply",
+                        asset_id
+                    );
+                    asset.total_supply
+                }
+            }
+            _ => {
+                return Err(AnyaError::Config(format!(
+                    "Unsupported storage type: {}",
+                    self.config.storage_type
+                )))
+            }
+>>>>>>> feature/git-workflows-consolidation-evidence-based
         };
 
         log::debug!("Asset {} balance: {}", asset_id, balance);
@@ -474,17 +685,33 @@ impl RGBManager for DefaultRGBManager {
     fn create_invoice(&self, asset_id: &str, amount: u64) -> AnyaResult<String> {
         // Validate the asset exists
         let assets = self.list_assets()?;
+<<<<<<< HEAD
         let asset = assets.iter()
+=======
+        let asset = assets
+            .iter()
+>>>>>>> feature/git-workflows-consolidation-evidence-based
             .find(|a| a.id == asset_id)
             .ok_or_else(|| AnyaError::NotFound(format!("Asset not found: {}", asset_id)))?;
 
         // Validate amount
         if amount == 0 {
+<<<<<<< HEAD
             return Err(AnyaError::Validation("Invoice amount must be greater than 0".to_string()));
         }
 
         // Generate unique invoice ID
         let invoice_id = format!("inv-{}-{}", 
+=======
+            return Err(AnyaError::Validation(
+                "Invoice amount must be greater than 0".to_string(),
+            ));
+        }
+
+        // Generate unique invoice ID
+        let invoice_id = format!(
+            "inv-{}-{}",
+>>>>>>> feature/git-workflows-consolidation-evidence-based
             std::time::SystemTime::now()
                 .duration_since(std::time::UNIX_EPOCH)
                 .unwrap()
@@ -517,6 +744,7 @@ impl RGBManager for DefaultRGBManager {
             "fs" => {
                 // Store as JSON file in filesystem
                 let invoices_dir = self.config.data_dir.join("invoices");
+<<<<<<< HEAD
                 std::fs::create_dir_all(&invoices_dir)
                     .map_err(|e| AnyaError::Storage(format!("Failed to create invoices directory: {}", e)))?;
 
@@ -535,12 +763,48 @@ impl RGBManager for DefaultRGBManager {
         }
 
         log::info!("Created invoice {} for {} units of asset {}", invoice_id, amount, asset.name);
+=======
+                std::fs::create_dir_all(&invoices_dir).map_err(|e| {
+                    AnyaError::Storage(format!("Failed to create invoices directory: {}", e))
+                })?;
+
+                let invoice_file = invoices_dir.join(format!("{}.json", invoice_id));
+                let invoice_json = serde_json::to_string_pretty(&invoice_data).map_err(|e| {
+                    AnyaError::Serialization(format!("Failed to serialize invoice: {}", e))
+                })?;
+
+                std::fs::write(&invoice_file, invoice_json).map_err(|e| {
+                    AnyaError::Storage(format!("Failed to write invoice file: {}", e))
+                })?;
+
+                log::debug!(
+                    "Stored invoice {} as file: {}",
+                    invoice_id,
+                    invoice_file.display()
+                );
+            }
+            _ => {
+                return Err(AnyaError::Config(format!(
+                    "Unsupported storage type: {}",
+                    self.config.storage_type
+                )))
+            }
+        }
+
+        log::info!(
+            "Created invoice {} for {} units of asset {}",
+            invoice_id,
+            amount,
+            asset.name
+        );
+>>>>>>> feature/git-workflows-consolidation-evidence-based
         Ok(invoice_id)
     }
 
     fn transfer_asset(&self, transfer: AssetTransfer) -> AnyaResult<String> {
         // Validate the asset exists
         let assets = self.list_assets()?;
+<<<<<<< HEAD
         let asset = assets.iter()
             .find(|a| a.id == transfer.asset_id)
             .ok_or_else(|| AnyaError::NotFound(format!("Asset not found: {}", transfer.asset_id)))?;
@@ -548,24 +812,53 @@ impl RGBManager for DefaultRGBManager {
         // Validate transfer amount
         if transfer.amount == 0 {
             return Err(AnyaError::Validation("Transfer amount must be greater than 0".to_string()));
+=======
+        let asset = assets
+            .iter()
+            .find(|a| a.id == transfer.asset_id)
+            .ok_or_else(|| {
+                AnyaError::NotFound(format!("Asset not found: {}", transfer.asset_id))
+            })?;
+
+        // Validate transfer amount
+        if transfer.amount == 0 {
+            return Err(AnyaError::Validation(
+                "Transfer amount must be greater than 0".to_string(),
+            ));
+>>>>>>> feature/git-workflows-consolidation-evidence-based
         }
 
         // Check if we have sufficient balance
         let current_balance = self.get_asset_balance(&transfer.asset_id)?;
         if transfer.amount > current_balance {
             return Err(AnyaError::Validation(format!(
+<<<<<<< HEAD
                 "Insufficient balance: requested {} but only {} available", 
+=======
+                "Insufficient balance: requested {} but only {} available",
+>>>>>>> feature/git-workflows-consolidation-evidence-based
                 transfer.amount, current_balance
             )));
         }
 
         // Validate recipient
         if transfer.recipient.is_empty() {
+<<<<<<< HEAD
             return Err(AnyaError::Validation("Recipient cannot be empty".to_string()));
         }
 
         // Generate unique transfer ID
         let transfer_id = format!("tx-{}-{}", 
+=======
+            return Err(AnyaError::Validation(
+                "Recipient cannot be empty".to_string(),
+            ));
+        }
+
+        // Generate unique transfer ID
+        let transfer_id = format!(
+            "tx-{}-{}",
+>>>>>>> feature/git-workflows-consolidation-evidence-based
             std::time::SystemTime::now()
                 .duration_since(std::time::UNIX_EPOCH)
                 .unwrap()
@@ -594,12 +887,20 @@ impl RGBManager for DefaultRGBManager {
         match self.config.storage_type.as_str() {
             "decentralized" => {
                 // Store using decentralized storage (IPFS + DWN + Bitcoin anchoring)
+<<<<<<< HEAD
                 log::info!("Storing transfer {} using decentralized storage", transfer_id);
+=======
+                log::info!(
+                    "Storing transfer {} using decentralized storage",
+                    transfer_id
+                );
+>>>>>>> feature/git-workflows-consolidation-evidence-based
                 // In practice, this would use DecentralizedStorage::store_transfer_and_update_balance()
             }
             "fs" => {
                 // Store transfer record as JSON file
                 let transfers_dir = self.config.data_dir.join("transfers");
+<<<<<<< HEAD
                 std::fs::create_dir_all(&transfers_dir)
                     .map_err(|e| AnyaError::Storage(format!("Failed to create transfers directory: {}", e)))?;
 
@@ -631,20 +932,83 @@ impl RGBManager for DefaultRGBManager {
         log::info!("Created transfer {} for {} units of {} to {}", 
             transfer_id, transfer.amount, asset.name, transfer.recipient);
         
+=======
+                std::fs::create_dir_all(&transfers_dir).map_err(|e| {
+                    AnyaError::Storage(format!("Failed to create transfers directory: {}", e))
+                })?;
+
+                let transfer_file = transfers_dir.join(format!("{}.json", transfer_id));
+                let transfer_json = serde_json::to_string_pretty(&transfer_data).map_err(|e| {
+                    AnyaError::Serialization(format!("Failed to serialize transfer: {}", e))
+                })?;
+
+                std::fs::write(&transfer_file, transfer_json).map_err(|e| {
+                    AnyaError::Storage(format!("Failed to write transfer file: {}", e))
+                })?;
+
+                // Update balance (simplified implementation)
+                let balance_dir = self.config.data_dir.join("balances");
+                std::fs::create_dir_all(&balance_dir).map_err(|e| {
+                    AnyaError::Storage(format!("Failed to create balances directory: {}", e))
+                })?;
+
+                let balance_file = balance_dir.join(format!("{}.balance", transfer.asset_id));
+                let new_balance = current_balance - transfer.amount;
+                std::fs::write(&balance_file, new_balance.to_string()).map_err(|e| {
+                    AnyaError::Storage(format!("Failed to update balance file: {}", e))
+                })?;
+
+                log::debug!(
+                    "Stored transfer {} and updated balance from {} to {}",
+                    transfer_id,
+                    current_balance,
+                    new_balance
+                );
+            }
+            _ => {
+                return Err(AnyaError::Config(format!(
+                    "Unsupported storage type: {}",
+                    self.config.storage_type
+                )))
+            }
+        }
+
+        log::info!(
+            "Created transfer {} for {} units of {} to {}",
+            transfer_id,
+            transfer.amount,
+            asset.name,
+            transfer.recipient
+        );
+
+>>>>>>> feature/git-workflows-consolidation-evidence-based
         Ok(transfer_id)
     }
 
     fn get_transfer_status(&self, transfer_id: &str) -> AnyaResult<TransferStatus> {
         // Validate transfer ID format
         if transfer_id.is_empty() || !transfer_id.starts_with("tx-") {
+<<<<<<< HEAD
             return Err(AnyaError::Validation("Invalid transfer ID format".to_string()));
+=======
+            return Err(AnyaError::Validation(
+                "Invalid transfer ID format".to_string(),
+            ));
+>>>>>>> feature/git-workflows-consolidation-evidence-based
         }
 
         // Load transfer status based on storage type
         match self.config.storage_type.as_str() {
             "decentralized" => {
                 // Query decentralized storage for transfer status
+<<<<<<< HEAD
                 log::info!("Querying transfer {} status from decentralized storage", transfer_id);
+=======
+                log::info!(
+                    "Querying transfer {} status from decentralized storage",
+                    transfer_id
+                );
+>>>>>>> feature/git-workflows-consolidation-evidence-based
                 // In practice, this would use DecentralizedStorage::get_transfer_status()
                 // For now, return pending status during transition
                 Ok(TransferStatus::Pending)
@@ -653,6 +1017,7 @@ impl RGBManager for DefaultRGBManager {
                 // Load from filesystem
                 let transfers_dir = self.config.data_dir.join("transfers");
                 let transfer_file = transfers_dir.join(format!("{}.json", transfer_id));
+<<<<<<< HEAD
                 
                 if !transfer_file.exists() {
                     return Err(AnyaError::NotFound(format!("Transfer not found: {}", transfer_id)));
@@ -667,6 +1032,28 @@ impl RGBManager for DefaultRGBManager {
                 // Extract status information from transfer data
                 let status = transfer_data["status"].as_str().unwrap_or("unknown");
                 
+=======
+
+                if !transfer_file.exists() {
+                    return Err(AnyaError::NotFound(format!(
+                        "Transfer not found: {}",
+                        transfer_id
+                    )));
+                }
+
+                let transfer_json = std::fs::read_to_string(&transfer_file).map_err(|e| {
+                    AnyaError::Storage(format!("Failed to read transfer file: {}", e))
+                })?;
+
+                let transfer_data: serde_json::Value = serde_json::from_str(&transfer_json)
+                    .map_err(|e| {
+                        AnyaError::Serialization(format!("Failed to parse transfer data: {}", e))
+                    })?;
+
+                // Extract status information from transfer data
+                let status = transfer_data["status"].as_str().unwrap_or("unknown");
+
+>>>>>>> feature/git-workflows-consolidation-evidence-based
                 let transfer_status = match status {
                     "pending" => TransferStatus::Pending,
                     "confirmed" => TransferStatus::Confirmed,
@@ -674,6 +1061,7 @@ impl RGBManager for DefaultRGBManager {
                     _ => TransferStatus::Failed(format!("Unknown status: {}", status)),
                 };
 
+<<<<<<< HEAD
                 log::debug!("Retrieved transfer {} status: {:?}", transfer_id, transfer_status);
                 
                 Ok(transfer_status)
@@ -681,13 +1069,33 @@ impl RGBManager for DefaultRGBManager {
             _ => Err(AnyaError::Config(
                 format!("Unsupported storage type: {}", self.config.storage_type)
             ))
+=======
+                log::debug!(
+                    "Retrieved transfer {} status: {:?}",
+                    transfer_id,
+                    transfer_status
+                );
+
+                Ok(transfer_status)
+            }
+            _ => Err(AnyaError::Config(format!(
+                "Unsupported storage type: {}",
+                self.config.storage_type
+            ))),
+>>>>>>> feature/git-workflows-consolidation-evidence-based
         }
     }
 
     fn validate_transfer(&self, transfer_id: &str) -> AnyaResult<bool> {
         // Validate transfer ID format
         if transfer_id.is_empty() || !transfer_id.starts_with("tx-") {
+<<<<<<< HEAD
             return Err(AnyaError::Validation("Invalid transfer ID format".to_string()));
+=======
+            return Err(AnyaError::Validation(
+                "Invalid transfer ID format".to_string(),
+            ));
+>>>>>>> feature/git-workflows-consolidation-evidence-based
         }
 
         // Load and validate transfer based on storage type
@@ -695,7 +1103,28 @@ impl RGBManager for DefaultRGBManager {
             "sqlite" => {
                 // Validate from SQLite database (placeholder implementation)
                 log::debug!("Validating transfer {} from SQLite", transfer_id);
+<<<<<<< HEAD
                 // TODO: Implement actual SQLite transfer validation
+=======
+                // [AIR-3][AIS-3][BPC-3][RES-3] Implement DWN transfer validation
+                let dwn_client =
+                    crate::web5::dwn::DWNClient::new(crate::web5::dwn::DWNConfig::default());
+                let record_id = transfer_id.trim_start_matches("tx-");
+
+                match dwn_client.get_record(record_id) {
+                    Ok(record) => {
+                        log::debug!("Found transfer record in DWN: {}", record_id);
+                        // Validate transfer state from the record
+                        let is_valid = record.verification_status.is_some()
+                            && record.verification_status.unwrap_or(false);
+                        return Ok(is_valid);
+                    }
+                    Err(e) => {
+                        log::warn!("DWN transfer validation error: {}", e);
+                        return Ok(false);
+                    }
+                }
+>>>>>>> feature/git-workflows-consolidation-evidence-based
                 // For now, assume validation passes
                 Ok(true)
             }
@@ -703,6 +1132,7 @@ impl RGBManager for DefaultRGBManager {
                 // Load transfer from filesystem
                 let transfers_dir = self.config.data_dir.join("transfers");
                 let transfer_file = transfers_dir.join(format!("{}.json", transfer_id));
+<<<<<<< HEAD
                 
                 if !transfer_file.exists() {
                     return Err(AnyaError::NotFound(format!("Transfer not found: {}", transfer_id)));
@@ -713,19 +1143,58 @@ impl RGBManager for DefaultRGBManager {
                 
                 let transfer_data: serde_json::Value = serde_json::from_str(&transfer_json)
                     .map_err(|e| AnyaError::Serialization(format!("Failed to parse transfer data: {}", e)))?;
+=======
+
+                if !transfer_file.exists() {
+                    return Err(AnyaError::NotFound(format!(
+                        "Transfer not found: {}",
+                        transfer_id
+                    )));
+                }
+
+                let transfer_json = std::fs::read_to_string(&transfer_file).map_err(|e| {
+                    AnyaError::Storage(format!("Failed to read transfer file: {}", e))
+                })?;
+
+                let transfer_data: serde_json::Value = serde_json::from_str(&transfer_json)
+                    .map_err(|e| {
+                        AnyaError::Serialization(format!("Failed to parse transfer data: {}", e))
+                    })?;
+>>>>>>> feature/git-workflows-consolidation-evidence-based
 
                 // Perform validation checks
                 let validation_checks = vec![
                     ("asset_id", transfer_data["asset_id"].is_string()),
+<<<<<<< HEAD
                     ("amount", transfer_data["amount"].is_u64() && transfer_data["amount"].as_u64().unwrap_or(0) > 0),
                     ("recipient", transfer_data["recipient"].is_string() && !transfer_data["recipient"].as_str().unwrap_or("").is_empty()),
+=======
+                    (
+                        "amount",
+                        transfer_data["amount"].is_u64()
+                            && transfer_data["amount"].as_u64().unwrap_or(0) > 0,
+                    ),
+                    (
+                        "recipient",
+                        transfer_data["recipient"].is_string()
+                            && !transfer_data["recipient"].as_str().unwrap_or("").is_empty(),
+                    ),
+>>>>>>> feature/git-workflows-consolidation-evidence-based
                     ("created_at", transfer_data["created_at"].is_u64()),
                     ("status", transfer_data["status"].is_string()),
                 ];
 
                 let is_valid = validation_checks.iter().all(|(field, check)| {
                     if !check {
+<<<<<<< HEAD
                         log::warn!("Transfer {} validation failed for field: {}", transfer_id, field);
+=======
+                        log::warn!(
+                            "Transfer {} validation failed for field: {}",
+                            transfer_id,
+                            field
+                        );
+>>>>>>> feature/git-workflows-consolidation-evidence-based
                         false
                     } else {
                         true
@@ -741,12 +1210,28 @@ impl RGBManager for DefaultRGBManager {
                             Ok(assets) => {
                                 let asset_exists = assets.iter().any(|a| a.id == asset_id);
                                 if !asset_exists {
+<<<<<<< HEAD
                                     log::warn!("Transfer {} references non-existent asset: {}", transfer_id, asset_id);
+=======
+                                    log::warn!(
+                                        "Transfer {} references non-existent asset: {}",
+                                        transfer_id,
+                                        asset_id
+                                    );
+>>>>>>> feature/git-workflows-consolidation-evidence-based
                                     return Ok(false);
                                 }
                             }
                             Err(e) => {
+<<<<<<< HEAD
                                 log::error!("Failed to validate asset existence for transfer {}: {}", transfer_id, e);
+=======
+                                log::error!(
+                                    "Failed to validate asset existence for transfer {}: {}",
+                                    transfer_id,
+                                    e
+                                );
+>>>>>>> feature/git-workflows-consolidation-evidence-based
                                 return Ok(false);
                             }
                         }
@@ -756,16 +1241,29 @@ impl RGBManager for DefaultRGBManager {
                 log::debug!("Transfer {} validation result: {}", transfer_id, is_valid);
                 Ok(is_valid)
             }
+<<<<<<< HEAD
             _ => Err(AnyaError::Config(
                 format!("Unsupported storage type: {}", self.config.storage_type)
             ))
+=======
+            _ => Err(AnyaError::Config(format!(
+                "Unsupported storage type: {}",
+                self.config.storage_type
+            ))),
+>>>>>>> feature/git-workflows-consolidation-evidence-based
         }
     }
 
     fn get_asset_metadata(&self, asset_id: &str) -> AnyaResult<HashMap<String, String>> {
         // Validate asset ID
         if asset_id.is_empty() {
+<<<<<<< HEAD
             return Err(AnyaError::Validation("Asset ID cannot be empty".to_string()));
+=======
+            return Err(AnyaError::Validation(
+                "Asset ID cannot be empty".to_string(),
+            ));
+>>>>>>> feature/git-workflows-consolidation-evidence-based
         }
 
         // Load asset metadata based on storage type
@@ -773,7 +1271,44 @@ impl RGBManager for DefaultRGBManager {
             "sqlite" => {
                 // Query SQLite database (placeholder implementation)
                 log::debug!("Querying asset {} metadata from SQLite", asset_id);
+<<<<<<< HEAD
                 // TODO: Implement actual SQLite asset metadata query
+=======
+                // [AIR-3][AIS-3][BPC-3][RES-3] DWN-based asset metadata query
+                let dwn_client =
+                    crate::web5::dwn::DWNClient::new(crate::web5::dwn::DWNConfig::default());
+
+                // Query for asset metadata in DWN
+                let query = crate::web5::dwn::DWNQuery {
+                    filter: Some(crate::web5::dwn::DWNQueryFilter {
+                        schema: Some("rgb/asset".to_string()),
+                        record_id: Some(asset_id.to_string()),
+                        ..Default::default()
+                    }),
+                    limit: Some(1),
+                    ..Default::default()
+                };
+
+                match dwn_client.query_records(&query) {
+                    Ok(results) => {
+                        if let Some(record) = results.records.first() {
+                            if let Ok(data) = serde_json::from_value::<HashMap<String, String>>(
+                                record.data.clone(),
+                            ) {
+                                metadata.extend(data);
+                                log::debug!(
+                                    "Retrieved {} metadata fields from DWN for asset {}",
+                                    data.len(),
+                                    asset_id
+                                );
+                            }
+                        }
+                    }
+                    Err(e) => {
+                        log::warn!("DWN metadata query error for asset {}: {}", asset_id, e);
+                    }
+                }
+>>>>>>> feature/git-workflows-consolidation-evidence-based
                 let mut metadata = HashMap::new();
                 metadata.insert("storage_type".to_string(), "sqlite".to_string());
                 metadata.insert("asset_id".to_string(), asset_id.to_string());
@@ -783,13 +1318,23 @@ impl RGBManager for DefaultRGBManager {
                 // Load from filesystem
                 let assets_dir = self.config.data_dir.join("assets");
                 let asset_file = assets_dir.join(format!("{}.json", asset_id));
+<<<<<<< HEAD
                 
                 if !asset_file.exists() {
                     return Err(AnyaError::NotFound(format!("Asset not found: {}", asset_id)));
+=======
+
+                if !asset_file.exists() {
+                    return Err(AnyaError::NotFound(format!(
+                        "Asset not found: {}",
+                        asset_id
+                    )));
+>>>>>>> feature/git-workflows-consolidation-evidence-based
                 }
 
                 let asset_json = std::fs::read_to_string(&asset_file)
                     .map_err(|e| AnyaError::Storage(format!("Failed to read asset file: {}", e)))?;
+<<<<<<< HEAD
                 
                 let asset_data: serde_json::Value = serde_json::from_str(&asset_json)
                     .map_err(|e| AnyaError::Serialization(format!("Failed to parse asset data: {}", e)))?;
@@ -797,6 +1342,17 @@ impl RGBManager for DefaultRGBManager {
                 // Extract metadata from asset data
                 let mut metadata = HashMap::new();
                 
+=======
+
+                let asset_data: serde_json::Value =
+                    serde_json::from_str(&asset_json).map_err(|e| {
+                        AnyaError::Serialization(format!("Failed to parse asset data: {}", e))
+                    })?;
+
+                // Extract metadata from asset data
+                let mut metadata = HashMap::new();
+
+>>>>>>> feature/git-workflows-consolidation-evidence-based
                 // Core asset information
                 if let Some(name) = asset_data["name"].as_str() {
                     metadata.insert("name".to_string(), name.to_string());
@@ -831,24 +1387,49 @@ impl RGBManager for DefaultRGBManager {
                 metadata.insert("asset_id".to_string(), asset_id.to_string());
                 metadata.insert("file_path".to_string(), asset_file.display().to_string());
 
+<<<<<<< HEAD
                 log::debug!("Retrieved metadata for asset {}: {} fields", asset_id, metadata.len());
                 Ok(metadata)
             }
             _ => Err(AnyaError::Config(
                 format!("Unsupported storage type: {}", self.config.storage_type)
             ))
+=======
+                log::debug!(
+                    "Retrieved metadata for asset {}: {} fields",
+                    asset_id,
+                    metadata.len()
+                );
+                Ok(metadata)
+            }
+            _ => Err(AnyaError::Config(format!(
+                "Unsupported storage type: {}",
+                self.config.storage_type
+            ))),
+>>>>>>> feature/git-workflows-consolidation-evidence-based
         }
     }
 
     fn get_asset_history(&self, asset_id: &str) -> AnyaResult<Vec<HistoryEntry>> {
         // Validate asset ID
         if asset_id.is_empty() {
+<<<<<<< HEAD
             return Err(AnyaError::Validation("Asset ID cannot be empty".to_string()));
+=======
+            return Err(AnyaError::Validation(
+                "Asset ID cannot be empty".to_string(),
+            ));
+>>>>>>> feature/git-workflows-consolidation-evidence-based
         }
 
         // Verify asset exists
         let assets = self.list_assets()?;
+<<<<<<< HEAD
         let _asset = assets.iter()
+=======
+        let _asset = assets
+            .iter()
+>>>>>>> feature/git-workflows-consolidation-evidence-based
             .find(|a| a.id == asset_id)
             .ok_or_else(|| AnyaError::NotFound(format!("Asset not found: {}", asset_id)))?;
 
@@ -857,6 +1438,7 @@ impl RGBManager for DefaultRGBManager {
             "sqlite" => {
                 // Query SQLite database (placeholder implementation)
                 log::debug!("Querying asset {} history from SQLite", asset_id);
+<<<<<<< HEAD
                 // TODO: Implement actual SQLite asset history query
                 Ok(vec![
                     HistoryEntry {
@@ -882,6 +1464,96 @@ impl RGBManager for DefaultRGBManager {
                 if asset_file.exists() {
                     if let Ok(asset_json) = std::fs::read_to_string(&asset_file) {
                         if let Ok(asset_data) = serde_json::from_str::<serde_json::Value>(&asset_json) {
+=======
+                // [AIR-3][AIS-3][BPC-3][RES-3] DWN-based asset history query
+                let dwn_client =
+                    crate::web5::dwn::DWNClient::new(crate::web5::dwn::DWNConfig::default());
+
+                // Query for asset history in DWN
+                let query = crate::web5::dwn::DWNQuery {
+                    filter: Some(crate::web5::dwn::DWNQueryFilter {
+                        schema: Some("rgb/history".to_string()),
+                        parent_id: Some(asset_id.to_string()),
+                        ..Default::default()
+                    }),
+                    limit: Some(50), // Get the last 50 history entries
+                    ..Default::default()
+                };
+
+                match dwn_client.query_records(&query) {
+                    Ok(results) => {
+                        for record in results.records {
+                            if let Ok(entry_data) =
+                                serde_json::from_value::<serde_json::Value>(record.data.clone())
+                            {
+                                let txid_str = entry_data["txid"].as_str().unwrap_or_default();
+                                let mut txid_bytes = [0u8; 32];
+                                if let Ok(decoded) = hex::decode(txid_str) {
+                                    let copy_len = std::cmp::min(decoded.len(), 32);
+                                    txid_bytes[..copy_len].copy_from_slice(&decoded[..copy_len]);
+                                }
+
+                                let txid =
+                                    bitcoin::Txid::from_slice(&txid_bytes).unwrap_or_default();
+                                let timestamp =
+                                    entry_data["timestamp"].as_u64().unwrap_or_default();
+                                let amount = entry_data["amount"].as_u64().unwrap_or_default();
+                                let from = entry_data["from"].as_str().map(|s| s.to_string());
+                                let to = entry_data["to"].as_str().unwrap_or_default().to_string();
+
+                                // Determine operation type
+                                let op_str = entry_data["operation"].as_str().unwrap_or_default();
+                                let operation = match op_str {
+                                    "issuance" => OperationType::Issuance,
+                                    "burn" => OperationType::Burn,
+                                    _ => OperationType::Transfer,
+                                };
+
+                                history.push(HistoryEntry {
+                                    txid,
+                                    timestamp,
+                                    amount,
+                                    from,
+                                    to,
+                                    operation,
+                                });
+                            }
+                        }
+                        log::debug!(
+                            "Retrieved {} history entries from DWN for asset {}",
+                            history.len(),
+                            asset_id
+                        );
+                    }
+                    Err(e) => {
+                        log::warn!("DWN history query error for asset {}: {}", asset_id, e);
+                    }
+                }
+                Ok(vec![HistoryEntry {
+                    txid: Txid::from_slice(&[0u8; 32]).unwrap(),
+                    timestamp: std::time::SystemTime::now()
+                        .duration_since(std::time::UNIX_EPOCH)
+                        .unwrap()
+                        .as_secs(),
+                    amount: 0,
+                    from: None,
+                    to: "system".to_string(),
+                    operation: OperationType::Issuance,
+                }])
+            }
+            "fs" => {
+                let mut history = Vec::new();
+
+                // Get asset creation event
+                let assets_dir = self.config.data_dir.join("assets");
+                let asset_file = assets_dir.join(format!("{}.json", asset_id));
+
+                if asset_file.exists() {
+                    if let Ok(asset_json) = std::fs::read_to_string(&asset_file) {
+                        if let Ok(asset_data) =
+                            serde_json::from_str::<serde_json::Value>(&asset_json)
+                        {
+>>>>>>> feature/git-workflows-consolidation-evidence-based
                             if let Some(created_at) = asset_data["created_at"].as_u64() {
                                 let total_supply = asset_data["total_supply"].as_u64().unwrap_or(0);
                                 history.push(HistoryEntry {
@@ -904,6 +1576,7 @@ impl RGBManager for DefaultRGBManager {
                         for entry in entries.flatten() {
                             if let Some(filename) = entry.file_name().to_str() {
                                 if filename.ends_with(".json") {
+<<<<<<< HEAD
                                     if let Ok(transfer_json) = std::fs::read_to_string(entry.path()) {
                                         if let Ok(transfer_data) = serde_json::from_str::<serde_json::Value>(&transfer_json) {
                                             if transfer_data["asset_id"].as_str() == Some(asset_id) {
@@ -912,13 +1585,43 @@ impl RGBManager for DefaultRGBManager {
                                                 let recipient = transfer_data["recipient"].as_str().unwrap_or("unknown");
                                                 let transfer_id = transfer_data["transfer_id"].as_str().unwrap_or("unknown");
                                                 
+=======
+                                    if let Ok(transfer_json) = std::fs::read_to_string(entry.path())
+                                    {
+                                        if let Ok(transfer_data) =
+                                            serde_json::from_str::<serde_json::Value>(
+                                                &transfer_json,
+                                            )
+                                        {
+                                            if transfer_data["asset_id"].as_str() == Some(asset_id)
+                                            {
+                                                let timestamp = transfer_data["created_at"]
+                                                    .as_u64()
+                                                    .unwrap_or(0);
+                                                let amount =
+                                                    transfer_data["amount"].as_u64().unwrap_or(0);
+                                                let recipient = transfer_data["recipient"]
+                                                    .as_str()
+                                                    .unwrap_or("unknown");
+                                                let transfer_id = transfer_data["transfer_id"]
+                                                    .as_str()
+                                                    .unwrap_or("unknown");
+
+>>>>>>> feature/git-workflows-consolidation-evidence-based
                                                 // Create a placeholder txid from transfer_id
                                                 let mut txid_bytes = [0u8; 32];
                                                 let id_bytes = transfer_id.as_bytes();
                                                 let copy_len = std::cmp::min(id_bytes.len(), 32);
+<<<<<<< HEAD
                                                 txid_bytes[..copy_len].copy_from_slice(&id_bytes[..copy_len]);
                                                 let txid = Txid::from_slice(&txid_bytes).unwrap();
                                                 
+=======
+                                                txid_bytes[..copy_len]
+                                                    .copy_from_slice(&id_bytes[..copy_len]);
+                                                let txid = Txid::from_slice(&txid_bytes).unwrap();
+
+>>>>>>> feature/git-workflows-consolidation-evidence-based
                                                 history.push(HistoryEntry {
                                                     txid,
                                                     timestamp,
@@ -943,6 +1646,7 @@ impl RGBManager for DefaultRGBManager {
                         for entry in entries.flatten() {
                             if let Some(filename) = entry.file_name().to_str() {
                                 if filename.ends_with(".json") {
+<<<<<<< HEAD
                                     if let Ok(invoice_json) = std::fs::read_to_string(entry.path()) {
                                         if let Ok(invoice_data) = serde_json::from_str::<serde_json::Value>(&invoice_json) {
                                             if invoice_data["asset_id"].as_str() == Some(asset_id) {
@@ -957,6 +1661,31 @@ impl RGBManager for DefaultRGBManager {
                                                 txid_bytes[..copy_len].copy_from_slice(&id_bytes[..copy_len]);
                                                 let txid = Txid::from_slice(&txid_bytes).unwrap();
                                                 
+=======
+                                    if let Ok(invoice_json) = std::fs::read_to_string(entry.path())
+                                    {
+                                        if let Ok(invoice_data) =
+                                            serde_json::from_str::<serde_json::Value>(&invoice_json)
+                                        {
+                                            if invoice_data["asset_id"].as_str() == Some(asset_id) {
+                                                let timestamp = invoice_data["created_at"]
+                                                    .as_u64()
+                                                    .unwrap_or(0);
+                                                let amount =
+                                                    invoice_data["amount"].as_u64().unwrap_or(0);
+                                                let invoice_id = invoice_data["invoice_id"]
+                                                    .as_str()
+                                                    .unwrap_or("unknown");
+
+                                                // Create a placeholder txid from invoice_id
+                                                let mut txid_bytes = [0u8; 32];
+                                                let id_bytes = invoice_id.as_bytes();
+                                                let copy_len = std::cmp::min(id_bytes.len(), 32);
+                                                txid_bytes[..copy_len]
+                                                    .copy_from_slice(&id_bytes[..copy_len]);
+                                                let txid = Txid::from_slice(&txid_bytes).unwrap();
+
+>>>>>>> feature/git-workflows-consolidation-evidence-based
                                                 history.push(HistoryEntry {
                                                     txid,
                                                     timestamp,
@@ -977,12 +1706,26 @@ impl RGBManager for DefaultRGBManager {
                 // Sort history by timestamp (newest first)
                 history.sort_by(|a, b| b.timestamp.cmp(&a.timestamp));
 
+<<<<<<< HEAD
                 log::debug!("Retrieved {} history entries for asset {}", history.len(), asset_id);
                 Ok(history)
             }
             _ => Err(AnyaError::Config(
                 format!("Unsupported storage type: {}", self.config.storage_type)
             ))
+=======
+                log::debug!(
+                    "Retrieved {} history entries for asset {}",
+                    history.len(),
+                    asset_id
+                );
+                Ok(history)
+            }
+            _ => Err(AnyaError::Config(format!(
+                "Unsupported storage type: {}",
+                self.config.storage_type
+            ))),
+>>>>>>> feature/git-workflows-consolidation-evidence-based
         }
     }
 }

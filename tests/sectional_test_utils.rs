@@ -162,6 +162,7 @@ pub mod sectional {
     where
         F: FnOnce() -> T,
     {
+        use std::alloc::GlobalAlloc;
         use std::mem;
         use std::alloc::GlobalAlloc;
 

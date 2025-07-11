@@ -141,7 +141,6 @@ pub fn check_consensus_rules_accelerated(
 
 #[cfg(test)]
 mod tests {
-    
 
     #[test]
     fn test_pow_validation() {

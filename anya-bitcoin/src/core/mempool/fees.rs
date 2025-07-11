@@ -323,7 +323,6 @@ impl Default for FeeEstimator {
 
 #[cfg(test)]
 mod tests {
-    
 
     #[test]
     fn test_fee_estimation() {

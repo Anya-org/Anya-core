@@ -2,7 +2,7 @@
 //!
 //! This file provides mock implementations for needed test utilities.
 
-use bitcoin::{TxIn, TxOut, OutPoint, ScriptBuf, Witness};
+use bitcoin::{OutPoint, ScriptBuf, TxIn, TxOut, Witness};
 
 // Mock implementations
 pub struct MockFactory;

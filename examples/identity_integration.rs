@@ -1,6 +1,6 @@
 use anya_core::web5::identity::{IdentityManager, DID};
-use serde_json;
 use chrono::Duration;
+use serde_json;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -11,7 +11,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Setup identity manager
     let mut identity_manager = IdentityManager::new("web5");
-    
+
     // Create identities
     let issuer = create_identity(&mut identity_manager, "issuer")?;
     let holder = create_identity(&mut identity_manager, "holder")?;
@@ -22,7 +22,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Verify the credential (simulated)
     let verification_result = verify_credential(&credential, &verifier)?;
-    
+
     println!("Credential verification result: {}", verification_result);
 
     // Example of credential sharing (simulated)
@@ -31,7 +31,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-fn create_identity(identity_manager: &mut IdentityManager, name: &str) -> Result<DID, Box<dyn std::error::Error>> {
+fn create_identity(
+    identity_manager: &mut IdentityManager,
+    name: &str,
+) -> Result<DID, Box<dyn std::error::Error>> {
     let did = identity_manager.create_identity()?;
     println!("Created identity {} with DID: {}", name, did.id);
     Ok(did)
@@ -39,7 +42,7 @@ fn create_identity(identity_manager: &mut IdentityManager, name: &str) -> Result
 
 fn issue_credential(
     issuer: &DID,
-    holder: &DID
+    holder: &DID,
 ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
     // Simulate creating a credential
     let credential = serde_json::json!({
@@ -59,14 +62,14 @@ fn issue_credential(
             "permissions": ["read", "write", "execute"]
         }
     });
-    
+
     println!("Created credential from {} to {}", issuer.id, holder.id);
     Ok(credential)
 }
 
 fn verify_credential(
     _credential: &serde_json::Value,
-    verifier: &DID
+    verifier: &DID,
 ) -> Result<bool, Box<dyn std::error::Error>> {
     // In a real implementation, this would perform cryptographic verification
     // For this example, we just simulate successful verification
@@ -79,7 +82,10 @@ fn share_credential(
     holder_did: &str,
     recipient_did: &str,
 ) -> Result<bool, Box<dyn std::error::Error>> {
-    println!("Sharing credential from {} to {}", holder_did, recipient_did);
+    println!(
+        "Sharing credential from {} to {}",
+        holder_did, recipient_did
+    );
     println!("Credential shared successfully");
     Ok(true)
 }

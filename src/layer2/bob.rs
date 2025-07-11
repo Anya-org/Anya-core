@@ -4,8 +4,8 @@
 //! which combines Bitcoin's security with Ethereum's EVM compatibility.
 
 use crate::layer2::{
-    AssetParams, AssetTransfer, Layer2Protocol, Layer2ProtocolTrait, Proof, ProtocolState, TransactionStatus,
-    TransferResult, ValidationResult, VerificationResult,
+    AssetParams, AssetTransfer, Layer2Protocol, Layer2ProtocolTrait, Proof, ProtocolState,
+    TransactionStatus, TransferResult, ValidationResult, VerificationResult,
 };
 use serde::{Deserialize, Serialize};
 
@@ -86,14 +86,20 @@ impl Layer2ProtocolTrait for BobClient {
     }
 
     /// Submit a transaction to BOB
-    fn submit_transaction(&self, tx_data: &[u8]) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+    fn submit_transaction(
+        &self,
+        tx_data: &[u8],
+    ) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
         // Implementation would submit to BOB network
         println!("Submitting transaction to BOB: {} bytes", tx_data.len());
         Ok("bob_tx_".to_string() + &hex::encode(&tx_data[..8]))
     }
 
     /// Check transaction status
-    fn check_transaction_status(&self, tx_id: &str) -> Result<TransactionStatus, Box<dyn std::error::Error + Send + Sync>> {
+    fn check_transaction_status(
+        &self,
+        tx_id: &str,
+    ) -> Result<TransactionStatus, Box<dyn std::error::Error + Send + Sync>> {
         println!("Checking BOB transaction status: {tx_id}");
         Ok(TransactionStatus::Confirmed)
     }
@@ -107,13 +113,19 @@ impl Layer2ProtocolTrait for BobClient {
     }
 
     /// Issue an asset on BOB
-    fn issue_asset(&self, params: AssetParams) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+    fn issue_asset(
+        &self,
+        params: AssetParams,
+    ) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
         println!("Issuing asset {} on BOB", params.name);
         Ok(format!("bob_asset_{}", params.asset_id))
     }
 
     /// Transfer an asset on BOB
-    fn transfer_asset(&self, transfer: AssetTransfer) -> Result<TransferResult, Box<dyn std::error::Error + Send + Sync>> {
+    fn transfer_asset(
+        &self,
+        transfer: AssetTransfer,
+    ) -> Result<TransferResult, Box<dyn std::error::Error + Send + Sync>> {
         println!(
             "Transferring {} of asset {} to {} on BOB",
             transfer.amount, transfer.asset_id, transfer.recipient
@@ -131,7 +143,10 @@ impl Layer2ProtocolTrait for BobClient {
     }
 
     /// Verify a proof on BOB
-    fn verify_proof(&self, proof: Proof) -> Result<VerificationResult, Box<dyn std::error::Error + Send + Sync>> {
+    fn verify_proof(
+        &self,
+        proof: Proof,
+    ) -> Result<VerificationResult, Box<dyn std::error::Error + Send + Sync>> {
         println!("Verifying {} proof on BOB", proof.proof_type);
 
         Ok(VerificationResult {
@@ -146,7 +161,10 @@ impl Layer2ProtocolTrait for BobClient {
     }
 
     /// Validate state on BOB
-    fn validate_state(&self, state_data: &[u8]) -> Result<ValidationResult, Box<dyn std::error::Error + Send + Sync>> {
+    fn validate_state(
+        &self,
+        state_data: &[u8],
+    ) -> Result<ValidationResult, Box<dyn std::error::Error + Send + Sync>> {
         println!("Validating state on BOB: {} bytes", state_data.len());
 
         Ok(ValidationResult {
@@ -178,13 +196,22 @@ impl Layer2Protocol for BobClient {
         Ok(self.state.clone())
     }
 
-    async fn submit_transaction(&self, tx_data: &[u8]) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+    async fn submit_transaction(
+        &self,
+        tx_data: &[u8],
+    ) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
         // Reuse existing implementation
-        println!("Asynchronously submitting transaction to BOB: {} bytes", tx_data.len());
+        println!(
+            "Asynchronously submitting transaction to BOB: {} bytes",
+            tx_data.len()
+        );
         Ok("bob_tx_".to_string() + &hex::encode(&tx_data[..8]))
     }
 
-    async fn check_transaction_status(&self, tx_id: &str) -> Result<TransactionStatus, Box<dyn std::error::Error + Send + Sync>> {
+    async fn check_transaction_status(
+        &self,
+        tx_id: &str,
+    ) -> Result<TransactionStatus, Box<dyn std::error::Error + Send + Sync>> {
         println!("Asynchronously checking BOB transaction status: {}", tx_id);
         Ok(TransactionStatus::Confirmed)
     }
@@ -196,12 +223,18 @@ impl Layer2Protocol for BobClient {
         Ok(())
     }
 
-    async fn issue_asset(&self, params: AssetParams) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+    async fn issue_asset(
+        &self,
+        params: AssetParams,
+    ) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
         println!("Asynchronously issuing asset {} on BOB", params.name);
         Ok(format!("bob_asset_{}", params.asset_id))
     }
 
-    async fn transfer_asset(&self, transfer: AssetTransfer) -> Result<TransferResult, Box<dyn std::error::Error + Send + Sync>> {
+    async fn transfer_asset(
+        &self,
+        transfer: AssetTransfer,
+    ) -> Result<TransferResult, Box<dyn std::error::Error + Send + Sync>> {
         println!(
             "Asynchronously transferring {} of asset {} to {} on BOB",
             transfer.amount, transfer.asset_id, transfer.recipient
@@ -218,7 +251,10 @@ impl Layer2Protocol for BobClient {
         })
     }
 
-    async fn verify_proof(&self, proof: Proof) -> Result<VerificationResult, Box<dyn std::error::Error + Send + Sync>> {
+    async fn verify_proof(
+        &self,
+        proof: Proof,
+    ) -> Result<VerificationResult, Box<dyn std::error::Error + Send + Sync>> {
         println!("Asynchronously verifying {} proof on BOB", proof.proof_type);
 
         Ok(VerificationResult {
@@ -232,8 +268,14 @@ impl Layer2Protocol for BobClient {
         })
     }
 
-    async fn validate_state(&self, state_data: &[u8]) -> Result<ValidationResult, Box<dyn std::error::Error + Send + Sync>> {
-        println!("Asynchronously validating state on BOB: {} bytes", state_data.len());
+    async fn validate_state(
+        &self,
+        state_data: &[u8],
+    ) -> Result<ValidationResult, Box<dyn std::error::Error + Send + Sync>> {
+        println!(
+            "Asynchronously validating state on BOB: {} bytes",
+            state_data.len()
+        );
 
         Ok(ValidationResult {
             is_valid: true,

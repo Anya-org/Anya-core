@@ -8,7 +8,7 @@ use std::time::Instant;
 /// Core functionality tests
 mod core_tests {
     use super::*;
-    
+
     #[test]
     fn test_cross_layer_initialization() {
         // Mock test for cross-layer system initialization
@@ -22,14 +22,14 @@ mod core_tests {
             assert!(true);
         }
     }
-    
+
     #[test]
     fn test_layer_communication() {
         // Mock test for layer-to-layer communication
         let communication_established = true;
         assert!(communication_established);
     }
-    
+
     #[test]
     fn test_resource_allocation() {
         // Mock test for resource allocation
@@ -41,7 +41,7 @@ mod core_tests {
 /// Performance tests
 mod performance_tests {
     use super::*;
-    
+
     #[test]
     fn test_cross_layer_performance() {
         let start = Instant::now();
@@ -50,7 +50,7 @@ mod performance_tests {
         let duration = start.elapsed();
         assert!(duration.as_millis() >= 1);
     }
-    
+
     #[test]
     fn test_optimization_levels() {
         // Mock test for optimization levels
@@ -61,8 +61,7 @@ mod performance_tests {
 
 /// Security tests
 mod security_tests {
-    use super::*;
-    
+
     #[test]
     fn test_cross_layer_security() {
         // Mock test for cross-layer security

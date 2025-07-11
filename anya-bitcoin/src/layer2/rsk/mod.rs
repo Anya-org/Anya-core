@@ -69,6 +69,7 @@ impl ProtocolConfig for RskConfig {
 /// Main RSK client
 pub struct RskClient {
     /// Client configuration
+    #[allow(dead_code)]
     config: RskConfig,
     /// Node connector
     node_connector: NodeConnector,
@@ -170,6 +171,7 @@ impl RskClient {
 
 /// Node connector component
 pub struct NodeConnector {
+    #[allow(dead_code)]
     config: RskConfig,
     last_block: Arc<Mutex<Option<BlockInfo>>>,
 }
@@ -225,6 +227,7 @@ impl NodeConnector {
 
 /// Bridge interface component
 pub struct BridgeInterface {
+    #[allow(dead_code)]
     config: RskConfig,
     peg_ins: Arc<Mutex<HashMap<String, PegInInfo>>>,
     peg_outs: Arc<Mutex<HashMap<String, PegOutInfo>>>,
@@ -313,6 +316,7 @@ impl BridgeInterface {
 
 /// Smart contract caller component
 pub struct SmartContractCaller {
+    #[allow(dead_code)]
     config: RskConfig,
     deployed_contracts: Arc<Mutex<HashMap<String, ContractInfo>>>,
     contract_calls: Arc<Mutex<HashMap<String, ContractCallResult>>>,

@@ -293,10 +293,7 @@ impl PerformanceOptimizer {
             Err(e) => {
                 // Return empty map with error for all resources if we can't even get the lock
                 let mut map = HashMap::new();
-                map.insert(
-                    "general".to_string(),
-                    Err(format!("Mutex lock error: {e}")),
-                );
+                map.insert("general".to_string(), Err(format!("Mutex lock error: {e}")));
                 return map;
             }
         };

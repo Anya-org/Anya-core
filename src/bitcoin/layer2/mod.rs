@@ -68,7 +68,8 @@ impl Layer2Registry {
 
     /// Get a reference to a registered protocol by name
     pub fn get(&self, name: &str) -> Option<&dyn Layer2Protocol> {
-        self.0.iter()
+        self.0
+            .iter()
             .find(|(n, _)| n == name)
             .map(|(_, p)| p.as_ref())
     }

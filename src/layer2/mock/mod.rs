@@ -1,9 +1,9 @@
-use mockall::{mock, predicate::*};
 use crate::layer2::{
-    AssetParams, AssetTransfer, Proof, ProtocolState, TransactionStatus, TransferResult,
-    ValidationResult, VerificationResult, Layer2Protocol
+    AssetParams, AssetTransfer, Layer2Protocol, Proof, ProtocolState, TransactionStatus,
+    TransferResult, ValidationResult, VerificationResult,
 };
 use async_trait::async_trait;
+use mockall::{mock, predicate::*};
 
 mock! {
     pub Layer2Protocol {}

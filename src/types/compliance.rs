@@ -105,8 +105,7 @@ impl Default for EnhancedDwnOptions {
 }
 
 /// DWN operation priority levels
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[derive(Default)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub enum DwnPriority {
     Low,
     #[default]
@@ -115,10 +114,8 @@ pub enum DwnPriority {
     Critical,
 }
 
-
 /// Core system structure for main.rs
-#[derive(Debug, Clone)]
-#[derive(Default)]
+#[derive(Debug, Clone, Default)]
 pub struct CoreSystem {
     /// System configuration
     pub config: SystemConfig,
@@ -127,7 +124,6 @@ pub struct CoreSystem {
     /// Performance metrics
     pub metrics: HashMap<String, f64>,
 }
-
 
 /// System configuration
 #[derive(Debug, Clone)]

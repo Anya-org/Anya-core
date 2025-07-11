@@ -8,7 +8,9 @@ pub mod reliability;
 // Re-exports
 pub use metrics::PrometheusMetrics;
 pub use performance_optimization::{OptimizationStatus, PerformanceOptimizer, ResourceType};
-pub use reliability::{AiVerification, ProgressTracker, Watchdog, execute_with_monitoring, execute_with_recovery};
+pub use reliability::{
+    execute_with_monitoring, execute_with_recovery, AiVerification, ProgressTracker, Watchdog,
+};
 
 /// Core functionality with auto-save capabilities
 pub struct CoreSystem {

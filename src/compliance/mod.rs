@@ -158,13 +158,8 @@ pub fn verify_all() -> Result<(), Box<dyn Error>> {
         chrono::Local::now().format("%Y-%m-%d %H:%M:%S")
     );
 
-    std::fs::write(
-        format!("{report_dir}/compliance_report.md"),
-        report_content,
-    )?;
+    std::fs::write(format!("{report_dir}/compliance_report.md"), report_content)?;
 
-    info!(
-        "Comprehensive compliance report generated in {report_dir}/compliance_report.md"
-    );
+    info!("Comprehensive compliance report generated in {report_dir}/compliance_report.md");
     Ok(())
 }
