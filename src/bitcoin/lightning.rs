@@ -795,7 +795,7 @@ mod tests {
         let invalid_key = "02" + &"a".repeat(32); // Too short
         let pubkey = LightningPublicKey::from_str(invalid_key);
         assert!(pubkey.is_err());
-    }
+        }
 
     #[test]
     fn test_lightning_txid_from_slice() {

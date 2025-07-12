@@ -17,12 +17,8 @@ use crate::security::hsm::audit::AuditLogger;
 use crate::security::hsm::config::Pkcs11Config;
 use crate::security::hsm::error::{AuditEventResult, AuditEventSeverity, AuditEventType, HsmError};
 use crate::security::hsm::provider::{
-<<<<<<< HEAD
-    HsmProvider, HsmProviderStatus, HsmRequest, HsmResponse, KeyGenParams, KeyInfo, KeyPair, SigningAlgorithm,
-=======
     HsmProvider, HsmProviderStatus, HsmRequest, HsmResponse, KeyGenParams, KeyInfo, KeyPair,
     SigningAlgorithm,
->>>>>>> feature/git-workflows-consolidation-evidence-based
 };
 
 /// PKCS#11 HSM Provider for hardware security devices
@@ -108,12 +104,8 @@ impl HsmProvider for Pkcs11HsmProvider {
     ) -> Result<Vec<u8>, HsmError> {
         self.log_stub_operation("sign").await?;
         Err(HsmError::UnsupportedOperation(
-<<<<<<< HEAD
-            "Signing operation not implemented yet. Will be available in future versions.".to_string(),
-=======
             "Signing operation not implemented yet. Will be available in future versions."
                 .to_string(),
->>>>>>> feature/git-workflows-consolidation-evidence-based
         ))
     }
 
@@ -126,24 +118,16 @@ impl HsmProvider for Pkcs11HsmProvider {
     ) -> Result<bool, HsmError> {
         self.log_stub_operation("verify").await?;
         Err(HsmError::UnsupportedOperation(
-<<<<<<< HEAD
-            "Signature verification not implemented yet. Will be available in future versions.".to_string(),
-=======
             "Signature verification not implemented yet. Will be available in future versions."
                 .to_string(),
->>>>>>> feature/git-workflows-consolidation-evidence-based
         ))
     }
 
     async fn export_public_key(&self, key_id: &str) -> Result<Vec<u8>, HsmError> {
         self.log_stub_operation("export_public_key").await?;
         Err(HsmError::UnsupportedOperation(
-<<<<<<< HEAD
-            "Public key export not implemented yet. Will be available in future versions.".to_string(),
-=======
             "Public key export not implemented yet. Will be available in future versions."
                 .to_string(),
->>>>>>> feature/git-workflows-consolidation-evidence-based
         ))
     }
 
@@ -170,12 +154,8 @@ impl HsmProvider for Pkcs11HsmProvider {
     }
 
     async fn execute_operation(&self, request: HsmRequest) -> Result<HsmResponse, HsmError> {
-<<<<<<< HEAD
-        self.log_stub_operation(&format!("execute_operation: {:?}", request.operation)).await?;
-=======
         self.log_stub_operation(&format!("execute_operation: {:?}", request.operation))
             .await?;
->>>>>>> feature/git-workflows-consolidation-evidence-based
         Err(HsmError::UnsupportedOperation(format!(
             "Operation {:?} not supported in the PKCS#11 provider stub implementation",
             request.operation

@@ -4,11 +4,7 @@ use std::collections::HashMap;
 use async_trait::async_trait;
 use base64::Engine;
 use bitcoin::secp256k1::{PublicKey, Secp256k1, SecretKey};
-<<<<<<< HEAD
-use bitcoin::{psbt::Psbt, Address, Network, CompressedPublicKey};
-=======
 use bitcoin::{psbt::Psbt, Address, CompressedPublicKey, Network};
->>>>>>> feature/git-workflows-consolidation-evidence-based
 use chrono::Utc;
 use rand::prelude::*;
 use rand::rngs::OsRng;
