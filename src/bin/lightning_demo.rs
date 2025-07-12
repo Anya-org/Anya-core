@@ -6,7 +6,8 @@
 use std::error::Error;
 use std::sync::Arc;
 
-use anya_core::bitcoin::lightning::{BitcoinConfig, BitcoinLightningBridge, LightningNode};
+use anya_core::bitcoin::config::BitcoinConfig;
+use anya_core::bitcoin::lightning::{BitcoinLightningBridge, LightningNode};
 use anya_core::{AnyaConfig, AnyaCore};
 use std::thread;
 use std::time::Duration;
@@ -37,8 +38,11 @@ fn main() -> Result<(), Box<dyn Error>> {
     let bitcoin_config = BitcoinConfig {
         enabled: true,
         network: "testnet".to_string(),
-        node_url: Some("http://127.0.0.1:18332".to_string()),
+        rpc_url: Some("http://127.0.0.1:18332".to_string()),
         auth: None,
+        min_confirmations: 6,
+        default_fee_rate: 10,
+        wallet_path: None,
     };
 
     // Create Lightning node instance
@@ -136,10 +140,10 @@ fn main() -> Result<(), Box<dyn Error>> {
             println!("   Found {} channel transactions:", txs.len());
             for tx in txs {
                 println!("   - Channel ID: {}", tx.channel_id);
-                println!("     Funding txid: {}", tx.funding_txid);
+                println!("     Funding txid: {:?}", tx.funding_txid);
                 println!("     Status: {:?}", tx.status);
                 if let Some(txid) = tx.closing_txid {
-                    println!("     Closing txid: {txid}");
+                    println!("     Closing txid: {:?}", txid);
                 }
             }
         }
