@@ -3,11 +3,7 @@
 // and duplication elimination enforcement
 
 use blake3;
-<<<<<<< HEAD
-use dashmap::{DashMap, DashSet};
-=======
 use dashmap::DashMap; // Removed unused DashSet import
->>>>>>> feature/git-workflows-consolidation-evidence-based
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::sync::{
@@ -24,24 +20,6 @@ use tokio::io::{AsyncReadExt, AsyncWriteExt};
 pub enum SourceOfTruthError {
     #[error("Work item not found: {0}")]
     WorkItemNotFound(String),
-<<<<<<< HEAD
-    
-    #[error("Duplication detected: {0}")]
-    DuplicationDetected(String),
-    
-    #[error("Invalid work item ID format: {0}")]
-    InvalidWorkItemId(String),
-    
-    #[error("Canonical document conflict: {0}")]
-    CanonicalConflict(String),
-    
-    #[error("Registry corruption detected: {0}")]
-    RegistryCorruption(String),
-    
-    #[error("IO error: {0}")]
-    IoError(#[from] std::io::Error),
-    
-=======
 
     #[error("Duplication detected: {0}")]
     DuplicationDetected(String),
@@ -58,7 +36,6 @@ pub enum SourceOfTruthError {
     #[error("IO error: {0}")]
     IoError(#[from] std::io::Error),
 
->>>>>>> feature/git-workflows-consolidation-evidence-based
     #[error("Serialization error: {0}")]
     SerializationError(#[from] serde_json::Error),
 }
@@ -182,15 +159,10 @@ pub struct SourceOfTruthRegistry {
     /// Function signature index
     function_signatures: DashMap<String, FunctionSignature>,
     /// Code fingerprint index
-<<<<<<< HEAD
-    code_fingerprints: DashMap<String, CodeFingerprint>,
-    /// Documentation content index
-=======
     #[allow(dead_code)]
     code_fingerprints: DashMap<String, CodeFingerprint>,
     /// Documentation content index
     #[allow(dead_code)]
->>>>>>> feature/git-workflows-consolidation-evidence-based
     documentation_index: DashMap<String, DocumentationEntry>,
     /// Last registry update
     last_updated: AtomicU64,
@@ -214,64 +186,37 @@ impl SourceOfTruthRegistry {
             version: AtomicU32::new(1),
             registry_path,
         };
-<<<<<<< HEAD
-        
-=======
 
->>>>>>> feature/git-workflows-consolidation-evidence-based
         // Create registry directory if it doesn't exist
         if let Some(parent) = std::path::Path::new(&registry.registry_path).parent() {
             fs::create_dir_all(parent).await?;
         }
-<<<<<<< HEAD
-        
-=======
 
->>>>>>> feature/git-workflows-consolidation-evidence-based
         // Load existing registry if it exists
         if let Err(_) = registry.load_from_disk().await {
             // If loading fails, initialize with empty registry
             registry.save_to_disk().await?;
         }
-<<<<<<< HEAD
-        
-        Ok(registry)
-    }
-    
-=======
 
         Ok(registry)
     }
 
->>>>>>> feature/git-workflows-consolidation-evidence-based
     /// Generate unique work item ID
     pub fn generate_work_item_id(&self) -> String {
         let now = chrono::Utc::now();
         let date_prefix = now.format("%Y-%m-%d").to_string();
-<<<<<<< HEAD
-        
-        // Find next sequence number for today
-        let mut sequence = 1;
-        loop {
-            let candidate_id = format!("WI-{}-{}", date_prefix, sequence);
-=======
 
         // Find next sequence number for today
         let mut sequence = 1;
         loop {
             let candidate_id = format!("WI-{date_prefix}-{sequence}");
->>>>>>> feature/git-workflows-consolidation-evidence-based
             if !self.work_items.contains_key(&candidate_id) {
                 return candidate_id;
             }
             sequence += 1;
         }
     }
-<<<<<<< HEAD
-    
-=======
 
->>>>>>> feature/git-workflows-consolidation-evidence-based
     /// Create new work item with comprehensive validation
     pub async fn create_work_item(
         &self,
@@ -280,8 +225,7 @@ impl SourceOfTruthRegistry {
     ) -> Result<WorkItem, SourceOfTruthError> {
         // 1. Generate unique ID
         let work_id = self.generate_work_item_id();
-<<<<<<< HEAD
-        
+
         // 2. Run pre-work duplication check
         let duplication_status = self.check_work_item_duplication(&title, &component).await?;
         if matches!(duplication_status, DuplicationCheckStatus::Failed(_)) {
@@ -289,18 +233,7 @@ impl SourceOfTruthRegistry {
                 format!("Work item title or component already exists: {}", title)
             ));
         }
-        
-=======
 
-        // 2. Run pre-work duplication check
-        let duplication_status = self.check_work_item_duplication(&title, &component).await?;
-        if matches!(duplication_status, DuplicationCheckStatus::Failed(_)) {
-            return Err(SourceOfTruthError::DuplicationDetected(format!(
-                "Work item title or component already exists: {title}"
-            )));
-        }
-
->>>>>>> feature/git-workflows-consolidation-evidence-based
         // 3. Create work item
         let work_item = WorkItem {
             id: work_id.clone(),
@@ -318,19 +251,6 @@ impl SourceOfTruthRegistry {
             created: Self::current_timestamp(),
             last_updated: Self::current_timestamp(),
         };
-<<<<<<< HEAD
-        
-        // 4. Register in registry
-        self.work_items.insert(work_id.clone(), work_item.clone());
-        self.update_last_modified();
-        
-        // 5. Save to disk
-        self.save_to_disk().await?;
-        
-        Ok(work_item)
-    }
-    
-=======
 
         // 4. Register in registry
         self.work_items.insert(work_id.clone(), work_item.clone());
@@ -342,7 +262,6 @@ impl SourceOfTruthRegistry {
         Ok(work_item)
     }
 
->>>>>>> feature/git-workflows-consolidation-evidence-based
     /// Update work item status with validation
     pub async fn update_work_item_status(
         &self,
@@ -350,18 +269,6 @@ impl SourceOfTruthRegistry {
         new_status: WorkStatus,
     ) -> Result<(), SourceOfTruthError> {
         // 1. Validate work item exists
-<<<<<<< HEAD
-        let mut work_item = self.work_items.get_mut(work_id)
-            .ok_or_else(|| SourceOfTruthError::WorkItemNotFound(work_id.to_string()))?;
-        
-        // 2. Validate status transition
-        self.validate_status_transition(&work_item.status, &new_status)?;
-        
-        // 3. Update work item
-        work_item.status = new_status.clone();
-        work_item.last_updated = Self::current_timestamp();
-        
-=======
         let mut work_item = self
             .work_items
             .get_mut(work_id)
@@ -374,22 +281,12 @@ impl SourceOfTruthRegistry {
         work_item.status = new_status.clone();
         work_item.last_updated = Self::current_timestamp();
 
->>>>>>> feature/git-workflows-consolidation-evidence-based
         // 4. Handle completion
         if matches!(new_status, WorkStatus::Completed) {
             work_item.completion_timestamp = Some(Self::current_timestamp());
             work_item.verification_hash = self.generate_verification_hash(&work_item).await?;
             work_item.source_of_truth_updated = true;
         }
-<<<<<<< HEAD
-        
-        self.update_last_modified();
-        self.save_to_disk().await?;
-        
-        Ok(())
-    }
-    
-=======
 
         self.update_last_modified();
         self.save_to_disk().await?;
@@ -397,7 +294,6 @@ impl SourceOfTruthRegistry {
         Ok(())
     }
 
->>>>>>> feature/git-workflows-consolidation-evidence-based
     /// Comprehensive duplication check for code files
     pub async fn check_code_duplication(
         &self,
@@ -406,47 +302,22 @@ impl SourceOfTruthRegistry {
     ) -> Result<DuplicationCheckStatus, SourceOfTruthError> {
         // 1. Generate content fingerprint
         let content_hash = blake3::hash(content.as_bytes()).into();
-<<<<<<< HEAD
-        
+
         // 2. Check for exact content duplication
         for entry in self.duplication_index.iter() {
-            if entry.value().content_hash == content_hash && 
-               entry.value().file_path != file_path {
+            if entry.value().content_hash == content_hash && entry.value().file_path != file_path {
                 return Ok(DuplicationCheckStatus::Failed(
                     format!("Exact content duplication found in {}", entry.value().file_path)
                 ));
             }
         }
-        
-=======
 
-        // 2. Check for exact content duplication
-        for entry in self.duplication_index.iter() {
-            if entry.value().content_hash == content_hash && entry.value().file_path != file_path {
-                return Ok(DuplicationCheckStatus::Failed(format!(
-                    "Exact content duplication found in {}",
-                    entry.value().file_path
-                )));
-            }
-        }
-
->>>>>>> feature/git-workflows-consolidation-evidence-based
         // 3. Check function signature duplication
         let functions = self.extract_rust_functions(content)?;
         for function in functions {
             let signature_key = format!("{}::{}", function.name, function.parameters.join(","));
             if let Some(existing) = self.function_signatures.get(&signature_key) {
                 if existing.file_path != file_path {
-<<<<<<< HEAD
-                    return Ok(DuplicationCheckStatus::Failed(
-                        format!("Function signature duplication: {} in {}", 
-                               signature_key, existing.file_path)
-                    ));
-                }
-            }
-        }
-        
-=======
                     return Ok(DuplicationCheckStatus::Failed(format!(
                         "Function signature duplication: {} in {}",
                         signature_key, existing.file_path
@@ -455,7 +326,6 @@ impl SourceOfTruthRegistry {
             }
         }
 
->>>>>>> feature/git-workflows-consolidation-evidence-based
         // 4. Update indexes
         self.duplication_index.insert(
             file_path.to_string(),
@@ -464,21 +334,12 @@ impl SourceOfTruthRegistry {
                 file_path: file_path.to_string(),
                 function_signature: None,
                 first_occurrence: Self::current_timestamp(),
-<<<<<<< HEAD
-            }
-        );
-        
-        Ok(DuplicationCheckStatus::Passed)
-    }
-    
-=======
             },
         );
 
         Ok(DuplicationCheckStatus::Passed)
     }
 
->>>>>>> feature/git-workflows-consolidation-evidence-based
     /// Check for work item title/component duplication
     async fn check_work_item_duplication(
         &self,
@@ -488,27 +349,13 @@ impl SourceOfTruthRegistry {
         for item in self.work_items.iter() {
             let work_item = item.value();
             if work_item.title == title && work_item.component == component {
-<<<<<<< HEAD
-                return Ok(DuplicationCheckStatus::Failed(
-                    format!("Duplicate work item: {} in {}", title, component)
-                ));
-=======
                 return Ok(DuplicationCheckStatus::Failed(format!(
                     "Duplicate work item: {title} in {component}"
                 )));
->>>>>>> feature/git-workflows-consolidation-evidence-based
             }
         }
         Ok(DuplicationCheckStatus::Passed)
     }
-<<<<<<< HEAD
-    
-    /// Extract Rust function signatures from source code
-    fn extract_rust_functions(&self, content: &str) -> Result<Vec<FunctionSignature>, SourceOfTruthError> {
-        let mut functions = Vec::new();
-        let lines: Vec<&str> = content.lines().collect();
-        
-=======
 
     /// Extract Rust function signatures from source code
     fn extract_rust_functions(
@@ -518,26 +365,11 @@ impl SourceOfTruthRegistry {
         let mut functions = Vec::new();
         let lines: Vec<&str> = content.lines().collect();
 
->>>>>>> feature/git-workflows-consolidation-evidence-based
         for (line_num, line) in lines.iter().enumerate() {
             if let Some(func) = self.parse_rust_function_signature(line, line_num as u32 + 1) {
                 functions.push(func);
             }
         }
-<<<<<<< HEAD
-        
-        Ok(functions)
-    }
-    
-    /// Parse a single Rust function signature
-    fn parse_rust_function_signature(&self, line: &str, line_number: u32) -> Option<FunctionSignature> {
-        let trimmed = line.trim();
-        
-        // Simple regex-like parsing for Rust functions
-        if trimmed.starts_with("pub fn ") || trimmed.starts_with("fn ") {
-            let visibility = if trimmed.starts_with("pub ") { "pub" } else { "private" };
-            
-=======
 
         Ok(functions)
     }
@@ -558,17 +390,12 @@ impl SourceOfTruthRegistry {
                 "private"
             };
 
->>>>>>> feature/git-workflows-consolidation-evidence-based
             // Extract function name and parameters (simplified)
             if let Some(paren_start) = trimmed.find('(') {
                 if let Some(fn_start) = trimmed.find("fn ") {
                     let name_start = fn_start + 3;
                     let name = trimmed[name_start..paren_start].trim().to_string();
-<<<<<<< HEAD
-                    
-=======
 
->>>>>>> feature/git-workflows-consolidation-evidence-based
                     // Extract parameters (simplified - just parameter names)
                     if let Some(paren_end) = trimmed.find(')') {
                         let param_str = &trimmed[paren_start + 1..paren_end];
@@ -577,16 +404,6 @@ impl SourceOfTruthRegistry {
                             .map(|p| p.trim().split(':').next().unwrap_or("").trim().to_string())
                             .filter(|p| !p.is_empty())
                             .collect();
-<<<<<<< HEAD
-                        
-                        // Extract return type
-                        let return_type = if let Some(arrow_pos) = trimmed.find("->") {
-                            Some(trimmed[arrow_pos + 2..].trim().split_whitespace().next().unwrap_or("").to_string())
-                        } else {
-                            None
-                        };
-                        
-=======
 
                         // Extract return type
                         let return_type = trimmed.find("->").map(|arrow_pos| {
@@ -597,7 +414,6 @@ impl SourceOfTruthRegistry {
                                 .to_string()
                         });
 
->>>>>>> feature/git-workflows-consolidation-evidence-based
                         return Some(FunctionSignature {
                             name,
                             parameters,
@@ -610,17 +426,10 @@ impl SourceOfTruthRegistry {
                 }
             }
         }
-<<<<<<< HEAD
-        
-        None
-    }
-    
-=======
 
         None
     }
 
->>>>>>> feature/git-workflows-consolidation-evidence-based
     /// Validate status transition is allowed
     fn validate_status_transition(
         &self,
@@ -634,16 +443,6 @@ impl SourceOfTruthRegistry {
             (WorkStatus::Testing, WorkStatus::Completed) => Ok(()),
             (_, WorkStatus::Blocked(_)) => Ok(()), // Can always be blocked
             (WorkStatus::Blocked(_), _) => Ok(()), // Can transition from blocked to any state
-<<<<<<< HEAD
-            _ => Err(SourceOfTruthError::InvalidWorkItemId(
-                format!("Invalid status transition from {:?} to {:?}", current, new)
-            ))
-        }
-    }
-    
-    /// Generate verification hash for completed work item
-    async fn generate_verification_hash(&self, work_item: &WorkItem) -> Result<[u8; 32], SourceOfTruthError> {
-=======
             _ => Err(SourceOfTruthError::InvalidWorkItemId(format!(
                 "Invalid status transition from {current:?} to {new:?}"
             ))),
@@ -655,33 +454,21 @@ impl SourceOfTruthRegistry {
         &self,
         work_item: &WorkItem,
     ) -> Result<[u8; 32], SourceOfTruthError> {
->>>>>>> feature/git-workflows-consolidation-evidence-based
         let mut hasher = blake3::Hasher::new();
         hasher.update(work_item.id.as_bytes());
         hasher.update(work_item.title.as_bytes());
         hasher.update(&work_item.completion_timestamp.unwrap_or(0).to_le_bytes());
-<<<<<<< HEAD
-        
-=======
 
->>>>>>> feature/git-workflows-consolidation-evidence-based
         // Include hash of all modified files
         for file_path in &work_item.files_modified {
             if let Ok(content) = fs::read_to_string(file_path).await {
                 hasher.update(content.as_bytes());
             }
         }
-<<<<<<< HEAD
-        
-        Ok(hasher.finalize().into())
-    }
-    
-=======
 
         Ok(hasher.finalize().into())
     }
 
->>>>>>> feature/git-workflows-consolidation-evidence-based
     /// Get current timestamp in nanoseconds
     fn current_timestamp() -> u64 {
         SystemTime::now()
@@ -689,15 +476,6 @@ impl SourceOfTruthRegistry {
             .unwrap()
             .as_nanos() as u64
     }
-<<<<<<< HEAD
-    
-    /// Update last modified timestamp
-    fn update_last_modified(&self) {
-        self.last_updated.store(Self::current_timestamp(), Ordering::Relaxed);
-        self.version.fetch_add(1, Ordering::Relaxed);
-    }
-    
-=======
 
     /// Update last modified timestamp
     fn update_last_modified(&self) {
@@ -706,20 +484,10 @@ impl SourceOfTruthRegistry {
         self.version.fetch_add(1, Ordering::Relaxed);
     }
 
->>>>>>> feature/git-workflows-consolidation-evidence-based
     /// Save registry to disk
     async fn save_to_disk(&self) -> Result<(), SourceOfTruthError> {
         // Create a serializable version of the registry
         let registry_data = RegistryData {
-<<<<<<< HEAD
-            canonical_documents: self.canonical_documents.iter()
-                .map(|entry| (entry.key().clone(), entry.value().clone()))
-                .collect(),
-            work_items: self.work_items.iter()
-                .map(|entry| (entry.key().clone(), entry.value().clone()))
-                .collect(),
-            duplication_index: self.duplication_index.iter()
-=======
             canonical_documents: self
                 .canonical_documents
                 .iter()
@@ -733,22 +501,11 @@ impl SourceOfTruthRegistry {
             duplication_index: self
                 .duplication_index
                 .iter()
->>>>>>> feature/git-workflows-consolidation-evidence-based
                 .map(|entry| (entry.key().clone(), entry.value().clone()))
                 .collect(),
             last_updated: self.last_updated.load(Ordering::Relaxed),
             version: self.version.load(Ordering::Relaxed),
         };
-<<<<<<< HEAD
-        
-        let json_data = serde_json::to_string_pretty(&registry_data)?;
-        let mut file = fs::File::create(&self.registry_path).await?;
-        file.write_all(json_data.as_bytes()).await?;
-        
-        Ok(())
-    }
-    
-=======
 
         let json_data = serde_json::to_string_pretty(&registry_data)?;
         let mut file = fs::File::create(&self.registry_path).await?;
@@ -757,30 +514,19 @@ impl SourceOfTruthRegistry {
         Ok(())
     }
 
->>>>>>> feature/git-workflows-consolidation-evidence-based
     /// Load registry from disk
     async fn load_from_disk(&self) -> Result<(), SourceOfTruthError> {
         let mut file = fs::File::open(&self.registry_path).await?;
         let mut contents = String::new();
         file.read_to_string(&mut contents).await?;
-<<<<<<< HEAD
-        
-        let registry_data: RegistryData = serde_json::from_str(&contents)?;
-        
-=======
 
         let registry_data: RegistryData = serde_json::from_str(&contents)?;
 
->>>>>>> feature/git-workflows-consolidation-evidence-based
         // Clear existing data
         self.canonical_documents.clear();
         self.work_items.clear();
         self.duplication_index.clear();
-<<<<<<< HEAD
-        
-=======
 
->>>>>>> feature/git-workflows-consolidation-evidence-based
         // Load data
         for (key, value) in registry_data.canonical_documents {
             self.canonical_documents.insert(key, value);
@@ -791,18 +537,11 @@ impl SourceOfTruthRegistry {
         for (key, value) in registry_data.duplication_index {
             self.duplication_index.insert(key, value);
         }
-<<<<<<< HEAD
-        
-        self.last_updated.store(registry_data.last_updated, Ordering::Relaxed);
-        self.version.store(registry_data.version, Ordering::Relaxed);
-        
-=======
 
         self.last_updated
             .store(registry_data.last_updated, Ordering::Relaxed);
         self.version.store(registry_data.version, Ordering::Relaxed);
 
->>>>>>> feature/git-workflows-consolidation-evidence-based
         Ok(())
     }
 }
@@ -818,14 +557,9 @@ struct RegistryData {
 }
 
 /// Global registry instance
-<<<<<<< HEAD
-static GLOBAL_REGISTRY: once_cell::sync::Lazy<Arc<tokio::sync::RwLock<Option<SourceOfTruthRegistry>>>> =
-    once_cell::sync::Lazy::new(|| Arc::new(tokio::sync::RwLock::new(None)));
-=======
 static GLOBAL_REGISTRY: once_cell::sync::Lazy<
     Arc<tokio::sync::RwLock<Option<SourceOfTruthRegistry>>>,
 > = once_cell::sync::Lazy::new(|| Arc::new(tokio::sync::RwLock::new(None)));
->>>>>>> feature/git-workflows-consolidation-evidence-based
 
 /// Initialize global registry
 pub async fn initialize_global_registry(registry_path: String) -> Result<(), SourceOfTruthError> {
@@ -844,21 +578,6 @@ pub async fn get_global_registry() -> Arc<tokio::sync::RwLock<Option<SourceOfTru
 mod tests {
     use super::*;
     use tempfile::tempdir;
-<<<<<<< HEAD
-    
-    #[tokio::test]
-    async fn test_work_item_creation() {
-        let temp_dir = tempdir().unwrap();
-        let registry_path = temp_dir.path().join("registry.json").to_string_lossy().to_string();
-        
-        let registry = SourceOfTruthRegistry::new(registry_path).await.unwrap();
-        
-        let work_item = registry.create_work_item(
-            "Test work item".to_string(),
-            "test_component".to_string(),
-        ).await.unwrap();
-        
-=======
 
     #[tokio::test]
     async fn test_work_item_creation() {
@@ -876,54 +595,10 @@ mod tests {
             .await
             .unwrap();
 
->>>>>>> feature/git-workflows-consolidation-evidence-based
         assert!(work_item.id.starts_with("WI-"));
         assert_eq!(work_item.status, WorkStatus::Planning);
         assert_eq!(work_item.duplication_check, DuplicationCheckStatus::Passed);
     }
-<<<<<<< HEAD
-    
-    #[tokio::test]
-    async fn test_duplication_detection() {
-        let temp_dir = tempdir().unwrap();
-        let registry_path = temp_dir.path().join("registry.json").to_string_lossy().to_string();
-        
-        let registry = SourceOfTruthRegistry::new(registry_path).await.unwrap();
-        
-        // First work item should pass
-        let _work_item1 = registry.create_work_item(
-            "Unique title".to_string(),
-            "component1".to_string(),
-        ).await.unwrap();
-        
-        // Duplicate should fail
-        let result = registry.create_work_item(
-            "Unique title".to_string(),
-            "component1".to_string(),
-        ).await;
-        
-        assert!(result.is_err());
-        assert!(matches!(result.unwrap_err(), SourceOfTruthError::DuplicationDetected(_)));
-    }
-    
-    #[tokio::test]
-    async fn test_status_transitions() {
-        let temp_dir = tempdir().unwrap();
-        let registry_path = temp_dir.path().join("registry.json").to_string_lossy().to_string();
-        
-        let registry = SourceOfTruthRegistry::new(registry_path).await.unwrap();
-        
-        let work_item = registry.create_work_item(
-            "Status test".to_string(),
-            "test_component".to_string(),
-        ).await.unwrap();
-        
-        // Valid transition
-        registry.update_work_item_status(&work_item.id, WorkStatus::InProgress).await.unwrap();
-        
-        // Invalid transition should fail
-        let result = registry.update_work_item_status(&work_item.id, WorkStatus::Completed).await;
-=======
 
     #[tokio::test]
     async fn test_duplication_detection() {
@@ -980,7 +655,6 @@ mod tests {
         let result = registry
             .update_work_item_status(&work_item.id, WorkStatus::Completed)
             .await;
->>>>>>> feature/git-workflows-consolidation-evidence-based
         assert!(result.is_err());
     }
 }

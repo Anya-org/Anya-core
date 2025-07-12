@@ -506,16 +506,12 @@ impl UnifiedWallet for Wallet {
 
         // Convert the key to a Stacks address format
         // Note: This is a simplified implementation. Production would use proper Stacks address derivation
-<<<<<<< HEAD
-        let address_hash = format!("{:x}", secret_key.secret_bytes()[0..20].iter().fold(0u64, |acc, &b| acc.wrapping_mul(256).wrapping_add(b as u64)));
-=======
         let address_hash = format!(
             "{:x}",
             secret_key.secret_bytes()[0..20]
                 .iter()
                 .fold(0u64, |acc, &b| acc.wrapping_mul(256).wrapping_add(b as u64))
         );
->>>>>>> feature/git-workflows-consolidation-evidence-based
         Ok(format!("ST{}", &address_hash[..32].to_uppercase()))
     }
 
@@ -527,16 +523,12 @@ impl UnifiedWallet for Wallet {
         // Note: This is a simplified implementation. Production would use proper RSK address derivation
         let public_key = bitcoin::secp256k1::PublicKey::from_secret_key(&self.secp, &secret_key);
         let address_bytes = &public_key.serialize()[1..]; // Remove 0x04 prefix
-<<<<<<< HEAD
-        let address_hash = format!("{:02x}", address_bytes[0..20].iter().fold(0u64, |acc, &b| acc.wrapping_mul(256).wrapping_add(b as u64)));
-=======
         let address_hash = format!(
             "{:02x}",
             address_bytes[0..20]
                 .iter()
                 .fold(0u64, |acc, &b| acc.wrapping_mul(256).wrapping_add(b as u64))
         );
->>>>>>> feature/git-workflows-consolidation-evidence-based
         Ok(format!("0x{}", &address_hash[..40]))
     }
 
@@ -548,16 +540,12 @@ impl UnifiedWallet for Wallet {
         // Note: This is a simplified implementation. Production would use proper Liquid address derivation
         let public_key = bitcoin::secp256k1::PublicKey::from_secret_key(&self.secp, &secret_key);
         let address_bytes = &public_key.serialize()[1..]; // Remove 0x04 prefix
-<<<<<<< HEAD
-        let address_hash = format!("{:02x}", address_bytes[0..25].iter().fold(0u128, |acc, &b| acc.wrapping_mul(256).wrapping_add(b as u128)));
-=======
         let address_hash = format!(
             "{:02x}",
             address_bytes[0..25].iter().fold(0u128, |acc, &b| acc
                 .wrapping_mul(256)
                 .wrapping_add(b as u128))
         );
->>>>>>> feature/git-workflows-consolidation-evidence-based
         Ok(format!("VT{}", &address_hash[..50]))
     }
 

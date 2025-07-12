@@ -12,6 +12,7 @@ use std::sync::{Arc, Mutex};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 // Import BitcoinConfig from a module we know exists
+use crate::bitcoin::config::BitcoinConfig;
 
 // Define custom Lightning-specific key types to avoid conflicts with secp256k1 types
 #[derive(Clone)]
@@ -46,76 +47,48 @@ impl std::str::FromStr for LightningPublicKey {
 }
 
 impl LightningPublicKey {
-    // Add a method to create from secp256k1 secret key
-    pub fn from_secret_key(
-        _secp: &LightningSecp256k1<All>,
-        _secret_key: &Secp256k1SecretKey,
-    ) -> Self {
-        // In a real implementation, this would use the secp256k1 context to derive the public key
-        // For now, we'll just return a dummy key
-        LightningPublicKey { bytes: [0x03; 33] }
-    }
-
-    // Add a method to create from another PublicKey
-    pub fn from_secp256k1(pubkey: &Secp256k1PublicKey) -> Self {
+    pub fn from_secret_key(secp: &secp256k1::Secp256k1<secp256k1::All>, secret_key: &Secp256k1SecretKey) -> Self {
+        let public_key = secp256k1::PublicKey::from_secret_key(secp, secret_key);
         let mut bytes = [0u8; 33];
-        bytes.copy_from_slice(&pubkey.serialize());
+        bytes.copy_from_slice(&public_key.serialize());
         LightningPublicKey { bytes }
     }
-}
 
-// Add Display implementation for LightningPublicKey
-impl std::fmt::Display for LightningPublicKey {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", hex::encode(self.bytes))
+    pub fn to_string(&self) -> String {
+        hex::encode(self.bytes)
     }
 }
 
-pub struct LightningSecretKey {
-    pub bytes: [u8; 32],
-}
+/// Lightning transaction ID
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct LightningTxid([u8; 32]);
 
-pub struct LightningSecp256k1<T> {
-    _marker: std::marker::PhantomData<T>,
-}
-
-pub struct All;
-
-impl Default for LightningSecp256k1<All> {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-impl LightningSecp256k1<All> {
-    pub fn new() -> Self {
-        Self {
-            _marker: std::marker::PhantomData,
+impl LightningTxid {
+    pub fn from_slice(slice: &[u8]) -> Result<Self, String> {
+        if slice.len() != 32 {
+            return Err("Invalid txid length".to_string());
         }
+        let mut bytes = [0u8; 32];
+        bytes.copy_from_slice(slice);
+        Ok(LightningTxid(bytes))
+    }
+
+    pub fn to_string(&self) -> String {
+        hex::encode(self.0)
     }
 }
 
-#[derive(Debug)]
-pub struct LightningTxid {
-    pub bytes: [u8; 32],
+/// Node information
+#[derive(Debug, Clone)]
+pub struct NodeInfo {
+    pub pubkey: String,
+    pub addresses: Vec<String>,
+    pub alias: Option<String>,
+    pub color: Option<String>,
+    pub features: Vec<String>,
 }
 
-impl std::fmt::Display for LightningTxid {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", hex::encode(self.bytes))
-    }
-}
-
-// Define BitcoinConfig as a struct that matches the interface needs
-#[derive(Clone, Debug)]
-pub struct BitcoinConfig {
-    pub enabled: bool,
-    pub network: String,
-    pub node_url: Option<String>,
-    pub auth: Option<String>,
-}
-
-/// Lightning Network node implementation
+/// Lightning node with real implementation
 pub struct LightningNode {
     /// Network configuration
     config: BitcoinConfig,
@@ -514,32 +487,7 @@ impl LightningNode {
         Ok(state.channels.values().cloned().collect())
     }
 
-    /// Close a channel
-    pub fn close_channel(&self, channel_id: &str) -> AnyaResult<LightningTxid> {
-        let mut state = self
-            .state
-            .lock()
-            .map_err(|e| format!("Mutex lock error: {e}"))?;
-
-        // Find channel
-        let channel = state
-            .channels
-            .get_mut(channel_id)
-            .ok_or_else(|| AnyaError::Bitcoin(format!("Channel not found: {channel_id}")))?;
-
-        // Generate closing transaction ID
-        let closing_txid = LightningTxid::from_slice(&[0x24; 32])
-            .map_err(|e| AnyaError::Bitcoin(format!("Failed to create closing txid: {e}")))?;
-
-        // Update channel state
-        channel.is_active = false;
-
-        state.last_updated = current_time();
-
-        Ok(closing_txid)
-    }
-
-    /// Create an invoice
+    /// Create a Lightning invoice
     pub fn create_invoice(
         &self,
         amount_msat: Option<u64>,
@@ -749,116 +697,117 @@ impl BitcoinLightningBridge {
     /// Register a channel transaction
     pub fn register_channel_transaction(
         &self,
-        channel: &Channel,
-        confirmation_height: Option<u32>,
-    ) -> AnyaResult<ChannelTransaction> {
-        Ok(ChannelTransaction {
-            channel_id: channel.channel_id.clone(),
-            funding_txid: channel.funding_txid.clone(),
-            funding_output_idx: channel.funding_output_idx,
-            funding_amount: channel.capacity,
-            status: if confirmation_height.is_some() {
-                ChannelTransactionStatus::Confirmed
-            } else {
-                ChannelTransactionStatus::Pending
-            },
-            confirmation_height,
+        channel_id: &str,
+        funding_txid: &str,
+        funding_output_idx: u32,
+        funding_amount: u64,
+    ) -> AnyaResult<()> {
+        let txid = LightningTxid::from_slice(&hex::decode(funding_txid).unwrap_or_default())
+            .map_err(|e| AnyaError::Bitcoin(format!("Invalid txid: {e}")))?;
+
+        let channel_transaction = ChannelTransaction {
+            channel_id: channel_id.to_string(),
+            funding_txid: txid,
+            funding_output_idx,
+            funding_amount,
+            status: ChannelTransactionStatus::Pending,
+            confirmation_height: None,
             closing_txid: None,
             created_at: current_time(),
             updated_at: current_time(),
-        })
+        };
+
+        let mut transactions = self
+            .channel_transactions
+            .lock()
+            .map_err(|e| format!("Mutex lock error: {e}"))?;
+        transactions.insert(channel_id.to_string(), channel_transaction);
+
+        Ok(())
     }
 
-    /// Register a channel closing
-    pub fn register_channel_close(
+    /// Update channel transaction status
+    pub fn update_channel_transaction(
         &self,
         channel_id: &str,
-        closing_txid: LightningTxid,
+        status: ChannelTransactionStatus,
+        confirmation_height: Option<u32>,
     ) -> AnyaResult<()> {
-        let mut channel_txs = self
+        let mut transactions = self
             .channel_transactions
             .lock()
             .map_err(|e| format!("Mutex lock error: {e}"))?;
 
-        match channel_txs.get_mut(channel_id) {
-            Some(tx_info) => {
-                tx_info.status = ChannelTransactionStatus::Closed;
-                tx_info.closing_txid = Some(closing_txid);
-                tx_info.updated_at = current_time();
-                Ok(())
-            }
-            None => Err(AnyaError::Bitcoin(format!(
-                "Channel not found: {channel_id}"
-            ))),
+        if let Some(transaction) = transactions.get_mut(channel_id) {
+            transaction.status = status;
+            transaction.confirmation_height = confirmation_height;
+            transaction.updated_at = current_time();
         }
+
+        Ok(())
     }
 
-    /// Get a channel transaction by ID
-    pub fn get_channel_transaction(
-        &self,
-        channel_id: &str,
-    ) -> AnyaResult<Option<ChannelTransaction>> {
-        let channel_txs = self
+    /// Get channel transaction information
+    pub fn get_channel_transaction(&self, channel_id: &str) -> AnyaResult<Option<ChannelTransaction>> {
+        let transactions = self
             .channel_transactions
             .lock()
             .map_err(|e| format!("Mutex lock error: {e}"))?;
-        Ok(channel_txs.get(channel_id).cloned())
+
+        Ok(transactions.get(channel_id).cloned())
     }
 
     /// List all channel transactions
     pub fn list_channel_transactions(&self) -> AnyaResult<Vec<ChannelTransaction>> {
-        let channel_txs = self
+        let transactions = self
             .channel_transactions
             .lock()
             .map_err(|e| format!("Mutex lock error: {e}"))?;
-        Ok(channel_txs.values().cloned().collect())
+
+        Ok(transactions.values().cloned().collect())
     }
 }
 
-/// Node information
-#[derive(Debug, Clone)]
-pub struct NodeInfo {
-    /// Node public key
-    pub pubkey: String,
-
-    /// Network addresses (host:port)
-    pub addresses: Vec<String>,
-
-    /// Node alias (name)
-    pub alias: Option<String>,
-
-    /// Color of the node (hex)
-    pub color: Option<String>,
-
-    /// Node features
-    pub features: Vec<String>,
-}
-
-/// Get current timestamp
 fn current_time() -> u64 {
     SystemTime::now()
         .duration_since(UNIX_EPOCH)
-        .unwrap_or_else(|_| Duration::from_secs(0))
+        .unwrap_or_default()
         .as_secs()
 }
 
-// Add a method to create LightningTxid from slice
-impl LightningTxid {
-    pub fn from_slice(data: &[u8]) -> Result<Self, String> {
-        if data.len() != 32 {
-            return Err("Invalid txid length".to_string());
-        }
+// Type alias for secp256k1 context
+type LightningSecp256k1<T> = secp256k1::Secp256k1<T>;
+type All = secp256k1::All;
 
-        let mut bytes = [0u8; 32];
-        bytes.copy_from_slice(data);
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-        Ok(LightningTxid { bytes })
+    #[test]
+    fn test_lightning_public_key_from_str() {
+        let valid_key = "02" + &"a".repeat(64);
+        let pubkey = LightningPublicKey::from_str(&valid_key);
+        assert!(pubkey.is_ok());
     }
-}
 
-// Add Clone implementation for LightningTxid
-impl Clone for LightningTxid {
-    fn clone(&self) -> Self {
-        Self { bytes: self.bytes }
+    #[test]
+    fn test_lightning_public_key_invalid_length() {
+        let invalid_key = "02" + &"a".repeat(32); // Too short
+        let pubkey = LightningPublicKey::from_str(invalid_key);
+        assert!(pubkey.is_err());
+    }
+
+    #[test]
+    fn test_lightning_txid_from_slice() {
+        let valid_txid = [0x42u8; 32];
+        let txid = LightningTxid::from_slice(&valid_txid);
+        assert!(txid.is_ok());
+    }
+
+    #[test]
+    fn test_lightning_txid_invalid_length() {
+        let invalid_txid = [0x42u8; 16]; // Too short
+        let txid = LightningTxid::from_slice(&invalid_txid);
+        assert!(txid.is_err());
     }
 }

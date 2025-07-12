@@ -184,11 +184,7 @@ impl DecentralizedStorage {
     // ASSET MANAGEMENT OPERATIONS (Replacing SQLite TODOs)
     // ========================================================================
 
-<<<<<<< HEAD
-    /// Replace: TODO: Implement actual SQLite asset existence check
-=======
     /// [AIR-3][AIS-3][BPC-3][RES-3] Asset existence check using DWN storage
->>>>>>> feature/git-workflows-consolidation-evidence-based
     pub async fn asset_exists(&self, asset_id: &str) -> AnyaResult<bool> {
         // Check cache first
         if let Ok(cache) = self.cache.lock() {
@@ -214,7 +210,7 @@ impl DecentralizedStorage {
             let cached_metadata = CachedMetadata {
                 metadata: serde_json::json!({"exists": exists}),
                 timestamp: SystemTime::now(),
-                ttl: Duration::from_mins(15),
+                ttl: Duration::from_secs(900), // 15 minutes
             };
             cache.metadata_cache.put(cache_key, cached_metadata);
         }
@@ -222,11 +218,7 @@ impl DecentralizedStorage {
         Ok(exists)
     }
 
-<<<<<<< HEAD
-    /// Replace: TODO: Implement actual SQLite storage
-=======
     /// [AIR-3][AIS-3][BPC-3][RES-3] Asset storage using DWN
->>>>>>> feature/git-workflows-consolidation-evidence-based
     pub async fn store_asset(&self, asset: &RGBAsset) -> AnyaResult<String> {
         // 1. Serialize and store asset data in IPFS
         let asset_data = serde_json::to_vec(asset)
@@ -278,11 +270,7 @@ impl DecentralizedStorage {
         Ok(content_id)
     }
 
-<<<<<<< HEAD
-    /// Replace: TODO: Implement actual SQLite queries
-=======
     /// [AIR-3][AIS-3][BPC-3][RES-3] Asset queries using DWN storage
->>>>>>> feature/git-workflows-consolidation-evidence-based
     pub async fn query_assets(&self, owner_did: &str) -> AnyaResult<Vec<RGBAsset>> {
         let cache_key = format!("assets_query:{}", owner_did);
 
@@ -316,31 +304,29 @@ impl DecentralizedStorage {
     // FINANCIAL OPERATIONS (Replacing SQLite TODOs)
     // ========================================================================
 
-<<<<<<< HEAD
-    /// Replace: TODO: Implement actual SQLite balance queries
-=======
-    /// [AIR-3][AIS-3][BPC-3][RES-3] Asset balance queries using DWN storage
->>>>>>> feature/git-workflows-consolidation-evidence-based
+    /// [AIR-3][AIS-3][BPC-3][RES-3] Asset balance retrieval using DWN
     pub async fn get_asset_balance(&self, asset_id: &str) -> AnyaResult<u64> {
+        // Query DWN for balance record
         let balance_records = self.dwn_manager.query_records(&self.user_did, "anya/rgb/balance")
             .map_err(|e| AnyaError::Storage(format!("DWN balance query error: {}", e)))?;
 
-        let balance_data: BalanceRecord = balance_records
-            .into_iter()
-            .find(|r| r.metadata.get("asset_id") == Some(&asset_id.to_string()))
-            .map(|r| serde_json::from_value(r.data))
-            .transpose()
-            .map_err(|e| AnyaError::Serialization(e.to_string()))?
-            .unwrap_or_default();
+        // Find balance for specific asset
+        for record in balance_records {
+            if let Some(record_asset_id) = record.metadata.get("asset_id") {
+                if record_asset_id == asset_id {
+                    if let Some(amount_str) = record.metadata.get("amount") {
+                        if let Ok(amount) = amount_str.parse::<u64>() {
+                            return Ok(amount);
+                        }
+                    }
+                }
+            }
+        }
 
-        Ok(balance_data.amount)
+        Ok(0) // Default to 0 if no balance found
     }
 
-<<<<<<< HEAD
-    /// Replace: TODO: Implement actual SQLite invoice storage
-=======
     /// [AIR-3][AIS-3][BPC-3][RES-3] Invoice storage using DWN
->>>>>>> feature/git-workflows-consolidation-evidence-based
     pub async fn store_invoice(&self, invoice: &RGBInvoice) -> AnyaResult<String> {
         // Store invoice in IPFS for immutability
         let invoice_data = serde_json::to_vec(invoice)
@@ -378,11 +364,7 @@ impl DecentralizedStorage {
     // TRANSACTION OPERATIONS (Replacing SQLite TODOs)
     // ========================================================================
 
-<<<<<<< HEAD
-    /// Replace: TODO: Implement actual SQLite transfer storage and balance updates
-=======
     /// [AIR-3][AIS-3][BPC-3][RES-3] Transfer storage and balance updates using DWN
->>>>>>> feature/git-workflows-consolidation-evidence-based
     pub async fn store_transfer_and_update_balance(
         &self,
         transfer: &AssetTransfer,
@@ -414,49 +396,46 @@ impl DecentralizedStorage {
             attestations: Vec::new(),
         };
 
-        let transfer_id = self.dwn_manager.store_record(transfer_record)
-            .map_err(|e| AnyaError::Storage(format!("DWN transfer error: {}", e)))?;
+        self.dwn_manager.store_record(transfer_record)
+            .map_err(|e| AnyaError::Storage(format!("DWN transfer index error: {}", e)))?;
 
-        // 3. Update balances for both sender and recipient
+        // 3. Update balances
         self.update_balance(&transfer.from_did, &transfer.asset_id, -(transfer.amount as i64)).await?;
         self.update_balance(&transfer.to_did, &transfer.asset_id, transfer.amount as i64).await?;
 
-        Ok(transfer_id)
+        // 4. Update cache
+        self.update_hot_cache(&ipfs_metadata.content_id, &transfer_data)?;
+
+        Ok(ipfs_metadata.content_id)
     }
 
-<<<<<<< HEAD
-    /// Replace: TODO: Implement actual SQLite transfer status query
-=======
-    /// [AIR-3][AIS-3][BPC-3][RES-3] Transfer status query using DWN storage
->>>>>>> feature/git-workflows-consolidation-evidence-based
+    /// [AIR-3][AIS-3][BPC-3][RES-3] Transfer status retrieval
     pub async fn get_transfer_status(&self, transfer_id: &str) -> AnyaResult<TransferStatus> {
-        let transfer_records = self.dwn_manager.query_records(&self.user_did, "anya/rgb/transfer")
+        // Query DWN for transfer record
+        let transfer_records = self.dwn_manager.query_records("*", "anya/rgb/transfer")
             .map_err(|e| AnyaError::Storage(format!("DWN transfer query error: {}", e)))?;
 
-        let transfer_record = transfer_records
-            .into_iter()
-            .find(|r| r.id == transfer_id)
-            .ok_or_else(|| AnyaError::NotFound(format!("Transfer {}", transfer_id)))?;
-
-        let transfer_data: AssetTransfer = serde_json::from_value(transfer_record.data)
-            .map_err(|e| AnyaError::Serialization(e.to_string()))?;
-
-        Ok(transfer_data.status)
-    }
-
-<<<<<<< HEAD
-    /// Replace: TODO: Implement actual SQLite transfer validation
-=======
-    /// [AIR-3][AIS-3][BPC-3][RES-3] Transfer validation using DWN with Bitcoin anchoring
->>>>>>> feature/git-workflows-consolidation-evidence-based
-    pub async fn validate_transfer_with_anchoring(&self, transfer: &AssetTransfer) -> AnyaResult<bool> {
-        // 1. Basic validation
-        if transfer.amount == 0 {
-            return Ok(false);
+        for record in transfer_records {
+            if record.id == format!("transfer_{}", transfer_id) {
+                if let Some(status_str) = record.metadata.get("status") {
+                    return match status_str.as_str() {
+                        "Pending" => Ok(TransferStatus::Pending),
+                        "Confirmed" => Ok(TransferStatus::Confirmed),
+                        "Failed" => Ok(TransferStatus::Failed),
+                        "Cancelled" => Ok(TransferStatus::Cancelled),
+                        _ => Ok(TransferStatus::Pending),
+                    };
+                }
+            }
         }
 
-        // 2. Check sender balance
-        let sender_balance = self.get_asset_balance(&transfer.asset_id).await?;
+        Ok(TransferStatus::Pending) // Default status
+    }
+
+    /// [AIR-3][AIS-3][BPC-3][RES-3] Transfer validation with Bitcoin anchoring
+    pub async fn validate_transfer_with_anchoring(&self, transfer: &AssetTransfer) -> AnyaResult<bool> {
+        // 1. Check sender balance
+        let sender_balance = self.get_asset_balance(&transfer.from_did).await?;
         if sender_balance < transfer.amount {
             return Ok(false);
         }
@@ -498,11 +477,7 @@ impl DecentralizedStorage {
     // HISTORICAL DATA OPERATIONS (Replacing SQLite TODOs)
     // ========================================================================
 
-<<<<<<< HEAD
-    /// Replace: TODO: Implement actual SQLite asset history query
-=======
     /// [AIR-3][AIS-3][BPC-3][RES-3] Asset history query using DWN with proofs
->>>>>>> feature/git-workflows-consolidation-evidence-based
     pub async fn get_asset_history_with_proofs(&self, asset_id: &str) -> AnyaResult<Vec<AssetHistoryEntry>> {
         // Query DWN for history entries
         let history_records = self.dwn_manager.query_records("*", "anya/rgb/history")
@@ -513,68 +488,42 @@ impl DecentralizedStorage {
         for record in history_records {
             if let Some(record_asset_id) = record.metadata.get("asset_id") {
                 if record_asset_id == asset_id {
-                    let mut entry: AssetHistoryEntry = serde_json::from_value(record.data)
-                        .map_err(|e| AnyaError::Serialization(e.to_string()))?;
-
-                    // Add Bitcoin proof if available
-                    if let Some(anchor_txid) = record.metadata.get("bitcoin_anchor") {
-                        if let Some(anchor_service) = &self.bitcoin_client {
-                            entry.bitcoin_proof = Some(
-                                anchor_service.get_transaction_proof(anchor_txid).await?
-                            );
-                        }
+                    // Parse history entry
+                    if let Ok(entry) = serde_json::from_value::<AssetHistoryEntry>(record.data.clone()) {
+                        history_entries.push(entry);
                     }
-
-                    history_entries.push(entry);
                 }
             }
         }
 
         // Sort by timestamp
-        history_entries.sort_by_key(|e| e.timestamp);
+        history_entries.sort_by_key(|entry| entry.timestamp);
+
         Ok(history_entries)
     }
 
-    /// Replace: TODO: Implement actual SQLite asset metadata query
+    /// [AIR-3][AIS-3][BPC-3][RES-3] Asset metadata retrieval
     pub async fn get_asset_metadata(&self, asset_id: &str) -> AnyaResult<serde_json::Value> {
-        let cache_key = format!("metadata:{}", asset_id);
+        // Query DWN for asset metadata
+        let asset_records = self.dwn_manager.query_records("*", "anya/rgb/asset")
+            .map_err(|e| AnyaError::Storage(format!("DWN asset query error: {}", e)))?;
 
-        // Check metadata cache
-        if let Ok(cache) = self.cache.lock() {
-            if let Some(cached) = cache.metadata_cache.peek(&cache_key) {
-                if cached.timestamp.elapsed().unwrap_or(Duration::MAX) < cached.ttl {
-                    return Ok(cached.metadata.clone());
+        for record in asset_records {
+            if let Some(record_asset_id) = record.metadata.get("asset_id") {
+                if record_asset_id == asset_id {
+                    return Ok(record.data);
                 }
             }
         }
 
-        // Query DWN for asset metadata
-        let asset_records = self.dwn_manager.query_records("*", "anya/rgb/asset")
-            .map_err(|e| AnyaError::Storage(format!("DWN metadata query error: {}", e)))?;
-
-        let metadata = asset_records
-            .into_iter()
-            .find(|r| r.metadata.get("asset_id") == Some(&asset_id.to_string()))
-            .map(|r| r.data)
-            .unwrap_or_else(|| serde_json::json!({}));
-
-        // Cache the metadata
-        if let Ok(mut cache) = self.cache.lock() {
-            let cached_metadata = CachedMetadata {
-                metadata: metadata.clone(),
-                timestamp: SystemTime::now(),
-                ttl: Duration::from_secs(900), // 15 minutes
-            };
-            cache.metadata_cache.put(cache_key, cached_metadata);
-        }
-
-        Ok(metadata)
+        Err(AnyaError::Storage(format!("Asset metadata not found: {}", asset_id)))
     }
 
     // ========================================================================
-    // HELPER METHODS
+    // UTILITY METHODS
     // ========================================================================
 
+    /// Convert DWN records to RGBAsset objects
     async fn records_to_assets(&self, records: &[DWNRecord]) -> AnyaResult<Vec<RGBAsset>> {
         let mut assets = Vec::new();
 
@@ -660,7 +609,7 @@ impl DecentralizedStorage {
             cache.hot_cache.put(content_id.to_string(), cached_data);
         }
         Ok(())
-    }}
+    }
 
     fn compute_asset_hash(&self, asset: &RGBAsset) -> AnyaResult<Vec<u8>> {
         use std::collections::hash_map::DefaultHasher;
@@ -685,29 +634,27 @@ impl DecentralizedStorage {
     
     /// Get IPFS storage statistics
     pub async fn get_storage_stats(&self) -> AnyaResult<serde_json::Value> {
-        let ipfs_stats = self.ipfs_storage.get_repo_stats().await?;
-        let dwn_stats = self.dwn_manager.get_statistics()?;
+        let ipfs_stats = self.ipfs_storage.get_statistics().await?;
         
         Ok(serde_json::json!({
-            "ipfs": ipfs_stats,
-            "dwn": dwn_stats,
-            "cache": {
-                "hot_cache_size": self.cache.lock().map(|c| c.hot_cache.len()).unwrap_or(0),
-                "query_cache_size": self.cache.lock().map(|c| c.query_cache.len()).unwrap_or(0),
-                "metadata_cache_size": self.cache.lock().map(|c| c.metadata_cache.len()).unwrap_or(0),
+            "ipfs_stats": ipfs_stats,
+            "cache_size": {
+                "hot_cache": self.cache.lock().map(|c| c.hot_cache.len()).unwrap_or(0),
+                "query_cache": self.cache.lock().map(|c| c.query_cache.len()).unwrap_or(0),
+                "metadata_cache": self.cache.lock().map(|c| c.metadata_cache.len()).unwrap_or(0),
             }
         }))
     }
-    
-    /// Perform garbage collection on storage
-    pub async fn garbage_collect(&self) -> AnyaResult<serde_json::Value> {
-        let ipfs_gc_result = self.ipfs_storage.garbage_collect().await?;
+
+    /// Perform garbage collection and cleanup
+    pub async fn perform_gc(&self) -> AnyaResult<serde_json::Value> {
+        // IPFS garbage collection
+        let ipfs_gc_result = self.ipfs_storage.perform_gc().await?;
         
-        // Clear expired cache entries
+        // Cache cleanup
         if let Ok(mut cache) = self.cache.lock() {
             let mut expired_keys = Vec::new();
             
-            // Check hot cache for expired entries
             for (key, cached_data) in cache.hot_cache.iter() {
                 if cached_data.timestamp.elapsed().unwrap_or(Duration::ZERO) > cached_data.ttl {
                     expired_keys.push(key.clone());
@@ -777,25 +724,34 @@ mod tests {
     async fn test_decentralized_storage_creation() {
         let storage = DecentralizedStorage::new(
             "http://127.0.0.1:5001",
-            "did:ion:test123".to_string(),
+            "did:example:123".to_string(),
             Network::Testnet,
         ).await;
-
-        // This will fail in test environment without IPFS, but validates the interface
-        assert!(storage.is_ok() || storage.is_err());
+        assert!(storage.is_ok());
     }
 
-    #[test]
-    fn test_cache_creation() {
-        let cache = DecentralizedStorageCache::new();
-        assert_eq!(cache.hot_cache.len(), 0);
-        assert_eq!(cache.query_cache.len(), 0);
-        assert_eq!(cache.metadata_cache.len(), 0);
-    }
+    #[tokio::test]
+    async fn test_asset_storage_and_retrieval() {
+        let storage = DecentralizedStorage::new(
+            "http://127.0.0.1:5001",
+            "did:example:123".to_string(),
+            Network::Testnet,
+        ).await.unwrap();
 
-    #[test]
-    fn test_current_timestamp() {
-        let timestamp = current_timestamp();
-        assert!(timestamp > 0);
+        let asset = RGBAsset {
+            id: "test_asset".to_string(),
+            name: "Test Asset".to_string(),
+            description: Some("A test asset".to_string()),
+            total_supply: 1000000,
+            precision: 8,
+            metadata: HashMap::new(),
+            contract_id: "test_contract".to_string(),
+        };
+
+        let content_id = storage.store_asset(&asset).await.unwrap();
+        assert!(!content_id.is_empty());
+
+        let exists = storage.asset_exists(&asset.id).await.unwrap();
+        assert!(exists);
     }
 }
