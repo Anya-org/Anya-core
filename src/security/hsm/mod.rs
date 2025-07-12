@@ -15,10 +15,6 @@ use bitcoin::ScriptBuf;
 use serde::{Deserialize, Serialize};
 use std::error::Error;
 use std::sync::Arc;
-<<<<<<< HEAD
-use crate::security::hsm::audit::AuditLogger;
-=======
->>>>>>> feature/git-workflows-consolidation-evidence-based
 
 pub use providers::{
     ledger::LedgerHsmProvider, pkcs11::Pkcs11HsmProvider, software::SoftwareHsmProvider,

@@ -21,10 +21,6 @@ use crate::security::hsm::provider::HsmProviderStatus;
 use crate::security::hsm::provider::{
     HsmProvider, KeyGenParams, KeyInfo, KeyPair, SigningAlgorithm,
 };
-<<<<<<< HEAD
-use crate::security::hsm::provider;
-=======
->>>>>>> feature/git-workflows-consolidation-evidence-based
 use std::collections::HashMap;
 
 /// Configuration for Ledger devices

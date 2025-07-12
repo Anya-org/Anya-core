@@ -51,19 +51,11 @@ use rand::{rngs::OsRng, Rng};
 use crate::security::hsm::{
     error::HsmError,
     provider::{
-<<<<<<< HEAD
-        EcCurve, HsmOperation, HsmProvider, HsmProviderStatus, HsmRequest,
-        HsmResponse, KeyGenParams, KeyInfo, KeyPair, KeyType, KeyUsage, SigningAlgorithm,
-    },
-    types::{
-        DeleteKeyParams, EncryptParams, DecryptParams, GetKeyParams, SignParams, VerifyParams,
-=======
         EcCurve, HsmOperation, HsmProvider, HsmProviderStatus, HsmRequest, HsmResponse,
         KeyGenParams, KeyInfo, KeyPair, KeyType, KeyUsage, SigningAlgorithm,
     },
     types::{
         DecryptParams, DeleteKeyParams, EncryptParams, GetKeyParams, SignParams, VerifyParams,
->>>>>>> feature/git-workflows-consolidation-evidence-based
     },
 };
 
@@ -459,11 +451,6 @@ impl SoftwareHsmProvider {
                 let mut sighash_cache = bitcoin::sighash::SighashCache::new(&psbt.unsigned_tx);
                 // Create a Prevouts struct from the collected UTXOs
                 let _prevouts = bitcoin::sighash::Prevouts::All(&prevouts_data);
-<<<<<<< HEAD
-                
-=======
-
->>>>>>> feature/git-workflows-consolidation-evidence-based
                 let sighash = sighash_cache.taproot_key_spend_signature_hash(
                     i,
                     &_prevouts,
