@@ -516,16 +516,14 @@ pub async fn create_hsm_provider(config: &HsmConfig) -> Result<Arc<dyn HsmProvid
 /// This provider is used for development and testing purposes only.
 #[derive(Debug)]
 pub struct SoftHsmProvider {
-    config: SoftHsmConfig,
     keys: Mutex<HashMap<String, KeyInfo>>,
     key_data: Mutex<HashMap<String, Vec<u8>>>, // For private key data (in a real HSM, this would never be exposed)
 }
 
 impl SoftHsmProvider {
     /// Create a new SoftHSM provider
-    pub fn new(config: &SoftHsmConfig) -> Result<Self, HsmError> {
+    pub fn new(_config: &SoftHsmConfig) -> Result<Self, HsmError> {
         Ok(Self {
-            config: config.clone(),
             keys: Mutex::new(HashMap::new()),
             key_data: Mutex::new(HashMap::new()),
         })
@@ -834,16 +832,12 @@ impl HsmProvider for SoftHsmProvider {
 
 /// CloudHSM provider
 #[derive(Debug)]
-pub struct CloudHsmProvider {
-    config: CloudHsmConfig,
-}
+pub struct CloudHsmProvider;
 
 impl CloudHsmProvider {
     /// Create a new CloudHSM provider
-    pub fn new(config: &CloudHsmConfig) -> Result<Self, HsmError> {
-        Ok(Self {
-            config: config.clone(),
-        })
+    pub fn new(_config: &CloudHsmConfig) -> Result<Self, HsmError> {
+        Ok(Self)
     }
 }
 
@@ -933,16 +927,12 @@ impl HsmProvider for CloudHsmProvider {
 
 /// TPM provider
 #[derive(Debug)]
-pub struct TpmProvider {
-    config: TpmConfig,
-}
+pub struct TpmProvider;
 
 impl TpmProvider {
     /// Create a new TPM provider
-    pub fn new(config: &TpmConfig) -> Result<Self, HsmError> {
-        Ok(Self {
-            config: config.clone(),
-        })
+    pub fn new(_config: &TpmConfig) -> Result<Self, HsmError> {
+        Ok(Self)
     }
 }
 
@@ -1032,16 +1022,12 @@ impl HsmProvider for TpmProvider {
 
 /// PKCS#11 provider
 #[derive(Debug)]
-pub struct Pkcs11Provider {
-    config: Pkcs11Config,
-}
+pub struct Pkcs11Provider;
 
 impl Pkcs11Provider {
     /// Create a new PKCS#11 provider
-    pub fn new(config: &Pkcs11Config) -> Result<Self, HsmError> {
-        Ok(Self {
-            config: config.clone(),
-        })
+    pub fn new(_config: &Pkcs11Config) -> Result<Self, HsmError> {
+        Ok(Self)
     }
 }
 
