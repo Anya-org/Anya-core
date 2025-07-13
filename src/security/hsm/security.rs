@@ -1,20 +1,7 @@
 // Security Manager Implementation for Anya Core HSM
 use std::collections::HashMap;
 use std::error::Error;
-use std::fmt;
 use std::sync::{Arc, Mutex, RwLock};
-
-/// Wrapper for Argon2 errors to implement std::error::Error
-#[derive(Debug)]
-struct Argon2ErrorWrapper(String);
-
-impl fmt::Display for Argon2ErrorWrapper {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "Argon2 error: {}", self.0)
-    }
-}
-
-impl Error for Argon2ErrorWrapper {}
 
 use crate::security::hsm::HsmManager;
 use crate::AnyaResult;
@@ -23,8 +10,6 @@ use secp256k1::ecdsa::Signature;
 
 /// Security Manager for cryptographic operations
 pub struct SecurityManager {
-    /// HSM manager for hardware security operations
-    hsm: Arc<HsmManager>,
     /// User activation status - operations require explicit activation
     activation_status: RwLock<bool>,
     /// Key cache for performance optimization
@@ -33,9 +18,8 @@ pub struct SecurityManager {
 
 impl SecurityManager {
     /// Create a new security manager with HSM integration
-    pub fn new(hsm: Arc<HsmManager>) -> Self {
+    pub fn new(_hsm: Arc<HsmManager>) -> Self {
         Self {
-            hsm,
             activation_status: RwLock::new(false),
             key_cache: Mutex::new(HashMap::new()),
         }

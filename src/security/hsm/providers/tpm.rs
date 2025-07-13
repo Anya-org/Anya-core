@@ -23,16 +23,14 @@ use std::fmt::Debug;
 /// TPM-based HSM provider implementation
 #[derive(Debug)]
 pub struct TpmHsmProvider {
-    config: TpmConfig,
     audit_logger: Arc<AuditLogger>,
     key_store: Mutex<HashMap<String, KeyInfo>>,
     key_data: Mutex<HashMap<String, Vec<u8>>>,
 }
 
 impl TpmHsmProvider {
-    pub fn new(config: &TpmConfig, audit_logger: Arc<AuditLogger>) -> Result<Self, HsmError> {
+    pub fn new(_config: &TpmConfig, audit_logger: Arc<AuditLogger>) -> Result<Self, HsmError> {
         Ok(Self {
-            config: config.clone(),
             audit_logger,
             key_store: Mutex::new(HashMap::new()),
             key_data: Mutex::new(HashMap::new()),

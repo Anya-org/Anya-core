@@ -40,9 +40,8 @@ use zeroize::Zeroize;
 // [AIR-3][AIS-3][BPC-3][RES-3] Import Bitcoin types for software HSM implementation
 // This follows official Bitcoin Improvement Proposals (BIPs) standards for secure HSM implementation
 use bitcoin::{
-    hashes::Hash as BitcoinHash,
-    secp256k1::{Message, PublicKey, Secp256k1, SecretKey, XOnlyPublicKey},
-    Network, Psbt,
+    secp256k1::{Message, PublicKey, Secp256k1, SecretKey},
+    Network,
 };
 
 // [AIR-3][AIS-3][BPC-3][RES-3] Import secure random number generation
@@ -54,17 +53,13 @@ use crate::security::hsm::{
         EcCurve, HsmOperation, HsmProvider, HsmProviderStatus, HsmRequest, HsmResponse,
         KeyGenParams, KeyInfo, KeyPair, KeyType, KeyUsage, SigningAlgorithm,
     },
-    types::{
-        DecryptParams, DeleteKeyParams, EncryptParams, GetKeyParams, SignParams, VerifyParams,
-    },
+    types::{DeleteKeyParams, GetKeyParams, SignParams, VerifyParams},
 };
 
 // Import from parent modules
 use crate::security::hsm::audit::AuditLogger;
 use crate::security::hsm::config::SoftHsmConfig;
 use crate::security::hsm::error::{AuditEventResult, AuditEventSeverity, AuditEventType};
-use base64::Engine;
-use bitcoin::key::Keypair;
 use chrono::{DateTime, Utc};
 use sha2::Digest;
 use sha2::{Sha256, Sha384};
@@ -831,22 +826,3 @@ impl HsmProvider for SoftwareHsmProvider {
     }
 }
 
-/// Parameters for rotating a key
-#[derive(Debug, serde::Deserialize)]
-struct RotateKeyParams {
-    key_id: String,
-}
-
-/// Parameters for Bitcoin transaction signing
-#[derive(Debug, serde::Deserialize)]
-struct BitcoinTxSignParams {
-    key_id: String,
-    psbt: String,
-}
-
-/// Response for signature in base64 format
-#[derive(Debug, serde::Serialize)]
-struct Base64SignatureResponse {
-    signature: String,
-    algorithm: SigningAlgorithm,
-}

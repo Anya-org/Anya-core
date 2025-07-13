@@ -206,7 +206,7 @@ impl HardwareHsmProvider {
 
         // Get key info
         let keys = self.keys.lock().await;
-        let _key_info = keys
+        let key_info = keys
             .get(key_id)
             .ok_or_else(|| HsmError::KeyNotFound(key_id.to_string()))?;
 
