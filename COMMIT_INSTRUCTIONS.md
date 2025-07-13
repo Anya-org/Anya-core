@@ -113,7 +113,6 @@ git commit -m "Restructure main application
 
 ### 8. CI/Debug
 ```bash
-git add anya-core-ci-debug/
 git commit -m "Add CI/Debug configuration
 
 - Add debugging configurations

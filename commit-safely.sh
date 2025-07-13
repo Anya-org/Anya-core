@@ -106,7 +106,6 @@ git commit -m "Restructure main application
 
 # Group 8: CI/Debug
 echo "Committing CI/Debug configuration..."
-git add anya-core-ci-debug/ || true
 git commit -m "Add CI/Debug configuration
 
 - Add debugging configurations
