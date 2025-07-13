@@ -78,12 +78,6 @@ struct SecureString {
 }
 
 impl SecureString {
-    fn new(data: String) -> Self {
-        Self {
-            data: Arc::new(Mutex::new(data.into_bytes())),
-        }
-    }
-
     fn from(data: Vec<u8>) -> Self {
         Self {
             data: Arc::new(Mutex::new(data)),
@@ -92,22 +86,6 @@ impl SecureString {
 
     async fn lock(&self) -> tokio::sync::MutexGuard<'_, Vec<u8>> {
         self.data.lock().await
-    }
-
-    fn as_bytes(&self) -> Vec<u8> {
-        // Best effort to get bytes without locking - only for testing
-        // In production, use lock().await first
-        self.data
-            .try_lock()
-            .map(|guard| guard.clone())
-            .unwrap_or_default()
-    }
-
-    fn as_str(&self) -> String {
-        // Best effort to get string without locking - only for testing
-        // In production, use lock().await first
-        let bytes = self.as_bytes();
-        String::from_utf8_lossy(&bytes).to_string()
     }
 }
 
@@ -188,14 +166,10 @@ impl Drop for SecureKey {
 /// - Implements proper key lifecycle management
 #[derive(Debug)]
 pub struct SoftwareHsmProvider {
-    /// Configuration for the software HSM
-    config: SoftHsmConfig,
     /// In-memory key storage with secure memory protection
     keys: Mutex<HashMap<String, SecureKey>>,
     /// Secp256k1 context for cryptographic operations
     secp: Secp256k1<bitcoin::secp256k1::All>,
-    /// Network this HSM is operating on (mainnet, testnet, etc.)
-    network: Network,
     /// Audit logger for security events
     audit_logger: Arc<AuditLogger>,
 }
@@ -203,8 +177,8 @@ pub struct SoftwareHsmProvider {
 impl SoftwareHsmProvider {
     /// Create a new software HSM provider
     pub async fn new(
-        config: SoftHsmConfig,
-        network: Network,
+        _config: SoftHsmConfig,
+        _network: Network,
         audit_logger: Arc<AuditLogger>,
     ) -> Result<Self, HsmError> {
         // Initialize the secp256k1 context with all capabilities
@@ -212,10 +186,8 @@ impl SoftwareHsmProvider {
 
         // Create the provider instance
         let provider = Self {
-            config,
             keys: Mutex::new(HashMap::new()),
             secp,
-            network,
             audit_logger,
         };
 
@@ -293,198 +265,6 @@ impl SoftwareHsmProvider {
             .await?;
 
         Ok(key_info)
-    }
-
-    /// Generate a new Bitcoin key pair using secp256k1 with BIP340/341/342 (Schnorr/Taproot) support
-    async fn generate_bitcoin_key(
-        &self,
-        params: &KeyGenParams,
-    ) -> Result<(SecureString, Vec<u8>), HsmError> {
-        // Generate a new random secret key using the system's secure RNG
-        let secret_key = SecretKey::new(&mut OsRng);
-        let secret_bytes = secret_key.secret_bytes();
-
-        // Generate the corresponding public key
-        let public_key = bitcoin::secp256k1::PublicKey::from_secret_key(&self.secp, &secret_key);
-
-        // Determine if this is a Taproot key based on parameters
-        let is_taproot = match params.key_type {
-            KeyType::Ec {
-                curve: EcCurve::Secp256k1,
-            } => {
-                // For now, assume schnorr if it's secp256k1, we'll improve this later
-                false // Disable taproot for now to avoid complexity
-            }
-            _ => false,
-        };
-
-        // For Taproot keys, we use the x-only public key based on BIP340
-        let public_key_bytes = if is_taproot {
-            // For Taproot, we use the x-only public key (32 bytes)
-            let (xonly, _parity) =
-                XOnlyPublicKey::from_keypair(&Keypair::from_secret_key(&self.secp, &secret_key));
-            xonly.serialize().to_vec()
-        } else {
-            // For legacy and segwit, use the full compressed public key (33 bytes)
-            public_key.serialize().to_vec()
-        };
-
-        // Securely store the secret key
-        let secure_secret = SecureString::from(hex::encode(secret_bytes).into_bytes());
-
-        // Zeroize the secret key from memory (secret_bytes is a [u8; 32])
-        let mut secret_bytes_mut = secret_bytes;
-        zeroize::Zeroize::zeroize(&mut secret_bytes_mut);
-
-        // Log the key generation
-        self.audit_logger
-            .log_event(
-                AuditEventType::KeyGeneration,
-                AuditEventResult::Success,
-                AuditEventSeverity::Info,
-                &format!(
-                    "Generated new {} Bitcoin key",
-                    if is_taproot { "Taproot" } else { "SegWit" }
-                ),
-            )
-            .await?;
-
-        Ok((secure_secret, public_key_bytes))
-    }
-
-    /// Sign a Bitcoin transaction with support for multiple script types
-    async fn sign_bitcoin_transaction(
-        &self,
-        key_id: &str,
-        psbt: &mut Psbt,
-    ) -> Result<(), HsmError> {
-        // Look up the key in our secure storage
-        let keys = self.keys.lock().await;
-        let key = keys
-            .get(key_id)
-            .ok_or_else(|| HsmError::KeyNotFound(key_id.into()))?;
-
-        // Get the secret key with zeroization on drop
-        let secret_key = {
-            let secret_bytes = hex::decode(&key.key_data.as_str())
-                .map_err(|e| HsmError::SigningError(format!("Invalid key data: {}", e)))?;
-            SecretKey::from_slice(&secret_bytes)
-                .map_err(|e| HsmError::SigningError(format!("Invalid secret key: {}", e)))?
-        };
-
-        // Get the public key
-        let public_key = bitcoin::secp256k1::PublicKey::from_secret_key(&self.secp, &secret_key);
-
-        // Pre-collect prevouts for Taproot case to avoid borrow conflicts
-        let prevouts_data: Vec<_> = psbt
-            .inputs
-            .iter()
-            .filter_map(|i| i.witness_utxo.clone())
-            .collect();
-
-        // Sign each input in the PSBT
-        for (i, input) in psbt.inputs.iter_mut().enumerate() {
-            // Skip if already signed
-            if input.final_script_witness.is_some() {
-                continue;
-            }
-
-            // Get the script code and value for this input
-            let (script_code, value) = if let Some(wit_utxo) = &input.witness_utxo {
-                // Native SegWit or Taproot
-                (wit_utxo.script_pubkey.clone(), wit_utxo.value)
-            } else if let Some(non_wit_utxo) = &input.non_witness_utxo {
-                // Legacy or P2SH-wrapped SegWit
-                let prevout_index = psbt.unsigned_tx.input[i].previous_output.vout as usize;
-                let prevout = &non_wit_utxo.output[prevout_index];
-                (prevout.script_pubkey.clone(), prevout.value)
-            } else {
-                return Err(HsmError::SigningError("No UTXO provided for input".into()));
-            };
-
-            // Sign based on script type
-            if script_code.is_p2pkh() {
-                // Legacy P2PKH
-                let sighash_cache = bitcoin::sighash::SighashCache::new(&psbt.unsigned_tx);
-                let sighash = sighash_cache.legacy_signature_hash(
-                    i,
-                    &script_code,
-                    bitcoin::sighash::EcdsaSighashType::All.to_u32(),
-                )?;
-
-                let message = Message::from_digest_slice(&sighash[..])
-                    .map_err(|e| HsmError::SigningError(format!("Invalid message: {}", e)))?;
-
-                let signature = self.secp.sign_ecdsa(&message, &secret_key);
-
-                // Add the signature to the PSBT
-                input.partial_sigs.insert(
-                    bitcoin::PublicKey::new(public_key),
-                    bitcoin::ecdsa::Signature::sighash_all(signature),
-                );
-            } else if script_code.is_p2wpkh() {
-                // Native SegWit P2WPKH
-                let mut sighash_cache = bitcoin::sighash::SighashCache::new(&psbt.unsigned_tx);
-                let sighash = sighash_cache.p2wpkh_signature_hash(
-                    i,
-                    &bitcoin::blockdata::script::Builder::new()
-                        .push_slice(&bitcoin::PubkeyHash::hash(&public_key.serialize()))
-                        .into_script(),
-                    value,
-                    bitcoin::sighash::EcdsaSighashType::All,
-                )?;
-
-                let message = Message::from_digest_slice(&sighash[..])
-                    .map_err(|e| HsmError::SigningError(format!("Invalid message hash: {}", e)))?;
-
-                let signature = self.secp.sign_ecdsa(&message, &secret_key);
-
-                // Add the signature to the witness
-                let sig = bitcoin::ecdsa::Signature::sighash_all(signature);
-                input.final_script_witness = Some(bitcoin::Witness::from_slice(&[
-                    sig.to_vec(),
-                    public_key.serialize().to_vec(),
-                ]));
-            } else if script_code.is_p2tr() {
-                // Taproot (BIP 341/342)
-                // Use the pre-collected prevouts data
-                let mut sighash_cache = bitcoin::sighash::SighashCache::new(&psbt.unsigned_tx);
-                // Create a Prevouts struct from the collected UTXOs
-                let _prevouts = bitcoin::sighash::Prevouts::All(&prevouts_data);
-                let sighash = sighash_cache.taproot_key_spend_signature_hash(
-                    i,
-                    &_prevouts,
-                    bitcoin::TapSighashType::All,
-                )?;
-
-                let message = Message::from_digest_slice(&sighash[..])
-                    .map_err(|e| HsmError::SigningError(format!("Invalid message hash: {}", e)))?;
-
-                // Create a keypair for BIP340 signing
-                let keypair = Keypair::from_secret_key(&self.secp, &secret_key);
-
-                // Sign the message
-                let signature = self.secp.sign_schnorr_no_aux_rand(&message, &keypair);
-
-                // Add the signature to the witness
-                input.final_script_witness =
-                    Some(bitcoin::Witness::from_slice(&[signature.as_ref().to_vec()]));
-            } else {
-                return Err(HsmError::SigningError("Unsupported script type".into()));
-            }
-        }
-
-        // Log the signing operation
-        self.audit_logger
-            .log_event(
-                AuditEventType::Sign,
-                AuditEventResult::Success,
-                AuditEventSeverity::Info,
-                &format!("Signed transaction with {} inputs", psbt.inputs.len()),
-            )
-            .await?;
-
-        Ok(())
     }
 
     /// Generate a new key pair
@@ -726,154 +506,6 @@ impl SoftwareHsmProvider {
     }
 
     // ...
-
-    async fn rotate_key(&self, params: RotateKeyParams) -> Result<(), HsmError> {
-        // Implementation of key rotation (create a new key and replace the old one)
-        // 1. Get the old key information
-        let old_key_info = {
-            let keys = self.keys.lock().await;
-            keys.get(&params.key_id)
-                .ok_or_else(|| HsmError::KeyNotFound(params.key_id.clone()))?
-                .info
-                .clone()
-        };
-
-        // 2. Generate a new key with the same type and usage
-        let gen_params = KeyGenParams {
-            id: None, // Generate a new ID
-            label: old_key_info.label.clone(),
-            key_type: old_key_info.key_type,
-            extractable: old_key_info.extractable,
-            usages: vec![KeyUsage::Sign, KeyUsage::Verify], // Default usages for Bitcoin
-            expires_at: None,
-            attributes: HashMap::new(),
-        };
-
-        let (new_key, _) = self.generate_key(gen_params).await?;
-
-        // 3. Delete the old key
-        self.delete_key(&params.key_id).await?;
-
-        // 4. Log the key rotation
-        self.audit_logger
-            .log_event(
-                AuditEventType::KeyRotation,
-                AuditEventResult::Success,
-                AuditEventSeverity::Info,
-                &format!("Rotated key: {} -> {}", params.key_id, new_key.id),
-            )
-            .await?;
-
-        Ok(())
-    }
-
-    async fn execute_operation(&self, request: HsmRequest) -> Result<HsmResponse, HsmError> {
-        let request_id = request.id.clone();
-
-        match request.operation {
-            // Key rotation operation
-            HsmOperation::Custom(ref op) if op == "RotateKey" => {
-                let params: RotateKeyParams =
-                    serde_json::from_value(request.parameters).map_err(|e| {
-                        HsmError::InvalidParameters(format!("Invalid rotation parameters: {}", e))
-                    })?;
-
-                // 1. Generate new key
-                let gen_params = KeyGenParams {
-                    id: None,
-                    label: None,
-                    key_type: KeyType::Ec {
-                        curve: EcCurve::Secp256k1,
-                    },
-                    extractable: false,
-                    usages: vec![KeyUsage::Sign, KeyUsage::Verify],
-                    expires_at: None,
-                    attributes: HashMap::new(),
-                };
-
-                let (new_key, new_key_info) = self.generate_key(gen_params).await?;
-
-                // 2. Delete the old key
-                self.delete_key(&params.key_id).await?;
-
-                // 3. Return the new key info
-                let response_data = serde_json::json!({
-                    "old_key_id": params.key_id,
-                    "new_key_id": new_key.id,
-                    "key_info": new_key_info
-                });
-
-                Ok(HsmResponse::success(request_id, Some(response_data)))
-            }
-
-            // Encryption/Decryption operations - basic implementation for SoftwareHsmProvider
-            // as they're not primary Bitcoin operations, but providing stubs for interface compliance
-            HsmOperation::Encrypt => {
-                let _params: EncryptParams =
-                    serde_json::from_value(request.parameters).map_err(|e| {
-                        HsmError::InvalidParameters(format!("Invalid encryption parameters: {}", e))
-                    })?;
-
-                // For now, return unsupported operation since Bitcoin HSM focuses on signing operations
-                // In a full implementation, this would use AES-GCM for symmetric encryption
-                // or ECIES for asymmetric encryption
-                Err(HsmError::UnsupportedOperation(
-                    "Encryption operations are not supported in the open-source Bitcoin HSM provider".to_string()
-                ))
-            }
-
-            HsmOperation::Decrypt => {
-                let _params: DecryptParams =
-                    serde_json::from_value(request.parameters).map_err(|e| {
-                        HsmError::InvalidParameters(format!("Invalid decryption parameters: {}", e))
-                    })?;
-
-                // For now, return unsupported operation
-                Err(HsmError::UnsupportedOperation(
-                    "Decryption operations are not supported in the open-source Bitcoin HSM provider".to_string()
-                ))
-            }
-
-            // Bitcoin-specific operations
-            HsmOperation::Custom(op) if op == "sign_bitcoin_tx" => {
-                let params: BitcoinTxSignParams = serde_json::from_value(request.parameters)
-                    .map_err(|e| {
-                        HsmError::InvalidParameters(format!(
-                            "Invalid Bitcoin TX signing parameters: {}",
-                            e
-                        ))
-                    })?;
-
-                // Decode PSBT using the updated base64 Engine API
-                let psbt_bytes = base64::engine::general_purpose::STANDARD
-                    .decode(&params.psbt)
-                    .map_err(|e| {
-                        HsmError::InvalidParameters(format!("Invalid PSBT base64: {}", e))
-                    })?;
-
-                let mut psbt = bitcoin::psbt::Psbt::deserialize(&psbt_bytes)
-                    .map_err(|e| HsmError::InvalidParameters(format!("Invalid PSBT: {}", e)))?;
-
-                // Sign the transaction
-                self.sign_bitcoin_transaction(&params.key_id, &mut psbt)
-                    .await?;
-
-                // Return the signed PSBT
-                let response_data = serde_json::json!({
-                    "signed_psbt": format!("{:?}", psbt),
-                    "network": self.network.to_string(),
-                });
-
-                Ok(HsmResponse::success(request_id, Some(response_data)))
-            }
-
-            // Fall through for unsupported operations
-            _ => Err(HsmError::UnsupportedOperation(format!(
-                "Operation not supported in open-source Bitcoin HSM provider: {:?}",
-                request.operation
-            ))),
-        }
-    }
 }
 
 #[async_trait]
@@ -1099,7 +731,7 @@ impl HsmProvider for SoftwareHsmProvider {
                         ))
                     })?;
 
-                let (key_pair, key_info) = self.generate_key(params).await?;
+                let (key_pair, _key_info) = self.generate_key(params).await?;
 
                 Ok(HsmResponse::success(
                     request.id,

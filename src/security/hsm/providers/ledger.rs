@@ -39,8 +39,6 @@ pub struct LedgerConfig {
 /// Ledger HSM Provider for hardware wallet integration
 #[derive(Debug)]
 pub struct LedgerHsmProvider {
-    /// Provider configuration
-    config: LedgerConfig,
     /// Keys (actually BIP32 paths) known to this provider
     keys: tokio::sync::Mutex<HashMap<String, KeyInfo>>,
     /// Audit logger
@@ -49,18 +47,13 @@ pub struct LedgerHsmProvider {
 
 impl LedgerHsmProvider {
     /// Create a new Ledger HSM provider
-    pub fn new(config: &LedgerConfig, audit_logger: Arc<AuditLogger>) -> Result<Self, HsmError> {
+    pub fn new(_config: &LedgerConfig, audit_logger: Arc<AuditLogger>) -> Result<Self, HsmError> {
         Ok(Self {
-            config: config.clone(),
             keys: tokio::sync::Mutex::new(HashMap::new()),
             audit_logger,
         })
     }
 
-    /// Generate a unique key ID
-    fn generate_key_id(&self) -> String {
-        Uuid::new_v4().to_string()
-    }
 }
 
 #[async_trait]
@@ -149,7 +142,7 @@ impl HsmProvider for LedgerHsmProvider {
         request: provider::HsmRequest,
     ) -> Result<provider::HsmResponse, HsmError> {
         // Just return an unsupported operation error for now
-        let request_id = request.id.clone();
+        let _request_id = request.id.clone();
         Err(HsmError::UnsupportedOperation(format!(
             "Operation {:?} not supported in the Ledger provider stub implementation",
             request.operation
