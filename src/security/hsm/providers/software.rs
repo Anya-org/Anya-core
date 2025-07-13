@@ -749,7 +749,7 @@ impl SoftwareHsmProvider {
             attributes: HashMap::new(),
         };
 
-        let (new_key, new_key_info) = self.generate_key(gen_params).await?;
+        let (new_key, _) = self.generate_key(gen_params).await?;
 
         // 3. Delete the old key
         self.delete_key(&params.key_id).await?;

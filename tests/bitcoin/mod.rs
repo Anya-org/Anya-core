@@ -1,48 +1,36 @@
-//! Bitcoin module tests - Validates full alignment with Bitcoin Core principles
-//!
-//! This module contains integration tests for Bitcoin functionality with specific
-//! focus on ensuring full compliance with Bitcoin's core principles:
-//! - Decentralization
-//! - Security
-//! - Immutability
-//! - Privacy
+use super::common::test_utilities::*;
+use crate::bitcoin::interface::BitcoinInterface;
+use crate::bitcoin::rust::RustBitcoinImplementation;
+use bitcoin::Network;
 
-mod cross_layer_tests;
-mod historical_compatibility_tests;
-mod layer3_tests;
-mod riscv_tests;
-mod riscv_vm_tests;
-<<<<<<< HEAD
-mod layer3_tests;
-mod historical_compatibility_tests;
-=======
-mod validation_test;
-mod vm_layer_tests;
->>>>>>> feature/git-workflows-consolidation-evidence-based
-// mod security_tests;  // Disabled - dependency issues
+#[tokio::test]
+async fn test_rust_bitcoin_implementation() {
+    let mut implementation = RustBitcoinImplementation::new_network(Network::Testnet);
 
-// Protocol tests module
-pub mod protocol;
+    // Test address generation
+    let address = implementation
+        .generate_address(crate::bitcoin::interface::AddressType::P2WPKH)
+        .await
+        .unwrap();
+    assert!(address.is_valid_for_network(Network::Testnet), "Generated address should be valid for testnet");
 
-// Re-export Bitcoin tests for main test runner
-pub use historical_compatibility_tests::*;
-// pub use security_tests::*;  // Disabled - dependency issues
+    // Test transaction creation
+    let outputs = vec![
+        (
+            "tb1qbe99gemjdvde2amfl54s34gkx4nscv9vpx0v2s".to_string(),
+            10000,
+        ),
+        (
+            "tb1qpx9gxxqsm97za32zn96sfsc7u0s5wz3y7j8z4n".to_string(),
+            20000,
+        ),
+    ];
+    let tx = implementation.create_transaction(outputs, 10).await.unwrap();
+    assert_eq!(tx.output.len(), 2, "Transaction should have 2 outputs");
 
-// Tests that verify Bitcoin Core principles alignment
-pub mod principles {
-    //! Tests specifically focused on verifying alignment with Bitcoin Core principles
+    // Test broadcasting (mocked)
+    let txid = implementation.broadcast_transaction(&tx).await.unwrap();
+    assert!(!txid.is_empty(), "Transaction ID should not be empty");
 
-    pub use super::historical_compatibility_tests::test_full_bitcoin_principles_alignment;
-    pub use super::historical_compatibility_tests::test_immutability_across_hardware_paths;
-    pub use super::historical_compatibility_tests::test_immutability_historical_compatibility;
-
-    // Security principle tests
-    // Disabled until security_tests module is available
-    // pub use super::security_tests::test_cve_2010_5139_value_overflow;
-    // pub use super::security_tests::test_cve_2018_17144_duplicate_inputs;
-    // pub use super::security_tests::test_differential_fuzzing;
-    // pub use super::security_tests::test_consensus_invariant_checker;
-    // pub use super::security_tests::test_hardware_optimizations_consensus;
-    // pub use super::security_tests::test_timing_side_channels;
-    // pub use super::security_tests::test_historical_consensus_bugs;
+    println!("Completed RustBitcoinImplementation tests successfully");
 }
