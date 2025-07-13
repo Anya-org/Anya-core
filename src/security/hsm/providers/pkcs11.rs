@@ -27,10 +27,6 @@ use crate::security::hsm::provider::{
 /// Currently implemented as a stub with placeholder functionality.
 #[derive(Debug)]
 pub struct Pkcs11HsmProvider {
-    /// Provider configuration
-    config: Pkcs11Config,
-    /// Keys stored in the HSM
-    keys: Mutex<HashMap<String, KeyInfo>>,
     /// Audit logger for security events
     audit_logger: Arc<AuditLogger>,
 }
@@ -40,23 +36,14 @@ impl Pkcs11HsmProvider {
     ///
     /// # Arguments
     ///
-    /// * `config` - The PKCS#11 configuration
+    /// * `_config` - The PKCS#11 configuration
     /// * `audit_logger` - Logger for security audit events
     ///
     /// # Returns
     ///
     /// A new PKCS#11 HSM provider or an error if initialization fails
-    pub fn new(config: &Pkcs11Config, audit_logger: Arc<AuditLogger>) -> Result<Self, HsmError> {
-        Ok(Self {
-            config: config.clone(),
-            keys: Mutex::new(HashMap::new()),
-            audit_logger,
-        })
-    }
-
-    /// Generate a unique key ID
-    fn generate_key_id(&self) -> String {
-        Uuid::new_v4().to_string()
+    pub fn new(_config: &Pkcs11Config, audit_logger: Arc<AuditLogger>) -> Result<Self, HsmError> {
+        Ok(Self { audit_logger })
     }
 
     /// Log a stub operation attempt

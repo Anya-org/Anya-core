@@ -30,9 +30,6 @@ use crate::security::hsm::provider::{
 /// Bitcoin HSM Provider
 #[derive(Debug)]
 pub struct BitcoinHsmProvider {
-    /// Configuration
-    config: BitcoinConfig,
-
     /// Network
     network: Network,
 
@@ -79,7 +76,6 @@ impl BitcoinHsmProvider {
         let secp = Secp256k1::new();
 
         let provider = Self {
-            config: config.clone(),
             network,
             secp,
             keys: Mutex::new(HashMap::new()),

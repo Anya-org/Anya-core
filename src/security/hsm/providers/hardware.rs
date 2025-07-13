@@ -30,12 +30,7 @@ enum ConnectionState {
 
 /// Device information
 #[derive(Debug, Clone)]
-struct DeviceInfo {
-    model: String,
-    serial: String,
-    firmware_version: String,
-    max_keys: usize,
-}
+struct DeviceInfo;
 
 /// Hardware HSM provider for physical security devices
 #[derive(Debug)]
@@ -79,32 +74,7 @@ impl HardwareHsmProvider {
         }
 
         // Simulate connection based on device type
-        let device_info = match self.config.device_type {
-            HardwareDeviceType::YubiHsm => DeviceInfo {
-                model: "YubiHSM 2".to_string(),
-                serial: "1234567890".to_string(),
-                firmware_version: "2.3.0".to_string(),
-                max_keys: 256,
-            },
-            HardwareDeviceType::Ledger => DeviceInfo {
-                model: "Ledger Nano S".to_string(),
-                serial: "LDG987654321".to_string(),
-                firmware_version: "2.1.0".to_string(),
-                max_keys: 100,
-            },
-            HardwareDeviceType::TrezorModel => DeviceInfo {
-                model: "Trezor Model T".to_string(),
-                serial: "TRZ123456789".to_string(),
-                firmware_version: "1.10.4".to_string(),
-                max_keys: 100,
-            },
-            HardwareDeviceType::Custom => DeviceInfo {
-                model: "Custom HSM".to_string(),
-                serial: "CST000000001".to_string(),
-                firmware_version: "1.0.0".to_string(),
-                max_keys: 500,
-            },
-        };
+        let device_info = DeviceInfo;
 
         // Update device info and state
         *state = ConnectionState::Connected;
@@ -236,7 +206,7 @@ impl HardwareHsmProvider {
 
         // Get key info
         let keys = self.keys.lock().await;
-        let key_info = keys
+        let _key_info = keys
             .get(key_id)
             .ok_or_else(|| HsmError::KeyNotFound(key_id.to_string()))?;
 

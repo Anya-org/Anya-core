@@ -110,12 +110,10 @@ impl Default for HsmHealthStatus {
 pub struct HsmManager {
     config: HsmConfig,
     provider: Box<dyn HsmProvider>,
-    stats: HsmStats,
     enabled: bool,
     audit_logger: Arc<AuditLogger>,
     status: Arc<RwLock<HsmStatus>>,
     health_status: Arc<RwLock<HsmHealthStatus>>,
-    operation_tracker: Arc<Mutex<HashMap<String, (DateTime<Utc>, String)>>>,
 }
 
 impl HsmManager {
@@ -125,7 +123,6 @@ impl HsmManager {
             config.provider_type
         );
 
-        let stats = HsmStats::default();
         let audit_logger = Arc::new(AuditLogger::new(&config.audit).await?);
 
         let provider: Box<dyn HsmProvider> = match config.provider_type {
@@ -173,10 +170,8 @@ impl HsmManager {
         Ok(Self {
             config,
             provider,
-            stats,
             enabled: false,
             audit_logger,
-            operation_tracker: Arc::new(Mutex::new(HashMap::new())),
             status: Arc::new(RwLock::new(HsmStatus::Initializing)),
             health_status: Arc::new(RwLock::new(HsmHealthStatus::default())),
         })
@@ -771,13 +766,11 @@ pub struct AtomicSwap {
     redeem_script: ScriptBuf,
 }
 
-pub struct NetworkManager {
-    connected: bool,
-}
+pub struct NetworkManager;
 
 impl NetworkManager {
     pub fn new() -> Self {
-        Self { connected: false }
+        Self {}
     }
 
     pub async fn get_merkle_proof(&self, _txid: &Txid) -> Result<MerkleProof, Box<dyn Error>> {
@@ -920,7 +913,6 @@ impl MobileSDK {
 
 pub struct HsmBridge {
     provider: Box<dyn HsmProvider>,
-    connected: bool,
 }
 
 impl HsmBridge {

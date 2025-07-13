@@ -90,17 +90,6 @@ impl LocalWallet {
         Network::Bitcoin // Default to mainnet
     }
 
-    fn sign_transaction(&self, _psbt: &mut bitcoin::psbt::Psbt) -> Result<(), BitcoinError> {
-        // Implementation for signing PSBT
-        // This is a simplified implementation
-        Ok(())
-    }
-
-    fn find_key_for_output(&self, _output: &bitcoin::TxOut) -> Option<String> {
-        // Implementation to find the key for a given output
-        // This is a simplified implementation
-        None
-    }
 }
 
 impl RustBitcoinImplementation {
@@ -150,28 +139,6 @@ impl RustBitcoinImplementation {
             .map_err(|e| BitcoinError::Other(format!("Failed to create RPC client: {}", e)))?;
         self.rpc_client = Some(rpc_client);
         Ok(self)
-    }
-
-    /// Get UTXOs for an address
-    async fn get_utxos(&self, _address: &str) -> Result<Vec<bitcoin::OutPoint>, BitcoinError> {
-        if let Some(_client) = &self.rpc_client {
-            // Implementation using RPC client
-            Ok(vec![])
-        } else {
-            // Fallback implementation
-            Ok(vec![])
-        }
-    }
-
-    /// Estimate fee rate for target blocks
-    async fn estimate_fee_rate(&self, _target_blocks: u32) -> Result<FeeRate, BitcoinError> {
-        if let Some(_client) = &self.rpc_client {
-            // Implementation using RPC client
-            Ok(FeeRate::from_sat_per_vb(10).unwrap())
-        } else {
-            // Fallback implementation
-            Ok(FeeRate::from_sat_per_vb(10).unwrap())
-        }
     }
 }
 

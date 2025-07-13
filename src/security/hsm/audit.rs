@@ -919,14 +919,12 @@ impl AuditStorage for FileAuditStorage {
 /// Database storage for audit events
 #[derive(Debug)]
 pub struct DbAuditStorage {
-    connection_string: String,
     memory_storage: MemoryAuditStorage, // Fallback storage
 }
 
 impl DbAuditStorage {
-    pub fn new(connection_string: String) -> Self {
+    pub fn new(_connection_string: String) -> Self {
         Self {
-            connection_string,
             memory_storage: MemoryAuditStorage::new(),
         }
     }
