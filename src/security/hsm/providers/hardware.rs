@@ -306,7 +306,7 @@ impl HsmProvider for HardwareHsmProvider {
     async fn sign(
         &self,
         key_id: &str,
-        algorithm: SigningAlgorithm,
+        _algorithm: SigningAlgorithm,
         data: &[u8],
     ) -> Result<Vec<u8>, HsmError> {
         self.ensure_authenticated().await?;
@@ -340,9 +340,9 @@ impl HsmProvider for HardwareHsmProvider {
     async fn verify(
         &self,
         key_id: &str,
-        algorithm: SigningAlgorithm,
+        _algorithm: SigningAlgorithm,
         data: &[u8],
-        signature: &[u8],
+        _signature: &[u8],
     ) -> Result<bool, HsmError> {
         self.ensure_authenticated().await?;
 

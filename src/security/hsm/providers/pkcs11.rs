@@ -89,7 +89,7 @@ impl HsmProvider for Pkcs11HsmProvider {
         Ok(())
     }
 
-    async fn generate_key(&self, params: KeyGenParams) -> Result<(KeyPair, KeyInfo), HsmError> {
+    async fn generate_key(&self, _params: KeyGenParams) -> Result<(KeyPair, KeyInfo), HsmError> {
         self.log_stub_operation("generate_key").await?;
         Err(HsmError::UnsupportedOperation(
             "Key generation not implemented yet. Will be available in future versions.".to_string(),
@@ -98,9 +98,9 @@ impl HsmProvider for Pkcs11HsmProvider {
 
     async fn sign(
         &self,
-        key_id: &str,
-        algorithm: SigningAlgorithm,
-        data: &[u8],
+        _key_id: &str,
+        _algorithm: SigningAlgorithm,
+        _data: &[u8],
     ) -> Result<Vec<u8>, HsmError> {
         self.log_stub_operation("sign").await?;
         Err(HsmError::UnsupportedOperation(
@@ -111,10 +111,10 @@ impl HsmProvider for Pkcs11HsmProvider {
 
     async fn verify(
         &self,
-        key_id: &str,
-        algorithm: SigningAlgorithm,
-        data: &[u8],
-        signature: &[u8],
+        _key_id: &str,
+        _algorithm: SigningAlgorithm,
+        _data: &[u8],
+        _signature: &[u8],
     ) -> Result<bool, HsmError> {
         self.log_stub_operation("verify").await?;
         Err(HsmError::UnsupportedOperation(
@@ -123,7 +123,7 @@ impl HsmProvider for Pkcs11HsmProvider {
         ))
     }
 
-    async fn export_public_key(&self, key_id: &str) -> Result<Vec<u8>, HsmError> {
+    async fn export_public_key(&self, _key_id: &str) -> Result<Vec<u8>, HsmError> {
         self.log_stub_operation("export_public_key").await?;
         Err(HsmError::UnsupportedOperation(
             "Public key export not implemented yet. Will be available in future versions."
@@ -136,7 +136,7 @@ impl HsmProvider for Pkcs11HsmProvider {
         Ok(vec![])
     }
 
-    async fn delete_key(&self, key_id: &str) -> Result<(), HsmError> {
+    async fn delete_key(&self, _key_id: &str) -> Result<(), HsmError> {
         self.log_stub_operation("delete_key").await?;
         Err(HsmError::UnsupportedOperation(
             "Key deletion not implemented yet. Will be available in future versions.".to_string(),

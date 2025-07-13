@@ -332,10 +332,10 @@ pub trait HsmProvider: Send + Sync + Debug {
     /// Verify signature
     async fn verify(
         &self,
-        key_id: &str,
-        algorithm: SigningAlgorithm,
-        data: &[u8],
-        signature: &[u8],
+        _key_id: &str,
+        _algorithm: SigningAlgorithm,
+        _data: &[u8],
+        _signature: &[u8],
     ) -> Result<bool, HsmError> {
         Err(HsmError::UnsupportedOperation(
             "Verification not implemented".into(),
@@ -343,7 +343,7 @@ pub trait HsmProvider: Send + Sync + Debug {
     }
 
     /// Sign PSBT (Partially Signed Bitcoin Transaction)
-    async fn sign_psbt(&self, psbt: &mut Psbt) -> Result<(), HsmError> {
+    async fn sign_psbt(&self, _psbt: &mut Psbt) -> Result<(), HsmError> {
         Err(HsmError::UnsupportedOperation(
             "PSBT signing not implemented".into(),
         ))
@@ -372,7 +372,7 @@ pub trait HsmProvider: Send + Sync + Debug {
     async fn perform_health_check(&self) -> Result<bool, HsmError> {
         // Default implementation performs basic status check and key operation tests
         // Each provider should override this with more specific checks
-        let status = self.get_status().await?;
+        let _status = self.get_status().await?;
 
         // Generate a test key to verify key operations
         let test_params = KeyGenParams {
@@ -686,13 +686,13 @@ impl HsmProvider for SoftHsmProvider {
                 };
 
                 // Decode the data
-                let data = BASE64.decode(&data_base64).map_err(|e| {
+                let _data = BASE64.decode(&data_base64).map_err(|e| {
                     HsmError::InvalidParameters(format!("Invalid base64 data: {}", e))
                 })?;
 
                 // Check if the key exists
                 let keys = self.keys.lock().await;
-                let key_data_map = self.key_data.lock().await;
+                let _key_data_map = self.key_data.lock().await;
 
                 if !keys.contains_key(&key_id) {
                     return Err(HsmError::KeyNotFound(key_id));

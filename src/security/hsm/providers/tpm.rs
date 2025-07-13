@@ -6,17 +6,18 @@
 
 // [AIR-3][AIS-3][BPC-3][RES-3] Import necessary dependencies for TPM HSM provider
 // This follows official Bitcoin Improvement Proposals (BIPs) standards for secure HSM implementation
-use crate::security::hsm::{
-    HsmProvider, HsmError, KeyPair, KeyInfo, KeyGenParams, KeyType, KeyUsage, EcCurve,
+use crate::security::hsm::provider::{
+    HsmProvider, KeyPair, KeyInfo, KeyGenParams,
     SigningAlgorithm, HsmProviderStatus, HsmRequest, HsmResponse, HsmOperation
 };
-use crate::security::hsm::audit::{AuditLogger, AuditEventType, AuditEventResult, AuditEventSeverity};
+use crate::security::hsm::error::{HsmError, AuditEventType, AuditEventResult, AuditEventSeverity};
+use crate::security::hsm::audit::AuditLogger;
 use crate::security::hsm::config::TpmConfig;
 use std::sync::Arc;
 use std::collections::HashMap;
 use std::sync::Mutex;
 use async_trait::async_trait;
-use chrono::{DateTime, Utc};
+use chrono::{Utc};
 use std::fmt::Debug;
 
 /// TPM-based HSM provider implementation
@@ -78,21 +79,21 @@ impl HsmProvider for TpmHsmProvider {
     }
 
     async fn generate_key(&self, params: KeyGenParams) -> Result<(KeyPair, KeyInfo), HsmError> {
-        let key_id = params.id.unwrap_or_else(|| format!("tpm_key_{}", Utc::now().timestamp()));
-        
+        let key_id = params.id.clone().unwrap_or_else(|| format!("tpm_key_{}", Utc::now().timestamp()));
+
         // Generate key material (in real implementation, this would use TPM)
         let key_material = vec![0u8; 32]; // Placeholder
         let public_key = vec![0u8; 33]; // Placeholder public key
-        
+
         let key_info = KeyInfo {
-            name: key_id.clone(),
+            id: key_id.clone(),
+            label: params.label.clone(),
             key_type: params.key_type.clone(),
-            hsm_id: key_id.clone(),
+            extractable: params.extractable,
+            usages: params.usages.clone(),
             created_at: Utc::now(),
-            last_used: None,
-            public_key: Some(base64::encode(&public_key)),
-            version: 1,
-            exportable: params.extractable,
+            expires_at: params.expires_at,
+            attributes: params.attributes.clone(),
         };
 
         let key_pair = KeyPair {
@@ -117,12 +118,15 @@ impl HsmProvider for TpmHsmProvider {
     async fn sign(
         &self,
         key_id: &str,
-        algorithm: SigningAlgorithm,
-        data: &[u8],
+        _algorithm: SigningAlgorithm,
+        _data: &[u8],
     ) -> Result<Vec<u8>, HsmError> {
-        let key_store = self.key_store.lock().map_err(|_| HsmError::InternalError("Failed to lock key store".to_string()))?;
-        
-        if !key_store.contains_key(key_id) {
+        let found_key = {
+            let key_store = self.key_store.lock().map_err(|_| HsmError::InternalError("Failed to lock key store".to_string()))?;
+            key_store.contains_key(key_id)
+        };
+
+        if !found_key {
             self.log_operation("sign", key_id, false).await;
             return Err(HsmError::KeyNotFound(format!("Key {} not found", key_id)));
         }
@@ -137,12 +141,12 @@ impl HsmProvider for TpmHsmProvider {
     async fn verify(
         &self,
         key_id: &str,
-        algorithm: SigningAlgorithm,
-        data: &[u8],
-        signature: &[u8],
+        _algorithm: SigningAlgorithm,
+        _data: &[u8],
+        _signature: &[u8],
     ) -> Result<bool, HsmError> {
         let key_store = self.key_store.lock().map_err(|_| HsmError::InternalError("Failed to lock key store".to_string()))?;
-        
+
         if !key_store.contains_key(key_id) {
             return Err(HsmError::KeyNotFound(format!("Key {} not found", key_id)));
         }
@@ -154,7 +158,7 @@ impl HsmProvider for TpmHsmProvider {
 
     async fn export_public_key(&self, key_id: &str) -> Result<Vec<u8>, HsmError> {
         let key_store = self.key_store.lock().map_err(|_| HsmError::InternalError("Failed to lock key store".to_string()))?;
-        
+
         if !key_store.contains_key(key_id) {
             return Err(HsmError::KeyNotFound(format!("Key {} not found", key_id)));
         }
@@ -171,11 +175,18 @@ impl HsmProvider for TpmHsmProvider {
     }
 
     async fn delete_key(&self, key_id: &str) -> Result<(), HsmError> {
-        let mut key_store = self.key_store.lock().map_err(|_| HsmError::InternalError("Failed to lock key store".to_string()))?;
-        let mut key_data = self.key_data.lock().map_err(|_| HsmError::InternalError("Failed to lock key data".to_string()))?;
-        
-        if key_store.remove(key_id).is_some() {
-            key_data.remove(key_id);
+        let key_removed = {
+            let mut key_store = self.key_store.lock().map_err(|_| HsmError::InternalError("Failed to lock key store".to_string()))?;
+            let mut key_data = self.key_data.lock().map_err(|_| HsmError::InternalError("Failed to lock key data".to_string()))?;
+            if key_store.remove(key_id).is_some() {
+                key_data.remove(key_id);
+                true
+            } else {
+                false
+            }
+        };
+
+        if key_removed {
             self.log_operation("delete_key", key_id, true).await;
             Ok(())
         } else {
@@ -220,11 +231,13 @@ impl HsmProvider for TpmHsmProvider {
                 let keys = self.list_keys().await?;
                 let key_list: Vec<serde_json::Value> = keys
                     .iter()
-                    .map(|k| serde_json::json!({
-                        "name": k.name,
-                        "key_type": format!("{:?}", k.key_type),
-                        "created_at": k.created_at.to_rfc3339()
-                    }))
+                    .map(|k| {
+                        serde_json::json!({
+                            "label": k.label,
+                            "key_type": format!("{:?}", k.key_type),
+                            "created_at": k.created_at.to_rfc3339()
+                        })
+                    })
                     .collect();
                 let response = HsmResponse::success(request.id, Some(serde_json::json!(key_list)));
                 Ok(response)
@@ -247,6 +260,15 @@ impl HsmProvider for TpmHsmProvider {
                     request.id,
                     "Custom operations not supported".to_string()
                 );
+                Ok(response)
+            }
+            // Add match arms for Encrypt and Decrypt
+            HsmOperation::Encrypt => {
+                let response = HsmResponse::error(request.id, "Encrypt not implemented".to_string());
+                Ok(response)
+            }
+            HsmOperation::Decrypt => {
+                let response = HsmResponse::error(request.id, "Decrypt not implemented".to_string());
                 Ok(response)
             }
         }

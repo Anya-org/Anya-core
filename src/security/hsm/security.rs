@@ -64,7 +64,7 @@ impl SecurityManager {
     pub async fn sign_repudiation(
         &self,
         txid: &Txid,
-        nonce: &[u8; 32],
+        _nonce: &[u8; 32],
     ) -> Result<Signature, Box<dyn Error>> {
         if !self.is_enabled() {
             return Err("Security operations are disabled. Enable them first.".into());

@@ -4,12 +4,12 @@
 
 use crate::AnyaError;
 use crate::AnyaResult;
-use secp256k1::{PublicKey as Secp256k1PublicKey, SecretKey as Secp256k1SecretKey};
+use secp256k1::SecretKey as Secp256k1SecretKey;
 use std::collections::HashMap;
 use std::fmt;
 use std::str::FromStr;
 use std::sync::{Arc, Mutex};
-use std::time::{Duration, SystemTime, UNIX_EPOCH};
+use std::time::{SystemTime, UNIX_EPOCH};
 
 // Import BitcoinConfig from a module we know exists
 use crate::bitcoin::config::BitcoinConfig;
