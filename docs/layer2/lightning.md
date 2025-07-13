@@ -16,19 +16,16 @@ The Lightning Network implementation in Anya Core provides a production-ready so
 ## Configuration
 
 ```rust
-use anya_core::layer2::lightning::{LightningConfig, LightningProtocol};
+use anya_core::layer2::lightning::{LightningConfig, LightningNetwork};
 
 let config = LightningConfig {
     network: "mainnet".to_string(),
     node_url: "localhost:10009".to_string(),
-    auth_token: Some("your_auth_token".to_string()),
-    auto_pilot: true,
-    watchtower_enabled: true,
-    min_channel_capacity: 20000,
-    fee_rate: 1,
+    macaroon: "your_macaroon_hex".to_string(),
+    cert: "your_tls_cert_base64".to_string(),
 };
 
-let lightning = LightningProtocol::with_config(config);
+let lightning = LightningNetwork::new(config);
 ```
 
 ## Usage
@@ -36,11 +33,11 @@ let lightning = LightningProtocol::with_config(config);
 ### Basic Operations
 
 ```rust
-use anya_core::layer2::{Layer2Protocol, lightning::LightningProtocol};
+use anya_core::layer2::{Layer2Protocol, lightning::LightningNetwork};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let lightning = LightningProtocol::new();
+    let lightning = LightningNetwork::new(LightningNetwork::default());
     
     // Initialize the Lightning Network connection
     lightning.initialize().await?;
@@ -79,14 +76,14 @@ println!("Active channels: {}", state.connections);
 
 ## API Reference
 
-### LightningProtocol
+### LightningNetwork
 
 The main Lightning Network protocol implementation.
 
 #### Methods
 
-- `new() -> Self`: Create a new Lightning protocol instance with default configuration
-- `with_config(config: LightningConfig) -> Self`: Create with custom configuration
+- `new(config: LightningConfig) -> Self`: Create a new Lightning protocol instance with custom configuration
+- `default() -> Self`: Create a new Lightning protocol instance with default configuration
 - All methods from `Layer2Protocol` trait
 
 ### LightningConfig
@@ -97,7 +94,8 @@ Configuration structure for Lightning Network settings.
 
 - `network: String`: Network type ("mainnet", "testnet", "regtest")
 - `node_url: String`: Lightning node RPC endpoint
-- `auth_token: Option<String>`: Authentication token for node access
+- `macaroon: String`: Macaroon for authentication (hex encoded)
+- `cert: String`: TLS certificate (base64 encoded)
 - `auto_pilot: bool`: Enable automatic channel management
 - `watchtower_enabled: bool`: Enable watchtower services
 - `min_channel_capacity: u64`: Minimum channel capacity in satoshis

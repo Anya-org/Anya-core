@@ -56,26 +56,30 @@ Anya Core provides a comprehensive framework for Bitcoin Layer2 protocols, imple
 All Layer2 implementations follow a standardized async trait interface:
 
 ```rust
-use anya_core::layer2::{Layer2Protocol, ProtocolState, TransactionStatus};
+use async_trait::async_trait;
+use crate::layer2::{AssetParams, AssetTransfer, Layer2Error, Proof, ProtocolState, TransactionStatus, TransferResult, ValidationResult, VerificationResult};
 
 #[async_trait]
 pub trait Layer2Protocol: Send + Sync {
     // Connection management
-    async fn initialize(&self) -> Result<(), AnyaError>;
-    async fn connect(&self) -> Result<(), AnyaError>;
-    async fn disconnect(&self) -> Result<(), AnyaError>;
+    async fn initialize(&self) -> Result<(), Layer2Error>;
+    async fn connect(&self) -> Result<(), Layer2Error>;
     
     // Transaction operations
-    async fn submit_transaction(&self, tx: &[u8]) -> Result<String, AnyaError>;
-    async fn get_transaction_status(&self, tx_id: &str) -> Result<TransactionStatus, AnyaError>;
+    async fn submit_transaction(&self, tx: &[u8]) -> Result<String, Layer2Error>;
+    async fn check_transaction_status(&self, tx_id: &str) -> Result<TransactionStatus, Layer2Error>;
     
     // State management
-    async fn get_state(&self) -> Result<ProtocolState, AnyaError>;
-    async fn sync_state(&self) -> Result<(), AnyaError>;
+    async fn get_state(&self) -> Result<ProtocolState, Layer2Error>;
+    async fn sync_state(&self) -> Result<(), Layer2Error>;
     
     // Asset operations (optional)
-    async fn issue_asset(&self, params: AssetParams) -> Result<String, AnyaError>;
-    async fn transfer_asset(&self, transfer: AssetTransfer) -> Result<TransferResult, AnyaError>;
+    async fn issue_asset(&self, params: AssetParams) -> Result<String, Layer2Error>;
+    async fn transfer_asset(&self, transfer: AssetTransfer) -> Result<TransferResult, Layer2Error>;
+    
+    // Verification and validation
+    async fn verify_proof(&self, proof: &Proof) -> Result<VerificationResult, Layer2Error>;
+    async fn validate_state(&self) -> Result<ValidationResult, Layer2Error>;
 }
 ```
 
@@ -96,6 +100,7 @@ manager.add_protocol(Layer2ProtocolType::RGB, rgb_protocol).await?;
 let result = manager.submit_transaction(
     Layer2ProtocolType::Lightning,
     &transaction_data
+).await?;
 
 ## Architecture
 
