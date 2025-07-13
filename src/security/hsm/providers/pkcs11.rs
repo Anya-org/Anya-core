@@ -8,10 +8,7 @@
 //! functionality in future versions.
 
 use async_trait::async_trait;
-use std::collections::HashMap;
 use std::sync::Arc;
-use tokio::sync::Mutex;
-use uuid::Uuid;
 
 use crate::security::hsm::audit::AuditLogger;
 use crate::security::hsm::config::Pkcs11Config;

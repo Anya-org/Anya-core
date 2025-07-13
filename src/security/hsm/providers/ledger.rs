@@ -11,7 +11,6 @@ use std::sync::Arc;
 // External crates
 use async_trait::async_trait;
 use bitcoin::Network;
-use uuid::Uuid;
 
 // [AIR-3][AIS-3][BPC-3][RES-3] Import HSM module types following BDF v2.5 standards
 use crate::security::hsm::audit::AuditLogger;

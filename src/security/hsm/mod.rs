@@ -60,8 +60,7 @@ use bitcoin::taproot::TaprootBuilder;
 use bitcoin::{Network, Psbt, Script, Txid, XOnlyPublicKey};
 use chrono::{DateTime, Utc};
 use secp256k1::ecdsa::Signature;
-use std::collections::HashMap;
-use tokio::sync::{Mutex, RwLock};
+use tokio::sync::RwLock;
 use tracing::{debug, error, info};
 
 use self::config::HsmConfig;
