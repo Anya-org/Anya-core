@@ -74,6 +74,7 @@ async fn test_dao_system_basic() {
 }
 
 #[tokio::test]
+#[cfg(feature = "hsm")]
 async fn test_security_hsm_module() {
     // Test that HSM module is available and compiles
     use anya_core::security::hsm;
