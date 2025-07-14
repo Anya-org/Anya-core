@@ -166,11 +166,7 @@ fn test_multi_sig_workflow() {
 }
 
 #[test]
-<<<<<<< HEAD
-#[ignore] // Disabled - struct definitions don't match implementation  
-=======
 #[ignore] // Disabled - struct definitions don't match implementation
->>>>>>> feature/git-workflows-consolidation-evidence-based
 fn test_stacks_asset_integration_disabled() {
     println!("Stacks asset integration test disabled - struct field mismatches");
 }

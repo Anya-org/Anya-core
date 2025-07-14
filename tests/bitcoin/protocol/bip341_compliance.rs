@@ -341,11 +341,6 @@ impl BIP341Checker {
     fn parent_hash_node(node_hash: &TapNodeHash, branch_tag: &TapBranchTag) -> Result<TapNodeHash> {
         // Create a simple mock implementation for testing
         // In a real implementation, this would use proper taproot hash calculations
-<<<<<<< HEAD
-        
-=======
-
->>>>>>> feature/git-workflows-consolidation-evidence-based
         // Simplified implementation for current Bitcoin library
         // Just create a dummy TapNodeHash for testing
         let dummy_hash = [0u8; 32];

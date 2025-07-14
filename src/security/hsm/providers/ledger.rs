@@ -52,7 +52,6 @@ impl LedgerHsmProvider {
             audit_logger,
         })
     }
-
 }
 
 #[async_trait]

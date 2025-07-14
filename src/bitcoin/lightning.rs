@@ -47,7 +47,10 @@ impl std::str::FromStr for LightningPublicKey {
 }
 
 impl LightningPublicKey {
-    pub fn from_secret_key(secp: &secp256k1::Secp256k1<secp256k1::All>, secret_key: &Secp256k1SecretKey) -> Self {
+    pub fn from_secret_key(
+        secp: &secp256k1::Secp256k1<secp256k1::All>,
+        secret_key: &Secp256k1SecretKey,
+    ) -> Self {
         let public_key = secp256k1::PublicKey::from_secret_key(secp, secret_key);
         let mut bytes = [0u8; 33];
         bytes.copy_from_slice(&public_key.serialize());
@@ -748,7 +751,10 @@ impl BitcoinLightningBridge {
     }
 
     /// Get channel transaction information
-    pub fn get_channel_transaction(&self, channel_id: &str) -> AnyaResult<Option<ChannelTransaction>> {
+    pub fn get_channel_transaction(
+        &self,
+        channel_id: &str,
+    ) -> AnyaResult<Option<ChannelTransaction>> {
         let transactions = self
             .channel_transactions
             .lock()
@@ -795,7 +801,7 @@ mod tests {
         let invalid_key = "02" + &"a".repeat(32); // Too short
         let pubkey = LightningPublicKey::from_str(invalid_key);
         assert!(pubkey.is_err());
-        }
+    }
 
     #[test]
     fn test_lightning_txid_from_slice() {

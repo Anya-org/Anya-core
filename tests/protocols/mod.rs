@@ -9,11 +9,6 @@
 async fn test_mock_protocol_compilation() {
     // Simplified test to ensure compilation passes
     println!("Protocol tests disabled pending API fixes");
-<<<<<<< HEAD
-}
-        .unwrap());
-=======
->>>>>>> feature/git-workflows-consolidation-evidence-based
 }
 
 #[test]

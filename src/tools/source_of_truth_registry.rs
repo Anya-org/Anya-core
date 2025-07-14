@@ -229,9 +229,10 @@ impl SourceOfTruthRegistry {
         // 2. Run pre-work duplication check
         let duplication_status = self.check_work_item_duplication(&title, &component).await?;
         if matches!(duplication_status, DuplicationCheckStatus::Failed(_)) {
-            return Err(SourceOfTruthError::DuplicationDetected(
-                format!("Work item title or component already exists: {}", title)
-            ));
+            return Err(SourceOfTruthError::DuplicationDetected(format!(
+                "Work item title or component already exists: {}",
+                title
+            )));
         }
 
         // 3. Create work item
@@ -306,9 +307,10 @@ impl SourceOfTruthRegistry {
         // 2. Check for exact content duplication
         for entry in self.duplication_index.iter() {
             if entry.value().content_hash == content_hash && entry.value().file_path != file_path {
-                return Ok(DuplicationCheckStatus::Failed(
-                    format!("Exact content duplication found in {}", entry.value().file_path)
-                ));
+                return Ok(DuplicationCheckStatus::Failed(format!(
+                    "Exact content duplication found in {}",
+                    entry.value().file_path
+                )));
             }
         }
 
