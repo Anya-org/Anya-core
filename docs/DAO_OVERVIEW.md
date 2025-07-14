@@ -3,7 +3,7 @@ title: "Dao_overview"
 description: "Documentation for Dao_overview"
 ---
 
-[AIR-3][AIS-3][BPC-3][RES-3]
+[AIR-3][AIS-3][BPC-3][RES-3][DAO-3]
 
 
 # Anya DAO Overview
@@ -16,9 +16,6 @@ Add a brief overview of this document here.
 
 - [Section 1](#section-1)
 - [Section 2](#section-2)
-
-
-[AIS-3][BPC-3][DAO-3]
 
 ## Compliance Framework
 

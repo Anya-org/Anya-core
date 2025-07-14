@@ -3,14 +3,12 @@ title: "Dao_system_guide"
 description: "Documentation for Dao_system_guide"
 ---
 
-[AIR-3][AIS-3][BPC-3][RES-3]
+[AIR-3][AIS-3][BPC-3][RES-3][DAO-3]
 
 
 <!-- markdownlint-disable MD013 line-length -->
 <!-- markdownlint-disable MD033 html -->
 <!-- markdownlint-disable MD040 fenced-code-language -->
-
-[AIS-3][BPC-3][DAO-3]
 
 # DAO System Guide
 

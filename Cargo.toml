@@ -1,47 +1,3 @@
-[workspace]
-members = [
-    "anya-bitcoin",
-    "anya-extensions", # Add this for better workspace organization
-]
-
-[workspace.package]
-version = "1.2.0"
-edition = "2021"
-authors = ["botshelomokoka@gmail.com"]
-license = "MIT"
-repository = "https://github.com/anya-org/anya-core"
-
-[workspace.dependencies]
-# Core dependencies for workspace members
-tokio = { version = "=1.45.1", features = ["full"] }
-serde = { version = "1.0.219", features = ["derive", "rc"] }
-serde_json = { version = "1.0.140", features = ["std", "preserve_order"] }
-anyhow = { version = "1.0.98", features = ["std", "backtrace"] }
-tracing = { version = "0.1.41", features = ["std", "attributes"] }
-
-# Bitcoin dependencies for workspace
-# Use 0.32.6 as our standard version
-bitcoin = { version = "=0.32.6", features = [
-    "std",
-    "serde",
-    "rand",
-    "secp-recovery",
-    "base64",
-    "rand-std",
-] }
-secp256k1 = { version = "=0.29.1", features = [
-    "rand-std",
-    "global-context",
-    "recovery",
-] }
-bitcoincore-rpc = { version = "0.19", features = ["default"] }
-
-# Web5 dependencies for workspace
-web5 = { git = "https://github.com/TBD54566975/web5-rs", rev = "310d79c9" }
-
-# Additional workspace dependencies
-semver = { version = "1.0.26", features = ["serde"] }
-
 [package]
 name = "anya-core"
 version = "1.2.0"
@@ -73,7 +29,7 @@ complete = ["hsm"]
 std = []
 # Bitcoin implementation features
 bitcoin_integration = []
-rust-bitcoin = ["bitcoin", "bdk"]
+rust-bitcoin = ["bitcoin"]
 # RSK integration for Bitcoin verification
 rsk = []
 # Add alignment-focused feature for system optimization
@@ -110,8 +66,6 @@ secp256k1 = { version = "0.29", features = [
     "global-context",
     "recovery",
 ] }
-# Note: bdk 0.30.x depends on bitcoin 0.30.x, so we must allow both bitcoin versions in the project
-bdk = { version = "0.30", optional = true, features = ["std", "compiler"] }
 bitcoincore-rpc = { version = "0.19", features = ["default"] }
 miniscript = { version = "=12.3.0", features = [
     "std",

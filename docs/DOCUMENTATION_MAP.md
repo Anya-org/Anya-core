@@ -40,7 +40,7 @@ This document provides a comprehensive map of all documentation in the Anya Core
 - `DEPLOYMENT.md` - Deployment procedures
 - `TESTING.md` - Testing guidelines
 - `MAINTENANCE.md` - Maintenance procedures
-- `SYSTEM_MAP.md` - System component relationships
+- `ARCHITECTURE.md` - System component relationships
 
 ### Module Documentation
 

@@ -12,10 +12,8 @@ A modular Bitcoin infrastructure platform designed for enterprise applications, 
 [![Layer2](https://img.shields.io/badge/Layer2-9_Protocols-blue)](docs/layer2/README.md)
 [![Rust](https://img.shields.io/badge/Rust-1.70+-orange)](https://rust-lang.org)
 
-*Last Updated: June 20, 2025*  
-**Version: 1.2.0 - Development Build**
-
-> **🚧 ACTIVE DEVELOPMENT:** This project implements core Bitcoin functionality with Layer2 protocol foundations. Features include: Bitcoin transaction processing, Taproot support (BIP-341/342), PSBT implementation (BIP-174), Lightning Network integration, and comprehensive Layer2 protocol framework. Currently in active development with production-grade components.
+*Last Updated: July 17, 2025*
+**Version: 1.2.0**
 
 ## 📖 Documentation Hub
 
@@ -332,8 +330,8 @@ export ANYA_MONITORING_LOG_LEVEL=debug
 ```toml
 [dependencies]
 # Bitcoin ecosystem
-bitcoin = { version = "0.32", features = ["std", "serde", "rand"] }
-secp256k1 = { version = "0.29", features = ["rand-std", "global-context"] }
+bitcoin = { version = "0.32.6", features = ["std", "serde", "rand"] }
+secp256k1 = { version = "0.29.1", features = ["rand-std", "global-context"] }
 bdk = { version = "0.30", features = ["std", "compiler"] }
 
 # Async runtime and networking

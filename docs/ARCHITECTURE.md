@@ -70,6 +70,49 @@ Anya Core is built on a hexagonal architecture (ports and adapters) pattern, emp
 
 ## System Architecture
 
+### Visual System Map
+
+```mermaid
+flowchart TD
+    A[User/Contributor]
+    subgraph Docs[Documentation]
+        D1[INDEX_CORRECTED.md]
+        D2[docs/INDEX.md]
+        D4[docs/ML_SYSTEM_ARCHITECTURE.md]
+        D5[docs/SECURITY_ARCHITECTURE.md]
+        D6[docs/PERFORMANCE_ARCHITECTURE.md]
+    end
+    subgraph Core[Core System]
+        C1[core/ - Consensus, Mempool, Network]
+        C2[bitcoin/ - Primitives, Wallet, Taproot]
+        C3[layer2/ - RGB, DLC, RSK, Lightning, BitVM]
+        C4[dao/ - Governance, Voting, Tokenomics]
+        C5[infrastructure/ - Dev Rewards, Monitoring, HA]
+        C6[ml/ - Agents, Federated Learning]
+        C7[security/ - HSM, Crypto, Hardening]
+        C8[extensions/ - Alignment, Audit, Protocol]
+    end
+    subgraph Contracts[Smart Contracts]
+        S1[contracts/dao/vesting.clar]
+        S2[contracts/dao/treasury-management.clar]
+        S3[contracts/dao/license-manager.clar]
+    end
+    subgraph Tests[Testing]
+        T1[tests/ - Unit & Integration]
+        T2[tests/integration/]
+        T3[tests/modules/]
+    end
+    A-->|Reads|Docs
+    Docs-->|Guides|Core
+    Core-->|Implements|Contracts
+    Core-->|Tested by|Tests
+    A-->|Runs|Core
+    A-->|Proposes|dao/
+    dao/-->|Rewards|infrastructure/dev_rewards/
+    ml/-->|AI/ML|Core
+    security/-->|Secures|Core
+```
+
 ### 1. Web5 Integration
 
 - Decentralized identity (DID) management
@@ -1082,5 +1125,11 @@ interface MobileSDK {
 
 ## See Also
 
-- [Related Document](#related-document)
+- [Agent Architecture](AGENT_ARCHITECTURE.md)
+- [System Map](SYSTEM_MAP.md)
+- [Master Implementation Plan](MASTER_IMPLEMENTATION_PLAN_CANONICAL.md)
+- [Git Workflow](GIT_WORKFLOW.md)
+- [Security Architecture](SECURITY_ARCHITECTURE.md)
+- [Performance Architecture](PERFORMANCE_ARCHITECTURE.md)
+- [Hexagonal Architecture](HEXAGONAL.md)
 

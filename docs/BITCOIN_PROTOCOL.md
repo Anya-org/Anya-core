@@ -1,11 +1,8 @@
+[AIR-3][AIS-3][BPC-3][RES-3]
 ---
 title: "Bitcoin_protocol"
 description: "Documentation for Bitcoin_protocol"
 ---
-
-[AIR-3][AIS-3][BPC-3][RES-3]
-
-
 ## BIP-341 Compliance [BPC-3]
 
 ## Overview
