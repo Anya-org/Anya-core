@@ -58,7 +58,7 @@ impl LocalWallet {
             .secp
             .generate_keypair(&mut secp256k1::rand::thread_rng());
         let bitcoin_pubkey = bitcoin::PublicKey::new(public_key);
-        let key_id = format!("key_{}", bitcoin_pubkey.to_string());
+        let key_id = format!("key_{bitcoin_pubkey}");
         let network = self.network();
         let address = match address_type {
             AddressType::P2PKH => {
@@ -152,7 +152,7 @@ impl RustBitcoinImplementation {
         rpc_auth: bitcoincore_rpc::Auth,
     ) -> Result<Self, BitcoinError> {
         let rpc_client = bitcoincore_rpc::Client::new(&rpc_url, rpc_auth)
-            .map_err(|e| BitcoinError::Other(format!("Failed to create RPC client: {}", e)))?;
+            .map_err(|e| BitcoinError::Other(format!("Failed to create RPC client: {e}")))?;
         self.rpc_client = Some(rpc_client);
         Ok(self)
     }
@@ -202,7 +202,7 @@ impl BitcoinInterface for RustBitcoinImplementation {
 
     async fn generate_address(&self, address_type: AddressType) -> BitcoinResult<Address> {
         let mut wallet = LocalWallet::new();
-        let (_key_id, bitcoin_address) = wallet.generate_key(address_type.clone())?;
+        let (_key_id, bitcoin_address) = wallet.generate_key(address_type)?;
 
         Ok(bitcoin_address)
     }
