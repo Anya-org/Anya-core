@@ -89,14 +89,3 @@ jobs:
               });
             }
             
-      - name: Assign Reviewers
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const reviewers = ['reviewer1', 'reviewer2']; // Replace with actual reviewer usernames
-            await github.rest.pulls.requestReviewers({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: context.issue.number,
-              reviewers: reviewers
-            });
