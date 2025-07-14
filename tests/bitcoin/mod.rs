@@ -1,19 +1,24 @@
-use super::common::test_utilities::*;
+use anya_core::bitcoin::config::BitcoinConfig;
 use anya_core::bitcoin::interface::BitcoinInterface;
 use anya_core::bitcoin::rust::RustBitcoinImplementation;
-use bitcoin::Network;
+use bitcoin::network::constants::Network;
 
 #[tokio::test]
 async fn test_rust_bitcoin_implementation() {
-    let mut implementation = RustBitcoinImplementation::new(Network::Testnet);
+    let config = BitcoinConfig {
+        network: Network::Testnet.to_string(),
+        ..Default::default()
+    };
+    let mut implementation = RustBitcoinImplementation::new(&config).unwrap();
 
     // Test address generation
     let address = implementation
         .generate_address(anya_core::bitcoin::interface::AddressType::P2WPKH)
         .await
         .unwrap();
-    assert!(
-        address.is_valid_for_network(Network::Testnet),
+    assert_eq!(
+        address.network,
+        Network::Testnet,
         "Generated address should be valid for testnet"
     );
 
