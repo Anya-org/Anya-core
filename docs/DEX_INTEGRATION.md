@@ -3,7 +3,7 @@ title: "Dex_integration"
 description: "Documentation for Dex_integration"
 ---
 
-[AIR-3][AIS-3][BPC-3][RES-3]
+[AIR-3][AIS-3][BPC-3][RES-3][DAO-3]
 
 
 # DEX Integration
@@ -12,9 +12,6 @@ description: "Documentation for Dex_integration"
 
 - [Section 1](#section-1)
 - [Section 2](#section-2)
-
-
-[AIS-3][BPC-3][DAO-3]
 
 ## Overview
 

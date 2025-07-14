@@ -3,7 +3,7 @@ title: "Dao_index"
 description: "Documentation for Dao_index"
 ---
 
-[AIR-3][AIS-3][BPC-3][RES-3]
+[AIR-3][AIS-3][BPC-3][RES-3][DAO-3]
 
 
 <!-- markdownlint-disable MD013 line-length -->
@@ -22,9 +22,6 @@ The Anya DAO Documentation Index provides a comprehensive entry point to all doc
 - [Tokenomics](#tokenomics)
 - [Security](#security)
 - [Integration](#integration)
-
-
-[AIS-3][BPC-3][DAO-3]
 
 ## Core Documentation
 

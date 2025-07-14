@@ -1,3 +1,4 @@
+[AIR-3][AIS-3][BPC-3][RES-3]
 # Anya-core DAO Business Agent Upgrade Proposal
 ## Comprehensive Enhancement for API, Business Pricing, Contracting & Operations
 

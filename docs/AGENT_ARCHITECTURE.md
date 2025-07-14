@@ -3,7 +3,6 @@ title: "Agent_architecture"
 description: "Documentation for Agent_architecture"
 ---
 
-[AIR-3][AIS-3][BPC-3][RES-3]
 
 
 <!-- markdownlint-disable MD013 line-length -->
@@ -409,5 +408,8 @@ The Anya Agent Architecture provides a robust, extensible framework for building
 
 ## See Also
 
-- [Related Document](#related-document)
+- [Architecture](ARCHITECTURE.md)
+- [Master Implementation Plan](MASTER_IMPLEMENTATION_PLAN_CANONICAL.md)
+- [DAO Overview](DAO_OVERVIEW.md)
+- [Security Architecture](SECURITY_ARCHITECTURE.md)
 
