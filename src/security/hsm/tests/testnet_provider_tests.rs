@@ -25,11 +25,10 @@ mod tests {
 
     // Mock audit logger for testing
     #[cfg(feature = "audit_logger")]
-    
     #[cfg(not(feature = "audit_logger"))]
     #[derive(Clone)]
     struct AuditLogger;
-    
+
     #[cfg(not(feature = "audit_logger"))]
     impl AuditLogger {
         fn new(_path: &str) -> Result<Self, Box<dyn std::error::Error>> {

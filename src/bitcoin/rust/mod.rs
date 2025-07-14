@@ -6,12 +6,12 @@ use crate::bitcoin::interface::{
     AddressType, BitcoinImplementationType, BitcoinInterface, BlockHeader,
 };
 use async_trait::async_trait;
-use bitcoin::{
-    Address as BitcoinAddress, Block as BitcoinBlock, Network, Transaction as BitcoinTransaction,
-    Txid, FeeRate, ScriptBuf, PrivateKey, secp256k1::Secp256k1,
-    PubkeyHash, CompressedPublicKey, absolute::LockTime,
-};
 use bitcoin::secp256k1::{self, XOnlyPublicKey as SecpXOnlyPublicKey};
+use bitcoin::{
+    absolute::LockTime, secp256k1::Secp256k1, Address as BitcoinAddress, Block as BitcoinBlock,
+    CompressedPublicKey, FeeRate, Network, PrivateKey, PubkeyHash, ScriptBuf,
+    Transaction as BitcoinTransaction, Txid,
+};
 use std::collections::HashMap;
 use std::str::FromStr;
 
@@ -50,8 +50,13 @@ impl LocalWallet {
         }
     }
 
-    fn generate_key(&mut self, address_type: AddressType) -> Result<(String, BitcoinAddress), BitcoinError> {
-        let (secret_key, public_key) = self.secp.generate_keypair(&mut secp256k1::rand::thread_rng());
+    fn generate_key(
+        &mut self,
+        address_type: AddressType,
+    ) -> Result<(String, BitcoinAddress), BitcoinError> {
+        let (secret_key, public_key) = self
+            .secp
+            .generate_keypair(&mut secp256k1::rand::thread_rng());
         let bitcoin_pubkey = bitcoin::PublicKey::new(public_key);
         let key_id = format!("key_{}", bitcoin_pubkey.to_string());
         let network = self.network();
@@ -66,14 +71,22 @@ impl LocalWallet {
                 BitcoinAddress::p2wpkh(&compressed_pubkey, network)
             }
             AddressType::P2TR => {
-                let x_only = SecpXOnlyPublicKey::from_slice(&public_key.x_only_public_key().0.serialize())
-                    .map_err(|_| BitcoinError::Other("Failed to create x-only public key".to_string()))?;
+                let x_only =
+                    SecpXOnlyPublicKey::from_slice(&public_key.x_only_public_key().0.serialize())
+                        .map_err(|_| {
+                        BitcoinError::Other("Failed to create x-only public key".to_string())
+                    })?;
                 let taproot_spend_info = bitcoin::taproot::TaprootBuilder::new()
                     .add_leaf(0, ScriptBuf::new())
                     .map_err(|_| BitcoinError::Other("Failed to create taproot".to_string()))?
                     .finalize(&self.secp, x_only)
                     .map_err(|_| BitcoinError::Other("Failed to finalize taproot".to_string()))?;
-                BitcoinAddress::p2tr(&self.secp, x_only, taproot_spend_info.merkle_root(), network)
+                BitcoinAddress::p2tr(
+                    &self.secp,
+                    x_only,
+                    taproot_spend_info.merkle_root(),
+                    network,
+                )
             }
             _ => {
                 return Err(BitcoinError::Other("Unsupported address type".to_string()));
@@ -89,7 +102,6 @@ impl LocalWallet {
     fn network(&self) -> Network {
         Network::Bitcoin // Default to mainnet
     }
-
 }
 
 impl RustBitcoinImplementation {
@@ -113,7 +125,7 @@ impl RustBitcoinImplementation {
                 ))))
             }
         };
-        Ok(Self { 
+        Ok(Self {
             network,
             rpc_client: None,
             wallet: LocalWallet::new(),
@@ -134,7 +146,11 @@ impl RustBitcoinImplementation {
     }
 
     /// Add RPC client to the implementation
-    pub fn with_rpc_client(mut self, rpc_url: String, rpc_auth: bitcoincore_rpc::Auth) -> Result<Self, BitcoinError> {
+    pub fn with_rpc_client(
+        mut self,
+        rpc_url: String,
+        rpc_auth: bitcoincore_rpc::Auth,
+    ) -> Result<Self, BitcoinError> {
         let rpc_client = bitcoincore_rpc::Client::new(&rpc_url, rpc_auth)
             .map_err(|e| BitcoinError::Other(format!("Failed to create RPC client: {}", e)))?;
         self.rpc_client = Some(rpc_client);
@@ -147,32 +163,32 @@ impl BitcoinInterface for RustBitcoinImplementation {
     async fn get_transaction(&self, txid: &str) -> BitcoinResult<Transaction> {
         let txid_hash = Txid::from_str(txid)
             .map_err(|_| BitcoinError::InvalidTransaction("Invalid transaction ID".to_string()))?;
-        
+
         if let Some(cached_tx) = self.tx_cache.get(&txid_hash) {
             return Ok(cached_tx.clone());
         }
-        
+
         if let Some(_client) = &self.rpc_client {
             // Implementation using RPC client
             return Err(BitcoinError::TransactionNotFound);
         }
-        
+
         Err(BitcoinError::TransactionNotFound)
     }
 
     async fn get_block(&self, hash: &str) -> BitcoinResult<Block> {
         let _block_hash = bitcoin::BlockHash::from_str(hash)
             .map_err(|_| BitcoinError::InvalidTransaction("Invalid block hash".to_string()))?;
-        
+
         if let Some(cached_block) = self.block_cache.get(hash) {
             return Ok(cached_block.clone());
         }
-        
+
         if let Some(_client) = &self.rpc_client {
             // Implementation using RPC client
             return Err(BitcoinError::BlockNotFound);
         }
-        
+
         Err(BitcoinError::BlockNotFound)
     }
 
@@ -187,7 +203,7 @@ impl BitcoinInterface for RustBitcoinImplementation {
     async fn generate_address(&self, address_type: AddressType) -> BitcoinResult<Address> {
         let mut wallet = LocalWallet::new();
         let (_key_id, bitcoin_address) = wallet.generate_key(address_type.clone())?;
-        
+
         Ok(bitcoin_address)
     }
 
@@ -202,15 +218,15 @@ impl BitcoinInterface for RustBitcoinImplementation {
             return Err(BitcoinError::Other("Invalid fee rate".to_string()));
         }
         let fee_rate = fee_rate.unwrap();
-        
+
         // Estimate transaction size (simplified)
         let estimated_size = 200; // bytes
         let _fee = fee_rate.fee_vb(estimated_size);
-        
+
         // Generate change address
         let mut wallet = LocalWallet::new();
         let _change_address = wallet.generate_key(AddressType::P2WPKH)?.1;
-        
+
         // Create a simple transaction (simplified)
         let bitcoin_tx = BitcoinTransaction {
             version: bitcoin::transaction::Version(2),
@@ -218,7 +234,7 @@ impl BitcoinInterface for RustBitcoinImplementation {
             input: vec![],
             output: vec![],
         };
-        
+
         Ok(bitcoin_tx)
     }
 
@@ -227,7 +243,7 @@ impl BitcoinInterface for RustBitcoinImplementation {
             // Implementation using RPC client
             return Ok(transaction.compute_txid().to_string());
         }
-        
+
         Ok(transaction.compute_txid().to_string())
     }
 
@@ -236,7 +252,7 @@ impl BitcoinInterface for RustBitcoinImplementation {
             // Implementation using RPC client
             return Err(BitcoinError::BlockNotFound);
         }
-        
+
         Err(BitcoinError::BlockNotFound)
     }
 

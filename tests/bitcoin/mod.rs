@@ -12,7 +12,10 @@ async fn test_rust_bitcoin_implementation() {
         .generate_address(crate::bitcoin::interface::AddressType::P2WPKH)
         .await
         .unwrap();
-    assert!(address.is_valid_for_network(Network::Testnet), "Generated address should be valid for testnet");
+    assert!(
+        address.is_valid_for_network(Network::Testnet),
+        "Generated address should be valid for testnet"
+    );
 
     // Test transaction creation
     let outputs = vec![
@@ -25,7 +28,10 @@ async fn test_rust_bitcoin_implementation() {
             20000,
         ),
     ];
-    let tx = implementation.create_transaction(outputs, 10).await.unwrap();
+    let tx = implementation
+        .create_transaction(outputs, 10)
+        .await
+        .unwrap();
     assert_eq!(tx.output.len(), 2, "Transaction should have 2 outputs");
 
     // Test broadcasting (mocked)

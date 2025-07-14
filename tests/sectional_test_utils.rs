@@ -163,8 +163,8 @@ pub mod sectional {
         F: FnOnce() -> T,
     {
         use std::alloc::GlobalAlloc;
-        use std::mem;
         use std::alloc::GlobalAlloc;
+        use std::mem;
 
         // Force a garbage collection if possible (fixed unsafe call)
         unsafe {

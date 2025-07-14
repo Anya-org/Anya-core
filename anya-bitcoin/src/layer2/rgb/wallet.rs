@@ -67,28 +67,6 @@ impl RGBWallet {
     }
 
     /// Transfer an asset
-<<<<<<< HEAD
-    pub fn transfer_asset(
-        &self,
-        asset_id: &str,
-        amount: u64,
-        recipient: &str,
-    ) -> AnyaResult<Txid> {
-        // Simple implementation that validates inputs and returns a mock transaction ID
-        use bitcoin::hashes::{Hash, sha256};
-        use crate::core::error::AnyaError;
-        
-        if asset_id.is_empty() {
-            return Err(AnyaError::Validation("Asset ID cannot be empty".to_string()));
-        }
-        if amount == 0 {
-            return Err(AnyaError::Validation("Transfer amount must be greater than 0".to_string()));
-        }
-        if recipient.is_empty() {
-            return Err(AnyaError::Validation("Recipient cannot be empty".to_string()));
-        }
-        
-=======
     pub fn transfer_asset(&self, asset_id: &str, amount: u64, recipient: &str) -> AnyaResult<Txid> {
         // Simple implementation that validates inputs and returns a mock transaction ID
         use crate::core::error::AnyaError;
@@ -110,18 +88,11 @@ impl RGBWallet {
             ));
         }
 
->>>>>>> feature/git-workflows-consolidation-evidence-based
         // Generate a deterministic transaction ID based on the transfer parameters
         let transfer_data = format!("{}:{}:{}:{}", self.id, asset_id, amount, recipient);
         let tx_hash = sha256::Hash::hash(transfer_data.as_bytes());
         let txid = Txid::from_slice(tx_hash.as_ref())
             .map_err(|e| AnyaError::General(format!("Failed to create transaction ID: {}", e)))?;
-<<<<<<< HEAD
-        
-        log::info!("Wallet {} initiated transfer of {} units of {} to {}", 
-            self.id, amount, asset_id, recipient);
-        
-=======
 
         log::info!(
             "Wallet {} initiated transfer of {} units of {} to {}",
@@ -131,7 +102,6 @@ impl RGBWallet {
             recipient
         );
 
->>>>>>> feature/git-workflows-consolidation-evidence-based
         Ok(txid)
     }
 
@@ -139,22 +109,6 @@ impl RGBWallet {
     pub fn receive_asset(&mut self, asset_id: &str, amount: u64, txid: Txid) -> AnyaResult<()> {
         // Simple implementation that validates inputs and updates wallet state
         use crate::core::error::AnyaError;
-<<<<<<< HEAD
-        
-        if asset_id.is_empty() {
-            return Err(AnyaError::Validation("Asset ID cannot be empty".to_string()));
-        }
-        if amount == 0 {
-            return Err(AnyaError::Validation("Receive amount must be greater than 0".to_string()));
-        }
-        
-        // Update asset balance (in a real implementation, this would update persistent storage)
-        let current_balance = self.balances.get(asset_id)
-            .map(|b| b.confirmed)
-            .unwrap_or(0);
-        let new_confirmed_balance = current_balance + amount;
-        
-=======
 
         if asset_id.is_empty() {
             return Err(AnyaError::Validation(
@@ -175,7 +129,6 @@ impl RGBWallet {
             .unwrap_or(0);
         let new_confirmed_balance = current_balance + amount;
 
->>>>>>> feature/git-workflows-consolidation-evidence-based
         // Create or update AssetBalance
         let asset_balance = if let Some(mut balance) = self.balances.get(asset_id).cloned() {
             balance.confirmed = new_confirmed_balance;
@@ -201,14 +154,6 @@ impl RGBWallet {
                 spendable: new_confirmed_balance,
             }
         };
-<<<<<<< HEAD
-        
-        self.balances.insert(asset_id.to_string(), asset_balance.clone());
-        
-        log::info!("Wallet {} received {} units of {} in transaction {}. New balance: {}", 
-            self.id, amount, asset_id, txid, asset_balance.confirmed);
-        
-=======
 
         self.balances
             .insert(asset_id.to_string(), asset_balance.clone());
@@ -222,7 +167,6 @@ impl RGBWallet {
             asset_balance.confirmed
         );
 
->>>>>>> feature/git-workflows-consolidation-evidence-based
         Ok(())
     }
 }
