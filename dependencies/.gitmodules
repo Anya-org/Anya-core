@@ -3,3 +3,6 @@
     url = git@github.com:botshelomokoka/anya-enterprise.git
 	branch = main
     update = rebase
+[submodule "anya-core-ci-debug"]
+    path = anya-core-ci-debug
+    url = https://github.com/Anya-org/anya-core-ci-debug.git
