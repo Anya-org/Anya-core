@@ -11,7 +11,7 @@ Testing is a crucial part of the Anya framework. It is essential to ensure that 
 There are several types of testing that are important for the Anya framework. These include:
 
 *   **Unit Testing**: This is the process of testing individual units of code to ensure that they behave as expected. Unit tests are important for the development of the Anya framework, as they help to identify and fix bugs early on.
-*   **Integration Testing**: This is the process of testing multiple units of code together to ensure that they interact correctly. Integration tests are important for the development of the Anya framework, as they help to identify and fix bugs that may arise from the interaction of multiple units of code.
+*   **Integration Testing**: This is the process of testing multiple units of code together to ensure that they interact correctly. Integration tests are important for the development of the Anya framework, as they help to identify and fix bugs that may arise from the interaction of multiple units ofcode.
 *   **System Testing**: This is the process of testing the entire Anya framework to ensure that it works as expected. System tests are important for the development of the Anya framework, as they help to identify and fix bugs that may arise from the interaction of multiple components of the framework.
 *   **Acceptance Testing**: This is the process of testing the Anya framework to ensure that it meets the requirements of the users. Acceptance tests are important for the development of the Anya framework, as they help to ensure that the code is reliable and that the users can trust the results.
 
