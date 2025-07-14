@@ -13,28 +13,6 @@ mod tests {
     };
     use crate::security::hsm::providers::simulator::SimulatorHsmProvider;
 
-    // Simple mock structure for tests - no feature flag required
-    #[derive(Clone)]
-    struct MockLogger;
-
-    impl MockLogger {
-        fn new(_path: &str) -> Result<Self, Box<dyn std::error::Error>> {
-            Ok(MockLogger)
-        }
-    }
-
-    // Mock audit logger for testing
-    #[cfg(feature = "audit_logger")]
-    #[cfg(not(feature = "audit_logger"))]
-    #[derive(Clone)]
-    struct AuditLogger;
-
-    #[cfg(not(feature = "audit_logger"))]
-    impl AuditLogger {
-        fn new(_path: &str) -> Result<Self, Box<dyn std::error::Error>> {
-            Ok(AuditLogger)
-        }
-    }
 
     #[tokio::test]
     #[ignore = "Requires AuditLogger implementation"]

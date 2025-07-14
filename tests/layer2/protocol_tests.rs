@@ -31,7 +31,6 @@ pub struct ProtocolTestSuite {
     milestones: Vec<TestMilestone>,
     watchdog: Watchdog,
     progress: ProgressTracker,
-    verification: AiVerification,
 }
 
 impl ProtocolTestSuite {
@@ -42,11 +41,6 @@ impl ProtocolTestSuite {
             progress: ProgressTracker::new(protocol_name)
                 .with_timeout(Duration::from_secs(300))
                 .with_verbosity(true),
-            verification: AiVerification::new()
-                .with_min_confidence(0.95)
-                .with_blockchain_verification(true)
-                .with_external_data_verification(true)
-                .with_human_verification(false),
         }
     }
 

@@ -795,15 +795,15 @@ mod tests {
 
     #[test]
     fn test_lightning_public_key_from_str() {
-        let valid_key = "02" + &"a".repeat(64);
+        let valid_key = "02".to_string() + &"a".repeat(64);
         let pubkey = LightningPublicKey::from_str(&valid_key);
         assert!(pubkey.is_ok());
     }
 
     #[test]
     fn test_lightning_public_key_invalid_length() {
-        let invalid_key = "02" + &"a".repeat(32); // Too short
-        let pubkey = LightningPublicKey::from_str(invalid_key);
+        let invalid_key = "02".to_string() + &"a".repeat(32); // Too short
+        let pubkey = LightningPublicKey::from_str(&invalid_key);
         assert!(pubkey.is_err());
     }
 

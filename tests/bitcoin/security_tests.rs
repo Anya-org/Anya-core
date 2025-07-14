@@ -228,7 +228,7 @@ pub fn test_timing_side_channels() {
 
     // If times are too similar despite different validation paths, it might indicate
     // artificial timing normalization is being used, which is good for security
-    let diff_ratio = (0.0 - 0.0).abs() / 1.0;
+    let diff_ratio = (0.0f64 - 0.0f64).abs() / 1.0f64;
 
     // Assert that time difference is not too revealing
     // Note: This is a very simple check, real side-channel analysis is much more complex
