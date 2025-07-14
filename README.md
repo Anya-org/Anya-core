@@ -46,7 +46,7 @@ A modular Bitcoin infrastructure platform designed for enterprise applications, 
 
 ## Overview
 
-Anya Core is a modular Bitcoin infrastructure platform designed for enterprise applications. The project provides:
+Anya Core is an advanced integrated system combining Bitcoin/crypto functionality, ML-based analytics, and Web5 decentralized data management with enterprise-grade security and revenue tracking. Built on a hexagonal architecture, it provides a robust, scalable, and secure platform for institutional-grade operations.
 
 **Core Bitcoin Features:**
 
@@ -171,16 +171,20 @@ println!("Transaction processed: {}", tx_result.txid);
 
 **Minimum Requirements:**
 
-- Rust 1.70+ with cargo
-- 4GB RAM
-- 10GB available disk space
-- Linux/macOS/Windows with WSL2
+-   CPU: 8+ cores recommended
+-   RAM: 16GB+ recommended
+-   Storage: 1TB+ SSD recommended
+-   Network: 1Gbps+ recommended
+-   GPU: Optional for ML acceleration
+-   NPU: Optional for advanced ML
 
-**Recommended for Full Features:**
+**Software Dependencies:**
 
-- 8GB+ RAM for Layer2 protocol testing
-- Bitcoin Core 24.0+ for full node integration
-- Hardware Security Module (HSM) for production deployment
+-   Rust 1.70+
+-   PostgreSQL 14+
+-   Redis 7.0+
+-   Bitcoin Core 24.0+
+-   Python 3.10+ (for ML components)
 
 ### Installation Methods
 
