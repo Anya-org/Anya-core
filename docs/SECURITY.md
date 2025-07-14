@@ -168,7 +168,7 @@ For security-related issues:
 #### Reporting Process
 
 1. **Confidential Disclosure**
-   - Email: `security@anya-project.org`
+   - Email: `botshelomokoka+security@gmail.com`
    - PGP Key: [Available in `/security/pgp-key.asc`]
    - Encrypted communication mandatory
 
@@ -235,9 +235,9 @@ For security-related issues:
 
 ## Contact
 
-- **Security Team**: `security@anya-project.org`
-- **PGP Fingerprint**: `XXXX XXXX XXXX XXXX XXXX`
-- **Bug Bounty Platform**: [HackerOne Link]
+- **Security Team**: `botshelomokoka+security@gmail.com`
+- **PGP Fingerprint**: Not available
+- **Bug Bounty Platform**: Not available
 
 ## Legal
 
@@ -245,10 +245,8 @@ For security-related issues:
 - No legal action against good-faith researchers
 - Compliance with responsible disclosure principles
 
-**Last Updated**: [Current Date]
+**Last Updated**: 2024-07-22
 **Version**: 1.0.0
-
-*Last updated: 2025-06-02*
 
 ## Cryptographic Implementation [AIS-3][BPC-3]
 Aligned with official Bitcoin Improvement Proposals (BIPs)

@@ -1,6 +1,6 @@
 security:
   # Security policy location
-  policy: SECURITY.md
+  policy: docs/SECURITY.md
   
   # Dependency scanning
   dependencies:
