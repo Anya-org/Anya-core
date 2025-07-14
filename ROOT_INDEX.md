@@ -91,7 +91,7 @@ All modules maintain compliance with official Bitcoin Improvement Proposals (BIP
 ### Core Documentation
 
 - [Getting Started](README.md) - Project overview and setup
-- [Installation](INSTALLATION.md) - Installation instructions
+- [Installation](./INSTALLATION.md) - Installation instructions
 - [System Architecture](SYSTEM_MAP.md) - Complete system architecture
 - [Security Framework](docs/SECURITY.md) - AIS-3 compliance details
 - [Changelog](CHANGELOG.md) - Release notes and changes

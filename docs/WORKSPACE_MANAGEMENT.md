@@ -108,7 +108,7 @@ The documentation is organized into 35+ specialized categories:
 | **API** | API documentation and references | `API.md`, `CLI_REFERENCE.md` | ✅ Complete |
 | **Implementation** | Implementation guides and status | `IMPLEMENTATION_*.md` | ✅ Complete |
 | **Testing** | Testing strategies and procedures | `TESTING_*.md` | ✅ Complete |
-| **Deployment** | Deployment and installation | `DEPLOYMENT.md`, `INSTALLATION.md` | ✅ Complete |
+| **Deployment** | Deployment and installation | `DEPLOYMENT.md`, `./INSTALLATION.md` | ✅ Complete |
 | **Enterprise** | Enterprise features and guides | `ENTERPRISE_*.md` | ✅ Complete |
 | **Web5** | Web5 integration documentation | `WEB5_*.md` | ✅ Complete |
 | **DAO** | DAO system documentation | `DAO_*.md`, `GOVERNANCE_*.md` | ✅ Complete |

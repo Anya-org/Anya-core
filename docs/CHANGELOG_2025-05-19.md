@@ -115,5 +115,5 @@ All modules now comply with official Bitcoin Improvement Proposals (BIPs) and in
 
 ## See Also
 
-- [Related Document 1](../INSTALLATION.md)
+- [Related Document 1](./INSTALLATION.md)
 - [Related Document 2](../INSTALLATION_REVIEW.md)

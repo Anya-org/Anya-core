@@ -30,7 +30,7 @@
 | Document | Purpose | Audience | Priority |
 |----------|---------|----------|----------|
 | [README.md](../README.md) | Project overview & quick start | All users | 🔥 Critical |
-| [INSTALLATION.md](./INSTALLATION.md) | Complete installation guide | Developers | 🔥 Critical |
+| [INSTALLATION.md](../INSTALLATION.md) | Complete installation guide | Developers | 🔥 Critical |
 | [Configuration Guide](./installation/CONFIGURATION.md) | System configuration | DevOps | ⚡ High |
 | [Troubleshooting](installation/troubleshooting.md) | Common issues & solutions | Support | ⚡ High |
 

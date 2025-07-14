@@ -202,5 +202,5 @@ fn validate_psbt_v2(psbt: &Psbt) -> Result<()> {
 
 ## See Also
 
-- [Related Document 1](../INSTALLATION.md)
+- [Related Document 1](./INSTALLATION.md)
 - [Related Document 2](../INSTALLATION_REVIEW.md)

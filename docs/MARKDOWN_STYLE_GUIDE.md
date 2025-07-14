@@ -163,5 +163,5 @@ node scripts/fix_markdown.js docs
 2025-03-12 
 ## See Also
 
-- [Related Document 1](../INSTALLATION.md)
+- [Related Document 1](./INSTALLATION.md)
 - [Related Document 2](../INSTALLATION_REVIEW.md)

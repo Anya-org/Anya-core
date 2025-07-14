@@ -453,5 +453,7 @@ As the Bitcoin ecosystem evolves, we will consider supporting additional Layer 2
 
 ## See Also
 
-- [Related Document 1](../INSTALLATION.md)
+- [Related Document 1]../INSTALLATION.md)
+- [Related Document 1]../INSTALLATION.md)
+- [Related Document 1]../INSTALLATION.md)
 - [Related Document 2](../../INSTALLATION_REVIEW.md)

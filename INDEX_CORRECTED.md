@@ -25,7 +25,7 @@ Welcome to the Anya Core documentation. This index will help you navigate the va
 ## Quick Start
 
 - [Getting Started](docs/getting-started/README.md) - Quick setup guide
-- [Installation](INSTALLATION.md) - Installation instructions
+- [Installation](./INSTALLATION.md) - Installation instructions
 - [README](README.md) - Main project readme with overview and features
 
 ## Core Documentation
@@ -44,7 +44,7 @@ Welcome to the Anya Core documentation. This index will help you navigate the va
 
 ## Installation & Deployment
 
-- [Installation Guide](INSTALLATION.md) - Complete installation instructions
+- [Installation Guide](./INSTALLATION.md) - Complete installation instructions
 - [Production Setup](docs/deployment/production-setup.md) - Advanced deployment scenarios
 
 ## Architecture Documentation

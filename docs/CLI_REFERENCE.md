@@ -59,7 +59,7 @@ anya governance check --proposal proposal.yaml
 
 ## Installation Enhancements
 
-```markdown:docs/INSTALLATION.md
+```markdown:./INSTALLATION.md
 ### Advanced Installation
 ```bash
 # Enterprise deployment
