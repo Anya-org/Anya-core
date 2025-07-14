@@ -56,9 +56,11 @@ impl LightningPublicKey {
         bytes.copy_from_slice(&public_key.serialize());
         LightningPublicKey { bytes }
     }
+}
 
-    pub fn to_string(&self) -> String {
-        hex::encode(self.bytes)
+impl fmt::Display for LightningPublicKey {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", hex::encode(self.bytes))
     }
 }
 
@@ -75,9 +77,11 @@ impl LightningTxid {
         bytes.copy_from_slice(slice);
         Ok(LightningTxid(bytes))
     }
+}
 
-    pub fn to_string(&self) -> String {
-        hex::encode(self.0)
+impl fmt::Display for LightningTxid {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", hex::encode(self.0))
     }
 }
 

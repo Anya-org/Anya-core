@@ -143,7 +143,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                 println!("     Funding txid: {:?}", tx.funding_txid);
                 println!("     Status: {:?}", tx.status);
                 if let Some(txid) = tx.closing_txid {
-                    println!("     Closing txid: {:?}", txid);
+                    println!("     Closing txid: {txid:?}");
                 }
             }
         }

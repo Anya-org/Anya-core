@@ -28,9 +28,10 @@ pub struct HsmStubError {
 }
 
 /// [AIR-3][AIS-3][BPC-3][SEC-2] Security classification for HSM errors
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum SecurityLevel {
     /// Informational security message
+    #[default]
     Info,
     /// Warning security message
     Warning,
@@ -220,11 +221,6 @@ pub trait HsmProvider: Send + Sync {
     }
 }
 
-impl Default for SecurityLevel {
-    fn default() -> Self {
-        SecurityLevel::Info
-    }
-}
 
 /// [AIR-3][AIS-3][BPC-3][RES-3][SEC-2] Enhanced Bitcoin HSM Provider
 /// This follows official Bitcoin Improvement Proposals (BIPs) standards
@@ -359,9 +355,10 @@ pub struct HsmConfig {
 impl HsmConfig {
     /// Create a new HSM config with the given provider type
     pub fn new(provider: &str) -> Self {
-        let mut config = Self::default();
-        config.provider_type = provider.to_string();
-        config
+        HsmConfig {
+            provider_type: provider.to_string(),
+            ..Default::default()
+        }
     }
 
     /// Add a configuration parameter

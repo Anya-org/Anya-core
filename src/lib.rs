@@ -396,7 +396,7 @@ impl From<serde_json::Error> for AnyaError {
 pub type AnyaResult<T> = Result<T, AnyaError>;
 
 /// Core configuration for the Anya system
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct AnyaConfig {
     /// ML system configuration
     pub ml_config: ml::MLConfig,
@@ -409,20 +409,6 @@ pub struct AnyaConfig {
     pub bitcoin_config: crate::security::hsm_shim::HsmConfig,
     /// DAO configuration
     pub dao_config: dao::DAOConfig,
-}
-
-impl Default for AnyaConfig {
-    fn default() -> Self {
-        Self {
-            ml_config: ml::MLConfig::default(),
-            web5_config: web5::Web5Config::default(),
-            #[cfg(feature = "hsm")]
-            bitcoin_config: crate::security::hsm::config::HsmConfig::default(),
-            #[cfg(not(feature = "hsm"))]
-            bitcoin_config: crate::security::hsm_shim::HsmConfig::default(),
-            dao_config: dao::DAOConfig::default(),
-        }
-    }
 }
 
 /// Core Anya system

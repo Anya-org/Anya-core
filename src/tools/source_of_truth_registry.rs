@@ -193,7 +193,7 @@ impl SourceOfTruthRegistry {
         }
 
         // Load existing registry if it exists
-        if let Err(_) = registry.load_from_disk().await {
+        if registry.load_from_disk().await.is_err() {
             // If loading fails, initialize with empty registry
             registry.save_to_disk().await?;
         }
@@ -230,8 +230,7 @@ impl SourceOfTruthRegistry {
         let duplication_status = self.check_work_item_duplication(&title, &component).await?;
         if matches!(duplication_status, DuplicationCheckStatus::Failed(_)) {
             return Err(SourceOfTruthError::DuplicationDetected(format!(
-                "Work item title or component already exists: {}",
-                title
+                "Work item title or component already exists: {title}"
             )));
         }
 
