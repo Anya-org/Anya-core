@@ -162,14 +162,13 @@ pub mod sectional {
     where
         F: FnOnce() -> T,
     {
-        use std::alloc::GlobalAlloc;
-        use std::alloc::GlobalAlloc;
+        use std::alloc::{GlobalAlloc, System};
         use std::mem;
 
         // Force a garbage collection if possible (fixed unsafe call)
         unsafe {
             let layout = std::alloc::Layout::new::<u8>();
-            let _ = std::alloc::System.alloc(layout);
+            let _ = System.alloc(layout);
         }
 
         // Run the function and measure the result

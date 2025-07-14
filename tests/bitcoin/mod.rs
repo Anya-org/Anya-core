@@ -1,15 +1,15 @@
 use super::common::test_utilities::*;
-use crate::bitcoin::interface::BitcoinInterface;
-use crate::bitcoin::rust::RustBitcoinImplementation;
+use anya_core::bitcoin::interface::BitcoinInterface;
+use anya_core::bitcoin::rust::RustBitcoinImplementation;
 use bitcoin::Network;
 
 #[tokio::test]
 async fn test_rust_bitcoin_implementation() {
-    let mut implementation = RustBitcoinImplementation::new_network(Network::Testnet);
+    let mut implementation = RustBitcoinImplementation::new(Network::Testnet);
 
     // Test address generation
     let address = implementation
-        .generate_address(crate::bitcoin::interface::AddressType::P2WPKH)
+        .generate_address(anya_core::bitcoin::interface::AddressType::P2WPKH)
         .await
         .unwrap();
     assert!(

@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-=======
-/// The `initialize_modules` function initializes various modules related to networking, machine
-/// learning, cryptocurrencies, analytics, and trading in a Rust application.
 mod network;
 mod ml;
 mod bitcoin;
@@ -24,7 +20,7 @@ fn initialize_modules() {
     stacks::init();
     advanced_analytics::init();
     high_volume_trading::init();
-    go_rules::init();
+    go_rules::init("path/to/config").unwrap();
 }
 
 #[tokio::main]
@@ -48,13 +44,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     initialize_modules();
 
     // Initialize and use the InternalAIEngine
-    let ai_engine = InternalAIEngine::init()?;
+    let ai_engine = InternalAIEngine::new();
+    InternalAIEngine::init()?;
     ai_engine.perform_research().await?;
-    ai_engine.submit_upgrade_request(
-        "your_repo/your_project",
-        "Upgrade Request: Enhance Security",
-        "Please consider upgrading the security features based on recent research findings."
-    ).await?;
+
 
     // Submit issues to all relevant repositories
     let github_integrator = GitHubIntegrator::new("your_github_token".to_string());
@@ -109,7 +102,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             last_epoch_check = Instant::now(); // Reset the epoch timer
         }
 
-        for repo in repos.iter() {esearch and submit upgrade requests
+        // Perform research and submit upgrade requests
         ai_engine.perform_research().await?;
         for repo in &repos {
             let issue = Issue {
@@ -123,4 +116,3 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         // Example: Monitor system health, handle user requests, etc.
     }
 }
->>>>>>> 8b5207b (feat: Enhance CI workflow, add system monitoring module, and implement GitHub integration for issue tracking)

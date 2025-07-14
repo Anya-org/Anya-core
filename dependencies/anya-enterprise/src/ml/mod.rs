@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-=======
 mod federated_learning;
 mod research;
 mod github_integration;
@@ -15,9 +13,7 @@ pub use federated_learning::{FederatedLearning, FederatedLearningModel, setup_fe
 pub use research::Researcher;
 pub use github_integration::{GitHubIntegrator, Issue};
 pub use bitcoin_models::{BitcoinPricePredictor, TransactionVolumeForecaster, RiskAssessor};
-pub use ml_types::{MLInput, MLOutput};rning};
-pub use bitcoin_models::{BitcoinPricePredictor, TransactionVolumeForecaster, RiskAssessor};
-pub use bitcoin_models::{BitcoinPricePredictor, TransactionVolumeForecaster, RiskAssessor};
+pub use ml_types::{MLInput, MLOutput};
 pub use differential_privacy::implement_differential_privacy;
 pub use secure_aggregation::implement_secure_aggregation;
 pub use advanced_aggregation::implement_advanced_aggregation;
@@ -25,7 +21,6 @@ pub use external_ai_services::integrate_external_ai_services;
 pub use nlp::implement_nlp;
 
 use gorules::{init_gorules, execute_rule};
-use log::{info, error};
 use log::{info, error};
 use serde::{Serialize, Deserialize};
 use thiserror::Error;
@@ -73,6 +68,8 @@ pub struct InternalAIEngine {
     ema: ExponentialMovingAverage,
     rsi: RelativeStrengthIndex,
 }
+
+impl InternalAIEngine {
     pub fn new() -> Self {
         Self {
             global_model: LinearRegression::default(),
@@ -95,8 +92,6 @@ pub struct InternalAIEngine {
         let papers = researcher.crawl_mdpi("cybersecurity vulnerabilities", 5).await?;
         researcher.analyze_papers(papers).await?;
         Ok(())
-    }       rsi: RelativeStrengthIndex::new(14).unwrap(),
-        }
     }
 
     pub fn update_model(&mut self, local_model: Array1<f64>) -> Result<(), MLError> {
@@ -118,7 +113,7 @@ pub struct InternalAIEngine {
             .collect();
         let target: Vec<f64> = vec![1.0; aggregated_features.len()]; // Placeholder target
 
-        let dataset = Dataset::new(aggregated_features, target);
+        let dataset = Dataset::new(Array2::from_shape_vec((aggregated_features.len(), 1), aggregated_features).unwrap(), Array1::from(target)).unwrap();
         self.global_model = LinearRegression::default().fit(&dataset).map_err(|e| MLError::UpdateError(e.to_string()))?;
         
         self.local_models.clear();
@@ -145,10 +140,10 @@ pub struct InternalAIEngine {
         self.rsi.next(last_performance);
 
         // Adjust model based on indicators
-        if self.rsi.rsi() > 70.0 {
+        if self.rsi.next(last_performance) > 70.0 {
             // Model might be overfitting, increase regularization
             self.global_model = self.global_model.alpha(self.global_model.alpha() * 1.1);
-        } else if self.rsi.rsi() < 30.0 {
+        } else if self.rsi.next(last_performance) < 30.0 {
             // Model might be underfitting, decrease regularization
             self.global_model = self.global_model.alpha(self.global_model.alpha() * 0.9);
         }
@@ -170,6 +165,7 @@ pub struct InternalAIEngine {
         let std_dev = self.performance_history.std_dev();
         1.0 / (1.0 + (-avg_performance / std_dev).exp())
     }
+}
 pub fn init() -> Result<(), Box<dyn std::error::Error>> {
     info!("Initializing ML module");
     federated_learning::init()?;
@@ -200,4 +196,3 @@ pub fn execute_business_logic(rule: &str) {
 // TODO: Implement advanced aggregation algorithms
 // TODO: Integrate with external AI services for enhanced functionality
 // TODO: Implement natural language processing capabilities
->>>>>>> 8b5207b (feat: Enhance CI workflow, add system monitoring module, and implement GitHub integration for issue tracking)
