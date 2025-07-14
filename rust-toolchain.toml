@@ -1,4 +1,4 @@
 [toolchain]
 channel = "nightly"
-components = ["rust-src"]
+components = ["rust-src", "rustfmt"]
 # Using latest nightly to support edition2024 required by base64ct v1.8.0
