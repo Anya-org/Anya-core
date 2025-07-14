@@ -38,5 +38,5 @@ Add a brief overview of this document here.
 - Q4 2024: Finalize BIP-380 implementation and audit 
 ## See Also
 
-- [Related Document 1](../INSTALLATION.md)
+- [Related Document 1](./INSTALLATION.md)
 - [Related Document 2](../INSTALLATION_REVIEW.md)

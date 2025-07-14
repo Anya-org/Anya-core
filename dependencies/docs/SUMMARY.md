@@ -43,7 +43,7 @@
     * [Release Process](version-management/release-process.md)
 * [Toolchain](toolchain/README.md)
   * [Rust Setup](toolchain/rust-setup.md)
-    * [Installation](../../docs/INSTALLATION.md)
+    * [Installation](../../INSTALLATION.md)
     * [Configuration](../../docs/installation/CONFIGURATION.md)
   * [Required Tools](toolchain/required-tools.md)
     * [Development Tools](toolchain/development-tools.md)
