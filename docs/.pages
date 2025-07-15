@@ -1,0 +1,43 @@
+nav:
+  - Home: index.md
+  - Getting Started:
+    - getting-started/index.md
+    - getting-started/installation.md
+    - getting-started/configuration.md
+    - getting-started/quick-start.md
+  - Architecture:
+    - architecture/index.md
+    - architecture/core-components.md
+    - architecture/system-design.md
+    - architecture/security-model.md
+  - Bitcoin:
+    - bitcoin/index.md
+    - bitcoin/taproot.md
+    - bitcoin/lightning.md
+    - bitcoin/privacy-bips.md
+  - Layer 2:
+    - layer2/index.md
+    - layer2/bob.md
+    - layer2/dlc.md
+    - layer2/lightning.md
+    - layer2/liquid.md
+    - layer2/rgb.md
+    - layer2/rsk.md
+    - layer2/stacks.md
+    - layer2/state_channels.md
+    - layer2/taproot_assets.md
+  - API Reference:
+    - api/index.md
+    - api/api-reference.md
+    - api/cli-reference.md
+  - Development:
+    - development/index.md
+    - development/development.md
+    - development/contributing.md
+  - DAO:
+    - dao/index.md
+  - Enterprise:
+    - enterprise/index.md
+  - Security:
+    - security/index.md
+  - ...
