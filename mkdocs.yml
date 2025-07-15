@@ -118,51 +118,6 @@ plugins:
           secondaryColor: '#3f51b5'
           tertiaryColor: '#3f51b5'
 
-# Navigation
-nav:
-  - Home: index.md
-  - Getting Started:
-      - Installation: INSTALLATION.md
-      - Setup: SETUP_USAGE.md
-      - Environment: ENVIRONMENT.md
-  - Architecture:
-      - Overview: ARCHITECTURE.md
-      - Agent System: AGENT_ARCHITECTURE.md
-      - Performance: PERFORMANCE_ARCHITECTURE.md
-      - Security: SECURITY_ARCHITECTURE.md
-      - ML System: ML_SYSTEM_ARCHITECTURE.md
-  - Development:
-      - Contributing: CONTRIBUTING.md
-      - Development Guide: development.md
-      - Testing: TESTING.md
-      - Error Handling: ERROR_HANDLING.md
-  - Bitcoin & Layer2:
-      - Bitcoin Protocol: BITCOIN_PROTOCOL.md
-      - Bitcoin Compliance: BITCOIN_COMPLIANCE.md
-      - BIP Compliance: BIP_COMPLIANCE.md
-      - HSM Integration: HSM_FEATURE_GUIDE.md
-  - Web5 & Identity:
-      - Web5 Integration: WEB5_INTEGRATION.md
-      - Identity: identity.md
-  - Enterprise:
-      - Enterprise Guide: ENTERPRISE_GUIDE.md
-      - Enterprise Features: ENTERPRISE_FEATURES.md
-      - Configuration: CONFIGURATION_MANAGEMENT.md
-  - DAO & Governance:
-      - DAO Overview: DAO_OVERVIEW.md
-      - DAO System: DAO_SYSTEM_GUIDE.md
-      - Governance: GOVERNANCE_FRAMEWORK.md
-      - Business Plan: BUSINESS_PLAN.md
-  - API Reference:
-      - API Overview: API.md
-      - CLI Reference: CLI_REFERENCE.md
-      - Dependencies: DEPENDENCIES.md
-  - Maintenance:
-      - Roadmap: ROADMAP.md
-      - Migration: MIGRATION.md
-      - Troubleshooting: TROUBLESHOOTING.md
-      - Security: SECURITY.md
-
 # Build Configuration
 docs_dir: docs
 site_dir: site
