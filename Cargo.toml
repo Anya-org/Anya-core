@@ -167,8 +167,10 @@ lazy_static = "1.5.0"
 mockall = "=0.13.1"  # Added here for use in non-test code
 clarinet-utils = "1.0.0"
 geiger = "0.5.0"
+bdk = { version = "0.28.1", features = ["all-keys", "key-value-db"] }
 
 [dev-dependencies]
+anyhow = { version = "1.0.98", features = ["std", "backtrace"] }
 did-key = "0.2.1"
 mockall = "=0.13.1"
 tempfile = "3.20.0"
