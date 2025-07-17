@@ -13,3 +13,4 @@ mkdocs-section-index>=0.3.8
 markdown-include>=0.8.1
 pygments>=2.15.1
 pymdown-extensions>=10.3.0
+mkdocs-linkcheck>=1.0.0

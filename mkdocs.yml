@@ -98,7 +98,7 @@ plugins:
   - git-committers:
       repository: anya-org/anya-core
       branch: main
-      enabled: false
+      enabled: true
       docs_path: docs/
   - include-markdown
   - minify:
@@ -110,6 +110,8 @@ plugins:
   - mermaid2:
       arguments:
         theme: dark
+  - linkcheck:
+      show_same_dir: true
         themeVariables:
           primaryColor: '#303030'
           primaryTextColor: '#fff'

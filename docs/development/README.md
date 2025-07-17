@@ -20,6 +20,7 @@ This guide provides comprehensive information for developers working on Anya Cor
 - [Code Review Process](#code-review-process)
 - [Debugging and Profiling](#debugging-and-profiling)
 - [Extension Development](#extension-development)
+- [Documentation Development](#documentation-development)
 
 ## Development Environment Setup
 
@@ -447,6 +448,47 @@ async fn test_extension_lifecycle() {
     assert!(extension.is_running());
 }
 ```
+
+### Extension Testing
+
+```rust
+#[tokio::test]
+async fn test_extension_lifecycle() {
+    let mut extension = MyExtension::new();
+    let ctx = ExtensionContext::test();
+
+    // Test initialization
+    extension.initialize(&ctx).await?;
+
+    // Test event handling
+    let event = Event::new("test");
+    extension.handle_event(event).await?;
+
+    assert!(extension.is_running());
+}
+```
+
+## Documentation Development
+
+### Prerequisites
+
+- **Python**: Latest stable version (3.x)
+- **pip**: Python package installer
+
+### Environment Configuration
+
+```bash
+# Navigate to the project root
+cd anya-core
+
+# Install documentation dependencies
+pip install -r requirements-docs.txt
+
+# Start the local development server
+mkdocs serve
+```
+
+The documentation will be available at `http://127.0.0.1:8000`. The server will automatically reload when you make changes to the documentation files.
 
 ## Best Practices
 
