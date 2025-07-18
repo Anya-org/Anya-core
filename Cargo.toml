@@ -25,7 +25,7 @@ default = ["std", "rust-bitcoin"]
 # Feature flag for HSM functionality
 hsm = []
 # Feature flag for complete system (including HSM)
-complete = ["hsm"]
+complete = []
 std = []
 # Bitcoin implementation features
 bitcoin_integration = []
