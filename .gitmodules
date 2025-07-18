@@ -1,8 +1,4 @@
-[submodule "anya-enterprise"]
-    path = anya-enterprise
-    url = git@github.com:botshelomokoka/anya-enterprise.git
-	branch = main
-    update = rebase
-[submodule "anya-core-ci-debug"]
-    path = anya-core-ci-debug
-    url = https://github.com/Anya-org/anya-core-ci-debug.git
+[submodule "scripts/anya-core"]
+    path = scripts/anya-core
+    url = https://github.com/Anya-org/Anya-core.git
+
