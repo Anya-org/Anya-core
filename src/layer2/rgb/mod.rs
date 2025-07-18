@@ -155,6 +155,12 @@ pub struct ContractManager {
     _placeholder: (),
 }
 
+impl Default for ContractManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl ContractManager {
     /// [AIR-3][AIS-3][BPC-3][RES-3] Generate a unique asset ID using Taproot-compatible hashing
     /// This follows official Bitcoin Improvement Proposals (BIPs) standards for asset ID generation
