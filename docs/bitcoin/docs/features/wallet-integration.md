@@ -17,6 +17,7 @@ The Anya Bitcoin wallet integration provides enterprise-grade wallet management 
 ## Features
 
 ### Core Features
+
 - Multi-signature support ([Security Guide](../../security/multi-signature.md))
 - HD wallet generation ([Technical Details](../technical/hd-wallets.md))
 - Transaction management ([Transaction Guide](../features/transaction-management.md))
@@ -24,6 +25,7 @@ The Anya Bitcoin wallet integration provides enterprise-grade wallet management 
 - UTXO management ([UTXO Guide](../features/utxo-management.md))
 
 ### Advanced Features
+
 - Hardware wallet support ([Hardware Integration](../features/hardware-wallets.md))
 - Custom signing schemes ([Signing Guide](../features/signing-schemes.md))
 - Fee management ([Fee Estimation](../../../../anya-enterprise/docs/features/fee-estimation.md))
@@ -32,6 +34,7 @@ The Anya Bitcoin wallet integration provides enterprise-grade wallet management 
 ## Implementation
 
 ### Wallet Creation
+
 ```rust
 pub struct WalletConfig {
     pub network: Network,
@@ -51,6 +54,7 @@ impl Wallet {
 For more details, see [Wallet Creation Guide](../guides/wallet-creation.md).
 
 ### Transaction Signing
+
 ```rust
 pub async fn sign_transaction(
     &self,
@@ -66,14 +70,18 @@ For signing details, see [Transaction Signing Guide](../guides/transaction-signi
 ## Security
 
 ### Key Management
+
 For detailed key management documentation, see:
+
 - [Key Generation](../../security/key-generation.md)
 - [Key Storage](../../security/key-storage.md)
 - [Key Backup](../../security/key-backup.md)
 - [Key Recovery](../../security/key-recovery.md)
 
 ### Multi-Signature
+
 For multi-signature implementation details, see:
+
 - [Multi-Signature Setup](../guides/multisig-setup.md)
 - [Signing Workflow](../guides/multisig-signing.md)
 - [Security Considerations](../../security/multisig-security.md)
@@ -81,6 +89,7 @@ For multi-signature implementation details, see:
 ## API Reference
 
 ### REST Endpoints
+
 For complete API documentation, see our [API Reference](../integration/api-reference.md#wallet-endpoints).
 
 ```rust
@@ -91,11 +100,13 @@ PUT    /api/v1/wallets/{id}
 ```
 
 ### WebSocket API
+
 For real-time updates, see [WebSocket Documentation](../../api/websocket.md#wallet-updates).
 
 ## Examples
 
 ### Basic Usage
+
 ```rust
 use anya_bitcoin::{Wallet, WalletConfig, Network};
 
@@ -110,6 +121,7 @@ let wallet = Wallet::create(config).await?;
 ```
 
 For more examples, see:
+
 - [Basic Examples](../examples/basic-wallet.md)
 - [Advanced Examples](../examples/advanced-wallet.md)
 - [Integration Examples](wallet-integration.md)
@@ -117,6 +129,7 @@ For more examples, see:
 ## Configuration
 
 ### Development
+
 ```toml
 [wallet]
 network = "testnet"
@@ -133,6 +146,7 @@ For full configuration options, see [Configuration Guide](../guides/wallet-confi
 ## Error Handling
 
 ### Common Errors
+
 ```rust
 pub enum WalletError {
     InvalidConfiguration(String),
@@ -147,6 +161,7 @@ For error handling details, see [Error Handling Guide](../integration/error-hand
 ## Testing
 
 ### Unit Tests
+
 ```rust
 #[test]
 fn test_wallet_creation() {
@@ -156,6 +171,7 @@ fn test_wallet_creation() {
 ```
 
 For testing guidelines, see:
+
 - [Testing Guide](../../../TESTING.md)
 - [Integration Tests](../../../../dependencies/docs/testing/integration-testing.md)
 - [Security Testing](../../../../dependencies/docs/testing/security-testing.md)
@@ -171,6 +187,7 @@ For testing guidelines, see:
 ## Support
 
 For wallet-related support:
+
 - [Technical Support](../../../support/technical.md)
 - [Security Issues](../../../SECURITY.md)
 - [Feature Requests](../../../../dependencies/docs/build-system/features.md)

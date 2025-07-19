@@ -4,25 +4,24 @@ use std::path::PathBuf;
 
 use tokio::sync::OnceCell;
 
-async fn create_test_wallet() -> Arc<BitcoinWallet> {
-    // Use a static OnceCell to avoid recreating the wallet for every test
-    static WALLET: OnceCell<Arc<BitcoinWallet>> = OnceCell::const_new();
-    WALLET
-        .get_or_init(|| async {
-            let config = WalletConfig {
-                name: "test-wallet".to_string(),
-                database_path: PathBuf::from("/tmp/anya-test-wallet/wallet.db"),
-                network: Network::Regtest,
-                electrum_url: "ssl://electrum.blockstream.info:60002".to_string(),
-                password: None,
-                mnemonic: None,
-                use_taproot: true,
-            };
-            let wallet = BitcoinWallet::new(config).await.expect("Failed to create wallet");
-            Arc::new(wallet)
-        })
-        .await
-        .clone()
+fn create_test_wallet() -> Arc<BitcoinWallet> {
+    let config = WalletConfig {
+        name: "test-wallet".to_string(),
+        network: Network::Regtest,
+        wallet_type: WalletType::Taproot,
+        seed_phrase: None,
+        password: None,
+        receive_descriptor: "tr([73c5da0a/86'/1'/0']xprv9xgqHN7yz9MwCkxsBPN5qetuNdQSUttZNKw1dcYTV4mTp8ZrKLRPXBThPxq9h3wcAAJVH5qQCk99URy2CQHEMnMKUNpUorQJpXbgJC6C1HR/0/*)".to_string(),
+        change_descriptor: "tr([73c5da0a/86'/1'/0']xprv9xgqHN7yz9MwCkxsBPN5qetuNdQSUttZNKw1dcYTV4mTp8ZrKLRPXBThPxq9h3wcAAJVH5qQCk99URy2CQHEMnMKUNpUorQJpXbgJC6C1HR/1/*)".to_string(),
+        xpub: None,
+        data_dir: PathBuf::from("/tmp/anya-test-wallet"),
+        use_rpc: false,
+        coin_selection: CoinSelectionStrategy::BranchAndBound,
+        gap_limit: 20,
+        min_confirmations: 1,
+        fee_strategy: FeeStrategy::Medium,
+    };
+    Arc::new(BitcoinWallet::new(config, None))
 }
 // Tests for the documentation
 //
@@ -44,7 +43,7 @@ use anya_core::{
 /// Test the health check endpoint
 #[tokio::test]
 async fn test_health_check() {
-    let wallet = create_test_wallet().await;
+    let wallet = create_test_wallet();
     let identity = Arc::new(IdentityManager::new("test_namespace"));
     let app = configure_routes(wallet, identity);
 
@@ -64,7 +63,7 @@ async fn test_health_check() {
 /// Test the system information endpoint
 #[tokio::test]
 async fn test_system_info() {
-    let wallet = create_test_wallet().await;
+    let wallet = create_test_wallet();
     let identity = Arc::new(IdentityManager::new("test_namespace"));
     let app = configure_routes(wallet, identity);
 

@@ -17,21 +17,27 @@
 ## Extension Categories
 
 ### 🔧 Core Extensions
+
 **Maintained by Anya Core Team**
+
 - Bitcoin blockchain integration
 - Web5 identity and credentials
 - Machine learning inference
 - Security and cryptography tools
 
 ### 🌍 Community Extensions
+
 **Community-contributed extensions**
+
 - Protocol implementations
 - Third-party service integrations
 - Developer tools and utilities
 - Specialized use-case extensions
 
 ### 🏢 Enterprise Extensions
+
 **Commercial and enterprise-grade extensions**
+
 - Enterprise Bitcoin solutions
 - Regulatory compliance tools
 - Advanced security features
@@ -42,6 +48,7 @@
 ### Bitcoin Extensions
 
 #### bitcoin-core
+
 **Full Bitcoin Core integration with advanced features**
 
 ```bash
@@ -49,6 +56,7 @@ anya ext install bitcoin-core
 ```
 
 **Features:**
+
 - ✅ Full node operation (mainnet, testnet, regtest)
 - ✅ HD wallet management with BIP32/BIP44 support
 - ✅ Advanced transaction building with PSBT
@@ -58,6 +66,7 @@ anya ext install bitcoin-core
 - ✅ Hardware wallet integration (Ledger, Trezor)
 
 **Configuration:**
+
 ```toml
 [extensions.bitcoin-core]
 network = "mainnet"
@@ -68,6 +77,7 @@ transaction_index = true
 ```
 
 **Usage Examples:**
+
 ```rust
 use anya_bitcoin_core::{BitcoinCore, WalletManager};
 
@@ -77,6 +87,7 @@ let address = wallet.get_new_address().await?;
 ```
 
 #### bitcoin-lightning
+
 **Lightning Network integration for instant payments**
 
 ```bash
@@ -84,6 +95,7 @@ anya ext install bitcoin-lightning
 ```
 
 **Features:**
+
 - ⚡ LND and CLN (Core Lightning) support
 - ⚡ Channel management and automation
 - ⚡ Payment routing optimization
@@ -92,6 +104,7 @@ anya ext install bitcoin-lightning
 - ⚡ LNURL support
 
 **Usage Examples:**
+
 ```rust
 use anya_bitcoin_lightning::{LightningNode, PaymentManager};
 
@@ -101,6 +114,7 @@ let payment = lightning.pay_invoice(payment_request).await?;
 ```
 
 #### bitcoin-wallet
+
 **Advanced wallet features and management**
 
 ```bash
@@ -108,6 +122,7 @@ anya ext install bitcoin-wallet
 ```
 
 **Features:**
+
 - 👛 Multiple wallet types (HD, multi-sig, time-locked)
 - 👛 Coin selection optimization
 - 👛 Privacy features (CoinJoin, mixing)
@@ -118,6 +133,7 @@ anya ext install bitcoin-wallet
 ### Web5 Extensions
 
 #### web5-dids
+
 **Decentralized Identity (DID) management**
 
 ```bash
@@ -125,6 +141,7 @@ anya ext install web5-dids
 ```
 
 **Features:**
+
 - 🆔 Multiple DID methods (ION, Key, Web, PKH)
 - 🆔 DID document creation and management
 - 🆔 Key rotation and recovery
@@ -133,6 +150,7 @@ anya ext install web5-dids
 - 🆔 DID authentication
 
 **Configuration:**
+
 ```toml
 [extensions.web5-dids]
 default_method = "did:ion"
@@ -144,6 +162,7 @@ ion = "https://beta.ion.msidentity.com/api/v1.0/identifiers/"
 ```
 
 **Usage Examples:**
+
 ```rust
 use anya_web5_dids::{DidManager, DidMethod};
 
@@ -153,6 +172,7 @@ let document = did_manager.resolve_did(&did).await?;
 ```
 
 #### web5-credentials
+
 **Verifiable Credentials and Presentations**
 
 ```bash
@@ -160,6 +180,7 @@ anya ext install web5-credentials
 ```
 
 **Features:**
+
 - 📜 VC-JWT and JSON-LD credential formats
 - 📜 Credential schema validation
 - 📜 Presentation definition support
@@ -168,6 +189,7 @@ anya ext install web5-credentials
 - 📜 Credential exchange protocols
 
 **Usage Examples:**
+
 ```rust
 use anya_web5_credentials::{CredentialManager, VerifiableCredential};
 
@@ -181,6 +203,7 @@ let signed_credential = credential_manager.sign_credential(credential).await?;
 ```
 
 #### web5-protocols
+
 **Web5 Protocol implementation and management**
 
 ```bash
@@ -188,6 +211,7 @@ anya ext install web5-protocols
 ```
 
 **Features:**
+
 - 🔄 Protocol definition and installation
 - 🔄 Message routing and handling
 - 🔄 Data schema validation
@@ -198,6 +222,7 @@ anya ext install web5-protocols
 ### Machine Learning Extensions
 
 #### ml-inference
+
 **Machine learning model inference engine**
 
 ```bash
@@ -205,6 +230,7 @@ anya ext install ml-inference
 ```
 
 **Features:**
+
 - 🧠 ONNX, TensorFlow, PyTorch model support
 - 🧠 CPU and GPU acceleration
 - 🧠 Batch and streaming inference
@@ -213,6 +239,7 @@ anya ext install ml-inference
 - 🧠 A/B testing support
 
 **Configuration:**
+
 ```toml
 [extensions.ml-inference]
 backend = "onnx"
@@ -222,6 +249,7 @@ batch_size = 32
 ```
 
 **Usage Examples:**
+
 ```rust
 use anya_ml_inference::{ModelManager, InferenceRequest};
 
@@ -230,6 +258,7 @@ let result = model.infer(input_tensor).await?;
 ```
 
 #### ml-training
+
 **Distributed model training capabilities**
 
 ```bash
@@ -237,6 +266,7 @@ anya ext install ml-training
 ```
 
 **Features:**
+
 - 🎓 Distributed training support
 - 🎓 Hyperparameter optimization
 - 🎓 Model versioning and experiments
@@ -245,6 +275,7 @@ anya ext install ml-training
 - 🎓 Training monitoring and metrics
 
 #### ml-models
+
 **Pre-trained model repository and management**
 
 ```bash
@@ -252,6 +283,7 @@ anya ext install ml-models
 ```
 
 **Features:**
+
 - 📚 Curated model repository
 - 📚 Automatic model updates
 - 📚 Model validation and testing
@@ -262,6 +294,7 @@ anya ext install ml-models
 ### Security Extensions
 
 #### security-tools
+
 **Advanced security and cryptography tools**
 
 ```bash
@@ -269,6 +302,7 @@ anya ext install security-tools
 ```
 
 **Features:**
+
 - 🔒 Hardware security module (HSM) integration
 - 🔒 Advanced encryption algorithms
 - 🔒 Secure multi-party computation
@@ -277,6 +311,7 @@ anya ext install security-tools
 - 🔒 Audit logging and compliance
 
 #### privacy-tools
+
 **Privacy-preserving technologies**
 
 ```bash
@@ -284,6 +319,7 @@ anya ext install privacy-tools
 ```
 
 **Features:**
+
 - 🔐 Anonymous credentials
 - 🔐 Confidential transactions
 - 🔐 Private information retrieval
@@ -296,6 +332,7 @@ anya ext install privacy-tools
 ### Protocol Implementations
 
 #### nostr-protocol
+
 **Nostr protocol integration**
 
 ```bash
@@ -303,6 +340,7 @@ anya ext install nostr-protocol
 ```
 
 **Features:**
+
 - 📡 Nostr relay communication
 - 📡 Event publishing and subscription
 - 📡 NIP implementation (NIP-01 to NIP-42)
@@ -310,6 +348,7 @@ anya ext install nostr-protocol
 - 📡 Decentralized identity (NIP-05)
 
 #### matrix-protocol
+
 **Matrix protocol for secure messaging**
 
 ```bash
@@ -317,6 +356,7 @@ anya ext install matrix-protocol
 ```
 
 **Features:**
+
 - 💬 End-to-end encrypted messaging
 - 💬 Room and space management
 - 💬 Federation and bridging
@@ -326,6 +366,7 @@ anya ext install matrix-protocol
 ### Development Tools
 
 #### dev-tools
+
 **Developer productivity tools**
 
 ```bash
@@ -333,6 +374,7 @@ anya ext install dev-tools
 ```
 
 **Features:**
+
 - 🛠 Code generation and scaffolding
 - 🛠 Testing utilities and mocks
 - 🛠 Development server and hot reload
@@ -341,6 +383,7 @@ anya ext install dev-tools
 - 🛠 Debugging and inspection tools
 
 #### api-gateway
+
 **API gateway and service mesh**
 
 ```bash
@@ -348,6 +391,7 @@ anya ext install api-gateway
 ```
 
 **Features:**
+
 - 🌐 Request routing and load balancing
 - 🌐 Authentication and authorization
 - 🌐 Rate limiting and throttling
@@ -358,6 +402,7 @@ anya ext install api-gateway
 ### Data Integration
 
 #### database-connectors
+
 **Database integration connectors**
 
 ```bash
@@ -365,6 +410,7 @@ anya ext install database-connectors
 ```
 
 **Features:**
+
 - 🗄 PostgreSQL, MySQL, SQLite support
 - 🗄 MongoDB and Redis integration
 - 🗄 Connection pooling and management
@@ -373,6 +419,7 @@ anya ext install database-connectors
 - 🗄 Data synchronization
 
 #### file-storage
+
 **Distributed file storage integration**
 
 ```bash
@@ -380,6 +427,7 @@ anya ext install file-storage
 ```
 
 **Features:**
+
 - 📁 IPFS integration
 - 📁 AWS S3 and compatible storage
 - 📁 Encrypted storage backends
@@ -392,6 +440,7 @@ anya ext install file-storage
 ### Compliance and Regulatory
 
 #### kyc-aml-compliance
+
 **Know Your Customer and Anti-Money Laundering**
 
 ```bash
@@ -399,6 +448,7 @@ anya ext install kyc-aml-compliance --license enterprise
 ```
 
 **Features:**
+
 - 📋 Identity verification workflows
 - 📋 Transaction monitoring and analysis
 - 📋 Sanctions list screening
@@ -407,12 +457,14 @@ anya ext install kyc-aml-compliance --license enterprise
 - 📋 Audit trail and compliance tracking
 
 **Supported Regulations:**
+
 - FinCEN (USA)
 - MiCA (EU)
 - FATF recommendations
 - Local jurisdictional requirements
 
 #### audit-logging
+
 **Enterprise audit logging and compliance**
 
 ```bash
@@ -420,6 +472,7 @@ anya ext install audit-logging --license enterprise
 ```
 
 **Features:**
+
 - 📊 Comprehensive audit trails
 - 📊 Tamper-evident logging
 - 📊 Real-time monitoring and alerts
@@ -430,6 +483,7 @@ anya ext install audit-logging --license enterprise
 ### Enterprise Security
 
 #### enterprise-security
+
 **Advanced enterprise security features**
 
 ```bash
@@ -437,6 +491,7 @@ anya ext install enterprise-security --license enterprise
 ```
 
 **Features:**
+
 - 🏢 LDAP/Active Directory integration
 - 🏢 SAML/OAuth2 authentication
 - 🏢 Role-based access control (RBAC)
@@ -445,6 +500,7 @@ anya ext install enterprise-security --license enterprise
 - 🏢 Threat detection and response
 
 #### backup-recovery
+
 **Enterprise backup and disaster recovery**
 
 ```bash
@@ -452,6 +508,7 @@ anya ext install backup-recovery --license enterprise
 ```
 
 **Features:**
+
 - 💾 Automated backup scheduling
 - 💾 Point-in-time recovery
 - 💾 Cross-region replication
@@ -462,6 +519,7 @@ anya ext install backup-recovery --license enterprise
 ### Monitoring and Analytics
 
 #### enterprise-monitoring
+
 **Comprehensive monitoring and observability**
 
 ```bash
@@ -469,6 +527,7 @@ anya ext install enterprise-monitoring --license enterprise
 ```
 
 **Features:**
+
 - 📈 Real-time metrics and dashboards
 - 📈 Distributed tracing
 - 📈 Log aggregation and analysis
@@ -477,6 +536,7 @@ anya ext install enterprise-monitoring --license enterprise
 - 📈 Performance optimization
 
 #### business-analytics
+
 **Business intelligence and analytics**
 
 ```bash
@@ -484,6 +544,7 @@ anya ext install business-analytics --license enterprise
 ```
 
 **Features:**
+
 - 📊 Transaction analytics
 - 📊 User behavior analysis
 - 📊 Financial reporting
