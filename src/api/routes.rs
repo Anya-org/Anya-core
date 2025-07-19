@@ -7,15 +7,14 @@ use std::sync::Arc;
 use tower_http::trace::TraceLayer;
 
 use crate::api::handlers;
-#[cfg(feature = "rust-bitcoin")]
-use crate::bitcoin::wallet::BitcoinWallet;
 use crate::web5::identity::IdentityManager;
 
 use super::handlers::auth::auth_middleware;
 
 /// Configure all API routes
 #[cfg(feature = "rust-bitcoin")]
-pub fn configure_routes(wallet: Arc<BitcoinWallet>, identity: Arc<IdentityManager>) -> Router {
+use crate::bitcoin::wallet::Wallet;
+pub fn configure_routes(wallet: Arc<Wallet>, identity: Arc<IdentityManager>) -> Router {
     // Public routes that don't require authentication
     let public_routes = Router::new()
         .route("/health", get(handlers::system::health_check))

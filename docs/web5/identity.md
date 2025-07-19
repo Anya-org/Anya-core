@@ -17,9 +17,11 @@ description: "Documentation for Identity"
 
 
 ## Overview
+
 The identity management system in Anya provides decentralized identity capabilities using Web5 standards.
 
 ### Features
+
 - DID Creation and Management
 - Verifiable Credentials
 - Identity Verification

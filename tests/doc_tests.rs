@@ -1,10 +1,10 @@
-use anya_core::bitcoin::wallet::{WalletConfig, BitcoinWallet, CoinSelectionStrategy, FeeStrategy, WalletType};
+use anya_core::bitcoin::wallet::{WalletConfig, CoinSelectionStrategy, FeeStrategy, WalletType, Wallet};
 use bitcoin::Network;
 use std::path::PathBuf;
 
 use tokio::sync::OnceCell;
 
-fn create_test_wallet() -> Arc<BitcoinWallet> {
+async fn create_test_wallet() -> Arc<Wallet> {
     let config = WalletConfig {
         name: "test-wallet".to_string(),
         network: Network::Regtest,
@@ -21,7 +21,8 @@ fn create_test_wallet() -> Arc<BitcoinWallet> {
         min_confirmations: 1,
         fee_strategy: FeeStrategy::Medium,
     };
-    Arc::new(BitcoinWallet::new(config, None))
+    let wallet = Wallet::new(config, None);
+    Arc::new(wallet)
 }
 // Tests for the documentation
 //
@@ -43,7 +44,7 @@ use anya_core::{
 /// Test the health check endpoint
 #[tokio::test]
 async fn test_health_check() {
-    let wallet = create_test_wallet();
+    let wallet = create_test_wallet().await;
     let identity = Arc::new(IdentityManager::new("test_namespace"));
     let app = configure_routes(wallet, identity);
 
@@ -63,7 +64,7 @@ async fn test_health_check() {
 /// Test the system information endpoint
 #[tokio::test]
 async fn test_system_info() {
-    let wallet = create_test_wallet();
+    let wallet = create_test_wallet().await;
     let identity = Arc::new(IdentityManager::new("test_namespace"));
     let app = configure_routes(wallet, identity);
 
