@@ -13,6 +13,7 @@ Add a brief overview of this document here.
 This document outlines the compliance requirements and guidelines for AI components in Anya Core.
 
 ## Table of Contents
+
 - [Regulatory Framework](#regulatory-framework)
 - [Data Protection](#data-protection)
 - [Model Governance](#model-governance)
@@ -328,6 +329,7 @@ This document outlines the compliance requirements and guidelines for AI compone
 ## Review and Update
 
 This document should be reviewed and updated at least annually or when significant changes occur in:
+
 - Regulatory requirements
 - Organizational structure
 - Technology stack

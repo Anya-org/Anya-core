@@ -24,7 +24,7 @@ thiserror = "2.0"
 bitcoin = { workspace = true, features = ["rand"] }
 
 # Web5 Integration
-web5 = { workspace = true }
+web5-rust = "2.0.0-beta9"
 
 # Internal Dependencies
 anya-core = { path = ".." }

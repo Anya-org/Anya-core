@@ -20,17 +20,20 @@ Anya Extensions provide a powerful way to extend the functionality of the Anya C
 ## Quick Setup
 
 ### 1. Clone the Repository
+
 ```bash
 git clone https://github.com/anya-org/anya-core.git
 cd anya-core
 ```
 
 ### 2. Build Core Platform
+
 ```bash
 cargo build --release
 ```
 
 ### 3. Create Your First Extension
+
 ```bash
 # Use the extension template
 cargo generate --git https://github.com/anya-org/extension-template my-extension
@@ -44,18 +47,21 @@ cargo test
 ## Extension Types
 
 ### Bitcoin Protocol Extensions
+
 - BIP implementations
 - Custom transaction validation
 - Wallet functionality
 - Layer 2 integrations
 
 ### Web5 Extensions
+
 - Decentralized identity services
 - DWN integrations
 - Verifiable credentials
 - Data management
 
 ### AI/ML Extensions
+
 - Custom models
 - Analytics engines
 - Prediction services

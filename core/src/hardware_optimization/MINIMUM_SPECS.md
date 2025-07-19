@@ -23,24 +23,28 @@ This document outlines the minimum hardware specifications for running Anya Core
 To ensure maximum decentralization, Anya Core implements progressive enhancement through multiple hardware support tiers:
 
 ### Tier 1: Optimal Hardware (Intel Core i5/i7 or AMD Ryzen 5/7)
+
 - **Optimizations**: Full AVX2/AVX512 batch signature verification
 - **Batch Size**: 512+ signatures in parallel
 - **Cache Strategy**: Multi-level cache optimization
 - **Throughput**: 10,000+ tx/sec
 
 ### Tier 2: Target Baseline (Intel Core i3-7020U)
+
 - **Optimizations**: AVX2 signature verification with Kaby Lake cache awareness
 - **Batch Size**: 384 signatures in parallel
 - **Cache Strategy**: L2/L3 cache optimization
 - **Throughput**: 3,000+ tx/sec
 
 ### Tier 3: Legacy Hardware (Pre-AVX2 CPUs)
+
 - **Optimizations**: SSE4 fallback optimizations
 - **Batch Size**: 64 signatures in parallel
 - **Cache Strategy**: Minimal cache usage
 - **Throughput**: 500+ tx/sec
 
 ### Tier 4: Minimum Viable Hardware (Older CPUs, single-board computers)
+
 - **Optimizations**: Pure software fallback, no SIMD
 - **Batch Size**: Sequential processing only
 - **Cache Strategy**: Memory-conserving algorithms

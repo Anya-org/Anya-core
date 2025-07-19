@@ -169,6 +169,7 @@ const proposal = await anyaDAO.createProposal({
 - [API Reference](api/GOVERNANCE_API.md) - Technical API documentation
 
 *Last updated: 2025-02-24* 
+
 ## See Also
 
 - [Related Document 1](./INSTALLATION.md)

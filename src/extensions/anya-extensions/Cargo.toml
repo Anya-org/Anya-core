@@ -23,7 +23,7 @@ secp256k1 = { workspace = true }
 bitcoincore-rpc = { workspace = true }
 
 # Web5 Integration
-web5 = { workspace = true }
+web5-rust = "2.0.0-beta9"
 
 # Internal Dependencies
 anya-core = { path = "../../anya-core", version = "0.2.0" }
