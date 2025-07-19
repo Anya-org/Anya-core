@@ -76,6 +76,22 @@ pub trait Web5Client: Send + Sync {
     fn update_record(&self, record_id: &str, options: &UpdateRecordOptions) -> Result<Record, Web5Error>;
     fn delete_record(&self, record_id: &str) -> Result<bool, Web5Error>;
     fn query_records(&self, query: &QueryOptions) -> Result<Vec<Record>, Web5Error>;
+    // v2.0.0-beta9: Add support for async and new API signatures
+    fn create_record_async<'a>(&'a self, options: &'a CreateRecordOptions) -> std::pin::Pin<Box<dyn std::future::Future<Output = Result<Record, Web5Error>> + Send + 'a>> {
+        Box::pin(async move { self.create_record(options) })
+    }
+    fn read_record_async<'a>(&'a self, record_id: &'a str) -> std::pin::Pin<Box<dyn std::future::Future<Output = Result<Option<Record>, Web5Error>> + Send + 'a>> {
+        Box::pin(async move { self.read_record(record_id) })
+    }
+    fn update_record_async<'a>(&'a self, record_id: &'a str, options: &'a UpdateRecordOptions) -> std::pin::Pin<Box<dyn std::future::Future<Output = Result<Record, Web5Error>> + Send + 'a>> {
+        Box::pin(async move { self.update_record(record_id, options) })
+    }
+    fn delete_record_async<'a>(&'a self, record_id: &'a str) -> std::pin::Pin<Box<dyn std::future::Future<Output = Result<bool, Web5Error>> + Send + 'a>> {
+        Box::pin(async move { self.delete_record(record_id) })
+    }
+    fn query_records_async<'a>(&'a self, query: &'a QueryOptions) -> std::pin::Pin<Box<dyn std::future::Future<Output = Result<Vec<Record>, Web5Error>> + Send + 'a>> {
+        Box::pin(async move { self.query_records(query) })
+    }
 }
 
 /// Options for creating a record

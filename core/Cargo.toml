@@ -37,7 +37,7 @@ hmac = "0.12.1"
 cargo-audit = { version = "0.18.3", optional = true }
 
 # Use a specific version tag to avoid Git issues
-web5 = { git = "https://github.com/decentralized-identity/web5-rs.git", tag = "v4.0.0" }
+web5-rust = "2.0.0-beta9"
 
 # Add SGX implementation
 sgx_urts = { version = "1.1.1", optional = true }
