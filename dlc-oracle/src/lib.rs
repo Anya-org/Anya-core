@@ -63,13 +63,25 @@ impl Oracle {
     /// Create an attestation for a given value
     pub fn attest(&self, value: &str) -> Result<Attestation> {
         // Implementation would go here
-        todo!("Implement attestation signing")
+        let secp = bitcoin::secp256k1::Secp256k1::new();
+        let message = bitcoin::secp256k1::Message::from_slice(value.as_bytes()).unwrap();
+        let signature = secp.sign_ecdsa(&message, &self.secret_key);
+        Ok(Attestation {
+            value: value.to_string(),
+            public_key: self.public_key,
+            signature,
+            timestamp: current_timestamp(),
+        })
     }
     
     /// Verify an attestation
     pub fn verify(attestation: &Attestation) -> Result<bool> {
         // Implementation would go here
-        todo!("Implement attestation verification")
+        let secp = bitcoin::secp256k1::Secp256k1::new();
+        let message = bitcoin::secp256k1::Message::from_slice(attestation.value.as_bytes()).unwrap();
+        secp.verify_ecdsa(&message, &attestation.signature, &attestation.public_key)
+            .map(|_| true)
+            .map_err(|e| Error::Verification(e.to_string()))
     }
 }
 

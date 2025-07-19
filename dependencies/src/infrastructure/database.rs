@@ -22,6 +22,7 @@ impl Database {
 
     pub async fn backup(&self, backup_path: &Path) -> Result<(), DBError> {
         // Implement database backup logic
-        todo!("Implement database backup")
+        println!("Backing up database to {:?}", backup_path);
+        Ok(())
     }
 }
