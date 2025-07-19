@@ -73,8 +73,6 @@ miniscript = { version = "=12.3.0", features = [
 ] } # Enhanced for better policy compilation
 bip39 = { version = "2.0", features = ["std"] }
 
-# Enhanced Web5/DID dependencies for better alignment
-web5-rust = "2.0.0-beta9"
 jsonwebtoken = { version = "=9.3.1", features = [
     "use_pem",
 ] } # Enhanced JWT support

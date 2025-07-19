@@ -2,7 +2,7 @@
 // Replaces SQLite with IPFS + DWN + Bitcoin anchoring for complete data sovereignty
 // [AIR-012] Operational Reliability and [AIP-002] Modular Architecture
 
-use crate::web5::{DWNManager, DWNRecord, Web5Error, Web5Result};
+// use Web5Adapter HTTP client instead of direct web5 imports
 use crate::storage::ipfs::{IPFSStorage, IPFSConfig};
 use crate::{AnyaError, AnyaResult};
 use bitcoin::{Network, Txid};

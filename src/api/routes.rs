@@ -7,14 +7,15 @@ use std::sync::Arc;
 use tower_http::trace::TraceLayer;
 
 use crate::api::handlers;
-use crate::web5::identity::IdentityManager;
+
+use crate::web5::Web5Adapter;
 
 use super::handlers::auth::auth_middleware;
 
 /// Configure all API routes
 #[cfg(feature = "rust-bitcoin")]
 use crate::bitcoin::wallet::Wallet;
-pub fn configure_routes(wallet: Arc<Wallet>, identity: Arc<IdentityManager>) -> Router {
+pub fn configure_routes(wallet: Arc<Wallet>, web5_adapter: Arc<Web5Adapter>) -> Router {
     // Public routes that don't require authentication
     let public_routes = Router::new()
         .route("/health", get(handlers::system::health_check))
@@ -50,7 +51,7 @@ pub fn configure_routes(wallet: Arc<Wallet>, identity: Arc<IdentityManager>) -> 
             "/credentials/verify",
             post(handlers::identity::verify_credential),
         )
-        .with_state(identity.clone());
+        .with_state(web5_adapter.clone());
 
     // DLC routes - require authentication
     let dlc_routes = Router::new()
@@ -75,7 +76,7 @@ pub fn configure_routes(wallet: Arc<Wallet>, identity: Arc<IdentityManager>) -> 
 
 /// Configure all API routes (without Bitcoin functionality)
 #[cfg(not(feature = "rust-bitcoin"))]
-pub fn configure_routes(identity: Arc<IdentityManager>) -> Router {
+pub fn configure_routes(web5_adapter: Arc<Web5Adapter>) -> Router {
     // Public routes that don't require authentication
     let public_routes = Router::new()
         .route("/health", get(handlers::system::health_check))
@@ -98,7 +99,7 @@ pub fn configure_routes(identity: Arc<IdentityManager>) -> Router {
             "/credentials/verify",
             post(handlers::identity::verify_credential),
         )
-        .with_state(identity.clone());
+        .with_state(web5_adapter.clone());
 
     // DLC routes - require authentication (without Bitcoin dependency)
     let dlc_routes = Router::new()

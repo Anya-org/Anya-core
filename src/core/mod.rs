@@ -12,6 +12,7 @@ pub use reliability::{
     execute_with_monitoring, execute_with_recovery, AiVerification, ProgressTracker, Watchdog,
 };
 
+use crate::web::web5_adapter::Web5Adapter; // use Web5Adapter HTTP client instead of direct web5 imports
 /// Core functionality with auto-save capabilities
 pub struct CoreSystem {
     performance_optimizer: PerformanceOptimizer,
@@ -115,7 +116,7 @@ pub mod ports {
 
 use crate::ml::agent_system::MLAgentSystem;
 use crate::tokenomics::{engine::TokenomicsConfig, TokenomicsEngine};
-use crate::web5::Web5Adapter;
+// use Web5Adapter HTTP client instead of direct web5 imports
 
 #[derive(Debug, Clone)]
 pub struct BitcoinConfig {
@@ -144,7 +145,7 @@ pub struct Config {
 pub struct AnyaCore {
     #[cfg(feature = "rust-bitcoin")]
     bitcoin_adapter: Arc<dyn crate::bitcoin::interface::BitcoinInterface>,
-    web5_adapter: Arc<Web5Adapter>,
+    web5_adapter: Arc<crate::web::web5_adapter::Web5Adapter>,
     ml_agent_system: Arc<MLAgentSystem>,
     dao_governance: Arc<crate::dao::DaoGovernance>,
     tokenomics: Arc<TokenomicsEngine>,
@@ -167,13 +168,8 @@ impl AnyaCore {
         let bitcoin: Arc<dyn crate::bitcoin::interface::BitcoinInterface + Send + Sync> =
             Arc::new(bitcoin_adapter);
 
-        let web5_config = crate::web5::Web5Config {
-            enabled: true,
-            did_method: "ion".to_string(),
-            dwn_url: Some(config.web5.endpoint.clone()),
-            use_local_storage: true,
-        };
-        let web5 = Arc::new(Web5Adapter::build(web5_config).await?);
+        // Use HTTP-based Web5Adapter client
+        let web5 = Arc::new(crate::web::web5_adapter::Web5Adapter::new(&config.web5.endpoint));
 
         let ml_config = crate::ml::MLConfig {
             enabled: true,
@@ -198,13 +194,8 @@ impl AnyaCore {
 
     #[cfg(not(feature = "rust-bitcoin"))]
     pub async fn new(config: Config) -> Result<Self, Box<dyn std::error::Error>> {
-        let web5_config = crate::web5::Web5Config {
-            enabled: true,
-            did_method: "ion".to_string(),
-            dwn_url: Some(config.web5.endpoint.clone()),
-            use_local_storage: true,
-        };
-        let web5 = Arc::new(Web5Adapter::build(web5_config).await?);
+        // Use HTTP-based Web5Adapter client
+        let web5 = Arc::new(crate::web::web5_adapter::Web5Adapter::new(&config.web5.endpoint));
 
         let ml_config = crate::ml::MLConfig {
             enabled: true,
