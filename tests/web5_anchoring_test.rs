@@ -9,6 +9,7 @@ mod web5_tests {
     use std::sync::Arc;
     use tempfile::tempdir;
     use anyhow::Result;
+    use anya_core::bitcoin::wallet::{CoinSelectionStrategy, FeeStrategy, AddressManager, TransactionManager};
 
     #[tokio::test]
     async fn test_web5_credential_with_bitcoin_anchoring() -> Result<()> {
@@ -26,10 +27,10 @@ mod web5_tests {
             change_descriptor: "tr([73c5da0a/86'/1'/0']xprv9xgqHN7yz9MwCkxsBPN5qetuNdQSUttZNKw1dcYTV4mTp8ZrKLRPXBThPxq9h3wcAAJVH5qQCk99URy2CQHEMnMKUNpUorQJpXbgJC6C1HR/1/*)".to_string(),
             data_dir: temp_dir.path().to_path_buf(),
             use_rpc: false,
-            coin_selection: Default::default(),
+            coin_selection: CoinSelectionStrategy::BranchAndBound,
             gap_limit: 20,
             min_confirmations: 1,
-            fee_strategy: Default::default(),
+            fee_strategy: FeeStrategy::Medium,
             xpub: None,
         };
 
@@ -57,10 +58,10 @@ mod web5_tests {
         //     )
         //     .await?;
 
-        // Verify the credential has Bitcoin anchoring info
+            // ...existing code...
         // assert!(credential.bitcoin_anchoring.is_some());
         println!("Credential issued successfully with Bitcoin anchoring");
-
+            // ...existing code...
         // Verify the credential
         // let is_valid = credential_manager.verify_credential(&credential).await?;
         // assert!(is_valid);
@@ -86,10 +87,10 @@ mod web5_tests {
             change_descriptor: "tr([73c5da0a/86'/1'/0']xprv9xgqHN7yz9MwCkxsBPN5qetuNdQSUttZNKw1dcYTV4mTp8ZrKLRPXBThPxq9h3wcAAJVH5qQCk99URy2CQHEMnMKUNpUorQJpXbgJC6C1HR/1/*)".to_string(),
             data_dir: temp_dir.path().to_path_buf(),
             use_rpc: false,
-            coin_selection: Default::default(),
+            coin_selection: CoinSelectionStrategy::BranchAndBound,
             gap_limit: 20,
             min_confirmations: 1,
-            fee_strategy: Default::default(),
+            fee_strategy: FeeStrategy::Medium,
             xpub: None,
         };
 
@@ -111,10 +112,15 @@ mod web5_tests {
 
         // Create multi-output PSBT
         println!("Creating multi-output PSBT...");
-        let psbt = wallet.create_transaction(outputs.clone(), 1.0, Default::default()).await?;
+        use anya_core::bitcoin::wallet::transactions::{TxOptions, CoinSelectionStrategy as TxCoinSelectionStrategy};
+        let tx_options = TxOptions {
+            coin_selection: TxCoinSelectionStrategy::BranchAndBound,
+            ..Default::default()
+        };
+        let psbt = wallet.create_transaction(outputs.clone(), 1.0, tx_options)?;
 
         // Check that the PSBT has the correct number of outputs
-        assert_eq!(psbt.unsigned_tx.output.len(), 4); // 3 destinations + change output
+        assert_eq!(psbt.output.len(), 4); // 3 destinations + change output
 
         // Enhance the PSBT for hardware wallet compatibility
         println!("Enhancing PSBT for hardware wallet compatibility...");
@@ -122,7 +128,7 @@ mod web5_tests {
         // wallet.enhance_psbt_for_hardware(&mut enhanced_psbt).await?;
 
         // Check if the PSBT was properly enhanced with BDK 0.30.0
-        assert!(enhanced_psbt.inputs.len() > 0);
+        assert!(enhanced_psbt.input.len() > 0);
 
         println!("Multi-output PSBT created and enhanced successfully");
 

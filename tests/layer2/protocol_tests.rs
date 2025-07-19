@@ -1,5 +1,5 @@
 use anya_core::{
-    core::reliability::{AiVerification, ConfidenceAssessment, ProgressTracker, Watchdog},
+    core::reliability::{ConfidenceAssessment, ProgressTracker, Watchdog},
     layer2::{
         AssetParams, AssetTransfer, Layer2Protocol, Proof, ProtocolState, TransactionStatus,
         TransferResult, ValidationResult, VerificationResult,

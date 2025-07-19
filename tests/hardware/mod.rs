@@ -17,4 +17,3 @@ mod profile_tests;
 // Re-export hardware tests for main test runner
 // pub use bitcoin_principles_tests::*;  // Disabled - missing dependencies
 // pub use hardware_optimization_tests::*;  // Disabled - missing dependencies
-pub use profile_tests::*;

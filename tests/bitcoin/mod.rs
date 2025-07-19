@@ -9,7 +9,7 @@ async fn test_rust_bitcoin_implementation() {
         network: Network::Testnet.to_string(),
         ..Default::default()
     };
-    let mut implementation = RustBitcoinImplementation::new(&config).unwrap();
+    let implementation = RustBitcoinImplementation::new(&config).unwrap();
 
     // Test address generation
     let address = implementation

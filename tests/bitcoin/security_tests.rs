@@ -3,18 +3,12 @@
 #![cfg(test)] // Keep the file as a valid module but don't enable the tests yet
 
 // Imports needed for when tests are enabled
-use anya_core::{
-    bitcoin::validation::TransactionValidator, hardware_optimization::HardwareOptimizationManager,
-};
+use anya_core::bitcoin::validation::TransactionValidator;
 
-#[cfg(feature = "rust-bitcoin")]
-use anya_core::bitcoin::interface::BlockHeader;
 use bitcoin::{
-    absolute::LockTime, transaction::Version, Amount, Block, OutPoint, ScriptBuf, Sequence,
+    absolute::LockTime, transaction::Version, Amount, OutPoint, ScriptBuf, Sequence,
     Transaction, TxIn, TxOut, Witness,
 };
-use std::collections::HashMap;
-use std::sync::Arc;
 
 /// [SECURITY SENSITIVE] Test full Bitcoin Core security alignment
 /// Tests our implementation against CVE-2010-5139 (value overflow)
