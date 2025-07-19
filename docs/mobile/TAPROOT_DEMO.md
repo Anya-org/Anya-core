@@ -46,7 +46,10 @@ impl TaprootMobileWallet {
     
     pub fn create_taproot_address(&self, index: u32) -> Result<Address, Error> {
         // Implementation for creating Taproot addresses
-        todo!("Implement Taproot address creation")
+        let derivation_path = format!("m/86'/0'/0'/0/{}", index);
+        let derived_key = self.keychain.derive_from_path(&derivation_path)?;
+        let (internal_key, _) = derived_key.to_public(&self.secp).x_only_public_key();
+        Ok(Address::p2tr(&self.secp, internal_key, None, self.network))
     }
 }
 ```
@@ -61,7 +64,14 @@ pub fn create_script_path_transaction(
     control_block: &ControlBlock,
 ) -> Result<Transaction, Error> {
     // Implementation for script path spending
-    todo!("Implement script path spending")
+    let mut tx_builder = self.create_transaction_builder();
+    tx_builder.add_input_with_script(
+        self.keychain.clone(),
+        script.clone(),
+        control_block.clone(),
+    );
+    tx_builder.add_output(Address::p2tr(&self.secp, self.keychain.to_public(&self.secp).x_only_public_key().0, None, self.network), 10000);
+    Ok(tx_builder.build())
 }
 ```
 
