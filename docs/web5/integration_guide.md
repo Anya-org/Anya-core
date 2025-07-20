@@ -17,6 +17,7 @@ last_updated: 2025-05-30
 
 
 ## Overview
+
 Anya's Web5 integration provides decentralized identity and data management capabilities with ML-powered analytics and revenue tracking.
 
 ## Core Components

@@ -23,13 +23,17 @@ Anya provides a comprehensive REST and WebSocket API for integrating Bitcoin inf
 ## Authentication
 
 ### API Keys
+
+
 ```rust
 // Request with API key
 GET /api/v1/transactions
 Authorization: Bearer YOUR_API_KEY
 ```
 
+
 ### OAuth2
+
 ```rust
 // OAuth2 token request
 POST /oauth/token
@@ -44,7 +48,9 @@ grant_type=client_credentials
 
 ### Transaction Endpoints
 
+
 #### Create Transaction
+
 ```rust
 POST /api/v1/transactions
 Content-Type: application/json
@@ -57,38 +63,49 @@ Content-Type: application/json
     "fee_rate": "5",
     "rbf": true
 }
+
 ```
 
 #### Get Transaction
+
 ```rust
+
 GET /api/v1/transactions/{txid}
 ```
 
 #### List Transactions
+
 ```rust
 GET /api/v1/transactions?limit=10&offset=0
+
 ```
 
 ### Wallet Endpoints
 
 #### Create Wallet
+
 ```rust
 POST /api/v1/wallets
 Content-Type: application/json
 
 {
     "name": "main",
+
     "type": "segwit",
     "backup_type": "encrypted"
 }
 ```
 
+
 #### Get Wallet
+
 ```rust
 GET /api/v1/wallets/{wallet_id}
 ```
 
 #### List Wallets
+
+
 ```rust
 GET /api/v1/wallets?limit=10&offset=0
 ```
@@ -96,25 +113,31 @@ GET /api/v1/wallets?limit=10&offset=0
 ### Contract Endpoints
 
 #### Create Contract
+
 ```rust
 POST /api/v1/contracts
 Content-Type: application/json
+
 
 {
     "type": "dlc",
     "oracle": "oracle_id",
     "outcomes": ["true", "false"],
     "collateral": "1.0"
+
 }
 ```
 
 #### Get Contract
+
 ```rust
 GET /api/v1/contracts/{contract_id}
 ```
 
 #### Execute Contract
+
 ```rust
+
 PUT /api/v1/contracts/{contract_id}/execute
 Content-Type: application/json
 
@@ -126,8 +149,10 @@ Content-Type: application/json
 ## WebSocket API
 
 ### Connection
+
 ```rust
 // Connect to WebSocket
+
 ws://api.anya.com/v1/ws
 
 // Authentication message
@@ -140,12 +165,14 @@ ws://api.anya.com/v1/ws
 ### Subscriptions
 
 #### Transaction Updates
+
 ```rust
 // Subscribe
 {
     "type": "subscribe",
     "channel": "transactions"
 }
+
 
 // Update message
 {
@@ -159,11 +186,13 @@ ws://api.anya.com/v1/ws
 ```
 
 #### Block Updates
+
 ```rust
 // Subscribe
 {
     "type": "subscribe",
     "channel": "blocks"
+
 }
 
 // Update message
@@ -178,12 +207,14 @@ ws://api.anya.com/v1/ws
 ```
 
 #### Contract Updates
+
 ```rust
 // Subscribe
 {
     "type": "subscribe",
     "channel": "contracts"
 }
+
 
 // Update message
 {
@@ -198,7 +229,9 @@ ws://api.anya.com/v1/ws
 
 ## Error Handling
 
+
 ### Error Format
+
 ```json
 {
     "error": {
@@ -207,12 +240,15 @@ ws://api.anya.com/v1/ws
         "details": {
             "field": "amount",
             "reason": "insufficient_funds"
+
         }
     }
 }
 ```
 
 ### Common Error Codes
+
+
 - `invalid_request`: Invalid request parameters
 - `unauthorized`: Authentication failed
 - `forbidden`: Permission denied
@@ -220,16 +256,20 @@ ws://api.anya.com/v1/ws
 - `rate_limited`: Too many requests
 - `internal_error`: Server error
 
+
 ## Rate Limiting
 
 ### Headers
+
 ```
+
 X-RateLimit-Limit: 1000
 X-RateLimit-Remaining: 999
 X-RateLimit-Reset: 1631234567
 ```
 
 ### Limits
+
 - REST API: 1000 requests per minute
 - WebSocket: 100 messages per second
 - Bulk operations: 10 requests per minute
@@ -237,17 +277,22 @@ X-RateLimit-Reset: 1631234567
 ## Pagination
 
 ### Request
+
+
 ```rust
 GET /api/v1/transactions?limit=10&offset=0
 ```
 
 ### Response
+
+
 ```json
 {
     "data": [...],
     "pagination": {
         "total": 100,
         "limit": 10,
+
         "offset": 0,
         "has_more": true
     }
@@ -257,11 +302,14 @@ GET /api/v1/transactions?limit=10&offset=0
 ## Versioning
 
 ### API Versions
+
 - v1: Current stable version
 - v2: Beta version (if available)
 - v0: Deprecated version
 
+
 ### Headers
+
 ```
 Accept: application/json; version=1
 ```
@@ -269,11 +317,13 @@ Accept: application/json; version=1
 ## Examples
 
 ### Creating a Transaction
+
 ```rust
 use anya_sdk::{Client, TransactionBuilder};
 
 let client = Client::new(api_key);
 let tx = TransactionBuilder::new()
+
     .add_recipient("bc1q...", "0.1")
     .set_fee_rate(5)
     .enable_rbf()
@@ -283,6 +333,7 @@ let result = client.send_transaction(tx).await?;
 ```
 
 ### Managing Contracts
+
 ```rust
 use anya_sdk::{Client, ContractBuilder};
 
@@ -295,17 +346,21 @@ let contract = ContractBuilder::new()
     .build()?;
 
 let result = client.create_contract(contract).await?;
+
 ```
 
 ### WebSocket Subscription
+
 ```rust
 use anya_sdk::{WebSocketClient, Subscription};
+
 
 let ws = WebSocketClient::new(api_key);
 ws.subscribe(vec![
     Subscription::Transactions,
     Subscription::Blocks,
     Subscription::Contracts,
+
 ])?;
 
 while let Some(msg) = ws.next().await {
@@ -314,38 +369,46 @@ while let Some(msg) = ws.next().await {
         Message::Block(block) => println!("New block: {}", block.height),
         Message::Contract(contract) => println!("Contract update: {}", contract.id),
     }
+
 }
 ```
 
 ## Best Practices
 
 ### 1. Error Handling
+
+
 - Always check error responses
 - Implement exponential backoff
 - Handle rate limiting
 - Log errors appropriately
 
 ### 2. Performance
+
 - Use WebSocket for real-time updates
 - Implement caching
 - Batch operations when possible
 - Monitor API usage
 
 ### 3. Security
+
 - Secure API keys
 - Use HTTPS
+
 - Implement timeouts
 - Validate responses
 
 ## SDK Support
 
 ### Official SDKs
+
 - Rust: `anya-sdk`
 - Python: `anya-python`
 - JavaScript: `anya-js`
 - Go: `anya-go`
 
 ### Installation
+
 ```bash
 ## Rust
 cargo add anya-sdk
@@ -363,6 +426,7 @@ go get github.com/anya/anya-go
 ## Support
 
 For API support:
+
 - API documentation
 - SDK documentation
 - Support channels

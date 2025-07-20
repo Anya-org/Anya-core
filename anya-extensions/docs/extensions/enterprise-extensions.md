@@ -58,6 +58,7 @@ pub struct EnterpriseConfig {
 ## Enterprise Bitcoin Extensions
 
 ### Bitcoin Custody Suite Enterprise
+
 **Provider**: Anya Enterprise Solutions  
 **Version**: 4.2.0  
 **Compliance**: SOC 2 Type II, ISO 27001, FIPS 140-2 Level 3
@@ -197,6 +198,7 @@ third_party_auditor = "big4-audit-firm"
 ```
 
 ### Bitcoin Treasury Management Enterprise
+
 **Provider**: Anya Enterprise Solutions  
 **Version**: 3.8.1  
 **Compliance**: SOX, GAAP, IFRS
@@ -268,6 +270,7 @@ impl BitcoinTreasuryEnterprise {
 ## Enterprise Web5 Extensions
 
 ### Web5 Identity Governance Enterprise
+
 **Provider**: Anya Enterprise Solutions  
 **Version**: 2.5.0  
 **Compliance**: GDPR, CCPA, SOC 2 Type II
@@ -352,6 +355,7 @@ impl Web5IdentityGovernanceEnterprise {
 ```
 
 ### Web5 Data Governance Enterprise
+
 **Provider**: Anya Enterprise Solutions  
 **Version**: 3.1.2  
 **Compliance**: GDPR, HIPAA, SOX
@@ -413,6 +417,7 @@ impl Web5DataGovernanceEnterprise {
 ## Enterprise ML Extensions
 
 ### ML Operations Enterprise
+
 **Provider**: Anya Enterprise Solutions  
 **Version**: 5.0.1  
 **Compliance**: SOC 2 Type II, ISO 27001
@@ -517,6 +522,7 @@ impl MLOperationsEnterprise {
 ```
 
 ### AI Risk Management Enterprise
+
 **Provider**: Anya Enterprise Solutions  
 **Version**: 2.3.0  
 **Compliance**: EU AI Act, NIST AI RMF
@@ -591,6 +597,7 @@ impl AIRiskManagementEnterprise {
 ## Compliance and Governance Extensions
 
 ### Regulatory Compliance Suite Enterprise
+
 **Provider**: Anya Enterprise Solutions  
 **Version**: 4.1.0  
 **Compliance**: Multi-jurisdictional
@@ -646,6 +653,7 @@ impl RegulatoryComplianceEnterprise {
 ```
 
 ### Audit and Compliance Monitoring Enterprise
+
 **Provider**: Anya Enterprise Solutions  
 **Version**: 3.4.0  
 **Compliance**: SOC 2 Type II, ISO 27001
@@ -694,6 +702,7 @@ impl AuditComplianceEnterprise {
 ## Infrastructure and Operations Extensions
 
 ### Enterprise Infrastructure Management
+
 **Provider**: Anya Enterprise Solutions  
 **Version**: 6.0.0  
 **Compliance**: SOC 2 Type II, FedRAMP
@@ -782,6 +791,7 @@ impl EnterpriseInfrastructureManager {
 ### Enterprise Licensing Tiers
 
 #### Starter Enterprise
+
 - **Price**: $10,000/year
 - **Support**: Business hours email support
 - **SLA**: 99.5% uptime
@@ -789,6 +799,7 @@ impl EnterpriseInfrastructureManager {
 - **Users**: Up to 100 users
 
 #### Professional Enterprise
+
 - **Price**: $50,000/year
 - **Support**: 24/7 phone and email support
 - **SLA**: 99.9% uptime
@@ -797,6 +808,7 @@ impl EnterpriseInfrastructureManager {
 - **Compliance**: SOC 2 Type II, ISO 27001
 
 #### Enterprise Plus
+
 - **Price**: Custom pricing
 - **Support**: Dedicated customer success manager
 - **SLA**: 99.99% uptime

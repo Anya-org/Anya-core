@@ -8,7 +8,7 @@ use tower_http::trace::TraceLayer;
 
 use crate::api::handlers;
 
-use crate::web5::Web5Adapter;
+use crate::web::web5_adapter::Web5Adapter;
 
 use super::handlers::auth::auth_middleware;
 

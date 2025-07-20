@@ -1,14 +1,13 @@
 //! Web5 Implementation Core [AIR-3][AIS-3][BPC-3][RES-3]
 
 // Re-export modules
-pub mod adapter;
 pub mod dwn; // Decentralized Web Node
 pub mod identity;
 pub mod protocols;
 pub mod vc; // Verifiable Credentials
 
 // Re-export important types for easy access
-pub use adapter::Web5Adapter;
+// Legacy Web5Adapter removed. Use the canonical HTTP client adapter from src/web/web5_adapter.rs
 pub use identity::{DIDDocument, DIDManager, IdentityManager, Web5Error, Web5Result, DID};
 pub use protocols::{ProtocolDefinition, ProtocolHandler, ProtocolManager};
 

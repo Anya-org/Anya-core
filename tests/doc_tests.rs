@@ -2,7 +2,7 @@ use anya_core::bitcoin::wallet::{WalletConfig, CoinSelectionStrategy, FeeStrateg
 use bitcoin::Network;
 use std::path::PathBuf;
 
-use tokio::sync::OnceCell;
+
 
 async fn create_test_wallet() -> Arc<Wallet> {
     let config = WalletConfig {
@@ -29,7 +29,7 @@ async fn create_test_wallet() -> Arc<Wallet> {
 // This file contains tests that verify the correctness of the code examples in the
 // documentation. It also includes integration tests that check the API endpoints.
 
-use anya_core::AnyaConfig;
+
 use axum::{
     body::Body,
     http::{Request, StatusCode},

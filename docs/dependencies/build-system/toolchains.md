@@ -5,6 +5,7 @@ This document details the toolchain configuration in Anya.
 ## Rust Toolchain
 
 ### 1. Channel Selection
+
 ```toml
 [toolchain]
 channel = "stable"
@@ -14,6 +15,7 @@ profile = "minimal"
 ```
 
 ### 2. Component Installation
+
 ```bash
 # Install core components
 rustup component add rustfmt
@@ -28,6 +30,7 @@ rustup target add aarch64-apple-darwin
 ```
 
 ### 3. Tool Configuration
+
 ```toml
 # rustfmt.toml
 max_width = 100
@@ -44,6 +47,7 @@ too-many-arguments-threshold = 10
 ## External Tools
 
 ### 1. Build Tools
+
 ```bash
 # Windows (PowerShell)
 choco install cmake llvm visualstudio2019buildtools
@@ -56,6 +60,7 @@ brew install cmake llvm
 ```
 
 ### 2. Development Tools
+
 ```bash
 # Install development tools
 cargo install cargo-edit
@@ -65,6 +70,7 @@ cargo install cargo-audit
 ```
 
 ### 3. Testing Tools
+
 ```bash
 # Install testing tools
 cargo install cargo-tarpaulin
@@ -75,24 +81,28 @@ cargo install cargo-criterion
 ## Best Practices
 
 ### 1. Toolchain Management
+
 - Use rustup for toolchain management
 - Keep toolchain updated
 - Use consistent versions
 - Document requirements
 
 ### 2. Development Workflow
+
 - Use cargo-edit for dependency management
 - Use cargo-watch for development
 - Use cargo-outdated for updates
 - Use cargo-audit for security
 
 ### 3. Testing Workflow
+
 - Use cargo-tarpaulin for coverage
 - Use cargo-nextest for testing
 - Use cargo-criterion for benchmarks
 - Use clippy for linting
 
 ## Related Documentation
+
 - [Build Profiles](build-profiles.md)
 - [Cross Compilation](cross-compilation.md)
 - [Dependencies](dependencies.md)

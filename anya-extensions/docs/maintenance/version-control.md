@@ -66,6 +66,7 @@ git config --global core.hooksPath ~/.config/git/hooks
 ### Git Message Template
 
 Create `~/.gitmessage`:
+
 ```
 # <type>(<scope>): <subject>
 #
@@ -129,6 +130,7 @@ main
 ### Branch Types
 
 #### Main Branch
+
 - **Purpose**: Production-ready code
 - **Protection**: Branch protection enabled
 - **Merges**: Only from release and hotfix branches
@@ -141,6 +143,7 @@ git branch --set-upstream-to=origin/main main
 ```
 
 #### Develop Branch
+
 - **Purpose**: Integration branch for features
 - **Protection**: Require pull request reviews
 - **Merges**: From feature branches
@@ -153,6 +156,7 @@ git push -u origin develop
 ```
 
 #### Feature Branches
+
 - **Purpose**: New features and enhancements
 - **Lifetime**: Until feature completion
 - **Naming**: `feature/<description>`
@@ -172,6 +176,7 @@ git push -u origin feature/bitcoin-lightning-integration
 ```
 
 #### Release Branches
+
 - **Purpose**: Prepare new release versions
 - **Lifetime**: Until release completion
 - **Naming**: `release/v<version>`
@@ -196,6 +201,7 @@ git merge --no-ff release/v1.2.0
 ```
 
 #### Hotfix Branches
+
 - **Purpose**: Critical fixes for production
 - **Lifetime**: Until fix deployment
 - **Naming**: `hotfix/v<version>` or `hotfix/<issue>`
@@ -263,6 +269,7 @@ Follow the [Conventional Commits](https://www.conventionalcommits.org/) specific
 ### Commit Types
 
 #### Feature Development
+
 ```bash
 # New features
 git commit -m "feat(bitcoin): add multi-signature wallet support"
@@ -275,6 +282,7 @@ git commit -m "feat(bitcoin): add fee estimation with RBF support"
 ```
 
 #### Bug Fixes
+
 ```bash
 # Bug fixes
 git commit -m "fix(bitcoin): resolve wallet balance calculation error"
@@ -286,6 +294,7 @@ git commit -m "fix(security): prevent private key exposure in logs"
 ```
 
 #### Documentation
+
 ```bash
 # Documentation updates
 git commit -m "docs(api): add Bitcoin wallet API examples"
@@ -294,6 +303,7 @@ git commit -m "docs(web5): add DID method comparison guide"
 ```
 
 #### Performance and Optimization
+
 ```bash
 # Performance improvements
 git commit -m "perf(bitcoin): optimize UTXO selection algorithm"
@@ -302,6 +312,7 @@ git commit -m "perf(core): reduce extension startup time by 50%"
 ```
 
 #### Refactoring
+
 ```bash
 # Code refactoring
 git commit -m "refactor(bitcoin): extract transaction builder to separate module"
@@ -310,6 +321,7 @@ git commit -m "refactor(ml): reorganize model management code"
 ```
 
 #### Testing
+
 ```bash
 # Test additions
 git commit -m "test(bitcoin): add integration tests for Lightning Network"
@@ -318,6 +330,7 @@ git commit -m "test(ml): add performance benchmarks for model inference"
 ```
 
 #### Build and CI
+
 ```bash
 # Build system changes
 git commit -m "build: update Rust to 1.70.0"
@@ -328,18 +341,21 @@ git commit -m "chore: update dependencies to latest versions"
 ### Commit Message Best Practices
 
 #### Subject Line
+
 - Use imperative mood ("add" not "added")
 - Keep under 50 characters
 - Don't end with period
 - Be specific and descriptive
 
 #### Body
+
 - Wrap at 72 characters
 - Explain what and why, not how
 - Use present tense
 - Include motivation and context
 
 #### Footer
+
 - Reference issues and pull requests
 - Include breaking change information
 - Note co-authors
@@ -633,6 +649,7 @@ gh pr create --base develop
 ### Merge Strategies
 
 #### Feature Merges
+
 ```bash
 # Squash and merge for clean history
 git checkout develop
@@ -649,6 +666,7 @@ Closes #456"
 ```
 
 #### Release Merges
+
 ```bash
 # No-fast-forward merge to preserve branch structure
 git checkout main

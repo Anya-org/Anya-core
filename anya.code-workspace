@@ -33,13 +33,6 @@
             "anya",
             "anya-org'",
             "Tokenomics"
-        ],
-        "github.copilot.chat.codeGeneration.instructions": [
-            "Always generate the best possible code according to the latest best practices.",
-            "Use the best, original libraries available.",
-            "Research before generating code.",
-            "Ensure all code is strictly aligned with the project's conventions and requirements."
         ]
-    ]
-}
+    }
 }

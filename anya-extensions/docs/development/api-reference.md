@@ -9,6 +9,7 @@ Complete API reference for Anya Core extension development, covering all interfa
 ## Core Extension Traits
 
 ### ExtensionTrait
+
 Base trait that all extensions must implement:
 
 ```rust
@@ -31,6 +32,7 @@ pub trait ExtensionTrait: Send + Sync {
 ```
 
 ### BitcoinExtensionTrait
+
 Specialized trait for Bitcoin protocol extensions:
 
 ```rust
@@ -49,6 +51,7 @@ pub trait BitcoinExtensionTrait: ExtensionTrait {
 ## Core APIs
 
 ### Bitcoin Integration
+
 ```rust
 // Transaction management
 use anya_core::bitcoin::{Transaction, TransactionManager};
@@ -64,6 +67,7 @@ let psbt = psbt_manager.create_psbt(transaction)?;
 ```
 
 ### Web5 Integration
+
 ```rust
 // Decentralized Identity
 use anya_core::web5::{Did, DidManager};
@@ -80,6 +84,7 @@ dwn.store_message(message)?;
 ```
 
 ### ML/AI Integration
+
 ```rust
 // Agent System
 use anya_core::ml::{Agent, AgentChecker, SystemStage};
@@ -98,6 +103,7 @@ let prediction = model.predict(&input_data)?;
 ## Configuration API
 
 ### ExtensionConfig
+
 ```rust
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ExtensionConfig {
@@ -119,6 +125,7 @@ impl ExtensionConfig {
 ## Error Handling
 
 ### ExtensionError
+
 ```rust
 #[derive(Debug, Error)]
 pub enum ExtensionError {
@@ -145,6 +152,7 @@ pub enum ExtensionError {
 ## Event System
 
 ### Event Publishing
+
 ```rust
 use anya_core::events::{Event, EventBus, EventHandler};
 
@@ -173,6 +181,7 @@ event_bus.subscribe("transaction.*", Box::new(MyEventHandler)).await?;
 ## Security APIs
 
 ### Permission System
+
 ```rust
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum Permission {
@@ -191,6 +200,7 @@ fn check_permission(extension: &Extension, permission: &Permission) -> bool {
 ```
 
 ### Cryptographic Operations
+
 ```rust
 use anya_core::crypto::{KeyPair, Signature, Hash};
 
@@ -208,6 +218,7 @@ let is_valid = key_pair.public_key().verify(message, &signature)?;
 ## Testing APIs
 
 ### Test Utilities
+
 ```rust
 use anya_core::testing::{TestEnvironment, MockBitcoinNetwork, TestConfig};
 
@@ -227,6 +238,7 @@ assert!(result.is_success());
 ## Performance Monitoring
 
 ### Metrics Collection
+
 ```rust
 use anya_core::metrics::{Counter, Histogram, Gauge};
 
@@ -245,6 +257,7 @@ timer.observe_duration();
 ## Lifecycle Management
 
 ### Extension Manager
+
 ```rust
 use anya_core::extensions::{ExtensionManager, ExtensionStatus};
 
@@ -267,6 +280,7 @@ manager.unload_extension("my_extension").await?;
 ## Examples
 
 ### Simple Bitcoin Extension
+
 ```rust
 use anya_core::prelude::*;
 
@@ -326,6 +340,7 @@ impl TransactionLogger {
 ## Integration Examples
 
 See the [Integration Guide](../integration/README.md) for complete examples of:
+
 - Bitcoin protocol extensions
 - Web5 service integrations
 - ML model deployment

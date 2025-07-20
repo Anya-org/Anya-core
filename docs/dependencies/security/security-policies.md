@@ -5,6 +5,7 @@ This document details the security policies in Anya.
 ## Policy Areas
 
 ### 1. Code Security
+
 ```rust
 // Security policy enforcement
 pub struct SecurityPolicy {
@@ -37,6 +38,7 @@ impl SecurityRule for MinimumKeyLengthRule {
 ```
 
 ### 2. Dependency Security
+
 ```toml
 # Cargo.toml security policies
 [package.metadata.policies.security]
@@ -47,6 +49,7 @@ audit_schedule = "daily"
 ```
 
 ### 3. Runtime Security
+
 ```rust
 // Runtime security policy configuration
 pub struct RuntimeSecurityConfig {
@@ -70,6 +73,7 @@ impl RuntimeSecurityConfig {
 ## Policy Implementation
 
 ### 1. Access Control
+
 ```rust
 pub struct AccessPolicy {
     roles: HashMap<RoleId, Permissions>,
@@ -91,6 +95,7 @@ impl AccessPolicy {
 ```
 
 ### 2. Data Security
+
 ```rust
 pub struct DataSecurityPolicy {
     encryption: EncryptionConfig,
@@ -109,6 +114,7 @@ impl DataSecurityPolicy {
 ```
 
 ### 3. Network Security
+
 ```rust
 pub struct NetworkSecurityPolicy {
     firewall: FirewallConfig,
@@ -129,24 +135,28 @@ impl NetworkSecurityPolicy {
 ## Best Practices
 
 ### 1. Policy Management
+
 - Regular review
 - Version control
 - Change tracking
 - Compliance monitoring
 
 ### 2. Implementation
+
 - Automated enforcement
 - Logging and auditing
 - Exception handling
 - Documentation
 
 ### 3. Maintenance
+
 - Policy updates
 - Compliance checks
 - Training materials
 - Review process
 
 ## Related Documentation
+
 - [Audit Process](audit-process.md)
 - [Vulnerability Management](vulnerability-management.md)
 - [Compliance Checks](compliance-checks.md)

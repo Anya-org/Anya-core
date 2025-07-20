@@ -12,6 +12,7 @@ description: "Documentation for Web5_integration"
 This document outlines how Anya Core integrates with Web5, a decentralized web platform built on Bitcoin and IPFS.
 
 ## Table of Contents
+
 - [Overview](#overview)
 - [Architecture](#architecture)
 - [Getting Started](#getting-started)
@@ -26,6 +27,7 @@ This document outlines how Anya Core integrates with Web5, a decentralized web p
 ## Overview
 
 Web5 is a decentralized web platform that enables:
+
 - Self-sovereign identity (SSI)
 - Decentralized data storage
 - Verifiable credentials

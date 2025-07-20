@@ -9,6 +9,7 @@ Integration tests ensure that Anya-core extensions work correctly across system 
 ## Integration Test Architecture
 
 ### Test Categories
+
 - **Bitcoin Network Integration**: Testnet/mainnet connectivity
 - **Web5 Protocol Integration**: DWN, DID, and VC interactions
 - **ML Pipeline Integration**: Model training and inference workflows
@@ -17,6 +18,7 @@ Integration tests ensure that Anya-core extensions work correctly across system 
 - **Database Integration**: Persistent storage validation
 
 ### Test Environment Setup
+
 ```bash
 # Integration test environment
 export BITCOIN_NETWORK=testnet
@@ -29,6 +31,7 @@ export REDIS_URL=redis://localhost:6379/1
 ## Bitcoin Network Integration
 
 ### Testnet Integration Tests
+
 ```rust
 #[cfg(test)]
 mod bitcoin_integration_tests {
@@ -99,6 +102,7 @@ mod bitcoin_integration_tests {
 ```
 
 ### Block Processing Integration
+
 ```rust
 #[tokio::test]
 async fn test_block_processing_pipeline() {
@@ -126,6 +130,7 @@ async fn test_block_processing_pipeline() {
 ## Web5 Integration Testing
 
 ### DID Resolution Integration
+
 ```rust
 #[cfg(test)]
 mod web5_integration_tests {
@@ -215,6 +220,7 @@ mod web5_integration_tests {
 ## ML Pipeline Integration
 
 ### Model Training Integration
+
 ```rust
 #[cfg(test)]
 mod ml_integration_tests {
@@ -277,6 +283,7 @@ mod ml_integration_tests {
 ## Cross-System Integration
 
 ### Bitcoin + Web5 Integration
+
 ```rust
 #[tokio::test]
 async fn test_bitcoin_web5_identity_verification() {
@@ -315,6 +322,7 @@ async fn test_bitcoin_web5_identity_verification() {
 ```
 
 ### Web5 + ML Integration
+
 ```rust
 #[tokio::test]
 async fn test_web5_ml_personalization() {
@@ -349,6 +357,7 @@ async fn test_web5_ml_personalization() {
 ## Database Integration
 
 ### Persistent Storage Tests
+
 ```rust
 #[tokio::test]
 async fn test_database_transaction_consistency() {
@@ -388,6 +397,7 @@ async fn test_database_transaction_consistency() {
 ## Performance Integration Tests
 
 ### Load Testing
+
 ```rust
 #[tokio::test]
 async fn test_concurrent_transaction_processing() {
@@ -421,6 +431,7 @@ async fn test_concurrent_transaction_processing() {
 ## Test Environment Management
 
 ### Docker Test Environment
+
 ```yaml
 # docker-compose.test.yml
 version: '3.8'
@@ -458,6 +469,7 @@ services:
 ```
 
 ### Test Setup and Teardown
+
 ```rust
 use testcontainers::{Docker, Container, Image};
 
@@ -501,6 +513,7 @@ impl TestEnvironment {
 ## Continuous Integration
 
 ### CI Integration Test Pipeline
+
 ```yaml
 # .github/workflows/integration-tests.yml
 name: Integration Tests
@@ -556,12 +569,14 @@ jobs:
 ## Best Practices
 
 ### Test Isolation
+
 1. **Clean State**: Each test starts with a fresh environment
 2. **Independent**: Tests don't depend on execution order
 3. **Idempotent**: Tests can be run multiple times safely
 4. **Atomic**: Each test validates one integration scenario
 
 ### Error Handling
+
 ```rust
 #[tokio::test]
 async fn test_network_failure_recovery() {
@@ -578,6 +593,7 @@ async fn test_network_failure_recovery() {
 ```
 
 ### Test Data Management
+
 ```rust
 lazy_static! {
     static ref TEST_DATA: TestDataManager = TestDataManager::new();

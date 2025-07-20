@@ -5,6 +5,7 @@ This document provides a step-by-step guide for implementing the reorganization 
 ## Reorganization Steps
 
 1. **Prepare the Directory Structure**
+
    ```bash
    # Create the main directory structure
    mkdir -p reorganized/bitcoin/{core,layer2,protocol,testing,docs,ports,adapters,riscv,security}
@@ -29,6 +30,7 @@ This document provides a step-by-step guide for implementing the reorganization 
    ```
 
 2. **Copy Core Files**
+
    ```bash
    # Copy core consensus files
    cp anya-bitcoin/src/core/consensus/* reorganized/bitcoin/core/consensus/
@@ -49,6 +51,7 @@ This document provides a step-by-step guide for implementing the reorganization 
    ```
 
 3. **Copy Layer 2 Files**
+
    ```bash
    # Copy framework files
    cp anya-bitcoin/src/layer2/framework/* reorganized/bitcoin/layer2/framework/
@@ -72,12 +75,14 @@ This document provides a step-by-step guide for implementing the reorganization 
    ```
 
 4. **Copy Protocol Files**
+
    ```bash
    cp src/bitcoin/protocol.rs reorganized/bitcoin/protocol/core_protocol.rs
    cp anya-bitcoin/src/protocol/* reorganized/bitcoin/protocol/
    ```
 
 5. **Copy Testing Files**
+
    ```bash
    # Copy core tests
    cp -r src/bitcoin/tests/* reorganized/bitcoin/testing/core/
@@ -96,6 +101,7 @@ This document provides a step-by-step guide for implementing the reorganization 
    ```
 
 6. **Copy Documentation Files**
+
    ```bash
    # Copy architecture documentation
    cp docs/HEXAGONAL.md reorganized/bitcoin/docs/architecture/
@@ -105,6 +111,7 @@ This document provides a step-by-step guide for implementing the reorganization 
    ```
 
 7. **Create Port Interfaces**
+
    ```bash
    # Create port files based on hexagonal architecture
    touch reorganized/bitcoin/ports/blockchain_port.rs
@@ -113,6 +120,7 @@ This document provides a step-by-step guide for implementing the reorganization 
    ```
 
 8. **Add Implementation Documentation**
+
    ```bash
    # Add implementation documentation
    cp -r docs/bitcoin/* reorganized/bitcoin/docs/
@@ -123,6 +131,7 @@ This document provides a step-by-step guide for implementing the reorganization 
 After completing the reorganization, validate the structure:
 
 1. **Ensure All Files Are Correctly Placed**
+
    ```bash
    find reorganized/bitcoin -type f | sort > reorganized_files.txt
    ```
@@ -137,6 +146,7 @@ After completing the reorganization, validate the structure:
    Update all module references and imports in the copied files to reflect the new structure.
 
 4. **Run Tests**
+
    ```bash
    cd reorganized/bitcoin
    cargo test
@@ -147,11 +157,13 @@ After completing the reorganization, validate the structure:
 To integrate the reorganized structure with the existing codebase:
 
 1. **Create a New Branch**
+
    ```bash
    git checkout -b bitcoin-reorganization
    ```
 
 2. **Replace Existing Implementation**
+
    ```bash
    # Backup existing implementation
    mv anya-bitcoin anya-bitcoin.bak
@@ -165,6 +177,7 @@ To integrate the reorganized structure with the existing codebase:
    Update package references in Cargo.toml files to reflect the new structure.
 
 4. **Commit Changes**
+
    ```bash
    git add .
    git commit -m "feat(bitcoin): Reorganize Bitcoin implementation following hexagonal architecture"

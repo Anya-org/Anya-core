@@ -35,6 +35,7 @@ graph TD
 Immediate automated checks that all submissions must pass before human review.
 
 #### Code Quality Checks
+
 ```yaml
 # .anya-ci.yml configuration
 validation:
@@ -55,12 +56,14 @@ validation:
 ```
 
 #### Structure Validation
+
 - **Directory Structure**: Compliance with extension layout standards
 - **Cargo.toml**: Proper metadata and dependency management
 - **License**: Valid and compatible open source license
 - **Documentation**: Required documentation files present
 
 #### Automated Test Suite
+
 ```rust
 // Example automated validation tests
 #[test]
@@ -93,12 +96,14 @@ fn validate_test_coverage() {
 Comprehensive security analysis focusing on cryptographic implementations, key management, and vulnerability assessment.
 
 #### Automated Security Scans
+
 - **Dependency Audit**: Check for known vulnerabilities in dependencies
 - **Static Analysis**: Code analysis for common security anti-patterns
 - **Cryptographic Review**: Validation of cryptographic implementations
 - **Secrets Detection**: Scan for accidentally committed secrets or keys
 
 #### Security Categories
+
 ```rust
 // Security classification system
 #[derive(Debug, Clone)]
@@ -147,6 +152,7 @@ impl SecurityLevel {
 Domain experts review extensions for technical correctness, architecture, and ecosystem integration.
 
 #### Review Team Structure
+
 - **Bitcoin Experts**: BIP compliance, Bitcoin Core integration, Lightning Network
 - **Web5 Specialists**: DID standards, decentralized protocols, identity management
 - **ML Engineers**: Model validation, algorithmic fairness, performance optimization
@@ -156,6 +162,7 @@ Domain experts review extensions for technical correctness, architecture, and ec
 #### Review Criteria
 
 ##### Bitcoin Extensions
+
 ```markdown
 ## Bitcoin Review Checklist
 
@@ -185,6 +192,7 @@ Domain experts review extensions for technical correctness, architecture, and ec
 ```
 
 ##### Web5 Extensions
+
 ```markdown
 ## Web5 Review Checklist
 
@@ -208,6 +216,7 @@ Domain experts review extensions for technical correctness, architecture, and ec
 ```
 
 ##### ML Extensions
+
 ```markdown
 ## ML Review Checklist
 
@@ -235,6 +244,7 @@ Domain experts review extensions for technical correctness, architecture, and ec
 Public review period allowing community feedback and participation in the evaluation process.
 
 #### Community Review Process
+
 1. **Public Announcement**: Extension details published for community review
 2. **Review Period**: 14-day minimum review period for community feedback
 3. **Expert Response**: Review team responds to community concerns
@@ -242,6 +252,7 @@ Public review period allowing community feedback and participation in the evalua
 5. **Final Evaluation**: Comprehensive evaluation including community input
 
 #### Community Participation
+
 ```markdown
 ## Community Review Guidelines
 
@@ -269,6 +280,7 @@ Please structure feedback as:
 ## Review Timeline
 
 ### Standard Review Process
+
 ```
 Day 0:   Submission received, automated validation begins
 Day 1:   Automated validation complete, security scan initiated
@@ -282,6 +294,7 @@ Day 30:  Publication or revision request
 ```
 
 ### Expedited Review (Critical Security Updates)
+
 ```
 Day 0:   Emergency submission received
 Day 1:   Automated validation and security scan
@@ -294,12 +307,14 @@ Day 6:   Publication or rejection
 ## Reviewer Guidelines
 
 ### Technical Review Standards
+
 - **Thorough Analysis**: Comprehensive examination of code, architecture, and documentation
 - **Constructive Feedback**: Specific, actionable feedback for improvements
 - **Standard Compliance**: Verification of compliance with relevant standards and BIPs
 - **Security Focus**: Special attention to security implications and best practices
 
 ### Review Documentation
+
 ```rust
 // Example review report structure
 #[derive(Debug, Serialize)]
@@ -335,14 +350,18 @@ pub enum ReviewRecommendation {
 ## Appeals Process
 
 ### Revision Requests
+
 If revisions are requested:
+
 1. **Detailed Feedback**: Specific issues and suggested improvements provided
 2. **Revision Period**: 30 days to address feedback and resubmit
 3. **Re-review**: Focused review of changes and issue resolution
 4. **Final Decision**: Approval, additional revisions, or rejection
 
 ### Appeal Process
+
 For rejected submissions:
+
 1. **Appeal Request**: Formal appeal with justification for reconsideration
 2. **Independent Review**: Review by different expert panel
 3. **Community Input**: Additional community feedback period
@@ -351,12 +370,14 @@ For rejected submissions:
 ## Quality Assurance
 
 ### Reviewer Qualification
+
 - **Domain Expertise**: Proven expertise in relevant technology areas
 - **Community Standing**: Positive reputation within the community
 - **Review Training**: Completion of reviewer training and certification
 - **Ongoing Education**: Continuous learning and skill development
 
 ### Review Quality Metrics
+
 ```rust
 // Review quality tracking
 #[derive(Debug)]
@@ -383,12 +404,14 @@ impl ReviewMetrics {
 ## Continuous Improvement
 
 ### Process Evolution
+
 - **Regular Review**: Quarterly review of process effectiveness
 - **Community Feedback**: Ongoing feedback collection from developers and users
 - **Metric Analysis**: Analysis of review metrics and outcomes
 - **Process Updates**: Continuous improvement based on data and feedback
 
 ### Tool Development
+
 - **Automation Enhancement**: Improved automated validation and testing
 - **Review Tools**: Better tools for reviewers and community participants
 - **Integration Improvements**: Streamlined integration with development workflows
@@ -397,12 +420,14 @@ impl ReviewMetrics {
 ## Support and Resources
 
 ### Developer Support
+
 - **Review Preparation**: Guidelines and tools for preparing successful submissions
 - **Feedback Understanding**: Help interpreting review feedback and requirements
 - **Revision Assistance**: Support for addressing review comments and issues
 - **Best Practices**: Ongoing education about development and submission best practices
 
 ### Reviewer Resources
+
 - **Training Materials**: Comprehensive training for new reviewers
 - **Review Tools**: Advanced tools for efficient and thorough review
 - **Expert Consultation**: Access to specialized expertise for complex reviews
