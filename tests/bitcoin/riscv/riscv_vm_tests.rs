@@ -1,1 +1,0 @@
-/home/anya/anyachainlabs/projects/anya-core/anya-bitcoin/src/testing/./riscv/riscv_vm_tests.rs

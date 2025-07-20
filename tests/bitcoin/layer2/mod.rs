@@ -1,1 +1,0 @@
-../../../anya-bitcoin/testing/layer2/mod.rs
