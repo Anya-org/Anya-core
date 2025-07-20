@@ -32,5 +32,3 @@ pub mod vm_layer_tests;
 // pub mod layer2;
 #[path = "bitcoin/protocol/mod.rs"]
 pub mod protocol;
-#[path = "bitcoin/riscv/mod.rs"]
-pub mod riscv;
