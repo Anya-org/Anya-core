@@ -23,6 +23,7 @@ Add a brief overview of this document here.
 ## System Components
 
 ### Core Components
+
 1. **Anya Core**
    - AI/ML Processing Engine
    - Blockchain Integration
@@ -46,6 +47,7 @@ Add a brief overview of this document here.
 ## Integration Points
 
 ### Internal Integration
+
 ```mermaid
 graph TD
     A[Anya Core] --> B[Dash33]
@@ -56,18 +58,21 @@ graph TD
 ```
 
 ### External Integration
+
 - Web5 Protocol
 - Bitcoin Network
 - Enterprise Systems
 - Mobile Platforms
 
 ## Security Architecture
+
 - Zero-knowledge Proofs
 - Multi-signature Support
 - Encryption Layers
 - Access Control
 
 ## Performance Considerations
+
 - Scalability Design
 - Load Distribution
 - Caching Strategy

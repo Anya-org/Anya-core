@@ -67,3 +67,4 @@ node_modules/
 *.new
 node_modules
 .github/instructions/work.instructions.md
+anya.code-workspace

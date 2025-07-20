@@ -5,9 +5,7 @@ use std::error::Error;
 pub mod web5_examples {
     use crate::bitcoin::transaction::Transaction;
     use crate::bitcoin::taproot::TaprootTree;
-    use crate::web5::credential::CredentialManager;
-    use crate::web5::did::DidManager;
-    use crate::web5::dwn::DwnManager;
+    // use Web5Adapter HTTP client instead of direct web5 imports
     use bitcoin::Network;
     use std::collections::HashMap;
     use serde_json::Value;

@@ -5,6 +5,7 @@ This document details the system testing practices in Anya.
 ## Test Types
 
 ### 1. End-to-End Tests
+
 ```rust
 #[tokio::test]
 async fn test_complete_transaction_flow() {
@@ -31,6 +32,7 @@ async fn test_complete_transaction_flow() {
 ```
 
 ### 2. Load Tests
+
 ```rust
 #[tokio::test]
 async fn test_system_under_load() {
@@ -58,6 +60,7 @@ async fn test_system_under_load() {
 ```
 
 ### 3. Recovery Tests
+
 ```rust
 #[tokio::test]
 async fn test_system_recovery() {
@@ -86,6 +89,7 @@ async fn test_system_recovery() {
 ## Test Implementation
 
 ### 1. System Setup
+
 ```rust
 pub struct SystemTestContext {
     network: Network,
@@ -123,6 +127,7 @@ impl SystemTestContext {
 ```
 
 ### 2. Test Scenarios
+
 ```rust
 #[tokio::test]
 async fn test_system_scenarios() {
@@ -157,6 +162,7 @@ async fn test_performance_scenarios(ctx: &SystemTestContext) -> Result<()> {
 ```
 
 ### 3. Monitoring and Metrics
+
 ```rust
 pub struct SystemMetrics {
     response_times: Vec<Duration>,
@@ -186,24 +192,28 @@ impl SystemMetrics {
 ## Best Practices
 
 ### 1. Test Environment
+
 - Isolated testing
 - Production-like setup
 - Data management
 - Resource cleanup
 
 ### 2. Test Implementation
+
 - Comprehensive scenarios
 - Error simulation
 - Performance monitoring
 - State verification
 
 ### 3. Test Maintenance
+
 - Regular updates
 - Documentation
 - CI/CD integration
 - Monitoring and alerts
 
 ## Related Documentation
+
 - [Integration Testing](integration-testing.md)
 - [Performance Testing](performance-testing.md)
 - [Test Coverage](test-coverage.md)

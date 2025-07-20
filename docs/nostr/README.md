@@ -17,11 +17,13 @@ description: "Documentation for Readme"
 
 
 ## Overview
+
 Anya Core provides comprehensive support for the Nostr protocol, enabling decentralized communication with end-to-end encryption, multi-relay support, and advanced key management features.
 
 ## Key Features
 
 ### 1. Decentralized Communication
+
 - End-to-end encrypted messaging (NIP-04)
 - Multi-relay support with health monitoring
 - Automatic relay selection and load balancing
@@ -29,6 +31,7 @@ Anya Core provides comprehensive support for the Nostr protocol, enabling decent
 - Secure key management and backup
 
 ### 2. NIP Compliance
+
 - NIP-01: Basic protocol flow
 - NIP-02: Contact list and petnames
 - NIP-04: Encrypted direct messages
@@ -38,6 +41,7 @@ Anya Core provides comprehensive support for the Nostr protocol, enabling decent
 - NIP-20: Command Results
 
 ### 3. Key Management
+
 ```rust
 // Subscribe with existing nsec key
 let profile = NostrUserProfile::subscribe_with_key(
@@ -50,6 +54,7 @@ let nsec = profile.to_nsec()?;
 ```
 
 ### 4. Relay Management
+
 - Automatic relay selection based on health metrics
 - Load balancing across multiple relays
 - Connection pooling for improved performance
@@ -57,6 +62,7 @@ let nsec = profile.to_nsec()?;
 - Health monitoring and metrics
 
 ### 5. Security Features
+
 - ChaCha20-Poly1305 encryption for messages
 - Secure key storage and backup
 - Shared secret computation
@@ -66,13 +72,16 @@ let nsec = profile.to_nsec()?;
 ## Getting Started
 
 ### Installation
+
 Add to your `Cargo.toml`:
+
 ```toml
 [dependencies]
 anya-core = "1.3.0"
 ```
 
 ### Basic Usage
+
 ```rust
 // Initialize Nostr client
 let config = NostrConfig {
@@ -91,6 +100,7 @@ client.send_encrypted_message(
 ```
 
 ### Relay Configuration
+
 ```rust
 // Custom relay setup
 let relays = vec![
@@ -108,24 +118,28 @@ let profile = NostrUserProfile::subscribe_with_key(
 ## Best Practices
 
 ### Key Management
+
 1. Always backup your keys securely
 2. Use environment variables for sensitive data
 3. Implement key rotation policies
 4. Enable secure key recovery mechanisms
 
 ### Relay Selection
+
 1. Use multiple relays for redundancy
 2. Monitor relay health metrics
 3. Implement fallback mechanisms
 4. Configure geographic distribution
 
 ### Security
+
 1. Always use encryption for private messages
 2. Validate all incoming messages
 3. Implement rate limiting
 4. Monitor for suspicious activity
 
 ## Future Enhancements
+
 - Additional NIP implementations
 - Advanced relay features
 - Enhanced key management
@@ -135,9 +149,11 @@ let profile = NostrUserProfile::subscribe_with_key(
 - Voice/video support
 
 ## Contributing
+
 We welcome contributions! Please see our [Contributing Guide](../../CONTRIBUTING.md) for details.
 
 ## License
+
 This integration is part of Anya Core and is released under the MIT License. See [LICENSE.md](../../LICENSE.md) for details.
 
 *Last updated: 2025-06-02*

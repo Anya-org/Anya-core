@@ -2,7 +2,7 @@ use anya_core::bitcoin::wallet::{WalletConfig, CoinSelectionStrategy, FeeStrateg
 use bitcoin::Network;
 use std::path::PathBuf;
 
-use tokio::sync::OnceCell;
+
 
 async fn create_test_wallet() -> Arc<Wallet> {
     let config = WalletConfig {
@@ -29,7 +29,7 @@ async fn create_test_wallet() -> Arc<Wallet> {
 // This file contains tests that verify the correctness of the code examples in the
 // documentation. It also includes integration tests that check the API endpoints.
 
-use anya_core::AnyaConfig;
+
 use axum::{
     body::Body,
     http::{Request, StatusCode},
@@ -38,15 +38,16 @@ use std::sync::Arc;
 use tower::ServiceExt;
 
 use anya_core::{
-    api::routes::configure_routes, web5::identity::IdentityManager,
+    api::routes::configure_routes,
 };
+use anya_core::web::web5_adapter::Web5Adapter;
 
 /// Test the health check endpoint
 #[tokio::test]
 async fn test_health_check() {
     let wallet = create_test_wallet().await;
-    let identity = Arc::new(IdentityManager::new("test_namespace"));
-    let app = configure_routes(wallet, identity);
+    let web5_adapter = Arc::new(Web5Adapter::new("http://localhost:8080"));
+    let app = configure_routes(wallet, web5_adapter);
 
     let response = app
         .oneshot(
@@ -65,8 +66,8 @@ async fn test_health_check() {
 #[tokio::test]
 async fn test_system_info() {
     let wallet = create_test_wallet().await;
-    let identity = Arc::new(IdentityManager::new("test_namespace"));
-    let app = configure_routes(wallet, identity);
+    let web5_adapter = Arc::new(Web5Adapter::new("http://localhost:8080"));
+    let app = configure_routes(wallet, web5_adapter);
 
     let response = app
         .oneshot(

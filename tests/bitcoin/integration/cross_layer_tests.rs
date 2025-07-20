@@ -1,1 +1,0 @@
-/home/anya/anyachainlabs/projects/anya-core/anya-bitcoin/src/testing/./integration/cross_layer_tests.rs

@@ -11,7 +11,7 @@ packages:
     version: "78.0.0"
   _macros:
     dependency: transitive
-    description: dart
+    description: react
     source: sdk
     version: "0.3.3"
   analyzer:

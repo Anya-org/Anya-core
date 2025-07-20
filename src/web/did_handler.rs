@@ -1,15 +1,10 @@
-use std::error::Error;
-// ... existing code ...
+use crate::web::web5_adapter::Web5Adapter;
+// ...existing code...
 pub async fn handle_did_creation(request: Web5Request) -> Result<DidDocument> {
-    // v2.0.0-beta9: Use new web5-rust API for DID creation
-    use web5::did::{DIDMethod, DIDBuilder};
-    let did_method = DIDMethod::Bip340;
-    let public_key = generate_schnorr_key().await?;
-    let did = DIDBuilder::new()
-        .method(did_method)
-        .public_key(public_key)
-        .build()
-        .await
+    // Example: Use the async HTTP-based adapter for DID creation
+    let adapter = Web5Adapter::new("http://localhost:8080"); // Service URL should be configurable
+    let did_doc = adapter.create_did("bip340").await
         .map_err(|e| Error::Web5Error(e.to_string()))?;
-    Ok(did)
+    // Convert DidDocumentResponse to DidDocument as needed
+    Ok(did_doc.document)
 }

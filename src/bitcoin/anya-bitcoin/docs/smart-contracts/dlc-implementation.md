@@ -2,15 +2,33 @@
 
 ## Navigation
 
-- [Overview](#overview)
-- [Core Features](#core-features)
-- [Implementation Details](#implementation-details)
-- [Contract Lifecycle](#contract-lifecycle)
-- [Security Features](#security-features)
-- [Advanced Features](#advanced-features)
-- [Error Handling](#error-handling)
-- [Testing](#testing)
-- [Related Documentation](#related-documentation)
+- [DLC (Discreet Log Contracts) Implementation](#dlc-discreet-log-contracts-implementation)
+  - [Navigation](#navigation)
+  - [Overview](#overview)
+  - [Core Features](#core-features)
+    - [Contract Types](#contract-types)
+    - [Oracle Support](#oracle-support)
+  - [Implementation Details](#implementation-details)
+    - [Contract Creation](#contract-creation)
+    - [Oracle Integration](#oracle-integration)
+  - [Contract Lifecycle](#contract-lifecycle)
+    - [1. Setup Phase](#1-setup-phase)
+    - [2. Negotiation Phase](#2-negotiation-phase)
+    - [3. Execution Phase](#3-execution-phase)
+  - [Security Features](#security-features)
+    - [Key Management](#key-management)
+    - [Validation](#validation)
+  - [Advanced Features](#advanced-features)
+    - [Multi-Oracle Support](#multi-oracle-support)
+    - [Custom Outcomes](#custom-outcomes)
+  - [Error Handling](#error-handling)
+    - [Common Errors](#common-errors)
+    - [Error Recovery](#error-recovery)
+  - [Testing](#testing)
+    - [Unit Tests](#unit-tests)
+    - [Integration Tests](#integration-tests)
+  - [Related Documentation](#related-documentation)
+  - [Support](#support)
 
 ## Overview
 
@@ -19,12 +37,14 @@ Anya's DLC implementation provides a robust framework for creating and managing 
 ## Core Features
 
 ### Contract Types
+
 - Binary Outcome Contracts ([Details](./contract-types.md#binary))
 - Multi-Outcome Contracts ([Details](./contract-types.md#multi))
 - Numeric Outcome Contracts ([Details](./contract-types.md#numeric))
 - Range Outcome Contracts ([Details](./contract-types.md#range))
 
 ### Oracle Support
+
 - Multi-Oracle Support ([Guide](./oracle-integration.md#multi-oracle))
 - Redundancy Options ([Details](./oracle-integration.md#redundancy))
 - Fallback Mechanisms ([Guide](./oracle-integration.md#fallback))
@@ -33,6 +53,7 @@ Anya's DLC implementation provides a robust framework for creating and managing 
 ## Implementation Details
 
 ### Contract Creation
+
 ```rust
 pub async fn create_dlc_contract(
     contract_params: DLCContractParams,
@@ -46,6 +67,7 @@ pub async fn create_dlc_contract(
 For implementation details, see [Contract Creation Guide](./guides/contract-creation.md).
 
 ### Oracle Integration
+
 ```rust
 pub struct OracleInfo {
     pub public_key: PublicKey,
@@ -65,6 +87,7 @@ For oracle details, see [Oracle Integration Guide](./oracle-integration.md).
 ## Contract Lifecycle
 
 ### 1. Setup Phase
+
 ```rust
 // Create contract parameters
 let params = DLCContractParams::new()
@@ -79,6 +102,7 @@ let contract = DLCContract::new(params)?;
 For setup details, see [Contract Setup Guide](./guides/contract-setup.md).
 
 ### 2. Negotiation Phase
+
 ```rust
 // Offer contract
 let offer = contract.create_offer()?;
@@ -90,6 +114,7 @@ let accepted = contract.accept_offer(offer)?;
 For negotiation details, see [Contract Negotiation Guide](./guides/contract-negotiation.md).
 
 ### 3. Execution Phase
+
 ```rust
 // Execute contract based on oracle outcome
 let outcome = oracle.get_outcome()?;
@@ -101,6 +126,7 @@ For execution details, see [Contract Execution Guide](./guides/contract-executio
 ## Security Features
 
 ### Key Management
+
 ```rust
 // Generate secure keys
 let contract_keys = DLCKeyPair::new_secure()?;
@@ -110,11 +136,13 @@ contract_keys.backup_to_encrypted_file("backup.enc", password)?;
 ```
 
 For security details, see:
+
 - [Key Management Guide](../security/key-management.md)
 - [Backup Procedures](../../security/backup-procedures.md)
 - [Security Best Practices](../../../../../anya-extensions/docs/development/best-practices.md)
 
 ### Validation
+
 ```rust
 // Validate contract parameters
 contract.validate_parameters()?;
@@ -128,6 +156,7 @@ For validation details, see [Contract Validation Guide](./guides/contract-valida
 ## Advanced Features
 
 ### Multi-Oracle Support
+
 ```rust
 pub struct MultiOracleConfig {
     oracles: Vec<OracleInfo>,
@@ -147,6 +176,7 @@ impl DLCContract {
 For multi-oracle details, see [Multi-Oracle Guide](./guides/multi-oracle.md).
 
 ### Custom Outcomes
+
 ```rust
 pub enum OutcomeType {
     Binary(bool),
@@ -161,6 +191,7 @@ For custom outcome details, see [Custom Outcomes Guide](./guides/custom-outcomes
 ## Error Handling
 
 ### Common Errors
+
 ```rust
 pub enum DLCError {
     InvalidParameters(String),
@@ -172,11 +203,13 @@ pub enum DLCError {
 ```
 
 For error handling details, see:
+
 - [Error Handling Guide](../integration/error-handling.md)
 - [Recovery Procedures](./guides/error-recovery.md)
 - [Troubleshooting Guide](../../../../../docs/TROUBLESHOOTING.md)
 
 ### Error Recovery
+
 ```rust
 match contract.execute(outcome) {
     Ok(result) => // Handle success
@@ -192,6 +225,7 @@ match contract.execute(outcome) {
 ## Testing
 
 ### Unit Tests
+
 ```rust
 #[test]
 fn test_dlc_creation() {
@@ -201,6 +235,7 @@ fn test_dlc_creation() {
 ```
 
 ### Integration Tests
+
 ```rust
 #[tokio::test]
 async fn test_complete_flow() {
@@ -215,6 +250,7 @@ async fn test_complete_flow() {
 ```
 
 For testing details, see:
+
 - [Testing Guide](../../../../../docs/TESTING.md)
 - [Integration Testing](../../../../../dependencies/docs/testing/integration-testing.md)
 - [Performance Testing](../../../../../dependencies/docs/testing/performance-testing.md)
@@ -230,6 +266,7 @@ For testing details, see:
 ## Support
 
 For DLC-related support:
+
 - [Technical Support](../../../../../docs/support/technical.md)
 - [Security Issues](../../../../../docs/SECURITY.md)
 - [Feature Requests](../../../../../dependencies/docs/build-system/features.md)

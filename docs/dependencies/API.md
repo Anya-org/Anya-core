@@ -59,6 +59,7 @@ This document provides an overview of the API endpoints available in Anya Core.
 ## Code Examples
 
 ### User Management
+
 ```rust
 // Create a new user
 let user = api.users().create(UserCreateRequest {
@@ -78,6 +79,7 @@ let updated_user = api.users().update(user.id, UserUpdateRequest {
 ```
 
 ### Bitcoin Operations
+
 ```rust
 // Create a new wallet
 let wallet = api.bitcoin().create_wallet(WalletCreateRequest {
@@ -97,6 +99,7 @@ let status = api.bitcoin().get_transaction_status(tx.id).await?;
 ```
 
 ### Lightning Network
+
 ```rust
 // Open channel
 let channel = api.lightning().open_channel(ChannelRequest {
@@ -116,6 +119,7 @@ let payment = api.lightning().pay_invoice(invoice.bolt11).await?;
 ```
 
 ### Decentralized Identity
+
 ```rust
 // Create DID
 let did = api.identity().create_did(DidCreateRequest {
@@ -137,6 +141,7 @@ let credential = api.identity().create_credential(CredentialRequest {
 ```
 
 ### Smart Contracts
+
 ```rust
 // Deploy contract
 let contract = api.contracts().deploy(ContractDeployRequest {
@@ -158,6 +163,7 @@ let state = api.contracts().get_state(contract.id).await?;
 ```
 
 ## Error Handling
+
 ```rust
 match api.bitcoin().send_transaction(tx_request).await {
     Ok(tx) => println!("Transaction sent: {}", tx.id),
@@ -168,6 +174,7 @@ match api.bitcoin().send_transaction(tx_request).await {
 ```
 
 ## Rate Limiting
+
 ```rust
 // Configure rate limits
 let client = ApiClient::new()

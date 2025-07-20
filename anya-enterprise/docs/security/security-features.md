@@ -20,18 +20,21 @@ Anya's Enterprise Security module provides comprehensive security features for B
 ## Core Features
 
 ### Authentication & Authorization
+
 - Multi-factor authentication ([Guide](./mfa.md))
 - Role-based access control ([Details](./rbac.md))
 - Token-based authentication ([Guide](./token-auth.md))
 - Session management ([Details](./session-management.md))
 
 ### Encryption & Key Management
+
 - End-to-end encryption ([Guide](./e2e-encryption.md))
 - Key rotation ([Details](./key-rotation.md))
 - Hardware security module integration ([Guide](./hsm-integration.md))
 - Secure key storage ([Details](./key-storage.md))
 
 ### Audit & Compliance
+
 - Comprehensive audit logging ([Guide](./audit-logging.md))
 - Compliance reporting ([Details](./compliance-reporting.md))
 - Security monitoring ([Guide](./security-monitoring.md))
@@ -40,6 +43,7 @@ Anya's Enterprise Security module provides comprehensive security features for B
 ## Implementation Details
 
 ### Authentication
+
 ```rust
 pub struct AuthenticationManager {
     pub providers: Vec<Box<dyn AuthProvider>>,
@@ -60,6 +64,7 @@ impl AuthenticationManager {
 For authentication details, see [Authentication Guide](../integration/authentication.md).
 
 ### Authorization
+
 ```rust
 pub struct AuthorizationManager {
     pub role_manager: RoleManager,
@@ -84,6 +89,7 @@ For authorization details, see [Authorization Guide](./authorization.md).
 ## Encryption
 
 ### Data Encryption
+
 ```rust
 pub struct EncryptionManager {
     pub key_manager: KeyManager,
@@ -105,6 +111,7 @@ impl EncryptionManager {
 For encryption details, see [Data Encryption Guide](./data-encryption.md).
 
 ### Key Management
+
 ```rust
 pub struct KeyManager {
     pub key_store: Box<dyn KeyStore>,
@@ -127,6 +134,7 @@ For key management details, see [Key Management Guide](../../../docs/bitcoin/doc
 ## Audit Logging
 
 ### Audit Trail
+
 ```rust
 pub struct AuditLogger {
     pub storage: Box<dyn AuditStorage>,
@@ -147,6 +155,7 @@ impl AuditLogger {
 For audit logging details, see [Audit Logging Guide](./audit-logging.md).
 
 ### Event Monitoring
+
 ```rust
 pub struct SecurityMonitor {
     pub event_processor: EventProcessor,
@@ -168,6 +177,7 @@ For monitoring details, see [Security Monitoring Guide](./security-monitoring.md
 ## Compliance
 
 ### Compliance Management
+
 ```rust
 pub struct ComplianceManager {
     pub policy_engine: PolicyEngine,
@@ -188,6 +198,7 @@ impl ComplianceManager {
 For compliance details, see [Compliance Management Guide](./compliance-management.md).
 
 ### Policy Enforcement
+
 ```rust
 pub struct PolicyEngine {
     pub rules: Vec<PolicyRule>,
@@ -210,6 +221,7 @@ For policy details, see [Policy Enforcement Guide](./policy-enforcement.md).
 ## Security Configuration
 
 ### Network Security
+
 ```toml
 [security.network]
 tls_version = "1.3"
@@ -221,6 +233,7 @@ private_key_path = "/path/to/key.pem"
 For network security details, see [Network Security Guide](../../../docs/bitcoin/docs/security/network-security.md).
 
 ### Access Control
+
 ```toml
 [security.access_control]
 enable_mfa = true
@@ -234,18 +247,21 @@ For access control details, see [Access Control Guide](./access-control.md).
 ## Best Practices
 
 ### Key Management
+
 1. Regular key rotation ([Guide](./key-rotation.md))
 2. Secure key storage ([Guide](./key-storage.md))
 3. Backup procedures ([Guide](./key-backup.md))
 4. Access controls ([Guide](./key-access-control.md))
 
 ### Authentication
+
 1. Strong password policies ([Guide](./password-policies.md))
 2. Multi-factor authentication ([Guide](./mfa.md))
 3. Session management ([Guide](./session-management.md))
 4. Token security ([Guide](./token-security.md))
 
 ### Encryption
+
 1. Algorithm selection ([Guide](./encryption-algorithms.md))
 2. Key size requirements ([Guide](./key-requirements.md))
 3. Secure communication ([Guide](./secure-communication.md))
@@ -262,6 +278,7 @@ For access control details, see [Access Control Guide](./access-control.md).
 ## Support
 
 For security-related support:
+
 - [Technical Support](../../../docs/support/technical.md)
 - [Security Issues](../../../docs/SECURITY.md)
 - [Feature Requests](../../../dependencies/docs/build-system/features.md)

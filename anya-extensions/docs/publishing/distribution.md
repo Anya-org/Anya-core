@@ -38,6 +38,7 @@ graph TD
 The main distribution channel for all approved extensions.
 
 #### Registry Structure
+
 ```
 anya-extensions-registry/
 ├── core/                   # Core system extensions
@@ -58,6 +59,7 @@ anya-extensions-registry/
 ```
 
 #### Access Patterns
+
 ```rust
 // Example registry client usage
 use anya_extensions::registry::{Registry, RegistryConfig};
@@ -97,6 +99,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 Collaborative platform for community-driven extension sharing and discovery.
 
 #### Features
+
 - **Community Ratings**: User ratings and reviews for extensions
 - **Curated Collections**: Expert-curated extension bundles
 - **Discussion Forums**: Community discussion and support
@@ -104,6 +107,7 @@ Collaborative platform for community-driven extension sharing and discovery.
 - **Contribution Tracking**: Recognition for community contributors
 
 #### Community API
+
 ```rust
 // Community hub interaction
 use anya_extensions::community::{CommunityHub, Rating, Review};
@@ -136,6 +140,7 @@ let recommendations = hub
 Specialized distribution channels for enterprise customers with enhanced security and support.
 
 #### Enterprise Features
+
 - **Private Registries**: Organization-specific extension repositories
 - **Security Audits**: Enhanced security validation and auditing
 - **Support Tiers**: Professional support and maintenance contracts
@@ -143,6 +148,7 @@ Specialized distribution channels for enterprise customers with enhanced securit
 - **Custom Deployment**: Tailored deployment and integration services
 
 #### Enterprise Registry Configuration
+
 ```yaml
 # enterprise-registry.yml
 enterprise:
@@ -174,6 +180,7 @@ enterprise:
 ### Installation Methods
 
 #### Command Line Interface
+
 ```bash
 # Install from primary registry
 anya-ext install bitcoin-core-wallet
@@ -196,6 +203,7 @@ anya-ext install bitcoin-core-wallet \
 ```
 
 #### Programmatic Installation
+
 ```rust
 use anya_extensions::installer::{Installer, InstallOptions};
 
@@ -217,6 +225,7 @@ println!("Installed: {} at {}", installation.name, installation.path);
 ```
 
 #### Configuration Management
+
 ```rust
 // Extension configuration system
 use anya_extensions::config::{ConfigManager, ConfigSource};
@@ -240,6 +249,7 @@ bitcoin_config.apply_to_extension().await?;
 ### Dependency Management
 
 #### Dependency Resolution
+
 ```toml
 # Extension manifest with dependencies
 [package]
@@ -263,6 +273,7 @@ enterprise = ["advanced", "audit-logging", "compliance-reporting"]
 ```
 
 #### Conflict Resolution
+
 ```rust
 // Dependency conflict resolution
 use anya_extensions::resolver::{DependencyResolver, ConflictStrategy};
@@ -298,6 +309,7 @@ if let Some(conflicts) = resolution.conflicts() {
 ### Cryptographic Verification
 
 #### Package Signing
+
 ```rust
 // Package signature verification
 use anya_extensions::crypto::{SignatureVerifier, PublicKey};
@@ -331,6 +343,7 @@ match verification_result {
 ```
 
 #### Checksum Verification
+
 ```rust
 // File integrity verification
 use anya_extensions::integrity::{ChecksumVerifier, HashAlgorithm};
@@ -351,6 +364,7 @@ if expected_checksum != actual_checksum {
 ### Vulnerability Management
 
 #### Security Scanning
+
 ```rust
 // Vulnerability scanning integration
 use anya_extensions::security::{VulnerabilityScanner, ScanResult};
@@ -384,6 +398,7 @@ match scan_result {
 ### Content Delivery Network
 
 #### CDN Configuration
+
 ```yaml
 # CDN distribution configuration
 cdn:
@@ -409,6 +424,7 @@ cdn:
 ```
 
 #### Geographic Distribution
+
 ```rust
 // Geographic-aware distribution
 use anya_extensions::distribution::{GeographicRouter, Region};
@@ -428,6 +444,7 @@ let download_url = router
 ### Caching Strategies
 
 #### Local Caching
+
 ```rust
 // Local package caching
 use anya_extensions::cache::{PackageCache, CachePolicy};
@@ -451,6 +468,7 @@ let package = cache
 ### Distribution Metrics
 
 #### Usage Analytics
+
 ```rust
 // Usage tracking and analytics
 use anya_extensions::analytics::{AnalyticsCollector, Event};
@@ -479,6 +497,7 @@ let usage_report = collector
 ```
 
 #### Performance Monitoring
+
 ```yaml
 # Monitoring configuration
 monitoring:
@@ -510,6 +529,7 @@ monitoring:
 ### Multi-Platform Distribution
 
 #### Platform-Specific Packages
+
 ```toml
 # Platform-specific package configurations
 [platforms.linux-x86_64]
@@ -534,6 +554,7 @@ package_format = "container"
 ```
 
 #### Cross-Platform Compatibility
+
 ```rust
 // Platform detection and compatibility
 use anya_extensions::platform::{Platform, Compatibility};
@@ -564,6 +585,7 @@ match compatibility {
 ### Private Registries
 
 #### Setup and Configuration
+
 ```bash
 # Deploy private registry
 anya-registry deploy \
@@ -581,6 +603,7 @@ anya-ext config set registry.private.verify-ssl true
 ```
 
 #### Access Control
+
 ```yaml
 # Private registry access control
 access_control:
@@ -607,6 +630,7 @@ access_control:
 ### Compliance and Auditing
 
 #### Audit Logging
+
 ```rust
 // Comprehensive audit logging
 use anya_extensions::audit::{AuditLogger, AuditEvent};
@@ -631,6 +655,7 @@ audit_logger.log(AuditEvent::Installation {
 ## Future Enhancements
 
 ### Planned Features
+
 - **Blockchain-Based Distribution**: Decentralized package distribution using Bitcoin and Web5
 - **AI-Powered Recommendations**: Machine learning-driven extension discovery
 - **Cross-Chain Integration**: Support for multi-blockchain extension ecosystems
@@ -638,6 +663,7 @@ audit_logger.log(AuditEvent::Installation {
 - **Developer Analytics**: Advanced analytics for extension developers
 
 ### Community Roadmap
+
 - **Decentralized Governance**: Community-driven distribution decisions
 - **Incentive Mechanisms**: Token-based rewards for quality contributions
 - **Global Mirrors**: Expanded geographic distribution network

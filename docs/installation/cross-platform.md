@@ -21,126 +21,75 @@ Add a brief overview of this document here.
 - [Section 2](#section-2)
 
 
-Anya now supports cross-platform installation using Dart SDK, making it easier to deploy and run on any operating system.
+
+Anya now supports cross-platform installation using the React SDK, making it easier to deploy and run on any operating system. The React SDK is the primary solution for web and desktop. For mobile, use the native Android/iOS SDKs (see platform-specific docs).
+
 
 ## Prerequisites
 
-### Windows
-```powershell
-## Install Chocolatey (if not installed)
-Set-ExecutionPolicy Bypass -Scope Process -Force
-[System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
-iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+### Web/Desktop (React SDK)
 
-## Install Dart SDK
-choco install dart-sdk -y
-```
+- Node.js (v18+ recommended)
+- npm or yarn
 
-### macOS
-```bash
-## Install using Homebrew
-brew tap dart-lang/dart
-brew install dart
-```
+### Mobile
 
-### Linux (Ubuntu/Debian)
-```bash
-## Add Google's apt repository
-sudo apt-get update
-sudo apt-get install apt-transport-https
-wget -qO- https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo gpg --dearmor -o /usr/share/keyrings/dart.gpg
-echo 'deb [signed-by=/usr/share/keyrings/dart.gpg arch=amd64] https://storage.googleapis.com/download.dartlang.org/linux/debian stable main' | sudo tee /etc/apt/sources.list.d/dart_stable.list
+- Android: See [Android SDK Guide](../mobile/ANDROID.md)
+- iOS: See [iOS SDK Guide](../mobile/IOS.md)
 
-## Install Dart SDK
-sudo apt-get update
-sudo apt-get install dart
-```
 
-## Installing Anya
-
-Once Dart SDK is installed, you can install Anya using:
+## Installing Anya (React SDK)
 
 ```bash
-dart pub global activate anya
+# Install dependencies
+npm install anya-react-sdk
+# or
+yarn add anya-react-sdk
 ```
+
 
 ## Verifying Installation
 
-Verify your installation:
+Import and use the SDK in your React app:
 
-```bash
-anya --version
+```javascript
+import { AnyaProvider } from 'anya-react-sdk';
+
+function App() {
+  return (
+    <AnyaProvider>
+      {/* your app */}
+    </AnyaProvider>
+  );
+}
 ```
+
 
 ## Configuration
 
-Create a new Anya project:
+Refer to the [React SDK documentation](../web/REACT_SDK.md) for configuration options and usage examples.
 
-```bash
-anya init my_project
-cd my_project
-```
-
-Configure your Bitcoin network settings in `config.yaml`:
-
-```yaml
-network:
-  type: mainnet  # or testnet
-  rpc_url: "http://localhost:8332"
-  rpc_user: "your_username"
-  rpc_password: "your_password"
-
-web5:
-  enabled: true
-  did_method: "key"  # or "ion"
-```
 
 ## Running Anya
 
-Start the Anya service:
+Run your React app as usual:
 
 ```bash
-anya serve
+npm start
+# or
+yarn start
 ```
+
 
 ## Development Setup
 
-For development, you'll need additional tools:
+For development, use standard React/Node.js tools. See the [React SDK README](../web/REACT_SDK.md) for details.
 
-```bash
-## Install development dependencies
-dart pub get
-
-## Run tests
-dart test
-
-## Build for production
-dart compile exe bin/anya.dart
-```
 
 ## Troubleshooting
 
-### Common Issues
+See the [React SDK Troubleshooting Guide](../web/REACT_SDK_TROUBLESHOOTING.md) for common issues and solutions.
 
-1. **Dart SDK not found**
-   ```bash
-   # Add Dart to PATH
-   export PATH="$PATH:/usr/lib/dart/bin"  # Linux
-   # or
-   refreshenv  # Windows (after Chocolatey installation)
-   ```
-
-2. **Permission Issues**
-   ```bash
-   # Linux/macOS
-   sudo chown -R $(whoami) ~/.pub-cache
-   ```
-
-3. **Network Configuration**
-   ```bash
-   # Test Bitcoin RPC connection
-   anya test-connection
-   ```
 
 ## Next Steps
 

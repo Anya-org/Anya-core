@@ -17,11 +17,13 @@ description: "Documentation for Nip 04"
 
 
 ## Overview
+
 NIP-04 defines the protocol for end-to-end encrypted direct messages in Nostr. Anya Core implements this using ChaCha20-Poly1305 encryption with shared secret computation.
 
 ## Implementation Details
 
 ### Message Encryption
+
 ```rust
 pub struct EncryptedMessage {
     shared_secret: [u8; 32],
@@ -55,6 +57,7 @@ impl NostrClient {
 ```
 
 ### Shared Secret Computation
+
 ```rust
 impl NostrClient {
     fn compute_shared_secret(&self, recipient_pubkey: &str) -> Result<[u8; 32], CoreError> {
@@ -73,6 +76,7 @@ impl NostrClient {
 ## Usage Examples
 
 ### Sending Encrypted Messages
+
 ```rust
 // Initialize client
 let client = NostrClient::new(config).await?;
@@ -85,6 +89,7 @@ client.send_encrypted_message(
 ```
 
 ### Receiving Encrypted Messages
+
 ```rust
 // Subscribe to encrypted messages
 let subscription = client.subscribe(vec![
@@ -105,6 +110,7 @@ while let Some(event) = subscription.next().await {
 ## Security Considerations
 
 ### 1. Key Management
+
 ```rust
 // GOOD: Store private key securely
 let encrypted_key = encrypt_with_password(private_key, user_password)?;
@@ -115,6 +121,7 @@ let private_key = "nsec1..."; // Never do this!
 ```
 
 ### 2. Message Validation
+
 ```rust
 // Validate message before decryption
 fn validate_encrypted_message(&self, event: &NostrEvent) -> Result<(), CoreError> {
@@ -138,6 +145,7 @@ fn validate_encrypted_message(&self, event: &NostrEvent) -> Result<(), CoreError
 ```
 
 ### 3. Nonce Management
+
 ```rust
 impl NostrClient {
     fn generate_nonce() -> [u8; 24] {
@@ -169,6 +177,7 @@ impl NostrClient {
 ## Common Issues and Solutions
 
 ### 1. Decryption Failures
+
 ```rust
 match client.decrypt_message(&event).await {
     Ok(content) => {
@@ -190,6 +199,7 @@ match client.decrypt_message(&event).await {
 ```
 
 ### 2. Key Exchange Issues
+
 ```rust
 // Implement key verification
 fn verify_key_exchange(&self, pubkey: &str) -> Result<(), CoreError> {
@@ -208,6 +218,7 @@ fn verify_key_exchange(&self, pubkey: &str) -> Result<(), CoreError> {
 ```
 
 ## Related NIPs
+
 - [NIP-01: Basic Protocol](./nip-01.md)
 - [NIP-02: Contact List](./nip-02.md)
 - [NIP-05: DNS Mapping](./nip-05.md)

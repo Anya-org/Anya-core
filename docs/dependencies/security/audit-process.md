@@ -5,6 +5,7 @@ This document details the security audit process in Anya.
 ## Audit Types
 
 ### 1. Dependency Audits
+
 ```bash
 # Run security audit
 cargo audit
@@ -15,6 +16,7 @@ cargo audit --json > audit-report.json
 ```
 
 ### 2. Code Audits
+
 ```bash
 # Run static analysis
 cargo clippy -- -D warnings
@@ -25,6 +27,7 @@ cargo clippy --message-format=json > clippy-report.json
 ```
 
 ### 3. Runtime Audits
+
 ```rust
 // Enable runtime checks
 #[cfg(debug_assertions)]
@@ -41,6 +44,7 @@ pub fn enable_security_checks() {
 ## Audit Process
 
 ### 1. Scheduled Audits
+
 ```yaml
 # .github/workflows/security-audit.yml
 name: Security Audit
@@ -63,6 +67,7 @@ jobs:
 ```
 
 ### 2. Manual Audits
+
 ```bash
 # Full security audit
 ./scripts/security-audit.sh
@@ -74,6 +79,7 @@ jobs:
 ```
 
 ### 3. Continuous Audits
+
 ```rust
 // Runtime security checks
 pub struct SecurityMonitor {
@@ -95,24 +101,28 @@ impl SecurityMonitor {
 ## Best Practices
 
 ### 1. Process Management
+
 - Regular scheduled audits
 - Automated checks
 - Manual reviews
 - Incident response
 
 ### 2. Tool Integration
+
 - CI/CD integration
 - Automated reporting
 - Alert systems
 - Documentation
 
 ### 3. Follow-up Actions
+
 - Issue tracking
 - Fix verification
 - Documentation updates
 - Process improvements
 
 ## Related Documentation
+
 - [Security Policies](security-policies.md)
 - [Vulnerability Management](vulnerability-management.md)
 - [Dependency Auditing](dependency-auditing.md)

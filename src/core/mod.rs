@@ -12,30 +12,33 @@ pub use reliability::{
     execute_with_monitoring, execute_with_recovery, AiVerification, ProgressTracker, Watchdog,
 };
 
-/// Core functionality with auto-save capabilities
+
+/// Core functionality with auto-save capabilities.
+/// Provides performance optimization and input processing for the Anya system.
 pub struct CoreSystem {
     performance_optimizer: PerformanceOptimizer,
 }
 
 impl CoreSystem {
-    /// Create a new core system with specified auto-save frequency for each component
+    /// Creates a new core system with the specified auto-save frequency for each component.
     pub fn new(auto_save_frequency: usize) -> Self {
         Self {
             performance_optimizer: PerformanceOptimizer::new(auto_save_frequency),
         }
     }
 
-    /// Get access to the performance optimizer
+    /// Returns a reference to the performance optimizer.
     pub fn performance_optimizer(&self) -> &PerformanceOptimizer {
         &self.performance_optimizer
     }
 
-    /// Process input across all components
+    /// Processes input across all components. Returns Ok if successful.
     pub fn process_input(&self, _input: &str) -> Result<(), String> {
         Ok(())
     }
 
-    /// Get stats about the auto-save state of all components
+    /// Gets stats about the auto-save state of all components.
+    /// Returns a tuple of (agent_inputs, hardening_changes, performance_changes).
     pub fn get_auto_save_stats(&self) -> (usize, usize, usize) {
         let (performance_changes, _, _) = self.performance_optimizer.get_stats();
         (0, 0, performance_changes)
@@ -49,6 +52,7 @@ mod tests {
     use std::collections::HashMap;
     use std::time::Duration;
 
+    /// Integration test for CoreSystem performance optimizer and input processing.
     #[test]
     fn test_core_system_integration() -> Result<(), Box<dyn std::error::Error>> {
         let core = CoreSystem::new(20);
@@ -73,20 +77,6 @@ mod tests {
             500.0,
             Duration::from_millis(50),
         )?;
-
-        // The following is commented out as system_hardening is not available
-        /*
-        use crate::security::system_hardening::SecurityLevel;
-        let mut security_settings = HashMap::new();
-        security_settings.insert("firewall".to_string(), "enabled".to_string());
-
-        core.system_hardening().configure_component(
-            "network",
-            SecurityLevel::Enhanced,
-            security_settings,
-            true,
-        )?;
-        */
 
         let (agent_inputs, hardening_changes, performance_changes) = core.get_auto_save_stats();
 
@@ -115,7 +105,7 @@ pub mod ports {
 
 use crate::ml::agent_system::MLAgentSystem;
 use crate::tokenomics::{engine::TokenomicsConfig, TokenomicsEngine};
-use crate::web5::Web5Adapter;
+// use Web5Adapter HTTP client instead of direct web5 imports
 
 #[derive(Debug, Clone)]
 pub struct BitcoinConfig {
@@ -144,7 +134,7 @@ pub struct Config {
 pub struct AnyaCore {
     #[cfg(feature = "rust-bitcoin")]
     bitcoin_adapter: Arc<dyn crate::bitcoin::interface::BitcoinInterface>,
-    web5_adapter: Arc<Web5Adapter>,
+    web5_adapter: Arc<crate::web::web5_adapter::Web5Adapter>,
     ml_agent_system: Arc<MLAgentSystem>,
     dao_governance: Arc<crate::dao::DaoGovernance>,
     tokenomics: Arc<TokenomicsEngine>,
@@ -167,13 +157,8 @@ impl AnyaCore {
         let bitcoin: Arc<dyn crate::bitcoin::interface::BitcoinInterface + Send + Sync> =
             Arc::new(bitcoin_adapter);
 
-        let web5_config = crate::web5::Web5Config {
-            enabled: true,
-            did_method: "ion".to_string(),
-            dwn_url: Some(config.web5.endpoint.clone()),
-            use_local_storage: true,
-        };
-        let web5 = Arc::new(Web5Adapter::build(web5_config).await?);
+        // Use HTTP-based Web5Adapter client
+        let web5 = Arc::new(crate::web::web5_adapter::Web5Adapter::new(&config.web5.endpoint));
 
         let ml_config = crate::ml::MLConfig {
             enabled: true,
@@ -198,13 +183,8 @@ impl AnyaCore {
 
     #[cfg(not(feature = "rust-bitcoin"))]
     pub async fn new(config: Config) -> Result<Self, Box<dyn std::error::Error>> {
-        let web5_config = crate::web5::Web5Config {
-            enabled: true,
-            did_method: "ion".to_string(),
-            dwn_url: Some(config.web5.endpoint.clone()),
-            use_local_storage: true,
-        };
-        let web5 = Arc::new(Web5Adapter::build(web5_config).await?);
+        // Use HTTP-based Web5Adapter client
+        let web5 = Arc::new(crate::web::web5_adapter::Web5Adapter::new(&config.web5.endpoint));
 
         let ml_config = crate::ml::MLConfig {
             enabled: true,

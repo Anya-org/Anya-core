@@ -30,32 +30,32 @@ Anya is a next-generation, multi-dimensional intelligent agent system designed t
 #### Core Components
 
 -   **Rust Core Implementation**
-    -   High-performance agent logic
-    -   Secure state management
-    -   Cross-chain operations
-    -   Zero-knowledge proofs
+-   High-performance agent logic
+-   Secure state management
+-   Cross-chain operations
+-   Zero-knowledge proofs
 -   **React Mobile Integration**
-    -   React-based UI components
-    -   Mobile-optimized ML models
-    -   Secure key management
-    -   Real-time analytics display
+-   React-based UI components
+-   Mobile-optimized ML models
+-   Secure key management
+-   Real-time analytics display
 
 #### Integration Layer
 
 -   **Protocol Bridge**
-    -   Unified message format
-    -   State synchronization
-    -   Secure data transfer
-    -   Cross-platform events
+-   Unified message format
+-   State synchronization
+-   Secure data transfer
+-   Cross-platform events
 
 ### 2. Intelligent Governance Framework
 
 #### Key Capabilities
 
 -   **Decentralized Decision Making**
-    -   Bitcoin-inspired economic model
-    -   Quadratic and time-weighted voting
-    -   ML-driven governance intelligence
+-   Bitcoin-inspired economic model
+-   Quadratic and time-weighted voting
+-   ML-driven governance intelligence
 
 #### Governance Layers
 
@@ -70,10 +70,10 @@ Anya is a next-generation, multi-dimensional intelligent agent system designed t
 #### Core Features
 
 -   **Model Lifecycle Management**
-    -   Dynamic model registration
-    -   Performance tracking
-    -   Ethical compliance scoring
-    -   Cross-platform model deployment
+-   Dynamic model registration
+-   Performance tracking
+-   Ethical compliance scoring
+-   Cross-platform model deployment
 
 #### ML Governance Use Cases
 
@@ -114,20 +114,20 @@ Anya is a next-generation, multi-dimensional intelligent agent system designed t
 #### Intelligence Modalities
 
 -   **Reactive Intelligence**
-    -   Immediate response generation
-    -   Contextual awareness
-    -   Rapid decision making
-    -   Mobile-optimized processing
+-   Immediate response generation
+-   Contextual awareness
+-   Rapid decision making
+-   Mobile-optimized processing
 -   **Predictive Intelligence**
-    -   Long-term trend analysis
-    -   Scenario simulation
-    -   Proactive strategy development
-    -   Cross-platform predictions
+-   Long-term trend analysis
+-   Scenario simulation
+-   Proactive strategy development
+-   Cross-platform predictions
 -   **Adaptive Intelligence**
-    -   Continuous learning
-    -   Self-optimization
-    -   Dynamic strategy refinement
-    -   Platform-specific adaptation
+-   Continuous learning
+-   Self-optimization
+-   Dynamic strategy refinement
+-   Platform-specific adaptation
 
 ### 5. Security and Compliance Framework
 
@@ -272,8 +272,8 @@ The agent system follows a hexagonal architecture pattern:
 #### Core Technologies
 
 -   **Programming Languages**
-    -   Rust (Core Implementation)
-    -   Dart (Cross-Platform Interfaces)
+-   Rust (Core Implementation)
+-   Dart (Cross-Platform Interfaces)
 
 #### Mobile Integration
 

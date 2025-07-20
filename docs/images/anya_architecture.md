@@ -77,26 +77,31 @@ graph TD
 ## Component Descriptions
 
 ### Client Applications
+
 - **Web App**: Browser-based user interface
 - **Mobile App**: Native mobile applications
 - **CLI Tool**: Command-line interface for developers
 
 ### API Layer
+
 - **REST API**: HTTP/HTTPS endpoints for web and mobile clients
 - **JSON-RPC**: Remote procedure calls for CLI and system integration
 - **WebSocket**: Real-time event streaming
 
 ### Application Layer
+
 - **Domain Services**: Core business logic
 - **Use Cases**: Application-specific workflows
 - **Event Bus**: Handles domain events and integration events
 
 ### Domain Layer
+
 - **Domain Models**: Core business entities and value objects
 - **Repositories**: Data access interfaces
 - **Domain Events**: Events that represent state changes in the domain
 
 ### Infrastructure Layer
+
 - **Database**: Persistent data storage
 - **Cache**: High-speed data access layer
 - **Message Queue**: Asynchronous message processing
@@ -171,16 +176,19 @@ graph TD
 ## Security Architecture
 
 ### Authentication
+
 - JWT-based authentication
 - OAuth 2.0 / OpenID Connect
 - API key authentication for services
 
 ### Authorization
+
 - Role-based access control (RBAC)
 - Attribute-based access control (ABAC)
 - Policy-based access control (PBAC)
 
 ### Data Protection
+
 - Encryption at rest (AES-256)
 - Encryption in transit (TLS 1.3)
 - Field-level encryption for sensitive data
@@ -188,16 +196,19 @@ graph TD
 ## Performance Considerations
 
 ### Caching Strategy
+
 - Multi-level caching (in-memory, distributed, CDN)
 - Cache invalidation policies
 - Stale-while-revalidate pattern
 
 ### Database Optimization
+
 - Read replicas for scaling reads
 - Sharding for horizontal scaling
 - Connection pooling
 
 ### Asynchronous Processing
+
 - Event-driven architecture
 - Background job processing
 - Batch processing for heavy operations
@@ -205,16 +216,19 @@ graph TD
 ## Monitoring and Observability
 
 ### Metrics
+
 - System metrics (CPU, memory, disk, network)
 - Application metrics (request rate, error rate, latency)
 - Business metrics (transactions, active users)
 
 ### Logging
+
 - Structured logging with correlation IDs
 - Log aggregation and analysis
 - Log retention policies
 
 ### Tracing
+
 - Distributed tracing across services
 - Performance analysis
 - Dependency mapping

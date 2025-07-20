@@ -1,1 +1,0 @@
-/home/anya/anyachainlabs/projects/anya-core/anya-bitcoin/src/testing/./layer2/validation_test.rs

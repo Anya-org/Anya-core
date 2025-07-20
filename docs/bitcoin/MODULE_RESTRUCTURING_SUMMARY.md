@@ -1,4 +1,5 @@
 # Bitcoin Module Restructuring Summary
+
 [AIR-3][AIS-3][BPC-3][AIT-3][RES-3]
 
 This document summarizes the changes made to restructure the Bitcoin module and improve its architecture, focusing on hexagonal design and BIP implementations.

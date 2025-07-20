@@ -1,1 +1,0 @@
-/home/anya/anyachainlabs/projects/anya-core/anya-bitcoin/src/testing/./core/bip341_tests.rs

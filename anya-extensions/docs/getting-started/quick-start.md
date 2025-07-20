@@ -55,6 +55,7 @@ anya status
 ```
 
 Expected output:
+
 ```
 ✅ Anya Core v2.5.0 - Running
 ✅ Extensions: 0 loaded, 12 available
@@ -132,6 +133,7 @@ anya bitcoin wallet balance
 ```
 
 Sample output:
+
 ```
 Wallet: my_first_wallet
 Balance: 0.00000000 BTC
@@ -178,6 +180,7 @@ anya web5 did show
 ```
 
 Sample output:
+
 ```
 DID: did:ion:EiClkZMDxPKqC9c-umQfTkR8vvZ9JPhl_xLDI9Nfk38w5w
 Status: Published
@@ -240,6 +243,7 @@ anya ml models list
 ```
 
 Sample output:
+
 ```
 ✅ text-classifier (sentiment analysis)
 ✅ entity-extractor (NER)
@@ -267,6 +271,7 @@ anya ml infer \
 ```
 
 Sample output:
+
 ```
 Model: text-classifier
 Input: "I love using Anya Core!"
@@ -306,6 +311,7 @@ cd my-first-extension
 ```
 
 This creates:
+
 ```
 my-first-extension/
 ├── Cargo.toml
@@ -482,21 +488,25 @@ anya metrics --live
 ## Next Steps
 
 ### Development
+
 - **[API Reference](../development/api-reference.md)**: Complete API documentation
 - **[Best Practices](../development/best-practices.md)**: Development best practices
 - **[Architecture Guide](../development/architecture.md)**: System architecture deep dive
 
 ### Integration
+
 - **[Core Integration](../integration/core-integration.md)**: Advanced core integration
 - **[Third-party Integration](../integration/third-party-integration.md)**: External service integration
 - **[Security Guidelines](../integration/security-guidelines.md)**: Security implementation
 
 ### Advanced Features
+
 - **[Bitcoin Lightning](../../../docs/bitcoin/lightning.md)**: Lightning Network integration
 - **[Web5 Protocols](../web5/protocols.md)**: Custom protocol development
 - **[ML Training](../ml/training.md)**: Custom model training
 
 ### Production
+
 - **[Deployment Guide](README.md)**: Production deployment
 - **[Monitoring](README.md)**: System monitoring and alerting
 - **[Security Hardening](../security/hardening.md)**: Production security
@@ -506,6 +516,7 @@ anya metrics --live
 ### Common Issues
 
 #### Installation Problems
+
 ```bash
 # Update Rust toolchain
 rustup update
@@ -518,6 +529,7 @@ anya system check-deps
 ```
 
 #### Bitcoin Connection Issues
+
 ```bash
 # Check Bitcoin node status
 anya bitcoin node status
@@ -530,6 +542,7 @@ anya bitcoin config show
 ```
 
 #### Web5 DID Resolution Failures
+
 ```bash
 # Check DID resolver status
 anya web5 resolvers status
@@ -542,6 +555,7 @@ anya web5 did resolve <did>
 ```
 
 #### ML Model Loading Issues
+
 ```bash
 # Verify model files
 anya ml models verify

@@ -15,6 +15,7 @@ After restructuring the Bitcoin module to follow a hexagonal architecture patter
 ### 1. Duplicate Type Definitions
 
 The following types have conflicting implementations of `Clone`:
+
 - `bip341::TaprootMerkleTree`
 - `bip341::TaprootLeaf`
 - `bip341::TaprootSpend`
@@ -25,6 +26,7 @@ These duplicates need to be removed and centralized in the `core/src/bip` direct
 ### 2. Missing Dependencies
 
 The following dependencies need to be added to Cargo.toml:
+
 - `chrono`
 - `humantime_serde`
 - `opcodes`
@@ -32,6 +34,7 @@ The following dependencies need to be added to Cargo.toml:
 ### 3. Result Type Errors
 
 Several trait implementations are using `Result<T>` instead of `Result<T, E>`:
+
 - `trait HsmConnector`
 - `trait BitcoinInterface`
 - Various other traits
@@ -39,6 +42,7 @@ Several trait implementations are using `Result<T>` instead of `Result<T, E>`:
 ### 4. Undefined Types
 
 The following types are referenced but not defined:
+
 - `SimulatorHsmProvider`
 - `SoftwareHsmProvider`
 - `HardwareHsmProvider`
@@ -72,6 +76,7 @@ The following types are referenced but not defined:
 ## Related Changes
 
 This issue is part of the larger Bitcoin module restructuring effort documented in:
+
 - [Bitcoin Module Restructuring Summary](docs/bitcoin/MODULE_RESTRUCTURING_SUMMARY.md)
 - [Bitcoin Architecture Update](docs/bitcoin/ARCHITECTURE_UPDATE.md)
 

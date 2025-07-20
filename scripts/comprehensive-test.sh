@@ -59,9 +59,9 @@ fi
 
 print_section "2. BITCOIN CORE TESTS"
 
-# Bitcoin protocol tests
+ # Bitcoin protocol tests (use correct path)
 total_tests=$((total_tests + 1))
-if run_test_section "Bitcoin Protocol Tests" "cd /workspaces/Anya-core && cargo test --package anya-bitcoin --lib --quiet"; then
+if run_test_section "Bitcoin Protocol Tests" "cd /workspaces/Anya-core/dependencies/anya-bitcoin && cargo test --lib --quiet"; then
     passed_tests=$((passed_tests + 1))
 else
     failed_tests=$((failed_tests + 1))
@@ -77,9 +77,9 @@ else
     failed_tests=$((failed_tests + 1))
 fi
 
-# Check Bitcoin library compilation
+# Check Bitcoin library compilation (use correct path)
 total_tests=$((total_tests + 1))
-if run_test_section "Bitcoin Library Compilation" "cd /workspaces/Anya-core && cargo check --package anya-bitcoin --quiet"; then
+if run_test_section "Bitcoin Library Compilation" "cd /workspaces/Anya-core/dependencies/anya-bitcoin && cargo check --quiet"; then
     passed_tests=$((passed_tests + 1))
 else
     failed_tests=$((failed_tests + 1))

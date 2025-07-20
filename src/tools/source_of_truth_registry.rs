@@ -268,14 +268,22 @@ impl SourceOfTruthRegistry {
         work_id: &str,
         new_status: WorkStatus,
     ) -> Result<(), SourceOfTruthError> {
+        use log::debug;
+        debug!("update_work_item_status called for work_id: {work_id}, new_status: {new_status:?}");
         // 1. Validate work item exists
-        let mut work_item = self
-            .work_items
-            .get_mut(work_id)
-            .ok_or_else(|| SourceOfTruthError::WorkItemNotFound(work_id.to_string()))?;
+        let mut work_item = match self.work_items.get_mut(work_id) {
+            Some(item) => item,
+            None => {
+                debug!("Work item not found: {work_id}");
+                return Err(SourceOfTruthError::WorkItemNotFound(work_id.to_string()));
+            }
+        };
 
         // 2. Validate status transition
-        self.validate_status_transition(&work_item.status, &new_status)?;
+        if let Err(e) = self.validate_status_transition(&work_item.status, &new_status) {
+            debug!("Invalid status transition: {e:?}");
+            return Err(e);
+        }
 
         // 3. Update work item
         work_item.status = new_status.clone();
@@ -291,6 +299,7 @@ impl SourceOfTruthRegistry {
         self.update_last_modified();
         self.save_to_disk().await?;
 
+        debug!("update_work_item_status completed for work_id: {work_id}");
         Ok(())
     }
 
@@ -437,6 +446,7 @@ impl SourceOfTruthRegistry {
         current: &WorkStatus,
         new: &WorkStatus,
     ) -> Result<(), SourceOfTruthError> {
+        use log::debug;
         match (current, new) {
             (WorkStatus::Planning, WorkStatus::InProgress) => Ok(()),
             (WorkStatus::InProgress, WorkStatus::CodeReview) => Ok(()),
@@ -444,9 +454,12 @@ impl SourceOfTruthRegistry {
             (WorkStatus::Testing, WorkStatus::Completed) => Ok(()),
             (_, WorkStatus::Blocked(_)) => Ok(()), // Can always be blocked
             (WorkStatus::Blocked(_), _) => Ok(()), // Can transition from blocked to any state
-            _ => Err(SourceOfTruthError::InvalidWorkItemId(format!(
-                "Invalid status transition from {current:?} to {new:?}"
-            ))),
+            _ => {
+                debug!("Invalid status transition from {current:?} to {new:?}");
+                Err(SourceOfTruthError::InvalidWorkItemId(format!(
+                    "Invalid status transition from {current:?} to {new:?}"
+                )))
+            }
         }
     }
 
@@ -631,31 +644,53 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_status_transitions() {
+    async fn test_status_transition_valid() {
+        use tokio::time::{timeout, Duration};
+        use log::debug;
         let temp_dir = tempdir().unwrap();
         let registry_path = temp_dir
             .path()
-            .join("registry.json")
+            .join("registry_valid.json")
             .to_string_lossy()
             .to_string();
 
         let registry = SourceOfTruthRegistry::new(registry_path).await.unwrap();
-
         let work_item = registry
-            .create_work_item("Status test".to_string(), "test_component".to_string())
+            .create_work_item("Status test valid".to_string(), "test_component".to_string())
             .await
             .unwrap();
 
-        // Valid transition
-        registry
-            .update_work_item_status(&work_item.id, WorkStatus::InProgress)
+        let valid = timeout(Duration::from_secs(10), registry.update_work_item_status(&work_item.id, WorkStatus::InProgress)).await;
+        match valid {
+            Ok(Ok(_)) => debug!("Valid status transition succeeded"),
+            Ok(Err(e)) => panic!("Valid status transition failed: {e:?}"),
+            Err(_) => panic!("Timeout on valid status transition"),
+        }
+    }
+
+    #[tokio::test]
+    async fn test_status_transition_invalid() {
+        use tokio::time::{timeout, Duration};
+        use log::debug;
+        let temp_dir = tempdir().unwrap();
+        let registry_path = temp_dir
+            .path()
+            .join("registry_invalid.json")
+            .to_string_lossy()
+            .to_string();
+
+        let registry = SourceOfTruthRegistry::new(registry_path).await.unwrap();
+        let work_item = registry
+            .create_work_item("Status test invalid".to_string(), "test_component".to_string())
             .await
             .unwrap();
 
-        // Invalid transition should fail
-        let result = registry
-            .update_work_item_status(&work_item.id, WorkStatus::Completed)
-            .await;
-        assert!(result.is_err());
+        // Try invalid transition: Planning -> Completed (should fail)
+        let invalid = timeout(Duration::from_secs(10), registry.update_work_item_status(&work_item.id, WorkStatus::Completed)).await;
+        match invalid {
+            Ok(Ok(_)) => panic!("Invalid status transition unexpectedly succeeded"),
+            Ok(Err(_)) => debug!("Invalid status transition correctly failed"),
+            Err(_) => panic!("Timeout on invalid status transition"),
+        }
     }
 }
