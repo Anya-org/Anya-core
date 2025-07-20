@@ -275,7 +275,7 @@ This document maintains a comprehensive, up-to-date list of development tasks, i
 
 To contribute to these tasks:
 
-1. Review [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines
+1. Review [CONTRIBUTING.md](../CONTRIBUTING.md) for guidelines
 2. Check current task assignments and dependencies
 3. Submit proposals for new tasks or modifications
 4. Follow established development and documentation standards
@@ -284,14 +284,14 @@ To contribute to these tasks:
 
 - [WORKSPACE_MANAGEMENT.md](WORKSPACE_MANAGEMENT.md) – Workspace organization
 - [DOCUMENTATION_CLEANUP_PLAN.md](DOCUMENTATION_CLEANUP_PLAN.md) – Documentation strategy
-- [ROADMAP.md](ROADMAP.md) – Project roadmap and milestones
+- [ROADMAP.md](../maintenance/ROADMAP.md) – Project roadmap and milestones
 - [IMPLEMENTATION_SUMMARY.md](IMPLEMENTATION_SUMMARY.md) – Current implementation status
 - [IMPLEMENTATION_MILESTONES.md](IMPLEMENTATION_MILESTONES.md) – Implementation milestones
 - [IMPLEMENTATION_ARCHITECTURE.md](IMPLEMENTATION_ARCHITECTURE.md) – Architecture overview
 - [TESTING_IMPLEMENTATION.md](TESTING_IMPLEMENTATION.md) – Testing implementation
 - [TESTING_STRATEGY.md](TESTING_STRATEGY.md) – Testing strategy
-- [SECURITY_ARCHITECTURE.md](SECURITY_ARCHITECTURE.md) – Security architecture
-- [PERFORMANCE_ARCHITECTURE.md](PERFORMANCE_ARCHITECTURE.md) – Performance architecture
+- [SECURITY_ARCHITECTURE.md](../architecture/SECURITY_ARCHITECTURE.md) – Security architecture
+- [PERFORMANCE_ARCHITECTURE.md](../architecture/PERFORMANCE_ARCHITECTURE.md) – Performance architecture
 
 ---
 

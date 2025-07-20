@@ -126,7 +126,7 @@ The ML system adheres to Bitcoin protocol standards and AI ethics guidelines:
 
 For more information, see:
 
-- [ML System Architecture](../../docs/ML_SYSTEM_ARCHITECTURE.md)
+- [ML System Architecture](../../docs/dependencies/ML_SYSTEM_ARCHITECTURE.md)
 - [Implementation Status](../../docs/IMPLEMENTATION_MILESTONES.md)
 - [AI Labeling Standards](../../docs/standards/AI_LABELING.md)
 

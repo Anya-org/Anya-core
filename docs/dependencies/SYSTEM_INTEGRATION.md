@@ -5,6 +5,7 @@ This document outlines the architecture for system integration, focusing on core
 ## Core Integration Points
 
 ### ML System Integration
+
 - **Data Pipeline Integration**: Describes how data flows through various stages from collection to processing.
 - **Model Registry Integration**: Details the management and versioning of machine learning models.
 - **Metrics Collection Integration**: Explains the collection and aggregation of performance metrics.
@@ -17,6 +18,7 @@ This document outlines the architecture for system integration, focusing on core
 - **Model Deployment**: Details the process of deploying trained models to production.
 
 ### Blockchain Integration
+
 - **Bitcoin Core Connection**: Integration with the Bitcoin Core for blockchain operations.
 - **Lightning Network Interface**: Interface for handling transactions on the Lightning Network.
 - **DLC Protocol Support**: Support for Discreet Log Contracts (DLC) for smart contracts.
@@ -28,6 +30,7 @@ This document outlines the architecture for system integration, focusing on core
 - **Smart Contract Execution**: Covers the process of executing smart contracts on the blockchain.
 
 ### Web5 Integration
+
 - **DID Management**: Handling Decentralized Identifiers (DIDs) for identity management.
 - **Data Storage**: Mechanisms for storing data in a decentralized manner.
 - **Protocol Handling**: Managing various protocols for data exchange.
@@ -39,6 +42,7 @@ This document outlines the architecture for system integration, focusing on core
 - **Data Authentication**: Describes the process of authenticating data to ensure its integrity.
 
 ## Integration Patterns
+
 1. **Data Collection**: Gathering data from various sources.
 2. **Validation**: Ensuring data integrity and correctness.
 3. **Processing**: Transforming and analyzing data.
@@ -46,6 +50,7 @@ This document outlines the architecture for system integration, focusing on core
 5. **Analysis**: Analyzing stored data to derive insights.
 
 ## Control Flow
+
 1. **Request Handling**: Managing incoming requests.
 2. **Authentication**: Verifying user identities.
 3. **Authorization**: Granting access based on permissions.
@@ -53,6 +58,7 @@ This document outlines the architecture for system integration, focusing on core
 5. **Response**: Sending back the results of the operations.
 
 ## Error Handling
+
 1. **Error Detection**: Identifying errors in the system.
 2. **Error Classification**: Categorizing errors based on severity and type.
 3. **Error Recovery**: Implementing mechanisms to recover from errors.

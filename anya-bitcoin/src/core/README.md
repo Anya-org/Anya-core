@@ -5,6 +5,7 @@ This directory contains the core domain logic for the Bitcoin implementation, fo
 ## Module Structure
 
 ### Consensus
+
 ```rust
 core::consensus
 ├── validation.rs   // Block and transaction validation
@@ -13,12 +14,14 @@ core::consensus
 ```
 
 The consensus module handles all consensus-critical code:
+
 - BIP-341 (Taproot) validation
 - Block verification
 - Transaction validation
 - Network parameters
 
 ### Mempool
+
 ```rust
 core::mempool
 ├── pool.rs        // Transaction pool management
@@ -27,12 +30,14 @@ core::mempool
 ```
 
 The mempool module manages unconfirmed transactions:
+
 - Transaction pool management
 - Fee estimation
 - Replace-by-fee (RBF)
 - Transaction prioritization
 
 ### Network
+
 ```rust
 core::network
 ├── p2p.rs         // P2P network protocol
@@ -41,12 +46,14 @@ core::network
 ```
 
 The network module defines P2P protocol behavior:
+
 - Message structures
 - Peer management
 - Network protocol
 - Connection handling
 
 ### Script
+
 ```rust
 core::script
 ├── interpreter.rs  // Script interpretation
@@ -54,6 +61,7 @@ core::script
 ```
 
 The script module handles Bitcoin script:
+
 - Script interpretation
 - Standard script types
 - Tapscript support
@@ -88,6 +96,7 @@ The script module handles Bitcoin script:
 ## Usage Examples
 
 ### Consensus Validation
+
 ```rust
 use core::consensus::{validation, rules, params};
 
@@ -98,6 +107,7 @@ rules::verify_pow(&block)?;
 ```
 
 ### Mempool Management
+
 ```rust
 use core::mempool::{pool, policy, fees};
 
@@ -108,6 +118,7 @@ mempool.add_transaction(tx)?;
 ```
 
 ### Network Protocol
+
 ```rust
 use core::network::{p2p, messages};
 
@@ -117,6 +128,7 @@ handler.handle_message(message)?;
 ```
 
 ### Script Validation
+
 ```rust
 use core::script::{interpreter, standard};
 

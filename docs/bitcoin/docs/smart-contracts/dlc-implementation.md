@@ -2,37 +2,23 @@
 
 ## Navigation
 
-- [Overview](#overview)
-- [Core Features](#core-features)
-- [Implementation Details](#implementation-details)
-- [Contract Lifecycle](#contract-lifecycle)
-- [Security Features](#security-features)
-- [Advanced Features](#advanced-features)
-- [Error Handling](#error-handling)
-- [Testing](#testing)
-- [Related Documentation](#related-documentation)
 
 ## Overview
 
-Anya's DLC implementation provides a robust framework for creating and managing Bitcoin-based smart contracts using the Discreet Log Contracts protocol. This implementation follows the latest DLC specifications while adding enterprise-grade features and security. For architecture details, see our [Architecture Overview](../layer2/OVERVIEW.md).
+Anya's DLC implementation provides a robust framework for creating and managing Bitcoin-based smart contracts using the Discreet Log Contracts protocol. This implementation follows the latest DLC specifications while adding enterprise-grade features and security.
 
 ## Core Features
 
 ### Contract Types
-- Binary Outcome Contracts ([Details](./contract-types.md#binary))
-- Multi-Outcome Contracts ([Details](./contract-types.md#multi))
-- Numeric Outcome Contracts ([Details](./contract-types.md#numeric))
-- Range Outcome Contracts ([Details](./contract-types.md#range))
+
 
 ### Oracle Support
-- Multi-Oracle Support ([Guide](./oracle-integration.md#multi-oracle))
-- Redundancy Options ([Details](./oracle-integration.md#redundancy))
-- Fallback Mechanisms ([Guide](./oracle-integration.md#fallback))
-- Custom Oracle Integration ([Guide](./oracle-integration.md#custom))
+
 
 ## Implementation Details
 
 ### Contract Creation
+
 ```rust
 pub async fn create_dlc_contract(
     contract_params: DLCContractParams,
@@ -43,9 +29,10 @@ pub async fn create_dlc_contract(
 }
 ```
 
-For implementation details, see [Contract Creation Guide](./guides/contract-creation.md).
+For implementation details, see Contract Creation Guide.
 
 ### Oracle Integration
+
 ```rust
 pub struct OracleInfo {
     pub public_key: PublicKey,
@@ -60,11 +47,12 @@ pub async fn verify_oracle_announcement(
 }
 ```
 
-For oracle details, see [Oracle Integration Guide](./oracle-integration.md).
+For oracle details, see Oracle Integration Guide.
 
 ## Contract Lifecycle
 
 ### 1. Setup Phase
+
 ```rust
 // Create contract parameters
 let params = DLCContractParams::new()
@@ -76,9 +64,10 @@ let params = DLCContractParams::new()
 let contract = DLCContract::new(params)?;
 ```
 
-For setup details, see [Contract Setup Guide](./guides/contract-setup.md).
+For setup details, see Contract Setup Guide.
 
 ### 2. Negotiation Phase
+
 ```rust
 // Offer contract
 let offer = contract.create_offer()?;
@@ -87,20 +76,22 @@ let offer = contract.create_offer()?;
 let accepted = contract.accept_offer(offer)?;
 ```
 
-For negotiation details, see [Contract Negotiation Guide](./guides/contract-negotiation.md).
+For negotiation details, see Contract Negotiation Guide.
 
 ### 3. Execution Phase
+
 ```rust
 // Execute contract based on oracle outcome
 let outcome = oracle.get_outcome()?;
 let execution = contract.execute(outcome)?;
 ```
 
-For execution details, see [Contract Execution Guide](./guides/contract-execution.md).
+For execution details, see Contract Execution Guide.
 
 ## Security Features
 
 ### Key Management
+
 ```rust
 // Generate secure keys
 let contract_keys = DLCKeyPair::new_secure()?;
@@ -110,11 +101,10 @@ contract_keys.backup_to_encrypted_file("backup.enc", password)?;
 ```
 
 For security details, see:
-- [Key Management Guide](../security/key-management.md)
-- [Backup Procedures](../../security/backup-procedures.md)
-- [Security Best Practices](../../../../anya-extensions/docs/development/best-practices.md)
+
 
 ### Validation
+
 ```rust
 // Validate contract parameters
 contract.validate_parameters()?;
@@ -123,11 +113,12 @@ contract.validate_parameters()?;
 oracle.verify_signatures(announcement)?;
 ```
 
-For validation details, see [Contract Validation Guide](./guides/contract-validation.md).
+For validation details, see Contract Validation Guide.
 
 ## Advanced Features
 
 ### Multi-Oracle Support
+
 ```rust
 pub struct MultiOracleConfig {
     oracles: Vec<OracleInfo>,
@@ -144,9 +135,10 @@ impl DLCContract {
 }
 ```
 
-For multi-oracle details, see [Multi-Oracle Guide](./guides/multi-oracle.md).
+For multi-oracle details, see Multi-Oracle Guide.
 
 ### Custom Outcomes
+
 ```rust
 pub enum OutcomeType {
     Binary(bool),
@@ -156,11 +148,12 @@ pub enum OutcomeType {
 }
 ```
 
-For custom outcome details, see [Custom Outcomes Guide](./guides/custom-outcomes.md).
+For custom outcome details, see Custom Outcomes Guide.
 
 ## Error Handling
 
 ### Common Errors
+
 ```rust
 pub enum DLCError {
     InvalidParameters(String),
@@ -172,11 +165,10 @@ pub enum DLCError {
 ```
 
 For error handling details, see:
-- [Error Handling Guide](../integration/error-handling.md)
-- [Recovery Procedures](./guides/error-recovery.md)
-- [Troubleshooting Guide](../../../TROUBLESHOOTING.md)
+
 
 ### Error Recovery
+
 ```rust
 match contract.execute(outcome) {
     Ok(result) => // Handle success
@@ -192,6 +184,7 @@ match contract.execute(outcome) {
 ## Testing
 
 ### Unit Tests
+
 ```rust
 #[test]
 fn test_dlc_creation() {
@@ -201,6 +194,7 @@ fn test_dlc_creation() {
 ```
 
 ### Integration Tests
+
 ```rust
 #[tokio::test]
 async fn test_complete_flow() {
@@ -215,24 +209,14 @@ async fn test_complete_flow() {
 ```
 
 For testing details, see:
-- [Testing Guide](../../../TESTING.md)
-- [Integration Testing](../../../../dependencies/docs/testing/integration-testing.md)
-- [Performance Testing](../../../../dependencies/docs/testing/performance-testing.md)
+
 
 ## Related Documentation
 
-- [Oracle Integration](./oracle-integration.md)
-- [Contract Types](./contract-types.md)
-- [Security Features](../../../../anya-enterprise/docs/security/security-features.md)
-- [API Reference](../integration/api-reference.md)
-- [Contributing Guide](../../index.md)
 
 ## Support
 
 For DLC-related support:
-- [Technical Support](../../../support/technical.md)
-- [Security Issues](../../../SECURITY.md)
-- [Feature Requests](../../../../dependencies/docs/build-system/features.md)
-- [Bug Reports](../../../support/bugs.md)
+
 
 *Last updated: 2025-06-02*

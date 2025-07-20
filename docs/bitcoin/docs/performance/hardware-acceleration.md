@@ -379,7 +379,7 @@ Key security points:
 
 - [Taproot Integration Guide](../taproot/integration.md)
 - [Hardware Acceleration Security](../security/hardware-acceleration-security.md)
-- [Performance Optimization Guide](../../../../anya-enterprise/docs/performance/optimization.md)
+- [Performance Optimization Guide](../../../enterprise/performance/optimization.md)
 - [Bitcoin Core Principles Alignment](../../../../alignment.md)
 
 *Last updated: 2025-05-01*

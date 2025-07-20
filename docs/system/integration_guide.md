@@ -29,4 +29,4 @@ This guide covers the integration of all major system components including Web5,
 ## See Also
 
 - [Related Document 1](../INSTALLATION.md)
-- [Related Document 2](../../INSTALLATION_REVIEW.md)
+- [Related Document 2](../INSTALLATION_REVIEW.md)

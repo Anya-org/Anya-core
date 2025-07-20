@@ -76,8 +76,8 @@ The implementation is fully compliant with Web5 standards:
 To contribute to the Web5 implementation:
 
 1. Read the [Contributing Guide](../../dependencies/CONTRIBUTING.md)
-2. Follow the [AI Labeling Standards](../../docs/AI_LABELING.md)
-3. Ensure all code meets [official Bitcoin Improvement Proposals (BIPs)](../../docs/BIP_COMPLIANCE.md) requirements
+2. Follow the [AI Labeling Standards](../../docs/standards/AI_LABELING.md)
+3. Ensure all code meets [official Bitcoin Improvement Proposals (BIPs)](../../docs/standards/BIP_COMPLIANCE.md) requirements
 
 ## Testing
 
@@ -94,7 +94,7 @@ For more information, see:
 
 - [Web5 Documentation](README.md): Complete Web5 documentation
 - [DID System](README.md): Detailed DID implementation documentation
-- [Bitcoin Integration](../../docs/BIP_COMPLIANCE.md): Bitcoin integration details
+- [Bitcoin Integration](../../docs/standards/BIP_COMPLIANCE.md): Bitcoin integration details
 
 ## Version Information
 
@@ -153,4 +153,4 @@ Security features include:
 - **Key Rotation**: Support for key rotation and recovery
 - **Audit Trails**: Comprehensive logging and audit capabilities
 
-*This component complies with [AI Labeling Standards](../../docs/AI_LABELING.md)*
+*This component complies with [AI Labeling Standards](../../docs/standards/AI_LABELING.md)*

@@ -141,7 +141,7 @@ The cryptographic module adheres to Bitcoin protocol standards:
 
 For more information, see:
 
-- [Security Guidelines](../../../docs/SECURITY.md)
+- [Security Guidelines](../../../scripts/enterprise/SECURITY.md)
 - [Cryptographic Standards](https://developers.bitcoin.org/reference/transactions.html)
 - [Implementation Status](../../../docs/IMPLEMENTATION_MILESTONES.md)
 
@@ -151,4 +151,4 @@ For more information, see:
 - Last Updated: 2025-04-29
 - Bitcoin Improvement Proposals (BIPs): Latest standards
 
-*This component complies with [AI Labeling Standards](../../../docs/AI_LABELING.md)* 
+*This component complies with [AI Labeling Standards](../../../docs/standards/AI_LABELING.md)* 

@@ -29,4 +29,4 @@ This guide details the security architecture and best practices for the Anya sys
 ## See Also
 
 - [Related Document 1](../INSTALLATION.md)
-- [Related Document 2](../../INSTALLATION_REVIEW.md)
+- [Related Document 2](../INSTALLATION_REVIEW.md)

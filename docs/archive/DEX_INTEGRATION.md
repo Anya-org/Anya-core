@@ -224,8 +224,8 @@ To withdraw liquidity:
 
 - [Governance Token](GOVERNANCE_TOKEN.md) - Token traded on the DEX
 - [Treasury Management](TREASURY_MANAGEMENT.md) - Treasury interaction with DEX
-- [Governance Framework](GOVERNANCE_FRAMEWORK.md) - Governance control of DEX
-- [Setup & Usage](SETUP_USAGE.md) - How to interact with the DEX
+- [Governance Framework](../GOVERNANCE_FRAMEWORK.md) - Governance control of DEX
+- [Setup & Usage](../getting-started/SETUP_USAGE.md) - How to interact with the DEX
 
 *Last updated: 2025-02-24* 
 ## See Also

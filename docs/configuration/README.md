@@ -329,7 +329,7 @@ anya-core config test-connections
 For configuration support:
 
 - [Configuration Examples](./examples/)
-- [Troubleshooting Guide](../README.md)
+- [Troubleshooting Guide](README.md)
 - [Community Support](https://github.com/anya-core/community)
 
 *This documentation follows the [AI Labeling Standards](../standards/AI_LABELING.md) based on official Bitcoin Improvement Proposals (BIPs).*

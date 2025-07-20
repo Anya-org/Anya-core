@@ -365,7 +365,7 @@ mod tests {
 
 ## Related Resources
 - [NIP-04 Specification](../nips/nip-04.md)
-- [Security Best Practices](../../../anya-extensions/docs/development/best-practices.md)
+- [Security Best Practices](../../extensions/development/best-practices.md)
 - [API Reference](../api/client.md)
 
 *Last updated: 2025-06-02*

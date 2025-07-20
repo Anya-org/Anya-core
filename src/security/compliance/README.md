@@ -139,7 +139,7 @@ if report.is_passing() {
 For more information, see:
 
 - [BIP Specifications](https://github.com/bitcoin/bips)
-- [Security Guidelines](../../../docs/SECURITY.md)
+- [Security Guidelines](../../../scripts/enterprise/SECURITY.md)
 - [Implementation Status](../../../docs/IMPLEMENTATION_MILESTONES.md)
 
 ## Version Information
@@ -148,4 +148,4 @@ For more information, see:
 - Last Updated: 2025-04-29
 - Bitcoin Improvement Proposals (BIPs): Latest standards
 
-*This component complies with [AI Labeling Standards](../../../docs/AI_LABELING.md)*
+*This component complies with [AI Labeling Standards](../../../docs/standards/AI_LABELING.md)*

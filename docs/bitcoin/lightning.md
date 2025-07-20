@@ -196,4 +196,4 @@ _Last updated: 2025-03-01_
 ## See Also
 
 - [Related Document 1](../INSTALLATION.md)
-- [Related Document 2](../../INSTALLATION_REVIEW.md)
+- [Related Document 2](../INSTALLATION_REVIEW.md)

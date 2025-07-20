@@ -1,6 +1,6 @@
 # Dependencies Documentation
 
-* [Overview](README.md)
+* [Overview](security/README.md)
 * [Build System](build-system/README.md)
   * [Cargo Configuration](build-system/cargo-config.md)
     * [Dependencies](build-system/dependencies.md)
@@ -10,7 +10,7 @@
     * [Target Platforms](build-system/target-platforms.md)
     * [Toolchains](build-system/toolchains.md)
   * [Build Profiles](build-system/build-profiles.md)
-    * [Development](../../docs/development.md)
+    * [Development](../development/development.md)
     * [Production](build-system/production.md)
     * [Testing](../TESTING.md)
 * [Security](security/README.md)
@@ -43,7 +43,7 @@
     * [Release Process](version-management/release-process.md)
 * [Toolchain](toolchain/README.md)
   * [Rust Setup](toolchain/rust-setup.md)
-    * [Installation](../../INSTALLATION.md)
+    * [Installation](../getting-started/INSTALLATION.md)
     * [Configuration](../../docs/installation/CONFIGURATION.md)
   * [Required Tools](toolchain/required-tools.md)
     * [Development Tools](toolchain/development-tools.md)

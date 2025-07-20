@@ -108,7 +108,7 @@ The Bitcoin implementation provides:
 
 To contribute to the Bitcoin implementation:
 
-1. Read the [Contributing Guide](../../CONTRIBUTING.md)
+1. Read the [Contributing Guide](../CONTRIBUTING.md)
 2. Follow the [AI Labeling Standards](../standards/AI_LABELING.md)
 3. Ensure all code meets [BIP Compliance Standards](../standards/BIP_COMPLIANCE.md) requirements
 
@@ -128,7 +128,7 @@ All Bitcoin components are tested using:
 
 ## Documentation
 
-- [Architecture](architecture.md) - Detailed architecture of the Bitcoin integration
+- [Architecture](../dependencies/system/architecture.md) - Detailed architecture of the Bitcoin integration
 - [API Reference](../api/README.md) - API documentation for Bitcoin-related functionality
-- [Development Guide](../development.md) - Guide for developers working on Bitcoin features
-- [Testing](../testing.md) - Testing strategy and guidelines for Bitcoin features
+- [Development Guide](../development/development.md) - Guide for developers working on Bitcoin features
+- [Testing](../development/TESTING.md) - Testing strategy and guidelines for Bitcoin features

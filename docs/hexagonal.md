@@ -267,5 +267,5 @@ The Hexagonal Architecture provides a clean separation of concerns, making the c
 
 ## See Also
 
-- [Related Document 1](../INSTALLATION.md)
-- [Related Document 2](../INSTALLATION_REVIEW.md)
+- [Related Document 1](getting-started/INSTALLATION.md)
+- [Related Document 2](INSTALLATION_REVIEW.md)

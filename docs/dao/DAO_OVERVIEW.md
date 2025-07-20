@@ -65,10 +65,10 @@ The DAO dashboard is available at [https://dao.anya-core.org](https://dao.anya-c
 
 ## Related Documents
 
-- [Governance Token](GOVERNANCE_TOKEN.md) - Details on the AGT token
+- [Governance Token](../archive/GOVERNANCE_TOKEN.md) - Details on the AGT token
 - [Governance Framework](GOVERNANCE_FRAMEWORK.md) - Proposal and voting systems
-- [Bitcoin Compliance](BITCOIN_COMPLIANCE.md) - Protocol compliance details
-- [Treasury Management](TREASURY_MANAGEMENT.md) - Treasury operations
+- [Bitcoin Compliance](../protocol/BITCOIN_COMPLIANCE.md) - Protocol compliance details
+- [Treasury Management](../archive/TREASURY_MANAGEMENT.md) - Treasury operations
 
 *Last updated: 2025-02-24* 
 ## See Also

@@ -177,7 +177,7 @@ For more detailed information about the DAO system, see:
 
 - [DAO Documentation Index](../docs/DAO_INDEX.md) - Central entry point to all DAO documentation
 - [DAO System Map](../docs/DAO_SYSTEM_MAP.md) - Architectural overview
-- [Tokenomics System](../docs/TOKENOMICS_SYSTEM.md) - Token economics details
+- [Tokenomics System](../docs/archive/TOKENOMICS_SYSTEM.md) - Token economics details
 - [Implementation Milestones](../docs/IMPLEMENTATION_MILESTONES.md) - Current status and roadmap
 
 ## Bitcoin Development Framework Compliance

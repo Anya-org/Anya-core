@@ -86,4 +86,4 @@ For more information, see:
 - Last Updated: 2025-04-29
 - Bitcoin Development Framework: v2.5
 
-*This component complies with [AI Labeling Standards](../../../../docs/AI_LABELING.md)* 
+*This component complies with [AI Labeling Standards](../../../../docs/standards/AI_LABELING.md)* 

@@ -718,7 +718,7 @@ class BugMetricsCollector:
 
 - [Technical Support](./technical.md)
 - [Contributing Guidelines](../CONTRIBUTING.md)
-- [Security Guidelines](../SECURITY_GUIDELINES.md)
+- [Security Guidelines](../archive/SECURITY_GUIDELINES.md)
 - [Development Workflow](../development/workflow.md)
 
 ---

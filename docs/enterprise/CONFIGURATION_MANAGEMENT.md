@@ -338,7 +338,7 @@ impl CoreSystem {
 [AIR-3][AIS-3][BPC-3][RES-3]
 
 
-*This document follows the [AI Labeling System](../docs/standards/AI_LABELING.md) standards based on official Bitcoin Improvement Proposals (BIPs).* 
+*This document follows the [AI Labeling System](../standards/AI_LABELING.md) standards based on official Bitcoin Improvement Proposals (BIPs).* 
 ## See Also
 
 - [Related Document](#related-document)

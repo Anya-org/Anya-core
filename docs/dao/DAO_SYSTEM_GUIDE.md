@@ -67,7 +67,7 @@ The AGT token is distributed according to the following model:
 - **5% Strategic Partners** (1.05B AGT)
   - 3-year vesting schedule
 
-*For detailed tokenomics information, see [TOKENOMICS_SYSTEM.md](TOKENOMICS_SYSTEM.md)*
+*For detailed tokenomics information, see [TOKENOMICS_SYSTEM.md](../archive/TOKENOMICS_SYSTEM.md)*
 
 ## Governance Framework
 
@@ -272,8 +272,8 @@ The DAO dashboard is available at [https://dao.anya-core.org](https://dao.anya-c
 
 - [DAO Technical Documentation](./DAO_TECHNICAL.md)
 - [DAO System Map](./DAO_SYSTEM_MAP.md)
-- [Tokenomics System](./TOKENOMICS_SYSTEM.md)
-- [Governance API Reference](./api/GOVERNANCE_API.md)
+- [Tokenomics System](../archive/TOKENOMICS_SYSTEM.md)
+- [Governance API Reference](../api/GOVERNANCE_API.md)
 
 ## Key Features
 
@@ -291,9 +291,9 @@ This project includes several documents covering different aspects of the DAO sy
 | Document | Purpose | Location |
 |----------|---------|----------|
 | [DAO Index](DAO_INDEX.md) | Central entry point to all DAO documentation | `docs/DAO_INDEX.md` |
-| [DAO README](../dao/README.md) | Overview of setup and usage | `dao/README.md` |
+| [DAO README](../dependencies/security/README.md) | Overview of setup and usage | `dao/README.md` |
 | [DAO System Map](DAO_SYSTEM_MAP.md) | Architectural overview | `docs/DAO_SYSTEM_MAP.md` |
-| [Tokenomics System](TOKENOMICS_SYSTEM.md) | Token economics architecture | `docs/TOKENOMICS_SYSTEM.md` |
+| [Tokenomics System](../archive/TOKENOMICS_SYSTEM.md) | Token economics architecture | `docs/TOKENOMICS_SYSTEM.md` |
 | [Implementation Milestones](IMPLEMENTATION_MILESTONES.md) | Progress tracking and roadmap | `docs/IMPLEMENTATION_MILESTONES.md` |
 | This Guide | Comprehensive consolidated documentation | `docs/DAO_SYSTEM_GUIDE.md` |
 

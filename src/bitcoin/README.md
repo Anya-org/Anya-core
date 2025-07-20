@@ -90,8 +90,8 @@ The implementation is fully compliant with the Bitcoin protocol:
 To contribute to the Bitcoin implementation:
 
 1. Read the [Contributing Guide](../../dependencies/CONTRIBUTING.md)
-2. Follow the [AI Labeling Standards](../../docs/AI_LABELING.md)
-3. Ensure all code meets [BIP Compliance Standards](../../docs/BIP_COMPLIANCE.md) requirements
+2. Follow the [AI Labeling Standards](../../docs/standards/AI_LABELING.md)
+3. Ensure all code meets [BIP Compliance Standards](../../docs/standards/BIP_COMPLIANCE.md) requirements
 
 ## Testing
 
@@ -107,8 +107,8 @@ All Bitcoin components are tested using:
 For more information, see:
 
 - [Bitcoin Protocol Documentation](README.md): Complete Bitcoin documentation
-- [BIP Compliance Matrix](../../docs/BIP_COMPLIANCE.md): Detailed BIP compliance information
-- [Security Architecture](../../docs/SECURITY_ARCHITECTURE.md): Security design and implementation
+- [BIP Compliance Matrix](../../docs/standards/BIP_COMPLIANCE.md): Detailed BIP compliance information
+- [Security Architecture](../../docs/architecture/SECURITY_ARCHITECTURE.md): Security design and implementation
 
 ## Version Information
 
@@ -116,4 +116,4 @@ For more information, see:
 - Last Updated: 2025-04-28
 - Bitcoin Improvement Proposals: BIP-340, BIP-341, BIP-342, BIP-174, BIP-370
 
-*This component complies with [AI Labeling Standards](../../docs/AI_LABELING.md)* 
+*This component complies with [AI Labeling Standards](../../docs/standards/AI_LABELING.md)* 

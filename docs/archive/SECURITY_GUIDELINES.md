@@ -645,9 +645,9 @@ describe('Security Tests', () => {
 ## See Also
 
 - [Authentication System](../api/auth.md)
-- [Authorization Guide](../anya-enterprise/docs/security/authorization.md)
+- [Authorization Guide](../enterprise/security/authorization.md)
 - [Encryption Standards](../security/encryption.md)
-- [Compliance Framework](../anya-enterprise/docs/audit/framework.md)
+- [Compliance Framework](../enterprise/audit/framework.md)
 
 ---
 

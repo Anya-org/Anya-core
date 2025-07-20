@@ -1126,10 +1126,10 @@ interface MobileSDK {
 ## See Also
 
 - [Agent Architecture](AGENT_ARCHITECTURE.md)
-- [System Map](SYSTEM_MAP.md)
+- [System Map](../../src/system_map.md)
 - [Master Implementation Plan](MASTER_IMPLEMENTATION_PLAN_CANONICAL.md)
 - [Git Workflow](GIT_WORKFLOW.md)
 - [Security Architecture](SECURITY_ARCHITECTURE.md)
 - [Performance Architecture](PERFORMANCE_ARCHITECTURE.md)
-- [Hexagonal Architecture](HEXAGONAL.md)
+- [Hexagonal Architecture](../bitcoin/docs/architecture/HEXAGONAL.md)
 

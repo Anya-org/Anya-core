@@ -3,14 +3,14 @@
 **Date: June 22, 2025**
 
 > **Status (June 2025):**
-> The Layer2 async API and related modules are under active development. The implementation is not yet production-ready. Some features described below may not work as intended due to unresolved build and logic errors, especially in `Layer2Manager` and HSM/security modules. See [ROADMAP.md](/docs/ROADMAP.md) for up-to-date status and actionable items.
+> The Layer2 async API and related modules are under active development. The implementation is not yet production-ready. Some features described below may not work as intended due to unresolved build and logic errors, especially in `Layer2Manager` and HSM/security modules. See [ROADMAP.md](../maintenance/ROADMAP.md) for up-to-date status and actionable items.
 
 > **Known Issues:**
 >
 > - Critical errors remain in Layer2Manager and HSM/security modules; many async methods may fail or be incomplete.
 > - Not all tests pass; do not rely on this API for production use.
 > - Documentation and code are being actively aligned—expect breaking changes.
-> - For details, see the main [ROADMAP.md](/docs/ROADMAP.md).
+> - For details, see the main [ROADMAP.md](../maintenance/ROADMAP.md).
 
 This document provides a comprehensive reference for the asynchronous API of the Layer2 modules in Anya-core.
 
@@ -273,4 +273,4 @@ fn submit_transaction_sync(&self, tx: &Transaction) -> Result<TxStatus, Layer2Er
 }
 ```
 
-For detailed migration guidance, please see the [Sync to Async Migration Guide](/docs/layer2/SYNC_TO_ASYNC_MIGRATION_GUIDE.md).
+For detailed migration guidance, please see the [Sync to Async Migration Guide](SYNC_TO_ASYNC_MIGRATION_GUIDE.md).

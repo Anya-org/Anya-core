@@ -19,6 +19,7 @@ Add a brief overview of this document here.
 
 
 ## Audit Types
+
 1. **Automated Weekly Audits**
    - Runs every Monday 00:00 UTC
    - Checks:
@@ -42,6 +43,7 @@ Add a brief overview of this document here.
      - Performance metrics
 
 ## Audit Workflow
+
 ```mermaid
 graph TD
     A[Start Audit] --> B{Type?}
@@ -64,33 +66,40 @@ graph TD
 ## Key Audit Components
 
 ### 1. BIP Compliance Verification
+
 ```bash
 anya-validator check-compliance --bip=all --level=strict
 ```
 
 ### 2. Cryptographic Safety
+
 ```bash
 anya-validator check-crypto --algo=all --constant-time
 ```
 
 ### 3. Memory Safety
+
 ```bash
 anya-validator check-memory --isolation --protection
 ```
 
 ### 4. Network Security
+
 ```bash
 anya-validator check-network --ports=all --firewall
 ```
 
 ## Audit Reports
+
 Reports include:
+
 - Compliance matrix
 - Vulnerability scores (CVSS)
 - Resource utilization
 - Failure recovery metrics
 
 Example:
+
 ```json
 {
   "timestamp": 1712345678,
@@ -113,6 +122,7 @@ Example:
 ```
 
 ## Chaos Engineering Tests
+
 1. **Network Partition Simulation**
    - Blocks RPC traffic for 5 minutes
    - Verifies failover mechanisms
@@ -126,6 +136,7 @@ Example:
    - Tests backup node activation
 
 ## Hardware Profile Validation
+
 ```bash
 # Test minimal profile
 anya-test hardware --profile minimal --validate
@@ -135,6 +146,7 @@ anya-test hardware --profile enterprise --duration 24h
 ```
 
 ## Audit Trail Requirements
+
 1. Cryptographic hashes of all binaries
 2. Signed compliance reports
 3. Vulnerability disclosure history
@@ -142,12 +154,14 @@ anya-test hardware --profile enterprise --duration 24h
 5. Chaos engineering results
 
 ## Remediation Process
+
 1. Critical issues (<24h response)
 2. High risk (72h mitigation)
 3. Medium risk (7 day resolution)
 4. Low risk (30 day review)
 
 Would you like me to add specific audit checklists or compliance matrices? 
+
 ## See Also
 
 - [Related Document](#related-document)

@@ -90,10 +90,10 @@ cargo deny check
 
 ## Documentation
 
-- [Architecture](docs/ARCHITECTURE.md)
+- [Architecture](docs/web5_ml/ARCHITECTURE.md)
 - [Security](SECURITY.md)
 - [Integration Guide](../docs/ai/INTEGRATION.md)
-- [Dependency Management](docs/DEPENDENCIES.md)
+- [Dependency Management](../docs/dependencies/DEPENDENCIES.md)
 
 ## Contributing
 

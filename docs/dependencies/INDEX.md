@@ -31,7 +31,7 @@
 
 - [ML System Architecture](ML_SYSTEM_ARCHITECTURE.md)
 - [ML Metrics](ML_METRICS.md)
-- [Agent Architecture](AGENT_ARCHITECTURE.md)
+- [Agent Architecture](../architecture/AGENT_ARCHITECTURE.md)
 - Code:
   - [MLCore](../src/ml_core/mod.rs)
   - [ML Agents](../src/ml/agents/mod.rs)
@@ -69,9 +69,9 @@
 ### Project Management
 
 - [Roadmap](../ROADMAP.md)
-- [Changelog](../CHANGELOG.md)
-- [Contributing](CONTRIBUTING.md)
-- [New Features](../NEW_FEATURES.md)
+- [Changelog](../../scripts/enterprise/CHANGELOG.md)
+- [Contributing](../CONTRIBUTING.md)
+- [New Features](../../dependencies/NEW_FEATURES.md)
 
 ### CI/CD
 

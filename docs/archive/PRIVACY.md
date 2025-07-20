@@ -62,10 +62,10 @@ Anya Core implements comprehensive privacy protection measures to ensure user da
 
 ## See Also
 
-- [Security Documentation](SECURITY.md)
-- [Encryption Guidelines](security/encryption.md)
-- [Bitcoin Privacy BIPs](bitcoin/privacy-bips.md)
+- [Security Documentation](../maintenance/SECURITY.md)
+- [Encryption Guidelines](../security/encryption.md)
+- [Bitcoin Privacy BIPs](../bitcoin/privacy-bips.md)
 
 ---
 
-*This documentation is part of the Anya Core project. For more information, see the [main documentation index](index.md).*
+*This documentation is part of the Anya Core project. For more information, see the [main documentation index](../monitoring/index.md).*

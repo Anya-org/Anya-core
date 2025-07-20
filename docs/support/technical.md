@@ -641,7 +641,7 @@ A: Minimum requirements:
 - Network: Stable internet connection
 
 **Q: How do I report a security vulnerability?**
-A: Please follow our [Security Guidelines](../SECURITY_GUIDELINES.md):
+A: Please follow our [Security Guidelines](../archive/SECURITY_GUIDELINES.md):
 
 - Email: <security@anya-core.org>
 - Use PGP encryption for sensitive reports
@@ -691,7 +691,7 @@ A: Follow these steps:
 
 - [Bug Reports](./bugs.md)
 - [API Documentation](../api/README.md)
-- [Security Guidelines](../SECURITY_GUIDELINES.md)
+- [Security Guidelines](../archive/SECURITY_GUIDELINES.md)
 - [Getting Started Guide](../getting-started/README.md)
 
 ---

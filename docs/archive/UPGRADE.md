@@ -46,7 +46,7 @@ This document provides guidelines for upgrading Anya Core between versions. Alwa
    - Verify Docker Compose: `docker-compose --version` (≥ 2.0)
 
 3. **Review Release Notes**
-   Always check the [CHANGELOG.md](../dependencies/CHANGELOG.md) for breaking changes and new requirements.
+   Always check the [CHANGELOG.md](../../scripts/enterprise/CHANGELOG.md) for breaking changes and new requirements.
 
 ## Upgrade Procedure
 
@@ -201,7 +201,7 @@ If you encounter issues after upgrade:
 If you encounter issues:
 
 1. Check logs: `journalctl -u anya-core -n 100`
-2. Review [Troubleshooting Guide](installation/troubleshooting.md)
+2. Review [Troubleshooting Guide](../installation/troubleshooting.md)
 3. Open an issue on [GitHub](https://github.com/your-org/anya-core/issues)
 4. Email support: <botshelomokoka@gmail.com>
 

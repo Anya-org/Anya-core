@@ -5,6 +5,7 @@ This document details the integration testing practices in Anya.
 ## Test Structure
 
 ### 1. Test Setup
+
 ```rust
 // tests/integration_tests.rs
 use anya::{Wallet, Network, Transaction};
@@ -30,6 +31,7 @@ impl IntegrationTestContext {
 ```
 
 ### 2. Component Integration
+
 ```rust
 #[tokio::test]
 async fn test_wallet_network_integration() {
@@ -47,6 +49,7 @@ async fn test_wallet_network_integration() {
 ```
 
 ### 3. System Integration
+
 ```rust
 #[tokio::test]
 async fn test_full_system_integration() {
@@ -71,6 +74,7 @@ async fn test_full_system_integration() {
 ## Test Scenarios
 
 ### 1. Component Interaction
+
 ```rust
 #[tokio::test]
 async fn test_component_interactions() {
@@ -90,6 +94,7 @@ async fn test_component_interactions() {
 ```
 
 ### 2. Data Flow
+
 ```rust
 #[tokio::test]
 async fn test_data_flow() {
@@ -108,6 +113,7 @@ async fn test_data_flow() {
 ```
 
 ### 3. Error Handling
+
 ```rust
 #[tokio::test]
 async fn test_error_handling() {
@@ -130,24 +136,28 @@ async fn test_error_handling() {
 ## Best Practices
 
 ### 1. Test Environment
+
 - Isolated testing
 - Clean state
 - Resource management
 - Configuration control
 
 ### 2. Test Implementation
+
 - Comprehensive scenarios
 - Error handling
 - Performance monitoring
 - State verification
 
 ### 3. Test Maintenance
+
 - Regular updates
 - Documentation
 - CI/CD integration
 - Monitoring and alerts
 
 ## Related Documentation
+
 - [Unit Testing](unit-testing.md)
 - [Performance Testing](performance-testing.md)
 - [System Testing](system-testing.md)

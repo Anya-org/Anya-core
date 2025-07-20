@@ -45,6 +45,6 @@ Supporting off-chain components include:
 ### Component Architecture 
 ## See Also
 
-- [ML_SYSTEM_ARCHITECTURE.md](../dependencies/docs/ML_SYSTEM_ARCHITECTURE.md) – ML system architecture
-- [SECURITY_ARCHITECTURE.md](./SECURITY_ARCHITECTURE.md) – Security system architecture
-- [PERFORMANCE_ARCHITECTURE.md](./PERFORMANCE_ARCHITECTURE.md) – Performance system architecture
+- [ML_SYSTEM_ARCHITECTURE.md](../dependencies/ML_SYSTEM_ARCHITECTURE.md) – ML system architecture
+- [SECURITY_ARCHITECTURE.md](../architecture/SECURITY_ARCHITECTURE.md) – Security system architecture
+- [PERFORMANCE_ARCHITECTURE.md](../architecture/PERFORMANCE_ARCHITECTURE.md) – Performance system architecture

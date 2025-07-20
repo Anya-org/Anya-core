@@ -29,4 +29,4 @@ Please refer to the main document for complete installation instructions.
 ## See Also
 
 - [Installation Troubleshooting](./troubleshooting.md)
-- [Installation Review](../../INSTALLATION_REVIEW.md)
+- [Installation Review](../INSTALLATION_REVIEW.md)

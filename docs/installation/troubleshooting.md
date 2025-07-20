@@ -239,5 +239,5 @@ If you're still experiencing issues:
 ## See Also
 
 - [Installation Guide](../INSTALLATION.md)
-- [Installation Review](../../INSTALLATION_REVIEW.md)
+- [Installation Review](../INSTALLATION_REVIEW.md)
 - [Docker Configuration](../docs/docker-config.md)

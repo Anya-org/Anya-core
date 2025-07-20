@@ -129,7 +129,7 @@ The treasury dashboard provides real-time visibility into:
 
 ## Related Documents
 
-- [Governance Framework](GOVERNANCE_FRAMEWORK.md) - Governance control of treasury
+- [Governance Framework](../GOVERNANCE_FRAMEWORK.md) - Governance control of treasury
 - [DEX Integration](DEX_INTEGRATION.md) - Treasury interaction with DEX
 - [Security Measures](SECURITY_MEASURES.md) - Treasury security protocols
 - [Implementation Architecture](IMPLEMENTATION_ARCHITECTURE.md) - Technical implementation details

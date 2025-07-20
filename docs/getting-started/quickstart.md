@@ -123,7 +123,7 @@ Select option 2 to deploy to GitHub Pages, or option 1 to preview the production
 
 - [Explore the API Reference](../api/README.md)
 - [Read the Architecture Documentation](../architecture/README.md)
-- [Learn about Contribution Guidelines](../../CONTRIBUTING.md)
+- [Learn about Contribution Guidelines](../CONTRIBUTING.md)
 
 ## See Also
 

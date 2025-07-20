@@ -371,4 +371,4 @@ The support for Bitcoin-specific operations makes it particularly valuable for b
 ## See Also
 
 - [Related Document 1](../INSTALLATION.md)
-- [Related Document 2](../../INSTALLATION_REVIEW.md)
+- [Related Document 2](../INSTALLATION_REVIEW.md)

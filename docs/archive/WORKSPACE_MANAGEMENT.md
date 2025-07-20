@@ -307,8 +307,8 @@ Before committing documentation changes:
 ## See Also
 
 - [Documentation QA Complete Report](DOCUMENTATION_QA_COMPLETE.md)
-- [Bitcoin Compliance Documentation](BITCOIN_COMPLIANCE.md)
-- [System Architecture Overview](ARCHITECTURE.md)
-- [Security Framework Documentation](SECURITY.md)
-- [Development Setup Guide](dev_setup.md)
+- [Bitcoin Compliance Documentation](../protocol/BITCOIN_COMPLIANCE.md)
+- [System Architecture Overview](../ai/ARCHITECTURE.md)
+- [Security Framework Documentation](../maintenance/SECURITY.md)
+- [Development Setup Guide](../dev_setup.md)
 

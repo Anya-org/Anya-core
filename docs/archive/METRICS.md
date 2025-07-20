@@ -121,7 +121,7 @@ Anya-Core implements a comprehensive metrics system that follows the hexagonal a
 
 ## See Also
 
-- [PERFORMANCE_ARCHITECTURE.md](./PERFORMANCE_ARCHITECTURE.md) - Performance architecture details
-- [SECURITY_ARCHITECTURE.md](./SECURITY_ARCHITECTURE.md) - Security monitoring framework
+- [PERFORMANCE_ARCHITECTURE.md](../architecture/PERFORMANCE_ARCHITECTURE.md) - Performance architecture details
+- [SECURITY_ARCHITECTURE.md](../architecture/SECURITY_ARCHITECTURE.md) - Security monitoring framework
 - [MONITORING.md](./monitoring/) - Detailed monitoring configuration
 

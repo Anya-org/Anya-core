@@ -612,9 +612,9 @@ See [LICENSE](LICENSE) for full license text.
 
 **Community:**
 
-- **Contributing Guide:** [CONTRIBUTING.md](CONTRIBUTING.md)
+- **Contributing Guide:** [CONTRIBUTING.md](docs/CONTRIBUTING.md)
 - **Code of Conduct:** [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)
-- **Security Reporting:** [docs/security/SECURITY.md](docs/security/SECURITY.md)
+- **Security Reporting:** [docs/security/SECURITY.md](scripts/enterprise/SECURITY.md)
 
 ---
 

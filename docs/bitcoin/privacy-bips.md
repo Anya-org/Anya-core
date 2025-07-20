@@ -446,10 +446,10 @@ impl PrivacyMetrics {
 
 ## See Also
 
-- [Security Policy](../SECURITY.md)
+- [Security Policy](../maintenance/SECURITY.md)
 - [Encryption Guidelines](../security/encryption.md)
 - [Bitcoin Integration](../bitcoin/README.md)
-- [Privacy Measures](../PRIVACY.md)
+- [Privacy Measures](../archive/PRIVACY.md)
 
 ---
 

@@ -104,7 +104,7 @@ This page provides a comprehensive index of documentation tags to help you find 
 ### Reference
 
 - [Glossary](reference/glossary.md)
-- [Best Practices](../anya-extensions/docs/development/best-practices.md)
+- [Best Practices](extensions/development/best-practices.md)
 - [Version History](reference/versions.md)
 - [Project Roadmap](ROADMAP.md)
 

@@ -143,8 +143,8 @@ In the event of a security incident:
 ## Related Documents
 
 - [Treasury Management](TREASURY_MANAGEMENT.md) - Treasury security controls
-- [Governance Framework](GOVERNANCE_FRAMEWORK.md) - Governance security measures
-- [Bitcoin Compliance](BITCOIN_COMPLIANCE.md) - BIP security standards
+- [Governance Framework](../GOVERNANCE_FRAMEWORK.md) - Governance security measures
+- [Bitcoin Compliance](../protocol/BITCOIN_COMPLIANCE.md) - BIP security standards
 - [Implementation Architecture](IMPLEMENTATION_ARCHITECTURE.md) - Security architecture
 
 *Last updated: 2025-02-24* 

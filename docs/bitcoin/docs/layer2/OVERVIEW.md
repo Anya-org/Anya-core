@@ -430,9 +430,10 @@ As the Bitcoin ecosystem evolves, we will consider supporting additional Layer 2
 
 1. **Liquid Network**: Federation-based sidechain for financial institutions
 2. **Ark**: Novel commit-reveal scheme for private and scalable contracts
+
 3. **Eclair**: Alternative Lightning Network implementation
 4. **Lightning Service Providers (LSPs)**: Managed Lightning services
 
 ---
 
-*This document follows the [AI Labeling System](../../../AI_LABELING.md) standards based on official Bitcoin Improvement Proposals (BIPs).*
+*This document follows the AI Labeling System standards based on official Bitcoin Improvement Proposals (BIPs).*

@@ -6,7 +6,7 @@ last_updated: 2025-06-17
 
 # Installation Review Related Document
 
-This is a symbolic link to the main [INSTALLATION_REVIEW.md](../../INSTALLATION_REVIEW.md) document in the repository root.
+This is a symbolic link to the main [INSTALLATION_REVIEW.md](../INSTALLATION_REVIEW.md) document in the repository root.
 
 [AIR-3][AIS-3][BPC-3][RES-3]
 
@@ -28,5 +28,5 @@ Please refer to the main document for complete installation review information.
 
 ## See Also
 
-- [Installation Guide](../../INSTALLATION.md)
+- [Installation Guide](../getting-started/INSTALLATION.md)
 - [Installation Troubleshooting](./troubleshooting.md)

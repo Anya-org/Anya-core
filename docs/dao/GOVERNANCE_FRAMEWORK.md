@@ -163,14 +163,14 @@ const proposal = await anyaDAO.createProposal({
 
 ## Related Documents
 
-- [Governance Token](GOVERNANCE_TOKEN.md) - Token used for governance
-- [Treasury Management](TREASURY_MANAGEMENT.md) - Treasury control via governance
-- [Bitcoin Compliance](BITCOIN_COMPLIANCE.md) - BIP compliance for voting
-- [API Reference](api/GOVERNANCE_API.md) - Technical API documentation
+- [Governance Token](../archive/GOVERNANCE_TOKEN.md) - Token used for governance
+- [Treasury Management](../archive/TREASURY_MANAGEMENT.md) - Treasury control via governance
+- [Bitcoin Compliance](../protocol/BITCOIN_COMPLIANCE.md) - BIP compliance for voting
+- [API Reference](../api/GOVERNANCE_API.md) - Technical API documentation
 
 *Last updated: 2025-02-24* 
 
 ## See Also
 
-- [Related Document 1](./INSTALLATION.md)
+- [Related Document 1](../getting-started/INSTALLATION.md)
 - [Related Document 2](../INSTALLATION_REVIEW.md)

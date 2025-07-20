@@ -134,10 +134,10 @@ The PSBT transaction flow consists of:
 
 ## Related Documents
 
-- [Governance Framework](GOVERNANCE_FRAMEWORK.md) - Governance using Bitcoin standards
-- [Security Measures](SECURITY_MEASURES.md) - Bitcoin-based security protocols
-- [Implementation Architecture](IMPLEMENTATION_ARCHITECTURE.md) - Technical implementation details
-- [Setup & Usage](SETUP_USAGE.md) - Integration with Bitcoin tools
+- [Governance Framework](../GOVERNANCE_FRAMEWORK.md) - Governance using Bitcoin standards
+- [Security Measures](../archive/SECURITY_MEASURES.md) - Bitcoin-based security protocols
+- [Implementation Architecture](../archive/IMPLEMENTATION_ARCHITECTURE.md) - Technical implementation details
+- [Setup & Usage](../getting-started/SETUP_USAGE.md) - Integration with Bitcoin tools
 
 ## BOLT 12 Compliance
 
@@ -200,5 +200,5 @@ fn validate_psbt_v2(psbt: &Psbt) -> Result<()> {
 
 ## See Also
 
-- [Related Document 1](./INSTALLATION.md)
+- [Related Document 1](../getting-started/INSTALLATION.md)
 - [Related Document 2](../INSTALLATION_REVIEW.md)

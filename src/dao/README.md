@@ -67,8 +67,8 @@ The DAO is fully compliant with Bitcoin protocols through:
 To contribute to the DAO development:
 
 1. Read the [Contributing Guide](../../dependencies/CONTRIBUTING.md)
-2. Follow the [AI Labeling Standards](../../docs/AI_LABELING.md)
-3. Ensure all code meets [Bitcoin Improvement Proposals (BIPs)](../../docs/BIP_COMPLIANCE.md) requirements
+2. Follow the [AI Labeling Standards](../../docs/standards/AI_LABELING.md)
+3. Ensure all code meets [Bitcoin Improvement Proposals (BIPs)](../../docs/standards/BIP_COMPLIANCE.md) requirements
 
 ## Testing
 
@@ -83,7 +83,7 @@ All DAO components are tested using:
 For more information, see:
 
 - [DAO Documentation Index](../../docs/DAO_INDEX.md): Complete DAO documentation
-- [Tokenomics System](../../docs/TOKENOMICS_SYSTEM.md): Detailed tokenomics documentation
+- [Tokenomics System](../../docs/archive/TOKENOMICS_SYSTEM.md): Detailed tokenomics documentation
 - [Implementation Status](../../docs/IMPLEMENTATION_MILESTONES.md): Current progress and roadmap
 
 ## Version Information
@@ -92,4 +92,4 @@ For more information, see:
 - Last Updated: 2025-04-28
 - Bitcoin Improvement Proposals (BIPs): Latest standards
 
-*This component complies with [AI Labeling Standards](../../docs/AI_LABELING.md)*
+*This component complies with [AI Labeling Standards](../../docs/standards/AI_LABELING.md)*

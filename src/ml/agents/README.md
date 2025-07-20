@@ -24,7 +24,7 @@ The Read First Always principle requires that any operation modifying data (crea
 3. Better conflict detection and resolution
 4. Enhanced debugging capabilities
 
-For detailed information about this principle, see the [READ_FIRST_ALWAYS.md](../../../docs/READ_FIRST_ALWAYS.md) document.
+For detailed information about this principle, see the [READ_FIRST_ALWAYS.md](../../../docs/archive/READ_FIRST_ALWAYS.md) document.
 
 ## Integration with Bitcoin Anchoring
 

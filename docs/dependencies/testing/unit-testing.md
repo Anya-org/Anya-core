@@ -5,6 +5,7 @@ This document details the unit testing practices in Anya.
 ## Test Structure
 
 ### 1. Test Organization
+
 ```rust
 #[cfg(test)]
 mod tests {
@@ -30,6 +31,7 @@ mod tests {
 ```
 
 ### 2. Test Categories
+
 ```rust
 #[cfg(test)]
 mod tests {
@@ -54,6 +56,7 @@ mod tests {
 ```
 
 ### 3. Test Utilities
+
 ```rust
 // Test helpers
 pub mod test_utils {
@@ -74,6 +77,7 @@ pub mod test_utils {
 ## Test Implementation
 
 ### 1. Basic Tests
+
 ```rust
 #[cfg(test)]
 mod tests {
@@ -97,6 +101,7 @@ mod tests {
 ```
 
 ### 2. Property Tests
+
 ```rust
 use proptest::prelude::*;
 
@@ -112,6 +117,7 @@ proptest! {
 ```
 
 ### 3. Mock Tests
+
 ```rust
 use mockall::automock;
 
@@ -137,24 +143,28 @@ mod tests {
 ## Best Practices
 
 ### 1. Test Design
+
 - Single responsibility
 - Clear naming
 - Comprehensive coverage
 - Independent tests
 
 ### 2. Test Implementation
+
 - Setup and teardown
 - Error handling
 - Resource cleanup
 - Documentation
 
 ### 3. Test Maintenance
+
 - Regular updates
 - Coverage monitoring
 - Performance checks
 - Documentation updates
 
 ## Related Documentation
+
 - [Integration Testing](integration-testing.md)
 - [Performance Testing](performance-testing.md)
 - [Test Coverage](test-coverage.md)

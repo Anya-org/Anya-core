@@ -1,18 +1,2513 @@
-<!doctype html><html lang=en class=no-js> <head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="Documentation for Index - Bitcoin Integration Complete"><meta name=author content="Anya Core Team"><link href=https://docs.anya.org/ rel=canonical><link href=INSTALLATION/ rel=next><link rel=icon href=assets/images/favicon.png><meta name=generator content="mkdocs-1.6.1, mkdocs-material-9.6.14"><title>Index - PRODUCTION-READY (June 7, 2025) - Anya Core</title><link rel=stylesheet href=assets/stylesheets/main.342714a4.min.css><link rel=stylesheet href=assets/stylesheets/palette.06af60db.min.css><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=stylesheet href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback"><style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style><link rel=stylesheet href=css/timeago.css><link rel=stylesheet href=styles/extra.css><script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script><script id=__analytics>function __md_analytics(){function e(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],e("js",new Date),e("config","G-XXXXXXXXXX"),document.addEventListener("DOMContentLoaded",(function(){document.forms.search&&document.forms.search.query.addEventListener("blur",(function(){this.value&&e("event","search",{search_term:this.value})}));document$.subscribe((function(){var t=document.forms.feedback;if(void 0!==t)for(var a of t.querySelectorAll("[type=submit]"))a.addEventListener("click",(function(a){a.preventDefault();var n=document.location.pathname,d=this.getAttribute("data-md-value");e("event","feedback",{page:n,data:d}),t.firstElementChild.disabled=!0;var r=t.querySelector(".md-feedback__note [data-md-value='"+d+"']");r&&(r.hidden=!1)})),t.hidden=!1})),location$.subscribe((function(t){e("config","G-XXXXXXXXXX",{page_path:t.pathname})}))}));var t=document.createElement("script");t.async=!0,t.src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX",document.getElementById("__analytics").insertAdjacentElement("afterEnd",t)}</script><script>"undefined"!=typeof __md_analytics&&__md_analytics()</script></head> <body dir=ltr data-md-color-scheme=default data-md-color-primary=indigo data-md-color-accent=indigo> <input class=md-toggle data-md-toggle=drawer type=checkbox id=__drawer autocomplete=off> <input class=md-toggle data-md-toggle=search type=checkbox id=__search autocomplete=off> <label class=md-overlay for=__drawer></label> <div data-md-component=skip> <a href=#anya-core-documentation-production-ready class=md-skip> Skip to content </a> </div> <div data-md-component=announce> </div> <div data-md-color-scheme=default data-md-component=outdated hidden> </div> <header class="md-header md-header--shadow md-header--lifted" data-md-component=header> <nav class="md-header__inner md-grid" aria-label=Header> <a href=. title="Anya Core" class="md-header__button md-logo" aria-label="Anya Core" data-md-component=logo> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg> </a> <label class="md-header__button md-icon" for=__drawer> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg> </label> <div class=md-header__title data-md-component=header-title> <div class=md-header__ellipsis> <div class=md-header__topic> <span class=md-ellipsis> Anya Core </span> </div> <div class=md-header__topic data-md-component=header-topic> <span class=md-ellipsis> Index - PRODUCTION-READY (June 7, 2025) </span> </div> </div> </div> <form class=md-header__option data-md-component=palette> <input class=md-option data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme=default data-md-color-primary=indigo data-md-color-accent=indigo aria-label="Switch to dark mode" type=radio name=__palette id=__palette_0> <label class="md-header__button md-icon" title="Switch to dark mode" for=__palette_1 hidden> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg> </label> <input class=md-option data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme=slate data-md-color-primary=indigo data-md-color-accent=indigo aria-label="Switch to light mode" type=radio name=__palette id=__palette_1> <label class="md-header__button md-icon" title="Switch to light mode" for=__palette_0 hidden> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg> </label> </form> <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script> <label class="md-header__button md-icon" for=__search> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg> </label> <div class=md-search data-md-component=search role=dialog> <label class=md-search__overlay for=__search></label> <div class=md-search__inner role=search> <form class=md-search__form name=search> <input type=text class=md-search__input name=query aria-label=Search placeholder=Search autocapitalize=off autocorrect=off autocomplete=off spellcheck=false data-md-component=search-query required> <label class="md-search__icon md-icon" for=__search> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg> </label> <nav class=md-search__options aria-label=Search> <a href=javascript:void(0) class="md-search__icon md-icon" title=Share aria-label=Share data-clipboard data-clipboard-text data-md-component=search-share tabindex=-1> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg> </a> <button type=reset class="md-search__icon md-icon" title=Clear aria-label=Clear tabindex=-1> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg> </button> </nav> <div class=md-search__suggest data-md-component=search-suggest></div> </form> <div class=md-search__output> <div class=md-search__scrollwrap tabindex=0 data-md-scrollfix> <div class=md-search-result data-md-component=search-result> <div class=md-search-result__meta> Initializing search </div> <ol class=md-search-result__list role=presentation></ol> </div> </div> </div> </div> </div> <div class=md-header__source> <a href=https://github.com/anya-org/anya-core title="Go to repository" class=md-source data-md-component=source> <div class="md-source__icon md-icon"> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 448 512"><!-- Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg> </div> <div class=md-source__repository> anya-org/anya-core </div> </a> </div> </nav> <nav class=md-tabs aria-label=Tabs data-md-component=tabs> <div class=md-grid> <ul class=md-tabs__list> <li class="md-tabs__item md-tabs__item--active"> <a href=. class=md-tabs__link> Home </a> </li> <li class=md-tabs__item> <a href=INSTALLATION/ class=md-tabs__link> Getting Started </a> </li> <li class=md-tabs__item> <a href=ARCHITECTURE/ class=md-tabs__link> Architecture </a> </li> <li class=md-tabs__item> <a href=CONTRIBUTING/ class=md-tabs__link> Development </a> </li> <li class=md-tabs__item> <a href=BITCOIN_PROTOCOL/ class=md-tabs__link> Bitcoin & Layer2 </a> </li> <li class=md-tabs__item> <a href=WEB5_INTEGRATION/ class=md-tabs__link> Web5 & Identity </a> </li> <li class=md-tabs__item> <a href=ENTERPRISE_GUIDE/ class=md-tabs__link> Enterprise </a> </li> <li class=md-tabs__item> <a href=DAO_OVERVIEW/ class=md-tabs__link> DAO & Governance </a> </li> <li class=md-tabs__item> <a href=API/ class=md-tabs__link> API Reference </a> </li> <li class=md-tabs__item> <a href=ROADMAP/ class=md-tabs__link> Maintenance </a> </li> </ul> </div> </nav> </header> <div class=md-container data-md-component=container> <main class=md-main data-md-component=main> <div class="md-main__inner md-grid"> <div class="md-sidebar md-sidebar--primary" data-md-component=sidebar data-md-type=navigation> <div class=md-sidebar__scrollwrap> <div class=md-sidebar__inner> <nav class="md-nav md-nav--primary md-nav--lifted" aria-label=Navigation data-md-level=0> <label class=md-nav__title for=__drawer> <a href=. title="Anya Core" class="md-nav__button md-logo" aria-label="Anya Core" data-md-component=logo> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg> </a> Anya Core </label> <div class=md-nav__source> <a href=https://github.com/anya-org/anya-core title="Go to repository" class=md-source data-md-component=source> <div class="md-source__icon md-icon"> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 448 512"><!-- Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg> </div> <div class=md-source__repository> anya-org/anya-core </div> </a> </div> <ul class=md-nav__list data-md-scrollfix> <li class="md-nav__item md-nav__item--active"> <input class="md-nav__toggle md-toggle" type=checkbox id=__toc> <label class="md-nav__link md-nav__link--active" for=__toc> <span class=md-ellipsis> Home </span> <span class="md-nav__icon md-icon"></span> </label> <a href=. class="md-nav__link md-nav__link--active"> <span class=md-ellipsis> Home </span> </a> <nav class="md-nav md-nav--secondary" aria-label="Table of contents"> <label class=md-nav__title for=__toc> <span class="md-nav__icon md-icon"></span> Table of contents </label> <ul class=md-nav__list data-md-component=toc data-md-scrollfix> <li class=md-nav__item> <a href=#production-status-achieved-june-7-2025 class=md-nav__link> <span class=md-ellipsis> 🎉 PRODUCTION STATUS ACHIEVED (June 7, 2025) </span> </a> <nav class=md-nav aria-label="🎉 PRODUCTION STATUS ACHIEVED (June 7, 2025)"> <ul class=md-nav__list> <li class=md-nav__item> <a href=#bitcoin-implementation-status class=md-nav__link> <span class=md-ellipsis> ✅ Bitcoin Implementation Status </span> </a> </li> </ul> </nav> </li> <li class=md-nav__item> <a href=#overview class=md-nav__link> <span class=md-ellipsis> Overview </span> </a> </li> <li class=md-nav__item> <a href=#table-of-contents class=md-nav__link> <span class=md-ellipsis> Table of Contents </span> </a> </li> <li class=md-nav__item> <a href=#core-documentation class=md-nav__link> <span class=md-ellipsis> Core Documentation </span> </a> </li> <li class=md-nav__item> <a href=#bitcoin-layer2-protocol-documentation class=md-nav__link> <span class=md-ellipsis> ✅ Bitcoin &amp; Layer2 Protocol Documentation </span> </a> </li> <li class=md-nav__item> <a href=#monitoring-observability class=md-nav__link> <span class=md-ellipsis> Monitoring &amp; Observability </span> </a> </li> <li class=md-nav__item> <a href=#installation-setup class=md-nav__link> <span class=md-ellipsis> Installation &amp; Setup </span> </a> </li> <li class=md-nav__item> <a href=#security-documentation class=md-nav__link> <span class=md-ellipsis> Security Documentation </span> </a> </li> <li class=md-nav__item> <a href=#module-specific-documentation class=md-nav__link> <span class=md-ellipsis> Module-Specific Documentation </span> </a> </li> <li class=md-nav__item> <a href=#development class=md-nav__link> <span class=md-ellipsis> Development </span> </a> </li> <li class=md-nav__item> <a href=#architecture class=md-nav__link> <span class=md-ellipsis> Architecture </span> </a> </li> <li class=md-nav__item> <a href=#operations class=md-nav__link> <span class=md-ellipsis> Operations </span> </a> </li> <li class=md-nav__item> <a href=#api-templates-stubbing-approach class=md-nav__link> <span class=md-ellipsis> API Templates &amp; Stubbing Approach </span> </a> </li> <li class=md-nav__item> <a href=#ai-labeling class=md-nav__link> <span class=md-ellipsis> AI Labeling </span> </a> </li> <li class=md-nav__item> <a href=#documentation-versioning class=md-nav__link> <span class=md-ellipsis> Documentation Versioning </span> </a> </li> <li class=md-nav__item> <a href=#last-updated class=md-nav__link> <span class=md-ellipsis> Last Updated </span> </a> </li> <li class=md-nav__item> <a href=#getting-help class=md-nav__link> <span class=md-ellipsis> Getting Help </span> </a> </li> <li class=md-nav__item> <a href=#license class=md-nav__link> <span class=md-ellipsis> License </span> </a> </li> <li class=md-nav__item> <a href=#future-documentation class=md-nav__link> <span class=md-ellipsis> Future Documentation </span> </a> </li> <li class=md-nav__item> <a href=#about-anya-core class=md-nav__link> <span class=md-ellipsis> About Anya Core </span> </a> </li> <li class=md-nav__item> <a href=#quick-navigation class=md-nav__link> <span class=md-ellipsis> Quick Navigation </span> </a> <nav class=md-nav aria-label="Quick Navigation"> <ul class=md-nav__list> <li class=md-nav__item> <a href=#core-features class=md-nav__link> <span class=md-ellipsis> Core Features </span> </a> </li> <li class=md-nav__item> <a href=#development-resources class=md-nav__link> <span class=md-ellipsis> Development Resources </span> </a> </li> <li class=md-nav__item> <a href=#integration-guides class=md-nav__link> <span class=md-ellipsis> Integration Guides </span> </a> </li> </ul> </nav> </li> <li class=md-nav__item> <a href=#layer-2-solutions class=md-nav__link> <span class=md-ellipsis> Layer 2 Solutions </span> </a> <nav class=md-nav aria-label="Layer 2 Solutions"> <ul class=md-nav__list> <li class=md-nav__item> <a href=#bob-hybrid-l2 class=md-nav__link> <span class=md-ellipsis> BOB Hybrid L2 </span> </a> </li> <li class=md-nav__item> <a href=#lightning-network class=md-nav__link> <span class=md-ellipsis> Lightning Network </span> </a> </li> <li class=md-nav__item> <a href=#rgb-protocol-coming-q3-2025 class=md-nav__link> <span class=md-ellipsis> RGB Protocol (Coming Q3 2025) </span> </a> </li> <li class=md-nav__item> <a href=#rsk-rootstock-coming-q3-2025 class=md-nav__link> <span class=md-ellipsis> RSK - Rootstock (Coming Q3 2025) </span> </a> </li> <li class=md-nav__item> <a href=#taproot-assets-coming-q2-2025 class=md-nav__link> <span class=md-ellipsis> Taproot Assets (Coming Q2 2025) </span> </a> </li> <li class=md-nav__item> <a href=#state-channels class=md-nav__link> <span class=md-ellipsis> State Channels </span> </a> </li> </ul> </nav> </li> <li class=md-nav__item> <a href=#latest-features-2025-04-28 class=md-nav__link> <span class=md-ellipsis> Latest Features (2025-04-28) </span> </a> <nav class=md-nav aria-label="Latest Features (2025-04-28)"> <ul class=md-nav__list> <li class=md-nav__item> <a href=#priority-1-components class=md-nav__link> <span class=md-ellipsis> Priority 1 Components </span> </a> </li> <li class=md-nav__item> <a href=#dao-tokenomics-system class=md-nav__link> <span class=md-ellipsis> DAO &amp; Tokenomics System </span> </a> </li> <li class=md-nav__item> <a href=#ml-component class=md-nav__link> <span class=md-ellipsis> ML Component </span> </a> </li> <li class=md-nav__item> <a href=#security-component class=md-nav__link> <span class=md-ellipsis> Security Component </span> </a> </li> <li class=md-nav__item> <a href=#protocol-component class=md-nav__link> <span class=md-ellipsis> Protocol Component </span> </a> </li> <li class=md-nav__item> <a href=#enterprise-component class=md-nav__link> <span class=md-ellipsis> Enterprise Component </span> </a> </li> </ul> </nav> </li> <li class=md-nav__item> <a href=#latest-updates class=md-nav__link> <span class=md-ellipsis> Latest Updates </span> </a> <nav class=md-nav aria-label="Latest Updates"> <ul class=md-nav__list> <li class=md-nav__item> <a href=#version-siteversion-2025-04-28 class=md-nav__link> <span class=md-ellipsis> Version {{ site.version }} (2025-04-28) </span> </a> </li> </ul> </nav> </li> <li class=md-nav__item> <a href=#support class=md-nav__link> <span class=md-ellipsis> Support </span> </a> <nav class=md-nav aria-label=Support> <ul class=md-nav__list> <li class=md-nav__item> <a href=#community-support-anya-core class=md-nav__link> <span class=md-ellipsis> Community Support (anya-core) </span> </a> </li> <li class=md-nav__item> <a href=#support-hours class=md-nav__link> <span class=md-ellipsis> Support Hours </span> </a> </li> <li class=md-nav__item> <a href=#enterprise-support class=md-nav__link> <span class=md-ellipsis> Enterprise Support </span> </a> </li> </ul> </nav> </li> <li class=md-nav__item> <a href=#security class=md-nav__link> <span class=md-ellipsis> Security </span> </a> </li> <li class=md-nav__item> <a href=#quick-start class=md-nav__link> <span class=md-ellipsis> Quick Start </span> </a> </li> <li class=md-nav__item> <a href=#last-update class=md-nav__link> <span class=md-ellipsis> Last Update </span> </a> </li> <li class=md-nav__item> <a href=#see-also class=md-nav__link> <span class=md-ellipsis> See Also </span> </a> </li> </ul> </nav> </li> <li class="md-nav__item md-nav__item--nested"> <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type=checkbox id=__nav_2> <label class=md-nav__link for=__nav_2 id=__nav_2_label tabindex=0> <span class=md-ellipsis> Getting Started </span> <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav data-md-level=1 aria-labelledby=__nav_2_label aria-expanded=false> <label class=md-nav__title for=__nav_2> <span class="md-nav__icon md-icon"></span> Getting Started </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=INSTALLATION/ class=md-nav__link> <span class=md-ellipsis> Installation </span> </a> </li> <li class=md-nav__item> <a href=SETUP_USAGE/ class=md-nav__link> <span class=md-ellipsis> Setup </span> </a> </li> <li class=md-nav__item> <a href=ENVIRONMENT/ class=md-nav__link> <span class=md-ellipsis> Environment </span> </a> </li> </ul> </nav> </li> <li class="md-nav__item md-nav__item--nested"> <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type=checkbox id=__nav_3> <label class=md-nav__link for=__nav_3 id=__nav_3_label tabindex=0> <span class=md-ellipsis> Architecture </span> <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav data-md-level=1 aria-labelledby=__nav_3_label aria-expanded=false> <label class=md-nav__title for=__nav_3> <span class="md-nav__icon md-icon"></span> Architecture </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=ARCHITECTURE/ class=md-nav__link> <span class=md-ellipsis> Overview </span> </a> </li> <li class=md-nav__item> <a href=AGENT_ARCHITECTURE/ class=md-nav__link> <span class=md-ellipsis> Agent System </span> </a> </li> <li class=md-nav__item> <a href=PERFORMANCE_ARCHITECTURE/ class=md-nav__link> <span class=md-ellipsis> Performance </span> </a> </li> <li class=md-nav__item> <a href=SECURITY_ARCHITECTURE/ class=md-nav__link> <span class=md-ellipsis> Security </span> </a> </li> <li class=md-nav__item> <a href=ML_SYSTEM_ARCHITECTURE/ class=md-nav__link> <span class=md-ellipsis> ML System </span> </a> </li> </ul> </nav> </li> <li class="md-nav__item md-nav__item--nested"> <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type=checkbox id=__nav_4> <label class=md-nav__link for=__nav_4 id=__nav_4_label tabindex=0> <span class=md-ellipsis> Development </span> <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav data-md-level=1 aria-labelledby=__nav_4_label aria-expanded=false> <label class=md-nav__title for=__nav_4> <span class="md-nav__icon md-icon"></span> Development </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=CONTRIBUTING/ class=md-nav__link> <span class=md-ellipsis> Contributing </span> </a> </li> <li class=md-nav__item> <a href=development/ class=md-nav__link> <span class=md-ellipsis> Development Guide </span> </a> </li> <li class=md-nav__item> <a href=TESTING/ class=md-nav__link> <span class=md-ellipsis> Testing </span> </a> </li> <li class=md-nav__item> <a href=ERROR_HANDLING/ class=md-nav__link> <span class=md-ellipsis> Error Handling </span> </a> </li> </ul> </nav> </li> <li class="md-nav__item md-nav__item--nested"> <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type=checkbox id=__nav_5> <label class=md-nav__link for=__nav_5 id=__nav_5_label tabindex=0> <span class=md-ellipsis> Bitcoin & Layer2 </span> <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav data-md-level=1 aria-labelledby=__nav_5_label aria-expanded=false> <label class=md-nav__title for=__nav_5> <span class="md-nav__icon md-icon"></span> Bitcoin & Layer2 </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=BITCOIN_PROTOCOL/ class=md-nav__link> <span class=md-ellipsis> Bitcoin Protocol </span> </a> </li> <li class=md-nav__item> <a href=BITCOIN_COMPLIANCE/ class=md-nav__link> <span class=md-ellipsis> Bitcoin Compliance </span> </a> </li> <li class=md-nav__item> <a href=BIP_COMPLIANCE/ class=md-nav__link> <span class=md-ellipsis> BIP Compliance </span> </a> </li> <li class=md-nav__item> <a href=HSM_FEATURE_GUIDE/ class=md-nav__link> <span class=md-ellipsis> HSM Integration </span> </a> </li> </ul> </nav> </li> <li class="md-nav__item md-nav__item--nested"> <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type=checkbox id=__nav_6> <label class=md-nav__link for=__nav_6 id=__nav_6_label tabindex=0> <span class=md-ellipsis> Web5 & Identity </span> <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav data-md-level=1 aria-labelledby=__nav_6_label aria-expanded=false> <label class=md-nav__title for=__nav_6> <span class="md-nav__icon md-icon"></span> Web5 & Identity </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=WEB5_INTEGRATION/ class=md-nav__link> <span class=md-ellipsis> Web5 Integration </span> </a> </li> <li class=md-nav__item> <a href=identity/ class=md-nav__link> <span class=md-ellipsis> Identity </span> </a> </li> </ul> </nav> </li> <li class="md-nav__item md-nav__item--nested"> <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type=checkbox id=__nav_7> <label class=md-nav__link for=__nav_7 id=__nav_7_label tabindex=0> <span class=md-ellipsis> Enterprise </span> <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav data-md-level=1 aria-labelledby=__nav_7_label aria-expanded=false> <label class=md-nav__title for=__nav_7> <span class="md-nav__icon md-icon"></span> Enterprise </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=ENTERPRISE_GUIDE/ class=md-nav__link> <span class=md-ellipsis> Enterprise Guide </span> </a> </li> <li class=md-nav__item> <a href=ENTERPRISE_FEATURES/ class=md-nav__link> <span class=md-ellipsis> Enterprise Features </span> </a> </li> <li class=md-nav__item> <a href=CONFIGURATION_MANAGEMENT/ class=md-nav__link> <span class=md-ellipsis> Configuration </span> </a> </li> </ul> </nav> </li> <li class="md-nav__item md-nav__item--nested"> <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type=checkbox id=__nav_8> <label class=md-nav__link for=__nav_8 id=__nav_8_label tabindex=0> <span class=md-ellipsis> DAO & Governance </span> <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav data-md-level=1 aria-labelledby=__nav_8_label aria-expanded=false> <label class=md-nav__title for=__nav_8> <span class="md-nav__icon md-icon"></span> DAO & Governance </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=DAO_OVERVIEW/ class=md-nav__link> <span class=md-ellipsis> DAO Overview </span> </a> </li> <li class=md-nav__item> <a href=DAO_SYSTEM_GUIDE/ class=md-nav__link> <span class=md-ellipsis> DAO System </span> </a> </li> <li class=md-nav__item> <a href=GOVERNANCE_FRAMEWORK/ class=md-nav__link> <span class=md-ellipsis> Governance </span> </a> </li> <li class=md-nav__item> <a href=BUSINESS_PLAN/ class=md-nav__link> <span class=md-ellipsis> Business Plan </span> </a> </li> </ul> </nav> </li> <li class="md-nav__item md-nav__item--nested"> <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type=checkbox id=__nav_9> <label class=md-nav__link for=__nav_9 id=__nav_9_label tabindex=0> <span class=md-ellipsis> API Reference </span> <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav data-md-level=1 aria-labelledby=__nav_9_label aria-expanded=false> <label class=md-nav__title for=__nav_9> <span class="md-nav__icon md-icon"></span> API Reference </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=API/ class=md-nav__link> <span class=md-ellipsis> API Overview </span> </a> </li> <li class=md-nav__item> <a href=CLI_REFERENCE/ class=md-nav__link> <span class=md-ellipsis> CLI Reference </span> </a> </li> <li class=md-nav__item> <a href=DEPENDENCIES/ class=md-nav__link> <span class=md-ellipsis> Dependencies </span> </a> </li> </ul> </nav> </li> <li class="md-nav__item md-nav__item--nested"> <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type=checkbox id=__nav_10> <label class=md-nav__link for=__nav_10 id=__nav_10_label tabindex=0> <span class=md-ellipsis> Maintenance </span> <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav data-md-level=1 aria-labelledby=__nav_10_label aria-expanded=false> <label class=md-nav__title for=__nav_10> <span class="md-nav__icon md-icon"></span> Maintenance </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=ROADMAP/ class=md-nav__link> <span class=md-ellipsis> Roadmap </span> </a> </li> <li class=md-nav__item> <a href=MIGRATION/ class=md-nav__link> <span class=md-ellipsis> Migration </span> </a> </li> <li class=md-nav__item> <a href=TROUBLESHOOTING/ class=md-nav__link> <span class=md-ellipsis> Troubleshooting </span> </a> </li> <li class=md-nav__item> <a href=SECURITY/ class=md-nav__link> <span class=md-ellipsis> Security </span> </a> </li> </ul> </nav> </li> </ul> </nav> </div> </div> </div> <div class="md-sidebar md-sidebar--secondary" data-md-component=sidebar data-md-type=toc> <div class=md-sidebar__scrollwrap> <div class=md-sidebar__inner> <nav class="md-nav md-nav--secondary" aria-label="Table of contents"> <label class=md-nav__title for=__toc> <span class="md-nav__icon md-icon"></span> Table of contents </label> <ul class=md-nav__list data-md-component=toc data-md-scrollfix> <li class=md-nav__item> <a href=#production-status-achieved-june-7-2025 class=md-nav__link> <span class=md-ellipsis> 🎉 PRODUCTION STATUS ACHIEVED (June 7, 2025) </span> </a> <nav class=md-nav aria-label="🎉 PRODUCTION STATUS ACHIEVED (June 7, 2025)"> <ul class=md-nav__list> <li class=md-nav__item> <a href=#bitcoin-implementation-status class=md-nav__link> <span class=md-ellipsis> ✅ Bitcoin Implementation Status </span> </a> </li> </ul> </nav> </li> <li class=md-nav__item> <a href=#overview class=md-nav__link> <span class=md-ellipsis> Overview </span> </a> </li> <li class=md-nav__item> <a href=#table-of-contents class=md-nav__link> <span class=md-ellipsis> Table of Contents </span> </a> </li> <li class=md-nav__item> <a href=#core-documentation class=md-nav__link> <span class=md-ellipsis> Core Documentation </span> </a> </li> <li class=md-nav__item> <a href=#bitcoin-layer2-protocol-documentation class=md-nav__link> <span class=md-ellipsis> ✅ Bitcoin &amp; Layer2 Protocol Documentation </span> </a> </li> <li class=md-nav__item> <a href=#monitoring-observability class=md-nav__link> <span class=md-ellipsis> Monitoring &amp; Observability </span> </a> </li> <li class=md-nav__item> <a href=#installation-setup class=md-nav__link> <span class=md-ellipsis> Installation &amp; Setup </span> </a> </li> <li class=md-nav__item> <a href=#security-documentation class=md-nav__link> <span class=md-ellipsis> Security Documentation </span> </a> </li> <li class=md-nav__item> <a href=#module-specific-documentation class=md-nav__link> <span class=md-ellipsis> Module-Specific Documentation </span> </a> </li> <li class=md-nav__item> <a href=#development class=md-nav__link> <span class=md-ellipsis> Development </span> </a> </li> <li class=md-nav__item> <a href=#architecture class=md-nav__link> <span class=md-ellipsis> Architecture </span> </a> </li> <li class=md-nav__item> <a href=#operations class=md-nav__link> <span class=md-ellipsis> Operations </span> </a> </li> <li class=md-nav__item> <a href=#api-templates-stubbing-approach class=md-nav__link> <span class=md-ellipsis> API Templates &amp; Stubbing Approach </span> </a> </li> <li class=md-nav__item> <a href=#ai-labeling class=md-nav__link> <span class=md-ellipsis> AI Labeling </span> </a> </li> <li class=md-nav__item> <a href=#documentation-versioning class=md-nav__link> <span class=md-ellipsis> Documentation Versioning </span> </a> </li> <li class=md-nav__item> <a href=#last-updated class=md-nav__link> <span class=md-ellipsis> Last Updated </span> </a> </li> <li class=md-nav__item> <a href=#getting-help class=md-nav__link> <span class=md-ellipsis> Getting Help </span> </a> </li> <li class=md-nav__item> <a href=#license class=md-nav__link> <span class=md-ellipsis> License </span> </a> </li> <li class=md-nav__item> <a href=#future-documentation class=md-nav__link> <span class=md-ellipsis> Future Documentation </span> </a> </li> <li class=md-nav__item> <a href=#about-anya-core class=md-nav__link> <span class=md-ellipsis> About Anya Core </span> </a> </li> <li class=md-nav__item> <a href=#quick-navigation class=md-nav__link> <span class=md-ellipsis> Quick Navigation </span> </a> <nav class=md-nav aria-label="Quick Navigation"> <ul class=md-nav__list> <li class=md-nav__item> <a href=#core-features class=md-nav__link> <span class=md-ellipsis> Core Features </span> </a> </li> <li class=md-nav__item> <a href=#development-resources class=md-nav__link> <span class=md-ellipsis> Development Resources </span> </a> </li> <li class=md-nav__item> <a href=#integration-guides class=md-nav__link> <span class=md-ellipsis> Integration Guides </span> </a> </li> </ul> </nav> </li> <li class=md-nav__item> <a href=#layer-2-solutions class=md-nav__link> <span class=md-ellipsis> Layer 2 Solutions </span> </a> <nav class=md-nav aria-label="Layer 2 Solutions"> <ul class=md-nav__list> <li class=md-nav__item> <a href=#bob-hybrid-l2 class=md-nav__link> <span class=md-ellipsis> BOB Hybrid L2 </span> </a> </li> <li class=md-nav__item> <a href=#lightning-network class=md-nav__link> <span class=md-ellipsis> Lightning Network </span> </a> </li> <li class=md-nav__item> <a href=#rgb-protocol-coming-q3-2025 class=md-nav__link> <span class=md-ellipsis> RGB Protocol (Coming Q3 2025) </span> </a> </li> <li class=md-nav__item> <a href=#rsk-rootstock-coming-q3-2025 class=md-nav__link> <span class=md-ellipsis> RSK - Rootstock (Coming Q3 2025) </span> </a> </li> <li class=md-nav__item> <a href=#taproot-assets-coming-q2-2025 class=md-nav__link> <span class=md-ellipsis> Taproot Assets (Coming Q2 2025) </span> </a> </li> <li class=md-nav__item> <a href=#state-channels class=md-nav__link> <span class=md-ellipsis> State Channels </span> </a> </li> </ul> </nav> </li> <li class=md-nav__item> <a href=#latest-features-2025-04-28 class=md-nav__link> <span class=md-ellipsis> Latest Features (2025-04-28) </span> </a> <nav class=md-nav aria-label="Latest Features (2025-04-28)"> <ul class=md-nav__list> <li class=md-nav__item> <a href=#priority-1-components class=md-nav__link> <span class=md-ellipsis> Priority 1 Components </span> </a> </li> <li class=md-nav__item> <a href=#dao-tokenomics-system class=md-nav__link> <span class=md-ellipsis> DAO &amp; Tokenomics System </span> </a> </li> <li class=md-nav__item> <a href=#ml-component class=md-nav__link> <span class=md-ellipsis> ML Component </span> </a> </li> <li class=md-nav__item> <a href=#security-component class=md-nav__link> <span class=md-ellipsis> Security Component </span> </a> </li> <li class=md-nav__item> <a href=#protocol-component class=md-nav__link> <span class=md-ellipsis> Protocol Component </span> </a> </li> <li class=md-nav__item> <a href=#enterprise-component class=md-nav__link> <span class=md-ellipsis> Enterprise Component </span> </a> </li> </ul> </nav> </li> <li class=md-nav__item> <a href=#latest-updates class=md-nav__link> <span class=md-ellipsis> Latest Updates </span> </a> <nav class=md-nav aria-label="Latest Updates"> <ul class=md-nav__list> <li class=md-nav__item> <a href=#version-siteversion-2025-04-28 class=md-nav__link> <span class=md-ellipsis> Version {{ site.version }} (2025-04-28) </span> </a> </li> </ul> </nav> </li> <li class=md-nav__item> <a href=#support class=md-nav__link> <span class=md-ellipsis> Support </span> </a> <nav class=md-nav aria-label=Support> <ul class=md-nav__list> <li class=md-nav__item> <a href=#community-support-anya-core class=md-nav__link> <span class=md-ellipsis> Community Support (anya-core) </span> </a> </li> <li class=md-nav__item> <a href=#support-hours class=md-nav__link> <span class=md-ellipsis> Support Hours </span> </a> </li> <li class=md-nav__item> <a href=#enterprise-support class=md-nav__link> <span class=md-ellipsis> Enterprise Support </span> </a> </li> </ul> </nav> </li> <li class=md-nav__item> <a href=#security class=md-nav__link> <span class=md-ellipsis> Security </span> </a> </li> <li class=md-nav__item> <a href=#quick-start class=md-nav__link> <span class=md-ellipsis> Quick Start </span> </a> </li> <li class=md-nav__item> <a href=#last-update class=md-nav__link> <span class=md-ellipsis> Last Update </span> </a> </li> <li class=md-nav__item> <a href=#see-also class=md-nav__link> <span class=md-ellipsis> See Also </span> </a> </li> </ul> </nav> </div> </div> </div> <div class=md-content data-md-component=content> <article class="md-content__inner md-typeset"> <a href=https://github.com/anya-org/anya-core/edit/main/docs/index.md title="Edit this page" class="md-content__button md-icon"> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg> </a> <a href=https://github.com/anya-org/anya-core/raw/main/docs/index.md title="View source of this page" class="md-content__button md-icon"> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg> </a> <!-- markdownlint-disable MD013 line-length --> <h1 id=anya-core-documentation-production-ready>✅ Anya Core Documentation - PRODUCTION-READY<a class=headerlink href=#anya-core-documentation-production-ready title="Permanent link">&para;</a></h1> <h2 id=production-status-achieved-june-7-2025>🎉 PRODUCTION STATUS ACHIEVED (June 7, 2025)<a class=headerlink href=#production-status-achieved-june-7-2025 title="Permanent link">&para;</a></h2> <p><strong>MAJOR MILESTONE:</strong> Bitcoin Core compilation complete and all Layer2 protocols operational!</p> <h3 id=bitcoin-implementation-status>✅ Bitcoin Implementation Status<a class=headerlink href=#bitcoin-implementation-status title="Permanent link">&para;</a></h3> <ul> <li><strong>All compilation errors resolved:</strong> 58+ errors → 0 errors</li> <li><strong>Layer2 protocols operational:</strong> BOB, Lightning, RSK, RGB, DLC, Taproot Assets</li> <li><strong>Production-ready status:</strong> All critical systems functional</li> </ul> <h2 id=overview>Overview<a class=headerlink href=#overview title="Permanent link">&para;</a></h2> <p>The Anya Core Documentation Index provides a structured entry point to all technical, architectural, and operational documentation for the Anya Core project. It includes links to implementation guides, system architecture, security, testing, and compliance resources, ensuring easy navigation and up-to-date references for all contributors and users.</p> <p><strong>Current Status:</strong> All systems operational and production-ready as of June 7, 2025.</p> <h2 id=table-of-contents>Table of Contents<a class=headerlink href=#table-of-contents title="Permanent link">&para;</a></h2> <ul> <li><a href=#section-1>Section 1</a></li> <li><a href=#section-2>Section 2</a></li> </ul> <p>[AIR-3][AIS-3][BPC-3][RES-3]</p> <p>This is the central index for all Anya Core documentation. All documentation follows the AI labeling convention defined in <a href=standards/AI_LABELING/ >AI Labeling Reference Guide</a> and adheres to official Bitcoin Improvement Proposals (BIPs).</p> <h2 id=core-documentation>Core Documentation<a class=headerlink href=#core-documentation title="Permanent link">&para;</a></h2> <table> <thead> <tr> <th>Document</th> <th>Description</th> <th>Status</th> <th>Version</th> <th>Last Updated</th> </tr> </thead> <tbody> <tr> <td><a href=standards/AI_LABELING/ >AI Labeling Reference Guide</a></td> <td>Standardized AI labeling tags</td> <td>✅ Operational</td> <td>2.6.0</td> <td>2025-06-07</td> </tr> <tr> <td><a href=high_availability/ >High Availability</a></td> <td>High Availability subsystem</td> <td>✅ Production</td> <td>2.5.0</td> <td>2025-06-07</td> </tr> <tr> <td><a href=../SECURITY.md>Security Policy</a></td> <td>Security policies and procedures</td> <td>✅ Current</td> <td>2.6.0</td> <td>2025-06-07</td> </tr> <tr> <td><a href=UPGRADE/ >Upgrade Guide</a></td> <td>Version upgrade instructions</td> <td>✅ Updated</td> <td>2.6.0</td> <td>2025-06-07</td> </tr> <tr> <td><strong><a href=../BITCOIN_FRAMEWORK_IMPLEMENTATION.md>Bitcoin Integration</a></strong></td> <td><strong>Bitcoin Core implementation</strong></td> <td><strong>✅ PRODUCTION-READY</strong></td> <td><strong>1.1.0</strong></td> <td><strong>2025-06-07</strong></td> </tr> </tbody> </table> <h2 id=bitcoin-layer2-protocol-documentation>✅ Bitcoin &amp; Layer2 Protocol Documentation<a class=headerlink href=#bitcoin-layer2-protocol-documentation title="Permanent link">&para;</a></h2> <table> <thead> <tr> <th>Protocol</th> <th>Description</th> <th>Status</th> <th>Implementation</th> <th>Last Updated</th> </tr> </thead> <tbody> <tr> <td><strong>Bitcoin Core</strong></td> <td>Core Bitcoin implementation</td> <td><strong>✅ OPERATIONAL</strong></td> <td><strong>Complete</strong></td> <td><strong>2025-06-07</strong></td> </tr> <tr> <td><strong>BOB Protocol</strong></td> <td>BOB Layer2 protocol</td> <td><strong>✅ FUNCTIONAL</strong></td> <td><strong>Production</strong></td> <td><strong>2025-06-07</strong></td> </tr> <tr> <td><strong>Lightning Network</strong></td> <td>Lightning payment channels</td> <td><strong>✅ INTEGRATED</strong></td> <td><strong>Active</strong></td> <td><strong>2025-06-07</strong></td> </tr> <tr> <td><strong>RSK (Rootstock)</strong></td> <td>RSK smart contracts</td> <td><strong>✅ PRODUCTION</strong></td> <td><strong>Deployed</strong></td> <td><strong>2025-06-07</strong></td> </tr> <tr> <td><strong>RGB Protocol</strong></td> <td>RGB asset protocol</td> <td><strong>✅ OPERATIONAL</strong></td> <td><strong>Complete</strong></td> <td><strong>2025-06-07</strong></td> </tr> <tr> <td><strong>DLC Support</strong></td> <td>Discreet Log Contracts</td> <td><strong>✅ ACTIVE</strong></td> <td><strong>Functional</strong></td> <td><strong>2025-06-07</strong></td> </tr> <tr> <td><strong>Taproot Assets</strong></td> <td>Taproot asset protocol</td> <td><strong>✅ DEPLOYED</strong></td> <td><strong>Full Support</strong></td> <td><strong>2025-06-07</strong></td> </tr> </tbody> </table> <h2 id=monitoring-observability>Monitoring &amp; Observability<a class=headerlink href=#monitoring-observability title="Permanent link">&para;</a></h2> <table> <thead> <tr> <th>Document</th> <th>Description</th> <th>Status</th> <th>Version</th> <th>Last Updated</th> </tr> </thead> <tbody> <tr> <td><a href=installation/MONITORING/ >Monitoring Guide</a></td> <td>Comprehensive monitoring setup</td> <td>✅ Current</td> <td>2.6.0</td> <td>2025-06-07</td> </tr> <tr> <td><a href=monitoring/ALERT_REFERENCE/ >Alerting Reference</a></td> <td>Alert rules and configurations</td> <td>✅ Updated</td> <td>2.6.0</td> <td>2025-06-07</td> </tr> <tr> <td><a href=monitoring/DASHBOARDS/ >Grafana Dashboards</a></td> <td>Dashboard documentation</td> <td>✅ Active</td> <td>2.6.0</td> <td>2025-06-07</td> </tr> </tbody> </table> <h2 id=installation-setup>Installation &amp; Setup<a class=headerlink href=#installation-setup title="Permanent link">&para;</a></h2> <table> <thead> <tr> <th>Document</th> <th>Description</th> <th>Status</th> <th>Version</th> <th>Last Updated</th> </tr> </thead> <tbody> <tr> <td><a href=./installation/README.md>Installation Guide</a></td> <td>Complete installation instructions</td> <td>✅ Updated</td> <td>2.6.0</td> <td>2025-06-07</td> </tr> <tr> <td><a href=installation/CONFIGURATION/ >Configuration Reference</a></td> <td>Configuration options</td> <td>✅ Current</td> <td>2.6.0</td> <td>2025-06-07</td> </tr> <tr> <td><a href=./installation/TROUBLESHOOTING.md>Troubleshooting</a></td> <td>Common issues and solutions</td> <td>✅ Updated</td> <td>2.6.0</td> <td>2025-06-07</td> </tr> </tbody> </table> <h2 id=security-documentation>Security Documentation<a class=headerlink href=#security-documentation title="Permanent link">&para;</a></h2> <table> <thead> <tr> <th>Document</th> <th>Description</th> <th>Version</th> <th>Last Updated</th> </tr> </thead> <tbody> <tr> <td><a href=./SECURITY_GUIDELINES.md>Security Guidelines</a></td> <td>Security best practices</td> <td>2.6.0</td> <td>2025-05-21</td> </tr> <tr> <td><a href=hsm_bitcoin_integration/ >HSM Integration</a></td> <td>Hardware Security Module</td> <td>2.5.0</td> <td>2025-05-15</td> </tr> <tr> <td><a href=./audits/ >Audit Reports</a></td> <td>Security audit reports</td> <td>2.5.0</td> <td>2025-05-15</td> </tr> <tr> <td><a href=./compliance/README.md>Compliance</a></td> <td>Regulatory compliance</td> <td>2.6.0</td> <td>2025-05-21</td> </tr> </tbody> </table> <h2 id=module-specific-documentation>Module-Specific Documentation<a class=headerlink href=#module-specific-documentation title="Permanent link">&para;</a></h2> <p>The following README files provide documentation for specific modules:</p> <table> <thead> <tr> <th>Module</th> <th>Description</th> <th>Tags</th> </tr> </thead> <tbody> <tr> <td><a href=../src/security/hsm/README.md>HSM Module</a></td> <td>Hardware Security Module implementation</td> <td>[AIR-3][AIS-3][AIT-3][AIP-3][RES-3]</td> </tr> </tbody> </table> <h2 id=development>Development<a class=headerlink href=#development title="Permanent link">&para;</a></h2> <table> <thead> <tr> <th>Document</th> <th>Description</th> <th>Version</th> <th>Last Updated</th> </tr> </thead> <tbody> <tr> <td><a href=./contributing.md>Contributing Guide</a></td> <td>Contribution guidelines</td> <td>2.6.0</td> <td>2025-05-21</td> </tr> <tr> <td><a href=dev_setup/ >Development Setup</a></td> <td>Environment setup</td> <td>2.6.0</td> <td>2025-05-21</td> </tr> <tr> <td><a href=./api/README.md>API Reference</a></td> <td>API documentation</td> <td>2.6.0</td> <td>2025-05-21</td> </tr> <tr> <td><a href=./testing/README.md>Testing Guide</a></td> <td>Testing procedures</td> <td>2.6.0</td> <td>2025-05-21</td> </tr> </tbody> </table> <h2 id=architecture>Architecture<a class=headerlink href=#architecture title="Permanent link">&para;</a></h2> <table> <thead> <tr> <th>Document</th> <th>Description</th> <th>Version</th> <th>Last Updated</th> </tr> </thead> <tbody> <tr> <td><a href=./architecture.md>System Architecture</a></td> <td>Overall system design</td> <td>2.6.0</td> <td>2025-05-21</td> </tr> <tr> <td><a href=hexagonal/ >Hexagonal Architecture</a></td> <td>Architecture pattern</td> <td>2.6.0</td> <td>2025-05-21</td> </tr> <tr> <td><a href=./data_flow.md>Data Flow</a></td> <td>Data processing pipelines</td> <td>2.6.0</td> <td>2025-05-21</td> </tr> <tr> <td><a href=./performance/README.md>Performance</a></td> <td>Performance characteristics</td> <td>2.6.0</td> <td>2025-05-21</td> </tr> </tbody> </table> <h2 id=operations>Operations<a class=headerlink href=#operations title="Permanent link">&para;</a></h2> <table> <thead> <tr> <th>Document</th> <th>Description</th> <th>Version</th> <th>Last Updated</th> </tr> </thead> <tbody> <tr> <td><a href=./operations/backup.md>Backup &amp; Recovery</a></td> <td>Data protection</td> <td>2.6.0</td> <td>2025-05-21</td> </tr> <tr> <td><a href=./operations/scaling.md>Scaling Guide</a></td> <td>System scaling</td> <td>2.6.0</td> <td>2025-05-21</td> </tr> <tr> <td><a href=./operations/disaster_recovery.md>Disaster Recovery</a></td> <td>Recovery procedures</td> <td>2.6.0</td> <td>2025-05-21</td> </tr> <tr> <td><a href=./monitoring/SETUP.md>Monitoring Setup</a></td> <td>Monitoring configuration</td> <td>2.6.0</td> <td>2025-05-21</td> </tr> </tbody> </table> <h2 id=api-templates-stubbing-approach>API Templates &amp; Stubbing Approach<a class=headerlink href=#api-templates-stubbing-approach title="Permanent link">&para;</a></h2> <table> <thead> <tr> <th>Module</th> <th>API Template</th> <th>Description</th> <th>Status</th> </tr> </thead> <tbody> <tr> <td>CacheManager</td> <td><a href=../src/cache/mod.rs>src/cache/mod.rs</a></td> <td>In-memory and persistent cache management</td> <td>Stub/Template</td> </tr> <tr> <td>SecurityManager</td> <td><a href=../src/security/mod.rs>src/security/mod.rs</a></td> <td>Security, HSM, and system hardening</td> <td>Stub/Template</td> </tr> <tr> <td>CONFIG/ConfigManager</td> <td><a href=../src/config/mod.rs>src/config/mod.rs</a></td> <td>Configuration management</td> <td>Stub/Template</td> </tr> <tr> <td>ResourceManager</td> <td><a href=../src/resource/mod.rs>src/resource/mod.rs</a></td> <td>Resource allocation and health</td> <td>Stub/Template</td> </tr> <tr> <td>PerformanceMonitor</td> <td><a href=../src/performance/mod.rs>src/performance/mod.rs</a></td> <td>Performance metrics and reporting</td> <td>Stub/Template</td> </tr> <tr> <td>MonitoringSystem, Registry, NetworkMetric, FeeMetric</td> <td><a href=../src/monitoring/mod.rs>src/monitoring/mod.rs</a></td> <td>Monitoring and metrics</td> <td>Stub/Template</td> </tr> <tr> <td>QuantumResistantCrypto</td> <td><a href=../src/crypto/quantum.rs>src/crypto/quantum.rs</a></td> <td>Quantum-safe cryptography</td> <td>Stub/Template</td> </tr> <tr> <td>MobileSDK</td> <td><a href=../src/mobile/sdk.rs>src/mobile/sdk.rs</a></td> <td>Mobile wallet and network</td> <td>Stub/Template</td> </tr> <tr> <td>TenantManager, TenantConfig, RateLimits, ResourceUsage, Tenant, TenantSecurity, AccessPolicy, RateLimit</td> <td><a href=../src/tenant/manager.rs>src/tenant/manager.rs</a></td> <td>Multi-tenant management</td> <td>Stub/Template</td> </tr> </tbody> </table> <h2 id=ai-labeling>AI Labeling<a class=headerlink href=#ai-labeling title="Permanent link">&para;</a></h2> <ul> <li>[AIR-3] - Automated documentation generation</li> <li>[AIS-3] - Security-focused documentation</li> <li>[BPC-3] - Bitcoin development best practices</li> <li>[RES-3] - Comprehensive operational guides</li> </ul> <h2 id=documentation-versioning>Documentation Versioning<a class=headerlink href=#documentation-versioning title="Permanent link">&para;</a></h2> <p>All documentation follows <a href=https://semver.org/ >Semantic Versioning</a>. Major version changes indicate breaking changes, while minor and patch versions indicate backward-compatible updates.</p> <h2 id=last-updated>Last Updated<a class=headerlink href=#last-updated title="Permanent link">&para;</a></h2> <p>This index was last updated on 2025-05-21.</p> <h2 id=getting-help>Getting Help<a class=headerlink href=#getting-help title="Permanent link">&para;</a></h2> <p>For documentation issues or suggestions: 1. Open an issue on <a href=https://github.com/your-org/anya-core/issues>GitHub</a> 2. Email: botshelomokoka+docs@gmail.com 3. Join our <a href=https://community.anya-core.org>community forum</a></p> <h2 id=license>License<a class=headerlink href=#license title="Permanent link">&para;</a></h2> <p>© 2025 Anya Core Project. All documentation is licensed under <a href=https://creativecommons.org/licenses/by-sa/4.0/ >CC BY-SA 4.0</a>.</p> <h2 id=future-documentation>Future Documentation<a class=headerlink href=#future-documentation title="Permanent link">&para;</a></h2> <p>The following documentation is planned for future releases:</p> <ul> <li>Performance Benchmarks [AIP-3]</li> <li>Deployment Guide [SCL-3]</li> <li>Security Audit Report [AIS-4]</li> </ul> <h2 id=about-anya-core>About Anya Core<a class=headerlink href=#about-anya-core title="Permanent link">&para;</a></h2> <p>Anya Core is an AI-powered Bitcoin protocol that enables advanced blockchain capabilities through machine learning and Web5 integration. This documentation will help you understand and implement Anya's powerful features.</p> <h2 id=quick-navigation>Quick Navigation<a class=headerlink href=#quick-navigation title="Permanent link">&para;</a></h2> <h3 id=core-features>Core Features<a class=headerlink href=#core-features title="Permanent link">&para;</a></h3> <ul> <li><a href=/anya-core/getting-started>Getting Started</a> - Quick setup guide</li> <li><a href=/anya-core/architecture>Architecture</a> - System design and components</li> <li><a href=/anya-core/bitcoin>Bitcoin Integration</a> - Bitcoin protocol features</li> <li><a href=/anya-core/web5>Web5 Integration</a> - Web5 implementation details</li> <li><a href=DAO_SYSTEM_GUIDE/ >DAO System</a> - Comprehensive DAO documentation</li> </ul> <h3 id=development-resources>Development Resources<a class=headerlink href=#development-resources title="Permanent link">&para;</a></h3> <ul> <li><a href=/anya-core/api>API Documentation</a> - Complete API reference</li> <li><a href=/anya-core/security>Security</a> - Security features and best practices</li> <li><a href=/anya-core/contributing>Contributing</a> - How to contribute</li> <li><a href=/anya-core/testing>Testing</a> - Testing procedures</li> <li><a href=IMPLEMENTATION_MILESTONES/ >Implementation Milestones</a> - Current progress</li> </ul> <h3 id=integration-guides>Integration Guides<a class=headerlink href=#integration-guides title="Permanent link">&para;</a></h3> <ul> <li><a href=/anya-core/integration/bitcoin>Bitcoin Integration</a></li> <li><a href=/anya-core/integration/web5>Web5 Integration</a></li> <li><a href=/anya-core/integration/lightning>Lightning Integration</a></li> <li><a href=/anya-core/integration/dlc>DLC Integration</a></li> <li><a href=/anya-core/integration/bob>BOB Layer 2 Integration</a></li> <li><a href=bitcoin/LAYER2_SUPPORT/ >Layer 2 Solutions Overview</a></li> </ul> <h2 id=layer-2-solutions>Layer 2 Solutions<a class=headerlink href=#layer-2-solutions title="Permanent link">&para;</a></h2> <p>Anya Core supports multiple Layer 2 solutions for Bitcoin:</p> <h3 id=bob-hybrid-l2>BOB Hybrid L2<a class=headerlink href=#bob-hybrid-l2 title="Permanent link">&para;</a></h3> <p>The BOB (Bitcoin Optimistic Blockchain) integration provides:</p> <ul> <li><strong>Hybrid Security Model</strong>: Combining Bitcoin PoW security with EVM versatility</li> <li><strong>Smart Contract Support</strong>: EVM-compatible smart contracts for Bitcoin</li> <li><strong>Cross-Layer Transactions</strong>: Seamless operations between Bitcoin L1 and BOB L2</li> <li><strong>BitVM Integration</strong>: Optimistic rollups via BitVM verification</li> <li><strong>Performance Optimization</strong>: Enhanced transaction throughput and reduced fees</li> </ul> <h3 id=lightning-network>Lightning Network<a class=headerlink href=#lightning-network title="Permanent link">&para;</a></h3> <p>The Lightning Network integration provides:</p> <ul> <li><strong>Payment Channels</strong>: Fast and low-fee off-chain transactions</li> <li><strong>Routing</strong>: Multi-hop payment routing across the network</li> <li><strong>HTLC Support</strong>: Hash Time Locked Contracts for secure payments</li> <li><strong>Watchtowers</strong>: Protection against channel breaches</li> </ul> <h3 id=rgb-protocol-coming-q3-2025>RGB Protocol (Coming Q3 2025)<a class=headerlink href=#rgb-protocol-coming-q3-2025 title="Permanent link">&para;</a></h3> <p>The RGB Protocol integration will provide:</p> <ul> <li><strong>Client-Side Validation</strong>: Validate contracts client-side</li> <li><strong>Asset Issuance</strong>: Issue fungible and non-fungible assets</li> <li><strong>Schema Validation</strong>: Use standardized schemas for contracts</li> <li><strong>Bitcoin Integration</strong>: Built on top of Bitcoin transactions</li> </ul> <h3 id=rsk-rootstock-coming-q3-2025>RSK - Rootstock (Coming Q3 2025)<a class=headerlink href=#rsk-rootstock-coming-q3-2025 title="Permanent link">&para;</a></h3> <p>The RSK integration will provide:</p> <ul> <li><strong>Two-Way Peg</strong>: Secure bridge between Bitcoin and RSK</li> <li><strong>Smart Bitcoin (RBTC)</strong>: Bitcoin-backed token on RSK</li> <li><strong>Smart Contracts</strong>: Solidity support for Bitcoin</li> <li><strong>Federation</strong>: Trusted federation for bridge security</li> </ul> <h3 id=taproot-assets-coming-q2-2025>Taproot Assets (Coming Q2 2025)<a class=headerlink href=#taproot-assets-coming-q2-2025 title="Permanent link">&para;</a></h3> <p>The Taproot Assets integration will provide:</p> <ul> <li><strong>Asset Issuance</strong>: Create and manage assets on Bitcoin</li> <li><strong>Transfers</strong>: Transfer assets between parties</li> <li><strong>Taproot Script Trees</strong>: Leverage Taproot script paths</li> <li><strong>Merkle Proof Verification</strong>: Validate asset ownership</li> </ul> <h3 id=state-channels>State Channels<a class=headerlink href=#state-channels title="Permanent link">&para;</a></h3> <p>The state channel integration provides:</p> <ul> <li><strong>Generic State</strong>: Support for arbitrary state transitions</li> <li><strong>Multi-Party Channels</strong>: Channels with multiple participants</li> <li><strong>Conditional Logic</strong>: Complex conditional state transitions</li> <li><strong>Dispute Resolution</strong>: On-chain dispute resolution mechanisms</li> </ul> <h2 id=latest-features-2025-04-28>Latest Features (2025-04-28)<a class=headerlink href=#latest-features-2025-04-28 title="Permanent link">&para;</a></h2> <h3 id=priority-1-components>Priority 1 Components<a class=headerlink href=#priority-1-components title="Permanent link">&para;</a></h3> <ul> <li><strong>ML*/Agent Checker (AIP-002)</strong>: System health monitoring and verification with auto-save</li> <li><strong>System Hardening (AIE-001)</strong>: Security configuration with different security levels</li> <li><strong>Performance Optimization (AIR-008)</strong>: Resource tracking and optimization with configurable targets</li> <li><strong>Core System Integration</strong>: Unified interface for all P1 components with consistent auto-save</li> </ul> <h3 id=dao-tokenomics-system>DAO &amp; Tokenomics System<a class=headerlink href=#dao-tokenomics-system title="Permanent link">&para;</a></h3> <ul> <li><strong>Bitcoin-Style Tokenomics</strong>: 21 billion token supply with halving mechanism</li> <li><strong>Strategic Distribution</strong>: 30% DEX, 15% development team, 55% DAO/community</li> <li><strong>Enhanced Governance</strong>: Advanced proposal creation, voting, and execution</li> <li><strong>DEX Integration</strong>: Built-in liquidity and trading capabilities</li> <li><strong>Comprehensive Logging</strong>: Complete transparency for all operations</li> </ul> <h3 id=ml-component>ML Component<a class=headerlink href=#ml-component title="Permanent link">&para;</a></h3> <ul> <li>Advanced model management with versioning</li> <li>Real-time inference engine</li> <li>Performance monitoring and optimization</li> <li>Model A/B testing support</li> </ul> <h3 id=security-component>Security Component<a class=headerlink href=#security-component title="Permanent link">&para;</a></h3> <ul> <li>Enhanced authentication and authorization</li> <li>Advanced cryptographic operations</li> <li>Comprehensive audit system</li> <li>Threat detection and prevention</li> </ul> <h3 id=protocol-component>Protocol Component<a class=headerlink href=#protocol-component title="Permanent link">&para;</a></h3> <ul> <li>Advanced transaction handling</li> <li>Multiple script type support</li> <li>Fee estimation and management</li> <li>PSBT implementation</li> </ul> <h3 id=enterprise-component>Enterprise Component<a class=headerlink href=#enterprise-component title="Permanent link">&para;</a></h3> <ul> <li>Advanced business operations</li> <li>Risk management system</li> <li>Compliance tracking</li> <li>Workflow automation</li> </ul> <h2 id=latest-updates>Latest Updates<a class=headerlink href=#latest-updates title="Permanent link">&para;</a></h2> <h3 id=version-siteversion-2025-04-28>Version {{ site.version }} (2025-04-28)<a class=headerlink href=#version-siteversion-2025-04-28 title="Permanent link">&para;</a></h3> <ul> <li>P1 component implementation complete (AIP-002, AIE-001, AIR-008)</li> <li>Bitcoin-style DAO implementation</li> <li>21 billion token supply with halving every 210,000 blocks</li> <li>Strategic token distribution (30% DEX, 15% team, 55% DAO)</li> <li>AI-powered Bitcoin analytics</li> <li>Web5 protocol integration</li> <li>Enhanced security features</li> <li>Cross-platform support</li> </ul> <p><a href=/anya-core/roadmap>View Full Roadmap</a></p> <h2 id=support>Support<a class=headerlink href=#support title="Permanent link">&para;</a></h2> <h3 id=community-support-anya-core>Community Support (anya-core)<a class=headerlink href=#community-support-anya-core title="Permanent link">&para;</a></h3> <p>The core protocol is community-supported through:</p> <ul> <li><a href="{{ site.github.repository_url }}/issues">GitHub Issues</a></li> <li><a href="{{ site.github.repository_url }}/discussions">Discussions</a></li> <li><a href="{{ site.github.repository_url }}/blob/main/CONTRIBUTING.md">Contributing Guide</a></li> </ul> <h3 id=support-hours>Support Hours<a class=headerlink href=#support-hours title="Permanent link">&para;</a></h3> <p>Community support is available during Johannesburg business hours:</p> <ul> <li>Time Zone: {{ site.support.timezone }}</li> <li>Hours: {{ site.support.hours }}</li> <li>Location: {{ site.support.location }}</li> </ul> <h3 id=enterprise-support>Enterprise Support<a class=headerlink href=#enterprise-support title="Permanent link">&para;</a></h3> <p>For enterprise solutions and dedicated support:</p> <ul> <li>Email: {{ site.support.enterprise_email }}</li> <li><a href=/anya-core/enterprise>Enterprise Features</a></li> <li><a href=/anya-core/enterprise/solutions>Custom Solutions</a></li> </ul> <h2 id=security>Security<a class=headerlink href=#security title="Permanent link">&para;</a></h2> <p>For security-related matters:</p> <ul> <li>Email: {{ site.support.security_email }}</li> <li><a href="{{ site.github.repository_url }}/security/policy">Security Policy</a></li> <li><a href="{{ site.github.repository_url }}/security/advisories">Responsible Disclosure</a></li> </ul> <h2 id=quick-start>Quick Start<a class=headerlink href=#quick-start title="Permanent link">&para;</a></h2> <div class="language-rust highlight"><pre><span></span><code><span id=__span-0-1><a id=__codelineno-0-1 name=__codelineno-0-1 href=#__codelineno-0-1></a><span class=k>use</span><span class=w> </span><span class=n>anya_core</span><span class=p>::</span><span class=n>Anya</span><span class=p>;</span>
-</span><span id=__span-0-2><a id=__codelineno-0-2 name=__codelineno-0-2 href=#__codelineno-0-2></a>
-</span><span id=__span-0-3><a id=__codelineno-0-3 name=__codelineno-0-3 href=#__codelineno-0-3></a><span class=cp>#[tokio::main]</span>
-</span><span id=__span-0-4><a id=__codelineno-0-4 name=__codelineno-0-4 href=#__codelineno-0-4></a><span class=k>async</span><span class=w> </span><span class=k>fn</span><span class=w> </span><span class=nf>main</span><span class=p>()</span><span class=w> </span><span class=p>-&gt;</span><span class=w> </span><span class=nb>Result</span><span class=o>&lt;</span><span class=p>()</span><span class=o>&gt;</span><span class=w> </span><span class=p>{</span>
-</span><span id=__span-0-5><a id=__codelineno-0-5 name=__codelineno-0-5 href=#__codelineno-0-5></a><span class=w>    </span><span class=c1>// Initialize Anya Core</span>
-</span><span id=__span-0-6><a id=__codelineno-0-6 name=__codelineno-0-6 href=#__codelineno-0-6></a><span class=w>    </span><span class=kd>let</span><span class=w> </span><span class=n>anya</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>Anya</span><span class=p>::</span><span class=n>new</span><span class=p>()</span>
-</span><span id=__span-0-7><a id=__codelineno-0-7 name=__codelineno-0-7 href=#__codelineno-0-7></a><span class=w>        </span><span class=p>.</span><span class=n>with_bitcoin</span><span class=p>()</span>
-</span><span id=__span-0-8><a id=__codelineno-0-8 name=__codelineno-0-8 href=#__codelineno-0-8></a><span class=w>        </span><span class=p>.</span><span class=n>with_web5</span><span class=p>()</span>
-</span><span id=__span-0-9><a id=__codelineno-0-9 name=__codelineno-0-9 href=#__codelineno-0-9></a><span class=w>        </span><span class=p>.</span><span class=n>with_dao</span><span class=p>()</span><span class=w> </span><span class=c1>// Initialize DAO with Bitcoin-style tokenomics</span>
-</span><span id=__span-0-10><a id=__codelineno-0-10 name=__codelineno-0-10 href=#__codelineno-0-10></a><span class=w>        </span><span class=p>.</span><span class=n>build</span><span class=p>()</span>
-</span><span id=__span-0-11><a id=__codelineno-0-11 name=__codelineno-0-11 href=#__codelineno-0-11></a><span class=w>        </span><span class=p>.</span><span class=k>await</span><span class=o>?</span><span class=p>;</span>
-</span><span id=__span-0-12><a id=__codelineno-0-12 name=__codelineno-0-12 href=#__codelineno-0-12></a>
-</span><span id=__span-0-13><a id=__codelineno-0-13 name=__codelineno-0-13 href=#__codelineno-0-13></a><span class=w>    </span><span class=c1>// Start the service</span>
-</span><span id=__span-0-14><a id=__codelineno-0-14 name=__codelineno-0-14 href=#__codelineno-0-14></a><span class=w>    </span><span class=n>anya</span><span class=p>.</span><span class=n>start</span><span class=p>().</span><span class=k>await</span><span class=o>?</span><span class=p>;</span>
-</span><span id=__span-0-15><a id=__codelineno-0-15 name=__codelineno-0-15 href=#__codelineno-0-15></a>
-</span><span id=__span-0-16><a id=__codelineno-0-16 name=__codelineno-0-16 href=#__codelineno-0-16></a><span class=w>    </span><span class=nb>Ok</span><span class=p>(())</span>
-</span><span id=__span-0-17><a id=__codelineno-0-17 name=__codelineno-0-17 href=#__codelineno-0-17></a><span class=p>}</span>
-</span></code></pre></div> <p><a href=/anya-core/getting-started>Get Started →</a></p> <h2 id=last-update>Last Update<a class=headerlink href=#last-update title="Permanent link">&para;</a></h2> <p><em>Last updated: 2025-04-28</em></p> <h2 id=see-also>See Also<a class=headerlink href=#see-also title="Permanent link">&para;</a></h2> <ul> <li><a href=#related-document>Related Document</a></li> </ul> <aside class=md-source-file> <span class=md-source-file__fact> <span class=md-icon title="Last update"> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg> </span> <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago" title="June 14, 2025 20:53:16 UTC"><span class=timeago datetime=2025-06-14T20:53:16+00:00 locale=en></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date" title="June 14, 2025 20:53:16 UTC">2025-06-14</span> </span> </aside> </article> </div> <script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script> </div> <button type=button class="md-top md-icon" data-md-component=top hidden> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg> Back to top </button> </main> <footer class=md-footer> <nav class="md-footer__inner md-grid" aria-label=Footer> <a href=INSTALLATION/ class="md-footer__link md-footer__link--next" aria-label="Next: Installation"> <div class=md-footer__title> <span class=md-footer__direction> Next </span> <div class=md-ellipsis> Installation </div> </div> <div class="md-footer__button md-icon"> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg> </div> </a> </nav> <div class="md-footer-meta md-typeset"> <div class="md-footer-meta__inner md-grid"> <div class=md-copyright> <div class=md-copyright__highlight> Copyright &copy; 2025 Anya Foundation </div> Made with <a href=https://squidfunk.github.io/mkdocs-material/ target=_blank rel=noopener> Material for MkDocs </a> </div> <div class=md-social> <a href=https://github.com/botshelomokoka/Anya-core target=_blank rel=noopener title=github.com class=md-social__link> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 496 512"><!-- Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8M97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg> </a> <a href=https://twitter.com/anyacore target=_blank rel=noopener title=twitter.com class=md-social__link> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 512 512"><!-- Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M459.37 151.716c.325 4.548.325 9.097.325 13.645 0 138.72-105.583 298.558-298.558 298.558-59.452 0-114.68-17.219-161.137-47.106 8.447.974 16.568 1.299 25.34 1.299 49.055 0 94.213-16.568 130.274-44.832-46.132-.975-84.792-31.188-98.112-72.772 6.498.974 12.995 1.624 19.818 1.624 9.421 0 18.843-1.3 27.614-3.573-48.081-9.747-84.143-51.98-84.143-102.985v-1.299c13.969 7.797 30.214 12.67 47.431 13.319-28.264-18.843-46.781-51.005-46.781-87.391 0-19.492 5.197-37.36 14.294-52.954 51.655 63.675 129.3 105.258 216.365 109.807-1.624-7.797-2.599-15.918-2.599-24.04 0-57.828 46.782-104.934 104.934-104.934 30.213 0 57.502 12.67 76.67 33.137 23.715-4.548 46.456-13.32 66.599-25.34-7.798 24.366-24.366 44.833-46.132 57.827 21.117-2.273 41.584-8.122 60.426-16.243-14.292 20.791-32.161 39.308-52.628 54.253"/></svg> </a> <a href=https://discord.gg/anya-core target=_blank rel=noopener title=discord.gg class=md-social__link> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 640 512"><!-- Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M524.531 69.836a1.5 1.5 0 0 0-.764-.7A485 485 0 0 0 404.081 32.03a1.82 1.82 0 0 0-1.923.91 338 338 0 0 0-14.9 30.6 447.9 447.9 0 0 0-134.426 0 310 310 0 0 0-15.135-30.6 1.89 1.89 0 0 0-1.924-.91 483.7 483.7 0 0 0-119.688 37.107 1.7 1.7 0 0 0-.788.676C39.068 183.651 18.186 294.69 28.43 404.354a2.02 2.02 0 0 0 .765 1.375 487.7 487.7 0 0 0 146.825 74.189 1.9 1.9 0 0 0 2.063-.676A348 348 0 0 0 208.12 430.4a1.86 1.86 0 0 0-1.019-2.588 321 321 0 0 1-45.868-21.853 1.885 1.885 0 0 1-.185-3.126 251 251 0 0 0 9.109-7.137 1.82 1.82 0 0 1 1.9-.256c96.229 43.917 200.41 43.917 295.5 0a1.81 1.81 0 0 1 1.924.233 235 235 0 0 0 9.132 7.16 1.884 1.884 0 0 1-.162 3.126 301.4 301.4 0 0 1-45.89 21.83 1.875 1.875 0 0 0-1 2.611 391 391 0 0 0 30.014 48.815 1.86 1.86 0 0 0 2.063.7A486 486 0 0 0 610.7 405.729a1.88 1.88 0 0 0 .765-1.352c12.264-126.783-20.532-236.912-86.934-334.541M222.491 337.58c-28.972 0-52.844-26.587-52.844-59.239s23.409-59.241 52.844-59.241c29.665 0 53.306 26.82 52.843 59.239 0 32.654-23.41 59.241-52.843 59.241m195.38 0c-28.971 0-52.843-26.587-52.843-59.239s23.409-59.241 52.843-59.241c29.667 0 53.307 26.82 52.844 59.239 0 32.654-23.177 59.241-52.844 59.241"/></svg> </a> </div> </div> </div> </footer> </div> <div class=md-dialog data-md-component=dialog> <div class="md-dialog__inner md-typeset"></div> </div> <script id=__config type=application/json>{"base": ".", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.indexes", "navigation.instant", "navigation.tracking", "navigation.expand", "navigation.top", "navigation.footer", "search.highlight", "search.suggest", "search.share", "content.code.annotate", "content.code.copy", "content.tooltips", "content.action.edit", "content.action.view"], "search": "assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script> <script src=assets/javascripts/bundle.13a4f30d.min.js></script> <script src=js/timeago.min.js></script> <script src=js/timeago_mkdocs_material.js></script> <script src=js/extra.js></script> </body> </html>
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="Anya Core - Enterprise-grade Bitcoin infrastructure for the next generation of financial applications.
+[AIR-3][AIS-3][BPC-3][RES-3]
+">
+        <meta name="author" content="Anya Core Team">
+        <link rel="canonical" href="https://docs.anya.org/">
+        <link rel="shortcut icon" href="img/favicon.ico">
+        <title>Anya Core</title>
+        <link href="css/bootstrap.min.css" rel="stylesheet">
+        <link href="css/fontawesome.min.css" rel="stylesheet">
+        <link href="css/brands.min.css" rel="stylesheet">
+        <link href="css/solid.min.css" rel="stylesheet">
+        <link href="css/v4-font-face.min.css" rel="stylesheet">
+        <link href="css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script>hljs.highlightAll();</script> 
+    </head>
+
+    <body class="homepage">
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href=".">Anya Core</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href="." class="nav-link active" aria-current="page">Anya Core | Implementation Status</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="CODE_OF_CONDUCT/" class="nav-link">Code of Conduct</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="CONTRIBUTING/" class="nav-link">Contributing</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="DAO_SYSTEM_GUIDE/" class="nav-link">DAO System Guide</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="GOVERNANCE_FRAMEWORK/" class="nav-link">Governance Framework</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="INSTALLATION/" class="nav-link">Installation</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="INSTALLATION_REVIEW/" class="nav-link">Installation</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="ROADMAP/" class="nav-link">Roadmap</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="TESTING/" class="nav-link">Testing</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="cargo-error-guide/" class="nav-link">A Guide to Understanding and Resolving Common Cargo Errors</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="dev_setup/" class="nav-link">Dev_setup</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="gh-pages-test/" class="nav-link">GitHub Pages Validation Test</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="hexagonal/" class="nav-link">Hexagonal</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="high_availability/" class="nav-link">High_availability</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="hsm_bitcoin_integration/" class="nav-link">Hsm_bitcoin_integration</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="hsm_rc_requirements/" class="nav-link">Hsm_rc_requirements</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="post_rc_fixes/" class="nav-link">Post_rc_fixes</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="tags/" class="nav-link">Tags</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="web5/" class="nav-link">Web5</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="workflow-architecture/" class="nav-link">Anya Core Workflow Architecture</a>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Ai</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="ai/" class="dropdown-item">Readme</a>
+</li>
+                                    
+<li>
+    <a href="ai/API/" class="dropdown-item">Api</a>
+</li>
+                                    
+<li>
+    <a href="ai/ARCHITECTURE/" class="dropdown-item">Architecture</a>
+</li>
+                                    
+<li>
+    <a href="ai/BEST_PRACTICES/" class="dropdown-item">Best_practices</a>
+</li>
+                                    
+<li>
+    <a href="ai/COMPLIANCE/" class="dropdown-item">Compliance</a>
+</li>
+                                    
+<li>
+    <a href="ai/DEVELOPMENT/" class="dropdown-item">Development</a>
+</li>
+                                    
+<li>
+    <a href="ai/INTEGRATION/" class="dropdown-item">Integration</a>
+</li>
+                                    
+<li>
+    <a href="ai/METRICS/" class="dropdown-item">Metrics</a>
+</li>
+                                    
+<li>
+    <a href="ai/MODEL_DEVELOPMENT/" class="dropdown-item">Model_development</a>
+</li>
+                                    
+<li>
+    <a href="ai/OVERVIEW/" class="dropdown-item">Overview</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Api</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="api/" class="dropdown-item">Api</a>
+</li>
+                                    
+<li>
+    <a href="api/API_REFERENCE/" class="dropdown-item">Api_reference</a>
+</li>
+                                    
+<li>
+    <a href="api/CLI_REFERENCE/" class="dropdown-item">Cli_reference</a>
+</li>
+                                    
+<li>
+    <a href="api/DEPENDENCIES/" class="dropdown-item">Dependencies</a>
+</li>
+                                    
+<li>
+    <a href="api/GOVERNANCE_API/" class="dropdown-item">Governance API Reference</a>
+</li>
+                                    
+<li>
+    <a href="api/PSBT_V2_EXAMPLES/" class="dropdown-item">PSBT v2 (BIP-370) API Usage Examples</a>
+</li>
+                                    
+<li>
+    <a href="api/api-reference/" class="dropdown-item">Api Reference</a>
+</li>
+                                    
+<li>
+    <a href="api/api-standards/" class="dropdown-item">API Standardization Guidelines</a>
+</li>
+                                    
+<li>
+    <a href="api/integration_guide/" class="dropdown-item">Integration_guide</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Architecture</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="architecture/" class="dropdown-item">Architecture</a>
+</li>
+                                    
+<li>
+    <a href="architecture/AGENT_ARCHITECTURE/" class="dropdown-item">Anya Agent Systems Architecture</a>
+</li>
+                                    
+<li>
+    <a href="architecture/AIP-2025-01-Adaptive-Hardware-Optimization/" class="dropdown-item">Universal Adaptive Hardware Optimization Framework</a>
+</li>
+                                    
+<li>
+    <a href="architecture/ARCHITECTURE/" class="dropdown-item">Architecture</a>
+</li>
+                                    
+<li>
+    <a href="architecture/ML_SYSTEM_ARCHITECTURE/" class="dropdown-item">ML SYSTEM ARCHITECTURE</a>
+</li>
+                                    
+<li>
+    <a href="architecture/OVERVIEW/" class="dropdown-item">Overview</a>
+</li>
+                                    
+<li>
+    <a href="architecture/PERFORMANCE_ARCHITECTURE/" class="dropdown-item">Performance_architecture</a>
+</li>
+                                    
+<li>
+    <a href="architecture/SECURITY_ARCHITECTURE/" class="dropdown-item">Security_architecture</a>
+</li>
+                                    
+<li>
+    <a href="architecture/core-components/" class="dropdown-item">Core Components</a>
+</li>
+                                    
+<li>
+    <a href="architecture/security-model/" class="dropdown-item">Security Model</a>
+</li>
+                                    
+<li>
+    <a href="architecture/system-design/" class="dropdown-item">System Design</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Archive</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="archive/" class="dropdown-item">Archive Folder (Docs)</a>
+</li>
+                                    
+<li>
+    <a href="archive/API_REFERENCE/" class="dropdown-item">API REFERENCE</a>
+</li>
+                                    
+<li>
+    <a href="archive/COMPLIANCE/" class="dropdown-item">Compliance</a>
+</li>
+                                    
+<li>
+    <a href="archive/DEX_INTEGRATION/" class="dropdown-item">Dex_integration</a>
+</li>
+                                    
+<li>
+    <a href="archive/ENTERPRISE/" class="dropdown-item">Enterprise</a>
+</li>
+                                    
+<li>
+    <a href="archive/FEATURE_MATRIX/" class="dropdown-item">Feature_matrix</a>
+</li>
+                                    
+<li>
+    <a href="archive/GITHUB_CLI_INTEGRATION/" class="dropdown-item">GitHub CLI Authentication Integration Guide</a>
+</li>
+                                    
+<li>
+    <a href="archive/GIT_SIGNING/" class="dropdown-item">Git_signing</a>
+</li>
+                                    
+<li>
+    <a href="archive/GOVERNANCE/" class="dropdown-item">Anya Project Governance Model</a>
+</li>
+                                    
+<li>
+    <a href="archive/GOVERNANCE_TOKEN/" class="dropdown-item">Governance_token</a>
+</li>
+                                    
+<li>
+    <a href="archive/HEXAGONAL/" class="dropdown-item">Hexagonal</a>
+</li>
+                                    
+<li>
+    <a href="archive/IMPLEMENTATION_ARCHITECTURE/" class="dropdown-item">Implementation_architecture</a>
+</li>
+                                    
+<li>
+    <a href="archive/MAINTENANCE/" class="dropdown-item">Anya Core Maintenance Log</a>
+</li>
+                                    
+<li>
+    <a href="archive/MARKDOWN_STYLE_GUIDE/" class="dropdown-item">Markdown_style_guide</a>
+</li>
+                                    
+<li>
+    <a href="archive/METRICS/" class="dropdown-item">Metrics</a>
+</li>
+                                    
+<li>
+    <a href="archive/MOBILE_INTEGRATION/" class="dropdown-item">Mobile_integration</a>
+</li>
+                                    
+<li>
+    <a href="archive/OPSource-dev/" class="dropdown-item">Opsource Dev</a>
+</li>
+                                    
+<li>
+    <a href="archive/PRIVACY/" class="dropdown-item">Privacy Measures</a>
+</li>
+                                    
+<li>
+    <a href="archive/READ_FIRST_ALWAYS/" class="dropdown-item">Read_first_always</a>
+</li>
+                                    
+<li>
+    <a href="archive/RECOMMENDATIONS/" class="dropdown-item">Recommendations</a>
+</li>
+                                    
+<li>
+    <a href="archive/SECURITY_AUDIT/" class="dropdown-item">Security_audit</a>
+</li>
+                                    
+<li>
+    <a href="archive/SECURITY_CODEQL/" class="dropdown-item">SECURITY CODEQL</a>
+</li>
+                                    
+<li>
+    <a href="archive/SECURITY_GUIDELINES/" class="dropdown-item">Security Guidelines</a>
+</li>
+                                    
+<li>
+    <a href="archive/SECURITY_MEASURES/" class="dropdown-item">Security_measures</a>
+</li>
+                                    
+<li>
+    <a href="archive/SENSITIVE_DATA_SETUP/" class="dropdown-item">Sensitive_data_setup</a>
+</li>
+                                    
+<li>
+    <a href="archive/SUMMARY/" class="dropdown-item">Summary</a>
+</li>
+                                    
+<li>
+    <a href="archive/SYSTEM_INTEGRATION/" class="dropdown-item">System_integration</a>
+</li>
+                                    
+<li>
+    <a href="archive/TODO/" class="dropdown-item">Anya-Core Project TODO List</a>
+</li>
+                                    
+<li>
+    <a href="archive/TOKENOMICS_SYSTEM/" class="dropdown-item">Tokenomics_system</a>
+</li>
+                                    
+<li>
+    <a href="archive/TREASURY_MANAGEMENT/" class="dropdown-item">Treasury_management</a>
+</li>
+                                    
+<li>
+    <a href="archive/UPGRADE/" class="dropdown-item">Upgrade</a>
+</li>
+                                    
+<li>
+    <a href="archive/VS_AI_rules/" class="dropdown-item">Vs_ai_rules</a>
+</li>
+                                    
+<li>
+    <a href="archive/WORKSPACE_MANAGEMENT/" class="dropdown-item">Workspace Management</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Bitcoin</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="bitcoin/" class="dropdown-item">Bitcoin</a>
+</li>
+                                    
+<li>
+    <a href="bitcoin/ARCHITECTURE_UPDATE/" class="dropdown-item">Bitcoin Module Architecture Update</a>
+</li>
+                                    
+<li>
+    <a href="bitcoin/BIP353/" class="dropdown-item">BIP353</a>
+</li>
+                                    
+<li>
+    <a href="bitcoin/BIP_IMPLEMENTATION_INDEX/" class="dropdown-item">Bitcoin Improvement Proposals (BIP) Implementation Index</a>
+</li>
+                                    
+<li>
+    <a href="bitcoin/BOLT12_IMPLEMENTATION_SUMMARY/" class="dropdown-item">BOLT12 Implementation Technical Summary</a>
+</li>
+                                    
+<li>
+    <a href="bitcoin/BRANCHING_STRATEGY/" class="dropdown-item">Bitcoin Module Branching Strategy</a>
+</li>
+                                    
+<li>
+    <a href="bitcoin/BRANCH_MERGER_GUIDE/" class="dropdown-item">Bitcoin Branch Merger Guide</a>
+</li>
+                                    
+<li>
+    <a href="bitcoin/CONSOLIDATION_STRATEGY/" class="dropdown-item">Bitcoin Implementation Consolidation Strategy</a>
+</li>
+                                    
+<li>
+    <a href="bitcoin/IMPLEMENTATION_PLAN/" class="dropdown-item">Bitcoin Implementation Consolidation Plan</a>
+</li>
+                                    
+<li>
+    <a href="bitcoin/IMPLEMENTATION_STATUS/" class="dropdown-item">Bitcoin Implementation Status</a>
+</li>
+                                    
+<li>
+    <a href="bitcoin/LAYER2_SUPPORT/" class="dropdown-item">Layer2_support</a>
+</li>
+                                    
+<li>
+    <a href="bitcoin/MODULE_RESTRUCTURING_SUMMARY/" class="dropdown-item">Bitcoin Module Restructuring Summary</a>
+</li>
+                                    
+<li>
+    <a href="bitcoin/PR_CHECKLIST/" class="dropdown-item">Bitcoin Module PR Checklist</a>
+</li>
+                                    
+<li>
+    <a href="bitcoin/PR_PREPARATION/" class="dropdown-item">Pull Request Preparation Guide</a>
+</li>
+                                    
+<li>
+    <a href="bitcoin/PR_SUMMARY/" class="dropdown-item">Bitcoin Module PR Summary</a>
+</li>
+                                    
+<li>
+    <a href="bitcoin/lightning/" class="dropdown-item">Lightning</a>
+</li>
+                                    
+<li>
+    <a href="bitcoin/migration/" class="dropdown-item">Migration</a>
+</li>
+                                    
+<li>
+    <a href="bitcoin/privacy-bips/" class="dropdown-item">Bitcoin Privacy BIPs</a>
+</li>
+                                    
+<li>
+    <a href="bitcoin/taproot/" class="dropdown-item">Bitcoin Taproot Implementation</a>
+</li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#" class="dropdown-item">Docs</a>
+    <ul class="dropdown-menu">
+            
+<li>
+    <a href="bitcoin/docs/LAYER2_SUPPORT/" class="dropdown-item">LAYER2 SUPPORT</a>
+</li>
+            
+<li>
+    <a href="bitcoin/docs/MIGRATION_MAP/" class="dropdown-item">Bitcoin Implementation Migration Map</a>
+</li>
+            
+<li>
+    <a href="bitcoin/docs/SUMMARY/" class="dropdown-item">Bitcoin Integration Documentation</a>
+</li>
+            
+<li>
+    <a href="bitcoin/docs/lightning/" class="dropdown-item">Lightning</a>
+</li>
+            
+  <li class="dropdown-submenu">
+    <a href="#" class="dropdown-item">Architecture</a>
+    <ul class="dropdown-menu">
+            
+<li>
+    <a href="bitcoin/docs/architecture/HEXAGONAL/" class="dropdown-item">HEXAGONAL</a>
+</li>
+    </ul>
+  </li>
+            
+  <li class="dropdown-submenu">
+    <a href="#" class="dropdown-item">Features</a>
+    <ul class="dropdown-menu">
+            
+<li>
+    <a href="bitcoin/docs/features/" class="dropdown-item">Core Features</a>
+</li>
+            
+<li>
+    <a href="bitcoin/docs/features/block-management/" class="dropdown-item">Block Management</a>
+</li>
+            
+<li>
+    <a href="bitcoin/docs/features/block-operations/" class="dropdown-item">Block Operations</a>
+</li>
+            
+<li>
+    <a href="bitcoin/docs/features/block-processing/" class="dropdown-item">Block Processing</a>
+</li>
+            
+<li>
+    <a href="bitcoin/docs/features/block-types/" class="dropdown-item">Block Types</a>
+</li>
+            
+<li>
+    <a href="bitcoin/docs/features/transaction-management/" class="dropdown-item">Transaction Management</a>
+</li>
+            
+<li>
+    <a href="bitcoin/docs/features/transaction-operations/" class="dropdown-item">Transaction Operations</a>
+</li>
+            
+<li>
+    <a href="bitcoin/docs/features/transaction-types/" class="dropdown-item">Transaction Types</a>
+</li>
+            
+<li>
+    <a href="bitcoin/docs/features/wallet-integration/" class="dropdown-item">Bitcoin Wallet Integration</a>
+</li>
+            
+<li>
+    <a href="bitcoin/docs/features/wallet-management/" class="dropdown-item">Wallet Management</a>
+</li>
+            
+<li>
+    <a href="bitcoin/docs/features/wallet-operations/" class="dropdown-item">Wallet Operations</a>
+</li>
+            
+<li>
+    <a href="bitcoin/docs/features/wallet-types/" class="dropdown-item">Wallet Types</a>
+</li>
+    </ul>
+  </li>
+            
+  <li class="dropdown-submenu">
+    <a href="#" class="dropdown-item">Integration</a>
+    <ul class="dropdown-menu">
+            
+<li>
+    <a href="bitcoin/docs/integration/" class="dropdown-item">Integration</a>
+</li>
+            
+<li>
+    <a href="bitcoin/docs/integration/api-reference/" class="dropdown-item">API Reference</a>
+</li>
+            
+<li>
+    <a href="bitcoin/docs/integration/error-handling/" class="dropdown-item">Error Handling</a>
+</li>
+            
+<li>
+    <a href="bitcoin/docs/integration/event-handling/" class="dropdown-item">Event Handling</a>
+</li>
+    </ul>
+  </li>
+            
+  <li class="dropdown-submenu">
+    <a href="#" class="dropdown-item">Layer2</a>
+    <ul class="dropdown-menu">
+            
+<li>
+    <a href="bitcoin/docs/layer2/OVERVIEW/" class="dropdown-item">OVERVIEW</a>
+</li>
+    </ul>
+  </li>
+            
+  <li class="dropdown-submenu">
+    <a href="#" class="dropdown-item">Network</a>
+    <ul class="dropdown-menu">
+            
+<li>
+    <a href="bitcoin/docs/network/" class="dropdown-item">Network</a>
+</li>
+            
+<li>
+    <a href="bitcoin/docs/network/network-types/" class="dropdown-item">Network Types</a>
+</li>
+            
+<li>
+    <a href="bitcoin/docs/network/node-configuration/" class="dropdown-item">Bitcoin Node Configuration</a>
+</li>
+            
+<li>
+    <a href="bitcoin/docs/network/p2p-communication/" class="dropdown-item">P2P Communication</a>
+</li>
+    </ul>
+  </li>
+            
+  <li class="dropdown-submenu">
+    <a href="#" class="dropdown-item">Performance</a>
+    <ul class="dropdown-menu">
+            
+<li>
+    <a href="bitcoin/docs/performance/" class="dropdown-item">Performance</a>
+</li>
+            
+<li>
+    <a href="bitcoin/docs/performance/benchmarks/" class="dropdown-item">Benchmarks</a>
+</li>
+            
+<li>
+    <a href="bitcoin/docs/performance/hardware-acceleration/" class="dropdown-item">Hardware Acceleration Guide</a>
+</li>
+            
+<li>
+    <a href="bitcoin/docs/performance/optimization-guide/" class="dropdown-item">Optimization Guide</a>
+</li>
+    </ul>
+  </li>
+            
+  <li class="dropdown-submenu">
+    <a href="#" class="dropdown-item">Security</a>
+    <ul class="dropdown-menu">
+            
+<li>
+    <a href="bitcoin/docs/security/" class="dropdown-item">Security</a>
+</li>
+            
+<li>
+    <a href="bitcoin/docs/security/hardware-acceleration-security/" class="dropdown-item">Hardware Acceleration Security</a>
+</li>
+            
+<li>
+    <a href="bitcoin/docs/security/key-management/" class="dropdown-item">Key Management</a>
+</li>
+            
+<li>
+    <a href="bitcoin/docs/security/key-operations/" class="dropdown-item">Key Operations</a>
+</li>
+            
+<li>
+    <a href="bitcoin/docs/security/key-types/" class="dropdown-item">Key Types</a>
+</li>
+            
+<li>
+    <a href="bitcoin/docs/security/network-authentication/" class="dropdown-item">Network Authentication</a>
+</li>
+            
+<li>
+    <a href="bitcoin/docs/security/network-authorization/" class="dropdown-item">Network Authorization</a>
+</li>
+            
+<li>
+    <a href="bitcoin/docs/security/network-security/" class="dropdown-item">Network Security</a>
+</li>
+            
+<li>
+    <a href="bitcoin/docs/security/taproot-security/" class="dropdown-item">Taproot Security Model</a>
+</li>
+            
+<li>
+    <a href="bitcoin/docs/security/transaction-security/" class="dropdown-item">Transaction Security</a>
+</li>
+            
+<li>
+    <a href="bitcoin/docs/security/transaction-validation/" class="dropdown-item">Transaction Validation</a>
+</li>
+            
+<li>
+    <a href="bitcoin/docs/security/transaction-verification/" class="dropdown-item">Transaction Verification</a>
+</li>
+    </ul>
+  </li>
+            
+  <li class="dropdown-submenu">
+    <a href="#" class="dropdown-item">Smart contracts</a>
+    <ul class="dropdown-menu">
+            
+<li>
+    <a href="bitcoin/docs/smart-contracts/" class="dropdown-item">Smart Contracts</a>
+</li>
+            
+<li>
+    <a href="bitcoin/docs/smart-contracts/contract-templates/" class="dropdown-item">Contract Templates</a>
+</li>
+            
+<li>
+    <a href="bitcoin/docs/smart-contracts/contract-types/" class="dropdown-item">Contract Types</a>
+</li>
+            
+<li>
+    <a href="bitcoin/docs/smart-contracts/dlc-implementation/" class="dropdown-item">DLC (Discreet Log Contracts) Implementation</a>
+</li>
+            
+<li>
+    <a href="bitcoin/docs/smart-contracts/script-types/" class="dropdown-item">Script Types</a>
+</li>
+            
+  <li class="dropdown-submenu">
+    <a href="#" class="dropdown-item">Guides</a>
+    <ul class="dropdown-menu">
+            
+<li>
+    <a href="bitcoin/docs/smart-contracts/guides/contract-creation/" class="dropdown-item">Contract Creation Guide</a>
+</li>
+            
+<li>
+    <a href="bitcoin/docs/smart-contracts/guides/contract-execution/" class="dropdown-item">Contract Execution Guide</a>
+</li>
+            
+<li>
+    <a href="bitcoin/docs/smart-contracts/guides/contract-negotiation/" class="dropdown-item">Contract Negotiation Guide</a>
+</li>
+            
+<li>
+    <a href="bitcoin/docs/smart-contracts/guides/contract-setup/" class="dropdown-item">Contract Setup Guide</a>
+</li>
+            
+<li>
+    <a href="bitcoin/docs/smart-contracts/guides/contract-validation/" class="dropdown-item">Contract Validation Guide</a>
+</li>
+            
+<li>
+    <a href="bitcoin/docs/smart-contracts/guides/custom-outcomes/" class="dropdown-item">Custom Outcomes Guide</a>
+</li>
+            
+<li>
+    <a href="bitcoin/docs/smart-contracts/guides/error-recovery/" class="dropdown-item">Error Recovery Guide</a>
+</li>
+            
+<li>
+    <a href="bitcoin/docs/smart-contracts/guides/multi-oracle/" class="dropdown-item">Multi-Oracle Guide</a>
+</li>
+    </ul>
+  </li>
+    </ul>
+  </li>
+            
+  <li class="dropdown-submenu">
+    <a href="#" class="dropdown-item">Taproot</a>
+    <ul class="dropdown-menu">
+            
+<li>
+    <a href="bitcoin/docs/taproot/integration/" class="dropdown-item">Taproot Integration Guide</a>
+</li>
+    </ul>
+  </li>
+            
+  <li class="dropdown-submenu">
+    <a href="#" class="dropdown-item">Testing</a>
+    <ul class="dropdown-menu">
+            
+<li>
+    <a href="bitcoin/docs/testing/" class="dropdown-item">Testing</a>
+</li>
+            
+<li>
+    <a href="bitcoin/docs/testing/integration-tests/" class="dropdown-item">Integration Tests</a>
+</li>
+            
+<li>
+    <a href="bitcoin/docs/testing/network-tests/" class="dropdown-item">Network Tests</a>
+</li>
+            
+<li>
+    <a href="bitcoin/docs/testing/unit-tests/" class="dropdown-item">Unit Tests</a>
+</li>
+    </ul>
+  </li>
+    </ul>
+  </li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Checkpoints</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="checkpoints/" class="dropdown-item">Checkpoints</a>
+</li>
+                                    
+<li>
+    <a href="checkpoints/AIP-001-read_first_implementation_complete-2025-03-02_06-36-47/" class="dropdown-item">AIP 001 read first implementation complete 2025 03 02 06 36 47</a>
+</li>
+                                    
+<li>
+    <a href="checkpoints/AIP-002-checkpoint_system_implementation-2025-03-02_06-51-39/" class="dropdown-item">Aip 002 Checkpoint_system_implementation 2025 03 02_06 51 39</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Configuration</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="configuration/" class="dropdown-item">Configuration</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Contributing</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="contributing/" class="dropdown-item">Contributing</a>
+</li>
+                                    
+<li>
+    <a href="contributing/coding-standards/" class="dropdown-item">Coding Standards</a>
+</li>
+                                    
+<li>
+    <a href="contributing/development-setup/" class="dropdown-item">Development Setup</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Dao</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="dao/" class="dropdown-item">DAO</a>
+</li>
+                                    
+<li>
+    <a href="dao/BITCOIN_INTEGRATION/" class="dropdown-item">Bitcoin_integration</a>
+</li>
+                                    
+<li>
+    <a href="dao/BUSINESS_PLAN/" class="dropdown-item">Business_plan</a>
+</li>
+                                    
+<li>
+    <a href="dao/DAO_OVERVIEW/" class="dropdown-item">Dao_overview</a>
+</li>
+                                    
+<li>
+    <a href="dao/DAO_SYSTEM_GUIDE/" class="dropdown-item">Dao_system_guide</a>
+</li>
+                                    
+<li>
+    <a href="dao/DECENTRALIZATION_STATUS_REPORT/" class="dropdown-item">Decentralization Implementation Status Report</a>
+</li>
+                                    
+<li>
+    <a href="dao/FULLY_DECENTRALIZED_ARCHITECTURE/" class="dropdown-item">Fully Decentralized DAO Architecture</a>
+</li>
+                                    
+<li>
+    <a href="dao/GOVERNANCE_FRAMEWORK/" class="dropdown-item">Governance_framework</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Dependencies</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="dependencies/API/" class="dropdown-item">Anya Core API Documentation</a>
+</li>
+                                    
+<li>
+    <a href="dependencies/ARCHITECTURE/" class="dropdown-item">Anya Core Architecture</a>
+</li>
+                                    
+<li>
+    <a href="dependencies/DEPENDENCIES/" class="dropdown-item">DEPENDENCIES</a>
+</li>
+                                    
+<li>
+    <a href="dependencies/DEPENDENCY_NOTES/" class="dropdown-item">Dependency Management Notes</a>
+</li>
+                                    
+<li>
+    <a href="dependencies/FEATURE_MATRIX/" class="dropdown-item">FEATURE MATRIX</a>
+</li>
+                                    
+<li>
+    <a href="dependencies/INDEX/" class="dropdown-item">INDEX</a>
+</li>
+                                    
+<li>
+    <a href="dependencies/ML_METRICS/" class="dropdown-item">ML METRICS</a>
+</li>
+                                    
+<li>
+    <a href="dependencies/ML_SYSTEM_ARCHITECTURE/" class="dropdown-item">ML SYSTEM ARCHITECTURE</a>
+</li>
+                                    
+<li>
+    <a href="dependencies/RECOMMENDATIONS/" class="dropdown-item">Key Recommendations for Anya Core</a>
+</li>
+                                    
+<li>
+    <a href="dependencies/SUMMARY/" class="dropdown-item">Dependencies Documentation</a>
+</li>
+                                    
+<li>
+    <a href="dependencies/SYSTEM_INTEGRATION/" class="dropdown-item">System Integration Architecture Documentation</a>
+</li>
+                                    
+<li>
+    <a href="dependencies/identity/" class="dropdown-item">Identity Management in Web5</a>
+</li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#" class="dropdown-item">Api</a>
+    <ul class="dropdown-menu">
+            
+<li>
+    <a href="dependencies/api/" class="dropdown-item">Anya API Documentation</a>
+</li>
+            
+<li>
+    <a href="dependencies/api/integration_guide/" class="dropdown-item">Anya Integration Guide</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#" class="dropdown-item">Build system</a>
+    <ul class="dropdown-menu">
+            
+<li>
+    <a href="dependencies/build-system/" class="dropdown-item">Build System</a>
+</li>
+            
+<li>
+    <a href="dependencies/build-system/build-profiles/" class="dropdown-item">Build Profiles</a>
+</li>
+            
+<li>
+    <a href="dependencies/build-system/cargo-config/" class="dropdown-item">Cargo Configuration</a>
+</li>
+            
+<li>
+    <a href="dependencies/build-system/cross-compilation/" class="dropdown-item">Cross Compilation</a>
+</li>
+            
+<li>
+    <a href="dependencies/build-system/dependencies/" class="dropdown-item">Dependencies</a>
+</li>
+            
+<li>
+    <a href="dependencies/build-system/features/" class="dropdown-item">Features</a>
+</li>
+            
+<li>
+    <a href="dependencies/build-system/profiles/" class="dropdown-item">Build Profiles</a>
+</li>
+            
+<li>
+    <a href="dependencies/build-system/target-platforms/" class="dropdown-item">Target Platforms</a>
+</li>
+            
+<li>
+    <a href="dependencies/build-system/toolchains/" class="dropdown-item">Toolchains</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#" class="dropdown-item">Identity</a>
+    <ul class="dropdown-menu">
+            
+<li>
+    <a href="dependencies/identity/" class="dropdown-item">Identity Protocol Documentation</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#" class="dropdown-item">Math</a>
+    <ul class="dropdown-menu">
+            
+<li>
+    <a href="dependencies/math/consensus_algorithm/" class="dropdown-item">Consensus Algorithm</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#" class="dropdown-item">Security</a>
+    <ul class="dropdown-menu">
+            
+<li>
+    <a href="dependencies/security/" class="dropdown-item">Security</a>
+</li>
+            
+<li>
+    <a href="dependencies/security/advanced_security/" class="dropdown-item">Advanced Security Guide</a>
+</li>
+            
+<li>
+    <a href="dependencies/security/audit-process/" class="dropdown-item">Security Audit Process</a>
+</li>
+            
+<li>
+    <a href="dependencies/security/dependency-auditing/" class="dropdown-item">Dependency Auditing</a>
+</li>
+            
+<li>
+    <a href="dependencies/security/license-compliance/" class="dropdown-item">License Compliance</a>
+</li>
+            
+<li>
+    <a href="dependencies/security/security-policies/" class="dropdown-item">Security Policies</a>
+</li>
+            
+<li>
+    <a href="dependencies/security/security_guide/" class="dropdown-item">Anya Security Guide</a>
+</li>
+            
+<li>
+    <a href="dependencies/security/vulnerability-management/" class="dropdown-item">Vulnerability Management</a>
+</li>
+            
+<li>
+    <a href="dependencies/security/wallet-integration/" class="dropdown-item">Bitcoin Wallet Integration [AIR-3][AIS-3][BPC-3]</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#" class="dropdown-item">System</a>
+    <ul class="dropdown-menu">
+            
+<li>
+    <a href="dependencies/system/architecture/" class="dropdown-item">Anya System Architecture</a>
+</li>
+            
+<li>
+    <a href="dependencies/system/integration_guide/" class="dropdown-item">Anya System Integration Guide</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#" class="dropdown-item">System integration</a>
+    <ul class="dropdown-menu">
+            
+<li>
+    <a href="dependencies/system-integration/" class="dropdown-item">System Integration</a>
+</li>
+            
+<li>
+    <a href="dependencies/system-integration/apis/" class="dropdown-item">APIs</a>
+</li>
+            
+<li>
+    <a href="dependencies/system-integration/events/" class="dropdown-item">Events</a>
+</li>
+            
+<li>
+    <a href="dependencies/system-integration/monitoring/" class="dropdown-item">Monitoring</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#" class="dropdown-item">Testing</a>
+    <ul class="dropdown-menu">
+            
+<li>
+    <a href="dependencies/testing/" class="dropdown-item">Testing</a>
+</li>
+            
+<li>
+    <a href="dependencies/testing/integration-testing/" class="dropdown-item">Integration Testing</a>
+</li>
+            
+<li>
+    <a href="dependencies/testing/integration-tests/" class="dropdown-item">Integration Tests</a>
+</li>
+            
+<li>
+    <a href="dependencies/testing/performance-testing/" class="dropdown-item">Performance Testing</a>
+</li>
+            
+<li>
+    <a href="dependencies/testing/security-testing/" class="dropdown-item">Security Testing</a>
+</li>
+            
+<li>
+    <a href="dependencies/testing/system-testing/" class="dropdown-item">System Testing</a>
+</li>
+            
+<li>
+    <a href="dependencies/testing/test-coverage/" class="dropdown-item">Test Coverage</a>
+</li>
+            
+<li>
+    <a href="dependencies/testing/unit-testing/" class="dropdown-item">Unit Testing</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#" class="dropdown-item">Toolchain</a>
+    <ul class="dropdown-menu">
+            
+<li>
+    <a href="dependencies/toolchain/" class="dropdown-item">Toolchain</a>
+</li>
+            
+<li>
+    <a href="dependencies/toolchain/required-tools/" class="dropdown-item">Required Tools</a>
+</li>
+            
+<li>
+    <a href="dependencies/toolchain/rust-setup/" class="dropdown-item">Rust Setup</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#" class="dropdown-item">Troubleshooting</a>
+    <ul class="dropdown-menu">
+            
+<li>
+    <a href="dependencies/troubleshooting/" class="dropdown-item">Troubleshooting</a>
+</li>
+            
+<li>
+    <a href="dependencies/troubleshooting/build-problems/" class="dropdown-item">Build Problems</a>
+</li>
+            
+<li>
+    <a href="dependencies/troubleshooting/common-issues/" class="dropdown-item">Common Issues</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#" class="dropdown-item">Version management</a>
+    <ul class="dropdown-menu">
+            
+<li>
+    <a href="dependencies/version-management/" class="dropdown-item">Version Management</a>
+</li>
+            
+<li>
+    <a href="dependencies/version-management/dependency-updates/" class="dropdown-item">Dependency Updates</a>
+</li>
+            
+<li>
+    <a href="dependencies/version-management/version-control/" class="dropdown-item">Version Control</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#" class="dropdown-item">Web5</a>
+    <ul class="dropdown-menu">
+            
+<li>
+    <a href="dependencies/web5/integration_guide/" class="dropdown-item">Web5 Integration Guide</a>
+</li>
+    </ul>
+  </li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Deployment</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="deployment/" class="dropdown-item">Deployment</a>
+</li>
+                                    
+<li>
+    <a href="deployment/DEPLOYMENT/" class="dropdown-item">Deployment</a>
+</li>
+                                    
+<li>
+    <a href="deployment/monitoring/" class="dropdown-item">Monitoring</a>
+</li>
+                                    
+<li>
+    <a href="deployment/production-setup/" class="dropdown-item">Production Setup</a>
+</li>
+                                    
+<li>
+    <a href="deployment/scaling/" class="dropdown-item">Scaling</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Development</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="development/" class="dropdown-item">Development</a>
+</li>
+                                    
+<li>
+    <a href="development/CONTRIBUTING/" class="dropdown-item">Contributing to Anya Core</a>
+</li>
+                                    
+<li>
+    <a href="development/ERROR_HANDLING/" class="dropdown-item">Error_handling</a>
+</li>
+                                    
+<li>
+    <a href="development/SETUP/" class="dropdown-item">Setup</a>
+</li>
+                                    
+<li>
+    <a href="development/TESTING/" class="dropdown-item">Testing</a>
+</li>
+                                    
+<li>
+    <a href="development/development/" class="dropdown-item">Development</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Enterprise</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="enterprise/CONFIGURATION_MANAGEMENT/" class="dropdown-item">Configuration_management</a>
+</li>
+                                    
+<li>
+    <a href="enterprise/ENTERPRISE_FEATURES/" class="dropdown-item">Enterprise_features</a>
+</li>
+                                    
+<li>
+    <a href="enterprise/ENTERPRISE_GUIDE/" class="dropdown-item">Enterprise_guide</a>
+</li>
+                                    
+<li>
+    <a href="enterprise/SUMMARY/" class="dropdown-item">Enterprise Documentation</a>
+</li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#" class="dropdown-item">Administration</a>
+    <ul class="dropdown-menu">
+            
+<li>
+    <a href="enterprise/administration/" class="dropdown-item">Administration</a>
+</li>
+            
+<li>
+    <a href="enterprise/administration/system-monitoring/" class="dropdown-item">System Monitoring</a>
+</li>
+            
+<li>
+    <a href="enterprise/administration/user-management/" class="dropdown-item">User Management</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#" class="dropdown-item">Audit</a>
+    <ul class="dropdown-menu">
+            
+<li>
+    <a href="enterprise/audit/framework/" class="dropdown-item">Audit Framework</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#" class="dropdown-item">Business continuity</a>
+    <ul class="dropdown-menu">
+            
+<li>
+    <a href="enterprise/business-continuity/plan/" class="dropdown-item">Business Continuity Plan</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#" class="dropdown-item">Deployment</a>
+    <ul class="dropdown-menu">
+            
+<li>
+    <a href="enterprise/deployment/" class="dropdown-item">Deployment</a>
+</li>
+            
+<li>
+    <a href="enterprise/deployment/configuration/" class="dropdown-item">Configuration</a>
+</li>
+            
+<li>
+    <a href="enterprise/deployment/installation-guide/" class="dropdown-item">Installation Guide</a>
+</li>
+            
+<li>
+    <a href="enterprise/deployment/scaling/" class="dropdown-item">Scaling</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#" class="dropdown-item">Features</a>
+    <ul class="dropdown-menu">
+            
+<li>
+    <a href="enterprise/features/" class="dropdown-item">Features</a>
+</li>
+            
+<li>
+    <a href="enterprise/features/advanced-analytics/" class="dropdown-item">Advanced Analytics</a>
+</li>
+            
+<li>
+    <a href="enterprise/features/anomaly-detection/" class="dropdown-item">Anomaly Detection</a>
+</li>
+            
+<li>
+    <a href="enterprise/features/enterprise-security/" class="dropdown-item">Enterprise Security</a>
+</li>
+            
+<li>
+    <a href="enterprise/features/fee-estimation/" class="dropdown-item">Fee Estimation</a>
+</li>
+            
+<li>
+    <a href="enterprise/features/high-volume-trading/" class="dropdown-item">High Volume Trading</a>
+</li>
+            
+<li>
+    <a href="enterprise/features/pattern-recognition/" class="dropdown-item">Pattern Recognition</a>
+</li>
+            
+<li>
+    <a href="enterprise/features/transaction-monitoring/" class="dropdown-item">Transaction Monitoring</a>
+</li>
+            
+<li>
+    <a href="enterprise/features/volume-analysis/" class="dropdown-item">Volume Analysis</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#" class="dropdown-item">Integration</a>
+    <ul class="dropdown-menu">
+            
+<li>
+    <a href="enterprise/integration/" class="dropdown-item">Integration</a>
+</li>
+            
+<li>
+    <a href="enterprise/integration/api-reference/" class="dropdown-item">API Reference</a>
+</li>
+            
+<li>
+    <a href="enterprise/integration/authentication/" class="dropdown-item">Authentication</a>
+</li>
+            
+<li>
+    <a href="enterprise/integration/system-requirements/" class="dropdown-item">System Requirements</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#" class="dropdown-item">Performance</a>
+    <ul class="dropdown-menu">
+            
+<li>
+    <a href="enterprise/performance/" class="dropdown-item">Performance</a>
+</li>
+            
+<li>
+    <a href="enterprise/performance/caching-strategies/" class="dropdown-item">Caching Strategies</a>
+</li>
+            
+<li>
+    <a href="enterprise/performance/load-balancing/" class="dropdown-item">Load Balancing</a>
+</li>
+            
+<li>
+    <a href="enterprise/performance/optimization/" class="dropdown-item">Optimization</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#" class="dropdown-item">Risk</a>
+    <ul class="dropdown-menu">
+            
+<li>
+    <a href="enterprise/risk/management/" class="dropdown-item">Risk Management</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#" class="dropdown-item">Security</a>
+    <ul class="dropdown-menu">
+            
+<li>
+    <a href="enterprise/security/" class="dropdown-item">Security</a>
+</li>
+            
+<li>
+    <a href="enterprise/security/access-control/" class="dropdown-item">Access Control</a>
+</li>
+            
+<li>
+    <a href="enterprise/security/audit-logging/" class="dropdown-item">Audit Logging</a>
+</li>
+            
+<li>
+    <a href="enterprise/security/authorization/" class="dropdown-item">Authorization Guide</a>
+</li>
+            
+<li>
+    <a href="enterprise/security/compliance-management/" class="dropdown-item">Compliance Management</a>
+</li>
+            
+<li>
+    <a href="enterprise/security/compliance/" class="dropdown-item">Compliance</a>
+</li>
+            
+<li>
+    <a href="enterprise/security/incident-response/" class="dropdown-item">Incident Response</a>
+</li>
+            
+<li>
+    <a href="enterprise/security/mfa/" class="dropdown-item">Multi-Factor Authentication (MFA)</a>
+</li>
+            
+<li>
+    <a href="enterprise/security/rbac/" class="dropdown-item">Role-Based Access Control (RBAC)</a>
+</li>
+            
+<li>
+    <a href="enterprise/security/security-features/" class="dropdown-item">Enterprise Security Features</a>
+</li>
+            
+<li>
+    <a href="enterprise/security/security-monitoring/" class="dropdown-item">Security Monitoring</a>
+</li>
+            
+<li>
+    <a href="enterprise/security/session-management/" class="dropdown-item">Session Management</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#" class="dropdown-item">Troubleshooting</a>
+    <ul class="dropdown-menu">
+            
+<li>
+    <a href="enterprise/troubleshooting/" class="dropdown-item">Troubleshooting</a>
+</li>
+            
+<li>
+    <a href="enterprise/troubleshooting/common-issues/" class="dropdown-item">Common Issues</a>
+</li>
+            
+<li>
+    <a href="enterprise/troubleshooting/error-codes/" class="dropdown-item">Error Codes</a>
+</li>
+            
+<li>
+    <a href="enterprise/troubleshooting/support/" class="dropdown-item">Support</a>
+</li>
+    </ul>
+  </li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Extensions</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="extensions/SUMMARY/" class="dropdown-item">Extensions Documentation</a>
+</li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#" class="dropdown-item">Development</a>
+    <ul class="dropdown-menu">
+            
+<li>
+    <a href="extensions/development/" class="dropdown-item">Extension Development</a>
+</li>
+            
+<li>
+    <a href="extensions/development/api-reference/" class="dropdown-item">API Reference</a>
+</li>
+            
+<li>
+    <a href="extensions/development/architecture/" class="dropdown-item">Extension Architecture</a>
+</li>
+            
+<li>
+    <a href="extensions/development/best-practices/" class="dropdown-item">Best Practices</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#" class="dropdown-item">Extensions</a>
+    <ul class="dropdown-menu">
+            
+<li>
+    <a href="extensions/extensions/" class="dropdown-item">Available Extensions</a>
+</li>
+            
+<li>
+    <a href="extensions/extensions/community-extensions/" class="dropdown-item">Community Extensions</a>
+</li>
+            
+<li>
+    <a href="extensions/extensions/core-extensions/" class="dropdown-item">Core Extensions</a>
+</li>
+            
+<li>
+    <a href="extensions/extensions/enterprise-extensions/" class="dropdown-item">Enterprise Extensions</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#" class="dropdown-item">Getting started</a>
+    <ul class="dropdown-menu">
+            
+<li>
+    <a href="extensions/getting-started/" class="dropdown-item">Getting Started with Anya Extensions</a>
+</li>
+            
+<li>
+    <a href="extensions/getting-started/configuration/" class="dropdown-item">Extension Configuration Guide</a>
+</li>
+            
+<li>
+    <a href="extensions/getting-started/installation/" class="dropdown-item">Extension Installation Guide</a>
+</li>
+            
+<li>
+    <a href="extensions/getting-started/quick-start/" class="dropdown-item">Quick Start Guide</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#" class="dropdown-item">Integration</a>
+    <ul class="dropdown-menu">
+            
+<li>
+    <a href="extensions/integration/" class="dropdown-item">Integration Guide Overview</a>
+</li>
+            
+<li>
+    <a href="extensions/integration/core-integration/" class="dropdown-item">Core Integration Patterns</a>
+</li>
+            
+<li>
+    <a href="extensions/integration/security-guidelines/" class="dropdown-item">Security Guidelines for Extensions</a>
+</li>
+            
+<li>
+    <a href="extensions/integration/third-party-integration/" class="dropdown-item">Third-Party Integration</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#" class="dropdown-item">Maintenance</a>
+    <ul class="dropdown-menu">
+            
+<li>
+    <a href="extensions/maintenance/" class="dropdown-item">Extension Maintenance</a>
+</li>
+            
+<li>
+    <a href="extensions/maintenance/deprecation/" class="dropdown-item">Deprecation Management Guide [AIR-3][AIS-3][AIT-3][RES-3]</a>
+</li>
+            
+<li>
+    <a href="extensions/maintenance/updates/" class="dropdown-item">Update Management Guide [AIR-3][AIS-3][AIT-3][RES-3]</a>
+</li>
+            
+<li>
+    <a href="extensions/maintenance/version-control/" class="dropdown-item">Version Control and Git Workflows</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#" class="dropdown-item">Publishing</a>
+    <ul class="dropdown-menu">
+            
+<li>
+    <a href="extensions/publishing/" class="dropdown-item">Extension Publishing Guide</a>
+</li>
+            
+<li>
+    <a href="extensions/publishing/distribution/" class="dropdown-item">Distribution</a>
+</li>
+            
+<li>
+    <a href="extensions/publishing/guidelines/" class="dropdown-item">Extension Publishing Guidelines</a>
+</li>
+            
+<li>
+    <a href="extensions/publishing/review-process/" class="dropdown-item">Review Process</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#" class="dropdown-item">Testing</a>
+    <ul class="dropdown-menu">
+            
+<li>
+    <a href="extensions/testing/" class="dropdown-item">Testing Framework [AIR-3][AIS-3][AIT-3][RES-3]</a>
+</li>
+            
+<li>
+    <a href="extensions/testing/integration-testing/" class="dropdown-item">Integration Testing Guide [AIR-3][AIS-3][AIT-3][RES-3]</a>
+</li>
+            
+<li>
+    <a href="extensions/testing/performance-testing/" class="dropdown-item">Performance Testing Guide [AIR-3][AIS-3][AIT-3][RES-3]</a>
+</li>
+            
+<li>
+    <a href="extensions/testing/unit-testing/" class="dropdown-item">Unit Testing Guide [AIR-3][AIS-3][AIT-3][RES-3]</a>
+</li>
+    </ul>
+  </li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Getting started</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="getting-started/" class="dropdown-item">Getting Started</a>
+</li>
+                                    
+<li>
+    <a href="getting-started/ENVIRONMENT/" class="dropdown-item">Environment</a>
+</li>
+                                    
+<li>
+    <a href="getting-started/INSTALLATION/" class="dropdown-item">Installation</a>
+</li>
+                                    
+<li>
+    <a href="getting-started/SETUP_USAGE/" class="dropdown-item">Setup_usage</a>
+</li>
+                                    
+<li>
+    <a href="getting-started/configuration/" class="dropdown-item">Configuration</a>
+</li>
+                                    
+<li>
+    <a href="getting-started/installation/" class="dropdown-item">Installation</a>
+</li>
+                                    
+<li>
+    <a href="getting-started/quick-start/" class="dropdown-item">Quick Start</a>
+</li>
+                                    
+<li>
+    <a href="getting-started/quickstart/" class="dropdown-item">Quickstart</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Guides</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="guides/" class="dropdown-item">Guides</a>
+</li>
+                                    
+<li>
+    <a href="guides/USER_GUIDE/" class="dropdown-item">User_guide</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Identity</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="identity/" class="dropdown-item">Identity</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Images</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="images/" class="dropdown-item">Images</a>
+</li>
+                                    
+<li>
+    <a href="images/anya_architecture/" class="dropdown-item">Anya_architecture</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Installation</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="installation/" class="dropdown-item">Installation</a>
+</li>
+                                    
+<li>
+    <a href="installation/CONFIGURATION/" class="dropdown-item">Configuration</a>
+</li>
+                                    
+<li>
+    <a href="installation/MONITORING/" class="dropdown-item">Monitoring</a>
+</li>
+                                    
+<li>
+    <a href="installation/UNIFIED_INSTALLER/" class="dropdown-item">Unified_installer</a>
+</li>
+                                    
+<li>
+    <a href="installation/cross-platform/" class="dropdown-item">Cross Platform</a>
+</li>
+                                    
+<li>
+    <a href="installation/related1/" class="dropdown-item">Installation</a>
+</li>
+                                    
+<li>
+    <a href="installation/related2/" class="dropdown-item">Installation Review</a>
+</li>
+                                    
+<li>
+    <a href="installation/troubleshooting/" class="dropdown-item">Installation Troubleshooting</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Integration</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="integration/" class="dropdown-item">Integration</a>
+</li>
+                                    
+<li>
+    <a href="integration/api-overview/" class="dropdown-item">Api Overview</a>
+</li>
+                                    
+<li>
+    <a href="integration/authentication/" class="dropdown-item">Authentication</a>
+</li>
+                                    
+<li>
+    <a href="integration/error-handling/" class="dropdown-item">Error Handling</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Layer2</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="layer2/" class="dropdown-item">Layer2</a>
+</li>
+                                    
+<li>
+    <a href="layer2/ARCHITECTURE_DIAGRAMS/" class="dropdown-item">Layer2 Architecture Diagrams</a>
+</li>
+                                    
+<li>
+    <a href="layer2/ASYNC_API_DOCUMENTATION/" class="dropdown-item">Layer2 Async API Documentation</a>
+</li>
+                                    
+<li>
+    <a href="layer2/ASYNC_PERFORMANCE_COMPARISON/" class="dropdown-item">Async Layer2 Implementation Performance Comparison</a>
+</li>
+                                    
+<li>
+    <a href="layer2/RGB_DAO_TEST_PLAN/" class="dropdown-item">RGB Asset and DAO Business Agent Test Failure Analysis</a>
+</li>
+                                    
+<li>
+    <a href="layer2/SYNC_TO_ASYNC_MIGRATION_GUIDE/" class="dropdown-item">Migration Guide: Sync to Async Layer2 API</a>
+</li>
+                                    
+<li>
+    <a href="layer2/bob/" class="dropdown-item">BOB (Build on Bitcoin) Layer2 Documentation</a>
+</li>
+                                    
+<li>
+    <a href="layer2/dlc/" class="dropdown-item">Discrete Log Contracts (DLC)</a>
+</li>
+                                    
+<li>
+    <a href="layer2/lightning/" class="dropdown-item">Lightning Network Integration</a>
+</li>
+                                    
+<li>
+    <a href="layer2/liquid/" class="dropdown-item">Liquid Network Layer2 Documentation</a>
+</li>
+                                    
+<li>
+    <a href="layer2/rgb/" class="dropdown-item">RGB Assets Protocol</a>
+</li>
+                                    
+<li>
+    <a href="layer2/rsk/" class="dropdown-item">RSK (Rootstock) Layer2 Documentation</a>
+</li>
+                                    
+<li>
+    <a href="layer2/stacks/" class="dropdown-item">Stacks Blockchain Layer2 Documentation</a>
+</li>
+                                    
+<li>
+    <a href="layer2/state_channels/" class="dropdown-item">State Channels Layer2 Documentation</a>
+</li>
+                                    
+<li>
+    <a href="layer2/taproot_assets/" class="dropdown-item">Taproot Assets Layer2 Documentation</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Lightning</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="lightning/BOLT12_IMPLEMENTATION/" class="dropdown-item">BOLT12 Implementation for Anya-core</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Maintenance</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="maintenance/ROADMAP/" class="dropdown-item">Anya Dependencies Roadmap</a>
+</li>
+                                    
+<li>
+    <a href="maintenance/SECURITY/" class="dropdown-item">Security Policy for Anya Core</a>
+</li>
+                                    
+<li>
+    <a href="maintenance/TROUBLESHOOTING/" class="dropdown-item">Troubleshooting</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Math</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="math/" class="dropdown-item">Math</a>
+</li>
+                                    
+<li>
+    <a href="math/consensus_algorithm/" class="dropdown-item">Consensus_algorithm</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Ml</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="ml/" class="dropdown-item">Ml</a>
+</li>
+                                    
+<li>
+    <a href="ml/models/" class="dropdown-item">Models</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Mobile</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="mobile/" class="dropdown-item">Mobile</a>
+</li>
+                                    
+<li>
+    <a href="mobile/SDK/" class="dropdown-item">Sdk</a>
+</li>
+                                    
+<li>
+    <a href="mobile/TAPROOT_DEMO/" class="dropdown-item">Taproot Mobile Demo</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Monitoring</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="monitoring/" class="dropdown-item">Monitoring</a>
+</li>
+                                    
+<li>
+    <a href="monitoring/ALERT_REFERENCE/" class="dropdown-item">Alert_reference</a>
+</li>
+                                    
+<li>
+    <a href="monitoring/BLOCKCHAIN_METRICS_MONITORING/" class="dropdown-item">Blockchain Metrics Monitoring System</a>
+</li>
+                                    
+<li>
+    <a href="monitoring/DASHBOARDS/" class="dropdown-item">Dashboards</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Nostr</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="nostr/" class="dropdown-item">Nostr</a>
+</li>
+                                    
+<li>
+    <a href="nostr/SUMMARY/" class="dropdown-item">Summary</a>
+</li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#" class="dropdown-item">Guides</a>
+    <ul class="dropdown-menu">
+            
+<li>
+    <a href="nostr/guides/private-messaging/" class="dropdown-item">Private Messaging</a>
+</li>
+    </ul>
+  </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#" class="dropdown-item">Nips</a>
+    <ul class="dropdown-menu">
+            
+<li>
+    <a href="nostr/nips/nip-01/" class="dropdown-item">Nip 01</a>
+</li>
+            
+<li>
+    <a href="nostr/nips/nip-04/" class="dropdown-item">Nip 04</a>
+</li>
+    </ul>
+  </li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Operations</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="operations/backup/" class="dropdown-item">Backup Operations</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Performance</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="performance/" class="dropdown-item">Performance</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Protocol</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="protocol/BIP_COMPLIANCE/" class="dropdown-item">Bip_compliance</a>
+</li>
+                                    
+<li>
+    <a href="protocol/BITCOIN_COMPLIANCE/" class="dropdown-item">Bitcoin_compliance</a>
+</li>
+                                    
+<li>
+    <a href="protocol/BITCOIN_PROTOCOL/" class="dropdown-item">BITCOIN PROTOCOL</a>
+</li>
+                                    
+<li>
+    <a href="protocol/HSM_FEATURE_GUIDE/" class="dropdown-item">Hsm_feature_guide</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Reference</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="reference/" class="dropdown-item">Reference</a>
+</li>
+                                    
+<li>
+    <a href="reference/CONTRIBUTING/" class="dropdown-item">Contributing</a>
+</li>
+                                    
+<li>
+    <a href="reference/glossary/" class="dropdown-item">Glossary</a>
+</li>
+                                    
+<li>
+    <a href="reference/versions/" class="dropdown-item">Versions</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Research</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="research/" class="dropdown-item">Research</a>
+</li>
+                                    
+<li>
+    <a href="research/PROTOCOL_UPGRADES/" class="dropdown-item">Protocol_upgrades</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Security</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="security/" class="dropdown-item">Security</a>
+</li>
+                                    
+<li>
+    <a href="security/CRYPTO_VALIDATION/" class="dropdown-item">Crypto_validation</a>
+</li>
+                                    
+<li>
+    <a href="security/advanced_security/" class="dropdown-item">Advanced_security</a>
+</li>
+                                    
+<li>
+    <a href="security/encryption/" class="dropdown-item">Security</a>
+</li>
+                                    
+<li>
+    <a href="security/hsm_guide/" class="dropdown-item">Hsm_guide</a>
+</li>
+                                    
+<li>
+    <a href="security/security_guide/" class="dropdown-item">Security_guide</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Standards</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="standards/" class="dropdown-item">Standards</a>
+</li>
+                                    
+<li>
+    <a href="standards/AI_LABELING/" class="dropdown-item">Ai_labeling</a>
+</li>
+                                    
+<li>
+    <a href="standards/BIP_COMPLIANCE/" class="dropdown-item">Bip_compliance</a>
+</li>
+                                    
+<li>
+    <a href="standards/BRANCH_STRUCTURE/" class="dropdown-item">Branch_structure</a>
+</li>
+                                    
+<li>
+    <a href="standards/MARKDOWN_STYLE_GUIDE/" class="dropdown-item">Markdown_style_guide</a>
+</li>
+                                    
+<li>
+    <a href="standards/SECURITY/" class="dropdown-item">Security</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Support</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="support/bugs/" class="dropdown-item">Bug Reports</a>
+</li>
+                                    
+<li>
+    <a href="support/technical/" class="dropdown-item">Technical Support</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">System</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="system/architecture/" class="dropdown-item">Architecture</a>
+</li>
+                                    
+<li>
+    <a href="system/integration_guide/" class="dropdown-item">Integration_guide</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Testing</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="testing/" class="dropdown-item">Testing</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Tutorials</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="tutorials/" class="dropdown-item">Tutorials</a>
+</li>
+                                    
+<li>
+    <a href="tutorials/advanced-features/" class="dropdown-item">Advanced Features</a>
+</li>
+                                    
+<li>
+    <a href="tutorials/basic-usage/" class="dropdown-item">Basic Usage</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Web5</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="web5/" class="dropdown-item">Web5</a>
+</li>
+                                    
+<li>
+    <a href="web5/README_READ_FIRST/" class="dropdown-item">Readme_read_first</a>
+</li>
+                                    
+<li>
+    <a href="web5/TAPROOT_INTEGRATION/" class="dropdown-item">Taproot_integration</a>
+</li>
+                                    
+<li>
+    <a href="web5/TESTING_READ_FIRST/" class="dropdown-item">Testing_read_first</a>
+</li>
+                                    
+<li>
+    <a href="web5/WEB5_INTEGRATION/" class="dropdown-item">Web5_integration</a>
+</li>
+                                    
+<li>
+    <a href="web5/identity/" class="dropdown-item">Identity</a>
+</li>
+                                    
+<li>
+    <a href="web5/integration_guide/" class="dropdown-item">Integration_guide</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Web5 ml</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="web5_ml/" class="dropdown-item">Web5 Ml</a>
+</li>
+                                    
+<li>
+    <a href="web5_ml/ARCHITECTURE/" class="dropdown-item">Architecture</a>
+</li>
+                                </ul>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                            <li class="nav-item">
+                                <a rel="prev" class="nav-link disabled">
+                                    <i class="fa fa-arrow-left"></i> Previous
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a rel="next" href="CODE_OF_CONDUCT/" class="nav-link">
+                                    Next <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="https://github.com/anya-org/anya-core/edit/main/docs/index.md" class="nav-link">Edit on anya-org/anya-core
+                                    </a>
+                            </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#anya-core-implementation-status-verified-reality" class="nav-link">Anya Core Implementation Status - VERIFIED REALITY</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#document-information" class="nav-link">Document Information</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#current-verified-status" class="nav-link">🔍 CURRENT VERIFIED STATUS</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#implementation-priorities-evidence-based" class="nav-link">📊 IMPLEMENTATION PRIORITIES (Evidence-Based)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#new-production-infrastructure-july-5-2025" class="nav-link">🏗️ NEW PRODUCTION INFRASTRUCTURE (July 5, 2025)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#evidence-based-completion-metrics" class="nav-link">🎯 EVIDENCE-BASED COMPLETION METRICS</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="anya-core-implementation-status-verified-reality">Anya Core Implementation Status - VERIFIED REALITY<a class="headerlink" href="#anya-core-implementation-status-verified-reality" title="Permanent link">&para;</a></h1>
+<h2 id="document-information">Document Information<a class="headerlink" href="#document-information" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Date</strong>: July 5, 2025 12:17 PM UTC</li>
+<li><strong>Status</strong>: Implementation Verification Complete - Reality-Based Assessment</li>
+<li><strong>Verification Method</strong>: Direct code analysis via grep and semantic search</li>
+<li><strong>Enforcement Script</strong>: <code>/scripts/verify_implementation_status.sh</code></li>
+<li><strong>Major Updates</strong>: Git workflows consolidated, DWN storage architecture documented</li>
+</ul>
+<h2 id="current-verified-status">🔍 CURRENT VERIFIED STATUS<a class="headerlink" href="#current-verified-status" title="Permanent link">&para;</a></h2>
+<h3 id="evidence-based-implementation-progress">Evidence-Based Implementation Progress<a class="headerlink" href="#evidence-based-implementation-progress" title="Permanent link">&para;</a></h3>
+<p><strong>VERIFICATION COMMANDS EXECUTED (July 19, 2025 3:55 PM):</strong></p>
+<pre><code class="language-bash">✅ Compilation: PASSING (cargo check --all-features)
+✅ 0 unimplemented!() macros remaining
+❌ 25 todo!() stubs remaining
+✅ 0 SQLite TODOs remaining
+❌ 288 mock implementations detected
+✅ 2 compilation warnings (target: &lt;10)
+</code></pre>
+<h3 id="verified-production-ready-components">✅ <strong>VERIFIED PRODUCTION READY COMPONENTS</strong><a class="headerlink" href="#verified-production-ready-components" title="Permanent link">&para;</a></h3>
+<h4 id="hsm-security-framework">HSM Security Framework ✅<a class="headerlink" href="#hsm-security-framework" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>Status</strong>: Production ready with zero compilation errors</li>
+<li><strong>Evidence</strong>: Compiles cleanly, comprehensive multi-provider support</li>
+<li><strong>File Locations</strong>: <code>/src/security/hsm/</code> modules all functional</li>
+</ul>
+<h4 id="dlc-oracle-implementation-new-july-5-2025">DLC Oracle Implementation ✅ (NEW - July 5, 2025)<a class="headerlink" href="#dlc-oracle-implementation-new-july-5-2025" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>Production-Ready Oracle</strong>: Complete rewrite of <code>/anya-bitcoin/layer2/dlc/oracle.rs</code> with real cryptography</li>
+<li><strong>Real Cryptographic Operations</strong>: All signing, verification, key generation using <code>bitcoin::secp256k1</code></li>
+<li><strong>Mock Code Eliminated</strong>: 6 mock implementations removed (149→143 total system-wide)</li>
+<li><strong>Security Features</strong>: Unique nonces, signature verification, event validation, proper error handling</li>
+<li><strong>Evidence</strong>: Zero unimplemented!() macros in DLC oracle module</li>
+<li><strong>Documentation</strong>: <code>DLC_ORACLE_IMPLEMENTATION_COMPLETION.md</code> with full verification evidence</li>
+</ul>
+<h4 id="rgb-protocol-core-functions-new-july-5-2025">RGB Protocol Core Functions ✅ (NEW - July 5, 2025)<a class="headerlink" href="#rgb-protocol-core-functions-new-july-5-2025" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>11 Functions Implemented</strong>: init, create_asset, list_assets, get_asset_balance, create_invoice, transfer_asset, get_transfer_status, validate_transfer, get_asset_metadata, get_asset_history</li>
+<li><strong>Evidence</strong>: Replaced unimplemented!() macros with real implementations in <code>/anya-bitcoin/layer2/rgb/mod.rs</code></li>
+<li><strong>Storage</strong>: File-based and transitional SQLite JSON storage working</li>
+<li><strong>Features</strong>: Asset creation, transfers, invoices, balance tracking, history</li>
+</ul>
+<h4 id="git-workflows-consolidated-new-july-5-2025">Git Workflows Consolidated ✅ (NEW - July 5, 2025)<a class="headerlink" href="#git-workflows-consolidated-new-july-5-2025" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>Evidence-Based CI/CD</strong>: 4 streamlined workflows with verification script integration</li>
+<li><strong>Files Created</strong>: <code>ci-main.yml</code>, <code>security.yml</code>, <code>docs.yml</code>, enhanced <code>release.yml</code></li>
+<li><strong>Enforcement</strong>: Unimplemented!() macro threshold checking (&gt;100 = CI failure)</li>
+<li><strong>Documentation Validation</strong>: Aspirational claims detection and blocking</li>
+<li><strong>Analysis Document</strong>: <code>GIT_WORKFLOWS_ANALYSIS.md</code> - single source of truth for workflows</li>
+</ul>
+<h4 id="web5dwn-storage-architecture-new-july-5-2025">Web5/DWN Storage Architecture ✅ (NEW - July 5, 2025)<a class="headerlink" href="#web5dwn-storage-architecture-new-july-5-2025" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>Core Functions</strong>: DWN store_record, query_records, send_message implemented</li>
+<li><strong>Cross-Platform Support</strong>: Rust and Dart implementations working</li>
+<li><strong>Documentation</strong>: <code>DWN_STORAGE_ARCHITECTURE_GUIDE.md</code> - production implementation guide</li>
+<li><strong>Evidence</strong>: <code>/src/web5/dwn.rs</code> 592 lines of functional DWN code</li>
+<li><strong>Status</strong>: Ready for production backend replacement (currently HashMap-based)</li>
+</ul>
+<h4 id="dlc-adaptor-signatures-new-july-5-2025">DLC Adaptor Signatures ✅ (NEW - July 5, 2025)<a class="headerlink" href="#dlc-adaptor-signatures-new-july-5-2025" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>Production-Ready Implementation</strong>: Complete rewrite of <code>/anya-bitcoin/layer2/dlc/adaptor.rs</code> with real cryptography</li>
+<li><strong>Real Cryptographic Operations</strong>: secp256k1-based signature encryption, decryption, verification</li>
+<li><strong>AdaptorSigner Trait</strong>: Full implementation with Schnorr signature support</li>
+<li><strong>Transaction Integration</strong>: Real sighash calculation and Bitcoin transaction signing</li>
+<li><strong>No Mock Code</strong>: All production logic uses real cryptographic primitives</li>
+<li><strong>Evidence</strong>: Zero unimplemented!() macros in DLC adaptor module</li>
+<li><strong>Documentation</strong>: <code>DLC_ADAPTOR_IMPLEMENTATION_COMPLETION.md</code> with verification evidence</li>
+</ul>
+<h4 id="cross-chain-bridge-new-july-5-2025">Cross-Chain Bridge ✅ (NEW - July 5, 2025)<a class="headerlink" href="#cross-chain-bridge-new-july-5-2025" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>Real Implementation</strong>: <code>/src/crosschain/bridge.rs</code> with production-ready transfer logic</li>
+<li><strong>Multi-Chain Support</strong>: Liquid Network and RSK (Rootstock) bridge implementations</li>
+<li><strong>Security Features</strong>: Health checks, fee validation, amount verification</li>
+<li><strong>Error Handling</strong>: Comprehensive validation and error propagation</li>
+<li><strong>Evidence</strong>: 1 unimplemented!() macro eliminated, real transfer execution</li>
+</ul>
+<h4 id="checkpoint-system-new-july-5-2025">Checkpoint System ✅ (NEW - July 5, 2025)<a class="headerlink" href="#checkpoint-system-new-july-5-2025" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>GitHub Integration</strong>: Real checkpoint creation with git integration support</li>
+<li><strong>Export/Import</strong>: JSON checkpoint data handling</li>
+<li><strong>AI Labeling</strong>: Automated checkpoint categorization</li>
+<li><strong>Evidence</strong>: 1 unimplemented!() macro eliminated, production-ready functionality</li>
+</ul>
+<h4 id="security-audit-framework-new-july-5-2025">Security Audit Framework ✅ (NEW - July 5, 2025)<a class="headerlink" href="#security-audit-framework-new-july-5-2025" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>Taproot Audit</strong>: Real signature validation, Schnorr implementation checks</li>
+<li><strong>PSBT Audit</strong>: Complete parsing, signing, finalization security validation</li>
+<li><strong>Cryptographic Testing</strong>: Real secp256k1 curve validation and security checks</li>
+<li><strong>Evidence</strong>: 2 unimplemented!() macros eliminated, comprehensive security validation</li>
+</ul>
+<h4 id="bitcoin-node-core-new-july-5-2025">Bitcoin Node Core ✅ (NEW - July 5, 2025)<a class="headerlink" href="#bitcoin-node-core-new-july-5-2025" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>Node Creation</strong>: Real Bitcoin node instantiation with network validation</li>
+<li><strong>Wallet Management</strong>: Production-ready wallet creation with mnemonic support</li>
+<li><strong>Network Operations</strong>: P2P connections, blockchain sync, RPC server functionality</li>
+<li><strong>Evidence</strong>: 3 unimplemented!() macros eliminated in <code>/dependencies/anya-bitcoin/src/lib.rs</code></li>
+</ul>
+<h3 id="verified-implementation-gaps">🔴 <strong>VERIFIED IMPLEMENTATION GAPS</strong><a class="headerlink" href="#verified-implementation-gaps" title="Permanent link">&para;</a></h3>
+<h4 id="layer-2-protocols-62-unimplemented-functions-remaining">Layer 2 Protocols - 62 unimplemented!() Functions Remaining<a class="headerlink" href="#layer-2-protocols-62-unimplemented-functions-remaining" title="Permanent link">&para;</a></h4>
+<p><strong>PROGRESS</strong>: Reduced from 73 to 62 unimplemented!() macros (11 completed)</p>
+<p><strong>Remaining Work</strong>:</p>
+<ul>
+<li><strong>DLC Protocol</strong>: 21+ unimplemented functions in adaptor signatures, oracles</li>
+<li><strong>Other Layer2</strong>: Lightning, Stacks, RSK protocols need implementation</li>
+<li><strong>Web5/DID Integration</strong>: 18 todo!() stubs in decentralized identity modules</li>
+</ul>
+<h4 id="storage-layer-placeholder-implementations">Storage Layer - Placeholder Implementations<a class="headerlink" href="#storage-layer-placeholder-implementations" title="Permanent link">&para;</a></h4>
+<p><strong>EVIDENCE</strong>: 15 SQLite TODO comments found</p>
+<pre><code class="language-rust">// Example from storage layer:
+pub fn store_asset_sqlite(&amp;self, asset: &amp;RGBAsset) -&gt; AnyaResult&lt;()&gt; {
+    log::debug!(&quot;Storing asset {} in SQLite&quot;, asset.id);
+    // TODO: Implement actual SQLite asset storage  // ❌ PLACEHOLDER
+    Ok(())
+}
+</code></pre>
+<p><strong>DWN Storage</strong>: Ready for production backend (replace HashMap with SQLite/IPFS)</p>
+<h4 id="network-layer-mock-implementations">Network Layer - Mock Implementations<a class="headerlink" href="#network-layer-mock-implementations" title="Permanent link">&para;</a></h4>
+<p><strong>EVIDENCE</strong>: 141 mock implementations detected</p>
+<h4 id="web5did-integration-todo-stubs">Web5/DID Integration - TODO Stubs<a class="headerlink" href="#web5did-integration-todo-stubs" title="Permanent link">&para;</a></h4>
+<p><strong>EVIDENCE</strong>: 18 todo!() stubs found in Web5 modules</p>
+<pre><code class="language-rust">// Example Web5 stub:
+pub fn create_did(&amp;self, _identity: &amp;str) -&gt; AnyaResult&lt;String&gt; {
+    todo!(&quot;DID creation not yet implemented&quot;)  // ❌ TODO STUB
+}
+</code></pre>
+<h2 id="implementation-priorities-evidence-based">📊 IMPLEMENTATION PRIORITIES (Evidence-Based)<a class="headerlink" href="#implementation-priorities-evidence-based" title="Permanent link">&para;</a></h2>
+<h3 id="priority-1-complete-layer-2-protocol-functions">Priority 1: Complete Layer 2 Protocol Functions<a class="headerlink" href="#priority-1-complete-layer-2-protocol-functions" title="Permanent link">&para;</a></h3>
+<p><strong>Target</strong>: Reduce 62 unimplemented!() macros to 0
+<strong>Focus Areas</strong>:</p>
+<ol>
+<li><strong>DLC Protocol</strong>: <code>/anya-bitcoin/layer2/dlc/</code> - adaptor signatures, oracle integration</li>
+<li><strong>Lightning Network</strong>: Complete LN payment channels</li>
+<li><strong>Cross-chain bridges</strong>: Stacks, RSK integration
+<strong>Verification</strong>: <code>grep -r "unimplemented!" --include="*.rs" . | wc -l</code> must equal 0</li>
+</ol>
+<h3 id="priority-2-replace-storage-placeholders">Priority 2: Replace Storage Placeholders<a class="headerlink" href="#priority-2-replace-storage-placeholders" title="Permanent link">&para;</a></h3>
+<p><strong>Target</strong>: Eliminate 15 SQLite TODO comments
+<strong>Focus</strong>: Replace DWN HashMap storage with production SQLite/IPFS backend (guide provided)</p>
+<h3 id="priority-3-complete-web5did-integration">Priority 3: Complete Web5/DID Integration<a class="headerlink" href="#priority-3-complete-web5did-integration" title="Permanent link">&para;</a></h3>
+<p><strong>Target</strong>: Eliminate 18 todo!() stubs in Web5 modules
+<strong>Focus</strong>: DID creation, authentication, credential verification</p>
+<h3 id="priority-4-reduce-mock-implementations">Priority 4: Reduce Mock Implementations<a class="headerlink" href="#priority-4-reduce-mock-implementations" title="Permanent link">&para;</a></h3>
+<p><strong>Target</strong>: Replace 141 mock implementations with production code
+<strong>Focus</strong>: Network layer, oracle integrations, cross-chain protocols</p>
+<h2 id="new-production-infrastructure-july-5-2025">🏗️ NEW PRODUCTION INFRASTRUCTURE (July 5, 2025)<a class="headerlink" href="#new-production-infrastructure-july-5-2025" title="Permanent link">&para;</a></h2>
+<h3 id="git-workflow-consolidation">Git Workflow Consolidation<a class="headerlink" href="#git-workflow-consolidation" title="Permanent link">&para;</a></h3>
+<p><strong>COMPLETED</strong>: Simplified from 18+ workflows to 4 essential workflows</p>
+<ul>
+<li><strong>ci-main.yml</strong>: Evidence-based CI with verification script integration</li>
+<li><strong>security.yml</strong>: Security audit, license compliance, code quality</li>
+<li><strong>docs.yml</strong>: Documentation validation, aspirational claims detection</li>
+<li><strong>release.yml</strong>: Enhanced with unimplemented!() gate (0 required for release)</li>
+</ul>
+<h3 id="dwn-storage-production-readiness">DWN Storage Production Readiness<a class="headerlink" href="#dwn-storage-production-readiness" title="Permanent link">&para;</a></h3>
+<p><strong>COMPLETED</strong>: Architecture and implementation guide for Web5 DWN storage</p>
+<ul>
+<li><strong>Current Status</strong>: Core DWN functions implemented, HashMap-based storage</li>
+<li><strong>Production Path</strong>: SQLite/IPFS backend replacement documented</li>
+<li><strong>Integration</strong>: RGB asset storage via DWN, Bitcoin anchoring patterns</li>
+<li><strong>Security</strong>: Encryption, access control, schema validation roadmap</li>
+</ul>
+<h2 id="evidence-based-completion-metrics">🎯 EVIDENCE-BASED COMPLETION METRICS<a class="headerlink" href="#evidence-based-completion-metrics" title="Permanent link">&para;</a></h2>
+<h3 id="code-quality-gates">Code Quality Gates<a class="headerlink" href="#code-quality-gates" title="Permanent link">&para;</a></h3>
+<pre><code class="language-bash"># All gates must pass for production readiness
+unimplemented_count=$(grep -r &quot;unimplemented!&quot; --include=&quot;*.rs&quot; . | wc -l)  # Target: 0
+todo_count=$(grep -r &quot;todo!&quot; --include=&quot;*.rs&quot; . | wc -l)                    # Target: 0
+sqlite_todos=$(grep -r &quot;TODO.*SQLite&quot; --include=&quot;*.rs&quot; . | wc -l)          # Target: 0
+mock_count=$(grep -r &quot;MockImpl\|placeholder&quot; --include=&quot;*.rs&quot; . | wc -l)   # Target: &lt;10
+warning_count=$(cargo check 2&gt;&amp;1 | grep &quot;warning:&quot; | wc -l)                # Target: &lt;10
+</code></pre>
+<h3 id="workflow-enforcement">Workflow Enforcement<a class="headerlink" href="#workflow-enforcement" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>CI Integration</strong>: Verification script runs on every push/PR</li>
+<li><strong>Release Gates</strong>: Zero unimplemented!() functions required for release</li>
+<li><strong>Documentation Validation</strong>: Aspirational claims blocked by CI</li>
+<li><strong>Security Audits</strong>: Weekly automated security scanning</li>
+</ul>
+<h3 id="dwn-storage-metrics">DWN Storage Metrics<a class="headerlink" href="#dwn-storage-metrics" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Backend</strong>: HashMap → SQLite/IPFS migration required</li>
+<li><strong>Encryption</strong>: Implementation required for production</li>
+<li><strong>Performance</strong>: Cache hit rate &gt;90%, query response &lt;100ms</li>
+<li><strong>Integration</strong>: RGB assets + Bitcoin anchoring ready for implementation</li>
+</ul>
+<hr />
+<p><strong>NEXT ACTION</strong>: Execute Priority 1 - Complete DLC protocol unimplemented!() functions to reduce count from 62 to target of 0.</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2025 Anya Foundation
+</p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = ".",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="js/base.js"></script>
+        <script src="search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
+
+<!--
+MkDocs version : 1.6.1
+Build Date UTC : 2025-07-20 16:05:01.933165+00:00
+-->

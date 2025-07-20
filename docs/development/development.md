@@ -85,7 +85,7 @@ println!("Read count: {}, Write count: {}, Compliance: {}%",
     metrics.read_count, metrics.write_count, metrics.compliance_rate());
 ```
 
-For detailed information, see the [Read First Always documentation](./READ_FIRST_ALWAYS.md).
+For detailed information, see the [Read First Always documentation](../archive/READ_FIRST_ALWAYS.md).
 
 ### 3. Caching System
 The caching system provides performance optimization:

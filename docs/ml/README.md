@@ -22,7 +22,7 @@ This directory contains documentation for the Machine Learning components in Any
 
 ## Contents
 
-- [Architecture](../ARCHITECTURE.md) - High-level architecture of the ML system
+- [Architecture](../ai/ARCHITECTURE.md) - High-level architecture of the ML system
 - [Model Management](models.md) - Managing ML models
 - [AI Agents](agents.md) - Autonomous agent system
 - [Training](training.md) - Training ML models
@@ -37,7 +37,7 @@ This directory contains documentation for the Machine Learning components in Any
 
 ## Development
 
-For information on developing ML components, see the [development guide](../development.md).
+For information on developing ML components, see the [development guide](../development/development.md).
 
 ## See Also
 

@@ -17,7 +17,7 @@ copyright: |
 
 # Theme Configuration
 theme:
-  name: material
+  name: mkdocs
   palette:
     - media: "(prefers-color-scheme: light)"
       scheme: default
@@ -54,35 +54,7 @@ theme:
 
 # Markdown Extensions
 markdown_extensions:
-  # Emoji support
-  - pymdownx.emoji:
-      emoji_index: !!python/name:material.extensions.emoji.twemoji
-      emoji_generator: !!python/name:material.extensions.emoji.to_svg
-  
-  # Code highlighting
-  - pymdownx.highlight:
-      anchor_linenums: true
-      line_spans: __span
-      pygments_lang_class: true
-  - pymdownx.superfences:
-      custom_fences:
-        - name: mermaid
-          class: mermaid
-          format: !!python/name:pymdownx.superfences.fence_code_format
-  - pymdownx.inlinehilite
-  
-  # Content organization
-  - pymdownx.snippets:
-      base_path: docs
-  - pymdownx.tabbed:
-      alternate_style: true
-  - pymdownx.tilde
-  - pymdownx.caret
-  - pymdownx.mark
-  - pymdownx.smartsymbols
-  - pymdownx.details
-  - pymdownx.tasklist:
-      custom_checkbox: true
+  # No pymdownx extensions (removed for compatibility)
   - toc:
       permalink: true
       toc_depth: 3
@@ -90,48 +62,12 @@ markdown_extensions:
 # Plugins
 plugins:
   - search
-  - awesome-pages
-  - git-revision-date-localized:
-      type: timeago
-      timezone: UTC
-      fallback_to_build_date: false
-  - git-committers:
-      repository: anya-org/anya-core
-      branch: main
-      enabled: true
-      docs_path: docs/
-  - include-markdown
-  - minify:
-      minify_html: true
-      minify_js: true
-      minify_css: true
-  - redirects:
-      redirect_maps: {}
-  - mermaid2:
-      arguments:
-        theme: dark
-  - linkcheck:
-      show_same_dir: true
-        themeVariables:
-          primaryColor: '#303030'
-          primaryTextColor: '#fff'
-          primaryBorderColor: '#3f51b5'
-          lineColor: '#3f51b5'
-          secondaryColor: '#3f51b5'
-          tertiaryColor: '#3f51b5'
 
 # Build Configuration
 docs_dir: docs
 site_dir: site
 strict: false
 use_directory_urls: true
-
-# Customization
-extra_css:
-  - styles/extra.css
-
-extra_javascript:
-  - js/extra.js
 
 # Extra Context
 extra:
@@ -140,12 +76,12 @@ extra:
   analytics:
     provider: google
     property: G-XXXXXXXXXX
-  logo: assets/logo.svg
-  favicon: assets/favicon.ico
-  social:
-    - icon: fontawesome/brands/github
-      link: https://github.com/botshelomokoka/Anya-core
-    - icon: fontawesome/brands/twitter
-      link: https://twitter.com/anyacore
-    - icon: fontawesome/brands/discord
-      link: https://discord.gg/anya-core
+  # logo: assets/logo.svg  # Uncomment if file exists
+  # favicon: assets/favicon.ico  # Uncomment if file exists
+  # social:
+  #   - icon: fontawesome/brands/github
+  #     link: https://github.com/Anya-org/Anya-core
+  #   - icon: fontawesome/brands/twitter
+  #     link: https://twitter.com/anya-core
+  #   - icon: fontawesome/brands/discord
+  #     link: https://discord.gg/anya-core

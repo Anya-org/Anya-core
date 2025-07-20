@@ -58,5 +58,5 @@ By following these rules, the development experience on Visual Studio will be op
 
 ## See Also
 
-- [Related Document 1](./INSTALLATION.md)
+- [Related Document 1](../getting-started/INSTALLATION.md)
 - [Related Document 2](../INSTALLATION_REVIEW.md)

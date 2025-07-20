@@ -132,7 +132,7 @@ The AGT token is implemented as a standard-compliant token with additional gover
 
 ## Related Documents
 
-- [Governance Framework](GOVERNANCE_FRAMEWORK.md) - How tokens are used in governance
+- [Governance Framework](../GOVERNANCE_FRAMEWORK.md) - How tokens are used in governance
 - [DEX Integration](DEX_INTEGRATION.md) - Liquidity provision for tokens
 - [Treasury Management](TREASURY_MANAGEMENT.md) - Token treasury operations
 - [Tokenomics Flowchart](TOKENOMICS_FLOWCHART.md) - Visual representation of token flows

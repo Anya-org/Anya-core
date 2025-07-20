@@ -71,4 +71,4 @@ Anya is an integrated system combining Bitcoin/crypto functionality, ML-based an
 ## See Also
 
 - [Related Document 1](../INSTALLATION.md)
-- [Related Document 2](../../INSTALLATION_REVIEW.md)
+- [Related Document 2](../INSTALLATION_REVIEW.md)

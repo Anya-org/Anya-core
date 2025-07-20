@@ -156,7 +156,7 @@ For logging details, see [Logging Configuration Guide](../monitoring/logging-con
    - Enable SSL/TLS
    - Use strong authentication
 
-2. **Access Control** ([Guide](../../../../anya-enterprise/docs/security/access-control.md))
+2. **Access Control** ([Guide](../../../enterprise/security/access-control.md))
    - Implement IP whitelisting
    - Use strong RPC authentication
    - Regular credential rotation
@@ -263,8 +263,8 @@ For performance monitoring, see [Performance Monitoring Guide](../monitoring/per
 ## Related Documentation
 
 - [Network Setup](./network-setup.md)
-- [Security Features](../../../../anya-enterprise/docs/security/security-features.md)
-- [Performance Optimization](../../../../anya-enterprise/docs/performance/optimization.md)
+- [Security Features](../../../enterprise/security/security-features.md)
+- [Performance Optimization](../../../enterprise/performance/optimization.md)
 - [Monitoring Guide](../layer2/OVERVIEW.md)
 - [Troubleshooting Guide](../../index.md)
 
@@ -272,8 +272,8 @@ For performance monitoring, see [Performance Monitoring Guide](../monitoring/per
 
 For node-related support:
 - [Technical Support](../../../support/technical.md)
-- [Security Issues](../../../SECURITY.md)
-- [Feature Requests](../../../../dependencies/docs/build-system/features.md)
+- [Security Issues](../../../maintenance/SECURITY.md)
+- [Feature Requests](../../../dependencies/build-system/features.md)
 - [Bug Reports](../../../support/bugs.md)
 
 *Last updated: 2025-06-02*
