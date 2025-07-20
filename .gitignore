@@ -66,3 +66,4 @@ node_modules/
 *.bak2
 *.new
 node_modules
+.github/instructions/work.instructions.md
