@@ -2,7 +2,7 @@
 # [AIR-3][AIS-3][BPC-3][RES-3]
 
 # Define the root directory and files
-ROOT_DIR="/home/portiam/Downloads/OPSource/anya"
+ROOT_DIR="/home/../../OPSource/anya"
 TODO_FILE="${ROOT_DIR}/TODO.md"
 SUMMARY_FILE="${ROOT_DIR}/todo_summary.md"
 
@@ -24,7 +24,7 @@ cat > "$TODO_FILE" << 'TODOEOF'
 
 ### 3. System Compatibility
 - [ ] Implement comprehensive system checks
-- [ ] Add Dart SDK version verification
+- [ ] Add React SDK version verification
 - [ ] Document system requirements
 
 ### 4. Script Management System

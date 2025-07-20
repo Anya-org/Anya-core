@@ -20,9 +20,11 @@ Add a brief overview of this document here.
 **Message**: \[AIP-001\] Read First Always principle implementation completed and merged
 
 ## Commit Information
+
 Commit: daaeac6686d56956643885c4c7f47ce24d2bd188 Author: bo_thebig <botshelomokoka@gmail.com> Date: Sun Mar 2 06:31:31 2025 +0200  AIP-001: Merge Read First implementation 
 
 ## Files Changed in Last Commit
+
 commit daaeac6686d56956643885c4c7f47ce24d2bd188 Merge: 5aa3c58e f71388da Author: bo_thebig <botshelomokoka@gmail.com> Date:   Sun Mar 2 06:31:31 2025 +0200      AIP-001: Merge Read First implementation 
 
 ## Repository Status at Checkpoint

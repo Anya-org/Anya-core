@@ -13,20 +13,11 @@ use std::sync::Arc;
 /// Configuration for integration testing
 #[derive(Debug, Clone)]
 struct IntegrationTestConfig {
-    timeout_seconds: u64,
-    performance_threshold_ms: u128,
-    max_retries: u32,
-    test_assets: Vec<String>,
+    // All fields removed to avoid dead code warnings. Add fields as needed for real tests.
 }
-
 impl Default for IntegrationTestConfig {
     fn default() -> Self {
-        Self {
-            timeout_seconds: 30,
-            performance_threshold_ms: 1000,
-            max_retries: 3,
-            test_assets: vec!["BTC".to_string(), "SATS".to_string()],
-        }
+        Self {}
     }
 }
 

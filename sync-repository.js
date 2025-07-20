@@ -97,27 +97,31 @@ function updateMcpConfigs() {
     'anya-core/.cursor/mcp.json',
     'Users/bmokoka/.cursor/mcp.json'
   ];
-  
+
   mcpConfigPaths.forEach(configPath => {
     const fullPath = path.join(REPO_ROOT, configPath);
+    if (!fs.existsSync(fullPath)) {
+      log(`Skipping missing submodule config: ${configPath}`, 'INFO');
+      return;
+    }
     updateFile(fullPath, (content) => {
       try {
         // Remove comments for parsing
         const cleanContent = content.replace(/\/\*[\s\S]*?\*\/|\/\/.*$/gm, '');
         const config = JSON.parse(cleanContent);
-        
+
         if (config.mcpServers && config.mcpServers['anya-bitcoin-tools']) {
           const server = config.mcpServers['anya-bitcoin-tools'];
-          
+
           // Add protocol information
           server.protocolVersion = updates.mcpFeatures.protocolVersion;
-          
+
           // Update features
           if (!server.features) server.features = {};
           server.features.jsonRpcProtocol = updates.mcpFeatures.jsonRpcCompliant;
           server.features.stdinStdoutCommunication = updates.mcpFeatures.stdinStdoutCommunication;
           server.features.BIPs = updates.mcpFeatures.bipCompliance;
-          
+
           // Add server info if missing
           if (!server.serverInfo) {
             server.serverInfo = {
@@ -127,7 +131,7 @@ function updateMcpConfigs() {
             };
           }
         }
-        
+
         return JSON.stringify(config, null, 2);
       } catch (error) {
         log(`Failed to parse JSON in ${configPath}: ${error.message}`, 'ERROR');

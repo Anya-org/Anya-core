@@ -5,6 +5,7 @@ This document details the test coverage practices in Anya.
 ## Coverage Types
 
 ### 1. Line Coverage
+
 ```rust
 // Example of ensuring line coverage
 #[cfg(test)]
@@ -32,6 +33,7 @@ fn complex_function(flag: bool) -> Result<(), Error> {
 ```
 
 ### 2. Branch Coverage
+
 ```rust
 #[cfg(test)]
 mod tests {
@@ -59,6 +61,7 @@ fn classify_number(n: i32) -> NumberType {
 ```
 
 ### 3. Function Coverage
+
 ```rust
 #[cfg(test)]
 mod tests {
@@ -85,6 +88,7 @@ mod tests {
 ## Coverage Tools
 
 ### 1. Tarpaulin Configuration
+
 ```toml
 # .config/tarpaulin.toml
 [coverage]
@@ -105,6 +109,7 @@ minimum_coverage = 80
 ```
 
 ### 2. Coverage Reports
+
 ```yaml
 # .github/workflows/coverage.yml
 name: Coverage
@@ -124,6 +129,7 @@ jobs:
 ```
 
 ### 3. Coverage Monitoring
+
 ```rust
 // Custom coverage tracker
 pub struct CoverageTracker {
@@ -145,24 +151,28 @@ impl CoverageTracker {
 ## Best Practices
 
 ### 1. Coverage Goals
+
 - Set minimum coverage requirements
 - Track coverage trends
 - Identify coverage gaps
 - Prioritize critical paths
 
 ### 2. Implementation
+
 - Regular coverage runs
 - Automated reporting
 - CI/CD integration
 - Documentation updates
 
 ### 3. Maintenance
+
 - Coverage monitoring
 - Gap analysis
 - Improvement planning
 - Regular updates
 
 ## Related Documentation
+
 - [Unit Testing](unit-testing.md)
 - [Integration Testing](integration-testing.md)
 - [Performance Testing](performance-testing.md)

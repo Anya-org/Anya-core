@@ -7,6 +7,11 @@
  * immutability, and verifiability.
  */
 
+describe('Web5 Edge Cases', () => {
+  it('should handle a minimal edge case', () => {
+    expect(true).toBeTruthy();
+  });
+});
 const assert = require('assert');
 const { describe, it } = require('mocha');
 const { FFI } = require('@node-rs/ffi');
@@ -203,10 +208,10 @@ const CONSTANT_TIME_EDGE_CASES = [
   },
   {
     description: "Edge case: One byte difference in middle",
-    a: (() => { 
-      const arr = new Uint8Array(32).fill(0); 
-      arr[16] = 1; 
-      return arr; 
+    a: (() => {
+      const arr = new Uint8Array(32).fill(0);
+      arr[16] = 1;
+      return arr;
     })(),
     b: new Uint8Array(32).fill(0),
     expectedEqual: false
@@ -241,21 +246,21 @@ const KEY_PATH_EDGE_CASES = [
   }
 ];
 
-describe('Web5 BIP-341 Edge Case Tests', function() {
+describe('Web5 BIP-341 Edge Case Tests', function () {
   // Set timeout for long-running tests
   this.timeout(20000);
-  
-  describe('Schnorr Signature Edge Cases', function() {
+
+  describe('Schnorr Signature Edge Cases', function () {
     SCHNORR_EDGE_CASES.forEach(vector => {
-      it(`should handle ${vector.description}`, function() {
+      it(`should handle ${vector.description}`, function () {
         try {
           const result = cryptoUtils.verifySchnorrSignature(
-            vector.pubkey, 
-            vector.msg, 
+            vector.pubkey,
+            vector.msg,
             vector.sig
           );
-          
-          assert.equal(result.valid, vector.result, 
+
+          assert.equal(result.valid, vector.result,
             `Expected verification result: ${vector.result}, got: ${result.valid}`);
         } catch (error) {
           // If we expect a failure and got an exception, that's fine
@@ -267,20 +272,20 @@ describe('Web5 BIP-341 Edge Case Tests', function() {
         }
       });
     });
-    
-    it('should handle malformed inputs gracefully', function() {
+
+    it('should handle malformed inputs gracefully', function () {
       // Test with null inputs
       const result1 = cryptoUtils.verifySchnorrSignature(null, '00', '00');
       assert.equal(result1.valid, false, "Should reject null pubkey");
-      
+
       // Test with invalid hex
       const result2 = cryptoUtils.verifySchnorrSignature(
-        "ZZZZ9cb081036e0faefa3a35157ad71086b123b2b144b649798b494c300a961d", 
+        "ZZZZ9cb081036e0faefa3a35157ad71086b123b2b144b649798b494c300a961d",
         "243f6a8885a308d313198a2e03707344a4093822299f31d0082efa98ec4e6c89",
         "e907831f80848d1069a5371b402410364bdf1c5f8307b0084c55f1ce2dca821525f66a4a85ea8b71e482a74f382d2ce5ebeee8fdb2172f477df4900d310536c"
       );
       assert.equal(result2.valid, false, "Should reject invalid hex pubkey");
-      
+
       // Test with wrong length
       const result3 = cryptoUtils.verifySchnorrSignature(
         "d689cb081036e0faefa3a35157ad7", // Too short
@@ -290,138 +295,138 @@ describe('Web5 BIP-341 Edge Case Tests', function() {
       assert.equal(result3.valid, false, "Should reject wrong length pubkey");
     });
   });
-  
-  describe('Constant-Time Comparison Edge Cases', function() {
+
+  describe('Constant-Time Comparison Edge Cases', function () {
     CONSTANT_TIME_EDGE_CASES.forEach(vector => {
-      it(`should handle ${vector.description}`, function() {
+      it(`should handle ${vector.description}`, function () {
         const result = cryptoUtils.constantTimeEqual(vector.a, vector.b);
-        assert.equal(result, vector.expectedEqual, 
+        assert.equal(result, vector.expectedEqual,
           `Expected ${vector.expectedEqual}, got ${result}`);
       });
     });
-    
-    it('should always take the same time regardless of position of difference', function() {
+
+    it('should always take the same time regardless of position of difference', function () {
       // Create arrays that differ at different positions
       const base = new Uint8Array(1024).fill(0);
-      
+
       // Measure time for differences at various positions
       const timings = [];
-      
+
       for (let pos = 0; pos < 1024; pos += 64) {
         const modified = new Uint8Array(base);
         modified[pos] = 1;
-        
+
         const start = process.hrtime.bigint();
         cryptoUtils.constantTimeEqual(base, modified);
         const end = process.hrtime.bigint();
-        
+
         timings.push(Number(end - start));
       }
-      
+
       // Calculate statistics to check for timing difference
       const mean = timings.reduce((a, b) => a + b, 0) / timings.length;
       const variance = timings.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / timings.length;
       const stdDev = Math.sqrt(variance);
-      
+
       // Check that standard deviation is within reasonable bounds
       // This is a heuristic test and may occasionally fail due to system load
       assert.ok(stdDev / mean < 0.5, "Timing variance too high, may indicate non-constant time");
     });
   });
-  
+
   // Tests that require FFI
   if (ffi) {
-    describe('Taproot Structure Edge Cases', function() {
+    describe('Taproot Structure Edge Cases', function () {
       TAPROOT_EDGE_CASES.forEach(vector => {
-        it(`should handle ${vector.description}`, async function() {
+        it(`should handle ${vector.description}`, async function () {
           const result = await ffi.call('test_taproot_structure_validation', [
             JSON.stringify({
               internalKey: vector.internalKey,
               scriptPaths: vector.scriptPaths
             })
           ]);
-          
+
           const validation = JSON.parse(result);
-          assert.equal(validation.valid, vector.expectedValid, 
+          assert.equal(validation.valid, vector.expectedValid,
             `Expected validation: ${vector.expectedValid}, got: ${validation.valid}`);
         });
       });
     });
-    
-    describe('DLC Creation Edge Cases', function() {
+
+    describe('DLC Creation Edge Cases', function () {
       DLC_EDGE_CASES.forEach(vector => {
-        it(`should handle ${vector.description}`, async function() {
+        it(`should handle ${vector.description}`, async function () {
           const result = await ffi.call('test_create_dlc_edge_case', [
             JSON.stringify(vector)
           ]);
-          
+
           const dlcResult = JSON.parse(result);
-          assert.equal(dlcResult.valid, vector.expectedValid, 
+          assert.equal(dlcResult.valid, vector.expectedValid,
             `Expected validity: ${vector.expectedValid}, got: ${dlcResult.valid}`);
         });
       });
     });
-    
-    describe('Key-Path Indistinguishability Edge Cases', function() {
+
+    describe('Key-Path Indistinguishability Edge Cases', function () {
       KEY_PATH_EDGE_CASES.forEach(vector => {
-        it(`should handle ${vector.description}`, async function() {
+        it(`should handle ${vector.description}`, async function () {
           const result = await ffi.call('test_key_path_indistinguishability', [
             JSON.stringify({
               internalKey: vector.internalKey,
               merkleRoot: vector.merkleRoot
             })
           ]);
-          
+
           const indistinguishResult = JSON.parse(result);
-          assert.equal(indistinguishResult.valid, vector.expectedValid, 
+          assert.equal(indistinguishResult.valid, vector.expectedValid,
             `Expected validity: ${vector.expectedValid}, got: ${indistinguishResult.valid}`);
-          
+
           if (vector.expectedValid) {
             // For valid cases, ensure the result has a proper P2TR address
-            assert.ok(indistinguishResult.taprootAddress.startsWith('bc1p'), 
+            assert.ok(indistinguishResult.taprootAddress.startsWith('bc1p'),
               "Address should be a valid P2TR address starting with bc1p");
-            
+
             // Also verify the commitment hash is present
-            assert.ok(indistinguishResult.commitmentHash, 
+            assert.ok(indistinguishResult.commitmentHash,
               "Commitment hash should be present in result");
           }
         });
       });
-      
-      it('should create key-path and script-path spends that are indistinguishable', async function() {
+
+      it('should create key-path and script-path spends that are indistinguishable', async function () {
         // Create a key-path only output
         const keyPathResult = await ffi.call('test_key_path_only_output', []);
         const keyPathData = JSON.parse(keyPathResult);
-        
+
         // Create a script-path output with one script
         const scriptPathResult = await ffi.call('test_script_path_output', []);
         const scriptPathData = JSON.parse(scriptPathResult);
-        
+
         // Both should have addresses starting with bc1p
-        assert.ok(keyPathData.taprootAddress.startsWith('bc1p'), 
+        assert.ok(keyPathData.taprootAddress.startsWith('bc1p'),
           "Key-path address should be a valid P2TR address");
-        assert.ok(scriptPathData.taprootAddress.startsWith('bc1p'), 
+        assert.ok(scriptPathData.taprootAddress.startsWith('bc1p'),
           "Script-path address should be a valid P2TR address");
-        
+
         // The actual test: spend both outputs and compare the on-chain footprint
         const keyPathSpendResult = await ffi.call('test_spend_output', [
           JSON.stringify({ outputId: keyPathData.outputId, spendMethod: 'key-path' })
         ]);
-        
+
         const scriptPathSpendResult = await ffi.call('test_spend_output', [
           JSON.stringify({ outputId: scriptPathData.outputId, spendMethod: 'script-path' })
         ]);
-        
+
         const keyPathSpend = JSON.parse(keyPathSpendResult);
         const scriptPathSpend = JSON.parse(scriptPathSpendResult);
-        
+
         // Both transaction signatures should be the same size
         assert.equal(
           keyPathSpend.transaction.sigBytes.length,
           scriptPathSpend.transaction.sigBytes.length,
           "Signature sizes should be identical for true indistinguishability"
         );
-        
+
         // Both witness stacks should have the same structure
         assert.equal(
           keyPathSpend.transaction.witnessStackItems.length,

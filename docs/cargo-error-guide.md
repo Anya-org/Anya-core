@@ -5,18 +5,18 @@ This guide provides a comprehensive overview of common errors that you may encou
 ## Table of Contents
 
 *   [Dependency Errors](#dependency-errors)
-    *   [Version Mismatches](#version-mismatches)
-    *   [Build Script Failures](#build-script-failures)
-    *   [Missing Dependencies](#missing-dependencies)
+*   [Version Mismatches](#version-mismatches)
+*   [Build Script Failures](#build-script-failures)
+*   [Missing Dependencies](#missing-dependencies)
 *   [Feature Flag Errors](#feature-flag-errors)
-    *   [Conflicting Features](#conflicting-features)
-    *   [Missing Features](#missing-features)
+*   [Conflicting Features](#conflicting-features)
+*   [Missing Features](#missing-features)
 *   [Workspace Errors](#workspace-errors)
-    *   [Inconsistent Dependencies](#inconsistent-dependencies)
-    *   [Path Issues](#path-issues)
+*   [Inconsistent Dependencies](#inconsistent-dependencies)
+*   [Path Issues](#path-issues)
 *   [Other Common Errors](#other-common-errors)
-    *   [Linker Errors](#linker-errors)
-    *   [Permission Errors](#permission-errors)
+*   [Linker Errors](#linker-errors)
+*   [Permission Errors](#permission-errors)
 
 ## Debugging Common Cargo Errors
 

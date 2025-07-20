@@ -20,7 +20,7 @@ Add a brief overview of this document here.
 - [Section 2](#section-2)
 
 
-This guide explains how to test the Read First Always principle implementation in both Dart and Rust components of the Anya Core project.
+This guide explains how to test the Read First Always principle implementation in both React and Rust components of the Anya Core project.
 
 ## Prerequisites
 
@@ -31,6 +31,7 @@ This guide explains how to test the Read First Always principle implementation i
    - Cargo package manager
 
 2. Clone the repository and check out the feature branch:
+
    ```bash
    git clone https://github.com/Anya-org/OPSource.git
    cd OPSource
@@ -42,16 +43,19 @@ This guide explains how to test the Read First Always principle implementation i
 ### Running the Unit Tests
 
 1. Navigate to the anya-core directory:
+
    ```bash
    cd anya-core
    ```
 
 2. Run the Dart tests specifically for the Read First implementation:
+
    ```bash
    flutter test test/web5/read_first_test.dart
    ```
 
 3. To run all tests including the Read First implementation:
+
    ```bash
    flutter test
    ```
@@ -85,16 +89,19 @@ This guide explains how to test the Read First Always principle implementation i
 ### Running the Unit Tests
 
 1. Navigate to the anya-core directory:
+
    ```bash
    cd anya-core
    ```
 
 2. Run the Rust tests specifically for the Web5 agent:
+
    ```bash
    cargo test --package anya-core --lib src/ml/agents/web5_agent
    ```
 
 3. To run all tests including the Web5 agent:
+
    ```bash
    cargo test
    ```

@@ -28,10 +28,10 @@ This document provides an overview of the Read First Always principle implementa
 
 The Read First Always principle is implemented across the following files:
 
-1. **`lib/src/core/web5/metrics.dart`**: Metrics tracking for Read First compliance
-2. **`lib/src/core/web5/read_first_dwn.dart`**: DWN wrapper that enforces the Read First principle
-3. **`lib/src/core/web5/web5_service.dart`**: Updated service with Read First principle integration
-4. **`lib/src/core/storage/dwn_store.dart`**: Storage implementation with Read First principle compliance
+1. **`lib/src/core/web5/metrics.react`**: Metrics tracking for Read First compliance
+2. **`lib/src/core/web5/read_first_dwn.react`**: DWN wrapper that enforces the Read First principle
+3. **`lib/src/core/web5/web5_service.react`**: Updated service with Read First principle integration
+4. **`lib/src/core/storage/dwn_store.react`**: Storage implementation with Read First principle compliance
 5. **`docs/READ_FIRST_ALWAYS.md`**: Comprehensive documentation of the principle
 6. **`test/web5/read_first_test.dart`**: Test suite for Read First functionality
 

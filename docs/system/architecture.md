@@ -17,11 +17,13 @@ last_updated: 2025-05-30
 
 
 ## Overview
+
 Anya is an integrated system combining Bitcoin/crypto functionality, ML-based analysis, and Web5 decentralized data management.
 
 ## Core Components
 
 ### 1. Authentication & Security
+
 - Bitcoin-based authentication
 - Lightning Network integration
 - Web5 DID management
@@ -29,6 +31,7 @@ Anya is an integrated system combining Bitcoin/crypto functionality, ML-based an
 - Key management and encryption
 
 ### 2. Machine Learning
+
 - File analysis and categorization
 - Revenue prediction
 - Market data analysis
@@ -36,6 +39,7 @@ Anya is an integrated system combining Bitcoin/crypto functionality, ML-based an
 - Model training and validation
 
 ### 3. Web5 Integration
+
 - Decentralized Web Nodes (DWN)
 - Protocol definitions
 - Data management
@@ -43,6 +47,7 @@ Anya is an integrated system combining Bitcoin/crypto functionality, ML-based an
 - Secure data storage
 
 ### 4. Revenue System
+
 - ML-based revenue tracking
 - Cost analysis
 - Optimization suggestions
@@ -50,6 +55,7 @@ Anya is an integrated system combining Bitcoin/crypto functionality, ML-based an
 - Revenue metrics
 
 ### 5. Monitoring & Metrics
+
 - System health monitoring
 - Performance metrics
 - Security auditing
