@@ -30,7 +30,7 @@ const updates = {
       "mocha": "^10.7.3"
     }
   },
-  
+
   // MCP server features
   mcpFeatures: {
     protocolVersion: "2024-11-05",
@@ -70,18 +70,18 @@ function updatePackageJsonFiles() {
     'package.json',
     'dependencies/package.json'
   ];
-  
+
   packageJsonPaths.forEach(pkgPath => {
     const fullPath = path.join(REPO_ROOT, pkgPath);
     updateFile(fullPath, (content) => {
       try {
         const pkg = JSON.parse(content);
-        
+
         // Update dependencies if they exist
         if (pkg.dependencies) {
           Object.assign(pkg.dependencies, updates.packageJson.dependencies);
         }
-        
+
         return JSON.stringify(pkg, null, 2) + '\n';
       } catch (error) {
         log(`Failed to parse JSON in ${pkgPath}: ${error.message}`, 'ERROR');
@@ -107,7 +107,7 @@ function updateMcpConfigs() {
     updateFile(fullPath, (content) => {
       try {
         // Remove comments for parsing
-        const cleanContent = content.replace(/\/\*[\s\S]*?\*\/|\/\/.*$/gm, '');
+        const cleanContent = content.replace(/\/*[\s\S]*?*\/|\/\/.*$/gm, '');
         const config = JSON.parse(cleanContent);
 
         if (config.mcpServers && config.mcpServers['anya-bitcoin-tools']) {
@@ -149,7 +149,7 @@ function updateDocumentation() {
       .replace(/@noble\/secp256k1/g, '@noble/curves')
       .replace(/noble\/secp256k1/g, 'noble/curves/secp256k1');
   });
-  
+
   // Update changelog
   const changelogPath = path.join(REPO_ROOT, 'CHANGELOG.md');
   updateFile(changelogPath, (content) => {
@@ -174,7 +174,7 @@ function updateDocumentation() {
 - Logging moved to stderr to avoid stdout conflicts
 - Updated package dependencies to latest versions
 `;
-    
+
     // Insert new entry after the first line if it doesn't already exist
     if (!content.includes(`## [1.0.0] - ${today}`)) {
       const lines = content.split('\n');
@@ -188,10 +188,10 @@ function updateDocumentation() {
 function runTests() {
   try {
     log('Running MCP server tests...');
-    execSync('node test-mcp-protocol.js', { 
-      cwd: REPO_ROOT, 
+    execSync('node test-mcp-protocol.js', {
+      cwd: REPO_ROOT,
       stdio: 'inherit',
-      timeout: 30000 
+      timeout: 30000
     });
     log('Tests completed successfully');
   } catch (error) {
@@ -210,7 +210,7 @@ function generateReport() {
     status: 'completed',
     files_updated: [
       'package.json',
-      'dependencies/package.json', 
+      'dependencies/package.json',
       '.cursor/mcp.json',
       'scripts/bitcoin/mcp-server.js',
       'scripts/bitcoin/mcp-server-fixed.js',
@@ -218,33 +218,33 @@ function generateReport() {
       'CHANGELOG.md'
     ]
   };
-  
+
   fs.writeFileSync(
     path.join(REPO_ROOT, 'repository-sync-report.json'),
     JSON.stringify(report, null, 2)
   );
-  
+
   log('Repository synchronization report generated');
 }
 
 // Enhanced CI/CD integration for cross-repository synchronization
 async function triggerCIAcrossRepos() {
   log('Triggering CI/CD across related repositories...', 'INFO');
-  
+
   const repos = [
     'anya-web5',
-    'anya-mobile', 
+    'anya-mobile',
     'anya-bitcoin',
     'anya-enterprise'
   ];
-  
+
   const githubToken = process.env.GITHUB_TOKEN;
-  
+
   if (!githubToken) {
     log('GITHUB_TOKEN not set, skipping cross-repo CI triggers', 'WARN');
     return;
   }
-  
+
   for (const repo of repos) {
     try {
       const fetch = require('node-fetch');
@@ -265,7 +265,7 @@ async function triggerCIAcrossRepos() {
           }
         })
       });
-      
+
       if (response.ok) {
         log(`Successfully triggered CI for ${repo}`, 'INFO');
       } else {
@@ -296,9 +296,9 @@ function getCurrentBranch() {
 // Enhanced synchronization with CI/CD metrics
 async function syncWithMetrics() {
   log('Starting enhanced repository synchronization with CI/CD metrics...', 'INFO');
-  
+
   const syncStartTime = Date.now();
-  
+
   // Collect current repository state
   const repoState = {
     commit: getCurrentCommit(),
@@ -306,7 +306,7 @@ async function syncWithMetrics() {
     timestamp: new Date().toISOString(),
     sync_version: '2025.1'
   };
-  
+
   // Update all configuration files
   const updateResults = {
     packageJson: false,
@@ -314,13 +314,13 @@ async function syncWithMetrics() {
     workflows: false,
     documentation: false
   };
-  
+
   try {
     updateResults.packageJson = updatePackageJsonFiles();
     updateResults.mcpConfigs = updateMcpConfigs();
     updateResults.workflows = await updateWorkflowFiles();
     updateResults.documentation = updateDocumentationLinks();
-    
+
     // Generate sync report
     const syncDuration = Date.now() - syncStartTime;
     const syncReport = {
@@ -330,20 +330,20 @@ async function syncWithMetrics() {
       success: Object.values(updateResults).some(result => result),
       repositories_triggered: ['anya-web5', 'anya-mobile', 'anya-bitcoin', 'anya-enterprise']
     };
-    
+
     // Write sync report
     fs.writeFileSync(
       path.join(REPO_ROOT, 'sync_report.json'),
       JSON.stringify(syncReport, null, 2)
     );
-    
+
     log(`Synchronization completed in ${syncDuration}ms`, 'INFO');
-    
+
     // Trigger CI across repos if any updates were made
     if (syncReport.success) {
       await triggerCIAcrossRepos();
     }
-    
+
   } catch (error) {
     log(`Synchronization failed: ${error.message}`, 'ERROR');
     throw error;
@@ -352,7 +352,7 @@ async function syncWithMetrics() {
 
 async function updateWorkflowFiles() {
   log('Updating GitHub Actions workflow files...', 'INFO');
-  
+
   const workflowUpdates = {
     'ci.yml': {
       rust_version: 'stable',
@@ -364,9 +364,9 @@ async function updateWorkflowFiles() {
       security_scanning: true
     }
   };
-  
+
   let updated = false;
-  
+
   const workflowDir = path.join(REPO_ROOT, '.github', 'workflows');
   if (fs.existsSync(workflowDir)) {
     for (const [filename, updates] of Object.entries(workflowUpdates)) {
@@ -375,7 +375,7 @@ async function updateWorkflowFiles() {
         // Read and update workflow file
         const content = fs.readFileSync(filePath, 'utf8');
         let updatedContent = content;
-        
+
         // Update specific workflow configurations
         if (filename === 'ci.yml') {
           updatedContent = updatedContent.replace(
@@ -383,7 +383,7 @@ async function updateWorkflowFiles() {
             `uses: actions/cache@${updates.cache_version}`
           );
         }
-        
+
         if (updatedContent !== content) {
           fs.writeFileSync(filePath, updatedContent);
           log(`Updated workflow: ${filename}`);
@@ -392,19 +392,37 @@ async function updateWorkflowFiles() {
       }
     }
   }
-  
+
   return updated;
 }
 
 // Main execution
 async function main() {
   log('Starting repository synchronization...');
-  
+
   updatePackageJsonFiles();
   updateMcpConfigs();
   updateDocumentation();
   generateReport();
-  
+
+  // Strict: ensure no Dart files exist in the repo
+  const dartFiles = [];
+  function walk(dir) {
+    fs.readdirSync(dir, { withFileTypes: true }).forEach(entry => {
+      const full = path.join(dir, entry.name);
+      if (entry.isDirectory() && !['.git', 'node_modules', '.cursor'].includes(entry.name)) {
+        walk(full);
+      } else if (entry.isFile() && entry.name.endsWith('.dart')) {
+        dartFiles.push(full);
+      }
+    });
+  }
+  walk(REPO_ROOT);
+  if (dartFiles.length > 0) {
+    log(`Dart files found (strict mode):\n${dartFiles.join('\n')}`, 'ERROR');
+    throw new Error('Dart files present in repository (strict-adhere)');
+  }
+
   log('Repository synchronization completed');
   log('Run "npm install" to update dependencies');
   log('Run "node simple-mcp-test.js" to verify MCP server functionality');

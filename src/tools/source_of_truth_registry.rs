@@ -281,7 +281,7 @@ impl SourceOfTruthRegistry {
 
         // 2. Validate status transition
         if let Err(e) = self.validate_status_transition(&work_item.status, &new_status) {
-            debug!("Invalid status transition: {:?}", e);
+            debug!("Invalid status transition: {e:?}");
             return Err(e);
         }
 
