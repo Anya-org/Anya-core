@@ -2,64 +2,122 @@
 
 ## Navigation
 
-- [Overview](#overview)
-- [Features](#features)
-- [Implementation](#implementation)
-- [Real-Time Analytics](#real-time-analytics)
-- [Data Visualization](#data-visualization)
-- [Machine Learning](#machine-learning)
-- [Performance Optimization](#performance-optimization)
-- [API Integration](#api-integration)
-- [Security](#security)
-- [Monitoring](#monitoring)
-- [Configuration Examples](#configuration-examples)
-- [Best Practices](#best-practices)
-- [Support](#support)
+- [Advanced Analytics](#advanced-analytics)
+  - [Navigation](#navigation)
+  - [Overview](#overview)
+  - [Features](#features)
+    - [Transaction Analytics](#transaction-analytics)
+    - [Market Intelligence](#market-intelligence)
+    - [Performance Metrics](#performance-metrics)
+  - [Implementation](#implementation)
+    - [Data Collection](#data-collection)
+    - [Data Processing](#data-processing)
+  - [Real-Time Analytics](#real-time-analytics)
+    - [Stream Processing](#stream-processing)
+    - [Event Processing](#event-processing)
+  - [Data Visualization](#data-visualization)
+    - [Chart Generation](#chart-generation)
+    - [Dashboard Configuration](#dashboard-configuration)
+  - [Machine Learning](#machine-learning)
+    - [Model Training](#model-training)
+    - [Prediction](#prediction)
+  - [Performance Optimization](#performance-optimization)
+    - [Caching Strategy](#caching-strategy)
+    - [Data Aggregation](#data-aggregation)
+  - [API Integration](#api-integration)
+    - [REST API](#rest-api)
+    - [WebSocket Streaming](#websocket-streaming)
+  - [Security](#security)
+    - [Access Control](#access-control)
+    - [Data Protection](#data-protection)
+  - [Monitoring](#monitoring)
+    - [System Metrics](#system-metrics)
+    - [Health Checks](#health-checks)
+  - [Configuration Examples](#configuration-examples)
+    - [Development](#development)
+    - [Production](#production)
+  - [Best Practices](#best-practices)
+  - [Support](#support)
+<!-- Broken link removed: Real-time transaction monitoring ([Guide](./transaction-monitoring.md)) -->
+<!-- Broken link removed: Pattern recognition ([Details](./pattern-recognition.md)) -->
+<!-- Broken link removed: Anomaly detection ([Guide](./anomaly-detection.md)) -->
+<!-- Broken link removed: Volume analysis ([Details](./volume-analysis.md)) -->
+<!-- Broken link removed: Fee estimation ([Guide](./fee-estimation.md)) -->
+    - [WebSocket Streaming](#websocket-streaming)
+<!-- Broken link removed: Price analysis ([Guide](./price-analysis.md)) -->
+<!-- Broken link removed: Market trends ([Details](./market-trends.md)) -->
+<!-- Broken link removed: Liquidity metrics ([Guide](./liquidity-metrics.md)) -->
+<!-- Broken link removed: Volatility indicators ([Details](./volatility-indicators.md)) -->
+<!-- Broken link removed: Correlation analysis ([Guide](./correlation-analysis.md)) -->
+    - [Health Checks](#health-checks)
+<!-- Broken link removed: System health monitoring ([Guide](./system-health-monitoring.md)) -->
+<!-- Broken link removed: Resource utilization ([Details](./resource-utilization.md)) -->
+<!-- Broken link removed: Network performance ([Guide](./network-performance.md)) -->
+<!-- Broken link removed: API response times ([Details](./api-response-times.md)) -->
+<!-- Broken link removed: Error rates ([Guide](./error-rates.md)) -->
 
 ## Overview
 
+<!-- Broken link removed: [Data Collection Guide](./data-collection.md) -->
 Anya Enterprise's Advanced Analytics module provides comprehensive data analysis and visualization capabilities for blockchain transactions, market trends, and system performance. This enterprise-grade solution offers real-time insights and predictive analytics.
 
+<!-- Broken link removed: [Data Processing Guide](./data-processing.md) -->
 ## Features
 
 ### Transaction Analytics
+<!-- Broken link removed: [Stream Processing Guide](./stream-processing.md) -->
 
 - Real-time transaction monitoring ([Guide](./transaction-monitoring.md))
+<!-- Broken link removed: [Event Processing Guide](./event-processing.md) -->
 - Pattern recognition ([Details](./pattern-recognition.md))
 - Anomaly detection ([Guide](./anomaly-detection.md))
 - Volume analysis ([Details](./volume-analysis.md))
+<!-- Broken link removed: [Chart Generation Guide](./chart-generation.md) -->
 - Fee estimation ([Guide](./fee-estimation.md))
 
+<!-- Broken link removed: [Dashboard Configuration Guide](./dashboard-config.md) -->
 ### Market Intelligence
 
 - Price analysis ([Guide](./price-analysis.md))
+<!-- Broken link removed: [Model Training Guide](./model-training.md) -->
 - Market trends ([Details](./market-trends.md))
 - Liquidity metrics ([Guide](./liquidity-metrics.md))
+<!-- Broken link removed: [Prediction Guide](./prediction.md) -->
 - Volatility indicators ([Details](./volatility-indicators.md))
 - Correlation analysis ([Guide](./correlation-analysis.md))
 
+<!-- Broken link removed: [Caching Strategy Guide](./caching-strategy.md) -->
 ### Performance Metrics
 
+<!-- Broken link removed: [Data Aggregation Guide](./data-aggregation.md) -->
 - System health monitoring ([Guide](./system-health-monitoring.md))
 - Resource utilization ([Details](./resource-utilization.md))
 - Network performance ([Guide](./network-performance.md))
+<!-- Broken link removed: [REST API Guide](../api/rest-api.md) -->
 - API response times ([Details](./api-response-times.md))
 - Error rates ([Guide](./error-rates.md))
+<!-- Broken link removed: [WebSocket Streaming Guide](../api/websocket-streaming.md) -->
 
 ## Implementation
 
+<!-- Broken link removed: [Access Control Guide](../security/access-control.md) -->
 ### Data Collection
 
+<!-- Broken link removed: [Data Protection Guide](../security/data-protection.md) -->
 ```rust
 pub struct AnalyticsCollector {
     pub config: CollectorConfig,
+<!-- Broken link removed: [System Metrics Guide](../monitoring/system-metrics.md) -->
     pub metrics: MetricsRegistry,
     pub storage: TimeSeriesDB,
+<!-- Broken link removed: [Health Checks Guide](../monitoring/health-checks.md) -->
 }
 
 impl AnalyticsCollector {
+<!-- Broken link removed: [Development Configuration Guide](./development-config.md) -->
     pub async fn collect_metrics(&self) -> Result<(), CollectorError> {
         // Implementation details
+<!-- Broken link removed: [Production Configuration Guide](./production-config.md) -->
     }
 }
 ```
@@ -213,7 +271,7 @@ impl AnalyticsCache {
 }
 ```
 
-For caching strategy details, see [Caching Strategy Guide](./caching-strategy.md).
+<!-- Broken link removed: [Caching Strategy Guide](./caching-strategy.md) -->
 
 ### Data Aggregation
 
@@ -295,7 +353,7 @@ pub struct DataProtection {
 }
 ```
 
-For data protection details, see [Data Protection Guide](../security/data-protection.md).
+<!-- Broken link removed: [Data Protection Guide](../security/data-protection.md) -->
 
 ## Monitoring
 
@@ -311,7 +369,7 @@ pub struct SystemMetrics {
 }
 ```
 
-For system metrics details, see [System Metrics Guide](../monitoring/system-metrics.md).
+<!-- Broken link removed: [System Metrics Guide](../monitoring/system-metrics.md) -->
 
 ### Health Checks
 
@@ -321,7 +379,7 @@ pub async fn check_analytics_health() -> Result<HealthStatus, HealthCheckError> 
 }
 ```
 
-For health checks details, see [Health Checks Guide](../monitoring/health-checks.md).
+<!-- Broken link removed: [Health Checks Guide](../monitoring/health-checks.md) -->
 
 ## Configuration Examples
 
@@ -338,7 +396,7 @@ interval = 60
 batch_size = 1000
 ```
 
-For development configuration details, see [Development Configuration Guide](./development-config.md).
+<!-- Broken link removed: [Development Configuration Guide](./development-config.md) -->
 
 ### Production
 
@@ -353,7 +411,7 @@ interval = 15
 batch_size = 5000
 ```
 
-For production configuration details, see [Production Configuration Guide](./production-config.md).
+<!-- Broken link removed: [Production Configuration Guide](./production-config.md) -->
 
 ## Best Practices
 
