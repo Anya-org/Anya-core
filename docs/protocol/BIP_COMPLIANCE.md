@@ -14,8 +14,8 @@ Add a brief overview of this document here.
 
 ## Table of Contents
 
-- [Section 1](#section-1)
-- [Section 2](#section-2)
+ Section 1
+ Section 2
 
 **Validation Date:** 2025-02-24  
 
@@ -36,6 +36,7 @@ Add a brief overview of this document here.
 
 - Q3 2024: Complete BIP-370 audit
 - Q4 2024: Finalize BIP-380 implementation and audit 
+
 ## See Also
 
 - [Related Document 1](../getting-started/INSTALLATION.md)

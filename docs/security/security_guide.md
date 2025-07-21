@@ -12,11 +12,12 @@ last_updated: 2025-05-30
 
 ## Table of Contents
 
-- [Section 1](#section-1)
-- [Section 2](#section-2)
+ Section 1
+ Section 2
 
 
 ## Overview
+
 This guide details the security architecture and best practices for the Anya system.
 
 ## Core Security Components

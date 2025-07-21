@@ -12,11 +12,12 @@ description: "Documentation for Integration_guide"
 
 ## Table of Contents
 
-- [Section 1](#section-1)
-- [Section 2](#section-2)
+ Section 1
+ Section 2
 
 
 ## Overview
+
 This guide covers integrating Anya's ML-powered blockchain analytics, Web5 data management, and revenue tracking capabilities.
 
 ## Core Components Integration

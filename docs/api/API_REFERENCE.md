@@ -17,7 +17,8 @@ Add a brief overview of this document here.
 ## Table of Contents
 
 - [Section 1](#section-1)
-- [Section 2](#section-2)
+Section 1
+Section 2
 
 ## Core API
 

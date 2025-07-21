@@ -7,8 +7,8 @@ description: "Documentation for Alert_reference"
 
 ## Table of Contents
 
-- [Section 1](#section-1)
-- [Section 2](#section-2)
+ Section 1
+ Section 2
 
 
 [AIR-3][AIS-3][BPC-3][RES-3]

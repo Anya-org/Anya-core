@@ -16,19 +16,21 @@ Add a brief overview of this document here.
 
 ## Table of Contents
 
-- [Section 1](#section-1)
-- [Section 2](#section-2)
+ Section 1
+ Section 2
 
 
 ## Development Environment Setup
 
 ### Prerequisites
+
 1. Install Rust (1.70 or higher)
 2. Install Cargo package manager
 3. Clone the repository
 4. Install development dependencies
 
 ### Building the Project
+
 ```bash
 ## Build the project
 cargo build
@@ -43,6 +45,7 @@ cargo run --features "development"
 ## Core Components
 
 ### 1. Web5Store
+
 The `Web5Store` is the main entry point for data operations:
 
 ```rust
@@ -60,6 +63,7 @@ let results = store.query_records("users", Some(filter)).await?;
 ```
 
 ### 2. Read First Always Principle
+
 The Read First Always principle is a fundamental data consistency pattern implemented throughout Web5 components:
 
 ```rust
@@ -88,6 +92,7 @@ println!("Read count: {}, Write count: {}, Compliance: {}%",
 For detailed information, see the [Read First Always documentation](../archive/READ_FIRST_ALWAYS.md).
 
 ### 3. Caching System
+
 The caching system provides performance optimization:
 
 ```rust
@@ -104,6 +109,7 @@ store.set_cached("key", value, Some(ttl)).await?;
 ```
 
 ### 4. Batch Operations
+
 For efficient bulk data processing:
 
 ```rust
@@ -126,6 +132,7 @@ store.bulk_update("users", updates).await?;
 ```
 
 ### 5. Event System
+
 The event system enables real-time notifications:
 
 ```rust
@@ -150,6 +157,7 @@ event_publisher.publish_event(
 ```
 
 ### 6. Health Monitoring
+
 Monitor system health and performance:
 
 ```rust
@@ -173,6 +181,7 @@ let subscriber = EventSubscriber::new(&event_bus)
 ## Best Practices
 
 ### 1. Error Handling
+
 ```rust
 // Use custom error types
 #[derive(Error, Debug)]
@@ -191,6 +200,7 @@ match operation {
 ```
 
 ### 2. Async Operations
+
 ```rust
 // Use async/await consistently
 async fn process_data() -> Result<(), Error> {
@@ -204,6 +214,7 @@ let results = futures::future::join_all(operations).await;
 ```
 
 ### 3. Testing
+
 ```rust
 #[cfg(test)]
 mod tests {
@@ -220,18 +231,21 @@ mod tests {
 ## Performance Optimization
 
 ### 1. Caching Strategy
+
 - Use appropriate cache sizes
 - Set reasonable TTL values
 - Monitor cache hit rates
 - Implement cache warming
 
 ### 2. Batch Processing
+
 - Choose optimal batch sizes
 - Use rate limiting
 - Handle partial failures
 - Monitor batch performance
 
 ### 3. Query Optimization
+
 - Use efficient filters
 - Implement pagination
 - Cache frequent queries
@@ -240,6 +254,7 @@ mod tests {
 ## Monitoring and Debugging
 
 ### 1. Logging
+
 ```rust
 // Use structured logging
 log::info!("Operation completed: {}", operation_id);
@@ -247,6 +262,7 @@ log::error!("Operation failed: {}", error);
 ```
 
 ### 2. Metrics
+
 ```rust
 // Record custom metrics
 metrics_collector.record_performance_metric(
@@ -257,6 +273,7 @@ metrics_collector.record_performance_metric(
 ```
 
 ### 3. Health Checks
+
 ```rust
 // Implement custom health checks
 async fn check_component_health() -> ComponentHealth {
@@ -272,16 +289,19 @@ async fn check_component_health() -> ComponentHealth {
 ## Security Considerations
 
 ### 1. Authentication
+
 - Always validate DIDs
 - Implement proper access control
 - Use secure communication
 
 ### 2. Data Validation
+
 - Validate all input data
 - Use schema validation
 - Sanitize user input
 
 ### 3. Error Handling
+
 - Don't expose internal errors
 - Log security events
 - Implement rate limiting
@@ -289,18 +309,21 @@ async fn check_component_health() -> ComponentHealth {
 ## Contributing
 
 ### 1. Code Style
+
 - Follow Rust style guidelines
 - Use meaningful names
 - Document public APIs
 - Write unit tests
 
 ### 2. Pull Requests
+
 - Create feature branches
 - Write clear descriptions
 - Include tests
 - Update documentation
 
 ### 3. Testing
+
 - Write unit tests
 - Add integration tests
 - Test edge cases

@@ -12,13 +12,13 @@ Complete API reference for Anya Core, covering Bitcoin, Web5/DID, DLC, and syste
 
 ## Table of Contents
 
-- [Authentication](#authentication)
-- [System API](#system-api)
-- [Bitcoin Wallet API](#bitcoin-wallet-api)
-- [Web5/DID API](#web5did-api)
-- [DLC API](#dlc-api)
-- [Error Handling](#error-handling)
-- [Rate Limiting](#rate-limiting)
+    Authentication
+    - System API
+    - Bitcoin Wallet API
+    - Web5/DID API
+    - DLC API
+    - Error Handling
+    - Rate Limiting
 
 ## Authentication
 
@@ -444,7 +444,7 @@ async def main():
 For API support and questions:
 
 - **Documentation Issues**: GitHub Issues
-- **API Support**: api-support@anya-core.dev
+- **API Support**: <api-support@anya-core.dev>
 - **Discord**: Join our developer community
 
 ---

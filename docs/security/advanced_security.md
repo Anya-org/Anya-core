@@ -12,11 +12,12 @@ last_updated: 2025-05-30
 
 ## Table of Contents
 
-- [Section 1](#section-1)
-- [Section 2](#section-2)
+ Section 1
+ Section 2
 
 
 ## Overview
+
 This guide details the comprehensive security architecture integrating Bitcoin, Web5, and ML components.
 
 ## Core Security Components
