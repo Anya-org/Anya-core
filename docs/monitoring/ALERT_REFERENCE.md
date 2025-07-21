@@ -91,13 +91,6 @@ Alerts are routed to notification channels as configured in `config/production.y
 
 ## AI Labeling
 
-[AIR-3] - Automated alert management
-[AIS-3] - Secure alert handling
-[BPC-3] - Bitcoin monitoring best practices
-[RES-3] - Comprehensive alert coverage
 
-[AIR-3]: ../standards/AI_LABELING.md "Automated alert management"
-[AIS-3]: ../standards/AI_LABELING.md "Secure alert handling"
-[BPC-3]: ../standards/AI_LABELING.md "Bitcoin monitoring best practices"
-[RES-3]: ../standards/AI_LABELING.md "Comprehensive alert coverage"
+*Complies with [AI Labeling Standards](../standards/AI_LABELING.md) — AIR-3, AIS-3, BPC-3, RES-3*
 

@@ -5,4 +5,3 @@ title: Configuration
 
 # Configuration
 
-- [Readme](README.md)
