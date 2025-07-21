@@ -92,7 +92,7 @@ monitoring:
     enabled: true
     channels:
       - type: "email"
-        recipients: ["ops@anya.io"]
+        recipients: ["botshelomokoka+anya-core@gmail.com"]
       - type: "slack"
         webhook: "${SLACK_WEBHOOK}"
   health_checks:

@@ -5,8 +5,8 @@ echo "Configuring Git commit signing..."
 
 # Set email and name if not already set
 if [ -z "$(git config --global user.email)" ]; then
-  git config --global user.email "botshelomokoka@gmail.com"
-  echo "Set user.email to botshelomokoka@gmail.com"
+  git config --global user.email "botshelomokoka+anya-core@gmail.com"
+  echo "Set user.email to botshelomokoka+anya-core@gmail.com"
 fi
 
 if [ -z "$(git config --global user.name)" ]; then

@@ -40,7 +40,7 @@ This directory contains the Anya Core installation system scripts. This system h
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-org/anya-core.git
+git clone https://github.com/anya-org/anya-core.git
 cd anya-core
 
 # Run the installer

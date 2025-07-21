@@ -38,7 +38,7 @@ df -h    # Should have 10GB+ free space
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/your-org/anya-core.git
+git clone https://github.com/anya-org/anya-core.git
 cd anya-core
 
 # 2. Run setup script
@@ -87,7 +87,7 @@ cargo test --lib
 curl -sSL https://install.anya-core.dev | bash
 
 # Or clone and install
-git clone https://github.com/your-org/anya-core.git
+git clone https://github.com/anya-org/anya-core.git
 cd anya-core
 ./install.sh --type=standard --network=testnet
 ```
@@ -105,7 +105,7 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 source ~/.cargo/env
 
 # 3. Clone and build
-git clone https://github.com/your-org/anya-core.git
+git clone https://github.com/anya-org/anya-core.git
 cd anya-core
 cargo build --release
 

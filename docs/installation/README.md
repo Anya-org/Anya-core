@@ -38,7 +38,7 @@ Add a brief overview of this document here.
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-org/anya-core.git
+git clone https://github.com/anya-org/anya-core.git
 cd anya-core
 
 # Run the installer with default options
@@ -137,8 +137,8 @@ docker-compose -f monitoring/docker-compose.yml up -d
 For additional help:
 
 1. Check the [troubleshooting guide](../maintenance/TROUBLESHOOTING.md)
-2. Open an issue on [GitHub](https://github.com/your-org/anya-core/issues)
-3. Email support: <botshelomokoka@gmail.com>
+2. Open an issue on [GitHub](https://github.com/anya-org/anya-core/issues)
+3. Email support: <botshelomokoka+anya-core-security@gmail.com>
 
 ## See Also
 

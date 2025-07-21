@@ -35,7 +35,7 @@ This guide provides comprehensive information for developers working on Anya Cor
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-org/Anya-core.git
+git clone https://github.com/anya-org/anya-core.git
 cd Anya-core
 
 # Install dependencies
