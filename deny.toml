@@ -1,19 +1,19 @@
-
-
-
 [advisories]
 ignore = []
-unmaintained = "deny"
+unmaintained = "all"
 yanked = "deny"
-
 
 [licenses]
 allow = [
     "MIT",
     "Apache-2.0",
     "BSD-3-Clause",
+    "BSD-2-Clause",
     "ISC",
-    "Unicode-DFS-2016",
+    "Zlib",
+    "CC0-1.0"
+    ,"MITNFA"
+    ,"Unicode-3.0"
 ]
 confidence-threshold = 0.95
 exceptions = []
@@ -23,12 +23,13 @@ exceptions = []
 multiple-versions = "deny"
 wildcards = "deny"
 highlight = "all"
-skip = []
 skip-tree = []
+# [AIR-3][AIS-3][BPC-3][RES-3] Allow duplicate versions for x25519-dalek and yamux as a temporary workaround for cargo-deny duplicate crate errors.
+skip = ["x25519-dalek", "yamux"]
 
 
 [sources]
 unknown-registry = "deny"
 unknown-git = "deny"
 allow-registry = ["https://github.com/rust-lang/crates.io-index"]
-allow-git = []
+allow-git = ["https://github.com/TBD54566975/web5-rs"]
