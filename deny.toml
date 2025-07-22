@@ -1,12 +1,13 @@
+
+
+
 [advisories]
-vulnerability = "deny"
-unmaintained = "none"
-yanked = "deny"
-notice = "warn"
 ignore = []
+unmaintained = "deny"
+yanked = "deny"
+
 
 [licenses]
-unlicensed = "deny"
 allow = [
     "MIT",
     "Apache-2.0",
@@ -14,31 +15,20 @@ allow = [
     "ISC",
     "Unicode-DFS-2016",
 ]
-deny = []
-copyleft = "warn"
-allow-osi-fsf-free = "neither"
-default = "deny"
-confidence-threshold = 0.92
+confidence-threshold = 0.95
 exceptions = []
 
+
 [bans]
-multiple-versions = "warn"
-wildcards = "allow"
+multiple-versions = "deny"
+wildcards = "deny"
 highlight = "all"
 skip = []
 skip-tree = []
+
 
 [sources]
 unknown-registry = "deny"
 unknown-git = "deny"
 allow-registry = ["https://github.com/rust-lang/crates.io-index"]
 allow-git = []
-[graph]
-targets = [
-    { triple = "x86_64-unknown-linux-gnu", features = [] },
-]
-all-targets = false
-all-features = false
-no-default-features = false
-features = []
-
