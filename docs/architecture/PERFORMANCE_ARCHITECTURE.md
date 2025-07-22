@@ -9,8 +9,8 @@ description: "Documentation for Performance_architecture"
 
 ## Table of Contents
 
-- [Section 1](#section-1)
-- [Section 2](#section-2)
+ Section 1
+ Section 2
 
 
 *Last Updated: 2024-03-10*

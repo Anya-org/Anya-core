@@ -630,6 +630,6 @@ Special thanks to the following projects and communities that make Anya Core pos
 
 ---
 
-**Maintainer:** Botshelo Mokoka (<botshelomokoka@gmail.com>)  
+**Maintainer:** Botshelo Mokoka (<botshelomokoka+anya-core@gmail.com>)  
 **Last Updated:** July 15, 2025  
 **Version:** 1.2.1 Development Build

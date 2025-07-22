@@ -40,7 +40,7 @@ This directory contains the configuration and setup for monitoring the Anya Core
    BITCOIN_RPC_PASSWORD=securepassword
    
    # Optional: SMTP for alerts
-   SMTP_FROM=botshelomokoka@gmail.com
+   SMTP_FROM=botshelomokoka+anya-core-monitoring@gmail.com
    SMTP_PASSWORD=your-app-password
    ```
 

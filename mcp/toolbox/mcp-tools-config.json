@@ -295,24 +295,54 @@
   "toolboxCapabilities": {
     "codeGeneration": {
       "enabled": true,
-      "languages": ["rust", "javascript", "typescript", "python", "clarity"],
-      "frameworks": ["bitcoin", "web5", "ml", "blockchain"]
+      "languages": [
+        "rust",
+        "javascript",
+        "typescript",
+        "python",
+        "clarity"
+      ],
+      "frameworks": [
+        "bitcoin",
+        "web5",
+        "ml",
+        "blockchain"
+      ]
     },
     "projectManagement": {
       "enabled": true,
-      "features": ["memory", "context", "planning", "tracking"]
+      "features": [
+        "memory",
+        "context",
+        "planning",
+        "tracking"
+      ]
     },
     "research": {
       "enabled": true,
-      "sources": ["web", "github", "documentation", "papers"]
+      "sources": [
+        "web",
+        "github",
+        "documentation",
+        "papers"
+      ]
     },
     "automation": {
       "enabled": true,
-      "capabilities": ["deployment", "testing", "monitoring", "maintenance"]
+      "capabilities": [
+        "deployment",
+        "testing",
+        "monitoring",
+        "maintenance"
+      ]
     },
     "collaboration": {
       "enabled": true,
-      "platforms": ["github", "documentation", "review"]
+      "platforms": [
+        "github",
+        "documentation",
+        "review"
+      ]
     }
   },
   "integrationPoints": {

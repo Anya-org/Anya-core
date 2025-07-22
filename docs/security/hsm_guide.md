@@ -8,8 +8,8 @@ last_updated: 2025-05-30
 
 ## Table of Contents
 
-- [Section 1](#section-1)
-- [Section 2](#section-2)
+ Section 1
+ Section 2
 
 
 [AIR-3][AIS-3][AIT-3][AIP-3][RES-3]
@@ -56,6 +56,7 @@ The HSM implementation follows the hexagonal architecture pattern with clean sep
 The Software HSM provider implements a software-based key store for development and testing environments.
 
 **Key Features**:
+
 - In-memory and file-based key storage
 - Support for multiple key types (RSA, EC, AES, Ed25519)
 - Session management with configurable timeouts
@@ -63,6 +64,7 @@ The Software HSM provider implements a software-based key store for development 
 - Support for Bitcoin test networks
 
 **Configuration**:
+
 ```yaml
 software:
   token_dir: ".tokens"
@@ -77,6 +79,7 @@ software:
 The Hardware HSM provider integrates with physical HSM devices such as YubiHSM, Ledger, and Trezor.
 
 **Key Features**:
+
 - Support for multiple hardware device types
 - Hardware-backed key generation and storage
 - Secure communication with hardware devices
@@ -84,6 +87,7 @@ The Hardware HSM provider integrates with physical HSM devices such as YubiHSM, 
 - Support for Bitcoin operations
 
 **Configuration**:
+
 ```yaml
 hardware:
   device_type: YubiHsm
@@ -95,6 +99,7 @@ hardware:
 ```
 
 **Supported Devices**:
+
 - YubiHSM
 - Ledger
 - Trezor
@@ -105,6 +110,7 @@ hardware:
 The Simulator HSM provider simulates HSM functionality for testing environments.
 
 **Key Features**:
+
 - Configurable latency simulation
 - Controllable failure scenarios
 - In-memory key storage
@@ -112,6 +118,7 @@ The Simulator HSM provider simulates HSM functionality for testing environments.
 - Full HSM operation support
 
 **Configuration**:
+
 ```yaml
 simulator:
   storage_path: ".simulator"
@@ -129,6 +136,7 @@ simulator:
 The Bitcoin HSM provider is specialized for Bitcoin operations with support for key derivation paths, address types, and Bitcoin-specific transactions.
 
 **Key Features**:
+
 - BIP32 hierarchical deterministic wallet support
 - Multiple address types (P2PKH, P2WPKH, P2TR)
 - Taproot transaction support
@@ -136,6 +144,7 @@ The Bitcoin HSM provider is specialized for Bitcoin operations with support for 
 - Secure transaction signing
 
 **Configuration**:
+
 ```yaml
 bitcoin:
   network: Testnet
@@ -368,6 +377,7 @@ The Anya Core HSM implementation provides a secure, flexible foundation for cryp
 The support for Bitcoin-specific operations makes it particularly valuable for blockchain applications, while the comprehensive audit capabilities ensure compliance with security best practices and regulatory requirements.
 
 *Last updated: 2025-05-30* 
+
 ## See Also
 
 - [Related Document 1](../INSTALLATION.md)

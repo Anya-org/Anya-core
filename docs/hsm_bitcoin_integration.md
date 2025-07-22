@@ -10,8 +10,8 @@ description: "Documentation for Hsm_bitcoin_integration"
 
 ## Table of Contents
 
-- [Section 1](#section-1)
-- [Section 2](#section-2)
+ Section 1
+ Section 2
 
 
 <!-- markdownlint-disable MD013 line-length -->

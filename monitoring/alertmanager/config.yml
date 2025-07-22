@@ -88,7 +88,7 @@ receivers:
   # Email receiver
   - name: 'email'
     email_configs:
-      - to: 'botshelomokoka@gmail.com'
+      - to: 'botshelomokoka+anya-core@gmail.com'
         send_resolved: true
         headers:
           subject: '[ANYA-CORE {{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] {{ .CommonLabels.alertname }}'

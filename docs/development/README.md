@@ -12,15 +12,15 @@ This guide provides comprehensive information for developers working on Anya Cor
 
 ## Table of Contents
 
-- [Development Environment Setup](#development-environment-setup)
-- [Project Structure](#project-structure)
-- [Coding Standards](#coding-standards)
-- [Development Workflow](#development-workflow)
-- [Testing Guidelines](#testing-guidelines)
-- [Code Review Process](#code-review-process)
-- [Debugging and Profiling](#debugging-and-profiling)
-- [Extension Development](#extension-development)
-- [Documentation Development](#documentation-development)
+ Development Environment Setup
+ Project Structure
+ Coding Standards
+ Development Workflow
+ Testing Guidelines
+ Code Review Process
+ Debugging and Profiling
+ Extension Development
+ Documentation Development
 
 ## Development Environment Setup
 
@@ -35,7 +35,7 @@ This guide provides comprehensive information for developers working on Anya Cor
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-org/Anya-core.git
+git clone https://github.com/anya-org/anya-core.git
 cd Anya-core
 
 # Install dependencies
@@ -51,6 +51,7 @@ cargo check
 ### IDE Setup
 
 Recommended development environment:
+
 - **VS Code** with Rust analyzer extension
 - **RustRover** for advanced debugging
 - **Neovim** with rust-tools.nvim
@@ -534,7 +535,7 @@ For development questions and support:
 
 - **GitHub Discussions**: Technical questions and design discussions
 - **Discord**: Real-time development chat
-- **Email**: security@anya-core.dev (security-related issues only)
+- **Email**: <security@anya-core.dev> (security-related issues only)
 
 ---
 

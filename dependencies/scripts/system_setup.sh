@@ -52,7 +52,7 @@ move_data() {
 # Specific project details
 INSTANCE_ID="9111727350091981557"
 PROJECT_ID="anya-433919"
-USERNAME="botshelomokoka@gmail.com"
+USERNAME="botshelomokoka+anya-core@gmail.com"
 
 INSTANCE_NAME=$(curl -s "http://metadata.google.internal/computeMetadata/v1/instance/name" -H "Metadata-Flavor: Google")
 if [ $? -ne 0 ]; then

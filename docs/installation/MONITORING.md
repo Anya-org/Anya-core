@@ -83,7 +83,7 @@ SMTP_AUTH_PASSWORD=your-gmail-app-password
 SMTP_HELO=gmail.com
 
 # Alert Recipients
-ALERT_EMAIL_RECIPIENT=botshelomokoka@gmail.com
+ALERT_EMAIL_RECIPIENT=botshelomokoka+anya-core-monitoring@gmail.com
 MAINNET_ALERT_RECIPIENT=mainnet-alerts@anyacore.org
 ```
 
@@ -187,8 +187,8 @@ docker-compose up -d
 
 For assistance with monitoring:
 
-- Email: <botshelomokoka@gmail.com>
-- GitHub Issues: <https://github.com/your-org/anya-core/issues>
+- Email: <botshelomokoka+anya-core@gmail.com>
+- GitHub Issues: <https://github.com/anya-org/anya-core/issues>
 
 ## See Also
 

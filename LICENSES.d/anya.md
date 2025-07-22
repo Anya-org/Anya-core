@@ -1,6 +1,6 @@
 ## Node Security Contributions
 
-Copyright (c) 2025 bo_thebig <botshelomokoka@gmail.com>
+Copyright (c) 2025 bo_thebig <botshelomokoka+anya-core@gmail.com>
 [AIS-3][BPC-3][SCL-3] Certified Contributions
 
 - Implemented Taproot-compliant network encryption
