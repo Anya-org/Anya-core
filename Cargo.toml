@@ -123,19 +123,17 @@ async-trait = "0.1.88"
 clap = { version = "=4.5.39", features = [
     "derive",
     "env",
-    "color",
+    "color"
 ] } # Enhanced CLI
 base64 = "=0.22.1"
-uuid = { version = "1.17.0", features = ["v4", "serde", "fast-rng"] }
 chrono = { version = "0.4.41", features = ["serde", "std"] }
+proc-macro-error2 = "2.0.1" # replaced unmaintained proc-macro-error
 rand = { version = "0.8.5", features = ["std", "std_rng"] }
-rand_distr = "0.4"
-reqwest = { version = "0.12.20", features = [
-    "json",
-] } # HTTP client for network validation
+reqwest = { version = "0.12.20", features = ["json"] } # HTTP client for network validation
+ring = "0.17.8" # updated to latest patched version
+uuid = { version = "1.17.0", features = ["v4", "serde", "fast-rng"] }
 
 # Additional dependencies for installer and other bins
-ring = "0.17"
 sysinfo = "0.32"
 dialoguer = "0.11"
 warp = "0.3"

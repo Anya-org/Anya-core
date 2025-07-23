@@ -32,7 +32,36 @@
         "cSpell.words": [
             "anya",
             "anya-org'",
-            "Tokenomics"
+            "bitcoincore",
+            "chacha",
+            "chrono",
+            "dalek",
+            "dashmap",
+            "dialoguer",
+            "getrandom",
+            "hmac",
+            "humantime",
+            "ipfs",
+            "IPFS",
+            "jsonwebtoken",
+            "libc",
+            "libp",
+            "maplit",
+            "mdns",
+            "miniscript",
+            "mockall",
+            "MSRV",
+            "multibase",
+            "multihash",
+            "reqwest",
+            "secp",
+            "serde",
+            "sysinfo",
+            "thiserror",
+            "Tokenomics",
+            "walkdir",
+            "yamux",
+            "zeroize"
         ]
     }
 }
