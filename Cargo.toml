@@ -45,6 +45,8 @@ memory_tracking = []
 chaos-viz = []
 
 [dependencies]
+# For cache performance tests and Zipf distribution
+rand_distr = "0.4"
 # API dependencies
 axum = "=0.8.4"
 tower = "=0.5.2"
