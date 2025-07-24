@@ -1,3 +1,7 @@
 [submodule "anya-core-ci-debug"]
 	path = anya-core-ci-debug
 	url = https://github.com/Anya-org/anya-core-ci-debug.git
+
+[submodule "scripts/anya-core"]
+	path = scripts/anya-core
+	url = https://github.com/Anya-org/Anya-core-scripts.git
