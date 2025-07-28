@@ -59,3 +59,120 @@ pub struct WalletInfo {
 // TODO: Implement biometric authentication, backup, wipe, and fee estimation
 // TODO: Add Kotlin/Swift wrappers and mobile bridge code
 // See docs/mobile/SDK.md for full API and roadmap
+
+// --- FFI Bindings Scaffold ---
+#[cfg(feature = "ffi")]
+pub mod ffi {
+    use super::*;
+    use std::ffi::{CStr, CString};
+    use std::os::raw::{c_char, c_int};
+
+    #[no_mangle]
+    pub extern "C" fn anya_initialize_wallet(mnemonic: *const c_char) -> c_int {
+        let sdk = MobileSDK::new();
+        let mnemonic_str = unsafe { CStr::from_ptr(mnemonic).to_str().unwrap_or("") };
+        match tokio::runtime::Runtime::new().unwrap().block_on(sdk.initialize_wallet(mnemonic_str)) {
+            Ok(_) => 0,
+            Err(_) => -1,
+        }
+    }
+
+    #[no_mangle]
+    pub extern "C" fn anya_send_transaction(recipient: *const c_char, amount: u64) -> *mut c_char {
+        let sdk = MobileSDK::new();
+        let recipient_str = unsafe { CStr::from_ptr(recipient).to_str().unwrap_or("") };
+        let txid = tokio::runtime::Runtime::new().unwrap().block_on(sdk.send_transaction(recipient_str, amount)).unwrap_or_default();
+        CString::new(txid).unwrap().into_raw()
+    }
+    
+    #[no_mangle]
+    pub extern "C" fn anya_sync_wallet() -> c_int {
+        let sdk = MobileSDK::new();
+        match tokio::runtime::Runtime::new().unwrap().block_on(sdk.sync_wallet()) {
+            Ok(_) => 0,
+            Err(_) => -1,
+        }
+    }
+
+    #[no_mangle]
+    pub extern "C" fn anya_get_wallet_info() -> *mut c_char {
+        let sdk = MobileSDK::new();
+        let info = tokio::runtime::Runtime::new().unwrap().block_on(sdk.get_wallet_info()).unwrap_or(WalletInfo {
+            balance: 0,
+            address: "".to_string(),
+            last_sync: chrono::Utc::now(),
+            transaction_count: 0,
+        });
+        let json = serde_json::json!({
+            "balance": info.balance,
+            "address": info.address,
+            "last_sync": info.last_sync.to_rfc3339(),
+            "transaction_count": info.transaction_count
+        }).to_string();
+        CString::new(json).unwrap().into_raw()
+    }
+
+    #[no_mangle]
+    pub extern "C" fn anya_authenticate_biometric() -> c_int {
+        let sdk = MobileSDK::new();
+        match tokio::runtime::Runtime::new().unwrap().block_on(sdk.authenticate_biometric()) {
+            Ok(true) => 1,
+            Ok(false) => 0,
+            Err(_) => -1,
+        }
+    }
+
+    #[no_mangle]
+    pub extern "C" fn anya_backup_wallet(destination: *const c_char) -> c_int {
+        let sdk = MobileSDK::new();
+        let dest_str = unsafe { CStr::from_ptr(destination).to_str().unwrap_or("") };
+        match tokio::runtime::Runtime::new().unwrap().block_on(sdk.backup_wallet(dest_str)) {
+            Ok(_) => 0,
+            Err(_) => -1,
+        }
+    }
+
+    #[no_mangle]
+    pub extern "C" fn anya_wipe_wallet() -> c_int {
+        let sdk = MobileSDK::new();
+        match tokio::runtime::Runtime::new().unwrap().block_on(sdk.wipe_wallet()) {
+            Ok(_) => 0,
+            Err(_) => -1,
+        }
+    }
+
+    #[no_mangle]
+    pub extern "C" fn anya_estimate_fee(amount: u64) -> u64 {
+        let sdk = MobileSDK::new();
+        tokio::runtime::Runtime::new().unwrap().block_on(sdk.estimate_fee(amount)).unwrap_or(0)
+    }
+    // Add more extern "C" functions for other APIs as needed
+}
+
+// --- Planned Features Stubs ---
+impl MobileSDK {
+    /// Biometric authentication stub
+    pub async fn authenticate_biometric(&self) -> Result<bool, String> {
+        // TODO: Integrate with mobile biometric APIs
+        Ok(true)
+    }
+    /// Wallet backup stub
+    pub async fn backup_wallet(&self, _destination: &str) -> Result<(), String> {
+        // TODO: Implement backup logic
+        Ok(())
+    }
+    /// Wallet wipe stub
+    pub async fn wipe_wallet(&self) -> Result<(), String> {
+        // TODO: Implement wipe logic
+        Ok(())
+    }
+    /// Fee estimation stub
+    pub async fn estimate_fee(&self, _amount: u64) -> Result<u64, String> {
+        // TODO: Implement fee estimation
+        Ok(1000)
+    }
+}
+
+// --- Mobile Wrappers & Integration Test Locations ---
+// Kotlin/Swift wrappers should call the FFI functions above.
+// Integration tests for FFI and wrappers should be added in `tests/mobile_ffi.rs` and platform test suites.
