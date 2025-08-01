@@ -46,26 +46,26 @@ pub mod bip;
 #[cfg(feature = "bitcoin")]
 pub mod bitcoin;
 pub mod compliance;
+pub mod config;
+pub mod core;
 pub mod dao;
 pub mod enterprise;
 pub mod extensions;
 pub mod handlers;
+pub mod infrastructure;
 pub mod install;
+pub mod layer2;
 pub mod ml;
+#[cfg(any(feature = "ffi", feature = "mobile"))]
+pub mod mobile;
 pub mod network;
 pub mod security;
 pub mod testing;
-pub mod types;
-pub mod web5;
-pub mod infrastructure;
-pub mod config;
-pub mod core;
-pub mod layer2;
 pub mod tokenomics;
 pub mod tools;
+pub mod types;
 pub mod web;
-#[cfg(any(feature = "ffi", feature = "mobile"))]
-pub mod mobile;
+pub mod web5;
 
 // Hardware optimization module
 pub mod hardware_optimization {
@@ -204,9 +204,10 @@ pub mod hardware_optimization {
             #[cfg(not(feature = "rust-bitcoin"))]
             pub fn verify_transaction_batch(
                 &self,
-                transactions: &[&str],
+                _transactions: &[bitcoin::Transaction],
                 _config: &BatchVerificationConfig,
             ) -> Result<Vec<usize>, Box<dyn std::error::Error>> {
+                log::debug!("Hardware-optimized batch verification not available");
                 Ok(vec![])
             }
 
@@ -224,7 +225,7 @@ pub mod hardware_optimization {
             #[cfg(not(feature = "rust-bitcoin"))]
             pub fn verify_taproot_transaction(
                 &self,
-                _tx: &str,
+                _tx: &bitcoin::Transaction,
             ) -> Result<(), Box<dyn std::error::Error>> {
                 Ok(())
             }
@@ -399,7 +400,11 @@ impl AnyaCore {
         status.component_status.push(ComponentStatus {
             name: "web5".to_string(),
             operational: self.web5_manager.is_some(),
-            health_score: if self.web5_manager.is_some() { 1.0 } else { 0.0 },
+            health_score: if self.web5_manager.is_some() {
+                1.0
+            } else {
+                0.0
+            },
         });
 
         status.component_status.push(ComponentStatus {
@@ -443,7 +448,7 @@ pub fn version() -> &'static str {
     env!("CARGO_PKG_VERSION")
 }
 
-#[cfg(feature = "bitcoin_integration")]
+#[cfg(feature = "bitcoin")]
 pub mod integration {
     pub fn bitcoin_enabled() -> bool {
         true
@@ -504,9 +509,9 @@ pub const IMPLEMENTATION_YEAR: u16 = 2025;
 pub const BUILD_ID: &str = env!("CARGO_PKG_VERSION");
 
 pub mod prelude {
-    pub use crate::dao::governance::DaoGovernance;
     #[cfg(feature = "rust-bitcoin")]
     pub use crate::bitcoin::adapters::BitcoinAdapter;
+    pub use crate::dao::governance::DaoGovernance;
 }
 
 mod error;
