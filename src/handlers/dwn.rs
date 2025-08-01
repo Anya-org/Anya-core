@@ -1,16 +1,16 @@
 // DWN (Decentralized Web Node) Handler Implementation
 // Author: Bo_theBig
 
-use std::collections::HashMap;
-use serde::{Deserialize, Serialize};
-use tokio::sync::RwLock;
-use uuid::Uuid;
 use axum::{
     extract::{Path, Query},
-    response::Json,
     http::StatusCode,
+    response::Json,
 };
+use serde::{Deserialize, Serialize};
 use serde_json::Value;
+use std::collections::HashMap;
+use tokio::sync::RwLock;
+use uuid::Uuid;
 
 /// DWN Message structure
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -136,7 +136,7 @@ impl DwnHandler {
                         if record_schema != schema {
                             matches = false;
                         }
-                    },
+                    }
                     None => matches = false,
                 }
             }
@@ -150,7 +150,7 @@ impl DwnHandler {
                                 matches = false;
                                 break;
                             }
-                        },
+                        }
                         None => {
                             matches = false;
                             break;
@@ -170,7 +170,9 @@ impl DwnHandler {
                 "createdAscending" => results.sort_by_key(|r| r.date_created),
                 "createdDescending" => results.sort_by_key(|r| std::cmp::Reverse(r.date_created)),
                 "publishedAscending" => results.sort_by_key(|r| r.date_modified),
-                "publishedDescending" => results.sort_by_key(|r| std::cmp::Reverse(r.date_modified)),
+                "publishedDescending" => {
+                    results.sort_by_key(|r| std::cmp::Reverse(r.date_modified))
+                }
                 _ => {} // No sorting for unknown sort orders
             }
         }
@@ -192,7 +194,7 @@ impl Default for DwnHandler {
 }
 
 // ============================================================================
-// HTTP API Handlers for Axum Routes  
+// HTTP API Handlers for Axum Routes
 // ============================================================================
 
 /// List DWN protocols
@@ -205,7 +207,7 @@ pub async fn list_protocols() -> Result<Json<Value>, StatusCode> {
                 "version": "1.0.0"
             },
             {
-                "id": "https://dwn.example.com/protocol/records", 
+                "id": "https://dwn.example.com/protocol/records",
                 "name": "DWN Records Protocol",
                 "version": "1.0.0"
             }
@@ -227,22 +229,24 @@ pub async fn create_protocol(Json(payload): Json<Value>) -> Result<Json<Value>, 
 }
 
 /// Query DWN records (route handler)
-pub async fn query_records(Query(params): Query<HashMap<String, String>>) -> Result<Json<Value>, StatusCode> {
+pub async fn query_records(
+    Query(params): Query<HashMap<String, String>>,
+) -> Result<Json<Value>, StatusCode> {
     let handler = DwnHandler::new();
-    
+
     let filter = DwnFilter {
         recipient: params.get("recipient").cloned(),
-        schema: params.get("schema").cloned(), 
+        schema: params.get("schema").cloned(),
         data_format: params.get("data_format").cloned(),
         tags: None,
     };
-    
+
     let query = DwnQuery {
         filter,
         date_sort: params.get("date_sort").cloned(),
         pagination: None,
     };
-    
+
     match handler.query_records(query).await {
         Ok(records) => Ok(Json(serde_json::json!({
             "success": true,
@@ -258,7 +262,7 @@ pub async fn query_records(Query(params): Query<HashMap<String, String>>) -> Res
 /// Create DWN record (route handler)
 pub async fn create_record(Json(payload): Json<DwnRecord>) -> Result<Json<Value>, StatusCode> {
     let handler = DwnHandler::new();
-    
+
     match handler.store_record(payload).await {
         Ok(record_id) => Ok(Json(serde_json::json!({
             "success": true,
@@ -274,7 +278,7 @@ pub async fn create_record(Json(payload): Json<DwnRecord>) -> Result<Json<Value>
 /// Get DWN record by ID (route handler)
 pub async fn get_record(Path(id): Path<String>) -> Result<Json<Value>, StatusCode> {
     let handler = DwnHandler::new();
-    
+
     match handler.get_record(&id).await {
         Ok(Some(record)) => Ok(Json(serde_json::json!({
             "success": true,
@@ -289,16 +293,19 @@ pub async fn get_record(Path(id): Path<String>) -> Result<Json<Value>, StatusCod
 }
 
 /// Update DWN record (route handler)
-pub async fn update_record(Path(id): Path<String>, Json(payload): Json<DwnRecord>) -> Result<Json<Value>, StatusCode> {
+pub async fn update_record(
+    Path(id): Path<String>,
+    Json(payload): Json<DwnRecord>,
+) -> Result<Json<Value>, StatusCode> {
     let handler = DwnHandler::new();
-    
+
     let mut updated_record = payload;
     updated_record.record_id = id.clone();
     updated_record.date_modified = std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
         .unwrap()
         .as_secs();
-    
+
     match handler.store_record(updated_record).await {
         Ok(_) => Ok(Json(serde_json::json!({
             "success": true,
@@ -306,7 +313,7 @@ pub async fn update_record(Path(id): Path<String>, Json(payload): Json<DwnRecord
         }))),
         Err(e) => {
             tracing::error!("Failed to update record: {}", e);
-            Err(StatusCode::INTERNAL_SERVER_ERROR) 
+            Err(StatusCode::INTERNAL_SERVER_ERROR)
         }
     }
 }
@@ -314,7 +321,7 @@ pub async fn update_record(Path(id): Path<String>, Json(payload): Json<DwnRecord
 /// Delete DWN record (route handler)
 pub async fn delete_record(Path(id): Path<String>) -> Result<Json<Value>, StatusCode> {
     let handler = DwnHandler::new();
-    
+
     match handler.delete_record(&id).await {
         Ok(true) => Ok(Json(serde_json::json!({
             "success": true,
@@ -335,7 +342,7 @@ mod tests {
     #[tokio::test]
     async fn test_dwn_message_storage() {
         let handler = DwnHandler::new();
-        
+
         let message = DwnMessage {
             message_id: String::new(),
             sender: "did:web:alice.example.com".to_string(),
@@ -347,7 +354,7 @@ mod tests {
 
         let message_id = handler.store_message(message).await.unwrap();
         let retrieved = handler.get_message(&message_id).await.unwrap();
-        
+
         assert!(retrieved.is_some());
         let retrieved = retrieved.unwrap();
         assert_eq!(retrieved.sender, "did:web:alice.example.com");
@@ -357,7 +364,7 @@ mod tests {
     #[tokio::test]
     async fn test_dwn_record_query() {
         let handler = DwnHandler::new();
-        
+
         let record = DwnRecord {
             record_id: String::new(),
             did: "did:web:test.example.com".to_string(),
@@ -369,7 +376,7 @@ mod tests {
         };
 
         let record_id = handler.store_record(record).await.unwrap();
-        
+
         let query = DwnQuery {
             filter: DwnFilter {
                 recipient: Some("did:web:test.example.com".to_string()),

@@ -1,8 +1,8 @@
 // Web5 Protocol Handler Implementation
 // Author: Bo_theBig
 
-use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 use tokio::sync::RwLock;
 use uuid::Uuid;
 
@@ -106,7 +106,7 @@ impl Web5Handler {
     /// Create new DID
     pub async fn create_did(&self, method: &str) -> Result<String, String> {
         let did_id = format!("did:{}:{}", method, Uuid::new_v4());
-        
+
         let document = DidDocument {
             id: did_id.clone(),
             context: vec!["https://www.w3.org/ns/did/v1".to_string()],
@@ -144,11 +144,9 @@ impl Web5Handler {
         credential_type: Vec<String>,
     ) -> Result<String, String> {
         let credential_id = format!("urn:uuid:{}", Uuid::new_v4());
-        
+
         let credential = VerifiableCredential {
-            context: vec![
-                "https://www.w3.org/2018/credentials/v1".to_string(),
-            ],
+            context: vec!["https://www.w3.org/2018/credentials/v1".to_string()],
             id: credential_id.clone(),
             r#type: credential_type,
             issuer,
@@ -164,7 +162,10 @@ impl Web5Handler {
     }
 
     /// Get credential by ID
-    pub async fn get_credential(&self, credential_id: &str) -> Result<Option<VerifiableCredential>, String> {
+    pub async fn get_credential(
+        &self,
+        credential_id: &str,
+    ) -> Result<Option<VerifiableCredential>, String> {
         let credentials = self.credentials.read().await;
         Ok(credentials.get(credential_id).cloned())
     }
@@ -176,10 +177,10 @@ impl Web5Handler {
         credential_ids: Vec<String>,
     ) -> Result<String, String> {
         let presentation_id = format!("urn:uuid:{}", Uuid::new_v4());
-        
+
         let mut verifiable_credentials = Vec::new();
         let credentials = self.credentials.read().await;
-        
+
         for credential_id in credential_ids {
             if let Some(credential) = credentials.get(&credential_id) {
                 verifiable_credentials.push(credential.clone());
@@ -187,11 +188,9 @@ impl Web5Handler {
                 return Err(format!("Credential {} not found", credential_id));
             }
         }
-        
+
         let presentation = VerifiablePresentation {
-            context: vec![
-                "https://www.w3.org/2018/credentials/v1".to_string(),
-            ],
+            context: vec!["https://www.w3.org/2018/credentials/v1".to_string()],
             id: presentation_id.clone(),
             r#type: vec!["VerifiablePresentation".to_string()],
             holder,
@@ -205,7 +204,10 @@ impl Web5Handler {
     }
 
     /// Get presentation by ID
-    pub async fn get_presentation(&self, presentation_id: &str) -> Result<Option<VerifiablePresentation>, String> {
+    pub async fn get_presentation(
+        &self,
+        presentation_id: &str,
+    ) -> Result<Option<VerifiablePresentation>, String> {
         let presentations = self.presentations.read().await;
         Ok(presentations.get(presentation_id).cloned())
     }
@@ -246,9 +248,9 @@ impl Web5Handler {
 pub mod api {
     use super::*;
     use axum::{
-        extract::{Path, Json},
-        response::{Json as ResponseJson},
+        extract::{Json, Path},
         http::StatusCode,
+        response::Json as ResponseJson,
     };
     use serde_json::Value;
     use std::sync::Arc;
@@ -259,7 +261,7 @@ pub mod api {
         Json(request): Json<Value>,
     ) -> Result<ResponseJson<Value>, StatusCode> {
         let method = request["method"].as_str().unwrap_or("web");
-        
+
         match handler.create_did(method).await {
             Ok(did_id) => Ok(ResponseJson(serde_json::json!({
                 "did": did_id
@@ -294,11 +296,10 @@ pub mod api {
             .filter_map(|v| v.as_str().map(|s| s.to_string()))
             .collect();
 
-        match handler.create_credential(
-            issuer.to_string(),
-            subject,
-            credential_type,
-        ).await {
+        match handler
+            .create_credential(issuer.to_string(), subject, credential_type)
+            .await
+        {
             Ok(credential_id) => Ok(ResponseJson(serde_json::json!({
                 "id": credential_id
             }))),
@@ -327,9 +328,9 @@ mod tests {
     async fn test_did_creation() {
         let handler = Web5Handler::new();
         let did_id = handler.create_did("web").await.unwrap();
-        
+
         assert!(did_id.starts_with("did:web:"));
-        
+
         let did = handler.get_did(&did_id).await.unwrap();
         assert!(did.is_some());
         let did = did.unwrap();
@@ -344,10 +345,16 @@ mod tests {
             "id": "did:web:alice.example.com",
             "name": "Alice Smith"
         });
-        let credential_type = vec!["VerifiableCredential".to_string(), "PersonCredential".to_string()];
+        let credential_type = vec![
+            "VerifiableCredential".to_string(),
+            "PersonCredential".to_string(),
+        ];
 
-        let credential_id = handler.create_credential(issuer, subject, credential_type).await.unwrap();
-        
+        let credential_id = handler
+            .create_credential(issuer, subject, credential_type)
+            .await
+            .unwrap();
+
         let credential = handler.get_credential(&credential_id).await.unwrap();
         assert!(credential.is_some());
         let credential = credential.unwrap();
@@ -358,17 +365,23 @@ mod tests {
     #[tokio::test]
     async fn test_presentation_creation() {
         let handler = Web5Handler::new();
-        
+
         // First create a credential
         let issuer = "did:web:issuer.example.com".to_string();
         let subject = serde_json::json!({"id": "did:web:subject.example.com"});
         let credential_type = vec!["VerifiableCredential".to_string()];
-        let credential_id = handler.create_credential(issuer, subject, credential_type).await.unwrap();
+        let credential_id = handler
+            .create_credential(issuer, subject, credential_type)
+            .await
+            .unwrap();
 
         // Then create a presentation
         let holder = "did:web:holder.example.com".to_string();
-        let presentation_id = handler.create_presentation(holder, vec![credential_id]).await.unwrap();
-        
+        let presentation_id = handler
+            .create_presentation(holder, vec![credential_id])
+            .await
+            .unwrap();
+
         let presentation = handler.get_presentation(&presentation_id).await.unwrap();
         assert!(presentation.is_some());
         let presentation = presentation.unwrap();
