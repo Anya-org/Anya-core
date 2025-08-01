@@ -1,15 +1,15 @@
 use axum::{
     middleware,
-    routing::{get, post, put, delete},
+    routing::{delete, get, post, put},
     Router,
 };
 use std::sync::Arc;
 use tower_http::trace::TraceLayer;
 
+use super::handlers::auth::auth_middleware;
 use crate::api::handlers;
 use crate::handlers::{dwn, rgb};
 use crate::web::web5_adapter::Web5Adapter;
-use super::handlers::auth::auth_middleware;
 
 #[cfg(feature = "bitcoin")]
 use crate::bitcoin::wallet::Wallet;
@@ -54,7 +54,10 @@ pub fn configure_routes(
             .route("/wallet/balance", get(handlers::wallet::get_balance))
             .route("/wallet/address", get(handlers::wallet::get_new_address))
             .route("/wallet/send", post(handlers::wallet::send_transaction))
-            .route("/wallet/history", get(handlers::wallet::get_transaction_history))
+            .route(
+                "/wallet/history",
+                get(handlers::wallet::get_transaction_history),
+            )
             .route("/wallet/backup", post(handlers::wallet::backup_wallet))
             .route("/wallet/restore", post(handlers::wallet::restore_wallet))
             .with_state(wallet)

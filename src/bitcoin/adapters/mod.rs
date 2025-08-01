@@ -17,9 +17,7 @@ use crate::bitcoin::interface::{
 };
 
 // Import Bitcoin types
-use bitcoin::{Transaction, Address, Block};
-
-
+use bitcoin::{Address, Block, Transaction};
 
 /// [AIR-3][AIS-3][BPC-3][RES-3] Bitcoin adapter for Bitcoin implementation
 #[allow(dead_code)]

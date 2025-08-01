@@ -7,10 +7,9 @@
 use crate::bitcoin::error::{BitcoinError, BitcoinResult};
 use bitcoin::{
     hashes::{sha256, Hash, HashEngine},
-    Transaction, TxOut,
-    secp256k1::{Secp256k1, XOnlyPublicKey, All},
+    secp256k1::{All, Secp256k1, XOnlyPublicKey},
     taproot::{TaprootBuilder, TaprootSpendInfo},
-    Address, Amount, ScriptBuf,
+    Address, Amount, ScriptBuf, Transaction, TxOut,
 };
 use rand;
 use std::collections::HashMap;
