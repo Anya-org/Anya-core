@@ -26,12 +26,18 @@ pub struct Signature {
 
 /// Sign a message with the provided private key
 pub fn sign(
-    _message: &[u8],
-    _private_key: &[u8],
+    message: &[u8],
+    private_key: &[u8],
     algorithm: SignatureAlgorithm,
 ) -> Result<Signature, Box<dyn Error>> {
     // Placeholder implementation
     // In a real implementation, we would use a crypto library like secp256k1, etc.
+    log::debug!(
+        "Signing message of length {} with key length {}",
+        message.len(),
+        private_key.len()
+    );
+
     let sig_len = match algorithm {
         SignatureAlgorithm::EcdsaSecp256k1 => 64,
         SignatureAlgorithm::SchnorrSecp256k1 => 64,
