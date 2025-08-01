@@ -33,6 +33,7 @@ This document provides guidance for migrating between different versions of the 
 ### Steps
 
 1. **Backup Your Data**
+
    ```bash
    anya-cli backupwallet /path/to/backup
    ```
@@ -42,6 +43,7 @@ This document provides guidance for migrating between different versions of the 
    - Update configuration parameters as per new requirements
 
 3. **Upgrade Process**
+
    ```bash
    # Stop the current node
    anya-cli stop
@@ -56,11 +58,13 @@ This document provides guidance for migrating between different versions of the 
 ## Breaking Changes
 
 ### Removed Features
+
 - Legacy address format support
 - Unencrypted wallet support
 - Deprecated RPC methods
 
 ### New Requirements
+
 - Minimum protocol version updated
 - New address format required
 - Mandatory wallet encryption
@@ -68,6 +72,7 @@ This document provides guidance for migrating between different versions of the 
 ## Deprecation Notices
 
 The following features are deprecated and will be removed in future versions:
+
 - [ ] Old address format
 - [ ] Unencrypted wallet storage
 - [ ] Legacy RPC methods
@@ -85,6 +90,7 @@ The following features are deprecated and will be removed in future versions:
 ### Common Issues
 
 1. **Missing Dependencies**
+
    ```bash
    # Install required dependencies
    sudo apt-get update
@@ -92,12 +98,14 @@ The following features are deprecated and will be removed in future versions:
    ```
 
 2. **Permission Issues**
+
    ```bash
    # Fix data directory permissions
    sudo chown -R anya:anya /path/to/anya/data
    ```
 
 3. **Reindexing Problems**
+
    ```bash
    # Start with reindexing
    anyad -reindex
@@ -106,6 +114,7 @@ The following features are deprecated and will be removed in future versions:
 ## Getting Help
 
 For additional assistance with migration:
+
 - [Documentation](https://docs.anya.org/bitcoin/migration)
 - [Community Forum](https://community.anya.org)
 - [Support Portal](https://support.anya.org)
