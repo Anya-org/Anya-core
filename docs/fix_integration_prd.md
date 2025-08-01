@@ -130,6 +130,8 @@ Each issue is broken down into small, manageable chunks that can be addressed in
 | Resolve Bitcoin Module Conflicts | Completed | Consolidated wallet implementation into wallet/mod.rs |
 | Fix Feature Flag Inconsistencies | Completed | Standardized on "bitcoin" feature throughout codebase |
 | Address Unused Imports/Variables | In Progress | Fixed `src/security/crypto/symmetric.rs`, `src/api/routes.rs` |
+| Fix Bitcoin Validation Type Mismatches | Not Started | Type mismatch in `src/bitcoin/validation.rs` for taproot transactions |
+| Fix API Parameter Inconsistencies | Not Started | Method parameter types don't match between implementation and usage |
 | Review and Fix Dead Code | Not Started | |
 | Address TODOs | Not Started | |
 | Enable Disabled Tests | Not Started | |
@@ -152,6 +154,75 @@ Each issue is broken down into small, manageable chunks that can be addressed in
 - Documentation updated
 - Feature parity with v1.2 maintained
 - New v1.3 features properly integrated
+
+## Critical Issues
+
+### 1. Bitcoin Validation Type Mismatches
+
+**Files**:
+
+- `src/bitcoin/validation.rs`
+- `src/lib.rs`
+
+**Issues**:
+
+- Type mismatches between function implementations and their usage:
+
+  ```rust
+  // In lib.rs (function definition)
+  pub fn verify_taproot_transaction(&self, _tx: &str, ...)
+  
+  // In validation.rs (function usage)
+  intel_opt.verify_taproot_transaction(tx)  // tx is of type &Transaction
+  ```
+
+- Similar issues with `verify_transaction_batch` method:
+
+  ```rust
+  // Expected: &[&str]
+  // Found: &Vec<bitcoin::Transaction>
+  ```
+
+**Planned Fix**:
+
+- Update function signatures to match parameter types
+- Or, convert parameter types at call sites
+- Use serialization/deserialization where needed
+
+### 2. Module Organization Issues
+
+**Files**:
+
+- `src/bitcoin/mod.rs`
+- `src/bitcoin/wallet.rs` and `src/bitcoin/wallet/mod.rs`
+
+**Issues**:
+
+- Duplicate wallet module implementations
+- Conflicts between files causing compilation errors
+
+**Planned Fix**:
+
+- Consolidate wallet implementation to a single location
+- Update imports and references accordingly
+
+### 3. Unused Code and Imports
+
+**Files**:
+
+- Multiple files across the codebase
+
+**Issues**:
+
+- Unused imports causing compiler warnings
+- Unused variables marked with `_` but still causing warnings
+- Dead code that is no longer used
+
+**Planned Fix**:
+
+- Systematically clean up unused imports
+- Remove or properly implement dead code
+- Use proper attributes like `#[allow(dead_code)]` where appropriate
 
 ## Documentation Verification
 
@@ -179,3 +250,45 @@ To ensure documentation alignment with code implementation:
    - Verify that all exported APIs are properly documented
    - Ensure that code examples in documentation match the current implementation
    - Update version numbers and compatibility tables to reflect v1.3 changes
+
+## Implementation Plan
+
+### 1. Layer2 Protocol Mock
+
+**Status**: Completed
+**Files**: 
+- `src/layer2/mock/mod.rs`
+- `src/layer2/mod.rs`
+
+**Issue**: Circular type definition causing compilation error: `pub type MockLayer2Protocol = MockLayer2Protocol;`
+**Solution**: Let mockall generate the mock type automatically
+
+### 2. Bitcoin Module Conflicts
+
+**Status**: Completed
+**Files**:
+- `src/bitcoin/wallet.rs`
+- `src/bitcoin/wallet/mod.rs`
+
+**Issue**: File for module wallet found at both paths, causing compiler error
+**Solution**: Remove the duplicated `wallet.rs` file and use wallet/mod.rs
+
+### 3. Bitcoin Validation Type Mismatches
+
+**Status**: Not Started
+**Files**:
+- `src/bitcoin/validation.rs`
+- `src/lib.rs`
+
+**Issue**: Type mismatch between function signatures in lib.rs and their usage in validation.rs
+**Solution**: 
+- Update the `verify_taproot_transaction` function signature in lib.rs to accept `&Transaction` instead of `&str`
+- Update the `verify_transaction_batch` function to accept `&[Transaction]` or serialize the transactions at call sites
+
+### 4. Unused Code and Imports
+
+**Status**: In Progress
+**Files**: Multiple files across the codebase
+
+**Issue**: Unused imports and variables causing compiler warnings
+**Solution**: Systematically clean up unused imports and variables
