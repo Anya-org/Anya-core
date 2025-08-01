@@ -1,12 +1,12 @@
 use hickory_resolver::config::{NameServerConfig, Protocol, ResolverConfig, ResolverOpts};
 use hickory_resolver::Resolver;
-use tracing::info;
 use serde::{Deserialize, Serialize};
 use std::net::{IpAddr, SocketAddr};
 use std::process::Command;
 use std::time::{Duration, Instant};
 use tokio::net::TcpStream;
 use tokio::time::timeout;
+use tracing::info;
 
 /// Network validation configuration
 #[derive(Clone, Debug, Serialize, Deserialize)]
