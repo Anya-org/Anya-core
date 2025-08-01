@@ -14,6 +14,7 @@
 use std::error::Error as StdError;
 use std::sync::Arc;
 // [AIR-3][AIS-3][BPC-3][RES-3] Removed unused import: async_trait::async_trait
+use bitcoin::{Address, Block, Transaction};
 
 // Re-export bitcoin types for use by other modules
 pub use crate::bitcoin::error::{BitcoinError, BitcoinResult};

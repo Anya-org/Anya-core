@@ -1,8 +1,8 @@
 // RGB (Really Good for Bitcoin) Handler Implementation
 // Author: Bo_theBig
 
-use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 use tokio::sync::RwLock;
 use uuid::Uuid;
 
@@ -187,7 +187,10 @@ impl RgbHandler {
     }
 
     /// Get contract history
-    pub async fn get_contract_history(&self, contract_id: &str) -> Result<Option<RgbContract>, String> {
+    pub async fn get_contract_history(
+        &self,
+        contract_id: &str,
+    ) -> Result<Option<RgbContract>, String> {
         let contracts = self.contracts.read().await;
         Ok(contracts.get(contract_id).cloned())
     }
@@ -210,7 +213,8 @@ impl RgbHandler {
         }];
         let witness = "bitcoin_transaction_witness".to_string();
 
-        self.add_state_transition(asset_id, inputs, outputs, witness).await
+        self.add_state_transition(asset_id, inputs, outputs, witness)
+            .await
     }
 }
 
@@ -219,9 +223,9 @@ impl RgbHandler {
 pub mod api {
     use super::*;
     use axum::{
-        extract::{Path, Json},
-        response::{Json as ResponseJson},
+        extract::{Json, Path},
         http::StatusCode,
+        response::Json as ResponseJson,
     };
     use serde_json::Value;
     use std::sync::Arc;
@@ -233,8 +237,12 @@ pub mod api {
     ) -> Result<ResponseJson<Value>, StatusCode> {
         let name = request["name"].as_str().ok_or(StatusCode::BAD_REQUEST)?;
         let ticker = request["ticker"].as_str().ok_or(StatusCode::BAD_REQUEST)?;
-        let precision = request["precision"].as_u64().ok_or(StatusCode::BAD_REQUEST)? as u8;
-        let total_supply = request["total_supply"].as_u64().ok_or(StatusCode::BAD_REQUEST)?;
+        let precision = request["precision"]
+            .as_u64()
+            .ok_or(StatusCode::BAD_REQUEST)? as u8;
+        let total_supply = request["total_supply"]
+            .as_u64()
+            .ok_or(StatusCode::BAD_REQUEST)?;
         let schema = match request["schema"].as_str() {
             Some("fungible") => RgbSchema::Fungible,
             Some("non_fungible") => RgbSchema::NonFungible,
@@ -243,13 +251,16 @@ pub mod api {
             _ => return Err(StatusCode::BAD_REQUEST),
         };
 
-        match handler.issue_asset(
-            name.to_string(),
-            ticker.to_string(),
-            precision,
-            total_supply,
-            schema,
-        ).await {
+        match handler
+            .issue_asset(
+                name.to_string(),
+                ticker.to_string(),
+                precision,
+                total_supply,
+                schema,
+            )
+            .await
+        {
             Ok(asset_id) => Ok(ResponseJson(serde_json::json!({
                 "asset_id": asset_id
             }))),
@@ -274,17 +285,24 @@ pub mod api {
         handler: Arc<RgbHandler>,
         Json(request): Json<Value>,
     ) -> Result<ResponseJson<Value>, StatusCode> {
-        let asset_id = request["asset_id"].as_str().ok_or(StatusCode::BAD_REQUEST)?;
-        let from_seal = request["from_seal"].as_str().ok_or(StatusCode::BAD_REQUEST)?;
+        let asset_id = request["asset_id"]
+            .as_str()
+            .ok_or(StatusCode::BAD_REQUEST)?;
+        let from_seal = request["from_seal"]
+            .as_str()
+            .ok_or(StatusCode::BAD_REQUEST)?;
         let to_seal = request["to_seal"].as_str().ok_or(StatusCode::BAD_REQUEST)?;
         let amount = request["amount"].as_u64().ok_or(StatusCode::BAD_REQUEST)?;
 
-        match handler.transfer_asset(
-            asset_id.to_string(),
-            from_seal.to_string(),
-            to_seal.to_string(),
-            amount,
-        ).await {
+        match handler
+            .transfer_asset(
+                asset_id.to_string(),
+                from_seal.to_string(),
+                to_seal.to_string(),
+                amount,
+            )
+            .await
+        {
             Ok(transition_id) => Ok(ResponseJson(serde_json::json!({
                 "transition_id": transition_id
             }))),
@@ -297,6 +315,15 @@ pub mod api {
         handler: Arc<RgbHandler>,
         Path(asset_id): Path<String>,
     ) -> Result<ResponseJson<Value>, StatusCode> {
+        // Log that this handler was called
+        log::debug!("RGB asset history requested for asset: {}", asset_id);
+
+        // Check if asset exists
+        let assets = handler.assets.read().await;
+        if !assets.contains_key(&asset_id) {
+            return Err(StatusCode::NOT_FOUND);
+        }
+
         // For now, return a placeholder response
         // In a real implementation, this would query blockchain history
         Ok(ResponseJson(serde_json::json!({
@@ -307,11 +334,7 @@ pub mod api {
 }
 
 // API Handler Functions for RGB routes
-use axum::{
-    extract::Path,
-    http::StatusCode,
-    response::Json,
-};
+use axum::{extract::Path, http::StatusCode, response::Json};
 use serde_json::{json, Value};
 
 pub async fn list_assets() -> Result<Json<Value>, StatusCode> {

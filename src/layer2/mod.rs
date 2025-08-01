@@ -358,7 +358,7 @@ pub use stacks::StacksProtocol;
 pub use state_channels::StateChannelsProtocol;
 
 // Mock protocol for testing
-pub use mock::MockLayer2ProtocolMock as MockLayer2Protocol;
+pub use mock::MockLayer2Protocol;
 
 // RGB Protocol trait implementation
 pub struct RGBProtocol {

@@ -1,3 +1,4 @@
+[package]
 name = "anya-bitcoin"
 version.workspace = true
 edition.workspace = true
@@ -23,7 +24,4 @@ name = "anya_bitcoin"
 path = "src/lib.rs"
 
 [features]
-default = ["bip174", "bip341"]
-
-
 default = ["bip174", "bip341"]
