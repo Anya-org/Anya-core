@@ -352,11 +352,13 @@ pub use taproot_assets::TaprootAssetsProtocol;
 pub use dlc::DlcProtocol;
 pub use lightning::LightningProtocol;
 pub use liquid::LiquidProtocol;
-pub use mock::MockLayer2Protocol;
 pub use rgb::RgbProtocol;
 pub use rsk::RskProtocol;
 pub use stacks::StacksProtocol;
 pub use state_channels::StateChannelsProtocol;
+
+// Mock protocol for testing
+pub use mock::MockLayer2ProtocolMock as MockLayer2Protocol;
 
 // RGB Protocol trait implementation
 pub struct RGBProtocol {
