@@ -1,12 +1,13 @@
 use axum::{
     middleware,
-    routing::{get, post},
+    routing::{get, post, put, delete},
     Router,
 };
 use std::sync::Arc;
 use tower_http::trace::TraceLayer;
 
 use crate::api::handlers;
+use crate::handlers::{dwn, rgb, web5};
 use crate::web::web5_adapter::Web5Adapter;
 use super::handlers::auth::auth_middleware;
 
@@ -64,22 +65,22 @@ pub fn configure_routes(
 
     // DWN (Decentralized Web Node) routes - require authentication
     let dwn_routes = Router::new()
-        .route("/dwn/protocols", get(handlers::dwn::list_protocols))
-        .route("/dwn/protocols", post(handlers::dwn::create_protocol))
-        .route("/dwn/records", get(handlers::dwn::query_records))
-        .route("/dwn/records", post(handlers::dwn::create_record))
-        .route("/dwn/records/:id", get(handlers::dwn::get_record))
-        .route("/dwn/records/:id", put(handlers::dwn::update_record))
-        .route("/dwn/records/:id", delete(handlers::dwn::delete_record));
+        .route("/dwn/protocols", get(dwn::list_protocols))
+        .route("/dwn/protocols", post(dwn::create_protocol))
+        .route("/dwn/records", get(dwn::query_records))
+        .route("/dwn/records", post(dwn::create_record))
+        .route("/dwn/records/:id", get(dwn::get_record))
+        .route("/dwn/records/:id", put(dwn::update_record))
+        .route("/dwn/records/:id", delete(dwn::delete_record));
 
     // RGB routes - require authentication (conditional)
     #[cfg(feature = "bitcoin")]
     let rgb_routes = Router::new()
-        .route("/rgb/assets", get(handlers::rgb::list_assets))
-        .route("/rgb/assets", post(handlers::rgb::create_asset))
-        .route("/rgb/assets/:id", get(handlers::rgb::get_asset))
-        .route("/rgb/assets/:id/transfer", post(handlers::rgb::transfer_asset))
-        .route("/rgb/assets/:id/history", get(handlers::rgb::get_asset_history));
+        .route("/rgb/assets", get(rgb::list_assets))
+        .route("/rgb/assets", post(rgb::create_asset))
+        .route("/rgb/assets/:id", get(rgb::get_asset))
+        .route("/rgb/assets/:id/transfer", post(rgb::transfer_asset))
+        .route("/rgb/assets/:id/history", get(rgb::get_asset_history));
 
     #[cfg(not(feature = "bitcoin"))]
     let rgb_routes = Router::new(); // Empty router when bitcoin feature is disabled
