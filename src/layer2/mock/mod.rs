@@ -1,6 +1,6 @@
 use crate::layer2::{
-    Layer2Protocol, ProtocolState, TransactionStatus, AssetParams, 
-    AssetTransfer, TransferResult, Proof, VerificationResult, ValidationResult
+    AssetParams, AssetTransfer, Layer2Protocol, Proof, ProtocolState, TransactionStatus,
+    TransferResult, ValidationResult, VerificationResult,
 };
 use async_trait::async_trait;
 use mockall::{mock, predicate::*};
