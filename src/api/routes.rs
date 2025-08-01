@@ -7,76 +7,20 @@ use std::sync::Arc;
 use tower_http::trace::TraceLayer;
 
 use crate::api::handlers;
-
 use crate::web::web5_adapter::Web5Adapter;
-
 use super::handlers::auth::auth_middleware;
 
-/// Configure all API routes
-#[cfg(feature = "rust-bitcoin")]
+#[cfg(feature = "bitcoin")]
 use crate::bitcoin::wallet::Wallet;
-pub fn configure_routes(wallet: Arc<Wallet>, web5_adapter: Arc<Web5Adapter>) -> Router {
-    // Public routes that don't require authentication
-    let public_routes = Router::new()
-        .route("/health", get(handlers::system::health_check))
-        .route("/info", get(handlers::system::system_info))
-        .route("/login", post(handlers::auth::login));
 
-    // Bitcoin wallet routes - require authentication
-    let wallet_routes = Router::new()
-        .route("/wallets", post(handlers::wallet::create_wallet))
-        .route("/wallets/:id", get(handlers::wallet::get_wallet))
-        .route("/wallets/:id/balance", get(handlers::wallet::get_balance))
-        .route(
-            "/wallets/:id/address",
-            post(handlers::wallet::generate_address),
-        )
-        .route(
-            "/wallets/:id/transactions",
-            post(handlers::wallet::send_transaction),
-        )
-        .route(
-            "/wallets/:id/transactions",
-            get(handlers::wallet::list_transactions),
-        )
-        .with_state(wallet.clone());
+#[cfg(not(feature = "bitcoin"))]
+pub struct Wallet;
 
-    // Web5/DID routes - require authentication
-    let identity_routes = Router::new()
-        .route("/identities", post(handlers::identity::create_identity))
-        .route("/identities/:id", get(handlers::identity::get_identity))
-        .route("/credentials", post(handlers::identity::create_credential))
-        .route("/credentials/:id", get(handlers::identity::get_credential))
-        .route(
-            "/credentials/verify",
-            post(handlers::identity::verify_credential),
-        )
-        .with_state(web5_adapter.clone());
-
-    // DLC routes - require authentication
-    let dlc_routes = Router::new()
-        .route("/dlc", post(handlers::dlc::create_contract))
-        .route("/dlc/:id", get(handlers::dlc::get_contract))
-        .route("/dlc/:id/accept", post(handlers::dlc::accept_contract))
-        .route("/dlc/:id/finalize", post(handlers::dlc::finalize_contract))
-        .route("/dlc/:id/execute", post(handlers::dlc::execute_contract));
-
-    // Combine routes with middleware for authenticated routes
-    let authenticated_api = Router::new()
-        .merge(wallet_routes)
-        .merge(identity_routes)
-        .merge(dlc_routes)
-        .layer(middleware::from_fn(auth_middleware));
-
-    // Combine public and authenticated routes
-    Router::new()
-        .nest("/api/v1", public_routes.merge(authenticated_api))
-        .layer(TraceLayer::new_for_http())
-}
-
-/// Configure all API routes (without Bitcoin functionality)
-#[cfg(not(feature = "rust-bitcoin"))]
-pub fn configure_routes(web5_adapter: Arc<Web5Adapter>) -> Router {
+/// Configure all API routes
+pub fn configure_routes(
+    #[cfg(feature = "bitcoin")] wallet: Arc<Wallet>,
+    web5_adapter: Arc<Web5Adapter>,
+) -> Router {
     // Public routes that don't require authentication
     let public_routes = Router::new()
         .route("/health", get(handlers::system::health_check))
@@ -101,7 +45,46 @@ pub fn configure_routes(web5_adapter: Arc<Web5Adapter>) -> Router {
         )
         .with_state(web5_adapter.clone());
 
-    // DLC routes - require authentication (without Bitcoin dependency)
+    // Bitcoin routes (conditional compilation)
+    #[cfg(feature = "bitcoin")]
+    let bitcoin_routes = {
+        // Bitcoin wallet routes - require authentication
+        Router::new()
+            .route("/wallet/balance", get(handlers::wallet::get_balance))
+            .route("/wallet/address", get(handlers::wallet::get_new_address))
+            .route("/wallet/send", post(handlers::wallet::send_transaction))
+            .route("/wallet/history", get(handlers::wallet::get_transaction_history))
+            .route("/wallet/backup", post(handlers::wallet::backup_wallet))
+            .route("/wallet/restore", post(handlers::wallet::restore_wallet))
+            .with_state(wallet)
+    };
+
+    #[cfg(not(feature = "bitcoin"))]
+    let bitcoin_routes = Router::new(); // Empty router when bitcoin feature is disabled
+
+    // DWN (Decentralized Web Node) routes - require authentication
+    let dwn_routes = Router::new()
+        .route("/dwn/protocols", get(handlers::dwn::list_protocols))
+        .route("/dwn/protocols", post(handlers::dwn::create_protocol))
+        .route("/dwn/records", get(handlers::dwn::query_records))
+        .route("/dwn/records", post(handlers::dwn::create_record))
+        .route("/dwn/records/:id", get(handlers::dwn::get_record))
+        .route("/dwn/records/:id", put(handlers::dwn::update_record))
+        .route("/dwn/records/:id", delete(handlers::dwn::delete_record));
+
+    // RGB routes - require authentication (conditional)
+    #[cfg(feature = "bitcoin")]
+    let rgb_routes = Router::new()
+        .route("/rgb/assets", get(handlers::rgb::list_assets))
+        .route("/rgb/assets", post(handlers::rgb::create_asset))
+        .route("/rgb/assets/:id", get(handlers::rgb::get_asset))
+        .route("/rgb/assets/:id/transfer", post(handlers::rgb::transfer_asset))
+        .route("/rgb/assets/:id/history", get(handlers::rgb::get_asset_history));
+
+    #[cfg(not(feature = "bitcoin"))]
+    let rgb_routes = Router::new(); // Empty router when bitcoin feature is disabled
+
+    // DLC routes - require authentication
     let dlc_routes = Router::new()
         .route("/dlc", post(handlers::dlc::create_contract))
         .route("/dlc/:id", get(handlers::dlc::get_contract))
@@ -109,9 +92,11 @@ pub fn configure_routes(web5_adapter: Arc<Web5Adapter>) -> Router {
         .route("/dlc/:id/finalize", post(handlers::dlc::finalize_contract))
         .route("/dlc/:id/execute", post(handlers::dlc::execute_contract));
 
-    // Combine routes with middleware for authenticated routes
-    let authenticated_api = Router::new()
-        .merge(identity_routes)
+    // Authenticated routes
+    let authenticated_api = identity_routes
+        .merge(bitcoin_routes)
+        .merge(dwn_routes)
+        .merge(rgb_routes)
         .merge(dlc_routes)
         .layer(middleware::from_fn(auth_middleware));
 

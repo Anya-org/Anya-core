@@ -1,4 +1,5 @@
 # Bitcoin Module PR Checklist
+
 [AIR-3][AIS-3][BPC-3][AIT-3][RES-3]
 
 This document provides a comprehensive checklist for preparing, reviewing, and merging Pull Requests for Bitcoin-related changes in the Anya-Core project.
@@ -6,6 +7,7 @@ This document provides a comprehensive checklist for preparing, reviewing, and m
 ## PR Preparation Checklist
 
 ### Code Quality
+
 - [ ] All compilation issues resolved
 - [ ] Code follows the project's style guidelines
 - [ ] No linting issues (run `cargo clippy`)
@@ -14,6 +16,7 @@ This document provides a comprehensive checklist for preparing, reviewing, and m
 - [ ] Hexagonal architecture principles adhered to
 
 ### Testing
+
 - [ ] Unit tests added for new functionality
 - [ ] Integration tests added where appropriate
 - [ ] Tests for edge cases included
@@ -21,6 +24,7 @@ This document provides a comprehensive checklist for preparing, reviewing, and m
 - [ ] Security-related tests included
 
 ### Documentation
+
 - [ ] Code is well-commented
 - [ ] API documentation updated
 - [ ] BIP implementation details documented
@@ -28,6 +32,7 @@ This document provides a comprehensive checklist for preparing, reviewing, and m
 - [ ] README files updated where necessary
 
 ### Bitcoin Compliance
+
 - [ ] Follows BIP specifications
 - [ ] Compatible with Bitcoin Core
 - [ ] Maintains transaction indistinguishability
@@ -35,6 +40,7 @@ This document provides a comprehensive checklist for preparing, reviewing, and m
 - [ ] Properly implements Taproot/Tapscript (if applicable)
 
 ### Branch Management
+
 - [ ] Feature branch up-to-date with target branch
 - [ ] No merge conflicts
 - [ ] Commit messages follow [AIR-3][AIS-3][BPC-3] format
@@ -43,6 +49,7 @@ This document provides a comprehensive checklist for preparing, reviewing, and m
 ## PR Review Checklist
 
 ### General
+
 - [ ] Code is clear and easy to understand
 - [ ] No unnecessary complexity
 - [ ] No duplicated code
@@ -50,6 +57,7 @@ This document provides a comprehensive checklist for preparing, reviewing, and m
 - [ ] Performance considerations addressed
 
 ### Bitcoin-Specific
+
 - [ ] Properly handles Bitcoin network interactions
 - [ ] Transaction validation is secure
 - [ ] Script execution follows BIP specifications
@@ -57,6 +65,7 @@ This document provides a comprehensive checklist for preparing, reviewing, and m
 - [ ] Handles blockchain reorganizations properly
 
 ### Security
+
 - [ ] No timing attack vulnerabilities
 - [ ] Proper input validation
 - [ ] Cryptographic operations use constant-time implementations
@@ -66,6 +75,7 @@ This document provides a comprehensive checklist for preparing, reviewing, and m
 ## Merge Process Checklist
 
 ### Pre-Merge
+
 - [ ] All PR checks pass
 - [ ] Required reviewers have approved
 - [ ] Documentation is complete
@@ -73,12 +83,14 @@ This document provides a comprehensive checklist for preparing, reviewing, and m
 - [ ] No regressions introduced
 
 ### Merge Strategy
+
 - [ ] Use merge commit for large features
 - [ ] Squash and merge for small fixes
 - [ ] Ensure clean commit history
 - [ ] Include proper commit message with issue references
 
 ### Post-Merge
+
 - [ ] Verify deployment/integration
 - [ ] Clean up feature branch
 - [ ] Close related issues

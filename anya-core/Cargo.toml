@@ -13,7 +13,7 @@ secp256k1.workspace = true
 bitcoin = { version = "=0.32.6", features = ["std", "serde", "rand", "bitcoinconsensus", "secp-recovery", "base64", "rand-std", "bitcoinconsensus-std"], optional = true }
 bitcoincore-rpc.workspace = true
 web5.workspace = true
-bdk.workspace = true
+bdk_wallet.workspace = true
 
 # Security Validation (BDF §3.3)
 ring = { version = "0.17.12", features = ["alloc"] }

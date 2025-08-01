@@ -11,8 +11,8 @@ secp256k1.workspace = true
 bitcoin.workspace = true
 bitcoincore-rpc.workspace = true
 
-# Taproot Implementation (BIP 341)
-bdk = { workspace = true, features = ["taproot"] }
+# BDK Wallet for Bitcoin functionality
+bdk_wallet = { workspace = true }
 
 [dev-dependencies]
 tokio-test = "0.4"

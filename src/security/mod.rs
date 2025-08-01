@@ -90,7 +90,7 @@ pub fn create_basic_security_config(
 // Implements security features for Bitcoin operations
 // as per official Bitcoin Improvement Proposals (BIPs) requirements
 
-use log::info;
+use tracing::info;
 // [AIR-3][AIS-3][BPC-3][RES-3] Constant time module already declared above
 
 // [AIR-3][AIS-3][BPC-3][RES-3] Conditionally export HSM types when the feature is enabled

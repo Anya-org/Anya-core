@@ -2,7 +2,7 @@
 //!
 //! This module provides functionality for BIP compliance reporting and validation.
 
-use log::{error, info};
+use tracing::{error, info};
 use std::error::Error;
 
 // Re-export compliance types from types module

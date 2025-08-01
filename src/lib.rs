@@ -43,12 +43,13 @@ use std::fmt;
 
 pub mod api;
 pub mod bip;
-#[cfg(feature = "rust-bitcoin")]
+#[cfg(feature = "bitcoin")]
 pub mod bitcoin;
 pub mod compliance;
 pub mod dao;
 pub mod enterprise;
 pub mod extensions;
+pub mod handlers;
 pub mod install;
 pub mod ml;
 pub mod network;

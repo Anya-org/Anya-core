@@ -8,16 +8,16 @@ use std::sync::Arc;
 // This follows official Bitcoin Improvement Proposals (BIPs) standards for type consistency
 use crate::bitcoin::config::BitcoinConfig;
 use crate::bitcoin::interface::{
-    Address,
     AddressType,
     BitcoinImplementationType,
     // [AIR-3][AIS-3][BPC-3][RES-3] Removed unused import: BitcoinError
     BitcoinInterface,
     BitcoinResult,
-    Block,
-    BlockHeader,
-    Transaction,
 };
+
+// Conditional imports based on features
+#[cfg(feature = "rust-bitcoin")]
+use crate::bitcoin::interface::{Address, Block, BlockHeader, Transaction};
 
 /// [AIR-3][AIS-3][BPC-3][RES-3] Bitcoin adapter for Bitcoin implementation
 #[allow(dead_code)]
@@ -52,21 +52,24 @@ impl BitcoinAdapter {
 /// [AIR-3][AIS-3][BPC-3][RES-3] Using async_trait for async interface implementation
 #[async_trait::async_trait]
 impl BitcoinInterface for BitcoinAdapter {
-    /// [AIR-3][AIS-3][BPC-3][RES-3] Get transaction by ID
-    async fn get_transaction(&self, txid: &str) -> BitcoinResult<Transaction> {
-        self.implementation.get_transaction(txid).await
-    }
-
-    /// [AIR-3][AIS-3][BPC-3][RES-3] Get block by hash
-    async fn get_block(&self, hash: &str) -> BitcoinResult<Block> {
-        self.implementation.get_block(hash).await
-    }
-
     /// [AIR-3][AIS-3][BPC-3][RES-3] Get current block height
     async fn get_block_height(&self) -> BitcoinResult<u32> {
         self.implementation.get_block_height().await
     }
 
+    #[cfg(feature = "rust-bitcoin")]
+    /// [AIR-3][AIS-3][BPC-3][RES-3] Get transaction by ID
+    async fn get_transaction(&self, txid: &str) -> BitcoinResult<Transaction> {
+        self.implementation.get_transaction(txid).await
+    }
+
+    #[cfg(feature = "rust-bitcoin")]
+    /// [AIR-3][AIS-3][BPC-3][RES-3] Get block by hash
+    async fn get_block(&self, hash: &str) -> BitcoinResult<Block> {
+        self.implementation.get_block(hash).await
+    }
+
+    #[cfg(feature = "rust-bitcoin")]
     /// [AIR-3][AIS-3][BPC-3][RES-3] Generate address of specified type
     async fn generate_address(&self, address_type: AddressType) -> BitcoinResult<Address> {
         self.implementation.generate_address(address_type).await
