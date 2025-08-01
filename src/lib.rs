@@ -201,6 +201,15 @@ pub mod hardware_optimization {
                 Ok(invalid_indices)
             }
 
+            #[cfg(not(feature = "rust-bitcoin"))]
+            pub fn verify_transaction_batch(
+                &self,
+                transactions: &[&str],
+                _config: &BatchVerificationConfig,
+            ) -> Result<Vec<usize>, Box<dyn std::error::Error>> {
+                Ok(vec![])
+            }
+
             #[cfg(feature = "rust-bitcoin")]
             pub fn verify_taproot_transaction(
                 &self,
@@ -209,6 +218,14 @@ pub mod hardware_optimization {
                 if tx.output.is_empty() {
                     return Err("Transaction has no outputs".into());
                 }
+                Ok(())
+            }
+
+            #[cfg(not(feature = "rust-bitcoin"))]
+            pub fn verify_taproot_transaction(
+                &self,
+                _tx: &str,
+            ) -> Result<(), Box<dyn std::error::Error>> {
                 Ok(())
             }
         }
@@ -268,7 +285,7 @@ impl fmt::Display for AnyaError {
 
 impl Error for AnyaError {}
 
-#[cfg(feature = "rust-bitcoin")]
+#[cfg(feature = "bitcoin")]
 impl From<crate::bitcoin::error::BitcoinError> for AnyaError {
     fn from(err: crate::bitcoin::error::BitcoinError) -> Self {
         AnyaError::Bitcoin(err.to_string())
