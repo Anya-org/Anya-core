@@ -223,7 +223,7 @@ impl BetaAccessManager {
         };
 
         // The signature format is zbase32 with recovery ID prefix
-        let recovery_id = RecoveryId::from_byte(signature_bytes[0] - 31)
+        let recovery_id = RecoveryId::from_i32((signature_bytes[0] - 31) as i32)
             .map_err(|e| BetaAccessError::AuthError(format!("Invalid recovery ID: {e}")))?;
 
         let signature = match RecoverableSignature::from_compact(&signature_bytes[1..], recovery_id)

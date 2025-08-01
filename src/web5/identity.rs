@@ -275,10 +275,7 @@ impl DIDManager {
 
         // Get the first private key for signing
         if let Some((_, private_key_bytes)) = did_obj.private_keys.iter().next() {
-            // Parse the private key - convert Vec<u8> to [u8; 32]
-            let private_key_array: [u8; 32] = private_key_bytes.as_slice().try_into()
-                .map_err(|_| "Private key must be exactly 32 bytes".to_string())?;
-            let private_key = secp256k1::SecretKey::from_byte_array(private_key_array)
+            let private_key = secp256k1::SecretKey::from_slice(private_key_bytes)
                 .map_err(|e| format!("Invalid private key: {e}"))?;
 
             // Create secp256k1 context

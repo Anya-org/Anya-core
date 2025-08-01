@@ -13,11 +13,13 @@ use crate::bitcoin::interface::{
     // [AIR-3][AIS-3][BPC-3][RES-3] Removed unused import: BitcoinError
     BitcoinInterface,
     BitcoinResult,
+    BlockHeader,
 };
 
-// Conditional imports based on features
-#[cfg(feature = "rust-bitcoin")]
-use crate::bitcoin::interface::{Address, Block, BlockHeader, Transaction};
+// Import Bitcoin types
+use bitcoin::{Transaction, Address, Block};
+
+
 
 /// [AIR-3][AIS-3][BPC-3][RES-3] Bitcoin adapter for Bitcoin implementation
 #[allow(dead_code)]
@@ -57,19 +59,16 @@ impl BitcoinInterface for BitcoinAdapter {
         self.implementation.get_block_height().await
     }
 
-    #[cfg(feature = "rust-bitcoin")]
     /// [AIR-3][AIS-3][BPC-3][RES-3] Get transaction by ID
     async fn get_transaction(&self, txid: &str) -> BitcoinResult<Transaction> {
         self.implementation.get_transaction(txid).await
     }
 
-    #[cfg(feature = "rust-bitcoin")]
     /// [AIR-3][AIS-3][BPC-3][RES-3] Get block by hash
     async fn get_block(&self, hash: &str) -> BitcoinResult<Block> {
         self.implementation.get_block(hash).await
     }
 
-    #[cfg(feature = "rust-bitcoin")]
     /// [AIR-3][AIS-3][BPC-3][RES-3] Generate address of specified type
     async fn generate_address(&self, address_type: AddressType) -> BitcoinResult<Address> {
         self.implementation.generate_address(address_type).await
