@@ -7,21 +7,25 @@ Anya Enterprise provides advanced Bitcoin infrastructure capabilities designed f
 ## Key Features
 
 ### Advanced Transaction Management
+
 - Multi-signature support
 - Hardware Security Module (HSM) integration
 - Enterprise-grade key management
 
 ### Compliance & Reporting
+
 - Real-time transaction monitoring
 - Regulatory compliance tools
 - Audit trail generation
 
 ### Performance & Scalability
+
 - High-throughput transaction processing
 - Load balancing capabilities
 - Enterprise SLA support
 
 ### Integration Capabilities
+
 - REST API for system integration
 - WebSocket streaming for real-time data
 - Custom webhook support
