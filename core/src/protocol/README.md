@@ -5,12 +5,14 @@ The Protocol component provides advanced transaction handling capabilities with 
 ## Architecture
 
 ### Repository Layer (`repository.rs`)
+
 - CRUD operations for transactions
 - Transaction validation
 - Status tracking
 - Metrics storage
 
 ### Service Layer (`service.rs`)
+
 - Transaction processing
 - Script operations
 - Fee management
@@ -18,6 +20,7 @@ The Protocol component provides advanced transaction handling capabilities with 
 - Metrics collection
 
 ### Handler Layer (`handler.rs`)
+
 - Request/response processing
 - Input validation
 - Error handling
@@ -27,6 +30,7 @@ The Protocol component provides advanced transaction handling capabilities with 
 ## Features
 
 ### Transaction Operations
+
 - Creation
 - Signing
 - Broadcasting
@@ -34,6 +38,7 @@ The Protocol component provides advanced transaction handling capabilities with 
 - Status tracking
 
 ### Script Support
+
 - P2PKH (Pay to Public Key Hash)
 - P2SH (Pay to Script Hash)
 - P2WPKH (Pay to Witness Public Key Hash)
@@ -41,6 +46,7 @@ The Protocol component provides advanced transaction handling capabilities with 
 - P2TR (Pay to Taproot)
 
 ### Advanced Features
+
 - Fee estimation
 - PSBT support
 - Mempool monitoring
@@ -87,6 +93,7 @@ cargo test --package anya-core --test protocol_integration
 ## Metrics
 
 The component exports the following metrics:
+
 - `protocol_transaction_time`: Histogram of transaction processing times
 - `protocol_fee_rates`: Histogram of fee rates
 - `protocol_errors`: Counter of transaction errors
@@ -95,6 +102,7 @@ The component exports the following metrics:
 ## Health Checks
 
 Health monitoring includes:
+
 - Service availability
 - Transaction performance
 - Fee rate analysis
@@ -104,6 +112,7 @@ Health monitoring includes:
 ## Security
 
 Security measures include:
+
 - Input validation
 - Fee limits
 - Access control
