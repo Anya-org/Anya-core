@@ -257,6 +257,7 @@ To ensure documentation alignment with code implementation:
 
 **Status**: Completed
 **Files**: 
+
 - `src/layer2/mock/mod.rs`
 - `src/layer2/mod.rs`
 
@@ -267,6 +268,7 @@ To ensure documentation alignment with code implementation:
 
 **Status**: Completed
 **Files**:
+
 - `src/bitcoin/wallet.rs`
 - `src/bitcoin/wallet/mod.rs`
 
@@ -277,11 +279,13 @@ To ensure documentation alignment with code implementation:
 
 **Status**: Not Started
 **Files**:
+
 - `src/bitcoin/validation.rs`
 - `src/lib.rs`
 
 **Issue**: Type mismatch between function signatures in lib.rs and their usage in validation.rs
 **Solution**: 
+
 - Update the `verify_taproot_transaction` function signature in lib.rs to accept `&Transaction` instead of `&str`
 - Update the `verify_transaction_batch` function to accept `&[Transaction]` or serialize the transactions at call sites
 
