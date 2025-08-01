@@ -1,24 +1,27 @@
 #[cfg(test)]
 mod tests {
     use crate::mobile::sdk::{MobileSDK, WalletInfo};
-    
+
     #[cfg(feature = "ffi")]
     mod ffi_tests {
         use super::*;
+        use crate::mobile::ffi;
         use std::ffi::{CStr, CString};
         use std::os::raw::c_char;
-        use crate::mobile::ffi;
 
         #[test]
         fn test_initialize_wallet() {
-            let mnemonic = CString::new("test test test test test test test test test test test junk").unwrap();
+            let mnemonic =
+                CString::new("test test test test test test test test test test test junk")
+                    .unwrap();
             let result = unsafe { ffi::anya_initialize_wallet(mnemonic.as_ptr()) };
             assert_eq!(result, 0);
         }
 
         #[test]
         fn test_send_transaction() {
-            let recipient = CString::new("bc1qxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxqqqqqq").unwrap();
+            let recipient =
+                CString::new("bc1qxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxqqqqqq").unwrap();
             let txid = unsafe { ffi::anya_send_transaction(recipient.as_ptr(), 1000) };
             let result = unsafe { CStr::from_ptr(txid).to_string_lossy().into_owned() };
             assert!(!result.is_empty());
@@ -36,22 +39,26 @@ mod tests {
             unsafe { ffi::anya_free_string(info_json) };
         }
     }
-    
+
     #[tokio::test]
     async fn test_sdk_initialize() {
         let sdk = MobileSDK::new();
-        let result = sdk.initialize_wallet("test test test test test test test test test test test junk").await;
+        let result = sdk
+            .initialize_wallet("test test test test test test test test test test test junk")
+            .await;
         assert!(result.is_ok());
     }
-    
+
     #[tokio::test]
     async fn test_sdk_send_transaction() {
         let sdk = MobileSDK::new();
-        let result = sdk.send_transaction("bc1qxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxqqqqqq", 1000).await;
+        let result = sdk
+            .send_transaction("bc1qxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxqqqqqq", 1000)
+            .await;
         assert!(result.is_ok());
         assert!(!result.unwrap().is_empty());
     }
-    
+
     #[tokio::test]
     async fn test_sdk_get_wallet_info() {
         let sdk = MobileSDK::new();

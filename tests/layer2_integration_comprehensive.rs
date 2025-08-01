@@ -120,9 +120,7 @@ async fn test_lightning_network_operations() {
                     println!("Lightning asset issued: {asset_id}");
                 }
                 Err(e) => {
-                    println!(
-                        "Lightning asset issuance failed (expected in test env): {e}"
-                    );
+                    println!("Lightning asset issuance failed (expected in test env): {e}");
                 }
             }
         }

@@ -6,8 +6,8 @@
 use anya_core::bitcoin::validation::TransactionValidator;
 
 use bitcoin::{
-    absolute::LockTime, transaction::Version, Amount, OutPoint, ScriptBuf, Sequence,
-    Transaction, TxIn, TxOut, Witness,
+    absolute::LockTime, transaction::Version, Amount, OutPoint, ScriptBuf, Sequence, Transaction,
+    TxIn, TxOut, Witness,
 };
 
 /// [SECURITY SENSITIVE] Test full Bitcoin Core security alignment

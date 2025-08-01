@@ -1,8 +1,8 @@
-use anya_core::bitcoin::wallet::{WalletConfig, CoinSelectionStrategy, FeeStrategy, WalletType, Wallet};
+use anya_core::bitcoin::wallet::{
+    CoinSelectionStrategy, FeeStrategy, Wallet, WalletConfig, WalletType,
+};
 use bitcoin::Network;
 use std::path::PathBuf;
-
-
 
 async fn create_test_wallet() -> Arc<Wallet> {
     let config = WalletConfig {
@@ -29,7 +29,6 @@ async fn create_test_wallet() -> Arc<Wallet> {
 // This file contains tests that verify the correctness of the code examples in the
 // documentation. It also includes integration tests that check the API endpoints.
 
-
 use axum::{
     body::Body,
     http::{Request, StatusCode},
@@ -37,9 +36,7 @@ use axum::{
 use std::sync::Arc;
 use tower::ServiceExt;
 
-use anya_core::{
-    api::routes::configure_routes,
-};
+use anya_core::api::routes::configure_routes;
 use anya_core::web::web5_adapter::Web5Adapter;
 
 /// Test the health check endpoint

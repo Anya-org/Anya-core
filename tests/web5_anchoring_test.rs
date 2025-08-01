@@ -3,13 +3,15 @@
 // Using standard approach for conditional compilation
 #[cfg(feature = "web5")] // Only compile when web5 feature is enabled
 mod web5_tests {
-    use anya_core::bitcoin::wallet::{Wallet, WalletConfig, WalletType, AddressType};
+    use anya_core::bitcoin::wallet::{
+        AddressManager, CoinSelectionStrategy, FeeStrategy, TransactionManager,
+    };
+    use anya_core::bitcoin::wallet::{AddressType, Wallet, WalletConfig, WalletType};
+    use anyhow::Result;
     use bdk::wallet::AddressIndex;
     use bitcoin::Network;
     use std::sync::Arc;
     use tempfile::tempdir;
-    use anyhow::Result;
-    use anya_core::bitcoin::wallet::{CoinSelectionStrategy, FeeStrategy, AddressManager, TransactionManager};
 
     #[tokio::test]
     async fn test_web5_credential_with_bitcoin_anchoring() -> Result<()> {
@@ -58,10 +60,10 @@ mod web5_tests {
         //     )
         //     .await?;
 
-            // ...existing code...
+        // ...existing code...
         // assert!(credential.bitcoin_anchoring.is_some());
         println!("Credential issued successfully with Bitcoin anchoring");
-            // ...existing code...
+        // ...existing code...
         // Verify the credential
         // let is_valid = credential_manager.verify_credential(&credential).await?;
         // assert!(is_valid);
@@ -97,7 +99,6 @@ mod web5_tests {
         let wallet = Arc::new(Wallet::new(wallet_config, None));
         wallet.initialize(None, None)?;
 
-
         // Generate some testing addresses
         let addr1 = wallet.get_address(0, AddressType::Taproot)?;
         let addr2 = wallet.get_address(1, AddressType::Taproot)?;
@@ -112,7 +113,9 @@ mod web5_tests {
 
         // Create multi-output PSBT
         println!("Creating multi-output PSBT...");
-        use anya_core::bitcoin::wallet::transactions::{TxOptions, CoinSelectionStrategy as TxCoinSelectionStrategy};
+        use anya_core::bitcoin::wallet::transactions::{
+            CoinSelectionStrategy as TxCoinSelectionStrategy, TxOptions,
+        };
         let tx_options = TxOptions {
             coin_selection: TxCoinSelectionStrategy::BranchAndBound,
             ..Default::default()
