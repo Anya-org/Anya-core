@@ -43,6 +43,9 @@ web5 = []
 memory_tracking = []
 # Chaos visualization for network testing
 chaos-viz = []
+# Mobile and FFI integration features
+ffi = ["std"]  # Mobile FFI bindings
+mobile = ["ffi", "std", "bitcoin/std", "bitcoin/rand-std", "secp256k1/global-context", "secp256k1/rand"]
 
 [dependencies]
 # For cache performance tests and Zipf distribution
@@ -52,7 +55,7 @@ axum = "=0.8.4"
 tower = "=0.5.2"
 tower-http = { version = "=0.6.6", features = ["cors", "trace"] }
 hyper = { version = "=1.6.0", features = ["full"] }
-tokio = { version = "=1.45.1", features = ["full"] }
+tokio = { version = "1.47.0", features = ["full"] }
 
 # Bitcoin dependencies with enhanced consensus safety
 bitcoin = { version = "0.32", features = [
@@ -63,10 +66,10 @@ bitcoin = { version = "0.32", features = [
     "base64",
     "rand-std",
 ], optional = true }
-secp256k1 = { version = "0.29", features = [
-    "rand-std",
+secp256k1 = { version = "0.31.1", features = [
     "global-context",
     "recovery",
+    "rand",
 ] }
 bitcoincore-rpc = { version = "0.19", features = ["default"] }
 miniscript = { version = "=12.3.0", features = [
@@ -96,7 +99,8 @@ serde = { version = "1.0.219", features = [
 serde_json = { version = "1.0.140", features = [
     "std",
     "preserve_order",
-] } # Maintain order for consensus
+    "arbitrary_precision",
+] } # Maintain order for consensus and support arbitrary precision for mobile
 humantime-serde = "=1.1.1"
 getrandom = { version = "=0.3.3", features = ["std"] }
 url = { version = "=2.5.4", features = ["serde"] }

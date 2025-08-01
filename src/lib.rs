@@ -63,6 +63,8 @@ pub mod layer2;
 pub mod tokenomics;
 pub mod tools;
 pub mod web;
+#[cfg(any(feature = "ffi", feature = "mobile"))]
+pub mod mobile;
 
 // Hardware optimization module
 pub mod hardware_optimization {
