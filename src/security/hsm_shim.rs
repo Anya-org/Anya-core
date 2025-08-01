@@ -221,7 +221,6 @@ pub trait HsmProvider: Send + Sync {
     }
 }
 
-
 /// [AIR-3][AIS-3][BPC-3][RES-3][SEC-2] Enhanced Bitcoin HSM Provider
 /// This follows official Bitcoin Improvement Proposals (BIPs) standards
 /// and provides secure key management capabilities

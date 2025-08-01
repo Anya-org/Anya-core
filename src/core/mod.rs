@@ -12,7 +12,6 @@ pub use reliability::{
     execute_with_monitoring, execute_with_recovery, AiVerification, ProgressTracker, Watchdog,
 };
 
-
 /// Core functionality with auto-save capabilities.
 /// Provides performance optimization and input processing for the Anya system.
 pub struct CoreSystem {
@@ -158,7 +157,9 @@ impl AnyaCore {
             Arc::new(bitcoin_adapter);
 
         // Use HTTP-based Web5Adapter client
-        let web5 = Arc::new(crate::web::web5_adapter::Web5Adapter::new(&config.web5.endpoint));
+        let web5 = Arc::new(crate::web::web5_adapter::Web5Adapter::new(
+            &config.web5.endpoint,
+        ));
 
         let ml_config = crate::ml::MLConfig {
             enabled: true,
@@ -184,7 +185,9 @@ impl AnyaCore {
     #[cfg(not(feature = "rust-bitcoin"))]
     pub async fn new(config: Config) -> Result<Self, Box<dyn std::error::Error>> {
         // Use HTTP-based Web5Adapter client
-        let web5 = Arc::new(crate::web::web5_adapter::Web5Adapter::new(&config.web5.endpoint));
+        let web5 = Arc::new(crate::web::web5_adapter::Web5Adapter::new(
+            &config.web5.endpoint,
+        ));
 
         let ml_config = crate::ml::MLConfig {
             enabled: true,
