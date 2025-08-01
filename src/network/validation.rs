@@ -323,6 +323,7 @@ impl NetworkValidator {
                 socket_addr: SocketAddr::new(resolver_ip, 53),
                 protocol: Protocol::Udp,
                 tls_dns_name: None,
+                tls_config: None,
                 bind_addr: None,
                 trust_negative_responses: true,
             };
