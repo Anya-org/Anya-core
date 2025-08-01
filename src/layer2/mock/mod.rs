@@ -22,3 +22,6 @@ mock! {
         async fn validate_state(&self, state_data: &[u8]) -> Result<ValidationResult, Box<dyn std::error::Error + Send + Sync>>;
     }
 }
+
+// The mock is automatically generated with the name MockLayer2Protocol
+// by the mockall library, so we don't need to create an alias

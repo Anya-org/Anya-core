@@ -2,10 +2,10 @@
 // [AIR-2][AIS-2][BPC-2][AIT-2][RES-2]
 //
 // This module provides symmetric encryption utilities using modern algorithms.
-use aes_gcm::{aead::Aead as AesAead, Aes256Gcm, KeyInit as AesKeyInit};
+use aes_gcm::{Aes256Gcm, KeyInit};
 /// Supports AES-256 (GCM, CBC, CTR modes) and ChaCha20-Poly1305.
 use chacha20poly1305::{
-    aead::{Aead, KeyInit, Payload},
+    aead::{Payload},
     ChaCha20Poly1305, Key,
 };
 use thiserror::Error;

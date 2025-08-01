@@ -7,7 +7,7 @@ use std::sync::Arc;
 use tower_http::trace::TraceLayer;
 
 use crate::api::handlers;
-use crate::handlers::{dwn, rgb, web5};
+use crate::handlers::{dwn, rgb};
 use crate::web::web5_adapter::Web5Adapter;
 use super::handlers::auth::auth_middleware;
 
