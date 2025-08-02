@@ -89,8 +89,8 @@ pub struct WalletInfo {
 #[cfg(feature = "ffi")]
 pub mod ffi {
     use super::*;
-    use std::ffi::{CStr, CString};
-    use std::os::raw::{c_char, c_int};
+    
+    use std::os::raw::c_int;
 
     // FFI functions moved to ffi.rs module
 

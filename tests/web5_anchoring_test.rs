@@ -1,14 +1,13 @@
 // Web5 Bitcoin anchoring test
 //! DISABLED: dependencies module not available in current architecture
 // Using standard approach for conditional compilation
-#[cfg(feature = "web5")] // Only compile when web5 feature is enabled
+#[cfg(all(feature = "web5", feature = "bdk"))] // Only compile when both web5 and bdk features are enabled
 mod web5_tests {
     use anya_core::bitcoin::wallet::{
         AddressManager, CoinSelectionStrategy, FeeStrategy, TransactionManager,
     };
     use anya_core::bitcoin::wallet::{AddressType, Wallet, WalletConfig, WalletType};
     use anyhow::Result;
-    use bdk::wallet::AddressIndex;
     use bitcoin::Network;
     use std::sync::Arc;
     use tempfile::tempdir;
@@ -127,7 +126,7 @@ mod web5_tests {
 
         // Enhance the PSBT for hardware wallet compatibility
         println!("Enhancing PSBT for hardware wallet compatibility...");
-        let mut enhanced_psbt = psbt.clone();
+        let enhanced_psbt = psbt.clone();
         // wallet.enhance_psbt_for_hardware(&mut enhanced_psbt).await?;
 
         // Check if the PSBT was properly enhanced with BDK 0.30.0

@@ -382,38 +382,57 @@ impl SourceOfTruthRegistry {
         work_id: &str,
         new_status: WorkStatus,
     ) -> Result<(), SourceOfTruthError> {
-        use log::debug;
-        debug!("update_work_item_status called for work_id: {work_id}, new_status: {new_status:?}");
-        // 1. Validate work item exists
-        let mut work_item = match self.work_items.get_mut(work_id) {
-            Some(item) => item,
-            None => {
-                debug!("Work item not found: {work_id}");
-                return Err(SourceOfTruthError::WorkItemNotFound(work_id.to_string()));
-            }
+        // 1. Validate work item exists and get current status
+        let current_status = {
+            let work_item = match self.work_items.get(work_id) {
+                Some(item) => item,
+                None => {
+                    return Err(SourceOfTruthError::WorkItemNotFound(work_id.to_string()));
+                }
+            };
+            work_item.status.clone()
         };
 
         // 2. Validate status transition
-        if let Err(e) = self.validate_status_transition(&work_item.status, &new_status) {
-            debug!("Invalid status transition: {e:?}");
+        if let Err(e) = self.validate_status_transition(&current_status, &new_status) {
             return Err(e);
         }
 
-        // 3. Update work item
-        work_item.status = new_status.clone();
-        work_item.last_updated = Self::current_timestamp();
+        // 3. Generate verification hash if completing (before updating)
+        let verification_hash = if matches!(new_status, WorkStatus::Completed) {
+            let work_item = self.work_items.get(work_id).unwrap();
+            let mut temp_item = work_item.clone();
+            temp_item.status = new_status.clone();
+            temp_item.completion_timestamp = Some(Self::current_timestamp());
+            Some(self.generate_verification_hash(&temp_item).await?)
+        } else {
+            None
+        };
 
-        // 4. Handle completion
-        if matches!(new_status, WorkStatus::Completed) {
-            work_item.completion_timestamp = Some(Self::current_timestamp());
-            work_item.verification_hash = self.generate_verification_hash(&work_item).await?;
-            work_item.source_of_truth_updated = true;
-        }
+        // 4. Update work item (separate scope to release lock)
+        {
+            let mut work_item = match self.work_items.get_mut(work_id) {
+                Some(item) => item,
+                None => {
+                    return Err(SourceOfTruthError::WorkItemNotFound(work_id.to_string()));
+                }
+            };
 
+            work_item.status = new_status.clone();
+            work_item.last_updated = Self::current_timestamp();
+
+            // Handle completion
+            if matches!(new_status, WorkStatus::Completed) {
+                work_item.completion_timestamp = Some(Self::current_timestamp());
+                work_item.verification_hash = verification_hash.unwrap();
+                work_item.source_of_truth_updated = true;
+            }
+        } // Release the mutable lock here
+
+        // 5. Save to disk after releasing the lock
         self.update_last_modified();
         self.save_to_disk().await?;
 
-        debug!("update_work_item_status completed for work_id: {work_id}");
         Ok(())
     }
 
@@ -606,7 +625,7 @@ impl SourceOfTruthRegistry {
             let words1: Vec<&str> = content1.split_whitespace().collect();
 
             // 2. Load the second document and get its normalized content
-            if let Ok(content2) = fs::read_to_string(&doc_entry.file_path).sync_wait() {
+            if let Ok(content2) = Self::sync_wait(fs::read_to_string(&doc_entry.file_path)) {
                 let normalized2 = self.normalize_documentation_content(&content2);
                 let words2: Vec<&str> = normalized2.split_whitespace().collect();
 
@@ -725,7 +744,6 @@ impl SourceOfTruthRegistry {
         current: &WorkStatus,
         new: &WorkStatus,
     ) -> Result<(), SourceOfTruthError> {
-        use log::debug;
         match (current, new) {
             (WorkStatus::Planning, WorkStatus::InProgress) => Ok(()),
             (WorkStatus::InProgress, WorkStatus::CodeReview) => Ok(()),
@@ -733,12 +751,9 @@ impl SourceOfTruthRegistry {
             (WorkStatus::Testing, WorkStatus::Completed) => Ok(()),
             (_, WorkStatus::Blocked(_)) => Ok(()), // Can always be blocked
             (WorkStatus::Blocked(_), _) => Ok(()), // Can transition from blocked to any state
-            _ => {
-                debug!("Invalid status transition from {current:?} to {new:?}");
-                Err(SourceOfTruthError::InvalidWorkItemId(format!(
-                    "Invalid status transition from {current:?} to {new:?}"
-                )))
-            }
+            _ => Err(SourceOfTruthError::InvalidWorkItemId(format!(
+                "Invalid status transition from {current:?} to {new:?}"
+            ))),
         }
     }
 
@@ -919,7 +934,7 @@ impl SourceOfTruthRegistry {
                 return Ok(true);
             }
             AnchorStatus::Confirmed(confirmations) => {
-                if confirmations >= anchor.required_confirmations {
+                if confirmations >= anchor.required_confirmations as u32 {
                     // Update status to final
                     if let Some(mut anchor_mut) = self.blockchain_anchors.get_mut(txid) {
                         anchor_mut.status = AnchorStatus::Final;
@@ -981,7 +996,7 @@ impl SourceOfTruthRegistry {
         anchor.merkle_proof = Some(merkle_proof);
 
         // Update status based on confirmations
-        if confirmations >= anchor.required_confirmations {
+        if confirmations >= anchor.required_confirmations as u32 {
             anchor.status = AnchorStatus::Final;
             log::info!(
                 "Anchor {} is now final with {} confirmations",
@@ -1114,33 +1129,39 @@ impl SourceOfTruthRegistry {
 
     /// Save registry to disk
     async fn save_to_disk(&self) -> Result<(), SourceOfTruthError> {
-        // Create a serializable version of the registry
+        // Create a serializable version of the registry by collecting iterators safely
+        let canonical_documents: HashMap<String, CanonicalDocument> = self
+            .canonical_documents
+            .iter()
+            .map(|entry| (entry.key().clone(), entry.value().clone()))
+            .collect();
+        let work_items: HashMap<String, WorkItem> = self
+            .work_items
+            .iter()
+            .map(|entry| (entry.key().clone(), entry.value().clone()))
+            .collect();
+        let duplication_index: HashMap<String, DuplicationEntry> = self
+            .duplication_index
+            .iter()
+            .map(|entry| (entry.key().clone(), entry.value().clone()))
+            .collect();
+        let blockchain_anchors: HashMap<String, BlockchainAnchor> = self
+            .blockchain_anchors
+            .iter()
+            .map(|entry| (entry.key().clone(), entry.value().clone()))
+            .collect();
+        let documentation_index: HashMap<String, DocumentationEntry> = self
+            .documentation_index
+            .iter()
+            .map(|entry| (entry.key().clone(), entry.value().clone()))
+            .collect();
+
         let registry_data = RegistryData {
-            canonical_documents: self
-                .canonical_documents
-                .iter()
-                .map(|entry| (entry.key().clone(), entry.value().clone()))
-                .collect(),
-            work_items: self
-                .work_items
-                .iter()
-                .map(|entry| (entry.key().clone(), entry.value().clone()))
-                .collect(),
-            duplication_index: self
-                .duplication_index
-                .iter()
-                .map(|entry| (entry.key().clone(), entry.value().clone()))
-                .collect(),
-            blockchain_anchors: self
-                .blockchain_anchors
-                .iter()
-                .map(|entry| (entry.key().clone(), entry.value().clone()))
-                .collect(),
-            documentation_index: self
-                .documentation_index
-                .iter()
-                .map(|entry| (entry.key().clone(), entry.value().clone()))
-                .collect(),
+            canonical_documents,
+            work_items,
+            duplication_index,
+            blockchain_anchors,
+            documentation_index,
             last_updated: self.last_updated.load(Ordering::Relaxed),
             version: self.version.load(Ordering::Relaxed),
             blockchain_anchoring_enabled: self.blockchain_anchoring_enabled.load(Ordering::Relaxed),
@@ -1449,7 +1470,7 @@ fn extract_markdown_sections(content: &str) -> Vec<(String, String)> {
             }
 
             // Extract heading text and level
-            let heading_level = line.chars().take_while(|&c| c == '#').count();
+            let _heading_level = line.chars().take_while(|&c| c == '#').count();
             let heading_text = line.trim_start_matches(|c| c == '#' || c == ' ').trim();
 
             // Set as current section
@@ -1519,7 +1540,7 @@ pub mod web5_anchoring {
         record_id: &str,
     ) -> Result<bool, Box<dyn Error>> {
         // Generate current registry root hash
-        let current_hash = registry.generate_registry_root_hash().await;
+        let _current_hash = registry.generate_registry_root_hash().await;
 
         // In a real implementation, this would:
         // 1. Retrieve the record from the Web5 DWN
@@ -1591,7 +1612,6 @@ mod tests {
 
     #[tokio::test]
     async fn test_status_transition_valid() {
-        use log::debug;
         use tokio::time::{timeout, Duration};
         let temp_dir = tempdir().unwrap();
         let registry_path = temp_dir
@@ -1610,12 +1630,12 @@ mod tests {
             .unwrap();
 
         let valid = timeout(
-            Duration::from_secs(10),
+            Duration::from_secs(5),
             registry.update_work_item_status(&work_item.id, WorkStatus::InProgress),
         )
         .await;
         match valid {
-            Ok(Ok(_)) => debug!("Valid status transition succeeded"),
+            Ok(Ok(_)) => println!("Valid status transition succeeded"),
             Ok(Err(e)) => panic!("Valid status transition failed: {e:?}"),
             Err(_) => panic!("Timeout on valid status transition"),
         }
@@ -1623,7 +1643,6 @@ mod tests {
 
     #[tokio::test]
     async fn test_status_transition_invalid() {
-        use log::debug;
         use tokio::time::{timeout, Duration};
         let temp_dir = tempdir().unwrap();
         let registry_path = temp_dir
@@ -1643,13 +1662,13 @@ mod tests {
 
         // Try invalid transition: Planning -> Completed (should fail)
         let invalid = timeout(
-            Duration::from_secs(10),
+            Duration::from_secs(5),
             registry.update_work_item_status(&work_item.id, WorkStatus::Completed),
         )
         .await;
         match invalid {
             Ok(Ok(_)) => panic!("Invalid status transition unexpectedly succeeded"),
-            Ok(Err(_)) => debug!("Invalid status transition correctly failed"),
+            Ok(Err(_)) => println!("Invalid status transition correctly failed"),
             Err(_) => panic!("Timeout on invalid status transition"),
         }
     }

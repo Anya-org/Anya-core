@@ -172,8 +172,8 @@ pub struct SoftwareHsmProvider {
 impl SoftwareHsmProvider {
     /// Create a new software HSM provider
     pub async fn new(
-        config: SoftHsmConfig,
-        network: Network,
+        _config: SoftHsmConfig,
+        _network: Network,
         audit_logger: Arc<AuditLogger>,
     ) -> Result<Self, HsmError> {
         // Initialize the secp256k1 context with all capabilities
@@ -201,7 +201,7 @@ impl SoftwareHsmProvider {
     }
 
     /// [AIR-3][AIS-3][BPC-3] Create production-grade software HSM provider
-    /// 
+    ///
     /// This method creates a software HSM provider with enhanced security features
     /// suitable for production environments with proper key encryption and storage.
     pub async fn new_production(
@@ -213,19 +213,19 @@ impl SoftwareHsmProvider {
         if let Some(ref encryption_key) = config.encryption_key {
             if encryption_key.len() < 32 {
                 return Err(HsmError::ConfigurationError(
-                    "Production software HSM requires 32+ character encryption key".into()
+                    "Production software HSM requires 32+ character encryption key".into(),
                 ));
             }
         } else {
             return Err(HsmError::ConfigurationError(
-                "Production software HSM requires encryption key".into()
+                "Production software HSM requires encryption key".into(),
             ));
         }
 
         // Validate network for production
         if network == Network::Bitcoin && config.use_testnet {
             return Err(HsmError::ConfigurationError(
-                "Cannot use testnet configuration with Bitcoin mainnet".into()
+                "Cannot use testnet configuration with Bitcoin mainnet".into(),
             ));
         }
 
@@ -233,12 +233,15 @@ impl SoftwareHsmProvider {
         let provider = Self::new(config, network, audit_logger).await?;
 
         // Log production initialization
-        provider.audit_logger.log(
-            AuditEventType::Initialization,
-            AuditEventResult::Success,
-            AuditEventSeverity::Info,
-            "Production software HSM initialized with encryption and security mitigations",
-        ).await?;
+        provider
+            .audit_logger
+            .log(
+                AuditEventType::Initialization,
+                AuditEventResult::Success,
+                AuditEventSeverity::Info,
+                "Production software HSM initialized with encryption and security mitigations",
+            )
+            .await?;
 
         Ok(provider)
     }
@@ -246,10 +249,10 @@ impl SoftwareHsmProvider {
     /// Generate secure encryption key for software HSM
     pub fn generate_secure_encryption_key() -> String {
         use rand::RngCore;
-        
+
         let mut key = [0u8; 32];
         rand::thread_rng().fill_bytes(&mut key);
-        
+
         // Encode as base64 for configuration
         base64::Engine::encode(&base64::engine::general_purpose::STANDARD, &key)
     }
@@ -260,31 +263,27 @@ impl SoftwareHsmProvider {
         if let Some(ref encryption_key) = config.encryption_key {
             if encryption_key.len() < 16 {
                 return Err(HsmError::ConfigurationError(
-                    "Encryption key must be at least 16 characters".into()
+                    "Encryption key must be at least 16 characters".into(),
                 ));
             }
         }
 
         // Check session limits
-        if let Some(max_sessions) = config.max_sessions {
-            if max_sessions == 0 || max_sessions > 1000 {
-                return Err(HsmError::ConfigurationError(
-                    "Max sessions must be between 1 and 1000".into()
-                ));
-            }
+        if config.max_sessions == 0 || config.max_sessions > 1000 {
+            return Err(HsmError::ConfigurationError(
+                "Max sessions must be between 1 and 1000".into(),
+            ));
         }
 
         // Check timeout settings
-        if let Some(timeout) = config.lock_timeout_seconds {
-            if timeout < 60 || timeout > 86400 {  // 1 minute to 24 hours
-                return Err(HsmError::ConfigurationError(
-                    "Lock timeout must be between 60 and 86400 seconds".into()
-                ));
-            }
+        if config.lock_timeout_seconds < 60 || config.lock_timeout_seconds > 86400 {
+            // 1 minute to 24 hours
+            return Err(HsmError::ConfigurationError(
+                "Lock timeout must be between 60 and 86400 seconds".into(),
+            ));
         }
 
         Ok(())
-    }
     }
 
     /// Generate a secure random key ID using the system's secure RNG

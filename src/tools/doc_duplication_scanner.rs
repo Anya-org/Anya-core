@@ -326,7 +326,7 @@ fn extract_html_sections(
 
         // Very simplified header detection - would use a parser in production
         if let Some(header_start) = trimmed.find("<h") {
-            if let Some(header_end) = trimmed[header_start..].find('>') {
+            if let Some(_header_end) = trimmed[header_start..].find('>') {
                 in_header = true;
 
                 // If we were tracking a section, add it

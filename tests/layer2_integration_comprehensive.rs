@@ -16,6 +16,7 @@ use std::sync::Arc;
 
 /// Configuration for integration testing
 #[derive(Debug, Clone)]
+#[allow(dead_code)]
 struct IntegrationTestConfig {
     timeout_seconds: u64,
     performance_threshold_ms: u128,

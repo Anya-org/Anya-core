@@ -21,6 +21,10 @@ pub enum HsmError {
     #[error("Configuration error: {0}")]
     ConfigError(String),
 
+    /// Configuration validation error
+    #[error("Configuration validation error: {0}")]
+    ConfigurationError(String),
+
     /// HSM initialization error
     #[error("HSM initialization error: {0}")]
     InitializationError(String),

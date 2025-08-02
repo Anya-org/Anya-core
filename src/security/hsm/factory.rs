@@ -5,7 +5,6 @@
 //! fallback strategies for production environments, ensuring high availability
 //! while maintaining security standards.
 
-use async_trait::async_trait;
 use std::sync::Arc;
 use tracing::{error, info, warn};
 
@@ -174,15 +173,12 @@ impl HsmProviderFactory {
     ) -> Result<Arc<dyn HsmProvider>, HsmError> {
         // Use secure defaults for fallback
         let fallback_config = SoftHsmConfig {
-            token_dir: config
-                .software
-                .token_dir
-                .clone()
-                .unwrap_or_else(|| ".anya-hsm".into()),
-            max_sessions: config.software.max_sessions.unwrap_or(10),
-            encryption_key: Self::generate_fallback_encryption_key()?,
-            lock_timeout_seconds: config.software.lock_timeout_seconds.unwrap_or(300),
-            use_testnet: config.bitcoin.network != bitcoin::Network::Bitcoin,
+            token_dir: config.software.token_dir.clone(),
+            max_sessions: config.software.max_sessions,
+            encryption_key: Some(Self::generate_fallback_encryption_key()?),
+            lock_timeout_seconds: config.software.lock_timeout_seconds,
+            use_testnet: config.bitcoin.network
+                != crate::security::hsm::config::BitcoinNetworkType::Mainnet,
         };
 
         let audit_config = crate::security::hsm::audit::AuditLoggerConfig::default();
@@ -211,7 +207,8 @@ impl HsmProviderFactory {
             failure_rate: 0.0,
             pin_timeout_seconds: 300,
             max_pin_attempts: 3,
-            use_testnet: config.bitcoin.network != bitcoin::Network::Bitcoin,
+            use_testnet: config.bitcoin.network
+                != crate::security::hsm::config::BitcoinNetworkType::Mainnet,
         };
 
         let provider = SimulatorHsmProvider::new(&fallback_config)?;
@@ -306,7 +303,7 @@ impl ProductionHsmFactory {
     /// Validate configuration meets production requirements
     fn validate_production_config(config: &HsmConfig) -> Result<(), HsmError> {
         // Network validation
-        if config.bitcoin.network == bitcoin::Network::Bitcoin {
+        if config.bitcoin.network == crate::security::hsm::config::BitcoinNetworkType::Mainnet {
             // Mainnet requires hardware HSM or secure software configuration
             match config.provider_type {
                 HsmProviderType::Simulator => {

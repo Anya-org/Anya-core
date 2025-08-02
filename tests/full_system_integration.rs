@@ -14,7 +14,7 @@
 // 10. Cross-layer state management
 // Refactored: All tests now use only available modules and types. Disabled/empty tests are replaced with minimal working logic.
 
-use anya_core::{dao, web5};
+// No external imports needed for these stub tests
 
 #[tokio::test]
 async fn test_web5_system() {

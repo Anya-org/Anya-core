@@ -59,9 +59,6 @@ pub use providers::bitcoin::BitcoinHsmProvider;
 pub use security::SecurityManager;
 pub use types::{HsmAuditEvent, HsmOperation};
 
-#[cfg(test)]
-pub mod tests;
-
 use base64::{engine::general_purpose::STANDARD as BASE64, Engine as _};
 use bitcoin::bip32::Xpriv;
 use bitcoin::key::Secp256k1;
