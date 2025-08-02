@@ -107,21 +107,34 @@ crate-type = ["lib", "staticlib", "cdylib"]
 default = ["std", "bitcoin", "mobile"]
 std = []
 # Bitcoin implementation features
+# [AIR-3][AIS-3][BPC-3] Enhanced Feature Flags with HSM Standardization
 bitcoin = ["dep:bitcoin", "dep:bitcoincore-rpc", "dep:miniscript", "dep:bdk_wallet"]
 rust-bitcoin = ["bitcoin"]  # Alias for backward compatibility
+
 # Mobile SDK features  
 ffi = ["std"]
 mobile = ["ffi", "std", "bitcoin", "dep:uniffi", "dep:jni"]
+
 # Web5 integration features
 web5 = ["dep:web5", "dep:jsonwebtoken", "dep:multibase", "dep:multihash"]
+
 # Enterprise features
 enterprise = ["dep:sqlx", "dep:yubihsm", "dep:sgx_urts"]
-# HSM features
-hsm = ["dep:yubihsm", "dep:sgx_urts"]
+
+# [AIS-3] HSM Features - Standardized with intelligent fallback
+hsm = ["hsm-software"]  # Default to software HSM (always available)
+hsm-full = ["hsm-software", "hsm-hardware", "hsm-bitcoin", "hsm-simulator"]
+hsm-software = []  # Software HSM - no external dependencies, always available
+hsm-hardware = ["dep:yubihsm", "dep:sgx_urts"]  # Hardware HSM devices
+hsm-bitcoin = ["bitcoin", "hsm-software"]  # Bitcoin-specific HSM operations
+hsm-simulator = ["hsm-software"]  # Simulator for testing
+hsm-production = ["hsm-hardware", "hsm-bitcoin"]  # Production-ready HSM
+
 # API features
 api = ["std"]
+
 # Complete system (including all features)
-complete = ["bitcoin", "mobile", "web5", "enterprise"]
+complete = ["bitcoin", "mobile", "web5", "enterprise", "hsm-full"]
 
 [dependencies]
 # === Core Dependencies (using workspace versions) ===

@@ -1,7 +1,10 @@
 //! Hardware Security Module (HSM) Implementation
+//! [AIR-3][AIS-3][BPC-3][RES-3]
 //!
 //! This module provides a unified interface for hardware security operations
 //! with a focus on open-source solutions that align with Bitcoin's philosophy.
+//!
+//! Features intelligent fallback strategies and production-grade reliability.
 
 use crate::security::hsm::audit::AuditLogger;
 use crate::security::hsm::providers::hardware::HardwareHsmProvider;
@@ -15,6 +18,9 @@ use bitcoin::ScriptBuf;
 use serde::{Deserialize, Serialize};
 use std::error::Error;
 use std::sync::Arc;
+
+// Enhanced factory for provider creation with fallback
+pub mod factory;
 
 pub use providers::{
     ledger::LedgerHsmProvider, pkcs11::Pkcs11HsmProvider, software::SoftwareHsmProvider,
@@ -42,6 +48,10 @@ pub mod provider;
 pub mod providers;
 pub mod security;
 pub mod types;
+
+// [AIR-3][AIS-3][BPC-3] Comprehensive HSM testing
+#[cfg(test)]
+pub mod tests;
 
 pub use error::*;
 pub use provider::HsmProviderStatus;
