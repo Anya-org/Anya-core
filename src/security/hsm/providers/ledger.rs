@@ -12,7 +12,7 @@ use std::sync::Arc;
 use async_trait::async_trait;
 use bitcoin::Network;
 
-// [AIR-3][AIS-3][BPC-3][RES-3] Import HSM module types following BDF v2.5 standards
+// [AIR-3][AIS-3][BPC-3][RES-3] Import HSM module types following BIP Standards
 use crate::security::hsm::audit::AuditLogger;
 use crate::security::hsm::error::HsmError;
 use crate::security::hsm::provider;

@@ -1,7 +1,7 @@
 // [AIR-3][AIS-3][BPC-3][AIT-3] Markdown Documentation Validation Module
 // AI-Readable: Enhanced with standardized markdown processing capabilities
 // AI-Secure: Validates document structure and prevents malformed content
-// Bitcoin-Protocol-Compliant: Ensures documentation meets BDF v2.5 standards
+// Bitcoin-Protocol-Compliant: Ensures documentation meets BIP Standards
 // AI-Testable: Comprehensive test coverage for document validation
 
 use regex::Regex;

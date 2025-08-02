@@ -2,12 +2,11 @@
 // Mock implementation - these features are now part of the main anya_core library
 
 #[cfg(feature = "rust-bitcoin")]
-use anya_core::layer2::manager::Layer2Manager;
+use anya_core::layer2::Layer2Manager;
 use std::time::Instant;
 
 /// Layer3 system tests
 mod layer3_tests {
-    
 
     #[test]
     fn test_layer3_initialization() {

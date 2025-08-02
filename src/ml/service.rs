@@ -28,7 +28,7 @@ pub struct Device {}
 
 #[allow(dead_code)]
 impl Device {
-    // [AIS-3] Use snake_case for function names as per BDF v2.5 standards
+    // [AIS-3] Use snake_case for function names as per BIP Standards
     pub fn cuda(_device_id: i64) -> Self {
         Self {}
     }
@@ -194,7 +194,7 @@ impl MLService {
         self.features_dim = features_dim;
         self.model_version = model_version.to_string();
 
-        // [AIS-3] Handle mutex lock error explicitly as per BDF v2.5 standards
+        // [AIS-3] Handle mutex lock error explicitly as per BIP Standards
         let mut model_guard = match self.model.lock() {
             Ok(guard) => guard,
             // [AIR-3][AIS-3][BPC-3][RES-3]
@@ -288,7 +288,7 @@ impl MLService {
 
         let total_risk = (market_risk + security_risk + execution_risk + volatility_risk) / 4.0;
 
-        // [BPC-3] Add required fields as per BDF v2.5 standards
+        // [BPC-3] Add required fields as per BIP Standards
         Ok(RiskMetrics {
             risk_score: total_risk,
             compliance_level: if total_risk < 0.3 {
@@ -370,7 +370,7 @@ impl MLService {
         // [AIR-3][AIS-3][BPC-3][RES-3] Use assess_risks method for risk assessment
         let risk_assessment = self.assess_risks(proposal)?;
 
-        // [AIR-3][AIS-3][BPC-3][RES-3] Create proposal metrics according to BDF v2.5 standards
+        // [AIR-3][AIS-3][BPC-3][RES-3] Create proposal metrics according to BIP Standards
         // Create a new ProposalMetrics instance with all fields initialized
         let mut metrics = ProposalMetrics {
             proposal_count: 1, // Just counting the current proposal
