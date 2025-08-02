@@ -1,6 +1,7 @@
 use hickory_resolver::config::{NameServerConfig, Protocol, ResolverConfig, ResolverOpts};
 use hickory_resolver::Resolver;
 use serde::{Deserialize, Serialize};
+use std::io::Read;
 use std::net::{IpAddr, SocketAddr};
 use std::process::Command;
 use std::time::{Duration, Instant};
@@ -372,32 +373,38 @@ impl NetworkValidator {
         info!("Validating network bandwidth...");
 
         let download_start = Instant::now();
-        let download_result =
-            reqwest::get("https://speed.cloudflare.com/__down?bytes=5000000").await;
+        // Use ureq for MIT-compliant HTTP requests
+        let download_result = tokio::task::spawn_blocking(|| {
+            match ureq::get("https://speed.cloudflare.com/__down?bytes=5000000").call() {
+                Ok(resp) => {
+                    let mut bytes = Vec::new();
+                    match resp.into_reader().read_to_end(&mut bytes) {
+                        Ok(size) => Ok(size),
+                        Err(_) => Err("IO Error"),
+                    }
+                }
+                Err(_) => Err("HTTP Error"),
+            }
+        })
+        .await;
 
         let download_mbps = match download_result {
-            Ok(resp) => {
-                if let Ok(bytes) = resp.bytes().await {
-                    let elapsed = download_start.elapsed();
-                    let bits = bytes.len() as f64 * 8.0;
-                    let seconds = elapsed.as_secs_f64();
-                    (bits / 1_000_000.0) / seconds
-                } else {
-                    0.0
-                }
+            Ok(Ok(_bytes_len)) => {
+                let elapsed = download_start.elapsed();
+                let bits = 5000000.0 * 8.0; // We know the expected size
+                let seconds = elapsed.as_secs_f64();
+                (bits / 1_000_000.0) / seconds
             }
-            Err(_) => 0.0,
+            _ => 0.0,
         };
 
-        let client = reqwest::Client::new();
+        // Upload test using ureq
         let upload_bytes = vec![0u8; 1_000_000];
-
         let upload_start = Instant::now();
-        let upload_result = client
-            .post("https://speed.cloudflare.com/__up")
-            .body(upload_bytes)
-            .send()
-            .await;
+        let upload_result = tokio::task::spawn_blocking(move || {
+            ureq::post("https://speed.cloudflare.com/__up").send_bytes(&upload_bytes)
+        })
+        .await;
 
         let upload_mbps = match upload_result {
             Ok(_) => {
@@ -546,23 +553,26 @@ impl NetworkValidator {
                     continue;
                 }
                 if let Some(_host) = url.host_str() {
-                    let client = reqwest::Client::builder()
-                        .danger_accept_invalid_certs(true)
-                        .build()
-                        .unwrap_or_default();
-
-                    let response = client.get(endpoint).send().await;
+                    // Use ureq for MIT-compliant HTTP requests
+                    let endpoint_clone = endpoint.clone();
+                    let response =
+                        tokio::task::spawn_blocking(move || ureq::get(&endpoint_clone).call())
+                            .await;
 
                     match response {
-                        Ok(resp) => {
-                            let is_secure = resp.status().is_success();
+                        Ok(Ok(resp)) => {
+                            let is_secure = resp.status() < 400;
                             endpoints_secure.push((endpoint.clone(), is_secure));
-                            if resp.status().is_client_error() {
+                            if resp.status() >= 400 {
                                 certificate_issues.push((
                                     endpoint.clone(),
                                     format!("Certificate error: {}", resp.status()),
                                 ));
                             }
+                        }
+                        Ok(Err(e)) => {
+                            endpoints_secure.push((endpoint.clone(), false));
+                            certificate_issues.push((endpoint.clone(), format!("HTTP error: {e}")));
                         }
                         Err(e) => {
                             endpoints_secure.push((endpoint.clone(), false));

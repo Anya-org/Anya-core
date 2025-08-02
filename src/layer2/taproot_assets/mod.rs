@@ -16,6 +16,10 @@ use crate::layer2::{
     TransferResult, ValidationResult, VerificationResult,
 };
 
+// Import and re-export the taproot asset types
+mod taproot_asset_types;
+pub use taproot_asset_types::*;
+
 /// Taproot Assets protocol implementation (placeholder)
 pub struct TaprootAssetsProtocol {
     connected: Arc<RwLock<bool>>,

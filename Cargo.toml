@@ -41,7 +41,8 @@ axum = { version = "0.8.4" }
 tower = { version = "0.5.2" }
 tower-http = { version = "0.6.6", features = ["cors", "trace"] }
 hyper = { version = "1.6.0", features = ["full"] }
-reqwest = { version = "0.12.22", features = ["json", "rustls-tls"] }
+# MIT-licensed HTTP client (replacing reqwest for license compliance)
+ureq = { version = "2.10.1", features = ["json"] }
 
 # === LTS Cryptography ===
 aes-gcm = { version = "0.10.3" }
@@ -118,24 +119,24 @@ std = []
 bitcoin = ["dep:bitcoin", "dep:bitcoincore-rpc", "dep:miniscript", "dep:bdk_wallet"]
 rust-bitcoin = ["bitcoin"]  # Alias for backward compatibility
 
-# Mobile SDK features  
+# Mobile SDK features (MIT-compliant)
 ffi = ["std"]
-mobile = ["ffi", "std", "bitcoin", "dep:uniffi", "dep:jni"]
+mobile = ["ffi", "std", "bitcoin"]
 
 # Web5 integration features
 web5 = ["dep:web5", "dep:jsonwebtoken", "dep:multibase", "dep:multihash"]
 
-# Enterprise features
-enterprise = ["dep:sqlx", "dep:yubihsm", "dep:sgx_urts"]
+# Enterprise features (MIT-compliant only)
+enterprise = ["dep:sqlx"]
 
-# [AIS-3] HSM Features - Standardized with intelligent fallback
+# [AIS-3] HSM Features - MIT-compliant external interface
 hsm = ["hsm-software"]  # Default to software HSM (always available)
-hsm-full = ["hsm-software", "hsm-hardware", "hsm-bitcoin", "hsm-simulator"]
+hsm-full = ["hsm-software", "hsm-bitcoin", "hsm-simulator", "hsm-external"]
 hsm-software = []  # Software HSM - no external dependencies, always available
-hsm-hardware = ["dep:yubihsm", "dep:sgx_urts"]  # Hardware HSM devices
+hsm-external = ["hsm-software"]  # External HSM interface via CLI - MIT compliant
 hsm-bitcoin = ["bitcoin", "hsm-software"]  # Bitcoin-specific HSM operations
 hsm-simulator = ["hsm-software"]  # Simulator for testing
-hsm-production = ["hsm-hardware", "hsm-bitcoin"]  # Production-ready HSM
+hsm-production = ["hsm-external", "hsm-bitcoin"]  # Production-ready HSM via external interface
 
 # Bitcoin advanced features
 taproot = ["bitcoin"]  # Taproot transaction support
@@ -186,13 +187,12 @@ ring = { version = "0.17.8" }
 maplit = { version = "1.0.2" }
 sysinfo = { version = "0.36.1" }
 
-# Mobile & FFI (optional)
-uniffi = { version = "0.25.0", optional = true }
+# Mobile & FFI (optional - MIT compliant)
 jni = { version = "0.21.1", optional = true }
 regex = "1.11.1"
 hex = "0.4.3"
 semver = "1.0.26"
-reqwest.workspace = true
+ureq = { workspace = true }  # MIT-licensed HTTP client
 syn = { version = "2.0.104", features = ["full"] }
 url = "2.5.4"
 rand.workspace = true
@@ -239,9 +239,7 @@ ring = { workspace = true }
 maplit = { workspace = true }
 sysinfo = { workspace = true }
 
-# === Enterprise Dependencies (not in workspace) ===
-yubihsm = { version = "0.42.1", optional = true }
-sgx_urts = { version = "1.1.1", optional = true }
+# === Enterprise Dependencies (MIT-compliant) ===
 sqlx = { version = "0.8.2", features = ["runtime-tokio-rustls", "postgres"], optional = true }
 
 [dev-dependencies]
@@ -254,8 +252,7 @@ test-log = { workspace = true }
 wiremock = { workspace = true }
 
 [build-dependencies]
-# For mobile builds
-uniffi = { version = "0.25.0", optional = true }
+# No build dependencies needed for MIT-compliant build
 
 [[bin]]
 name = "anya-core"

@@ -16,6 +16,10 @@ use crate::layer2::{
     TransferResult, ValidationResult, VerificationResult,
 };
 
+// Import and re-export the protocol trait
+mod protocol_trait;
+pub use protocol_trait::*;
+
 /// Stacks protocol implementation (placeholder)
 pub struct StacksProtocol {
     connected: Arc<RwLock<bool>>,

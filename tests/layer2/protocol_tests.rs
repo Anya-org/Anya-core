@@ -163,29 +163,27 @@ impl ProtocolTestSuite {
 
     /// Test asset management
     async fn test_asset_management<P: Layer2Protocol>(&self, protocol: &P) -> AnyaResult<()> {
+        // Create asset issuance parameters
         let params = AssetParams {
             name: "Test Asset".to_string(),
             symbol: "TEST".to_string(),
-            decimals: 8,
-            total_supply: 1000000,
-            asset_id: "test_asset_id".to_string(),
-            metadata: "test_metadata".to_string(),
-            precision: 8,
+            total_supply: 1_000_000,
+            metadata: "Test asset metadata".to_string(),
         };
 
+        // Test asset issuance
         let issue_result = protocol.issue_asset(params).await.map(|_| ());
         self.verify_result(
             issue_result.map_err(|e| AnyaError::InvalidInput(e.to_string())),
             "Asset issuance",
         )?;
 
+        // Create asset transfer parameters
         let transfer = AssetTransfer {
             asset_id: "test_asset".to_string(),
             amount: 100,
             from: "test_sender".to_string(),
             to: "test_receiver".to_string(),
-            metadata: Some("test_metadata".to_string()),
-            recipient: "test_recipient".to_string(),
         };
 
         let transfer_result = protocol.transfer_asset(transfer).await.map(|_| ());
@@ -197,7 +195,16 @@ impl ProtocolTestSuite {
 
     /// Test security features
     async fn test_security<P: Layer2Protocol>(&self, protocol: &P) -> AnyaResult<()> {
-        let proof = Proof::default(); // Placeholder proof
+        // Create a proof manually
+        let proof = Proof {
+            proof_type: "test".to_string(),
+            data: Vec::new(),
+            block_height: Some(100),
+            witness: None,
+            merkle_root: "0".repeat(64),
+            merkle_proof: Vec::new(),
+            block_header: "0".repeat(64),
+        };
 
         let verify_result = protocol.verify_proof(proof).await.map(|_| ());
         self.verify_result(
@@ -205,10 +212,11 @@ impl ProtocolTestSuite {
             "Proof verification",
         )?;
 
-        let _state = ProtocolState::default(); // Placeholder state
-                                               // The validate_state method expects a &[u8], so serialize state if needed
-                                               // For now, pass an empty slice or implement serialization as needed
-        let validate_result = protocol.validate_state(&[]).await.map(|_| ());
+        // Create a protocol state manually
+        let state = anya_core::layer2::create_protocol_state("1.0", 5, Some(1000), true);
+
+        // Pass the actual ProtocolState object
+        let validate_result = protocol.validate_state(&state).await.map(|_| ());
         self.verify_result(
             validate_result.map_err(|e| AnyaError::InvalidInput(e.to_string())),
             "State validation",
@@ -267,21 +275,29 @@ impl ProtocolTestSuite {
 }
 
 // Create a mock Layer2Protocol implementation
+use anya_core::layer2::Layer2Error;
+
 mock! {
     pub Layer2Protocol {}
 
     #[async_trait::async_trait]
     impl Layer2Protocol for Layer2Protocol {
-        async fn initialize(&self) -> Result<(), Box<dyn std::error::Error + Send + Sync>>;
-        async fn connect(&self) -> Result<(), Box<dyn std::error::Error + Send + Sync>>;
-        async fn get_state(&self) -> Result<ProtocolState, Box<dyn std::error::Error + Send + Sync>>;
-        async fn submit_transaction(&self, tx_data: &[u8]) -> Result<String, Box<dyn std::error::Error + Send + Sync>>;
-        async fn check_transaction_status(&self, tx_id: &str) -> Result<TransactionStatus, Box<dyn std::error::Error + Send + Sync>>;
-        async fn sync_state(&mut self) -> Result<(), Box<dyn std::error::Error + Send + Sync>>;
-        async fn issue_asset(&self, params: AssetParams) -> Result<String, Box<dyn std::error::Error + Send + Sync>>;
-        async fn transfer_asset(&self, transfer: AssetTransfer) -> Result<TransferResult, Box<dyn std::error::Error + Send + Sync>>;
-        async fn verify_proof(&self, proof: Proof) -> Result<VerificationResult, Box<dyn std::error::Error + Send + Sync>>;
-        async fn validate_state(&self, state_data: &[u8]) -> Result<ValidationResult, Box<dyn std::error::Error + Send + Sync>>;
+        async fn initialize(&self) -> Result<(), Layer2Error>;
+        async fn connect(&self) -> Result<(), Layer2Error>;
+        async fn get_state(&self) -> Result<ProtocolState, Layer2Error>;
+        async fn submit_transaction(&self, tx_data: &[u8]) -> Result<String, Layer2Error>;
+        async fn check_transaction_status(&self, tx_id: &str) -> Result<TransactionStatus, Layer2Error>;
+        async fn sync_state(&mut self) -> Result<(), Layer2Error>;
+        async fn issue_asset(&self, params: AssetParams) -> Result<String, Layer2Error>;
+        async fn transfer_asset(&self, transfer: AssetTransfer) -> Result<TransferResult, Layer2Error>;
+        async fn verify_proof(&self, proof: Proof) -> Result<VerificationResult, Layer2Error>;
+        async fn validate_state(&self, state: &ProtocolState) -> Result<ValidationResult, Layer2Error>;
+        async fn disconnect(&self) -> Result<(), Layer2Error>;
+        async fn health_check(&self) -> Result<anya_core::layer2::ProtocolHealth, Layer2Error>;
+        async fn get_transaction_history(&self, limit: Option<u32>) -> Result<Vec<anya_core::layer2::TransactionResult>, Layer2Error>;
+        async fn generate_proof(&self, transaction_id: &str) -> Result<Proof, Layer2Error>;
+        async fn get_capabilities(&self) -> Result<anya_core::layer2::ProtocolCapabilities, Layer2Error>;
+        async fn estimate_fees(&self, operation: &str, params: &[u8]) -> Result<anya_core::layer2::FeeEstimate, Layer2Error>;
     }
 }
 
@@ -311,22 +327,92 @@ mod tests {
         protocol
             .expect_submit_transaction()
             .returning(|_| Ok("test_tx_id".to_string()));
-        protocol
-            .expect_get_state()
-            .returning(|| Ok(ProtocolState::default()));
+
+        // Create a protocol state manually since there's no default
+        protocol.expect_get_state().returning(|| {
+            Ok(anya_core::layer2::create_protocol_state(
+                "1.0",
+                5,
+                Some(1000),
+                true,
+            ))
+        });
+
         protocol.expect_sync_state().returning(|| Ok(()));
+
         protocol
             .expect_issue_asset()
             .returning(|_| Ok("test_asset".to_string()));
-        protocol
-            .expect_transfer_asset()
-            .returning(|_| Ok(TransferResult::default()));
+
+        // Create TransferResult manually
+        protocol.expect_transfer_asset().returning(|_| {
+            Ok(TransferResult {
+                tx_id: "test_tx_id".to_string(),
+                status: TransactionStatus::Confirmed,
+                fee: Some(1000),
+                timestamp: std::time::SystemTime::now()
+                    .duration_since(std::time::UNIX_EPOCH)
+                    .unwrap_or_default()
+                    .as_secs(),
+            })
+        });
+
+        // Create VerificationResult manually
         protocol
             .expect_verify_proof()
-            .returning(|_| Ok(VerificationResult::default()));
+            .returning(|_| Ok(anya_core::layer2::create_verification_result(true, None)));
+
+        // Create ValidationResult manually
+        protocol.expect_validate_state().returning(|_| {
+            Ok(anya_core::layer2::create_validation_result(
+                true,
+                Vec::new(),
+            ))
+        });
+
+        // Setup mock for the remaining required methods
+        protocol.expect_disconnect().returning(|| Ok(()));
+        protocol.expect_health_check().returning(|| {
+            Ok(anya_core::layer2::ProtocolHealth {
+                healthy: true,
+                last_check: std::time::SystemTime::now()
+                    .duration_since(std::time::UNIX_EPOCH)
+                    .unwrap_or_default()
+                    .as_secs(),
+                error_count: 0,
+                uptime_seconds: 3600,
+            })
+        });
         protocol
-            .expect_validate_state()
-            .returning(|_| Ok(ValidationResult::default()));
+            .expect_get_transaction_history()
+            .returning(|_| Ok(Vec::new()));
+        protocol.expect_generate_proof().returning(|_| {
+            Ok(Proof {
+                proof_type: "test".to_string(),
+                data: Vec::new(),
+                block_height: Some(100),
+                witness: None,
+                merkle_root: "0".repeat(64),
+                merkle_proof: Vec::new(),
+                block_header: "0".repeat(64),
+            })
+        });
+        protocol.expect_get_capabilities().returning(|| {
+            Ok(anya_core::layer2::ProtocolCapabilities {
+                supports_assets: true,
+                supports_smart_contracts: false,
+                supports_privacy: false,
+                max_transaction_size: 1000,
+                fee_estimation: true,
+            })
+        });
+        protocol.expect_estimate_fees().returning(|_, _| {
+            Ok(anya_core::layer2::FeeEstimate {
+                estimated_fee: 1000,
+                fee_rate: 1.0,
+                confirmation_target: 6,
+            })
+        });
 
         // Run test suite
         let result = suite.run_protocol_tests(&mut protocol).await;
