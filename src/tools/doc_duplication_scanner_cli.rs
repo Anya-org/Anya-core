@@ -2,8 +2,7 @@ use crate::tools::doc_duplication_scanner::{scan_for_duplicates, DuplicationRepo
 use crate::tools::source_of_truth_registry::{get_global_registry, initialize_global_registry};
 use std::env;
 use std::error::Error;
-use std::fs;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use std::process;
 
 /// CLI entrypoint for documentation duplication scanner
@@ -21,7 +20,7 @@ pub async fn run_cli() -> Result<(), Box<dyn Error>> {
 
     // Initialize the registry if needed
     if get_global_registry().await.read().await.is_none() {
-        initialize_global_registry().await?;
+        initialize_global_registry(".source_of_truth_registry/registry.json".to_string()).await?;
     }
 
     // Run the scan
@@ -132,7 +131,10 @@ fn print_report(report: &DuplicationReport, format: Option<&str>) -> Result<(), 
                 for entry in &dup.entries {
                     println!("- **File:** `{}`", entry.file_path);
                     println!("  - **Section:** {}", entry.section);
-                    println!("  - **Snippet:** ```\n{}\n  ```\n", entry.content_snippet);
+                    println!(
+                        "  - **Snippet:** ```\n{} (Section: {})\n  ```\n",
+                        entry.title, entry.section
+                    );
                 }
             }
         }
@@ -155,7 +157,7 @@ fn print_report(report: &DuplicationReport, format: Option<&str>) -> Result<(), 
                 for entry in &dup.entries {
                     println!("File: {}", entry.file_path);
                     println!("Section: {}", entry.section);
-                    println!("Snippet: \n{}\n", entry.content_snippet);
+                    println!("Snippet: \n{} (Section: {})\n", entry.title, entry.section);
                 }
                 println!();
             }

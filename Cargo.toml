@@ -130,6 +130,9 @@ hsm-bitcoin = ["bitcoin", "hsm-software"]  # Bitcoin-specific HSM operations
 hsm-simulator = ["hsm-software"]  # Simulator for testing
 hsm-production = ["hsm-hardware", "hsm-bitcoin"]  # Production-ready HSM
 
+# Bitcoin advanced features
+taproot = ["bitcoin"]  # Taproot transaction support
+
 # API features
 api = ["std"]
 

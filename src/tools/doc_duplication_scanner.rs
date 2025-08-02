@@ -1,10 +1,9 @@
-use crate::tools::source_of_truth_registry::{DocumentationEntry, DuplicationCheck, RegistryError};
+use crate::tools::source_of_truth_registry::DocumentationEntry;
 use sha2::{Digest, Sha256};
 use std::collections::HashMap;
 use std::error::Error;
 use std::fs;
 use std::path::{Path, PathBuf};
-use tokio::task;
 
 /// Duplication report structure for documenting found duplications
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
@@ -171,14 +170,17 @@ fn extract_sections(
                 title,
                 file_path: file_path.to_string_lossy().to_string(),
                 section: "Whole File".to_string(),
-                content_snippet: content.chars().take(200).collect(),
                 word_count: content.split_whitespace().count(),
-                modification_date: fs::metadata(file_path)
+                similarity_score: None,
+                similar_to: None,
+                created_at: std::time::SystemTime::now()
+                    .duration_since(std::time::UNIX_EPOCH)
+                    .unwrap()
+                    .as_secs(),
+                updated_at: fs::metadata(file_path)
                     .and_then(|m| m.modified())
                     .map(|m| m.duration_since(std::time::UNIX_EPOCH).unwrap().as_secs())
                     .unwrap_or(0),
-                language: extension.to_string(),
-                similarity_scores: Vec::new(),
             });
         }
     }
@@ -402,17 +404,17 @@ fn add_section(
         title: title.to_string(),
         file_path: file_path.to_string_lossy().to_string(),
         section: title.to_string(),
-        content_snippet: content.chars().take(200).collect(),
         word_count: content.split_whitespace().count(),
-        modification_date: fs::metadata(file_path)
+        similarity_score: None,
+        similar_to: None,
+        created_at: std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_secs(),
+        updated_at: fs::metadata(file_path)
             .and_then(|m| m.modified())
             .map(|m| m.duration_since(std::time::UNIX_EPOCH).unwrap().as_secs())
             .unwrap_or(0),
-        language: file_path
-            .extension()
-            .map(|e| e.to_string_lossy().to_string())
-            .unwrap_or_default(),
-        similarity_scores: Vec::new(),
     });
 
     Ok(())
@@ -513,17 +515,26 @@ async fn find_duplications(
 
 /// Calculate similarity score between two documentation entries
 pub fn calculate_similarity_score(a: &DocumentationEntry, b: &DocumentationEntry) -> f32 {
-    // In a real implementation, you'd want a more sophisticated algorithm
-    // like cosine similarity with TF-IDF, or a locality-sensitive hash
+    // Since we don't store content_snippet, we'll use a simpler approach
+    // Compare normalized hashes for exact matches, and use title/section similarity
 
-    // Simple Jaccard similarity for demonstration
-    let a_words: Vec<&str> = normalize_documentation_content(&a.content_snippet)
-        .split_whitespace()
-        .collect();
+    // If normalized hashes are identical, it's a 100% match
+    if a.normalized_hash == b.normalized_hash {
+        return 1.0;
+    }
 
-    let b_words: Vec<&str> = normalize_documentation_content(&b.content_snippet)
-        .split_whitespace()
-        .collect();
+    // Otherwise, calculate basic similarity based on title and section
+    let a_title_words: Vec<&str> = a.title.split_whitespace().collect();
+    let b_title_words: Vec<&str> = b.title.split_whitespace().collect();
+
+    let a_section_words: Vec<&str> = a.section.split_whitespace().collect();
+    let b_section_words: Vec<&str> = b.section.split_whitespace().collect();
+
+    // Combine title and section words
+    let mut a_words = a_title_words;
+    a_words.extend(a_section_words);
+    let mut b_words = b_title_words;
+    b_words.extend(b_section_words);
 
     // Create sets
     let a_set: std::collections::HashSet<&str> = a_words.into_iter().collect();
