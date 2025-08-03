@@ -24,6 +24,7 @@ pub struct RealMLEngine {
     /// Inference metrics
     metrics: Arc<RwLock<InferenceMetrics>>,
     /// Hardware acceleration info
+    #[allow(dead_code)]
     hardware_info: HardwareInfo,
 }
 
@@ -49,10 +50,13 @@ pub struct MLConfig {
 struct LoadedModel {
     model_id: String,
     model_type: ModelType,
+    #[allow(dead_code)]
     model_path: PathBuf,
     input_shape: Vec<usize>,
+    #[allow(dead_code)]
     output_shape: Vec<usize>,
     version: String,
+    #[allow(dead_code)]
     loaded_at: u64,
     last_used: u64,
     inference_count: u64,
@@ -78,6 +82,7 @@ struct ModelCache {
 
 #[derive(Debug, Clone)]
 struct CachedPrediction {
+    #[allow(dead_code)]
     input_hash: String,
     output: Vec<f32>,
     confidence: f32,
@@ -102,7 +107,9 @@ struct HardwareInfo {
     cpu_count: usize,
     total_memory_gb: f64,
     gpu_available: bool,
+    #[allow(dead_code)]
     gpu_memory_gb: f64,
+    #[allow(dead_code)]
     supported_frameworks: Vec<String>,
 }
 

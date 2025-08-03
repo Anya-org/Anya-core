@@ -74,8 +74,10 @@ struct KeyStore {
 
 #[derive(Debug, Clone)]
 struct RSAKeyPair {
+    #[allow(dead_code)]
     private_key: RsaPrivateKey,
     public_key: RsaPublicKey,
+    #[allow(dead_code)]
     encrypted_private_pem: Option<Vec<u8>>,
 }
 
@@ -83,24 +85,26 @@ struct RSAKeyPair {
 struct Ed25519KeyPair {
     signing_key: SigningKey,
     verifying_key: VerifyingKey,
+    #[allow(dead_code)]
     encrypted_seed: Option<Vec<u8>>,
 }
 
 #[derive(Debug, Clone)]
 struct SymmetricKey {
     key: [u8; 32],
+    #[allow(dead_code)]
     encrypted_key: Option<Vec<u8>>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-struct KeyMetadata {
-    key_id: String,
-    key_type: KeyType,
-    created_at: u64,
-    last_used: u64,
-    usage_count: u64,
-    purpose: KeyPurpose,
-    expires_at: Option<u64>,
+pub struct KeyMetadata {
+    pub key_id: String,
+    pub key_type: KeyType,
+    pub created_at: u64,
+    pub last_used: u64,
+    pub usage_count: u64,
+    pub purpose: KeyPurpose,
+    pub expires_at: Option<u64>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -123,11 +127,15 @@ pub enum KeyPurpose {
 
 #[derive(Debug, Clone)]
 struct SecuritySession {
+    #[allow(dead_code)]
     session_id: String,
+    #[allow(dead_code)]
     created_at: u64,
     last_activity: u64,
     authenticated: bool,
+    #[allow(dead_code)]
     permissions: Vec<String>,
+    #[allow(dead_code)]
     user_id: String,
 }
 
@@ -267,7 +275,7 @@ impl SoftwareHSM {
             // Encrypt and save master key
             let password = "default_hsm_password"; // In production, get from secure source
             let mut encryption_key = [0u8; 32];
-            pbkdf2::pbkdf2::<Hmac<Sha256>>(
+            let _ = pbkdf2::pbkdf2::<Hmac<Sha256>>(
                 password.as_bytes(),
                 b"hsm_salt",
                 config.pbkdf2_iterations,

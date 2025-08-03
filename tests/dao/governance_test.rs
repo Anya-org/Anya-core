@@ -1,12 +1,19 @@
 // Fixed DAO governance test using current API
+use anya_core::dao::governance::{DaoConfig, DefaultCrossChainBridge, SecurityAudit};
 use anya_core::dao::{DaoGovernance, ProposalStatus};
+use std::sync::Arc;
 use tokio;
+
+fn create_test_dao() -> DaoGovernance {
+    let config = DaoConfig {};
+    let bridge = Arc::new(DefaultCrossChainBridge {});
+    let audit = Arc::new(SecurityAudit::new());
+    DaoGovernance::new(config, bridge, audit)
+}
 
 #[tokio::test]
 async fn test_dao3_compliance() {
-    let dao = DaoGovernance::new()
-        .await
-        .expect("Failed to create DAO governance");
+    let dao = create_test_dao();
 
     // Test DAO-3 compliance verification
     assert!(
@@ -18,9 +25,7 @@ async fn test_dao3_compliance() {
 #[tokio::test]
 async fn test_dao_governance_creation() {
     // Test DAO governance creation and basic functionality
-    let dao = DaoGovernance::new()
-        .await
-        .expect("Failed to create DAO governance");
+    let dao = create_test_dao();
 
     // Test that the DAO is properly initialized
     assert!(dao.is_active(), "DAO should be active after creation");
@@ -28,9 +33,7 @@ async fn test_dao_governance_creation() {
 
 #[tokio::test]
 async fn test_proposal_lifecycle() {
-    let mut dao = DaoGovernance::new()
-        .await
-        .expect("Failed to create DAO governance");
+    let mut dao = create_test_dao();
 
     // Create a test proposal
     let proposal_result = dao
@@ -51,15 +54,13 @@ async fn test_proposal_lifecycle() {
     assert!(proposal.is_ok(), "Should be able to retrieve proposal");
 
     let proposal = proposal.unwrap();
-    assert_eq!(proposal.title, "Test Proposal");
-    assert_eq!(proposal.status, ProposalStatus::Active);
+    assert_eq!(proposal.title(), "Test Proposal");
+    assert_eq!(proposal.status(), &ProposalStatus::Active);
 }
 
 #[tokio::test]
 async fn test_voting_mechanism() {
-    let mut dao = DaoGovernance::new()
-        .await
-        .expect("Failed to create DAO governance");
+    let mut dao = create_test_dao();
 
     // Create a proposal to vote on
     let proposal_id = dao
@@ -73,9 +74,7 @@ async fn test_voting_mechanism() {
         .expect("Failed to create proposal");
 
     // Test voting
-    let vote_result = dao
-        .vote(proposal_id, "test_voter".to_string(), true, 10)
-        .await;
+    let vote_result = dao.vote("test_voter", proposal_id, true);
     assert!(vote_result.is_ok(), "Should be able to vote on proposal");
 
     // Verify vote was recorded
@@ -83,14 +82,12 @@ async fn test_voting_mechanism() {
         .get_proposal(proposal_id)
         .await
         .expect("Failed to get proposal");
-    assert!(proposal.votes_for > 0, "Should have recorded vote");
+    assert!(proposal.yes_votes() > 0, "Should have recorded vote");
 }
 
 #[tokio::test]
 async fn test_cross_chain_governance() {
-    let dao = DaoGovernance::new()
-        .await
-        .expect("Failed to create DAO governance");
+    let dao = create_test_dao();
 
     // Test cross-chain governance capabilities
     let cross_chain_status = dao.get_cross_chain_status().await;
