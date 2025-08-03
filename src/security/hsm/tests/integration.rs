@@ -7,10 +7,9 @@
 #[cfg(test)]
 mod hsm_integration_tests {
     use std::sync::Arc;
-    use tokio::test;
 
     use crate::security::hsm::{
-        config::{HardwareConfig, HsmConfig, SimulatorConfig, SoftHsmConfig},
+        config::{HsmConfig, SimulatorConfig, SoftHsmConfig},
         error::HsmError,
         factory::{HsmProviderFactory, ProductionHsmFactory},
         provider::{
@@ -18,7 +17,7 @@ mod hsm_integration_tests {
             KeyUsage, SigningAlgorithm,
         },
     };
-    use bitcoin::Network;
+    use bitcoin::hashes::{sha256d, Hash};
 
     /// Test software fallback strategy when primary provider fails
     #[tokio::test]
@@ -85,7 +84,7 @@ mod hsm_integration_tests {
         // Test invalid simulator on mainnet
         let mut config = HsmConfig::default();
         config.provider_type = HsmProviderType::Simulator;
-        config.bitcoin.network = Network::Bitcoin;
+        config.bitcoin.network = crate::security::hsm::config::BitcoinNetworkType::Mainnet;
 
         let result = ProductionHsmFactory::create_for_production(&config).await;
         assert!(result.is_err(), "Simulator should fail on mainnet");
@@ -205,10 +204,10 @@ mod hsm_integration_tests {
         let config = HsmConfig {
             provider_type: HsmProviderType::SoftwareKeyStore,
             software: SoftHsmConfig {
-                token_dir: Some(".test-tokens".to_string()),
-                max_sessions: Some(10),
+                token_dir: ".test-tokens".to_string(),
+                max_sessions: 10,
                 encryption_key: Some("test-encryption-key-32-chars-long".to_string()),
-                lock_timeout_seconds: Some(300),
+                lock_timeout_seconds: 300,
                 use_testnet: true,
             },
             ..Default::default()
@@ -222,7 +221,7 @@ mod hsm_integration_tests {
         let config = HsmConfig {
             provider_type: HsmProviderType::Bitcoin,
             bitcoin: crate::security::hsm::config::BitcoinConfig {
-                network: Network::Testnet,
+                network: crate::security::hsm::config::BitcoinNetworkType::Testnet,
                 ..Default::default()
             },
             ..Default::default()
@@ -362,7 +361,7 @@ mod hsm_integration_tests {
             .expect("Bitcoin key generation should succeed");
 
         // Test signing Bitcoin transaction hash
-        let tx_hash = bitcoin::hashes::sha256d::Hash::hash(b"dummy transaction data");
+        let tx_hash = sha256d::Hash::hash(b"dummy transaction data");
         let signature = provider
             .sign(
                 &key_pair.id,
@@ -388,8 +387,35 @@ mod hsm_integration_tests {
 /// Performance benchmarks for HSM operations
 #[cfg(test)]
 mod hsm_performance_tests {
-    use super::*;
+    use std::sync::Arc;
     use std::time::Instant;
+
+    use crate::security::hsm::{
+        config::{HsmConfig, SoftHsmConfig},
+        error::HsmError,
+        factory::HsmProviderFactory,
+        provider::{
+            EcCurve, HsmProvider, HsmProviderType, KeyGenParams, KeyType, KeyUsage,
+            SigningAlgorithm,
+        },
+    };
+
+    async fn create_software_provider() -> Result<Arc<dyn HsmProvider>, HsmError> {
+        let config = HsmConfig {
+            provider_type: HsmProviderType::SoftwareKeyStore,
+            software: SoftHsmConfig {
+                token_dir: ".test-tokens".to_string(),
+                max_sessions: 10,
+                encryption_key: Some("test-encryption-key-32-chars-long".to_string()),
+                lock_timeout_seconds: 300,
+                use_testnet: true,
+            },
+            ..Default::default()
+        };
+
+        HsmProviderFactory::create_specific_provider(HsmProviderType::SoftwareKeyStore, &config)
+            .await
+    }
 
     #[tokio::test]
     async fn benchmark_key_generation() {

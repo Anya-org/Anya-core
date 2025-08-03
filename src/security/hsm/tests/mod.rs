@@ -5,7 +5,3 @@
 
 pub mod integration;
 pub mod testnet_provider_tests;
-
-// Re-export test utilities for other modules
-#[cfg(test)]
-pub use integration::*;

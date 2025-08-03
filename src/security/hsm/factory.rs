@@ -347,7 +347,7 @@ impl ProductionHsmFactory {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::security::hsm::config::HsmConfig;
+    use crate::security::hsm::config::{BitcoinNetworkType, HsmConfig};
 
     #[tokio::test]
     async fn test_software_fallback_strategy() {
@@ -370,7 +370,7 @@ mod tests {
     async fn test_production_config_validation() {
         let mut config = HsmConfig::default();
         config.provider_type = HsmProviderType::Simulator;
-        config.bitcoin.network = bitcoin::Network::Bitcoin;
+        config.bitcoin.network = BitcoinNetworkType::Mainnet;
 
         // Should fail validation
         let result = ProductionHsmFactory::validate_production_config(&config);
