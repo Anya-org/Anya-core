@@ -18,6 +18,12 @@ use std::sync::{Arc, Mutex};
 mod service;
 pub use service::MLService;
 
+// Real ML inference engine (replaces mock implementations)
+pub mod real_inference;
+pub use real_inference::{
+    InferenceMetrics, InferenceRequest, InferenceResponse, MLConfig as RealMLConfig, RealMLEngine,
+};
+
 // ML agent system module
 pub mod agent_system;
 pub use agent_system::MLAgentSystem;

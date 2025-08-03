@@ -50,6 +50,15 @@ chacha20poly1305 = { version = "0.10.1" }
 blake3 = { version = "1.8.2" }
 rand = { version = "0.8.5" }
 rand_core = { version = "0.6.4" }
+# Additional cryptographic dependencies for real implementations
+rsa = { version = "0.9.6" }
+ed25519-dalek = { version = "2.1.1", features = ["rand_core"] }
+hmac = { version = "0.12.1" }
+pbkdf2 = { version = "0.12.2" }
+base64 = { version = "0.22.1" }
+rocksdb = { version = "0.22.0" }
+reqwest = { version = "0.12.9", features = ["json"] }
+num_cpus = { version = "1.16.0" }
 
 # === LTS Utilities ===
 chrono = { version = "0.4.34", features = ["serde", "std"] }
@@ -92,7 +101,7 @@ sysinfo = { version = "0.36.1" }
 # === Enterprise Dependencies ===
 yubihsm = { version = "0.42.1" }
 sgx_urts = { version = "1.1.1" }
-sqlx = { version = "0.8.2", features = ["runtime-tokio-rustls", "postgres"] }
+sqlx = { version = "0.8.2", features = ["runtime-tokio-rustls", "postgres", "sqlite", "chrono", "uuid"] }
 
 [package]
 name = "anya-core"
@@ -154,6 +163,10 @@ api = ["std"]
 # Complete system (including all features)
 complete = ["bitcoin", "mobile", "web5", "enterprise", "hsm-full"]
 
+# Testing-only features (disabled by default)
+chaos-viz = []
+disabled = []
+
 [dependencies]
 # === Core Dependencies (using workspace versions) ===
 bitcoin = { workspace = true, optional = true }
@@ -205,6 +218,14 @@ url = "2.5.4"
 rand.workspace = true
 once_cell.workspace = true
 base64 = "0.22.1"
+# Cryptographic dependencies for real implementations
+rsa = { workspace = true }
+ed25519-dalek = { workspace = true }
+hmac = { workspace = true }
+pbkdf2 = { workspace = true }
+rocksdb = { workspace = true }
+reqwest = { workspace = true }
+num_cpus = { workspace = true }
 chacha20poly1305.workspace = true
 argon2 = "0.5.3"
 zeroize = "1.8.1"
@@ -223,6 +244,15 @@ web5 = { git = "https://github.com/TBD54566975/web5-rs", rev = "310d79c9", optio
 jsonwebtoken = { version = "9.3.1", features = ["use_pem"], optional = true }
 multibase = { version = "0.9.1", features = ["std"], optional = true }
 multihash = { version = "0.19.3", features = ["std"], optional = true }
+
+# Cryptographic and system dependencies for real implementations
+ed25519-dalek = { workspace = true }
+rsa = { workspace = true }
+hmac = { workspace = true }
+pbkdf2 = { workspace = true }
+rocksdb = { workspace = true }
+reqwest = { workspace = true }
+num_cpus = { workspace = true }
 
 # Utilities
 once_cell = { workspace = true }

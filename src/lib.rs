@@ -64,6 +64,7 @@ pub mod testing;
 pub mod tokenomics;
 pub mod tools;
 pub mod types;
+pub mod utils;
 pub mod web;
 pub mod web5;
 
@@ -432,16 +433,6 @@ pub struct ComponentStatus {
     pub name: String,
     pub operational: bool,
     pub health_score: f64,
-}
-
-pub mod utils {
-    pub fn generate_id() -> String {
-        format!("id:{:x}", rand::random::<u64>())
-    }
-
-    pub fn log(msg: &str) {
-        println!("[{}] {}", chrono::Utc::now(), msg);
-    }
 }
 
 pub fn version() -> &'static str {
