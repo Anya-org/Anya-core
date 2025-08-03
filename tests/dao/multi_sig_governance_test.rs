@@ -3,7 +3,7 @@ use anya_core::dao::compat::clarity_repl::repl::{
     ReadOnlyRequest, Session, TestEnvironment, TransactionRequest,
 };
 use anya_core::dao::compat::clarity_repl::vm::{PrincipalData, StacksTransaction, Value};
-use anya_core::layer2::stacks::{Layer2ProtocolTrait, StacksClient, StacksConfig};
+use anya_core::layer2::stacks::{StacksClient, StacksConfig};
 
 #[test]
 fn test_multi_sig_governance_with_real_stacks_client() {
@@ -158,68 +158,75 @@ fn test_multi_sig_workflow() {
     let add_signer_result = client.call_contract_function(
         &contract_deploy.unwrap(),
         "add-signer",
-        vec!["ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG".to_string()],
+        &[Value::String(
+            "ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG".to_string(),
+        )],
     );
 
     assert!(add_signer_result.is_ok());
 }
 
 #[test]
-#[ignore] // Disabled - struct definitions don't match implementation
-fn test_stacks_asset_integration_disabled() {
-    println!("Stacks asset integration test disabled - struct field mismatches");
-}
-
-// Original test disabled due to struct field mismatches
-/*
-#[test]
 fn test_stacks_asset_integration() {
+    // Fixed test using current StacksConfig structure and API
     let config = StacksConfig {
-        node_url: "http://localhost:20443".to_string(),
-        private_key: "test_private_key".to_string(),
-        network: StacksNetwork::Testnet,
+        network: "testnet".to_string(),
+        rpc_url: "http://localhost:20443".to_string(),
+        pox_enabled: false,
+        timeout_ms: 5000,
     };
 
-    let mut stacks_client = StacksClient::new(config);
+    let stacks_client = StacksClient::new(config);
 
-    // Test initialization
-    let init_result = stacks_client.initialize();
-    assert!(init_result.is_ok());
+    // Test contract deployment (simulates asset issuance contract)
+    let asset_contract = r#"
+        ;; Simplified asset contract for testing
+        (define-fungible-token multi-sig-token)
+        (define-data-var token-name (string-ascii 32) "MultiSig Governance Token")
+        (define-data-var token-symbol (string-ascii 8) "MSG")
+        
+        (define-public (mint (amount uint) (recipient principal))
+            (ft-mint? multi-sig-token amount recipient))
+        
+        (define-public (transfer (amount uint) (sender principal) (recipient principal))
+            (ft-transfer? multi-sig-token amount sender recipient))
+    "#;
 
-    // Test state synchronization
-    let sync_result = stacks_client.sync_state();
-    assert!(sync_result.is_ok());
+    let deploy_result = stacks_client.deploy_clarity_contract(asset_contract, "multi-sig-asset");
+    assert!(deploy_result.is_ok());
 
-    // Test asset issuance
-    let asset_params = AssetParams {
-        asset_id: "multi-sig-token".to_string(),
-        name: "MultiSig Governance Token".to_string(),
-        symbol: "MSG".to_string(),
-        total_supply: 1000000,
-        decimals: 6,
-        issuer: "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM".to_string(),
-    };
+    let contract_id = deploy_result.unwrap();
+    assert!(contract_id.contains("multi-sig-asset"));
 
-    let issue_result = stacks_client.issue_asset(asset_params);
-    assert!(issue_result.is_ok());
+    // Test asset minting via contract call
+    let mint_result = stacks_client.call_contract_function(
+        &contract_id,
+        "mint",
+        &[
+            Value::UInt(1000000), // amount
+            Value::Principal(PrincipalData::from(
+                "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM".to_string(),
+            )), // recipient
+        ],
+    );
+    assert!(mint_result.is_ok());
 
-    // Test asset transfer
-    let transfer = AssetTransfer {
-        asset_id: "multi-sig-token".to_string(),
-        amount: 100,
-        sender: "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM".to_string(),
-        recipient: "ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG".to_string(),
-        memo: Some("Governance token transfer".to_string()),
-    };
-
-    let transfer_result = stacks_client.transfer_asset(transfer);
+    // Test asset transfer via contract call
+    let transfer_result = stacks_client.call_contract_function(
+        &contract_id,
+        "transfer",
+        &[
+            Value::UInt(100), // amount
+            Value::Principal(PrincipalData::from(
+                "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM".to_string(),
+            )), // sender
+            Value::Principal(PrincipalData::from(
+                "ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG".to_string(),
+            )), // recipient
+        ],
+    );
     assert!(transfer_result.is_ok());
-
-    let result = transfer_result.unwrap();
-    assert_eq!(result.status, TransactionStatus::Confirmed);
-    assert!(result.tx_id.starts_with("stacks_transfer_"));
 }
-*/
 
 #[test]
 fn test_multi_sig_workflow_complete() {
@@ -285,9 +292,9 @@ fn test_multi_sig_workflow_complete() {
     let add_signer_call = client.call_contract_function(
         "advanced-multi-sig",
         "add-signer",
-        vec![
-            "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM".to_string(),
-            "2".to_string(),
+        &[
+            Value::String("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM".to_string()),
+            Value::String("2".to_string()),
         ],
     );
     assert!(add_signer_call.is_ok());
@@ -296,7 +303,7 @@ fn test_multi_sig_workflow_complete() {
     let create_proposal_call = client.call_contract_function(
         "advanced-multi-sig",
         "create-proposal",
-        vec!["Transfer 1000 STX to treasury".to_string()],
+        &[Value::String("Transfer 1000 STX to treasury".to_string())],
     );
     assert!(create_proposal_call.is_ok());
 
@@ -304,7 +311,7 @@ fn test_multi_sig_workflow_complete() {
     let vote_call = client.call_contract_function(
         "advanced-multi-sig",
         "vote-on-proposal",
-        vec!["1".to_string()],
+        &[Value::String("1".to_string())],
     );
     assert!(vote_call.is_ok());
 }

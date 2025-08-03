@@ -292,7 +292,7 @@ fn calculate_std_dev(times: &[std::time::Duration], avg_ns: f64) -> f64 {
 #[allow(dead_code)]
 fn test_invariant_violations(_checker: &()) {
     // Test version invariant
-    let invalid_version_tx = Transaction {
+    let _invalid_version_tx = Transaction {
         version: Version(0), // Invalid version
         lock_time: LockTime::ZERO,
         input: vec![TxIn {
@@ -312,7 +312,7 @@ fn test_invariant_violations(_checker: &()) {
     // );
 
     // Test empty inputs invariant
-    let empty_inputs_tx = Transaction {
+    let _empty_inputs_tx = Transaction {
         version: Version(1),
         lock_time: LockTime::ZERO,
         input: vec![], // No inputs
@@ -327,7 +327,7 @@ fn test_invariant_violations(_checker: &()) {
     // );
 
     // Test empty outputs invariant
-    let empty_outputs_tx = Transaction {
+    let _empty_outputs_tx = Transaction {
         version: Version(1),
         lock_time: LockTime::ZERO,
         input: vec![TxIn {
@@ -344,7 +344,7 @@ fn test_invariant_violations(_checker: &()) {
     // );
 
     // Test duplicate inputs invariant
-    let duplicate_inputs_tx = create_duplicate_inputs_transaction();
+    let _duplicate_inputs_tx = create_duplicate_inputs_transaction();
     // assert!(
     //     checker.check_transaction(&duplicate_inputs_tx).is_err(),
     //     "Transaction with duplicate inputs should be rejected"

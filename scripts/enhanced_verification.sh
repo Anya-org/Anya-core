@@ -138,45 +138,305 @@ else
     storage_status="INCOMPLETE"
 fi
 
-# Check for mock implementations (excluding tests)
-echo ""
-echo -e "${BLUE}🎭 MOCK IMPLEMENTATIONS (Production Code Only):${NC}"
-echo "-------------------------------------------------"
-mock_count=$(grep -r "mock\|Mock" --include="*.rs" . 2>/dev/null | grep -v "test\|Test\|#\[cfg(test)\]" | wc -l)
-echo "Production mock implementations found: $mock_count"
-
-# Detailed analysis per module
-echo ""
-echo "Mock distribution per module (>3 is violation):"
-mock_files=$(grep -r "mock\|Mock" --include="*.rs" . 2>/dev/null | grep -v "test\|Test\|#\[cfg(test)\]" | cut -d: -f1 | sort | uniq -c | sort -nr)
-violation_count=0
-
-while IFS= read -r line; do
-    count=$(echo "$line" | awk '{print $1}')
-    file=$(echo "$line" | awk '{print $2}')
-    module=$(dirname "$file" | sed 's|.*src/||')
+# Function to analyze system architecture and available components
+analyze_system_architecture() {
+    echo ""
+    echo -e "${BLUE}🏗️ SYSTEM ARCHITECTURE ANALYSIS:${NC}"
+    echo "================================="
     
-    if [ "$count" -gt 3 ]; then
-        echo -e "${RED}❌ $module: $count mocks (exceeds limit of 3)${NC}"
-        violation_count=$((violation_count + 1))
-    elif [ "$count" -eq 3 ]; then
-        echo -e "${YELLOW}⚠️ $module: $count mocks (at limit)${NC}"
+    # Core system components
+    echo ""
+    echo -e "${BLUE}Core Systems Available:${NC}"
+    
+    # Bitcoin Core System - check multiple possible locations
+    bitcoin_dirs=("anya-bitcoin" "src/bitcoin" "bitcoin-adapter" "anya-core/src/bitcoin")
+    bitcoin_found=false
+    bitcoin_files=0
+    
+    for bitcoin_dir in "${bitcoin_dirs[@]}"; do
+        if [ -d "$bitcoin_dir" ]; then
+            bitcoin_found=true
+            files_count=$(find "$bitcoin_dir" -name "*.rs" 2>/dev/null | wc -l)
+            bitcoin_files=$((bitcoin_files + files_count))
+        fi
+    done
+    
+    if [ "$bitcoin_found" = true ]; then
+        echo -e "${GREEN}✅ Bitcoin Core System: $bitcoin_files files${NC}"
+        
+        # Layer2 protocols - check in various locations
+        lightning_files=0
+        rgb_files=0
+        dlc_files=0
+        
+        for bitcoin_dir in "${bitcoin_dirs[@]}"; do
+            if [ -d "$bitcoin_dir" ]; then
+                lightning_count=$(find "$bitcoin_dir" -name "*lightning*" -type f 2>/dev/null | wc -l)
+                rgb_count=$(find "$bitcoin_dir" -name "*rgb*" -type f 2>/dev/null | wc -l)
+                dlc_count=$(find "$bitcoin_dir" -name "*dlc*" -type f 2>/dev/null | wc -l)
+                
+                lightning_files=$((lightning_files + lightning_count))
+                rgb_files=$((rgb_files + rgb_count))
+                dlc_files=$((dlc_files + dlc_count))
+            fi
+        done
+        
+        # Also check top-level directories
+        lightning_files=$((lightning_files + $(find . -maxdepth 2 -name "*lightning*" -type f 2>/dev/null | wc -l)))
+        rgb_files=$((rgb_files + $(find . -maxdepth 2 -name "*rgb*" -type f 2>/dev/null | wc -l)))
+        dlc_files=$((dlc_files + $(find . -maxdepth 2 -name "*dlc*" -type f 2>/dev/null | wc -l)))
+        
+        echo "  ├─ Lightning Network: $lightning_files implementation files"
+        echo "  ├─ RGB Protocol: $rgb_files implementation files"
+        echo "  └─ DLC Contracts: $dlc_files implementation files"
     else
-        echo -e "${GREEN}✅ $module: $count mocks${NC}"
+        echo -e "${RED}❌ Bitcoin Core System: Not found${NC}"
     fi
-done <<< "$mock_files"
+    
+    # HSM Security System
+    if [ -d "src/security" ]; then
+        hsm_files=$(find src/security -name "*.rs" 2>/dev/null | wc -l)
+        echo -e "${GREEN}✅ HSM Security System: $hsm_files files${NC}"
+        
+        # Check for HSM providers
+        yubikey_impl=$(grep -r "YubiHSM\|yubikey" src/security/ 2>/dev/null | wc -l)
+        sgx_impl=$(grep -r "SGX\|enclave" src/security/ 2>/dev/null | wc -l)
+        aws_impl=$(grep -r "AWS\|CloudHSM" src/security/ 2>/dev/null | wc -l)
+        
+        echo "  ├─ YubiHSM2 Provider: $yubikey_impl references"
+        echo "  ├─ Intel SGX Provider: $sgx_impl references"
+        echo "  └─ AWS CloudHSM Provider: $aws_impl references"
+    else
+        echo -e "${RED}❌ HSM Security System: Not found${NC}"
+    fi
+    
+    # Web5 Protocol System
+    if [ -d "src/web5" ]; then
+        web5_files=$(find src/web5 -name "*.rs" 2>/dev/null | wc -l)
+        echo -e "${GREEN}✅ Web5 Protocol System: $web5_files files${NC}"
+        
+        # Check for DID/VC implementation
+        did_impl=$(grep -r "DID\|did:" src/web5/ 2>/dev/null | wc -l)
+        vc_impl=$(grep -r "VerifiableCredential\|credential" src/web5/ 2>/dev/null | wc -l)
+        
+        echo "  ├─ Decentralized Identity: $did_impl references"
+        echo "  └─ Verifiable Credentials: $vc_impl references"
+    else
+        echo -e "${RED}❌ Web5 Protocol System: Not found${NC}"
+    fi
+    
+    # DAO Governance System
+    if [ -d "src/dao" ]; then
+        dao_files=$(find src/dao -name "*.rs" 2>/dev/null | wc -l)
+        echo -e "${GREEN}✅ DAO Governance System: $dao_files files${NC}"
+    else
+        echo -e "${RED}❌ DAO Governance System: Not found${NC}"
+    fi
+    
+    # Hardware Optimization System
+    if [ -d "core/src/hardware_optimization" ]; then
+        hw_files=$(find core/src/hardware_optimization -name "*.rs" 2>/dev/null | wc -l)
+        echo -e "${GREEN}✅ Hardware Optimization System: $hw_files files${NC}"
+        
+        # Check for specific optimizers
+        intel_impl=$(find core/src/hardware_optimization -name "*intel*" 2>/dev/null | wc -l)
+        riscv_impl=$(find core/src/hardware_optimization -name "*riscv*" 2>/dev/null | wc -l)
+        cuda_impl=$(find . -name "*cuda*" 2>/dev/null | wc -l)
+        
+        echo "  ├─ Intel Optimizer: $intel_impl files"
+        echo "  ├─ RISC-V Optimizer: $riscv_impl files"
+        echo "  └─ CUDA Acceleration: $cuda_impl files"
+    else
+        echo -e "${RED}❌ Hardware Optimization System: Not found${NC}"
+    fi
+    
+    # API System
+    if [ -d "src/api" ]; then
+        api_files=$(find src/api -name "*.rs" 2>/dev/null | wc -l)
+        echo -e "${GREEN}✅ API System: $api_files files${NC}"
+    else
+        echo -e "${RED}❌ API System: Not found${NC}"
+    fi
+}
 
-if [ $mock_count -lt 30 ]; then
-    echo -e "${GREEN}✅ Production mock count acceptable (<30)${NC}"
-    mock_status="ACCEPTABLE"
-elif [ $violation_count -gt 0 ]; then
-    echo -e "${RED}❌ $violation_count modules exceed 3-mock limit${NC}"
-    echo "   → Refactor high-mock modules to use dependency injection"
-    mock_status="VIOLATION"
-else
-    echo -e "${YELLOW}⚠️ Mock count borderline, monitor closely${NC}"
-    mock_status="BORDERLINE"
-fi
+# Enhanced mock implementation analysis
+analyze_mock_implementations() {
+    echo ""
+    echo -e "${BLUE}🎭 MOCK IMPLEMENTATION ANALYSIS:${NC}"
+    echo "================================="
+    
+    # Different types of mock patterns
+    mock_patterns=(
+        "MockImpl"
+        "mock_"
+        "placeholder"
+        "stub_"
+        "unimplemented!"
+        "todo!"
+        "NotImplemented"
+        "Simulator"
+    )
+    
+    echo ""
+    echo -e "${BLUE}Mock Pattern Distribution:${NC}"
+    
+    total_mock_count=0
+    for pattern in "${mock_patterns[@]}"; do
+        count=$(grep -r "$pattern" --include="*.rs" . 2>/dev/null | grep -v "test\|Test\|#\[cfg(test)\]" | wc -l)
+        total_mock_count=$((total_mock_count + count))
+        
+        if [ $count -gt 0 ]; then
+            if [ $count -gt 20 ]; then
+                echo -e "${RED}❌ $pattern: $count instances (HIGH)${NC}"
+            elif [ $count -gt 10 ]; then
+                echo -e "${YELLOW}⚠️ $pattern: $count instances (MEDIUM)${NC}"
+            else
+                echo -e "${GREEN}✅ $pattern: $count instances (LOW)${NC}"
+            fi
+        fi
+    done
+    
+    echo ""
+    echo -e "${BLUE}Mock Implementation by System:${NC}"
+    
+    # Analyze mocks by system component
+    systems=(
+        "src/bitcoin"
+        "bitcoin-adapter"
+        "src/security"
+        "src/web5"
+        "src/dao"
+        "src/api"
+        "core/src"
+    )
+    
+    for system in "${systems[@]}"; do
+        if [ -d "$system" ]; then
+            system_mocks=0
+            for pattern in "${mock_patterns[@]}"; do
+                count=$(grep -r "$pattern" --include="*.rs" "$system" 2>/dev/null | grep -v "test\|Test\|#\[cfg(test)\]" | wc -l)
+                system_mocks=$((system_mocks + count))
+            done
+            
+            system_files=$(find "$system" -name "*.rs" 2>/dev/null | wc -l)
+            if [ $system_files -gt 0 ]; then
+                # Use awk for percentage calculation instead of bc
+                mock_ratio=$(awk "BEGIN {printf \"%.1f\", ($system_mocks * 100) / $system_files}")
+                
+                if [ $system_mocks -eq 0 ]; then
+                    echo -e "${GREEN}✅ $(basename $system): 0 mocks (0%)${NC}"
+                elif [ $(awk "BEGIN {print ($mock_ratio < 10)}") -eq 1 ]; then
+                    echo -e "${GREEN}✅ $(basename $system): $system_mocks mocks (${mock_ratio}%)${NC}"
+                elif [ $(awk "BEGIN {print ($mock_ratio < 25)}") -eq 1 ]; then
+                    echo -e "${YELLOW}⚠️ $(basename $system): $system_mocks mocks (${mock_ratio}%)${NC}"
+                else
+                    echo -e "${RED}❌ $(basename $system): $system_mocks mocks (${mock_ratio}%)${NC}"
+                fi
+            fi
+        fi
+    done
+    
+    echo ""
+    echo -e "${BLUE}Critical Mock Analysis:${NC}"
+    
+    # Find high-impact mock implementations
+    echo ""
+    echo "High-impact placeholder implementations:"
+    grep -r "placeholder.*implementation\|MockImpl.*Provider\|unimplemented.*core" --include="*.rs" . 2>/dev/null | grep -v test | head -10
+    
+    echo ""
+    echo "Network/Oracle layer mocks (acceptable):"
+    grep -r "mock.*network\|mock.*oracle\|placeholder.*network" --include="*.rs" . 2>/dev/null | grep -v test | head -5
+    
+    # Determine mock status
+    if [ $total_mock_count -lt 50 ]; then
+        echo -e "${GREEN}✅ Total mock implementations: $total_mock_count (ACCEPTABLE)${NC}"
+        mock_status="ACCEPTABLE"
+    elif [ $total_mock_count -lt 100 ]; then
+        echo -e "${YELLOW}⚠️ Total mock implementations: $total_mock_count (BORDERLINE)${NC}"
+        mock_status="BORDERLINE"
+    else
+        echo -e "${RED}❌ Total mock implementations: $total_mock_count (TOO HIGH)${NC}"
+        mock_status="TOO_HIGH"
+    fi
+    
+    # Don't exit with mock count as return code
+    return 0
+}
+
+# Enhanced placeholder analysis
+analyze_placeholders() {
+    echo ""
+    echo -e "${BLUE}📝 PLACEHOLDER IMPLEMENTATION ANALYSIS:${NC}"
+    echo "======================================="
+    
+    # Different placeholder patterns
+    placeholder_patterns=(
+        "// TODO:"
+        "// FIXME:"
+        "// PLACEHOLDER:"
+        "// STUB:"
+        "NotImplemented"
+        "placeholder_implementation"
+        "stub_implementation"
+    )
+    
+    total_placeholder_count=0
+    
+    echo ""
+    echo -e "${BLUE}Placeholder Distribution by Type:${NC}"
+    
+    for pattern in "${placeholder_patterns[@]}"; do
+        count=$(grep -r "$pattern" --include="*.rs" . 2>/dev/null | wc -l)
+        total_placeholder_count=$((total_placeholder_count + count))
+        
+        if [ $count -gt 0 ]; then
+            echo "  $pattern: $count instances"
+            
+            # Show top locations for high counts
+            if [ $count -gt 5 ]; then
+                echo "    Top locations:"
+                grep -r "$pattern" --include="*.rs" . 2>/dev/null | head -3 | sed 's/^/      /'
+            fi
+        fi
+    done
+    
+    echo ""
+    echo -e "${BLUE}Priority Placeholder Analysis:${NC}"
+    
+    # Critical system placeholders
+    critical_placeholders=$(grep -r "TODO.*HSM\|TODO.*Bitcoin\|TODO.*Security\|PLACEHOLDER.*crypto" --include="*.rs" . 2>/dev/null | wc -l)
+    echo "Critical system placeholders: $critical_placeholders"
+    
+    # Network layer placeholders (acceptable)
+    network_placeholders=$(grep -r "TODO.*network\|PLACEHOLDER.*network\|TODO.*oracle" --include="*.rs" . 2>/dev/null | wc -l)
+    echo "Network layer placeholders: $network_placeholders (acceptable)"
+    
+    # Determine placeholder status
+    if [ $critical_placeholders -eq 0 ]; then
+        echo -e "${GREEN}✅ No critical system placeholders${NC}"
+        placeholder_status="ACCEPTABLE"
+    elif [ $critical_placeholders -lt 5 ]; then
+        echo -e "${YELLOW}⚠️ $critical_placeholders critical placeholders remaining${NC}"
+        placeholder_status="BORDERLINE"
+    else
+        echo -e "${RED}❌ $critical_placeholders critical placeholders (TOO HIGH)${NC}"
+        placeholder_status="TOO_HIGH"
+    fi
+    
+    # Don't exit with placeholder count as return code
+    return 0
+}
+
+# Call the new analysis functions
+analyze_system_architecture
+analyze_mock_implementations
+# Get mock status without using return value
+total_mock_count=$(grep -r "MockImpl\|mock_\|placeholder\|stub_\|unimplemented!\|todo!\|NotImplemented\|Simulator" --include="*.rs" . 2>/dev/null | grep -v "test\|Test\|#\[cfg(test)\]" | wc -l)
+
+analyze_placeholders
+# Get placeholder count without using return value  
+total_placeholder_count=$(grep -r "// TODO:\|// FIXME:\|// PLACEHOLDER:\|// STUB:\|NotImplemented\|placeholder_implementation\|stub_implementation" --include="*.rs" . 2>/dev/null | wc -l)
 
 # Warning count
 echo ""
@@ -218,7 +478,7 @@ echo ""
 echo -e "${BLUE}📊 OVERALL ASSESSMENT:${NC}"
 echo "====================="
 
-# Determine overall status
+# Determine overall status with enhanced criteria
 if [ "$compilation_status" = "FAILING" ]; then
     overall_status="❌ NOT COMPILABLE"
     priority="Fix compilation errors immediately"
@@ -234,6 +494,12 @@ elif [ $todo_count -gt 0 ]; then
 elif [ $license_status -ne 0 ]; then
     overall_status="⚠️ LICENSE COMPLIANCE ISSUES"
     priority="Fix MIT license compliance"
+elif [ "$mock_status" = "TOO_HIGH" ] || [ "$placeholder_status" = "TOO_HIGH" ]; then
+    overall_status="🟡 HIGH MOCK/PLACEHOLDER COUNT"
+    priority="Reduce mock implementations and placeholders in critical systems"
+elif [ "$mock_status" = "BORDERLINE" ] || [ "$placeholder_status" = "BORDERLINE" ]; then
+    overall_status="⚠️ PRODUCTION READY WITH CONCERNS"
+    priority="Monitor mock implementations, plan reduction strategy"
 else
     overall_status="✅ PRODUCTION READY"
     priority="Final testing and optimization"
@@ -241,6 +507,70 @@ fi
 
 echo "$overall_status"
 echo "   Priority: $priority"
+
+# Enhanced system readiness assessment
+echo ""
+echo -e "${BLUE}🎯 SYSTEM READINESS BREAKDOWN:${NC}"
+echo "==============================="
+
+# Core systems assessment
+echo "Core Bitcoin System: $([ "$bitcoin_found" = true ] && echo "✅ Available" || echo "❌ Missing")"
+echo "HSM Security System: $([ -d "src/security" ] && echo "✅ Available" || echo "❌ Missing")"
+echo "Web5 Protocol System: $([ -d "src/web5" ] && echo "✅ Available" || echo "❌ Missing")"
+echo "DAO Governance System: $([ -d "src/dao" ] && echo "✅ Available" || echo "❌ Missing")"
+echo "Hardware Optimization: $([ -d "core/src/hardware_optimization" ] && echo "✅ Available" || echo "❌ Missing")"
+echo "API System: $([ -d "src/api" ] && echo "✅ Available" || echo "❌ Missing")"
+
+# Implementation quality assessment
+echo ""
+echo -e "${BLUE}Implementation Quality:${NC}"
+echo "Compilation Status: $compilation_status"
+echo "Unimplemented Functions: $unimpl_count"
+echo "TODO Stubs: $todo_count"
+echo "Mock Implementations: $total_mock_count ($mock_status)"
+echo "Placeholder Implementations: $total_placeholder_count ($placeholder_status)"
+echo "Warning Count: $warning_count ($warning_status)"
+echo "License Compliance: $([ $license_status -eq 0 ] && echo "COMPLIANT" || echo "NON-COMPLIANT")"
+
+# Production readiness score
+echo ""
+echo -e "${BLUE}Production Readiness Score:${NC}"
+
+readiness_score=0
+
+# Compilation (25 points)
+[ "$compilation_status" = "PASSING" ] && readiness_score=$((readiness_score + 25))
+
+# Implementation completeness (25 points)
+[ $unimpl_count -eq 0 ] && readiness_score=$((readiness_score + 15))
+[ $todo_count -eq 0 ] && readiness_score=$((readiness_score + 10))
+
+# Code quality (20 points)
+[ "$mock_status" = "ACCEPTABLE" ] && readiness_score=$((readiness_score + 10))
+[ "$placeholder_status" = "ACCEPTABLE" ] && readiness_score=$((readiness_score + 5))
+[ "$warning_status" = "ACCEPTABLE" ] && readiness_score=$((readiness_score + 5))
+
+# System availability (20 points)
+[ "$bitcoin_found" = true ] && readiness_score=$((readiness_score + 5))
+[ -d "src/security" ] && readiness_score=$((readiness_score + 5))
+[ -d "src/web5" ] && readiness_score=$((readiness_score + 3))
+[ -d "src/dao" ] && readiness_score=$((readiness_score + 3))
+[ -d "src/api" ] && readiness_score=$((readiness_score + 4))
+
+# License compliance (10 points)
+[ $license_status -eq 0 ] && readiness_score=$((readiness_score + 10))
+
+echo "Overall Score: $readiness_score/100"
+
+if [ $readiness_score -ge 90 ]; then
+    echo -e "${GREEN}🏆 EXCELLENT: Production ready${NC}"
+elif [ $readiness_score -ge 75 ]; then
+    echo -e "${GREEN}✅ GOOD: Near production ready${NC}"
+elif [ $readiness_score -ge 60 ]; then
+    echo -e "${YELLOW}⚠️ FAIR: Needs improvement${NC}"
+else
+    echo -e "${RED}❌ POOR: Significant work needed${NC}"
+fi
 
 # Update PRD files with current status
 echo ""
@@ -306,7 +636,7 @@ echo ""
 echo -e "${BLUE}🎯 NEXT ACTIONS BASED ON VERIFICATION:${NC}"
 echo "======================================"
 
-# Priority-based recommendations
+# Priority-based recommendations with enhanced analysis
 if [ "$compilation_status" = "FAILING" ]; then
     echo "1. 🚨 CRITICAL: Fix compilation errors immediately"
     echo "2. Run: cargo check --all-features --verbose"
@@ -320,6 +650,15 @@ elif [ $license_status -ne 0 ]; then
     echo "1. 🚨 CRITICAL: Fix MIT license compliance issues"
     echo "2. Remove or replace non-MIT dependencies"
     echo "3. Run: cargo deny check licenses --verbose"
+elif [ "$mock_status" = "TOO_HIGH" ]; then
+    echo "1. 🚨 HIGH PRIORITY: Reduce mock implementations"
+    echo "2. Focus on core systems (HSM, Bitcoin, Security)"
+    echo "3. Implement dependency injection patterns"
+    echo "4. Replace mocks with real implementations"
+elif [ "$placeholder_status" = "TOO_HIGH" ]; then
+    echo "1. 🚨 HIGH PRIORITY: Complete placeholder implementations"
+    echo "2. Focus on critical system placeholders first"
+    echo "3. Network/Oracle placeholders are lower priority"
 elif [ $sqlite_todo_count -gt 0 ]; then
     echo "1. Replace SQLite placeholder implementations"
     echo "2. Add real database operations with connection pooling"
@@ -333,6 +672,101 @@ else
     echo "2. Final testing and performance benchmarking"
     echo "3. Security audit preparation"
     echo "4. Documentation finalization"
+fi
+
+# Mock implementation recommendations
+echo ""
+echo -e "${BLUE}🎭 MOCK IMPLEMENTATION RECOMMENDATIONS:${NC}"
+echo "====================================="
+
+if [ "$mock_status" = "TOO_HIGH" ] || [ "$mock_status" = "BORDERLINE" ]; then
+    echo "Priority areas for mock reduction:"
+    echo "1. HSM Provider implementations (replace with real hardware interfaces)"
+    echo "2. Bitcoin protocol handlers (connect to real Bitcoin Core)"
+    echo "3. Database operations (replace with actual persistence)"
+    echo "4. Security modules (implement real cryptographic operations)"
+    echo ""
+    echo "Acceptable mocks (can remain):"
+    echo "• Network layer testing interfaces"
+    echo "• Oracle data providers (external dependencies)"
+    echo "• Hardware simulation for testing"
+elif [ "$mock_status" = "ACCEPTABLE" ]; then
+    echo "✅ Mock implementation levels are acceptable"
+    echo "• Continue monitoring during development"
+    echo "• Focus on completing real implementations for new features"
+fi
+
+# Placeholder implementation recommendations
+echo ""
+echo -e "${BLUE}📝 PLACEHOLDER IMPLEMENTATION RECOMMENDATIONS:${NC}"
+echo "=============================================="
+
+if [ "$placeholder_status" = "TOO_HIGH" ] || [ "$placeholder_status" = "BORDERLINE" ]; then
+    echo "Priority areas for placeholder completion:"
+    echo "1. HSM security implementations"
+    echo "2. Bitcoin transaction processing"
+    echo "3. Cryptographic operations"
+    echo "4. Database persistence layer"
+    echo ""
+    echo "Lower priority placeholders:"
+    echo "• Network communication protocols"
+    echo "• External API integrations"
+    echo "• Oracle data interfaces"
+elif [ "$placeholder_status" = "ACCEPTABLE" ]; then
+    echo "✅ Placeholder levels are acceptable"
+    echo "• Most critical systems have real implementations"
+    echo "• Remaining placeholders are in non-critical areas"
+fi
+
+# System-specific recommendations
+echo ""
+echo -e "${BLUE}🏗️ SYSTEM-SPECIFIC RECOMMENDATIONS:${NC}"
+echo "==================================="
+
+echo "Bitcoin Core System:"
+if [ "$bitcoin_found" = true ]; then
+    bitcoin_todo_count=0
+    for bitcoin_dir in "${bitcoin_dirs[@]}"; do
+        if [ -d "$bitcoin_dir" ]; then
+            dir_todos=$(grep -r "todo!\|unimplemented!\|placeholder" "$bitcoin_dir/" --include="*.rs" 2>/dev/null | wc -l)
+            bitcoin_todo_count=$((bitcoin_todo_count + dir_todos))
+        fi
+    done
+    
+    if [ $bitcoin_todo_count -eq 0 ]; then
+        echo "  ✅ Implementation complete"
+    else
+        echo "  ⚠️ $bitcoin_todo_count incomplete implementations"
+        echo "     → Priority: Complete Layer2 protocol implementations"
+    fi
+else
+    echo "  ❌ System not found - critical for production"
+fi
+
+echo "HSM Security System:"
+if [ -d "src/security" ]; then
+    security_todo_count=$(grep -r "todo!\|unimplemented!\|placeholder" src/security/ --include="*.rs" 2>/dev/null | wc -l)
+    if [ $security_todo_count -eq 0 ]; then
+        echo "  ✅ Implementation complete"
+    else
+        echo "  ⚠️ $security_todo_count incomplete implementations"
+        echo "     → Priority: Implement hardware HSM providers"
+    fi
+else
+    echo "  ❌ System not found - critical for production"
+fi
+
+echo "Web5 Protocol System:"
+if [ -d "src/web5" ]; then
+    web5_todo_count=$(grep -r "todo!\|unimplemented!\|placeholder" src/web5/ --include="*.rs" 2>/dev/null | wc -l)
+    if [ $web5_todo_count -eq 0 ]; then
+        echo "  ✅ Implementation complete"
+    else
+        echo "  ⚠️ $web5_todo_count incomplete implementations"
+        echo "     → Priority: Complete DID and VC implementations"
+    fi
+else
+    echo "  ⚠️ System not found - optional for core functionality"
 fi
 
 echo ""
@@ -351,11 +785,45 @@ echo "Compilation: $compilation_status"
 echo "Unimplemented: $unimpl_count"
 echo "Todo stubs: $todo_count"
 echo "SQLite TODOs: $sqlite_todo_count"
-echo "Mock implementations: $mock_count"
-echo "Warnings: $warning_count"
+echo "Mock implementations: $total_mock_count ($mock_status)"
+echo "Placeholder implementations: $total_placeholder_count ($placeholder_status)"
+echo "Warnings: $warning_count ($warning_status)"
 echo "License compliance: $([ $license_status -eq 0 ] && echo "COMPLIANT" || echo "NON-COMPLIANT")"
 echo "Test status: $test_status"
 echo "Overall: $overall_status"
+echo "Production readiness score: $readiness_score/100"
+
+# System availability summary
+echo ""
+echo -e "${BLUE}System Availability Summary:${NC}"
+echo "Bitcoin Core: $([ "$bitcoin_found" = true ] && echo "✅" || echo "❌")"
+echo "HSM Security: $([ -d "src/security" ] && echo "✅" || echo "❌")"
+echo "Web5 Protocol: $([ -d "src/web5" ] && echo "✅" || echo "❌")"
+echo "DAO Governance: $([ -d "src/dao" ] && echo "✅" || echo "❌")"
+echo "Hardware Optimization: $([ -d "core/src/hardware_optimization" ] && echo "✅" || echo "❌")"
+echo "API System: $([ -d "src/api" ] && echo "✅" || echo "❌")"
+
+# Quality metrics
+echo ""
+echo -e "${BLUE}Quality Metrics:${NC}"
+if [ "$bitcoin_found" = true ]; then
+    bitcoin_mocks=0
+    for bitcoin_dir in "${bitcoin_dirs[@]}"; do
+        if [ -d "$bitcoin_dir" ]; then
+            dir_mocks=$(grep -r "mock\|Mock\|placeholder\|todo\|unimplemented" "$bitcoin_dir" --include="*.rs" 2>/dev/null | grep -v test | wc -l)
+            bitcoin_mocks=$((bitcoin_mocks + dir_mocks))
+        fi
+    done
+    bitcoin_quality=$(awk "BEGIN {printf \"%.1f\", (($bitcoin_files - $bitcoin_mocks) * 100) / $bitcoin_files}")
+    echo "Bitcoin implementation quality: ${bitcoin_quality}%"
+fi
+
+if [ -d "src/security" ]; then
+    security_files=$(find src/security -name "*.rs" 2>/dev/null | wc -l)
+    security_mocks=$(grep -r "mock\|Mock\|placeholder\|todo\|unimplemented" src/security --include="*.rs" 2>/dev/null | grep -v test | wc -l)
+    security_quality=$(awk "BEGIN {printf \"%.1f\", (($security_files - $security_mocks) * 100) / $security_files}")
+    echo "Security implementation quality: ${security_quality}%"
+fi
 
 echo ""
 echo -e "${BLUE}⚖️ ENFORCEMENT REMINDER:${NC}"
@@ -366,11 +834,12 @@ echo "• Progress tracked by macro reduction, not aspirational statements"
 echo "• This script must be run before any major status updates"
 echo "• MIT license compliance is mandatory for all components"
 
-# Exit with appropriate code
+# Exit with appropriate code based on critical issues only
 if [ "$compilation_status" = "FAILING" ] || [ $license_status -ne 0 ]; then
     exit 1
 elif [ $unimpl_count -gt 0 ] || [ $todo_count -gt 5 ]; then
     exit 2
 else
+    # Don't exit with high mock count for now, just report
     exit 0
 fi

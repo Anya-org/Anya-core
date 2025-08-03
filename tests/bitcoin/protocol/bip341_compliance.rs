@@ -108,8 +108,8 @@ impl TaprootVerifier {
     /// Compute merkle root from leaf hash and control block  
     fn compute_merkle_root(
         &self,
-        leaf_hash: TapLeafHash,
-        control_block: &ControlBlock,
+        _leaf_hash: TapLeafHash,
+        _control_block: &ControlBlock,
     ) -> Result<Option<TapNodeHash>> {
         // Mock implementation - in real code, this would compute the actual Merkle root
         // from the leaf hash and control block proof path
@@ -338,7 +338,10 @@ impl BIP341Checker {
     }
 
     /// Compute parent hash in merkle tree using TapNodeHash and TapBranchTag
-    fn parent_hash_node(node_hash: &TapNodeHash, branch_tag: &TapBranchTag) -> Result<TapNodeHash> {
+    fn parent_hash_node(
+        _node_hash: &TapNodeHash,
+        _branch_tag: &TapBranchTag,
+    ) -> Result<TapNodeHash> {
         // Create a simple mock implementation for testing
         // In a real implementation, this would use proper taproot hash calculations
         // Simplified implementation for current Bitcoin library
@@ -364,7 +367,7 @@ impl BIP341Checker {
         output_key_hex: &str,
     ) -> Result<bool> {
         // Parse keys from hex
-        let internal_key = XOnlyPublicKey::from_str(internal_key_hex)
+        let _internal_key = XOnlyPublicKey::from_str(internal_key_hex)
             .map_err(|e| anyhow::anyhow!("Failed to parse internal key: {}", e))?;
 
         println!("Successfully parsed internal key: {}", internal_key_hex);
@@ -435,13 +438,13 @@ pub fn test_taproot_multisig_schnorr() -> Result<()> {
     let secp = Secp256k1::new();
 
     // Create multisig script with 2-of-3 signers using Schnorr
-    let key1 = XOnlyPublicKey::from_str(
+    let _key1 = XOnlyPublicKey::from_str(
         "79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
     )?;
-    let key2 = XOnlyPublicKey::from_str(
+    let _key2 = XOnlyPublicKey::from_str(
         "c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5",
     )?;
-    let key3 = XOnlyPublicKey::from_str(
+    let _key3 = XOnlyPublicKey::from_str(
         "e493dbf1c10d80f3581e4904930b1404cc6c13900ee0758474fa94abe8c4cd13",
     )?;
 
@@ -592,7 +595,7 @@ pub fn test_taproot_compliance_vectors() -> Result<()> {
     let internal_key_untweaked: UntweakedPublicKey = internal_pubkey.into();
 
     // Use the tap_tweak method with the merkle_root
-    let (output_key, parity) = internal_key_untweaked.tap_tweak(&verifier.secp, Some(merkle_root));
+    let (output_key, _parity) = internal_key_untweaked.tap_tweak(&verifier.secp, Some(merkle_root));
 
     assert_eq!(
         output_key.to_x_only_public_key(),

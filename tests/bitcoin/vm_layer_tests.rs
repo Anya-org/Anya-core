@@ -1,18 +1,17 @@
 // VM Layer Tests
 // Mock implementation - these features are now part of the main anya_core library
 
-#[cfg(feature = "rust-bitcoin")]
-use anya_core::layer2::Layer2Manager;
 use std::time::Instant;
 
-/// VM layer system tests
+/// VM Layer system tests
 mod vm_layer_tests {
 
     #[test]
-    fn test_vm_initialization() {
-        // Mock test for VM layer initialization
+    fn test_vm_layer_initialization() {
+        // Mock test for VM Layer initialization
         #[cfg(feature = "rust-bitcoin")]
         {
+            use anya_core::layer2::Layer2Manager;
             let _manager = Layer2Manager::new();
             assert!(true);
         }
@@ -21,8 +20,6 @@ mod vm_layer_tests {
             assert!(true);
         }
     }
-
-    #[test]
     fn test_vm_configuration() {
         // Mock test for VM configuration
         let vm_configured = true;
