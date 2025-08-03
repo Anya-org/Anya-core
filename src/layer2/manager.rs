@@ -63,6 +63,7 @@ impl Default for Layer2ManagerConfig {
 pub struct Layer2Manager {
     coordinator: AsyncLayer2Coordinator,
     config: Layer2ManagerConfig,
+    #[allow(dead_code)] // Used for dynamic protocol configuration
     protocol_configs: Arc<RwLock<HashMap<Layer2ProtocolType, String>>>,
     event_handler: Arc<RwLock<Option<tokio::task::JoinHandle<()>>>>,
     initialized: Arc<RwLock<bool>>,

@@ -1,11 +1,11 @@
 #[cfg(test)]
 mod tests {
-    use crate::mobile::sdk::{MobileSDK, WalletInfo};
+    use anya_core::mobile::sdk::{MobileSDK, WalletInfo};
 
     #[cfg(feature = "ffi")]
     mod ffi_tests {
         use super::*;
-        use crate::mobile::ffi;
+        use anya_core::mobile::ffi;
         use std::ffi::{CStr, CString};
         use std::os::raw::c_char;
 

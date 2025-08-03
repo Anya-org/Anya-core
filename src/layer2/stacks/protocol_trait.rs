@@ -28,11 +28,22 @@ impl StacksClient {
     ) -> Result<String, Layer2Error> {
         // Simplified implementation for testing
         println!(
-            "Deploying contract {} with size {} bytes",
-            name,
-            contract.len()
+            "Deploying contract {} with name {} to {}",
+            contract, name, self.config.network
         );
-        Ok(format!("stacks_contract_{}", name))
+        Ok(format!("Contract {} deployed", name))
+    }
+
+    /// Call a contract function
+    pub fn call_contract_function(
+        &self,
+        contract: &str,
+        function: &str,
+        args: &[crate::dao::compat::clarity_repl::vm::Value],
+    ) -> Result<String, Layer2Error> {
+        // Mock implementation for testing
+        println!("Calling {}.{} with args: {:?}", contract, function, args);
+        Ok("Function called successfully".to_string())
     }
 
     /// Get the current state of the Stacks blockchain

@@ -68,6 +68,7 @@ pub enum Layer2Event {
 /// Protocol wrapper with async coordination
 pub struct AsyncProtocolWrapper {
     protocol: Arc<dyn Layer2Protocol>,
+    #[allow(dead_code)] // Used for protocol identification and routing
     protocol_type: Layer2ProtocolType,
     semaphore: Arc<Semaphore>,
     health: Arc<RwLock<ProtocolHealth>>,

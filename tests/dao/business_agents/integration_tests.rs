@@ -38,7 +38,7 @@ mod business_agent_tests {
         let _test_env = TestEnvironmentFactory::new_basic();
 
         // Mock contract deployment for testing
-        let contract_code = "mock-api-manager-contract";
+        let _contract_code = "mock-api-manager-contract";
 
         // Basic validation that environment is properly initialized
         // No need to check len() >= 0 as this is always true for unsigned types

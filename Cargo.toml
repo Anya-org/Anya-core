@@ -122,9 +122,16 @@ rust-bitcoin = ["bitcoin"]  # Alias for backward compatibility
 # Mobile SDK features (MIT-compliant)
 ffi = ["std"]
 mobile = ["ffi", "std", "bitcoin"]
+ndk = ["mobile", "dep:ndk"] # Android NDK support
+
+# Bitcoin implementation features enhanced
+bdk = ["bitcoin", "dep:bdk_wallet"] # Bitcoin Development Kit support
 
 # Web5 integration features
 web5 = ["dep:web5", "dep:jsonwebtoken", "dep:multibase", "dep:multihash"]
+
+# Testing and development features
+memory_tracking = ["std"] # Memory usage tracking for tests
 
 # Enterprise features (MIT-compliant only)
 enterprise = ["dep:sqlx"]

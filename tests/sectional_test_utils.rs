@@ -14,6 +14,7 @@ pub mod sectional {
 
     /// Sections available for testing
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+    #[allow(dead_code)] // Some variants may not be used in all test configurations
     pub enum Section {
         CoreIssuance,
         Distribution,
@@ -35,6 +36,7 @@ pub mod sectional {
             }
         }
 
+        #[allow(dead_code)] // May not be used in all test configurations
         pub fn from_str(s: &str) -> Option<Self> {
             match s {
                 "core-issuance" => Some(Section::CoreIssuance),

@@ -3,8 +3,7 @@ use anya_core::dao::compat::clarity_repl::repl::{
     ReadOnlyRequest, Session, TestEnvironment, TransactionRequest,
 };
 use anya_core::dao::compat::clarity_repl::vm::{PrincipalData, StacksTransaction, Value};
-use anya_core::layer2::stacks::{StacksClient, StacksConfig};
-use anya_core::layer2::Layer2ProtocolTrait;
+use anya_core::layer2::stacks::{Layer2ProtocolTrait, StacksClient, StacksConfig};
 
 #[test]
 fn test_multi_sig_governance_with_real_stacks_client() {
@@ -101,6 +100,9 @@ fn test_stacks_transaction_creation() {
             )),
             Value::UInt(1),
         ],
+        sender: Some(PrincipalData::from(
+            "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM".to_string(),
+        )),
     };
 
     assert_eq!(tx.contract_call, "multi-sig-governance");
@@ -111,10 +113,7 @@ fn test_stacks_transaction_creation() {
 #[test]
 fn test_clarity_session() {
     // Test using actual Session from compat module
-    let mut session = Session::new(
-        vec!["ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM".to_string()],
-        "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM".to_string(),
-    );
+    let mut session = Session::new();
 
     // Deploy a contract using real session
     let deploy_result = session.deploy_contract("multi-sig", "(define-data-var threshold uint u2)");
@@ -317,14 +316,15 @@ fn test_test_environment_integration() {
 
     // Execute a transaction request
     let tx_request = TransactionRequest {
-        contract: "multi-sig-governance".to_string(),
-        function: "add-signer".to_string(),
-        args: vec![
+        contract_call: "multi-sig-governance".to_string(),
+        function_name: "add-signer".to_string(),
+        function_args: vec![
             Value::Principal(PrincipalData::from(
                 "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM".to_string(),
             )),
             Value::UInt(1),
         ],
+        sender: PrincipalData::from("ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM".to_string()),
     };
 
     let tx_result = test_env.execute_transaction(tx_request);
@@ -332,9 +332,9 @@ fn test_test_environment_integration() {
 
     // Execute a read-only request
     let readonly_request = ReadOnlyRequest {
-        contract: "multi-sig-governance".to_string(),
-        function: "get-signer-count".to_string(),
-        args: vec![],
+        contract_call: "multi-sig-governance".to_string(),
+        function_name: "get-signer-count".to_string(),
+        function_args: vec![],
     };
 
     let readonly_result = test_env.execute_read_only(readonly_request);
