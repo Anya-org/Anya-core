@@ -265,7 +265,7 @@ impl SourceOfTruthRegistry {
             last_updated: AtomicU64::new(Self::current_timestamp()),
             version: AtomicU32::new(1),
             registry_path,
-            blockchain_anchoring_enabled: AtomicU32::new(0), // Disabled by default
+            blockchain_anchoring_enabled: AtomicU32::new(1), // Enabled by default - real implementation ready
             bitcoin_network: AtomicU32::new(1),              // Default to testnet (1) for safety
         };
 

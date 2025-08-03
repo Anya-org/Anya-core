@@ -4,7 +4,7 @@
 // Bitcoin-Protocol-Compliant: Tracks Bitcoin-related development activity
 // AI-Testable: Comprehensive test coverage for commit validation
 
-use super::DocError;
+use super::markdown::DocError;
 
 /// [AIR-3] Commit information structure for AI labelling system
 #[derive(Debug, Clone)]
