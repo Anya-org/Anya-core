@@ -2,6 +2,7 @@
 //!
 //! This module provides machine learning capabilities for the Anya system,
 //! including model management, training, prediction, and federated learning.
+//! [PRODUCTION-READY] Using real ML implementations with actual model inference
 
 use std::error::Error;
 // [AIR-3][AIS-3][BPC-3][RES-3] Import necessary dependencies for ML module
@@ -9,14 +10,20 @@ use std::error::Error;
 use crate::{AnyaError, AnyaResult};
 // Re-export these types to make them public
 pub use crate::dao::{Proposal, ProposalMetrics, RiskMetrics};
-// Import MLModel trait from service module
-pub use crate::ml::service::MLModel;
 use std::collections::HashMap;
 use std::path::Path;
 use std::sync::{Arc, Mutex};
 
+// Production ML Service (replaces all mock implementations)
+pub mod production;
+pub use production::{
+    InferenceResult, LoadedModel, MLServiceConfig, MLServiceMetrics, ModelPerformanceMetrics,
+    ModelType, ProductionMLService as MLService, RealMLService,
+};
+
+// Keep service module for trait definitions
 mod service;
-pub use service::MLService;
+pub use service::MLModel;
 
 // Real ML inference engine (replaces mock implementations)
 pub mod real_inference;
@@ -27,6 +34,22 @@ pub use real_inference::{
 // ML agent system module
 pub mod agent_system;
 pub use agent_system::MLAgentSystem;
+
+// ML model adapters for external framework integration
+pub mod adapters;
+pub use adapters::{AdapterFactory, MLAdapterRegistry, MLModelAdapter};
+
+// Tool integration framework
+pub mod tools;
+pub use tools::{Tool, ToolManager, ToolRegistry, ToolResult};
+
+// Planning and reasoning engine
+pub mod planning;
+pub use planning::{Goal, Plan, Planner, PlanningEngine, Reasoner};
+
+// Advanced agent orchestration system
+pub mod orchestration;
+pub use orchestration::{WorkflowBuilder, WorkflowDefinition, WorkflowEngine};
 
 /// Configuration options for ML functionality
 #[derive(Debug, Clone)]
@@ -78,11 +101,31 @@ unsafe impl Sync for MLSystem {}
 
 impl MLSystem {
     /// Create a new MLSystem with the given configuration
-    pub fn new(config: MLConfig) -> AnyaResult<Self> {
+    pub async fn new(config: MLConfig) -> AnyaResult<Self> {
         if !config.enabled {
+            // Create a default ML service config for disabled mode
+            let ml_config = MLServiceConfig {
+                models_dir: config
+                    .model_path
+                    .as_ref()
+                    .map(|p| std::path::PathBuf::from(p))
+                    .unwrap_or_else(|| std::path::PathBuf::from("./data/models")),
+                max_memory_mb: 512,
+                enable_gpu: config.use_gpu,
+                max_batch_size: 32,
+                confidence_threshold: 0.8,
+                model_cache_timeout: 3600,
+                auto_retrain_interval: 24,
+                enable_federated_learning: config.federated_learning,
+            };
+
+            let service = MLService::new(ml_config)
+                .await
+                .map_err(|e| AnyaError::ML(format!("Failed to create ML service: {e}")))?;
+
             return Ok(Self {
                 config,
-                service: MLService::new(),
+                service,
                 models: HashMap::new(),
             });
         }
@@ -95,7 +138,25 @@ impl MLSystem {
             }
         }
 
-        let ml_service = MLService::new();
+        // Create ML service config
+        let ml_config = MLServiceConfig {
+            models_dir: config
+                .model_path
+                .as_ref()
+                .map(|p| std::path::PathBuf::from(p))
+                .unwrap_or_else(|| std::path::PathBuf::from("./data/models")),
+            max_memory_mb: 1024,
+            enable_gpu: config.use_gpu,
+            max_batch_size: 64,
+            confidence_threshold: 0.8,
+            model_cache_timeout: 3600,
+            auto_retrain_interval: 24,
+            enable_federated_learning: config.federated_learning,
+        };
+
+        let ml_service = MLService::new(ml_config)
+            .await
+            .map_err(|e| AnyaError::ML(format!("Failed to create ML service: {e}")))?;
 
         Ok(Self {
             config,
@@ -122,7 +183,7 @@ impl MLSystem {
     }
 
     /// Get health metrics for the ML system
-    pub fn get_health_metrics(&self) -> HashMap<String, f64> {
+    pub async fn get_health_metrics(&self) -> HashMap<String, f64> {
         let mut metrics = HashMap::new();
         metrics.insert("model_count".to_string(), self.models.len() as f64);
         metrics.insert(
@@ -138,7 +199,21 @@ impl MLSystem {
             },
         );
 
-        // Add more detailed metrics here if needed
+        // Add service metrics
+        let service_metrics = self.service.get_metrics().await;
+        metrics.insert(
+            "service_total_inferences".to_string(),
+            service_metrics.total_inferences as f64,
+        );
+        metrics.insert(
+            "service_successful_inferences".to_string(),
+            service_metrics.successful_inferences as f64,
+        );
+        metrics.insert(
+            "service_failed_inferences".to_string(),
+            service_metrics.failed_inferences as f64,
+        );
+
         metrics
     }
 
@@ -148,11 +223,30 @@ impl MLSystem {
     }
 
     /// Get health metrics for all models
-    pub fn get_model_health_metrics(&self) -> HashMap<String, HashMap<String, f64>> {
+    pub async fn get_model_health_metrics(&self) -> HashMap<String, HashMap<String, f64>> {
         let mut metrics = HashMap::new();
 
-        // Add service metrics
-        metrics.insert("service".to_string(), self.service.get_health_metrics());
+        // Convert service metrics to HashMap<String, f64>
+        let service_metrics = self.service.get_metrics().await;
+        let mut service_health = HashMap::new();
+        service_health.insert(
+            "total_inferences".to_string(),
+            service_metrics.total_inferences as f64,
+        );
+        service_health.insert(
+            "successful_inferences".to_string(),
+            service_metrics.successful_inferences as f64,
+        );
+        service_health.insert(
+            "failed_inferences".to_string(),
+            service_metrics.failed_inferences as f64,
+        );
+        service_health.insert(
+            "average_inference_time_ms".to_string(),
+            service_metrics.average_inference_time_ms,
+        );
+
+        metrics.insert("service".to_string(), service_health);
 
         // Add model-specific metrics
         for (name, model) in &self.models {

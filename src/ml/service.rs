@@ -102,6 +102,7 @@ impl<T> RandomForestClassifier<T> {
 
 /// Machine Learning Service
 #[derive(Debug)]
+#[allow(dead_code)] // Legacy ML service, kept for backward compatibility
 pub struct MLService {
     device: Device,
     model: Arc<Mutex<RandomForestClassifier<f64>>>,
@@ -175,6 +176,7 @@ impl Default for MLService {
 
 impl MLService {
     /// Create a new ML service instance
+    #[allow(dead_code)] // Legacy ML service methods, kept for backward compatibility
     pub fn new() -> Self {
         // [AIR-3][AIS-3][BPC-3][RES-3] Default to CPU for now since we don't have tch in scope
         // This follows official Bitcoin Improvement Proposals (BIPs) standards for device handling
@@ -189,7 +191,8 @@ impl MLService {
         }
     }
 
-    /// Initialize the ML service with a specific model
+    /// Initialize the model
+    #[allow(dead_code)] // Legacy ML service methods, kept for backward compatibility
     pub fn initialize(&mut self, features_dim: usize, model_version: &str) -> AnyaResult<()> {
         self.features_dim = features_dim;
         self.model_version = model_version.to_string();
@@ -212,7 +215,8 @@ impl MLService {
         Ok(())
     }
 
-    /// Analyze a DAO proposal and return metrics
+    /// Analyze a proposal and return risk metrics
+    #[allow(dead_code)] // Legacy ML service methods, kept for backward compatibility
     pub fn analyze_proposal(&self, proposal: &Proposal) -> AnyaResult<HashMap<String, f64>> {
         if !self.is_initialized {
             return Err(AnyaError::ML("ML service not initialized".to_string()));
@@ -241,6 +245,7 @@ impl MLService {
     }
 
     /// Extract features from a proposal for ML processing
+    #[allow(dead_code)] // Legacy ML service methods, kept for backward compatibility
     fn extract_features(&self, _proposal: &Proposal) -> AnyaResult<Vec<f64>> {
         // [AIR-3][AIS-3][BPC-3][RES-3] In a real implementation, this would extract relevant features from the proposal
         // This follows official Bitcoin Improvement Proposals (BIPs) standards for ML feature extraction
@@ -250,6 +255,7 @@ impl MLService {
     }
 
     /// Predict outcomes based on features
+    #[allow(dead_code)] // Legacy ML service methods, kept for backward compatibility
     fn predict(&self, features: &[f64]) -> AnyaResult<HashMap<String, f64>> {
         // In a real implementation, this would use the actual model for predictions
         let mut predictions = HashMap::new();
@@ -267,6 +273,7 @@ impl MLService {
     }
 
     /// Calculate confidence for the prediction
+    #[allow(dead_code)] // Legacy ML service methods, kept for backward compatibility
     fn calculate_confidence(&self, features: &[f64]) -> f64 {
         // In a real implementation, this would be based on model certainty
         // This is a placeholder implementation
@@ -278,6 +285,7 @@ impl MLService {
     /// Assess risks for a proposal
     // [AIR-3][AIS-3][BPC-3][RES-3] Assess risks for a proposal
     // This follows official Bitcoin Improvement Proposals (BIPs) standards for ML operations
+    #[allow(dead_code)] // Legacy ML service methods, kept for backward compatibility
     fn assess_risks(&self, _proposal: &Proposal) -> AnyaResult<RiskMetrics> {
         // In a real implementation, this would perform detailed risk analysis
 
@@ -312,6 +320,7 @@ impl MLService {
     }
 
     /// Get consensus from federated model nodes
+    #[allow(dead_code)] // Legacy ML service methods, kept for backward compatibility
     fn get_federated_consensus(&self) -> AnyaResult<HashMap<String, f64>> {
         // In a real implementation, this would fetch data from federated nodes
 
@@ -325,6 +334,7 @@ impl MLService {
 
     /// Train the model with new data
     // [AIR-3][AIS-3][BPC-3][RES-3]
+    #[allow(dead_code)] // Legacy ML service methods, kept for backward compatibility
     pub async fn train(&mut self, features: Vec<f64>, labels: Vec<f64>) -> AnyaResult<()> {
         // Properly handle mutex lock error by converting to AnyaError::ML
         let mut model = match self.model.lock() {

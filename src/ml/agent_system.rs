@@ -17,7 +17,7 @@ impl MLAgentSystem {
     /// Initialize a new MLAgentSystem with the given configuration
     pub async fn init(config: MLConfig) -> AnyaResult<Self> {
         // Create an ML system
-        let ml_system = MLSystem::new(config)?;
+        let ml_system = MLSystem::new(config).await?;
 
         // Create an agent checker
         let agent_checker = crate::ml::create_agent_checker();
@@ -41,7 +41,7 @@ impl MLAgentSystem {
     /// Check system health
     pub async fn check_health(&self) -> AnyaResult<f64> {
         // Get health metrics from the ML system
-        let metrics = self.ml_system.get_health_metrics();
+        let metrics = self.ml_system.get_health_metrics().await;
 
         // Calculate a simple average of the numerical metrics
         let sum: f64 = metrics.values().sum();

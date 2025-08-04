@@ -15,6 +15,10 @@ use std::sync::{Arc, RwLock};
 pub mod system_map;
 pub use system_map::*;
 
+// Agent communication system
+pub mod communication;
+pub use communication::*;
+
 // Re-export agents
 pub mod federated_agent;
 pub use federated_agent::FederatedAgent;
@@ -167,6 +171,10 @@ pub enum AgentError {
     /// Error during processing
     #[error("Processing error: {0}")]
     ProcessingError(String),
+
+    /// Communication error
+    #[error("Communication error: {0}")]
+    CommunicationError(String),
 
     /// Input/output error
     #[error("I/O error: {0}")]
