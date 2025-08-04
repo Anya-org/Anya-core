@@ -477,6 +477,7 @@ impl RgbProtocol {
             amount: Some(amount),
             fee: Some(self.calculate_transaction_fee(amount).await?), // Real fee calculation
             confirmations: 1,
+            block_height: None,
             timestamp,
         };
 
@@ -690,6 +691,7 @@ impl Layer2Protocol for RgbProtocol {
             amount: Some(1000),
             fee: Some(100),
             confirmations: 1,
+            block_height: None,
             timestamp,
         };
 
@@ -782,6 +784,8 @@ impl Layer2Protocol for RgbProtocol {
             valid: true,
             is_valid: true,
             error: None,
+            error_message: None,
+            confidence_score: 1.0,
             timestamp,
         })
     }
@@ -832,6 +836,10 @@ impl Layer2Protocol for RgbProtocol {
             estimated_fee: base_fee,
             fee_rate: 1.0,          // 1 sat per vbyte
             confirmation_target: 6, // 6 blocks
+            slow_fee: (base_fee as f64 * 0.5) as u64,
+            normal_fee: base_fee,
+            fast_fee: (base_fee as f64 * 2.0) as u64,
+            estimated_confirmation_time: 6,
         })
     }
 }

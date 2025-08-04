@@ -110,10 +110,11 @@ impl Layer2Protocol for BobProtocol {
         let tx_result = TransactionResult {
             tx_id: tx_id.clone(),
             status: TransactionStatus::Confirmed,
-            amount: Some(100000),
-            fee: Some(500),
+            amount: None,
+            fee: None,
             confirmations: 1,
             timestamp,
+            block_height: None,
         };
 
         let mut transactions = self.transactions.write().await;
@@ -184,6 +185,8 @@ impl Layer2Protocol for BobProtocol {
             valid: true,
             is_valid: true,
             error: None,
+            error_message: None,
+            confidence_score: 1.0,
             timestamp,
         })
     }
@@ -219,6 +222,10 @@ impl Layer2Protocol for BobProtocol {
             estimated_fee: 500,
             fee_rate: 5.0,
             confirmation_target: 3,
+            slow_fee: 250,
+            normal_fee: 500,
+            fast_fee: 1000,
+            estimated_confirmation_time: 3,
         })
     }
 }

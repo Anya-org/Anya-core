@@ -271,6 +271,8 @@ impl Layer2Protocol for StateChannelsProtocol {
             valid: true,
             is_valid: true,
             error: None,
+            error_message: None,
+            confidence_score: 1.0,
             timestamp: SystemTime::now()
                 .duration_since(UNIX_EPOCH)
                 .unwrap_or_default()
@@ -305,10 +307,15 @@ impl Layer2Protocol for StateChannelsProtocol {
         _operation: &str,
         _params: &[u8],
     ) -> Result<FeeEstimate, Layer2Error> {
+        let estimated_fee = 500u64;
         Ok(FeeEstimate {
-            estimated_fee: 500,
+            estimated_fee,
             fee_rate: 0.5,
             confirmation_target: 1,
+            slow_fee: (estimated_fee as f64 * 0.5) as u64,
+            normal_fee: estimated_fee,
+            fast_fee: (estimated_fee as f64 * 2.0) as u64,
+            estimated_confirmation_time: 6,
         })
     }
 }

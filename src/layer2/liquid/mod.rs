@@ -250,6 +250,7 @@ impl LiquidProtocol {
             fee: Some(1000), // Mock fee in L-BTC sats
             confirmations: 1,
             timestamp: current_time,
+            block_height: None,
         };
 
         let mut transactions = self.transactions.write().await;
@@ -308,6 +309,7 @@ impl LiquidProtocol {
             amount: if confidential { None } else { Some(amount) },
             fee: Some(100), // Mock fee
             confirmations: 1,
+            block_height: None,
             timestamp: current_time,
         };
 
@@ -581,6 +583,7 @@ impl Layer2Protocol for LiquidProtocol {
             amount: Some(50000),
             fee: Some(100),
             confirmations: 1,
+            block_height: None,
             timestamp,
         };
 
@@ -673,6 +676,8 @@ impl Layer2Protocol for LiquidProtocol {
             valid: true,
             is_valid: true,
             error: None,
+            error_message: None,
+            confidence_score: 1.0,
             timestamp,
         })
     }
@@ -725,6 +730,10 @@ impl Layer2Protocol for LiquidProtocol {
             estimated_fee: base_fee,
             fee_rate: 0.1,          // 0.1 sats per vbyte (very low fees)
             confirmation_target: 1, // 1 minute block time
+            slow_fee: (base_fee as f64 * 0.5) as u64,
+            normal_fee: base_fee,
+            fast_fee: (base_fee as f64 * 2.0) as u64,
+            estimated_confirmation_time: 1,
         })
     }
 }

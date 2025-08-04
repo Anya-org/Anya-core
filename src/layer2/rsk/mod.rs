@@ -113,6 +113,7 @@ impl Layer2Protocol for RskProtocol {
             amount: Some(50000),
             fee: Some(200),
             confirmations: 1,
+            block_height: None,
             timestamp,
         };
 
@@ -184,6 +185,8 @@ impl Layer2Protocol for RskProtocol {
             valid: true,
             is_valid: true,
             error: None,
+            error_message: None,
+            confidence_score: 1.0,
             timestamp,
         })
     }
@@ -215,10 +218,15 @@ impl Layer2Protocol for RskProtocol {
         _operation: &str,
         _params: &[u8],
     ) -> Result<FeeEstimate, Layer2Error> {
+        let estimated_fee = 200u64;
         Ok(FeeEstimate {
-            estimated_fee: 200,
+            estimated_fee,
             fee_rate: 2.0,
             confirmation_target: 2,
+            slow_fee: (estimated_fee as f64 * 0.5) as u64,
+            normal_fee: estimated_fee,
+            fast_fee: (estimated_fee as f64 * 2.0) as u64,
+            estimated_confirmation_time: 6,
         })
     }
 }

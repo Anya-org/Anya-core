@@ -15,7 +15,8 @@ pub mod dlc;
 pub mod lightning;
 pub mod liquid;
 pub mod manager;
-pub mod mock;
+pub mod mock; // Kept for backward compatibility and testing
+pub mod production; // New production implementation
 pub mod rgb;
 pub mod rsk;
 pub mod stacks;
@@ -29,11 +30,16 @@ pub use dlc::DlcProtocol;
 pub use lightning::LightningProtocol;
 pub use liquid::LiquidProtocol;
 pub use manager::Layer2Manager;
+pub use production::{ProductionLayer2Protocol, RealLayer2Protocol}; // Use production implementation
 pub use rgb::RgbProtocol;
 pub use rsk::RskProtocol;
 pub use stacks::StacksProtocol;
 pub use state_channels::StateChannelsProtocol;
 pub use taproot_assets::TaprootAssetsProtocol;
+
+// Export mock for testing (but not as default)
+#[cfg(test)]
+pub use mock::MockLayer2Protocol;
 
 /// Error types for Layer2 operations
 #[derive(Debug, Clone, Error)]
@@ -110,6 +116,7 @@ pub struct TransactionResult {
     pub fee: Option<u64>,
     pub confirmations: u32,
     pub timestamp: u64,
+    pub block_height: Option<u64>,
 }
 
 /// Transfer result information
@@ -140,6 +147,8 @@ pub struct VerificationResult {
     pub is_valid: bool,
     pub error: Option<String>,
     pub timestamp: u64,
+    pub error_message: Option<String>,
+    pub confidence_score: f64,
 }
 
 /// Validation result
@@ -187,6 +196,10 @@ pub struct FeeEstimate {
     pub estimated_fee: u64,
     pub fee_rate: f64,
     pub confirmation_target: u32,
+    pub slow_fee: u64,
+    pub normal_fee: u64,
+    pub fast_fee: u64,
+    pub estimated_confirmation_time: u32,
 }
 
 /// Generic Layer2 protocol trait
@@ -294,8 +307,10 @@ pub fn create_verification_result(is_valid: bool, error: Option<String>) -> Veri
     VerificationResult {
         valid: is_valid,
         is_valid,
-        error,
+        error: error.clone(),
         timestamp,
+        error_message: error,
+        confidence_score: if is_valid { 1.0 } else { 0.0 },
     }
 }
 

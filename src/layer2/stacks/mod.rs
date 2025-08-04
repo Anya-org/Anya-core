@@ -117,6 +117,7 @@ impl Layer2Protocol for StacksProtocol {
             amount: Some(100000),
             fee: Some(1000),
             confirmations: 1,
+            block_height: None,
             timestamp,
         };
 
@@ -188,6 +189,8 @@ impl Layer2Protocol for StacksProtocol {
             valid: true,
             is_valid: true,
             error: None,
+            error_message: None,
+            confidence_score: 1.0,
             timestamp,
         })
     }
@@ -219,10 +222,15 @@ impl Layer2Protocol for StacksProtocol {
         _operation: &str,
         _params: &[u8],
     ) -> Result<FeeEstimate, Layer2Error> {
+        let estimated_fee = 1000u64;
         Ok(FeeEstimate {
-            estimated_fee: 1000,
+            estimated_fee,
             fee_rate: 10.0,
             confirmation_target: 6,
+            slow_fee: (estimated_fee as f64 * 0.5) as u64,
+            normal_fee: estimated_fee,
+            fast_fee: (estimated_fee as f64 * 2.0) as u64,
+            estimated_confirmation_time: 6,
         })
     }
 }
