@@ -58,6 +58,7 @@
             "reqwest",
             "secp",
             "serde",
+            "subworkflow",
             "sysinfo",
             "thiserror",
             "Tokenomics",

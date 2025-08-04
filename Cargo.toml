@@ -160,6 +160,10 @@ taproot = ["bitcoin"]  # Taproot transaction support
 # API features
 api = ["std"]
 
+# ML acceleration features
+cuda = []      # CUDA GPU acceleration support
+wgpu = []      # WebGPU acceleration support
+
 # Complete system (including all features)
 complete = ["bitcoin", "mobile", "web5", "enterprise", "hsm-full"]
 
