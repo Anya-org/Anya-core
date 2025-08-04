@@ -334,7 +334,10 @@ pub struct AnyaCore {
 impl AnyaCore {
     pub fn new(config: AnyaConfig) -> AnyaResult<Self> {
         let ml_system = if config.ml_config.enabled {
-            Some(ml::MLSystem::new(config.ml_config)?)
+            // For now, use a blocking approach - this needs to be refactored later
+            let rt = tokio::runtime::Runtime::new()
+                .map_err(|e| AnyaError::ML(format!("Failed to create runtime: {e}")))?;
+            Some(rt.block_on(ml::MLSystem::new(config.ml_config))?)
         } else {
             None
         };
@@ -387,9 +390,11 @@ impl AnyaCore {
         };
 
         if let Some(ml_system) = &self.ml_system {
-            status
-                .metrics
-                .insert("ml".to_string(), ml_system.get_model_health_metrics());
+            // Use blocking approach for async method
+            let rt = tokio::runtime::Runtime::new()
+                .map_err(|e| AnyaError::ML(format!("Failed to create runtime: {e}")))?;
+            let health_metrics = rt.block_on(ml_system.get_model_health_metrics());
+            status.metrics.insert("ml".to_string(), health_metrics);
         }
 
         status.component_status.push(ComponentStatus {

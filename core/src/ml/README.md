@@ -5,12 +5,14 @@ The ML component provides advanced machine learning capabilities with a focus on
 ## Architecture
 
 ### Repository Layer (`repository.rs`)
+
 - CRUD operations for ML models
 - Model validation and versioning
 - Metrics tracking and storage
 - Caching for model artifacts
 
 ### Service Layer (`service.rs`)
+
 - Model execution and inference
 - Performance monitoring
 - Security integration
@@ -18,6 +20,7 @@ The ML component provides advanced machine learning capabilities with a focus on
 - Metrics collection
 
 ### Handler Layer (`handler.rs`)
+
 - Request/response processing
 - Input validation
 - Error handling
@@ -27,6 +30,7 @@ The ML component provides advanced machine learning capabilities with a focus on
 ## Features
 
 ### Model Management
+
 - Version control for models
 - Model metadata tracking
 - Performance metrics
@@ -34,6 +38,7 @@ The ML component provides advanced machine learning capabilities with a focus on
 - Caching strategy
 
 ### Execution
+
 - Real-time inference
 - Batch processing
 - Resource management
@@ -41,6 +46,7 @@ The ML component provides advanced machine learning capabilities with a focus on
 - Performance optimization
 
 ### Monitoring
+
 - Execution metrics
 - Resource utilization
 - Error tracking
@@ -87,6 +93,7 @@ cargo test --package anya-core --test ml_integration
 ## Metrics
 
 The component exports the following metrics:
+
 - `ml_inference_time`: Histogram of inference execution times
 - `ml_model_accuracy`: Gauge of model accuracy
 - `ml_cache_hits`: Counter of model cache hits
@@ -95,6 +102,7 @@ The component exports the following metrics:
 ## Health Checks
 
 Health monitoring includes:
+
 - Model availability
 - Inference performance
 - Resource utilization
@@ -104,6 +112,7 @@ Health monitoring includes:
 ## Security
 
 Security measures include:
+
 - Input validation
 - Resource limits
 - Access control
