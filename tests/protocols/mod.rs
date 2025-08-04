@@ -1,8 +1,9 @@
 // Protocol Test Suite v2.5 - Basic validation tests
 // [AIT-3][BPC-3][RES-3]
 
+use anya_core::layer2::lightning::{LightningConfig, LightningProtocol};
 use anya_core::layer2::manager::Layer2Manager;
-use anya_core::layer2::{Layer2Protocol, LightningConfig, LightningProtocol};
+use anya_core::layer2::Layer2Protocol;
 
 #[tokio::test]
 async fn test_protocol_compilation() {

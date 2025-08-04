@@ -1,13 +1,13 @@
 #[cfg(test)]
 mod tests {
-    use anya_core::mobile::sdk::{MobileSDK, WalletInfo};
+    use anya_core::mobile::sdk::MobileSDK;
 
     #[cfg(feature = "ffi")]
     mod ffi_tests {
-        use super::*;
+        
         use anya_core::mobile::ffi;
         use std::ffi::{CStr, CString};
-        use std::os::raw::c_char;
+        
 
         #[test]
         fn test_initialize_wallet() {

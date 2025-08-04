@@ -411,6 +411,10 @@ mod tests {
                 estimated_fee: 1000,
                 fee_rate: 1.0,
                 confirmation_target: 6,
+                slow_fee: 500,
+                normal_fee: 1000,
+                fast_fee: 2000,
+                estimated_confirmation_time: 6,
             })
         });
 

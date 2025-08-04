@@ -31,7 +31,7 @@ async fn test_system_initialization() {
 async fn test_ml_system_basic() {
     // Test ML system initialization
     let ml_config = ml::MLConfig::default();
-    let result = ml::MLSystem::new(ml_config);
+    let result = ml::MLSystem::new(ml_config).await;
     match result {
         Ok(_ml_system) => {
             println!("✅ ML system initialization successful");
