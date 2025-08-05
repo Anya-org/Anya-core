@@ -206,7 +206,7 @@ mod hsm_integration_tests {
             software: SoftHsmConfig {
                 token_dir: ".test-tokens".to_string(),
                 max_sessions: 10,
-                encryption_key: Some("test-encryption-key-32-chars-long".to_string()),
+                encryption_key: Some("0123456789ABCDEF0123456789ABCDEF".to_string()),
                 lock_timeout_seconds: 300,
                 use_testnet: true,
             },
@@ -406,7 +406,7 @@ mod hsm_performance_tests {
             software: SoftHsmConfig {
                 token_dir: ".test-tokens".to_string(),
                 max_sessions: 10,
-                encryption_key: Some("test-encryption-key-32-chars-long".to_string()),
+                encryption_key: Some("0123456789ABCDEF0123456789ABCDEF".to_string()),
                 lock_timeout_seconds: 300,
                 use_testnet: true,
             },

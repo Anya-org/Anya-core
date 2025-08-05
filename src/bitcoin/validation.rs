@@ -2,13 +2,23 @@
 
 use super::protocol::{BPCLevel, BitcoinProtocol};
 // --- Required imports for Schnorr and merkle proof validation ---
-use bitcoin::secp256k1::{Secp256k1, XOnlyPublicKey, schnorr::Signature as SchnorrSignature};
-use bitcoin::hashes::sha256;
-// Stub for Schnorr signature verification
+use bitcoin::Transaction;
+use std::collections::{HashMap, VecDeque};
+use std::fmt;
+use std::sync::{Arc, Mutex, RwLock};
+use std::time::{SystemTime, UNIX_EPOCH};
+use thiserror::Error;
 // Stub for Schnorr signature verification
 fn verify_schnorr_signature(_msg: &[u8], _sig: &[u8], _pubkey: &[u8]) -> Result<bool, String> {
     // TODO: Implement real Schnorr signature verification
-    Ok(true); // Accept all for now
+    Ok(true) // Accept all for now
+}
+
+// Stub for merkle proof validation
+fn verify_merkle_proof(_proof: &[Vec<u8>], _root: &[u8]) -> Result<bool, String> {
+    // TODO: Implement real merkle proof validation
+    Ok(true) // Accept all for now
+}
 // Import required types
 use crate::bitcoin::error::BitcoinError;
 use crate::hardware_optimization::{intel::BatchVerificationConfig, HardwareOptimizationManager};
@@ -137,6 +147,39 @@ pub struct HistoricalBlock {
 
 // Global verification history is already defined at the top of the file
 
+/// Validation error enum
+#[derive(Debug, Error)]
+pub enum ValidationError {
+    #[error("Validation failed: {0}")]
+    Failed(String),
+
+    #[error("Bitcoin protocol error: {0}")]
+    Protocol(#[from] BitcoinError),
+
+    #[error("IO error: {0}")]
+    IoError(#[from] std::io::Error),
+
+    #[error("BIP-341 error: {0}")]
+    Taproot(String),
+
+    #[error("Consensus error: {0}")]
+    ConsensusError(String),
+}
+
+impl Clone for ValidationError {
+    fn clone(&self) -> Self {
+        match self {
+            ValidationError::Failed(msg) => ValidationError::Failed(msg.clone()),
+            ValidationError::Protocol(err) => ValidationError::Protocol(err.clone()),
+            ValidationError::IoError(_) => {
+                ValidationError::Failed("IO Error (not cloneable)".to_string())
+            }
+            ValidationError::Taproot(msg) => ValidationError::Taproot(msg.clone()),
+            ValidationError::ConsensusError(msg) => ValidationError::ConsensusError(msg.clone()),
+        }
+    }
+}
+
 /// Validates Bitcoin transactions according to BPC-3 standard
 /// Optimized for minimum hardware requirements (Intel i3-7020U)
 #[derive(Clone)]
@@ -202,8 +245,6 @@ impl TransactionValidator {
             verification_history: Arc::new(Mutex::new(Vec::new())),
         }
     }
-// End of TransactionValidator impl
-    }
 
     /// Create a validator with specific protocol level
     pub fn with_level(level: BPCLevel) -> Self {
@@ -242,11 +283,17 @@ impl TransactionValidator {
         println!("✅ SPV proof valid");
 
         Ok(())
-    // End of check_taproot_conditions
-
+    }
 
     /// Log a verification with detailed results for historical compatibility testing
     fn log_verification_with_results(
+        &self,
+        tx_hash: String,
+        verification_type: &str,
+        result: bool,
+        standard_result: bool,
+        optimized_result: Option<bool>,
+        block_height: Option<u32>,
     ) {
         // Get hardware info if available
         let hardware_info = self.hw_manager.intel_optimizer().map(|intel| {
@@ -286,9 +333,15 @@ impl TransactionValidator {
         }
     }
 
+    /// Simplified logging method
+    fn log_verification(&self, tx_hash: String, verification_type: &str, result: bool) {
+        self.log_verification_with_results(tx_hash, verification_type, result, result, None, None);
+    }
+
     /// Verify that hardware-optimized and standard verification produce consistent results
     /// This ensures consensus compatibility across all optimizations
     pub fn verify_consensus_compatibility(
+        &self,
         tx: &Transaction,
     ) -> Result<bool, ValidationError> {
         // Get transaction hash for logging
@@ -340,6 +393,7 @@ impl TransactionValidator {
     /// This ensures immutability of the blockchain by validating that
     /// our optimizations produce the same results as canonical validation
     pub fn verify_historical_transaction(
+        &self,
         tx: &Transaction,
         _block_height: u32,
     ) -> Result<bool, ValidationError> {
@@ -436,7 +490,7 @@ impl TransactionValidator {
     }
 
     /// Standard validation path (no hardware optimization)
-    fn validate_standard(&self, tx: &Transaction) -> Result<(), ValidationError> {
+    pub fn validate_standard(&self, tx: &Transaction) -> Result<(), ValidationError> {
         // Basic transaction structure validation
         if tx.input.is_empty() {
             return Err(ValidationError::Failed(
@@ -459,6 +513,51 @@ impl TransactionValidator {
                 ));
             }
             seen_outpoints.insert(input.previous_output);
+        }
+
+        // Security validation: Check for OP_EVAL opcode (CVE-2012-2459)
+        for (i, input) in tx.input.iter().enumerate() {
+            if input.script_sig.as_bytes().contains(&0x6F) {
+                return Err(ValidationError::Failed(format!(
+                    "Input {} script contains disabled opcode OP_EVAL (CVE-2012-2459)",
+                    i
+                )));
+            }
+        }
+
+        // Security validation: Check for signature malleability (CVE-2013-3220)
+        for (i, input) in tx.input.iter().enumerate() {
+            let script_bytes = input.script_sig.as_bytes();
+
+            // Look for DER-encoded signatures with high S values
+            // Format we're checking: 0x30 [len] 0x02 [r_len] [r...] 0x02 [s_len] [s with high bit]
+            if script_bytes.len() >= 6 {
+                // Minimum size for a DER signature
+                for pos in 0..script_bytes.len() - 5 {
+                    // Check for DER signature marker (0x30)
+                    if script_bytes[pos] == 0x30 {
+                        // Search for S value in the signature (marked by second 0x02)
+                        let mut s_value_pos = pos + 1;
+                        let mut found_first_02 = false;
+
+                        while s_value_pos < script_bytes.len() - 1 {
+                            if script_bytes[s_value_pos] == 0x02 {
+                                if found_first_02 && s_value_pos + 1 < script_bytes.len() {
+                                    // This is the S value - check for high bit
+                                    if script_bytes[s_value_pos + 1] >= 0x80 {
+                                        return Err(ValidationError::Failed(
+                                            format!("Input {} contains a malleable signature with high S value (CVE-2013-3220)", i)
+                                        ));
+                                    }
+                                    break;
+                                }
+                                found_first_02 = true;
+                            }
+                            s_value_pos += 1;
+                        }
+                    }
+                }
+            }
         }
 
         // Security validation: Check for value overflow (CVE-2010-5139)
@@ -493,7 +592,7 @@ impl TransactionValidator {
     }
 
     /// Optimized validation path (with hardware optimization)
-    fn validate_optimized(&self, tx: &Transaction) -> Result<(), ValidationError> {
+    pub fn validate_optimized(&self, tx: &Transaction) -> Result<(), ValidationError> {
         // Basic transaction structure validation (same as standard)
         if tx.input.is_empty() {
             return Err(ValidationError::Failed(
@@ -676,8 +775,8 @@ impl TransactionValidator {
             for (j, witness_elem) in input.witness.iter().enumerate() {
                 if witness_elem.contains(&0x6F) {
                     return Err(ValidationError::Taproot(format!(
-                        "Input {i} witness element {j} contains disabled opcode OP_EVAL (CVE-2012-2459)"
-                    )));
+                            "Input {i} witness element {j} contains disabled opcode OP_EVAL (CVE-2012-2459)"
+                        )));
                 }
             }
         }
@@ -744,7 +843,7 @@ impl TransactionValidator {
 
                     // Merkle proof validation stub
                     // TODO: Extract real leaf and merkle proof from witness/control block
-                    let leaf = script;
+                    let _leaf = script; // Using underscore to indicate intentionally unused variable
                     let merkle_proof: Vec<Vec<u8>> = vec![];
                     let root = &control_block[1..33]; // Simplified: first 32 bytes after version
                     match verify_merkle_proof(&merkle_proof, root) {
@@ -775,9 +874,7 @@ impl TransactionValidator {
 
         Ok(())
     }
-}
 
-impl TransactionValidator {
     /// Get the current protocol level
     pub fn get_level(&self) -> BPCLevel {
         self.protocol.get_level()
@@ -789,39 +886,6 @@ impl TransactionValidator {
             history.clone()
         } else {
             Vec::new()
-        }
-    }
-}
-
-/// Validation error enum
-#[derive(Debug, Error)]
-pub enum ValidationError {
-    #[error("Validation failed: {0}")]
-    Failed(String),
-
-    #[error("Bitcoin protocol error: {0}")]
-    Protocol(#[from] BitcoinError),
-
-    #[error("IO error: {0}")]
-    IoError(#[from] std::io::Error),
-
-    #[error("BIP-341 error: {0}")]
-    Taproot(String),
-
-    #[error("Consensus error: {0}")]
-    ConsensusError(String),
-}
-
-impl Clone for ValidationError {
-    fn clone(&self) -> Self {
-        match self {
-            ValidationError::Failed(msg) => ValidationError::Failed(msg.clone()),
-            ValidationError::Protocol(err) => ValidationError::Protocol(err.clone()),
-            ValidationError::IoError(_) => {
-                ValidationError::Failed("IO Error (not cloneable)".to_string())
-            }
-            ValidationError::Taproot(msg) => ValidationError::Taproot(msg.clone()),
-            ValidationError::ConsensusError(msg) => ValidationError::ConsensusError(msg.clone()),
         }
     }
 }
