@@ -24,6 +24,8 @@ mod business_agent_tests {
             }
         }
 
+        #[allow(dead_code)]
+        #[allow(dead_code)]
         fn deploy_contract(&mut self, name: &str, code: &str) -> Result<(), String> {
             self.contracts.insert(name.to_string(), code.to_string());
             Ok(())
