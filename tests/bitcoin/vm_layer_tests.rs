@@ -9,17 +9,12 @@ mod vm_layer_tests {
     #[test]
     fn test_vm_layer_initialization() {
         // Mock test for VM Layer initialization
-        #[cfg(feature = "rust-bitcoin")]
-        {
-            use anya_core::layer2::Layer2Manager;
-            let _manager = Layer2Manager::new();
-            assert!(true);
-        }
-        #[cfg(not(feature = "rust-bitcoin"))]
-        {
-            assert!(true);
-        }
+        use anya_core::layer2::Layer2Manager;
+        let _manager = Layer2Manager::new();
+        assert!(true);
     }
+    // Reserved for future implementation when VM configurations are implemented
+    #[allow(dead_code)]
     fn test_vm_configuration() {
         // Mock test for VM configuration
         let vm_configured = true;

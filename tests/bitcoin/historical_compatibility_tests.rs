@@ -14,6 +14,7 @@ use std::sync::Arc;
 struct TestTransactionFactory;
 
 impl TestTransactionFactory {
+    #[allow(dead_code)]
     fn create_historical_batch(_era: &str) -> Vec<String> {
         vec!["mock_tx_1".to_string(), "mock_tx_2".to_string()]
     }
@@ -192,7 +193,7 @@ pub async fn test_immutability_historical_compatibility() {
     };
 
     // Bonus points for successful batch validations and global stats consistency
-    let (total_records, consensus_checks, global_errors) = get_global_verification_stats();
+    let (_total_records, consensus_checks, global_errors) = get_global_verification_stats();
     let global_error_rate = if consensus_checks > 0 {
         (global_errors as f64 / consensus_checks as f64) * 100.0
     } else {

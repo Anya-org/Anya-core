@@ -8,7 +8,7 @@ use anya_core::layer2::Layer2Protocol;
 #[tokio::test]
 async fn test_protocol_compilation() {
     // Test that Layer2 protocols compile and can be instantiated
-    let manager = Layer2Manager::default();
+    let _manager = Layer2Manager::default();
     assert!(
         true, // Manager exists, so test passes
         "Layer2Manager should instantiate successfully"

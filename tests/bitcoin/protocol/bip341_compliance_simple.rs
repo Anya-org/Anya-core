@@ -2,8 +2,10 @@
 // [AIR-3][AIS-3][BPC-3][AIT-3][RES-3]
 //
 // Tests the implementation of BIP-341 (Taproot) features according to
-// Bitcoin Development Framework v2.5 requirements
+// Bitcoin Improvement Proposals
 
+#[allow(dead_code)]
+// Test functions that may not be called directly but are part of test infrastructure
 use anyhow::{bail, Result};
 use bitcoin::key::{TapTweak, TweakedPublicKey, UntweakedPublicKey};
 use bitcoin::secp256k1::{Secp256k1, SecretKey, XOnlyPublicKey};
@@ -45,6 +47,7 @@ impl TaprootVerifier {
     }
 
     /// Compute merkle root from leaf hash and control block  
+    #[allow(dead_code)]
     fn compute_merkle_root(
         &self,
         _leaf_hash: TapLeafHash,

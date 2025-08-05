@@ -2,8 +2,10 @@
 // [AIR-3][AIS-3][BPC-3][AIT-3][RES-3]
 //
 // Tests the implementation of BIP-341 (Taproot) features according to
-// Bitcoin Development Framework v2.5 requirements
+// Bitcoin Improvement Proposals
 
+#[allow(dead_code)]
+// Test functions that may not be called directly but are part of test infrastructure
 use anyhow::{bail, Result};
 use bitcoin::hashes::Hash;
 use bitcoin::key::{TapTweak, TweakedPublicKey, UntweakedPublicKey};
@@ -292,6 +294,7 @@ impl BIP341Checker {
     }
 
     /// Compute merkle root from leaf hash and control block
+    #[allow(dead_code)]
     fn compute_merkle_root(
         &self,
         leaf_hash: TapLeafHash,
@@ -372,6 +375,7 @@ impl BIP341Checker {
     }
 
     /// Compute parent hash in merkle tree - kept for compatibility with other code
+    #[allow(dead_code)]
     fn parent_hash(_left: &TapBranchTag, _right: &TapBranchTag) -> Result<TapNodeHash> {
         // Simplified mock implementation - TapBranchTag.as_ref() not available in current Bitcoin library
         let dummy_hash = [0u8; 32];

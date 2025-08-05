@@ -1,10 +1,12 @@
 #![cfg(test)]
+#![allow(dead_code)] // Test module functions that may not be called directly but are part of test infrastructure
 
 use anyhow::Result;
 use std::sync::Arc;
 use tokio::sync::RwLock;
 
 // RISC-V VM layer manager
+#[allow(dead_code)]
 pub struct RiscVmManager {
     capabilities: VmCapabilities,
     config: VmLayerConfig,

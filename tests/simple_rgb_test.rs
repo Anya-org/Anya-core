@@ -9,7 +9,7 @@ mod rgb_simple_tests {
     #[tokio::test]
     async fn test_rgb_asset_functionality() {
         // Create temp directory for the test
-        let temp_dir = tempdir().expect("Failed to create temp directory");
+        let _temp_dir = tempdir().expect("Failed to create temp directory");
 
         // Log the start of the test
         println!("Starting RGB asset functionality test");

@@ -9,17 +9,12 @@ mod layer3_tests {
     #[test]
     fn test_layer3_initialization() {
         // Mock test for Layer3 initialization
-        #[cfg(feature = "rust-bitcoin")]
-        {
-            use anya_core::layer2::Layer2Manager;
-            let _manager = Layer2Manager::new();
-            assert!(true);
-        }
-        #[cfg(not(feature = "rust-bitcoin"))]
-        {
-            assert!(true);
-        }
+        use anya_core::layer2::Layer2Manager;
+        let _manager = Layer2Manager::new();
+        assert!(true);
     }
+    // Reserved for future implementation when compute capabilities are supported
+    #[allow(dead_code)]
     fn test_compute_capabilities() {
         // Mock test for compute capabilities
         let compute_available = true;
