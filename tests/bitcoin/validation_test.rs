@@ -41,16 +41,26 @@ fn test_validate_from_file() {
 
 #[test]
 fn test_validate_taproot_transaction() {
-    // In a real test, we would create a valid Taproot transaction
-    // For now, we'll mock this with a dummy transaction
+    use bitcoin::{Amount, OutPoint, ScriptBuf, Sequence, TxIn, TxOut, Witness};
+
+    // Create a transaction that passes basic validation but should fail Taproot validation
+    // This transaction has inputs and outputs but no witness data (which Taproot requires)
     let tx = Transaction {
-        version: Version::ONE,     // Use Version::ONE instead of hardcoded 2
-        lock_time: LockTime::ZERO, // Use imported LockTime
-        input: vec![],
-        output: vec![],
+        version: Version::ONE,
+        lock_time: LockTime::ZERO,
+        input: vec![TxIn {
+            previous_output: OutPoint::null(),
+            script_sig: ScriptBuf::new(),
+            sequence: Sequence(0),
+            witness: Witness::default(), // Empty witness - should trigger Taproot error
+        }],
+        output: vec![TxOut {
+            value: Amount::from_sat(1000),
+            script_pubkey: ScriptBuf::new(),
+        }],
     };
 
-    // Since our test transaction has no witness data, this should fail
+    // Since our test transaction has empty witness data, this should fail Taproot validation
     let validator = TransactionValidator::new();
     let result = validator.validate_taproot_transaction(&tx);
     assert!(matches!(result, Err(ValidationError::Taproot(_))));
