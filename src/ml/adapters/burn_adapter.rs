@@ -99,6 +99,11 @@ impl BurnAdapter {
         }
     }
 
+    /// Get adapter configuration
+    pub fn config(&self) -> &BurnConfig {
+        &self.config
+    }
+
     /// Load a Burn model
     async fn load_burn_model(&self, config: &ModelConfig) -> Result<Arc<BurnModel>> {
         // In real implementation, this would use:
@@ -130,7 +135,7 @@ impl BurnAdapter {
     }
 
     /// Run classification inference
-    async fn run_classification(&self, model: &BurnModel, input: &[f32]) -> Result<Vec<f32>> {
+    async fn run_classification(&self, _model: &BurnModel, _input: &[f32]) -> Result<Vec<f32>> {
         // Real implementation would:
         // 1. Convert input to Burn tensor
         // 2. Run forward pass through model
@@ -142,7 +147,7 @@ impl BurnAdapter {
     }
 
     /// Run regression inference
-    async fn run_regression(&self, model: &BurnModel, input: &[f32]) -> Result<Vec<f32>> {
+    async fn run_regression(&self, _model: &BurnModel, input: &[f32]) -> Result<Vec<f32>> {
         // Real implementation would run regression model
         // Placeholder: return mock prediction
         Ok(vec![input.iter().sum::<f32>() / input.len() as f32])

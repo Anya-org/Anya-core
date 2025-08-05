@@ -72,6 +72,11 @@ impl HfClient {
         Self { client, api_token }
     }
 
+    /// Get the API token if available
+    pub fn api_token(&self) -> Option<&String> {
+        self.api_token.as_ref()
+    }
+
     /// Get model information from HuggingFace API
     pub async fn get_model_info(&self, model_id: &str) -> Result<ModelInfo> {
         let url = format!("https://huggingface.co/api/models/{}", model_id);
@@ -202,6 +207,11 @@ impl HuggingFaceAdapter {
             cache_dir: config.cache_dir.clone(),
             config,
         }
+    }
+
+    /// Get adapter configuration
+    pub fn config(&self) -> &HfConfig {
+        &self.config
     }
 
     /// Download and cache a model from HuggingFace
@@ -482,7 +492,16 @@ pub struct ModelInfo {
 #[derive(Debug, Deserialize)]
 struct FileInfo {
     path: String,
+    #[allow(dead_code)]
     size: Option<u64>,
+}
+
+impl FileInfo {
+    /// Get file size if available
+    #[allow(dead_code)]
+    pub fn size(&self) -> Option<u64> {
+        self.size
+    }
 }
 
 #[derive(Debug, Deserialize)]

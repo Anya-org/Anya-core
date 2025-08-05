@@ -270,10 +270,13 @@ impl MLAdapterRegistry {
 
     /// Get adapter for specific format
     pub fn get_adapter(&self, format: &ModelFormat) -> Option<Arc<dyn MLModelAdapter>> {
-        self.adapters
-            .get(format)
-            .cloned()
-            .or_else(|| self.default_adapter.clone())
+        self.adapters.get(format).cloned().or_else(|| {
+            if self.auto_selection_enabled {
+                self.default_adapter.clone()
+            } else {
+                None
+            }
+        })
     }
 
     /// Auto-select best adapter for a model file

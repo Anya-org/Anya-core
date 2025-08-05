@@ -88,6 +88,11 @@ impl CandleAdapter {
         }
     }
 
+    /// Get adapter configuration
+    pub fn config(&self) -> &CandleConfig {
+        &self.config
+    }
+
     /// Load a Candle model from Hugging Face or local path
     async fn load_candle_model(&self, config: &ModelConfig) -> Result<Arc<CandleModel>> {
         // In real implementation, this would use:
@@ -106,7 +111,7 @@ impl CandleAdapter {
     }
 
     /// Run text generation inference
-    async fn run_text_generation(&self, model: &CandleModel, prompt: &str) -> Result<String> {
+    async fn run_text_generation(&self, _model: &CandleModel, prompt: &str) -> Result<String> {
         // Real implementation would:
         // 1. Tokenize input using tokenizers-rs
         // 2. Run forward pass through Candle model
@@ -118,7 +123,7 @@ impl CandleAdapter {
     }
 
     /// Extract embeddings from text
-    async fn extract_embeddings(&self, model: &CandleModel, text: &str) -> Result<Vec<f32>> {
+    async fn extract_embeddings(&self, _model: &CandleModel, _text: &str) -> Result<Vec<f32>> {
         // Real implementation would extract hidden states from transformer
         // Placeholder: return random embeddings
         Ok(vec![0.1, 0.2, 0.3, 0.4, 0.5])

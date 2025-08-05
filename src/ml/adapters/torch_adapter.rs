@@ -147,7 +147,7 @@ impl TorchAdapter {
     }
 
     /// Run transformer model inference
-    async fn run_transformer(&self, model: &TorchModel, input: &[f32]) -> Result<Vec<f32>> {
+    async fn run_transformer(&self, _model: &TorchModel, _input: &[f32]) -> Result<Vec<f32>> {
         // Real implementation would:
         // 1. Convert input to tch::Tensor
         // 2. Run forward pass through transformer
@@ -159,7 +159,7 @@ impl TorchAdapter {
     }
 
     /// Run vision model inference
-    async fn run_vision(&self, model: &TorchModel, input: &[f32]) -> Result<Vec<f32>> {
+    async fn run_vision(&self, _model: &TorchModel, _input: &[f32]) -> Result<Vec<f32>> {
         // Real implementation would process image tensor
         // Placeholder: return mock classification scores
         Ok((0..1000)

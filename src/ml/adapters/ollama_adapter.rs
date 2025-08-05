@@ -306,7 +306,7 @@ impl MLModelAdapter for OllamaAdapter {
 
 /// Ollama API request structures
 #[derive(Debug, Serialize)]
-struct OllamaGenerateRequest {
+pub struct OllamaGenerateRequest {
     model: String,
     prompt: String,
     stream: bool,
@@ -322,11 +322,18 @@ struct OllamaOptions {
 }
 
 #[derive(Debug, Deserialize)]
-struct OllamaResponse {
+pub struct OllamaResponse {
     response: String,
     done: bool,
     eval_count: u64,
     eval_duration: u64,
+}
+
+impl OllamaResponse {
+    /// Get whether the response is done
+    pub fn is_done(&self) -> bool {
+        self.done
+    }
 }
 
 #[derive(Debug, Deserialize)]
@@ -337,8 +344,24 @@ struct OllamaTagsResponse {
 #[derive(Debug, Deserialize)]
 struct OllamaModelInfo {
     name: String,
+    #[allow(dead_code)]
     modified_at: String,
+    #[allow(dead_code)]
     size: u64,
+}
+
+impl OllamaModelInfo {
+    /// Get model modification time
+    #[allow(dead_code)]
+    pub fn modified_at(&self) -> &str {
+        &self.modified_at
+    }
+
+    /// Get model size in bytes
+    #[allow(dead_code)]
+    pub fn size(&self) -> u64 {
+        self.size
+    }
 }
 
 // Helper trait for type erasure
