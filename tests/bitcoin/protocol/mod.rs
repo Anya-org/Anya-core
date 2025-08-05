@@ -2,7 +2,7 @@
 // [AIR-3][AIS-3][BPC-3][AIT-3][RES-3]
 //
 // Module organization for Bitcoin protocol tests according to
-// Bitcoin Development Framework v2.5 requirements
+// Bitcoin Improvement Proposals
 
 /// BIP-341 (Taproot) Compliance Tests (full implementation)
 pub mod bip341_compliance;
