@@ -353,6 +353,7 @@ impl MLService {
     }
 
     /// Apply federated learning update
+    #[allow(dead_code)]
     pub async fn apply_federated_update(&mut self, weights: Vec<f64>) -> AnyaResult<()> {
         // In a real implementation, this would update the model with federated weights
         // For now, just log that we received the update
@@ -366,6 +367,7 @@ impl MLService {
 
     /// [AIR-3][AIS-3][BPC-3][RES-3] Predict proposal metrics based on proposal data
     /// This follows official Bitcoin Improvement Proposals (BIPs) standards for ML predictions
+    #[allow(dead_code)]
     pub async fn predict_proposal_metrics(
         &self,
         proposal: &Proposal,
@@ -420,6 +422,7 @@ impl MLService {
     }
 
     /// Export model to bytes for sharing
+    #[allow(dead_code)]
     pub fn export_model(&self) -> AnyaResult<Vec<u8>> {
         // In a real implementation, this would serialize the model
         // This is a simplified placeholder
@@ -428,6 +431,7 @@ impl MLService {
     }
 
     /// Import model from bytes
+    #[allow(dead_code)]
     pub fn import_model(&mut self, bytes: &[u8]) -> AnyaResult<()> {
         // In a real implementation, this would deserialize the model
         // This is a simplified placeholder

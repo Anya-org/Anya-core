@@ -777,7 +777,7 @@ impl HTNPlanner {
 
 #[async_trait::async_trait]
 impl Planner for HTNPlanner {
-    async fn generate_plan(&self, goal: &Goal, context: &PlanningContext) -> Result<Plan> {
+    async fn generate_plan(&self, goal: &Goal, _context: &PlanningContext) -> Result<Plan> {
         // Simplified HTN planning implementation
         let plan_id = Uuid::new_v4().to_string();
 

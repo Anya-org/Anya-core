@@ -358,7 +358,7 @@ impl WorkflowEngine {
             node_id: node_id.to_string(),
         });
 
-        let (workflow_id, node) = {
+        let (_workflow_id, node) = {
             let executions = self.active_executions.read().await;
             let execution = executions
                 .get(execution_id)
@@ -593,7 +593,7 @@ impl WorkflowEngine {
         &self,
         execution_id: &str,
         current_node: &str,
-        result: &serde_json::Value,
+        _result: &serde_json::Value,
     ) -> Result<Vec<String>> {
         let executions = self.active_executions.read().await;
         let execution = executions

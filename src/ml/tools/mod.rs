@@ -276,6 +276,12 @@ impl ToolRegistry {
         history.clone()
     }
 
+    /// Get safety policies for a specific safety level
+    pub async fn get_safety_policies(&self, level: SafetyLevel) -> Vec<String> {
+        let policies = self.safety_policies.read().await;
+        policies.get(&level).cloned().unwrap_or_default()
+    }
+
     /// Search tools by category or capability
     pub async fn search_tools(&self, query: &str) -> Vec<ToolDefinition> {
         let tools = self.tools.read().await;
