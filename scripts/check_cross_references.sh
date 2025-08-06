@@ -37,12 +37,12 @@ EOF
 main() {
     echo -e "${GREEN}🔍 Initializing cross-reference validation...${NC}"
     init_report
-    
+
     echo -e "${GREEN}📋 Checking documentation links...${NC}"
     find "$DOCS_ROOT" -name "*.md" -type f | while read -r file; do
         echo -e "${BLUE}📄 Analyzing: $(basename "$file")${NC}"
     done
-    
+
     echo -e "${GREEN}✅ Cross-reference validation complete!${NC}"
     echo -e "${BLUE}📋 Report saved to: $REPORT_FILE${NC}"
 }

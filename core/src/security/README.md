@@ -5,12 +5,14 @@ The Security component provides comprehensive security operations with a focus o
 ## Architecture
 
 ### Repository Layer (`repository.rs`)
+
 - CRUD operations for security audits
 - Audit trail management
 - Event storage and querying
 - Compliance tracking
 
 ### Service Layer (`service.rs`)
+
 - Security operations processing
 - Crypto operations
 - Policy enforcement
@@ -18,6 +20,7 @@ The Security component provides comprehensive security operations with a focus o
 - Metrics collection
 
 ### Handler Layer (`handler.rs`)
+
 - Request/response processing
 - Input validation
 - Error handling
@@ -27,6 +30,7 @@ The Security component provides comprehensive security operations with a focus o
 ## Features
 
 ### Authentication & Authorization
+
 - Multi-factor authentication
 - Role-based access control
 - Permission management
@@ -34,6 +38,7 @@ The Security component provides comprehensive security operations with a focus o
 - Token management
 
 ### Cryptographic Operations
+
 - Encryption/decryption
 - Digital signatures
 - Key management
@@ -41,6 +46,7 @@ The Security component provides comprehensive security operations with a focus o
 - Random number generation
 
 ### Audit & Compliance
+
 - Comprehensive audit logs
 - Event correlation
 - Compliance reporting
@@ -88,6 +94,7 @@ cargo test --package anya-core --test security_integration
 ## Metrics
 
 The component exports the following metrics:
+
 - `security_operation_time`: Histogram of operation execution times
 - `security_audit_count`: Counter of audit events
 - `security_errors`: Counter of security errors
@@ -96,6 +103,7 @@ The component exports the following metrics:
 ## Health Checks
 
 Health monitoring includes:
+
 - Service availability
 - Operation performance
 - Resource utilization
@@ -105,6 +113,7 @@ Health monitoring includes:
 ## Security Measures
 
 Security implementation includes:
+
 - Input sanitization
 - Rate limiting
 - Access control
