@@ -22,7 +22,7 @@
 
 ;; Token Constants
 (define-constant MAX_SUPPLY u21000000000000000) ;; 21B with 8 decimals
-(define-constant HALVING_INTERVAL u210000)
+(define-constant HALVING_INTERVAL u105000) ;; PRODUCTION: 105,000 blocks (adaptive minimum)
 (define-constant INITIAL_BLOCK_REWARD u1000000000) ;; 10,000 tokens per block
 (define-constant COMMUNITY_PERCENTAGE u15) ;; 15% to Community Incentives
 

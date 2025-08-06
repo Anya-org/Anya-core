@@ -1,0 +1,152 @@
+name: Documentation Quality Gate
+on: 
+  pull_request:
+    paths:
+      - 'docs/**'
+      - '.github/workflows/documentation.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'docs/**'
+      - '.github/workflows/documentation.yml'
+
+jobs:
+  validate:
+    name: Validate Documentation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install markdownlint
+        run: npm install -g markdownlint-cli
+
+      - name: Check Markdown syntax
+        run: markdownlint docs/**/*.md --ignore docs/template.md
+
+      - name: Verify frontmatter
+        run: |
+          bash -c "
+          failed_files=0
+          echo '### Frontmatter Validation Results' > frontmatter_results.md
+          echo '' >> frontmatter_results.md
+          
+          for file in \$(find docs -type f -name '*.md' ! -name 'template.md'); do
+            if ! grep -q '^---$' \"\$file\"; then
+              echo \"❌ \$file: Missing frontmatter\" >> frontmatter_results.md
+              ((failed_files++))
+              continue
+            fi
+            
+            issues=''
+            if ! grep -q '^title:' \"\$file\"; then issues+=\"Missing title; \"; fi
+            if ! grep -q '^description:' \"\$file\"; then issues+=\"Missing description; \"; fi
+            if ! grep -q '^category:' \"\$file\"; then issues+=\"Missing category; \"; fi
+            if ! grep -q '^tags:' \"\$file\"; then issues+=\"Missing tags; \"; fi
+            if ! grep -q '^last_updated:' \"\$file\"; then issues+=\"Missing last_updated; \"; fi
+            if ! grep -q '^compliance:' \"\$file\"; then issues+=\"Missing compliance; \"; fi
+            
+            if [ -n \"\$issues\" ]; then
+              echo \"❌ \$file: \${issues}\" >> frontmatter_results.md
+              ((failed_files++))
+            else
+              echo \"✅ \$file: Valid frontmatter\" >> frontmatter_results.md
+            fi
+          done
+          
+          echo \"\\n**Summary:** \$failed_files files with frontmatter issues\" >> frontmatter_results.md
+          
+          if [ \$failed_files -gt 0 ]; then
+            exit 1
+          fi
+          "
+        continue-on-error: true
+        id: frontmatter
+
+      - name: Check for broken links
+        run: |
+          bash -c "
+          broken_links=0
+          echo '### Link Validation Results' > links_results.md
+          echo '' >> links_results.md
+          
+          for file in \$(find docs -type f -name '*.md'); do
+            file_links=\$(grep -o -E '\\[.+?\\]\\(.+?\\)' \"\$file\" | grep -v '^#' | grep -v '^https?://' || echo '')
+            
+            if [ -n \"\$file_links\" ]; then
+              while IFS= read -r link; do
+                link_path=\$(echo \"\$link\" | sed -n 's/.*(\(.*\)).*/\\1/p')
+                
+                if [[ \"\$link_path\" =~ ^https?:// || \"\$link_path\" =~ ^# ]]; then
+                  continue
+                fi
+                
+                # Handle relative paths
+                if [[ \"\$link_path\" == /* ]]; then
+                  target_file=\"./docs\${link_path}\"
+                else
+                  target_file=\"\$(dirname \"\$file\")/\${link_path}\"
+                fi
+                
+                # Remove fragment identifiers
+                target_file=\$(echo \"\$target_file\" | sed 's/#.*//')
+                
+                if [ ! -f \"\$target_file\" ]; then
+                  echo \"❌ \$file: Broken link to \$link_path\" >> links_results.md
+                  ((broken_links++))
+                fi
+              done <<< \"\$file_links\"
+            fi
+          done
+          
+          echo \"\\n**Summary:** \$broken_links broken links found\" >> links_results.md
+          
+          if [ \$broken_links -gt 0 ]; then
+            exit 1
+          fi
+          "
+        continue-on-error: true
+        id: links
+
+      - name: Check documentation build
+        run: |
+          echo "Testing if documentation would build successfully..."
+          # This is a placeholder - in a real workflow, you'd run your 
+          # documentation build tool (mkdocs, sphinx, etc)
+          # For example: mkdocs build --strict
+
+      - name: Create validation summary
+        if: always()
+        run: |
+          echo "## Documentation Validation Summary" > validation_summary.md
+          echo "" >> validation_summary.md
+          
+          if [ "${{ steps.frontmatter.outcome }}" == "success" ]; then
+            echo "✅ **Frontmatter Validation**: All files have valid frontmatter" >> validation_summary.md
+          else
+            echo "❌ **Frontmatter Validation**: Issues found" >> validation_summary.md
+            cat frontmatter_results.md >> validation_summary.md
+          fi
+          
+          echo "" >> validation_summary.md
+          
+          if [ "${{ steps.links.outcome }}" == "success" ]; then
+            echo "✅ **Link Validation**: All links are valid" >> validation_summary.md
+          else
+            echo "❌ **Link Validation**: Broken links found" >> validation_summary.md
+            cat links_results.md >> validation_summary.md
+          fi
+          
+          cat validation_summary.md
+        
+      - name: Fail if validation issues found
+        if: steps.frontmatter.outcome != 'success' || steps.links.outcome != 'success'
+        run: |
+          echo "Documentation validation failed. Please fix the issues above."
+          exit 1

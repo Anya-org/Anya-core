@@ -29,11 +29,13 @@ The DAO is built using a hierarchical architecture with clear separation of conc
 The DAO implements Bitcoin-style tokenomics with:
 
 1. Fixed supply of 21 billion tokens
-2. Halving mechanism every 210,000 blocks
+2. Halving mechanism every 105,000 blocks (production system)
 3. Strategic distribution:
-   - 30% to DEX for liquidity
-   - 15% to development team
-   - 55% to DAO/community
+   - 35% to Protocol Treasury
+   - 25% to Liquidity Provision
+   - 20% to Team & Development
+   - 15% to Community Incentives
+   - 5% to Strategic Partners
 
 ## Usage
 

@@ -1,84 +1,55 @@
-# Lightning Network Implementation [AIR-3][AIS-3][BPC-3]
+# lightning Module
 
-This directory contains the Lightning Network implementation for Anya Core, following official Bitcoin Improvement Proposals (BIPs) standards.
+*Auto-generated documentation based on source code analysis*
+*Last updated: 2025-08-06 11:54:58*
 
 ## Overview
 
-Lightning Network is a second-layer payment protocol enabling fast, low-cost transactions through payment channels, significantly improving Bitcoin's scalability and transaction throughput.
+This module contains 1 Rust source files providing core functionality for the lightning component of Anya Core.
 
-## Key Features
+## Source Structure
 
-- **Payment Channels**: Fast and low-fee off-chain transactions
-- **Multi-hop Routing**: Payment routing across the network
-- **HTLC Support**: Hash Time Locked Contracts for secure payments
-- **Watchtowers**: Protection against channel breaches
-
-## Architecture
-
-The Lightning implementation follows a hexagonal architecture pattern:
-
-- Core domain logic for channel operations
-- Adapters for Bitcoin transaction and peer interactions
-- Ports for external system integration
-
-## Implementation Details
-
-- **Status**: 🔄 75% Complete
-- **Dependencies**: Bitcoin Core, Lightning Network Daemon (LND) or Lightning Development Kit (LDK)
-- **Implementation Target**: Q2 2025
-
-## Usage Example
-
-```rust
-use anya_core::layer2::lightning::LightningClient;
-
-// Create a new Lightning client
-let config = LightningConfig::default();
-let lightning_client = LightningClient::new(config);
-
-// Connect to a peer
-lightning_client.connect_peer("node_pub_key", "127.0.0.1", 9735)?;
-
-// Open a channel
-let channel = lightning_client.open_channel("node_pub_key", 100_000, None, false)?;
-
-// Create an invoice
-let invoice = lightning_client.create_invoice(50_000, "Test payment", 3600)?;
-
-// Pay an invoice
-let payment = lightning_client.pay_invoice(&invoice.bolt11, None)?;
+```
+Directory: consolidated/bitcoin/layer2/lightning/README.md
+├── Source Files:
 ```
 
-## Bitcoin Protocol Compliance
+## API Documentation
 
-The Lightning implementation adheres to Bitcoin protocol standards:
+**Structs:**## Usage
 
-- Uses Bitcoin transactions for channel funding and settlement
-- Implements BOLT (Basis of Lightning Technology) specifications
-- Supports Taproot for enhanced privacy
-- Follows BIP standards for transaction handling
+```rust
+// Example usage for lightning module
+// TODO: Add specific examples based on actual API
+```
 
-## Security
+## Implementation Notes
 
-Lightning operations are secured through:
+- Module location: `consolidated/bitcoin/layer2/lightning/README.md`
+- Rust files: 1
+- JavaScript/TypeScript files: 0
+- Python files: 0
+- Last analyzed: 2025-08-06 11:54:58
 
-- Hash Time Locked Contracts (HTLCs) for transaction safety
-- Watchtower support for channel monitoring
-- Onion routing for payment privacy
-- Proper channel backup and recovery mechanisms
+## Dependencies
 
-## Documentation
+This module may depend on other Anya Core modules. Check `Cargo.toml` or relevant configuration files for specific dependencies.
 
-For more information, see:
+## Testing
 
-- [BOLT Specifications](https://github.com/lightning/bolts)
-- [Implementation Status](../../../../docs/IMPLEMENTATION_MILESTONES.md)
-- [Layer 2 Overview](../../../../docs/architecture/OVERVIEW.md)
+Related tests can be found in:
+- Unit tests: Check for `#[cfg(test)]` modules in Rust files
+- Integration tests: Look for corresponding files in `tests/` directory
 
-## Version Information
+## Contributing
 
-- Current Version: 3.1.0
-- Last Updated: 2025-04-29
-- Bitcoin Development Framework: v2.5
+When contributing to this module:
+1. Ensure all public APIs are documented
+2. Add appropriate tests for new functionality
+3. Update this README when adding new public interfaces
+4. Follow the project's coding standards
 
-*This component complies with [AI Labeling Standards](../../../../docs/standards/AI_LABELING.md)* 
+---
+*This README was automatically generated and enhanced based on source code analysis.*
+*For the most up-to-date information, refer to the actual source code.*
+

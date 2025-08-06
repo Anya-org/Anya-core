@@ -645,7 +645,7 @@ impl HsmProvider for SoftwareHsmProvider {
         // Create key pair for return
         let key_pair = KeyPair {
             id: key_id.clone(),
-            key_type: key_type,
+            key_type,
             public_key: public_key.clone(),
             private_key_handle: key_id,
         };

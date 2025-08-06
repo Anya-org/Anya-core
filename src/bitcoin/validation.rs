@@ -519,8 +519,7 @@ impl TransactionValidator {
         for (i, input) in tx.input.iter().enumerate() {
             if input.script_sig.as_bytes().contains(&0x6F) {
                 return Err(ValidationError::Failed(format!(
-                    "Input {} script contains disabled opcode OP_EVAL (CVE-2012-2459)",
-                    i
+                    "Input {i} script contains disabled opcode OP_EVAL (CVE-2012-2459)"
                 )));
             }
         }
@@ -546,7 +545,7 @@ impl TransactionValidator {
                                     // This is the S value - check for high bit
                                     if script_bytes[s_value_pos + 1] >= 0x80 {
                                         return Err(ValidationError::Failed(
-                                            format!("Input {} contains a malleable signature with high S value (CVE-2013-3220)", i)
+                                            format!("Input {i} contains a malleable signature with high S value (CVE-2013-3220)")
                                         ));
                                     }
                                     break;
@@ -729,10 +728,9 @@ impl TransactionValidator {
             // If this input has a witness, validate it
             if !input.witness.is_empty() {
                 // Basic witness structure validation
-                if input.witness.len() < 1 {
+                if input.witness.is_empty() {
                     return Err(ValidationError::Taproot(format!(
-                        "Input {} has empty witness elements",
-                        i
+                        "Input {i} has empty witness elements"
                     )));
                 }
 
@@ -742,8 +740,7 @@ impl TransactionValidator {
                 if witness_size > 10000 {
                     // Reasonable witness size limit
                     return Err(ValidationError::Taproot(format!(
-                        "Input {} witness too large: {} bytes",
-                        i, witness_size
+                        "Input {i} witness too large: {witness_size} bytes"
                     )));
                 }
             }
@@ -756,8 +753,7 @@ impl TransactionValidator {
                 if output.script_pubkey.len() != 34 {
                     // 1 + 1 + 32 bytes for v1 witness program
                     return Err(ValidationError::Taproot(format!(
-                        "Output {} invalid Taproot script length",
-                        i
+                        "Output {i} invalid Taproot script length"
                     )));
                 }
             }
@@ -786,7 +782,7 @@ impl TransactionValidator {
             if !input.witness.is_empty() {
                 // --- Witness structure ---
                 // Must have at least one element (signature or script)
-                if input.witness.len() < 1 {
+                if input.witness.is_empty() {
                     return Err(ValidationError::Taproot(format!(
                         "Input {i} witness missing required elements"
                     )));

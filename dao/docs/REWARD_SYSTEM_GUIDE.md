@@ -7,7 +7,7 @@ This guide explains the Bitcoin-style reward system implementation for Anya Core
 The DAO reward system follows Anya Core's Bitcoin-inspired tokenomics with the following features:
 
 1. **Bitcoin-Style Supply**: 21 billion token supply with halving mechanism
-2. **Strategic Distribution**: 
+2. **Strategic Distribution**:
    - 15% allocated for community incentives (developer rewards)
    - Rewards calculated proportionally based on contribution points
 3. **Block-Based Issuance**: Rewards follow Bitcoin-style halving schedule
@@ -41,8 +41,9 @@ The reward calculation follows Bitcoin's model:
 
 - **Initial Block Reward**: 10,000 AGT per block
 - **Halving Schedule**:
-  - Blocks 0-210,000: 10,000 AGT per block
-  - Blocks 210,001-420,000: 5,000 AGT per block
+  - Blocks 0-105,000: 10,000 AGT per block
+  - Blocks 105,001-210,000: 5,000 AGT per block
+  - Blocks 210,001-315,000: 2,500 AGT per block
   - Blocks 420,001-630,000: 2,500 AGT per block
   - And so on...
 

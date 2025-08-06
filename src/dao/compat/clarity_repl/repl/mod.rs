@@ -11,6 +11,12 @@ pub struct Session {
     pub current_sender: PrincipalData,
 }
 
+impl Default for Session {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Session {
     pub fn new() -> Self {
         Self {
@@ -22,7 +28,7 @@ impl Session {
     }
 
     pub fn deploy_contract(&mut self, name: &str, code: &str) -> Result<String, String> {
-        self.contracts.push(format!("{}: {}", name, code));
+        self.contracts.push(format!("{name}: {code}"));
         Ok(format!("Contract {} deployed", name))
     }
 

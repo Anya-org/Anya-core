@@ -1,173 +1,50 @@
-# Anya-Core Documentation
-
-**🎉 Production-Ready Bitcoin Infrastructure Platform**  
-**Status:** ✅ Real Implementations Deployed - All 5 Critical Areas Operational  
-**Last Updated:** August 3, 2025
-
-## 🚀 Quick Start
-
-**New to Anya-Core?** Start here:
-
-1. **[System Overview](PRD_MASTER_INDEX.md)** - Current status and capabilities
-2. **[High-Level Roadmap](ROADMAP.md)** - Strategic direction and milestones  
-3. **[Implementation Success](IMPLEMENTATION_SUCCESS_REPORT.md)** - Real implementation achievements
-
-**Planning Development?** Continue here:
-4. **[Development Roadmap](IMPLEMENTATION_ROADMAP_PRD.md)** - Detailed roadmap (Phases 2-4)
-5. **[Enhancement Opportunities](ENHANCEMENT_OPPORTUNITIES_PRD.md)** - Optimization opportunities
-6. **[Current Week Plan](PHASE1_WEEK2_EXECUTION_PLAN.md)** - Immediate execution plan
-
-## 📚 **Optimized PRD System (8 Core Documents)**
-
-*✅ Reduced from 42+ documents to 8 core documents (81% reduction) while preserving all critical information*
-
-### **📋 Navigation & Planning (3 documents)**
-
-| Document | Purpose | Owner | Update Schedule |
-|----------|---------|-------|-----------------|
-| **[Documentation Index](README.md)** | Navigation guide & quick access | Documentation Team | As needed |
-| **[PRD Master Index](PRD_MASTER_INDEX.md)** | System overview & status dashboard | Product Team | Weekly |
-| **[High-Level Roadmap](ROADMAP.md)** | Strategic milestones & leadership overview | Leadership Team | Monthly |
-
-### **🏗️ Development & Implementation (3 documents)**  
-
-| Document | Purpose | Owner | Update Schedule |
-|----------|---------|-------|-----------------|
-| **[Implementation Roadmap PRD](IMPLEMENTATION_ROADMAP_PRD.md)** | Detailed development phases (2-4) | Engineering Lead | Weekly |
-| **[Enhancement Opportunities PRD](ENHANCEMENT_OPPORTUNITIES_PRD.md)** | Post-implementation optimization | Product & Engineering | Monthly |
-| **[Phase 1 Week 2 Plan](PHASE1_WEEK2_EXECUTION_PLAN.md)** | Current execution plan | Active Development Team | Daily |
-
-### **✅ Achievement & Verification (2 documents)**
-
-| Document | Purpose | Owner | Update Schedule |
-|----------|---------|-------|-----------------|
-| **[Implementation Success Report](IMPLEMENTATION_SUCCESS_REPORT.md)** | Real implementation verification | Engineering Lead | After milestones |
-| **[Comprehensive Verification](COMPREHENSIVE_REVIEW_AND_VERIFICATION.md)** | Technical metrics & validation | QA Team | After major changes |
-
-## 🎯 **Current System Status** *(August 3, 2025)*
-
-### **✅ Production-Ready Achievements**
-
-- **Layer2 Protocols:** ✅ Real P2P networking operational (EnhancedLayer2Protocol)
-- **Bitcoin Adapters:** ✅ HTTP RPC client operational (BitcoinRpcAdapter)
-- **Storage Layer:** ✅ SQLite + RocksDB dual backend operational (PersistentStorage)
-- **ML Agents:** ✅ Real model inference operational (RealMLEngine)
-- **Security HSM:** ✅ Real cryptographic operations operational (SoftwareHSM)
-
-### **📊 Key Metrics**
-
-| Metric | Status | Achievement |
-|--------|--------|-------------|
-| **Production Readiness** | ✅ **85%** | Production ready |
-| **Test Success Rate** | ✅ **99.1%** | Enterprise quality |
-| **Layer2 Protocols** | ✅ **9/9** | Complete solution |
-| **Real Implementations** | ✅ **95%** | All critical areas |
-
-## 📂 **Archive Structure**
-
-Historical documents preserved for reference:
-
-```
-docs/archive/
-├── historical_analysis/           # Mock reduction strategies (obsolete)
-├── implementation_phases/         # Phase-specific documents (completed)
-└── status_reports/               # Historical status reports (consolidated)
-```
-
-## 🧹 **Documentation Best Practices Applied**
-
-- ✅ **Single Source of Truth:** Each topic has one authoritative document
-- ✅ **Clear Ownership:** Each document has designated owner and update schedule  
-- ✅ **Logical Navigation:** From high-level overview to detailed implementation
-- ✅ **No Redundancy:** Eliminated 81% of files while preserving all critical information
-- ✅ **Historical Preservation:** Archived completed work for reference  
-- **Storage Layer:** SQLite + RocksDB operational (PersistentStorage)
-- **ML Agents:** Real inference operational (RealMLEngine)
-- **Security HSM:** Real cryptography operational (SoftwareHSM)
-
-### **📊 Key Metrics**
-
-- ✅ **Compilation:** Zero errors, warnings only
-- ✅ **Unimplemented Functions:** 0 (all real logic implemented)
-- ✅ **TODO Stubs:** 0 (no pending implementations)
-- ✅ **Test Coverage:** 99.1% pass rate (113/114 tests)
-- ⚠️ **Production Mocks:** 44 (acceptable for network/oracle layers)
-
-## 🗂️ Document Categories
-
-### **Active Documents** *(require regular updates)*
-
-- Core PRD documents for ongoing development planning
-- Current status and metrics tracking
-- Week-by-week execution plans
-
-### **Reference Documents** *(stable, updated as needed)*
-
-- Architecture and design decisions
-- API documentation and guides
-- Verification procedures and standards
-
-### **Archived Documents** *(historical, preserved for context)*
-
-- **[archive/historical_analysis/](archive/historical_analysis/)** - Completed analysis phase
-- **[archive/implementation_phases/](archive/implementation_phases/)** - Historical phase documents  
-- **[archive/status_reports/](archive/status_reports/)** - Historical status reports
-
-## 🔍 **Finding Information**
-
-### **By Role**
-
-- **👥 Product Managers:** Start with [PRD Master Index](PRD_MASTER_INDEX.md) → [Roadmap](ROADMAP.md)
-- **👨‍💻 Engineers:** Review [Implementation Roadmap](IMPLEMENTATION_ROADMAP_PRD.md) → [Enhancement Opportunities](ENHANCEMENT_OPPORTUNITIES_PRD.md)
-- **🧪 QA Engineers:** Check [Verification Results](COMPREHENSIVE_REVIEW_AND_VERIFICATION.md) → [Success Report](IMPLEMENTATION_SUCCESS_REPORT.md)
-- **📈 Leadership:** Read [Success Report](IMPLEMENTATION_SUCCESS_REPORT.md) → [High-Level Roadmap](ROADMAP.md)
-
-### **By Topic**
-
-- **Current Status:** [PRD Master Index](PRD_MASTER_INDEX.md)
-- **Future Planning:** [Implementation Roadmap PRD](IMPLEMENTATION_ROADMAP_PRD.md)
-- **Technical Achievements:** [Implementation Success Report](IMPLEMENTATION_SUCCESS_REPORT.md)
-- **Performance Metrics:** [Comprehensive Verification](COMPREHENSIVE_REVIEW_AND_VERIFICATION.md)
-- **Enhancement Ideas:** [Enhancement Opportunities PRD](ENHANCEMENT_OPPORTUNITIES_PRD.md)
-
-## 📞 **Document Ownership**
-
-| Document Category | Owner | Responsibilities |
-|-------------------|-------|------------------|
-| **PRD Master Index** | Product Manager | Weekly status updates, navigation accuracy |
-| **Implementation Roadmap** | Engineering Lead | Development timeline, resource planning |
-| **Enhancement Opportunities** | Product Manager | Feature prioritization, opportunity assessment |
-| **Success Reports** | Technical Lead | Achievement documentation, metrics validation |
-| **Verification Results** | QA Lead | Test results, quality metrics, compliance |
-
-## 🔄 **Maintenance Schedule**
-
-### **Daily Updates**
-
-- Current week execution plans
-- Active development status
-
-### **Weekly Updates**  
-
-- PRD Master Index status sections
-- Implementation roadmap progress
-- Resource allocation adjustments
-
-### **Monthly Reviews**
-
-- Enhancement opportunities prioritization
-- Document structure optimization
-- Archive older completed phases
-
-### **Quarterly Reviews**
-
-- Complete documentation audit
-- Structure and navigation improvements
-- Archive policy updates
-
+---
+title: "Anya Core Documentation"
+description: "Main documentation for Anya Core"
+status: "active"
+last_updated: "2025-08-06"
 ---
 
-**🎉 Real Implementations Deployed Successfully**  
-*All core functionality converted from mock to production-ready logic with comprehensive dependency integration.*
+# Anya Core Documentation
 
-For questions about this documentation system, see the [PRD Master Index](PRD_MASTER_INDEX.md) for current team contacts and responsibilities.
+Welcome to the Anya Core documentation repository. This documentation is aligned with source code and provides comprehensive information on the Anya Core system.
+
+## Table of Contents
+
+- [Modules](#modules)
+- [Standards](#standards)
+- [Getting Started](#getting-started)
+- [API Reference](#api-reference)
+
+## Modules
+
+Each Anya Core module has corresponding documentation:
+
+- [API](./api/README.md) - API documentation
+- [Tools](./tools/README.md) - Development and documentation tools
+- [Bitcoin](./bitcoin/README.md) - Bitcoin protocol integration
+- [Layer2](./layer2/README.md) - Layer2 protocols like Lightning, RGB, DLC
+- [Web5](./web5/README.md) - Decentralized identity and data management
+
+## Standards
+
+Documentation follows these standards:
+
+- Perfect 1:1 alignment with source code
+- Comprehensive API documentation
+- Code examples for all major functions
+- Cross-referenced modules and components
+
+## Getting Started
+
+See the [Getting Started](./getting-started/README.md) guide for installation and basic usage.
+
+## API Reference
+
+For detailed API documentation, see the [API Reference](./api/README.md) or run:
+
+```bash
+cargo doc --open
+```
+
+*Last updated: 2025-08-06*

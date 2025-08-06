@@ -1,21 +1,40 @@
-;; Anya DAO Token Economics Module [AIR-3][AIS-3][BPC-3][AIT-3]
-;; Implements the token distribution logic with Bitcoin-style tokenomics
-;; Compliant with official Bitcoin Improvement Proposals (BIPs)
+;; [DEPRECATED] Alternative Token Economics Module - DO NOT USE IN PRODUCTION
+;; [AIR-3][AIS-3][BPC-3][AIT-3]
+;;
+;; ⚠️  CRITICAL WARNING: This file is DEPRECATED and should not be used for production.
+;; ⚠️  Use the official production system: /contracts/dao/tokenomics.clar
+;;
+;; This file contains an alternative tokenomics implementation with OUTDATED parameters:
+;; - Initial Block Reward: 5,000 tokens per block (WRONG - Production uses 10,000)
+;; - Halving Interval: 210,000 blocks (WRONG - Production uses 105,000)
+;; - Distribution: 30%/15%/45%/10% (WRONG - Production uses 35%/25%/20%/15%/5%)
+;;
+;; CORRECT PRODUCTION PARAMETERS are in contracts/dao/tokenomics.clar:
+;; - Initial Block Reward: 10,000 tokens per block
+;; - Halving Interval: 105,000 blocks
+;; - Distribution: 35%/25%/20%/15%/5%
+;;
+;; Do not deploy this contract to mainnet - it will cause incorrect tokenomics.
 
-;; Constants - Token Distribution
+;; Import traits
+(impl-trait 'SPQHBC8CJ1DNBWX0RP71F18XC0RNZ5G4WWFZ.dao-trait.sip009-nft-trait)
+
+;; DEPRECATED Constants - Token Distribution
 (define-constant TOKEN-GENESIS-BLOCK u0)
-(define-constant HALVING-INTERVAL u210000) ;; Bitcoin-style halving
-(define-constant INITIAL-BLOCK-REWARD u5000) ;; 5,000 tokens per block
+(define-constant HALVING-INTERVAL u210000) ;; DEPRECATED: Use 105,000 in production
+(define-constant INITIAL-BLOCK-REWARD u5000) ;; DEPRECATED: Use 10,000 in production
 (define-constant TOTAL-SUPPLY u21000000000) ;; 21 billion tokens
 
-;; Distribution percentages (must add up to 100%)
-(define-constant DEX-ALLOCATION-PERCENTAGE u30) ;; 30% allocated to DEX
-(define-constant TEAM-ALLOCATION-PERCENTAGE u15) ;; 15% allocated to dev team
-(define-constant DAO-ALLOCATION-PERCENTAGE u45) ;; 45% to DAO/community
-(define-constant RESERVE-ALLOCATION-PERCENTAGE u10) ;; 10% to protocol reserves
+;; DEPRECATED Distribution percentages (DO NOT USE)
+(define-constant DEX-ALLOCATION-PERCENTAGE u30) ;; DEPRECATED: Use 25% liquidity in production
+(define-constant TEAM-ALLOCATION-PERCENTAGE u15) ;; DEPRECATED: Use 20% team in production
+(define-constant DAO-ALLOCATION-PERCENTAGE u45) ;; DEPRECATED: Use 15% community in production
+(define-constant RESERVE-ALLOCATION-PERCENTAGE u10) ;; DEPRECATED: Use 35% treasury in production
 
-;; Special constants - Taproot Assets Integration
-(define-constant TAPROOT-VERIFICATION-ENABLED true)
+;; Migration notice
+(define-read-only (get-production-system-notice)
+  "DEPRECATED: Use contracts/dao/tokenomics.clar for production deployment"
+)
 (define-constant BITVM-VERIFICATION-REQUIRED true)
 
 ;; Error codes
@@ -66,9 +85,9 @@
 
 ;; Distribution Phase Tracking
 (define-data-var is-initial-distribution bool true)
-(define-map distribution-phases 
-    uint 
-    { 
+(define-map distribution-phases
+    uint
+    {
         start-block: uint,
         end-block: uint,
         percentage: uint,
@@ -108,10 +127,10 @@
     (begin
         (asserts! (is-authorized tx-sender) (err ERR_UNAUTHORIZED))
         (asserts! (is-eq (var-get distribution-start-block) u0) (err ERR_ALREADY_INITIALIZED))
-        
+
         ;; Set distribution start
         (var-set distribution-start-block start-block)
-        
+
         ;; Initialize initial phase (45% in first 6 months)
         (map-set distribution-phases u1 {
             start-block: start-block,
@@ -120,7 +139,7 @@
             tokens-allocated: (/ (* TOTAL-SUPPLY INITIAL-RELEASE-PERCENTAGE) u100),
             tokens-released: u0
         })
-        
+
         ;; Initialize regular distribution phase
         (map-set distribution-phases u2 {
             start-block: (+ start-block INITIAL-RELEASE-BLOCKS),
@@ -129,7 +148,7 @@
             tokens-allocated: (/ (* TOTAL-SUPPLY (- u100 INITIAL-RELEASE-PERCENTAGE)) u100),
             tokens-released: u0
         })
-        
+
         (ok true)
 ))
 
@@ -237,7 +256,7 @@
     (let (
         (taproot-contract (contract-call? (var-get taproot-verifier) verify-taproot-commitment merkle-proof))
     )
-        (asserts! (unwrap! taproot-contract (err ERR_TAPROOT_VERIFICATION_FAILED)) 
+        (asserts! (unwrap! taproot-contract (err ERR_TAPROOT_VERIFICATION_FAILED))
                  (err ERR_TAPROOT_VERIFICATION_FAILED))
         (ok true)
 ))
@@ -263,7 +282,7 @@
         (tokens-released (get tokens-released phase-1))
     )
         (map-set distribution-phases u1 (merge phase-1 { tokens-released: (+ tokens-released amount) }))
-        
+
         ;; Check if we need to transition to regular phase
         (if (>= (+ tokens-released amount) (get tokens-allocated phase-1))
             (var-set is-initial-distribution false)
@@ -288,7 +307,7 @@
         (asserts! (> amount u0) (err ERR_ZERO_AMOUNT))
         (asserts! TAPROOT-VERIFICATION-ENABLED (err ERR_TAPROOT_VERIFICATION_FAILED))
         (asserts! (check-bitvm-verification) (err ERR_BITVM_VERIFICATION_FAILED))
-        
+
         ;; Calculate dynamic buyback parameters based on market conditions
         (let (
             (market-liquidity (+ (var-get dex-liquidity-reserve) amount))
@@ -302,7 +321,7 @@
                 price-impact: price-impact,
                 market-liquidity: market-liquidity
             })
-            
+
             ;; Update reserves
             (var-set buyback-reserve (+ (var-get buyback-reserve) amount))
             (ok true)
@@ -350,7 +369,7 @@
     (begin
         (asserts! (is-authorized tx-sender) (err ERR_UNAUTHORIZED))
         (asserts! (> amount u0) (err ERR_ZERO_AMOUNT))
-        
+
         (if is-addition
             (var-set treasury-balance (+ (var-get treasury-balance) amount))
             (begin
@@ -362,13 +381,13 @@
 
 ;; Query buyback metrics for a specific block
 (define-read-only (get-buyback-metrics (block-height uint))
-    (default-to 
+    (default-to
         {
             last-buyback-block: u0,
             buyback-amount: u0,
             price-impact: u0,
             market-liquidity: u0
-        } 
+        }
         (map-get? buyback-metrics block-height))
 )
 

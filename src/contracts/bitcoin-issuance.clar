@@ -1,8 +1,20 @@
- ;; Bitcoin-Style Token Issuance Module
-;; Implements a hybrid issuance model with:
-;; 1. Bitcoin-style issuance from the beginning with special distribution rules
-;; 2. 30% of issuance allocated to DEX for liquidity
-;; 3. Developer team allocation based on work contribution
+;; [DEPRECATED] Bitcoin-Style Token Issuance Module - DO NOT USE IN PRODUCTION
+;; [AIR-3][AIS-3][BPC-3][AIT-3]
+;;
+;; ⚠️  CRITICAL WARNING: This is a development/testing contract with WRONG parameters.
+;; ⚠️  For PRODUCTION use: /contracts/dao/tokenomics.clar
+;;
+;; This file contains INCORRECT tokenomics parameters that will cause wrong behavior:
+;; - Initial Block Reward: 5,000 tokens per block (WRONG - Production uses 10,000)
+;; - Halving Interval: 210,000 blocks (WRONG - Production uses 105,000)
+;; - Distribution: 30%/15%/55% (WRONG - Production uses 35%/25%/20%/15%/5%)
+;;
+;; CORRECT PRODUCTION PARAMETERS are in /contracts/dao/tokenomics.clar:
+;; - Initial Block Reward: 10,000 tokens per block
+;; - Halving Interval: 105,000 blocks (adaptive, minimum interval)
+;; - Distribution: 35% Treasury/25% Liquidity/20% Team/15% Community/5% Partners
+;;
+;; Do not deploy this contract to mainnet or reference it in production code.
 
 ;; Import traits
 (use-trait ft-trait 'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait;);(use-trait dao-trait 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.dao-trait.dao-trait;)
@@ -50,7 +62,7 @@
 ;; Initialize the issuance system
 (define-public (initialize (start-block uint;); (token principal;) (dao principal;) (dex principal;););    (begin
         (asserts! (is-authorized tx-sender;) (err ERR_UNAUTHORIZED;););        (asserts! (not (var-get is-initialized;);) (err ERR_ALREADY_INITIALIZED;);)
-        
+
         ;; Set initial values
         (var-set distribution-start-block start-block;);        (var-set token-contract token;);        (var-set dao-contract dao;);        (var-set dex-contract dex;);        (var-set is-initialized true;);        (var-set last-halving-height start-block;)
         ;        (ok true;)
@@ -58,16 +70,16 @@
 ;)
 
 ;; Set developer team allocations
-(define-public (set-team-allocations 
+(define-public (set-team-allocations
     (member1 principal;); (allocation1 uint;);    (member2 principal;) (allocation2 uint;);    (member3 principal;) (allocation3 uint;);    (member4 principal;) (allocation4 uint;);    (member5 principal;) (allocation5 uint;);    (member6 principal;) (allocation6 uint;);    (member7 principal;) (allocation7 uint;);    (member8 principal;) (allocation8 uint;);    (member9 principal;) (allocation9 uint;);    (member10 principal;) (allocation10 uint;)
 ;);    (begin
         (asserts! (is-authorized tx-sender;) (err ERR_UNAUTHORIZED;);)
-        
+
         ;; Check that allocations add up to 100%
         (asserts! (is-eq (+ allocation1 allocation2 allocation3 allocation4 allocation5
-                          allocation6 allocation7 allocation8 allocation9 allocation10;) 
+                          allocation6 allocation7 allocation8 allocation9 allocation10;)
                        u10000;);                 (err ERR_INVALID_DISTRIBUTION;);)
-        
+
         ;; Set allocations for each team member
         (map-set team-members-allocation member1 allocation1;);        (map-set team-members-allocation member2 allocation2;);        (map-set team-members-allocation member3 allocation3;);        (map-set team-members-allocation member4 allocation4;);        (map-set team-members-allocation member5 allocation5;);        (map-set team-members-allocation member6 allocation6;);        (map-set team-members-allocation member7 allocation7;);        (map-set team-members-allocation member8 allocation8;);        (map-set team-members-allocation member9 allocation9;);        (map-set team-members-allocation member10 allocation10;)
         ;        (ok true;)
@@ -116,19 +128,19 @@
         (guard (non-reentrant;););        (token-contract-principal (var-get token-contract;););        (available (get-available-to-mint;););        (dex-amount (/ (* available DEX_ALLOCATION_PERCENTAGE;) u100;););        (team-amount (/ (* available TEAM_ALLOCATION_PERCENTAGE;) u100;););        (dao-amount (/ (* available DAO_ALLOCATION_PERCENTAGE;) u100;););)
         ;; Validate inputs
         (asserts! (var-get is-initialized;) (err ERR_NOT_INITIALIZED;););        (asserts! (> available u0;) (err ERR_ZERO_AMOUNT;);)
-        
+
         ;; Check for halving
         (check-halving;)
-        
+
         ;; Update total distributed
         (var-set tokens-distributed (+ (var-get tokens-distributed;) available;);)
-        
+
         ;; Mint tokens to DEX for liquidity
         (as-contract (contract-call? token-contract-principal mint dex-amount (var-get dex-contract;););)
-        
+
         ;; Mint tokens to DAO
         (as-contract (contract-call? token-contract-principal mint dao-amount (var-get dao-contract;););)
-        
+
         ;; Mint tokens and distribute to team members
         (distribute-to-team-members team-amount token-contract-principal;)
         ;        (release-reentrancy;);        (ok available;)
@@ -141,10 +153,10 @@
         ;; For now, we'll just return true to indicate success
         ;; In a production version, you would need to implement logic to distribute to each team member
         ;; based on their percentage stored in the team-members-allocation map
-        
+
         ;; Note: The actual logic to distribute tokens to each team member would be more complex
         ;; and would require iterating through all team members and calculating their allocation
-        
+
         ;; For demonstration purposes only
         (print { message: "Tokens distributed to team members", amount: total-amount };)
         true;)

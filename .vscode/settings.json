@@ -1,0 +1,30 @@
+{
+    "cSpell.words": [
+        "safetensors",
+        "onnx",
+        "ONNX",
+        "Safetensors",
+        "huggingface",
+        "RUSTSEC",
+        "bitcoinjs",
+        "secp256k1",
+        "bip341",
+        "taproot",
+        "schnorr",
+        "utxo",
+        "psbt"
+    ],
+    "rust-analyzer.checkOnSave.command": "clippy",
+    "rust-analyzer.checkOnSave.extraArgs": [
+        "--all-targets",
+        "--all-features"
+    ],
+    "files.insertFinalNewline": true,
+    "files.trimTrailingWhitespace": true,
+    "markdownlint.config": {
+        "MD013": false,
+        "MD033": false,
+        "MD040": true,
+        "MD047": true
+    }
+}

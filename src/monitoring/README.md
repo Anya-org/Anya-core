@@ -1,0 +1,12 @@
+# monitoring Module
+
+MonitoringSystem, NetworkMetric, FeeMetric API \[TEMPLATE\]
+\[AIR-3\]\[AIS-3\]\[BPC-3\]\[RES-3\]
+
+## Overview
+
+This module is part of the Anya Core system.
+
+## For more information
+
+See the comprehensive documentation in the [docs/](../../../docs/) directory.

@@ -1,134 +1,81 @@
----
-title: "Bitcoin Protocol Implementation"
-description: "Documentation for Bitcoin Protocol Implementation in Anya Core"
-last_updated: 2025-07-12
----
-[AIR-3][AIS-3][BPC-3][RES-3]
+# Bitcoin Module Documentation
 
-# Bitcoin Protocol Implementation
+**Compliance Tags**: [AIR-3][AIS-3][BPC-3][RES-3]
+
+[AIS-3]: #ais-3 "Application Integration Standard Level 3"
+[RES-3]: #res-3 "Resource Efficiency Standard Level 3"
 
 ## Overview
 
-The Bitcoin implementation in Anya Core provides a comprehensive integration with the Bitcoin protocol, supporting advanced features such as Taproot, Schnorr signatures, and Partially Signed Bitcoin Transactions (PSBT). This implementation is fully compliant with official Bitcoin Improvement Proposals (BIPs) including BIP-340 (Schnorr Signatures), BIP-341 (Taproot), BIP-342 (Tapscript), BIP-174 (PSBT), and BIP-370 (PSBT v2).
+The Bitcoin module provides core Bitcoin functionality for the Anya Core system, implementing official Bitcoin Improvement Proposals (BIPs) and supporting hexagonal architecture for modularity and extensibility.
 
-## Table of Contents
+## Core Components
 
-- [Architecture](#architecture)
-- [Key Components](#key-components)
-- [BIP Implementation](#bip-implementation)
-- [Security Features](#security-features)
-- [Usage](#usage)
-- [Development](#development)
-- [Testing](#testing)
-- [Related Components](#related-components)
+### Adapters
 
-This directory contains documentation for the Bitcoin protocol implementation in Anya Core.
+Implements the `BitcoinAdapter` interface for connecting to various Bitcoin backends (Bitcoin Core, Electrum, Esplora, etc.).
 
-## Architecture
+### Protocol Compliance
 
-The implementation follows a hexagonal architecture pattern with:
+Implements the `BitcoinProtocol` trait and BPCLevel for strict protocol compliance and versioning.
 
-- **Core**: Core Bitcoin functionality
-- **Adapters**: Integration with external systems
-- **Ports**: Interfaces for communication
+### Node Management
 
+Implements the `BitcoinNode` interface for managing Bitcoin nodes, including connection, synchronization, and health monitoring.
+
+### Wallet Management
+
+Implements the `BitcoinWallet` interface for wallet operations, including address management, transaction creation, and signing.
+
+### Layer2 Support
+
+Exports the `Layer2Protocol` trait for integration with Layer2 solutions (Lightning, RGB, etc.).
+
+### Taproot & Validation
+
+Implements Taproot support and consolidated validation logic for transaction and block verification.
+
+### Configuration
+
+Provides the `BitcoinConfig` struct for configuring network, wallet, and node parameters.
+
+### Compatibility
+
+Includes compatibility modules for legacy import patterns and test utilities.
+
+## Usage Example
+
+```rust
+use anya_core::bitcoin::{BitcoinAdapter, BitcoinConfig, BitcoinWallet};
+
+let config = BitcoinConfig::default();
+let adapter = BitcoinAdapter::new(config)?;
+let wallet = BitcoinWallet::new(&adapter)?;
+let address = wallet.get_new_address()?;
+let txid = wallet.send_to_address(&address, 100_000)?;
 ```
-                      +----------------+
-                      |  Bitcoin Core  |
-                      +-------+--------+
-                              |
-                      +-------v--------+
-                      |  Adapter Layer |
-                      +-------+--------+
-                              |
-+----------------+    +-------v--------+    +----------------+
-|   External     |    |   Application  |    |   Monitoring   |
-|   Interfaces   <----+   Core Logic   +---->   & Metrics   |
-| (APIs, Wallets)|    +-------+--------+    | (Prometheus)   |
-+----------------+            |             +----------------+
-                      +-------v--------+
-                      |   Protocol     |
-                      |   Adapters     |
-                      +-------+--------+
-                              |
-                      +-------v--------+
-                      |  Blockchain    |
-                      |  Network       |
-                      +----------------+
-```
 
-## Key Components
+## Integration Points
 
-### Core Components
+- **Layer2 Module**: For advanced protocol support
+- **Lightning Module**: For Lightning Network operations
+- **Validation Module**: For transaction and block validation
+- **Performance Module**: For monitoring Bitcoin operations
 
-- **Bitcoin Protocol**: Implementation of the Bitcoin protocol
-- **Transaction Processing**: Handling of Bitcoin transactions
-- **UTXO Management**: Management of unspent transaction outputs
-- **Mempool**: Transaction memory pool implementation
-- **Block Processing**: Processing of Bitcoin blocks
+## Compliance Standards
 
-## BIP Implementation
+### AIR-3
 
-The implementation supports the following BIPs:
+Ensures high availability and integrity by following best practices for node management, wallet operations, and protocol compliance.
 
-- **BIP-340**: Schnorr Signatures for Bitcoin
-- **BIP-341**: Taproot: SegWit version 1 spending rules
-- **BIP-342**: Validation of Taproot Scripts
-- **BIP-174**: Partially Signed Bitcoin Transactions
-- **BIP-370**: PSBT Version 2
+### AIS-3
 
-## Security Features
+Comprehensive APIs for integration with other modules and external Bitcoin services.
 
-- **Secure Transaction Validation**: Comprehensive transaction validation
-- **Advanced Cryptography**: Secure cryptographic implementations
-- **Tamper-Proof Design**: Protection against tampering and manipulation
-- **Security Auditing**: Regular security audits and vulnerability checks
+### BPC-3
 
-## Features
+Implements Bitcoin protocol features and BIPs for full compatibility.
 
-- Full Bitcoin node integration
-- SPV (Simplified Payment Verification) support
-- Transaction creation and signing
-- Address management
-- Script support (P2PKH, P2SH, P2WPKH, P2WSH, P2TR, etc.)
-- Taproot and Schnorr signature support
-- PSBT v2 implementation
+### RES-3
 
-## Usage
-
-The Bitcoin implementation provides:
-
-- Transaction creation and signing
-- Block validation and processing
-- UTXO management
-- Mempool management
-- Network communication
-
-## Development
-
-To contribute to the Bitcoin implementation:
-
-1. Read the [Contributing Guide](../CONTRIBUTING.md)
-2. Follow the [AI Labeling Standards](../standards/AI_LABELING.md)
-3. Ensure all code meets [BIP Compliance Standards](../standards/BIP_COMPLIANCE.md) requirements
-
-## Testing
-
-All Bitcoin components are tested using:
-
-- Unit tests in `tests/bitcoin/`
-- Integration tests in `tests/integration/bitcoin/`
-- Consensus tests from the Bitcoin Core test suite
-- Fuzz testing for critical components
-
-## Related Components
-
-- [Layer 2 Solutions](../layer2/) - Layer 2 protocols built on top of Bitcoin
-- [Security](../security/) - Security considerations and best practices
-
-## Documentation
-
-- [Architecture](../dependencies/system/architecture.md) - Detailed architecture of the Bitcoin integration
-- [API Reference](../api/README.md) - API documentation for Bitcoin-related functionality
-- [Development Guide](../development/development.md) - Guide for developers working on Bitcoin features
-- [Testing](../development/TESTING.md) - Testing strategy and guidelines for Bitcoin features
+Efficient transaction processing, resource management, and optimized network operations.

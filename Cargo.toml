@@ -51,7 +51,7 @@ blake3 = { version = "1.8.2" }
 rand = { version = "0.8.5" }
 rand_core = { version = "0.6.4" }
 # Additional cryptographic dependencies for real implementations
-rsa = { version = "0.9.6" }
+# rsa = { version = "0.9.6" } # REMOVED: RUSTSEC-2023-0071 - migrated to ring
 ed25519-dalek = { version = "2.1.1", features = ["rand_core"] }
 hmac = { version = "0.12.1" }
 pbkdf2 = { version = "0.12.2" }
@@ -223,7 +223,7 @@ rand.workspace = true
 once_cell.workspace = true
 base64 = "0.22.1"
 # Cryptographic dependencies for real implementations
-rsa = { workspace = true }
+# rsa = { workspace = true } # REMOVED: RUSTSEC-2023-0071 - migrated to ring
 ed25519-dalek = { workspace = true }
 hmac = { workspace = true }
 pbkdf2 = { workspace = true }
@@ -239,6 +239,7 @@ aes-gcm.workspace = true
 blake3.workspace = true
 mockall.workspace = true
 getrandom = "0.3.3"
+cargo-geiger = "0.11.7"
 
 [target.'cfg(target_os = "android")'.dependencies]
 ndk = { version = "0.8.0", optional = true }
@@ -251,7 +252,7 @@ multihash = { version = "0.19.3", features = ["std"], optional = true }
 
 # Cryptographic and system dependencies for real implementations
 ed25519-dalek = { workspace = true }
-rsa = { workspace = true }
+# rsa = { workspace = true } # REMOVED: RUSTSEC-2023-0071 - migrated to ring
 hmac = { workspace = true }
 pbkdf2 = { workspace = true }
 rocksdb = { workspace = true }

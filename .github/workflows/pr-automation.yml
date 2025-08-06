@@ -10,7 +10,7 @@ on:
 permissions:
   contents: read
   pull-requests: write
-  labels: write
+  issues: write
 
 jobs:
   pr-checks:
@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Check PR Title
         uses: amannn/action-semantic-pull-request@v5
         env:
@@ -36,7 +36,7 @@ jobs:
             ci
             chore
             revert
-            
+
       - name: Check PR Description
         uses: actions/github-script@v7
         with:
@@ -45,7 +45,7 @@ jobs:
             if (!description || description.length < 50) {
               core.setFailed('PR description must be at least 50 characters long');
             }
-            
+
       - name: Check Branch Name
         uses: actions/github-script@v7
         with:
@@ -57,29 +57,29 @@ jobs:
               /^hotfix\/.*/,
               /^release\/.*/
             ];
-            
+
             if (!validPatterns.some(pattern => pattern.test(branchName))) {
               core.setFailed('Branch name must follow the pattern: feature/*, bugfix/*, hotfix/*, or release/*');
             }
-            
+
       - name: Check File Changes
         uses: actions/github-script@v7
         with:
           script: |
             const changedFiles = context.payload.pull_request.changed_files;
             const maxFiles = 20;
-            
+
             if (changedFiles > maxFiles) {
               core.setFailed(`PR contains too many changes (${changedFiles} files). Maximum allowed is ${maxFiles} files.`);
             }
-            
+
       - name: Add Labels
         uses: actions/github-script@v7
         with:
           script: |
             const labels = context.payload.pull_request.labels.map(label => label.name);
             const needsReview = !labels.includes('needs-review');
-            
+
             if (needsReview) {
               await github.rest.issues.addLabels({
                 owner: context.repo.owner,
@@ -88,4 +88,4 @@ jobs:
                 labels: ['needs-review']
               });
             }
-            
+

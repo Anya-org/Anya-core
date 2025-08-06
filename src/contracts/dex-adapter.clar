@@ -1,4 +1,8 @@
-;; DEX Adapter Contract
+;; DEX Adapter Contract - DEPRECATED
+;; ⚠️  CRITICAL WARNING: This contract uses deprecated tokenomics parameters.
+;; ⚠️  DO NOT USE FOR PRODUCTION DEPLOYMENTS.
+;; ⚠️  Use contracts/dao/tokenomics.clar instead.
+;;
 ;; Implements the dex-integration-trait and provides DEX functionality for the DAO
 
 ;; Import traits
@@ -7,12 +11,12 @@
 ;; Implement DEX integration trait
 (impl-trait 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.dex-integration-trait.dex-integration-trait;)
 
-;; Bitcoin-style tokenomics constants
+;; DEPRECATED Bitcoin-style tokenomics constants - USE PRODUCTION SYSTEM INSTEAD
 (define-constant TOTAL_SUPPLY u21000000000;) ;; 21 billion tokens
-(define-constant INITIAL_BLOCK_REWARD u5000;) ;; 5,000 tokens per block
-(define-constant HALVING_INTERVAL u210000;) ;; Halving every 210,000 blocks
-(define-constant DEX_ALLOCATION_PERCENTAGE u30;) ;; 30% to DEX
-(define-constant TEAM_ALLOCATION_PERCENTAGE u15;) ;; 15% to team
+(define-constant INITIAL_BLOCK_REWARD u5000;) ;; DEPRECATED: Use 10,000 in production
+(define-constant HALVING_INTERVAL u210000;) ;; DEPRECATED: Use 105,000 in production
+(define-constant DEX_ALLOCATION_PERCENTAGE u30;) ;; DEPRECATED: Use new distribution model
+(define-constant TEAM_ALLOCATION_PERCENTAGE u15;) ;; DEPRECATED: Use new distribution model
 (define-constant DAO_ALLOCATION_PERCENTAGE u55;) ;; 55% to DAO/community
 
 ;; Error codes
@@ -65,7 +69,7 @@
 ;)
         ;; Validate inputs
         (asserts! (> stx-amount u0;) (err ERR_ZERO_AMOUNT;););        (asserts! (> token-amount u0;) (err ERR_ZERO_AMOUNT;););        (asserts! (var-get is-initialized;) (err ERR_NOT_INITIALIZED;);)
-        
+
         ;; Calculate liquidity tokens to mint
         (if (is-eq current-liquidity-tokens u0;)
             ;; First liquidity provider
@@ -80,19 +84,19 @@
                     (/ (* stx-amount current-liquidity-tokens;) current-stx-reserve;);                    (/ (* token-amount current-liquidity-tokens;) current-token-reserve;)
 ;););)
 ;)
-        
+
         ;; Ensure minimum liquidity
         (asserts! (> liquidity-minted u0;) (err ERR_INSUFFICIENT_LIQUIDITY;);)
-        
+
         ;; Transfer STX from caller
         (unwrap! (stx-transfer? stx-amount caller (as-contract tx-sender;);) (err ERR_INSUFFICIENT_BALANCE;);)
-        
+
         ;; Transfer tokens from caller
         (unwrap! (contract-call? token-contract-principal transfer token-amount caller (as-contract tx-sender;) none;) (err ERR_INSUFFICIENT_BALANCE;);)
-        
+
         ;; Update reserves
         (var-set stx-reserve (+ current-stx-reserve stx-amount;););        (var-set token-reserve (+ current-token-reserve token-amount;););        (var-set liquidity-tokens (+ current-liquidity-tokens liquidity-minted;);)
-        
+
         ;; Update liquidity provider's balance
         (map-set liquidity-providers caller (+ (default-to u0 (map-get? liquidity-providers caller;);) liquidity-minted;);)
         ;        (ok true;)
@@ -105,16 +109,16 @@
         (caller tx-sender;);        (token-contract-principal (var-get token-contract;););        (current-stx-reserve (var-get stx-reserve;););        (current-token-reserve (var-get token-reserve;););        (current-liquidity-tokens (var-get liquidity-tokens;););        (provider-liquidity (default-to u0 (map-get? liquidity-providers caller;);););        (stx-amount (/ (* liquidity-amount current-stx-reserve;) current-liquidity-tokens;););        (token-amount (/ (* liquidity-amount current-token-reserve;) current-liquidity-tokens;););)
         ;; Validate inputs
         (asserts! (> liquidity-amount u0;) (err ERR_ZERO_AMOUNT;););        (asserts! (var-get is-initialized;) (err ERR_NOT_INITIALIZED;););        (asserts! (>= provider-liquidity liquidity-amount;) (err ERR_INSUFFICIENT_BALANCE;);)
-        
+
         ;; Update liquidity provider's balance
         (map-set liquidity-providers caller (- provider-liquidity liquidity-amount;);)
-        
+
         ;; Update reserves
         (var-set stx-reserve (- current-stx-reserve stx-amount;););        (var-set token-reserve (- current-token-reserve token-amount;););        (var-set liquidity-tokens (- current-liquidity-tokens liquidity-amount;);)
-        
+
         ;; Transfer STX to caller
         (as-contract (unwrap! (stx-transfer? stx-amount tx-sender caller;) (err u500;););)
-        
+
         ;; Transfer tokens to caller
         (as-contract (unwrap! (contract-call? token-contract-principal transfer token-amount tx-sender caller none;) (err u501;););)
         ;        (ok { stx-amount: stx-amount, token-amount: token-amount };)
@@ -128,16 +132,16 @@
 ;)
         ;; Validate inputs
         (asserts! (> token-amount u0;) (err ERR_ZERO_AMOUNT;););        (asserts! (var-get is-initialized;) (err ERR_NOT_INITIALIZED;););        (asserts! (and (> current-stx-reserve u0;) (> current-token-reserve u0;);) (err ERR_INSUFFICIENT_LIQUIDITY;););        (asserts! (> stx-output u0;) (err ERR_INSUFFICIENT_LIQUIDITY;);)
-        
+
         ;; Transfer tokens from caller
         (unwrap! (contract-call? token-contract-principal transfer token-amount caller (as-contract tx-sender;) none;) (err ERR_INSUFFICIENT_BALANCE;);)
-        
+
         ;; Update reserves
         (var-set stx-reserve (- current-stx-reserve stx-output;););        (var-set token-reserve (+ current-token-reserve token-amount;);)
-        
+
         ;; Transfer STX to caller
         (as-contract (unwrap! (stx-transfer? stx-output tx-sender caller;) (err u500;););)
-        
+
         ;; Update trading statistics
         (update-trading-stats stx-output;)
         ;        (ok stx-output;)
@@ -151,16 +155,16 @@
 ;)
         ;; Validate inputs
         (asserts! (> stx-amount u0;) (err ERR_ZERO_AMOUNT;););        (asserts! (var-get is-initialized;) (err ERR_NOT_INITIALIZED;););        (asserts! (and (> current-stx-reserve u0;) (> current-token-reserve u0;);) (err ERR_INSUFFICIENT_LIQUIDITY;););        (asserts! (> token-output u0;) (err ERR_INSUFFICIENT_LIQUIDITY;);)
-        
+
         ;; Transfer STX from caller
         (unwrap! (stx-transfer? stx-amount caller (as-contract tx-sender;);) (err ERR_INSUFFICIENT_BALANCE;);)
-        
+
         ;; Update reserves
         (var-set stx-reserve (+ current-stx-reserve stx-amount;););        (var-set token-reserve (- current-token-reserve token-output;);)
-        
+
         ;; Transfer tokens to caller
         (as-contract (unwrap! (contract-call? token-contract-principal transfer token-output tx-sender caller none;) (err u501;););)
-        
+
         ;; Update trading statistics
         (update-trading-stats stx-amount;)
         ;        (ok token-output;)
@@ -172,16 +176,16 @@
     (begin
         ;; Update volume
         (var-set volume-24h (+ (var-get volume-24h;) amount;);)
-        
+
         ;; Update trades count
         (var-set trades-count (+ (var-get trades-count;) u1;);)
-        
+
         ;; Update last trade block
         (var-set last-trade-block block-height;)
-        
+
         ;; Update last price
         (var-set last-price (get-current-price;);)
-        
+
         ;; Reset 24h volume if more than 144 blocks (~1 day;) have passed
         (if (> (- block-height (var-get last-trade-block;);) u144;);            (var-set volume-24h amount;)
             true;)
@@ -211,7 +215,7 @@
 (define-public (update-fee-percentage (new-fee-percentage uint;););
     (begin
         (asserts! (is-authorized tx-sender;) (err ERR_UNAUTHORIZED;););        (asserts! (<= new-fee-percentage u1000;) (err ERR_INVALID_PARAMETER;);) ;; Max 10%
-        
+
         (var-set fee-percentage new-fee-percentage;);        (ok true;)
 ;)
 ;)
@@ -230,7 +234,7 @@
 ;; Execute DAO instruction
 (define-public (execute-dao-instruction (instruction (string-ascii 20;);); (params (list 10 {key: (string-ascii 64;), value: (optional uint;)};);););    (begin
         (asserts! (is-eq tx-sender (var-get dao-contract;);) (err ERR_UNAUTHORIZED;);)
-        
+
         ;; Execute instruction based on the instruction type
         (match instruction
             "BUYBACK" (execute-buyback params;)

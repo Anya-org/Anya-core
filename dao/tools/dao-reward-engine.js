@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 /**
  * DAO Reward Engine
- * 
+ *
  * This script implements a Bitcoin-style reward system for the Anya DAO based on:
  * 1. Contribution history tracking
  * 2. Bitcoin-inspired halving and issuance model
  * 3. Strategic distribution as defined in Anya Core's tokenomics
- * 
+ *
  * Features:
  * - Aligns with Anya Core DAO design rules and tokenomics
  * - Implementation of the Bitcoin-style 21 billion supply with halving
@@ -42,7 +42,7 @@ const ON_CHAIN_BRIDGE = path.join(__dirname, 'on-chain-reward-bridge.js');
 const TOKEN_NAME = 'AGT'; // Anya Governance Token
 const COMMUNITY_INCENTIVE_PERCENTAGE = 0.15; // 15% of token supply for community incentives
 const MAX_SUPPLY = 21000000000; // 21 billion tokens (Bitcoin-style)
-const HALVING_INTERVAL = 210000; // Halving every 210,000 blocks
+const HALVING_INTERVAL = 105000; // Production: Halving every 105,000 blocks (updated from 210,000)
 
 // Command line args
 const args = process.argv.slice(2);

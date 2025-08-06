@@ -1,8 +1,8 @@
 {
   "timestamp": "2025-06-24T09:32:23.343Z",
   "period": "2025-06-24T08:20:25.619Z",
-  "currentBlock": 210000,
-  "blockReward": 5000,
+  "currentBlock": 105000,
+  "blockReward": 10000,
   "totalMinedSupply": 2100000000,
   "communityAllocation": 315000000,
   "rewardPerPoint": 1050000,

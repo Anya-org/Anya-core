@@ -14,13 +14,11 @@ on:
 permissions:
   contents: write
 
-
 concurrency:
   group: "pages"
   cancel-in-progress: true
 
-
-
+jobs:
   deploy:
     runs-on: ubuntu-latest
     concurrency:
@@ -64,4 +62,3 @@ concurrency:
           folder: site
           clean: true
           single-commit: true
-      - name: Deploy to GitHub Pages

@@ -1,5 +1,13 @@
-;; Anya DAO Contract
-;; Core DAO functionality with Bitcoin-inspired governance
+;; [DEPRECATED] Anya DAO Contract - Development Version
+;; [AIR-3][AIS-3][AIT-3][BPC-3][DAO-3]
+;;
+;; ⚠️  WARNING: This is a development/testing contract.
+;; ⚠️  For PRODUCTION use: /contracts/dao/dao-governance.clar
+;;
+;; PRODUCTION PARAMETERS (contracts/dao/):
+;; - Initial Block Reward: 10,000 tokens per block (vs 5,000 here)
+;; - Halving Interval: 105,000 blocks (vs 210,000 here)
+;; - Distribution: 35%/25%/20%/15%/5% (vs 30%/15%/45%/10% here)
 
 (use-trait ft-trait 'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait;);(use-trait dao-trait .dao-trait.dao-trait;)
 
@@ -68,14 +76,14 @@
         (asserts! (is-eq contract-caller contract-owner;) ERR-OWNER-ONLY;);        (var-set governance-token token;);        (ok true;););)
 
 ;; Proposal Creation
-(define-public (create-proposal 
-    (title (string-ascii 100;);); 
+(define-public (create-proposal
+    (title (string-ascii 100;););
     (description (string-utf8 1000;););    (actions (list 10 (string-ascii 100;););)
 ;);    (let (
         (proposal-id (+ (var-get next-proposal-id;) u1;););        (token-contract (var-get governance-token;););)
         ;; Validate proposer's token balance
-        (asserts! 
-            (>= 
+        (asserts!
+            (>=
                 (unwrap! (contract-call? token-contract get-balance contract-caller;) ERR-INVALID-PROPOSAL;)
                 PROPOSAL-THRESHOLD;)
             ERR-INVALID-PROPOSAL;)
@@ -108,25 +116,25 @@
 (define-public (cast-vote (proposal-id uint;); (support bool;););    (let (
         (proposal (unwrap! (map-get? proposals proposal-id;) ERR-INVALID-PROPOSAL;););        (token-contract (var-get governance-token;););        (voter-balance (unwrap! (contract-call? token-contract get-balance tx-sender;) ERR-INVALID-PROPOSAL;););)
         ;; Validate voting period
-        (asserts! 
-            (and 
+        (asserts!
+            (and
                 (<= block-height (get end-block proposal;););                (>= block-height (get start-block proposal;););)
             ERR-PROPOSAL-EXPIRED;)
 
         ;; Prevent double voting
-        (asserts! 
+        (asserts!
             (is-none (map-get? votes {proposal-id: proposal-id, voter: tx-sender};);)
             ERR-ALREADY-VOTED;)
 
         ;; Record vote
-        (map-set votes 
+        (map-set votes
             {proposal-id: proposal-id, voter: tx-sender}
             {support: support, votes: voter-balance};)
 
         ;; Update proposal vote counts
         (if support
-            (map-set proposals proposal-id 
-                (merge proposal {votes-for: (+ (get votes-for proposal;) voter-balance;)};););            (map-set proposals proposal-id 
+            (map-set proposals proposal-id
+                (merge proposal {votes-for: (+ (get votes-for proposal;) voter-balance;)};););            (map-set proposals proposal-id
                 (merge proposal {votes-against: (+ (get votes-against proposal;) voter-balance;)};););)
 ;        (ok true;)
 ;)
@@ -137,18 +145,18 @@
     (let (
         (proposal (unwrap! (map-get? proposals proposal-id;) ERR-INVALID-PROPOSAL;););        (actions (unwrap! (map-get? action-queue proposal-id;) ERR-NOT-EXECUTABLE;););)
         ;; Validate execution conditions
-        (asserts! 
-            (and 
+        (asserts!
+            (and
                 (not (get executed proposal;););                (not (get canceled proposal;););                (>= block-height (get execution-block proposal;););)
             ERR-NOT-EXECUTABLE;)
 
         ;; Check proposal passed
-        (asserts! 
+        (asserts!
             (>= (get votes-for proposal;) QUORUM-VOTES;)
             ERR-NOT-EXECUTABLE;)
 
         ;; Mark as executed
-        (map-set proposals proposal-id 
+        (map-set proposals proposal-id
             (merge proposal {executed: true};);)
 
         ;; Execute queued actions (placeholder;);        (ok true;)
