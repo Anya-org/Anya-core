@@ -519,8 +519,7 @@ impl TransactionValidator {
         for (i, input) in tx.input.iter().enumerate() {
             if input.script_sig.as_bytes().contains(&0x6F) {
                 return Err(ValidationError::Failed(format!(
-                    "Input {} script contains disabled opcode OP_EVAL (CVE-2012-2459)",
-                    i
+                    "Input {i} script contains disabled opcode OP_EVAL (CVE-2012-2459)"
                 )));
             }
         }
@@ -546,7 +545,7 @@ impl TransactionValidator {
                                     // This is the S value - check for high bit
                                     if script_bytes[s_value_pos + 1] >= 0x80 {
                                         return Err(ValidationError::Failed(
-                                            format!("Input {} contains a malleable signature with high S value (CVE-2013-3220)", i)
+                                            format!("Input {i} contains a malleable signature with high S value (CVE-2013-3220)")
                                         ));
                                     }
                                     break;
@@ -729,10 +728,9 @@ impl TransactionValidator {
             // If this input has a witness, validate it
             if !input.witness.is_empty() {
                 // Basic witness structure validation
-                if input.witness.len() < 1 {
+                if input.witness.is_empty() {
                     return Err(ValidationError::Taproot(format!(
-                        "Input {} has empty witness elements",
-                        i
+                        "Input {i} has empty witness elements"
                     )));
                 }
 

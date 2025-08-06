@@ -75,8 +75,8 @@ struct KeyStore {
     key_metadata: HashMap<String, KeyMetadata>,
 }
 
-/// DEPRECATED: RSA keypair structure - removed due to RUSTSEC-2023-0071
-/// Use EcdsaRingKeyPair or Ed25519KeyPair instead
+// DEPRECATED: RSA keypair structure - removed due to RUSTSEC-2023-0071
+// Use EcdsaRingKeyPair or Ed25519KeyPair instead
 /*
 #[derive(Debug, Clone)]
 struct RSAKeyPair {
@@ -87,7 +87,6 @@ struct RSAKeyPair {
     encrypted_private_pem: Option<Vec<u8>>,
 }
 */
-
 /// ECDSA keypair structure using ring for constant-time operations
 #[derive(Debug)]
 struct EcdsaRingKeyPair {
@@ -958,7 +957,6 @@ impl SoftwareHSM {
     }
 
     /// Helper functions
-
     async fn validate_session(&self, session_id: &str) -> Result<()> {
         let sessions = self.sessions.read().await;
         let session = sessions

@@ -1,8 +1,7 @@
 // Only import what is actually used
 // Removed unused imports: HashMap, Arc
 
-/// HSM Testnet Provider Tests
-
+//! HSM Testnet Provider Tests
 #[cfg(test)]
 mod tests {
     use std::collections::HashMap;
