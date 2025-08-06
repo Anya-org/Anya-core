@@ -15,7 +15,7 @@ This module implements the complete economic models and tokenomics for the Anya 
 
 ## Production Parameters (Source of Truth)
 
-Based on `contracts/dao/tokenomics.clar`:
+Based on `../../contracts/dao/tokenomics.clar`:
 
 - **Total Supply**: 21,000,000,000 AGT tokens (21 billion)
 - **Decimal Precision**: 8 decimals
