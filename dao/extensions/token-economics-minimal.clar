@@ -1,21 +1,38 @@
-;; Minimal Token Economics file [AIR-3][AIS-3][BPC-3][AIT-3]
-;; Implements the core constants of the Bitcoin-style tokenomics model
-;; Compliant with official Bitcoin Improvement Proposals (BIPs)
+;; [DEPRECATED] Minimal Token Economics File - DO NOT USE IN PRODUCTION
+;; [AIR-3][AIS-3][BPC-3][AIT-3]
+;;
+;; ⚠️  CRITICAL WARNING: This file is DEPRECATED and should not be used for production.
+;; ⚠️  Use the official production system: /contracts/dao/tokenomics.clar
+;;
+;; This minimal implementation contains INCORRECT parameters and will cause
+;; wrong tokenomics if deployed. The production system has different parameters.
+;;
+;; CORRECT PRODUCTION PARAMETERS are in contracts/dao/tokenomics.clar:
+;; - Initial Block Reward: 10,000 tokens per block (NOT 5,000)
+;; - Halving Interval: 105,000 blocks (NOT 210,000)
+;; - Distribution: 35%/25%/20%/15%/5% (NOT the percentages in this file)
+;;
+;; Do not deploy this contract to mainnet.
 
-;; Bitcoin-style tokenomics constants
+;; DEPRECATED Bitcoin-style tokenomics constants - WRONG VALUES
 (define-constant TOTAL-SUPPLY u21000000000) ;; 21 billion tokens
-(define-constant INITIAL-BLOCK-REWARD u5000) ;; 5,000 tokens per block
-(define-constant HALVING-INTERVAL u210000) ;; Halving every 210,000 blocks
+(define-constant INITIAL-BLOCK-REWARD u5000) ;; DEPRECATED: Use 10,000 in production
+(define-constant HALVING-INTERVAL u210000) ;; DEPRECATED: Use 105,000 in production
 
-;; Distribution percentages (must add up to 100%)
-(define-constant DEX-ALLOCATION-PERCENTAGE u30) ;; 30% to DEX
-(define-constant TEAM-ALLOCATION-PERCENTAGE u15) ;; 15% to team
-(define-constant DAO-ALLOCATION-PERCENTAGE u45) ;; 45% to DAO/community
-(define-constant RESERVE-ALLOCATION-PERCENTAGE u10) ;; 10% to protocol reserves
+;; DEPRECATED Distribution percentages (DO NOT USE IN PRODUCTION)
+(define-constant DEX-ALLOCATION-PERCENTAGE u30) ;; DEPRECATED: Use 25% liquidity
+(define-constant TEAM-ALLOCATION-PERCENTAGE u15) ;; DEPRECATED: Use 20% team
+(define-constant DAO-ALLOCATION-PERCENTAGE u45) ;; DEPRECATED: Use 15% community
+(define-constant RESERVE-ALLOCATION-PERCENTAGE u10) ;; DEPRECATED: Use 35% treasury
 
-;; Taproot asset verification constants
-(define-constant TAPROOT-VERIFICATION-ENABLED true)
-(define-constant BITVM-VERIFICATION-REQUIRED true)
+;; Migration notice function
+(define-read-only (get-migration-notice)
+  {
+    status: "DEPRECATED",
+    production-location: "contracts/dao/tokenomics.clar",
+    message: "This alternative implementation is deprecated. Use production system."
+  }
+)
 
 (define-data-var token-contract principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.governance_token)
 (define-data-var taproot-verifier principal 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.taproot_verification)
@@ -30,7 +47,7 @@
 
 (define-public (get-halving-interval)
     (ok HALVING-INTERVAL)
-) 
+)
 
 ;; Check if Taproot verification is enabled
 (define-public (is-taproot-enabled)
@@ -60,4 +77,4 @@
 (define-private (is-authorized (caller principal))
     ;; In a minimal implementation, we just check if caller is contract owner
     (is-eq caller tx-sender)
-) 
+)

@@ -22,8 +22,8 @@ This document outlines the Bitcoin integration model for the Anya DAO system, fo
 The Anya DAO implements a Bitcoin-inspired tokenomics model with the following key properties:
 
 1. **Fixed Supply**: 21 billion tokens (21,000,000,000)
-2. **Halving Schedule**: Block rewards halve every 210,000 blocks, mirroring Bitcoin's emission schedule
-3. **Initial Block Reward**: 5,000 tokens per block
+2. **Halving Schedule**: Block rewards halve every 105,000 blocks (adaptive minimum interval)
+3. **Initial Block Reward**: 10,000 tokens per block
 
 The distribution follows the principle of limited supply and decreasing inflation, ensuring long-term value preservation.
 
@@ -43,12 +43,12 @@ The distribution follows the principle of limited supply and decreasing inflatio
 The tokenomics implementation provides first-class support for Taproot Assets via the verification layer:
 
 ```clarity
-;; Verify Taproot asset commitment 
+;; Verify Taproot asset commitment
 (define-public (verify-taproot-asset (tx-hash (buff 32)) (merkle-proof (list 10 (buff 32))))
     (let (
         (taproot-contract (contract-call? (var-get taproot-verifier) verify-taproot-commitment merkle-proof))
     )
-        (asserts! (unwrap! taproot-contract (err ERR_TAPROOT_VERIFICATION_FAILED)) 
+        (asserts! (unwrap! taproot-contract (err ERR_TAPROOT_VERIFICATION_FAILED))
                  (err ERR_TAPROOT_VERIFICATION_FAILED))
         (ok true)
 ))
@@ -140,7 +140,7 @@ The token economics implementation includes an automated buyback mechanism with 
         (asserts! (> amount u0) (err ERR_ZERO_AMOUNT))
         (asserts! TAPROOT-VERIFICATION-ENABLED (err ERR_TAPROOT_VERIFICATION_FAILED))
         (asserts! (check-bitvm-verification) (err ERR_BITVM_VERIFICATION_FAILED))
-        
+
         ;; Calculate dynamic buyback parameters based on market conditions
         (let (
             (market-liquidity (+ (var-get dex-liquidity-reserve) amount))
@@ -154,7 +154,7 @@ The token economics implementation includes an automated buyback mechanism with 
                 price-impact: price-impact,
                 market-liquidity: market-liquidity
             })
-            
+
             ;; Update reserves
             (var-set buyback-reserve (+ (var-get buyback-reserve) amount))
             (ok true)
@@ -217,7 +217,7 @@ The result is a DAO system that inherits the security properties of Bitcoin whil
 
 ---
 
-*Last updated: 2025-04-29 15:45 UTC+2* 
+*Last updated: 2025-04-29 15:45 UTC+2*
 
 ## See Also
 

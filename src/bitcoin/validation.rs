@@ -740,8 +740,7 @@ impl TransactionValidator {
                 if witness_size > 10000 {
                     // Reasonable witness size limit
                     return Err(ValidationError::Taproot(format!(
-                        "Input {} witness too large: {} bytes",
-                        i, witness_size
+                        "Input {i} witness too large: {witness_size} bytes"
                     )));
                 }
             }
@@ -754,8 +753,7 @@ impl TransactionValidator {
                 if output.script_pubkey.len() != 34 {
                     // 1 + 1 + 32 bytes for v1 witness program
                     return Err(ValidationError::Taproot(format!(
-                        "Output {} invalid Taproot script length",
-                        i
+                        "Output {i} invalid Taproot script length"
                     )));
                 }
             }
@@ -784,7 +782,7 @@ impl TransactionValidator {
             if !input.witness.is_empty() {
                 // --- Witness structure ---
                 // Must have at least one element (signature or script)
-                if input.witness.len() < 1 {
+                if input.witness.is_empty() {
                     return Err(ValidationError::Taproot(format!(
                         "Input {i} witness missing required elements"
                     )));

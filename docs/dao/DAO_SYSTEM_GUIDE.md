@@ -84,7 +84,7 @@ The DAO supports multiple proposal types, each with specific requirements and vo
    - Fund allocations
    - Investment decisions
    - Protocol-owned liquidity operations
-   
+
 3. **Emission Schedule Adjustments**
    - Halving interval modifications
    - Block reward changes
@@ -359,12 +359,12 @@ The components interact with each other according to the following diagram:
 The Anya governance token (AGT) follows a Bitcoin-style issuance model:
 
 - **Total Supply**: 21 billion AGT (with 8 decimal places)
-- **Initial Block Reward**: 5,000 AGT per block (higher than Bitcoin)
-- **Halving Interval**: Every 210,000 blocks (~4 years with 10-minute blocks)
+- **Initial Block Reward**: 10,000 AGT per block
+- **Halving Interval**: Every 105,000 blocks (adaptive minimum interval)
 - **Halving Schedule**:
-  - First 210,000 blocks: 5,000 AGT per block
-  - Next 210,000 blocks: 2,500 AGT per block
-  - Next 210,000 blocks: 1,250 AGT per block
+  - First 105,000 blocks: 10,000 AGT per block
+  - Next 105,000 blocks: 5,000 AGT per block
+  - Next 105,000 blocks: 2,500 AGT per block
   - And so on...
 
 ### Distribution Allocation
@@ -532,7 +532,7 @@ Without Clarinet (simulation only):
 Current implementation status:
 
 - ✅ Core architecture and interfaces (BIP-341 compliant)
-- ✅ Enhanced Bitcoin-style issuance model 
+- ✅ Enhanced Bitcoin-style issuance model
 - ✅ DEX integration (Taproot-enabled)
 - 🔄 Advanced governance features (In Testing)
 
@@ -595,8 +595,8 @@ When extending or modifying the DAO system:
 | Parameter | Value | Description |
 |-----------|-------|-------------|
 | Total Supply | 21,000,000,000 AGT | Maximum supply cap |
-| Initial Block Reward | 5,000 AGT | Block reward with 8 decimal places |
-| Halving Interval | 210,000 blocks | ~4 years with 10-minute blocks |
+| Initial Block Reward | 10,000 AGT | Block reward with 8 decimal places |
+| Halving Interval | 105,000 blocks | Adaptive minimum interval |
 | DEX Allocation | 35% | Percentage of block rewards allocated to DEX |
 | DAO Allocation | 50% | Percentage of block rewards allocated to DAO/community |
 | DEX Fee | 0.3% | Trading fee percentage |
@@ -632,16 +632,19 @@ clarinet docs
 ## Bitcoin Protocol Compliance
 
 ### BIP-341 Implementation
-- Taproot-enabled treasury operations  
+
+- Taproot-enabled treasury operations
 - Schnorr signature aggregation for votes
 - MAST contracts for proposal execution
 
 ### BIP-174 Compliance
+
 - PSBT integration for cross-chain governance
 - Multi-sig transaction templates
 - Hardware wallet signing support
 
 ### Validation Workflows
+
 1. BIP-341 Validation Cycle:
    Proposal → Schnorr Sig → MAST Commitment → Execution
 2. BIP-174 PSBT Flow:
