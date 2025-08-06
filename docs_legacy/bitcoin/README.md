@@ -108,7 +108,7 @@ The Bitcoin implementation provides:
 
 To contribute to the Bitcoin implementation:
 
-1. Read the [Contributing Guide](../CONTRIBUTING.md)
+1. Read the [Contributing Guide](/CONTRIBUTING.md)
 2. Follow the [AI Labeling Standards](../standards/AI_LABELING.md)
 3. Ensure all code meets [BIP Compliance Standards](../standards/BIP_COMPLIANCE.md) requirements
 
