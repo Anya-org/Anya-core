@@ -1,82 +1,77 @@
-# Web5 Agent Implementation
+# agents Module
+
+*Auto-generated documentation based on source code analysis*
+*Last updated: 2025-08-06 11:54:58*
 
 ## Overview
 
-This directory contains the implementation of AI agents specialized for Web5 in the Anya Core project. The primary focus is on enforcing the Read First Always principle in Web5 operations to ensure data consistency and integrity in decentralized systems.
+This module contains 6 Rust source files providing core functionality for the agents component of Anya Core.
 
-## Components
+## Source Structure
 
-### Web5 Agent (`web5_agent.rs`)
+```
+Directory: src/ml/agents/README.md
+├── Source Files:
+```
 
-The Web5 agent implements the Read First Always principle for Web5 Decentralized Web Node (DWN) operations. Key features include:
+## API Documentation
 
-1. **ReadFirstDwnManager**: A wrapper around standard DWN operations that enforces reads before writes.
-2. **Metrics Tracking**: Collection of detailed metrics on read/write operations and compliance.
-3. **Violation Detection**: Automatic detection and logging of principle violations.
-4. **Testing**: Comprehensive tests that verify the implementation adheres to the principle.
+**Structs:**
 
-## Read First Always Principle
+**Enums:**
 
-The Read First Always principle requires that any operation modifying data (create, update, delete) must first read the current state of that data. This ensures:
+**Structs:**
 
-1. Data consistency across distributed systems
-2. Prevention of race conditions
-3. Better conflict detection and resolution
-4. Enhanced debugging capabilities
+**Structs:**
 
-For detailed information about this principle, see the [READ_FIRST_ALWAYS.md](../../../docs/archive/READ_FIRST_ALWAYS.md) document.
+**Enums:**
 
-## Integration with Bitcoin Anchoring
+**Structs:**
 
-The Read First principle is particularly important when working with Bitcoin-anchored data:
+**Enums:**
 
-1. It ensures all operations verify the current blockchain state before modifications
-2. It prevents potential conflicts in credential issuance and verification
-3. It maintains consistency between on-chain and off-chain data
+**Structs:**
 
-## Usage Examples
+**Functions:**
+
+**Enums:**
+
+**Structs:**
+
+**Enums:**## Usage
 
 ```rust
-// Create a ReadFirstDwnManager
-let web5_client = get_web5_client();
-let manager = ReadFirstDwnManager::new(Arc::new(web5_client));
-
-// Create a record (will automatically query similar records first)
-let record = manager.create_record(&CreateRecordOptions {
-    data: serde_json::to_string(&data)?,
-    schema: "https://schema.org/VerifiableCredential".to_string(),
-    data_format: "application/json".to_string(),
-})?;
-
-// Update a record (will automatically read the record first)
-let updated_record = manager.update_record(&record.id, &UpdateRecordOptions {
-    data: serde_json::to_string(&updated_data)?,
-    data_format: "application/json".to_string(),
-})?;
-
-// Get compliance metrics
-let metrics = manager.get_metrics();
-println!("Compliance rate: {}%", metrics.compliance_rate());
+// Example usage for agents module
+// TODO: Add specific examples based on actual API
 ```
+
+## Implementation Notes
+
+- Module location: `src/ml/agents/README.md`
+- Rust files: 6
+- JavaScript/TypeScript files: 0
+- Python files: 0
+- Last analyzed: 2025-08-06 11:54:58
+
+## Dependencies
+
+This module may depend on other Anya Core modules. Check `Cargo.toml` or relevant configuration files for specific dependencies.
 
 ## Testing
 
-The implementation includes comprehensive unit tests that verify:
+Related tests can be found in:
+- Unit tests: Check for `#[cfg(test)]` modules in Rust files
+- Integration tests: Look for corresponding files in `tests/` directory
 
-1. The Read First principle is enforced for all write operations
-2. Metrics are correctly tracked and reported
-3. Proper error handling for invalid operations
-4. Compliance rate calculation
+## Contributing
 
-Run tests with:
+When contributing to this module:
+1. Ensure all public APIs are documented
+2. Add appropriate tests for new functionality
+3. Update this README when adding new public interfaces
+4. Follow the project's coding standards
 
-```bash
-cargo test --package anya-core --lib src/ml/agents/web5_agent.rs
-```
+---
+*This README was automatically generated and enhanced based on source code analysis.*
+*For the most up-to-date information, refer to the actual source code.*
 
-## Future Improvements
-
-1. **Extended Metrics**: Add more detailed metrics like average operation timing
-2. **Recovery Strategies**: Implement automatic recovery from Read First violations
-3. **Integration with Tracing**: Add distributed tracing capabilities
-4. **Performance Optimizations**: Add caching for frequently accessed records

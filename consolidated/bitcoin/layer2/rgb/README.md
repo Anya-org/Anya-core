@@ -1,79 +1,57 @@
-# RGB Protocol Implementation [AIR-3][AIS-3][BPC-3]
+# rgb Module
 
-This directory contains the RGB protocol implementation for Anya Core, following official Bitcoin Improvement Proposals (BIPs) standards.
+*Auto-generated documentation based on source code analysis*
+*Last updated: 2025-08-06 11:54:58*
 
 ## Overview
 
-RGB is a scalable & confidential smart contracts system for Bitcoin & Lightning Network, providing asset issuance capabilities with enhanced privacy and scalability features.
+This module contains 1 Rust source files providing core functionality for the rgb component of Anya Core.
 
-## Key Features
+## Source Structure
 
-- **Client-Side Validation**: Validate contracts client-side
-- **Asset Issuance**: Issue fungible and non-fungible assets
-- **Schema Validation**: Use standardized schemas for contracts
-- **Bitcoin Integration**: Built on top of Bitcoin transactions
-
-## Architecture
-
-The RGB implementation follows a hexagonal architecture pattern:
-
-- Core domain logic for RGB contracts and assets
-- Adapters for interacting with Bitcoin transactions
-- Ports for external system integration
-
-## Implementation Details
-
-- **Status**: 🔄 75% Complete
-- **Dependencies**: Bitcoin Core, RGB Core
-- **Implementation Target**: Q3 2025
-
-## Usage Example
-
-```rust
-use anya_core::layer2::rgb::RgbClient;
-
-// Create a new RGB client
-let config = RgbConfig::default();
-let rgb_client = RgbClient::new(config);
-
-// Create a fungible asset
-let asset = rgb_client.create_fungible_asset("MyToken", 1000000, 2)?;
-
-// Transfer the asset
-let transfer = rgb_client.transfer_asset(asset.id, "recipient_id", 100)?;
-
-// Validate a contract
-let validation = rgb_client.validate_contract(contract_id)?;
+```
+Directory: consolidated/bitcoin/layer2/rgb/README.md
+├── Source Files:
 ```
 
-## Bitcoin Protocol Compliance
+## API Documentation
 
-The RGB implementation adheres to Bitcoin protocol standards:
+**Structs:**
 
-- Uses Bitcoin transactions for state transfers
-- Supports Taproot for enhanced privacy
-- Follows BIP-340/341/342 standards for signatures and script validation
+**Enums:**## Usage
 
-## Security
+```rust
+// Example usage for rgb module
+// TODO: Add specific examples based on actual API
+```
 
-RGB contract execution is secured through:
+## Implementation Notes
 
-- Client-side validation preventing unauthorized state transitions
-- Cryptographic proofs for ownership validation
-- Schema-based contract validation
+- Module location: `consolidated/bitcoin/layer2/rgb/README.md`
+- Rust files: 1
+- JavaScript/TypeScript files: 0
+- Python files: 0
+- Last analyzed: 2025-08-06 11:54:58
 
-## Documentation
+## Dependencies
 
-For more information, see:
+This module may depend on other Anya Core modules. Check `Cargo.toml` or relevant configuration files for specific dependencies.
 
-- [RGB Protocol Specification](https://rgb-org.github.io/spec/)
-- [Implementation Status](../../../../docs/IMPLEMENTATION_MILESTONES.md)
-- [Layer 2 Overview](../../../../docs/architecture/OVERVIEW.md)
+## Testing
 
-## Version Information
+Related tests can be found in:
+- Unit tests: Check for `#[cfg(test)]` modules in Rust files
+- Integration tests: Look for corresponding files in `tests/` directory
 
-- Current Version: 3.1.0
-- Last Updated: 2025-04-29
-- Bitcoin Development Framework: v2.5
+## Contributing
 
-*This component complies with [AI Labeling Standards](../../../../docs/standards/AI_LABELING.md)* 
+When contributing to this module:
+1. Ensure all public APIs are documented
+2. Add appropriate tests for new functionality
+3. Update this README when adding new public interfaces
+4. Follow the project's coding standards
+
+---
+*This README was automatically generated and enhanced based on source code analysis.*
+*For the most up-to-date information, refer to the actual source code.*
+

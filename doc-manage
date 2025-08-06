@@ -1,0 +1,45 @@
+#!/bin/bash
+# [AIR-3][AIS-3][BPC-3][RES-3] Quick Documentation Maintenance Command
+# Use this for ongoing documentation management
+
+set -euo pipefail
+
+echo "🔧 ANYA CORE DOCUMENTATION MANAGEMENT"
+echo "====================================="
+
+case "${1:-help}" in
+    "validate")
+        echo "🔍 Validating documentation alignment..."
+        ./scripts/validate_aligned_docs.sh
+        ;;
+    "update")
+        echo "📝 Updating documentation from source code..."
+        ./scripts/manage_docs.sh update
+        ;;
+    "sync")
+        echo "🔄 Syncing documentation..."
+        ./scripts/manage_docs.sh sync
+        ;;
+    "status")
+        echo "📊 Documentation status check..."
+        ./scripts/simple_doc_analysis.sh
+        ;;
+    "full")
+        echo "🚀 Full documentation refresh..."
+        ./scripts/comprehensive_doc_refactor.sh
+        ;;
+    "help"|*)
+        echo ""
+        echo "📚 Available commands:"
+        echo "  ./doc-manage validate  - Validate documentation alignment"
+        echo "  ./doc-manage update    - Update docs from source changes"
+        echo "  ./doc-manage sync      - Sync documentation structure"
+        echo "  ./doc-manage status    - Check documentation status"
+        echo "  ./doc-manage full      - Complete documentation refresh"
+        echo ""
+        echo "💡 Examples:"
+        echo "  ./doc-manage validate  # Quick validation"
+        echo "  ./doc-manage update    # After code changes"
+        echo "  ./doc-manage full      # Complete refresh"
+        ;;
+esac

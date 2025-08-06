@@ -1,106 +1,89 @@
-# Script Directory
+# scripts Module
 
-[AIR-3][AIS-3][BPC-3][AIT-3][RES-3]
+*Auto-generated documentation based on source code analysis*
+*Last updated: 2025-08-06 11:54:58*
 
-This directory contains scripts for building, testing, and maintaining the Anya Core project, including the documentation system and Bitcoin MCP Server implementation according to official Bitcoin Improvement Proposals (BIPs).
+## Overview
 
-## Directory Structure
+This module contains 7 Rust source files providing core functionality for the scripts component of Anya Core.
 
-- `bitcoin/`: Scripts specific to Bitcoin protocol implementation
-  - `validate-security.js`: Basic security validation for Bitcoin components
-  - `validate-bip-compliance.js`: Validates compliance with Bitcoin Improvement Proposals (BIPs)
-  - `mcp-server.js`: Main MCP server implementation
+This module includes 16 JavaScript/TypeScript files for frontend/web functionality.
 
-- `security/`: Security analysis and validation scripts
-  - `run-codeql-analysis.ps1`: PowerShell script to run CodeQL analysis
-  - `crypto-validation.js`: Validates cryptographic implementations
-  - `analyze-mcp-server.js`: Analyzes MCP server security
-  - `setup-permissions.sh`: Sets up permissions for security scripts
+This module contains 20 Python files for analysis, tooling, or integration purposes.
 
-- `documentation/`: Documentation build and deployment scripts
-  - `setup_docs.sh`: Sets up the documentation environment
-  - `serve_docs.sh`: Serves documentation locally for development
-  - `update_docs.sh`: Updates documentation files to follow standards
-  - `verify_docs.sh`: Verifies documentation meets project standards
-  - `deploy_docs.sh`: Builds and deploys documentation to production
+## Source Structure
 
-## Key Scripts
-
-### Documentation System
-
-The documentation system uses MkDocs with Material theme. Key scripts:
-
-1. **Setup Documentation Environment**:
-   ```bash
-   ./scripts/setup_docs.sh
-   ```
-
-2. **Serve Documentation Locally**:
-   ```bash
-   ./scripts/serve_docs.sh
-   ```
-
-3. **Verify Documentation Standards**:
-   ```bash
-   ./scripts/verify_docs.sh
-   ```
-
-4. **Deploy Documentation**:
-   ```bash
-   ./scripts/deploy_docs.sh
-   ```
-
-### Security Analysis
-
-The security analysis framework consists of multiple components:
-
-1. **CodeQL Analysis**:
-   ```powershell
-   .\scripts\security\run-codeql-analysis.ps1
-   ```
-   
-2. **Component-specific Analysis**:
-   ```bash
-   node scripts/security/analyze-mcp-server.js --file=scripts/bitcoin/mcp-server.js
-   node scripts/security/crypto-validation.js
-   node scripts/bitcoin/validate-bip-compliance.js
-   ```
-
-### Test Scripts
-
-Several scripts are available for testing various components:
-
-```powershell
-# Run all tests
-.\scripts\run-all-tests.sh
-
-# Run integration tests
-.\scripts\run-integration-tests.ps1
-
-# Run module tests
-.\scripts\run-module-tests.ps1
+```
+Directory: scripts/README.md
+├── Source Files:
 ```
 
-### Build Scripts
+## API Documentation
 
-Scripts for building and setting up the development environment:
+**Structs:**
 
-```bash
-# Setup development environment
-.\scripts\dev-setup.ps1
+**Structs:**
 
-# Build the project
-.\scripts\build.ps1
+**Structs:****JavaScript/TypeScript API:**
+
+**JavaScript/TypeScript API:**
+
+**JavaScript/TypeScript API:**
+
+**JavaScript/TypeScript API:**
+
+**JavaScript/TypeScript API:**
+
+**JavaScript/TypeScript API:**
+
+**JavaScript/TypeScript API:**
+
+**JavaScript/TypeScript API:**
+
+**JavaScript/TypeScript API:**
+
+**JavaScript/TypeScript API:**
+
+**JavaScript/TypeScript API:**
+
+**JavaScript/TypeScript API:**
+
+**JavaScript/TypeScript API:**
+
+**JavaScript/TypeScript API:**## Usage
+
+```rust
+// Example usage for scripts module
+// TODO: Add specific examples based on actual API
 ```
 
-## Compliance
+## Implementation Notes
 
-The scripts in this directory have been updated to comply with official Bitcoin Improvement Proposals (BIPs) requirements and include proper AI labeling ([AIR-3][AIS-3][BPC-3][AIT-3][RES-3]).
+- Module location: `scripts/README.md`
+- Rust files: 7
+- JavaScript/TypeScript files: 16
+- Python files: 20
+- Last analyzed: 2025-08-06 11:54:58
 
-For more information on security analysis and compliance, see `SECURITY_CODEQL.md` in the project root.
+## Dependencies
 
-## Recent Updates
+This module may depend on other Anya Core modules. Check `Cargo.toml` or relevant configuration files for specific dependencies.
 
-- **March 2025**: Cleaned up redundant scripts and standardized the security analysis framework
-- **March 2025**: Enhanced BIP compliance validation (BIP-340, BIP-341, BIP-342, BIP-174, BIP-370, BIP-327)
-- **March 2025**: Added CodeQL integration for comprehensive security analysis 
+## Testing
+
+Related tests can be found in:
+- Unit tests: Check for `#[cfg(test)]` modules in Rust files
+- Integration tests: Look for corresponding files in `tests/` directory
+
+## Contributing
+
+When contributing to this module:
+1. Ensure all public APIs are documented
+2. Add appropriate tests for new functionality
+3. Update this README when adding new public interfaces
+4. Follow the project's coding standards
+
+---
+*This README was automatically generated and enhanced based on source code analysis.*
+*For the most up-to-date information, refer to the actual source code.*
+

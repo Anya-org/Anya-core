@@ -1,130 +1,61 @@
-# ML Component
+# ml Module
 
-The ML component provides advanced machine learning capabilities with a focus on model management, execution, and monitoring.
+*Auto-generated documentation based on source code analysis*
+*Last updated: 2025-08-06 11:54:58*
 
-## Architecture
+## Overview
 
-### Repository Layer (`repository.rs`)
+This module contains 3 Rust source files providing core functionality for the ml component of Anya Core.
 
-- CRUD operations for ML models
-- Model validation and versioning
-- Metrics tracking and storage
-- Caching for model artifacts
+## Source Structure
 
-### Service Layer (`service.rs`)
+```
+Directory: core/src/ml/README.md
+├── Source Files:
+```
 
-- Model execution and inference
-- Performance monitoring
-- Security integration
-- Error handling and validation
-- Metrics collection
+## API Documentation
 
-### Handler Layer (`handler.rs`)
+**Structs:**
 
-- Request/response processing
-- Input validation
-- Error handling
-- Metrics tracking
-- Security enforcement
+**Structs:**
 
-## Features
+**Structs:**
 
-### Model Management
-
-- Version control for models
-- Model metadata tracking
-- Performance metrics
-- Validation rules
-- Caching strategy
-
-### Execution
-
-- Real-time inference
-- Batch processing
-- Resource management
-- Error handling
-- Performance optimization
-
-### Monitoring
-
-- Execution metrics
-- Resource utilization
-- Error tracking
-- Performance analysis
-- Health monitoring
-
-## Usage
+**Enums:**## Usage
 
 ```rust
-// Example: Execute model inference
-let request = MLRequest {
-    model_id: Some("model-123"),
-    input_data: vec![1.0, 2.0, 3.0],
-    parameters: Some(MLRequestParameters {
-        batch_size: Some(1),
-        threshold: Some(0.5),
-        max_iterations: Some(100),
-    }),
-};
-
-let response = ml_service.process(&context, request).await?;
+// Example usage for ml module
+// TODO: Add specific examples based on actual API
 ```
 
-## Configuration
+## Implementation Notes
 
-```toml
-[ml]
-model_cache_size = 1000
-max_batch_size = 64
-inference_timeout_ms = 5000
-min_confidence = 0.8
-```
-
-## Testing
-
-```bash
-# Run unit tests
-cargo test --package anya-core --lib ml
-
-# Run integration tests
-cargo test --package anya-core --test ml_integration
-```
-
-## Metrics
-
-The component exports the following metrics:
-
-- `ml_inference_time`: Histogram of inference execution times
-- `ml_model_accuracy`: Gauge of model accuracy
-- `ml_cache_hits`: Counter of model cache hits
-- `ml_errors`: Counter of inference errors
-
-## Health Checks
-
-Health monitoring includes:
-
-- Model availability
-- Inference performance
-- Resource utilization
-- Error rates
-- Cache effectiveness
-
-## Security
-
-Security measures include:
-
-- Input validation
-- Resource limits
-- Access control
-- Audit logging
-- Error handling
+- Module location: `core/src/ml/README.md`
+- Rust files: 3
+- JavaScript/TypeScript files: 0
+- Python files: 0
+- Last analyzed: 2025-08-06 11:54:58
 
 ## Dependencies
 
-```toml
-[dependencies]
-tokio = { version = "1.34", features = ["full"] }
-serde = { version = "1.0", features = ["derive"] }
-tracing = { version = "0.1", features = ["attributes"] }
-metrics = "0.21"
-```
+This module may depend on other Anya Core modules. Check `Cargo.toml` or relevant configuration files for specific dependencies.
+
+## Testing
+
+Related tests can be found in:
+- Unit tests: Check for `#[cfg(test)]` modules in Rust files
+- Integration tests: Look for corresponding files in `tests/` directory
+
+## Contributing
+
+When contributing to this module:
+1. Ensure all public APIs are documented
+2. Add appropriate tests for new functionality
+3. Update this README when adding new public interfaces
+4. Follow the project's coding standards
+
+---
+*This README was automatically generated and enhanced based on source code analysis.*
+*For the most up-to-date information, refer to the actual source code.*
+

@@ -1,131 +1,65 @@
-# Protocol Component
+# protocol Module
 
-The Protocol component provides advanced transaction handling capabilities with support for various Bitcoin script types and operations.
+*Auto-generated documentation based on source code analysis*
+*Last updated: 2025-08-06 11:54:58*
 
-## Architecture
+## Overview
 
-### Repository Layer (`repository.rs`)
+This module contains 3 Rust source files providing core functionality for the protocol component of Anya Core.
 
-- CRUD operations for transactions
-- Transaction validation
-- Status tracking
-- Metrics storage
+## Source Structure
 
-### Service Layer (`service.rs`)
+```
+Directory: core/src/protocol/README.md
+├── Source Files:
+```
 
-- Transaction processing
-- Script operations
-- Fee management
-- Security integration
-- Metrics collection
+## API Documentation
 
-### Handler Layer (`handler.rs`)
+**Structs:**
 
-- Request/response processing
-- Input validation
-- Error handling
-- Security enforcement
-- Metrics tracking
+**Enums:**
 
-## Features
+**Structs:**
 
-### Transaction Operations
+**Enums:**
 
-- Creation
-- Signing
-- Broadcasting
-- Validation
-- Status tracking
+**Structs:**
 
-### Script Support
-
-- P2PKH (Pay to Public Key Hash)
-- P2SH (Pay to Script Hash)
-- P2WPKH (Pay to Witness Public Key Hash)
-- P2WSH (Pay to Witness Script Hash)
-- P2TR (Pay to Taproot)
-
-### Advanced Features
-
-- Fee estimation
-- PSBT support
-- Mempool monitoring
-- Multi-signature operations
-- Transaction batching
-
-## Usage
+**Enums:**## Usage
 
 ```rust
-// Example: Create transaction
-let request = TransactionRequest {
-    operation: TransactionOperationType::Create,
-    protocol: ProtocolType::Bitcoin,
-    transaction_details: TransactionDetails {
-        inputs: vec![input],
-        outputs: vec![output],
-        transaction_options: options,
-    },
-};
-
-let response = protocol_service.process(&context, request).await?;
+// Example usage for protocol module
+// TODO: Add specific examples based on actual API
 ```
 
-## Configuration
+## Implementation Notes
 
-```toml
-[protocol]
-min_fee_rate = 1
-max_fee_rate = 100
-mempool_expiry_hours = 72
-rbf_sequence = 0xffffffff - 2
-```
-
-## Testing
-
-```bash
-# Run unit tests
-cargo test --package anya-core --lib protocol
-
-# Run integration tests
-cargo test --package anya-core --test protocol_integration
-```
-
-## Metrics
-
-The component exports the following metrics:
-
-- `protocol_transaction_time`: Histogram of transaction processing times
-- `protocol_fee_rates`: Histogram of fee rates
-- `protocol_errors`: Counter of transaction errors
-- `protocol_confirmations`: Histogram of confirmation times
-
-## Health Checks
-
-Health monitoring includes:
-
-- Service availability
-- Transaction performance
-- Fee rate analysis
-- Error rates
-- Network status
-
-## Security
-
-Security measures include:
-
-- Input validation
-- Fee limits
-- Access control
-- Audit logging
-- Error handling
+- Module location: `core/src/protocol/README.md`
+- Rust files: 3
+- JavaScript/TypeScript files: 0
+- Python files: 0
+- Last analyzed: 2025-08-06 11:54:58
 
 ## Dependencies
 
-```toml
-[dependencies]
-tokio = { version = "1.34", features = ["full"] }
-bitcoin = { version = "0.31.0", features = ["rand"] }
-serde = { version = "1.0", features = ["derive"] }
-tracing = { version = "0.1", features = ["attributes"] }
-metrics = "0.21"
-```
+This module may depend on other Anya Core modules. Check `Cargo.toml` or relevant configuration files for specific dependencies.
+
+## Testing
+
+Related tests can be found in:
+- Unit tests: Check for `#[cfg(test)]` modules in Rust files
+- Integration tests: Look for corresponding files in `tests/` directory
+
+## Contributing
+
+When contributing to this module:
+1. Ensure all public APIs are documented
+2. Add appropriate tests for new functionality
+3. Update this README when adding new public interfaces
+4. Follow the project's coding standards
+
+---
+*This README was automatically generated and enhanced based on source code analysis.*
+*For the most up-to-date information, refer to the actual source code.*
+
