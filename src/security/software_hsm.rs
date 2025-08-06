@@ -64,8 +64,8 @@ struct KeyStore {
     /// DEPRECATED: RSA keypairs removed due to RUSTSEC-2023-0071 timing attack vulnerability
     /// Use ECDSA (secp256k1/P-256) or Ed25519 instead
     // rsa_keys: HashMap<String, RSAKeyPair>,
-    
-    /// ECDSA keypairs for Bitcoin-compatible signatures  
+
+    /// ECDSA keypairs for Bitcoin-compatible signatures
     ecdsa_keys: HashMap<String, EcdsaRingKeyPair>,
     /// Ed25519 keypairs for signing
     ed25519_keys: HashMap<String, Ed25519KeyPair>,
@@ -92,8 +92,10 @@ struct RSAKeyPair {
 #[derive(Debug)]
 struct EcdsaRingKeyPair {
     // Note: ring's EcdsaKeyPair doesn't implement Clone, so we store the DER bytes
+    #[allow(dead_code)]
     private_key_der: Vec<u8>,
     public_key_bytes: Vec<u8>,
+    #[allow(dead_code)]
     encrypted_private_der: Option<Vec<u8>>,
 }
 
@@ -126,9 +128,8 @@ pub struct KeyMetadata {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum KeyType {
     // DEPRECATED: RSA keys removed due to RUSTSEC-2023-0071 timing attack vulnerability
-    // RSA2048,  
+    // RSA2048,
     // RSA4096,
-    
     /// ECDSA P-256 (replacement for RSA - constant-time, secure)
     EcdsaP256,
     /// Ed25519 signature keys
@@ -406,22 +407,16 @@ impl SoftwareHSM {
 
     /// Generate a new ECDSA keypair (P-256) - REPLACEMENT for deprecated RSA
     /// This method provides modern, constant-time cryptographic operations
-    pub async fn generate_ecdsa_key(
-        &self,
-        key_id: String,
-        session_id: &str,
-    ) -> Result<String> {
+    pub async fn generate_ecdsa_key(&self, key_id: String, session_id: &str) -> Result<String> {
         self.validate_session(session_id).await?;
 
         info!("Generating ECDSA P-256 keypair: {}", key_id);
 
         // Generate ECDSA P-256 key pair using ring for constant-time operations
         let rng = ring::rand::SystemRandom::new();
-        let private_key_der = signature::EcdsaKeyPair::generate_pkcs8(
-            &ECDSA_P256_SHA256_FIXED_SIGNING,
-            &rng,
-        )
-        .map_err(|e| anyhow!("Failed to generate ECDSA key: {:?}", e))?;
+        let private_key_der =
+            signature::EcdsaKeyPair::generate_pkcs8(&ECDSA_P256_SHA256_FIXED_SIGNING, &rng)
+                .map_err(|e| anyhow!("Failed to generate ECDSA key: {:?}", e))?;
 
         // Use ring's SystemRandom for secure randomness
         let rng = ring::rand::SystemRandom::new();
@@ -504,7 +499,7 @@ impl SoftwareHSM {
             key_id
         );
         warn!("🔐 SECURITY: Use generate_ecdsa_key() or generate_ed25519_key() instead");
-        
+
         // Log the deprecated usage attempt for security audit
         self.audit_operation(
             "generate_rsa_key_deprecated_blocked",
@@ -520,7 +515,8 @@ impl SoftwareHSM {
             "RSA key generation blocked due to RUSTSEC-2023-0071 timing attack vulnerability. \
             Use generate_ecdsa_key() (P-256) or generate_ed25519_key() for secure alternatives. \
             RSA-{} key '{}' was not created.",
-            key_size, key_id
+            key_size,
+            key_id
         ))
     }
 
