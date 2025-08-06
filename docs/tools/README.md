@@ -64,6 +64,5 @@ cargo test tools::
 
 - [Main Documentation](../README.md)
 - [API Reference](../api/README.md)
-- [Source Code](../../src/tools/)
 
 *Last updated: 2025-08-06*
