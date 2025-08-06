@@ -205,9 +205,10 @@ impl BetaAccessManager {
         hasher.update(session.k1.as_bytes());
         let message_hash = hasher.finalize();
 
-        let message = match Message::from_digest_slice(&message_hash) {
-            Ok(msg) => msg,
-            Err(e) => return Err(BetaAccessError::AuthError(format!("Invalid message: {e}"))),
+        let message = {
+            let digest: [u8; 32] = message_hash.into();
+            Message::from_digest_slice(&digest)
+                .map_err(|e| BetaAccessError::AuthError(format!("Invalid message: {e}")))?
         };
 
         // Parse public key and signature
@@ -221,7 +222,7 @@ impl BetaAccessManager {
         };
 
         // The signature format is zbase32 with recovery ID prefix
-        let recovery_id = RecoveryId::from_i32(signature_bytes[0] as i32 - 31)
+        let recovery_id = RecoveryId::from_i32((signature_bytes[0] - 31) as i32)
             .map_err(|e| BetaAccessError::AuthError(format!("Invalid recovery ID: {e}")))?;
 
         let signature = match RecoverableSignature::from_compact(&signature_bytes[1..], recovery_id)
@@ -248,13 +249,11 @@ impl BetaAccessManager {
 
                 // Mark session as authenticated
                 session.authenticated = true;
-                session.pubkey = Some(pubkey.to_string());
-
                 Ok(session.clone())
             }
-            Err(e) => Err(BetaAccessError::AuthError(format!(
-                "Signature verification failed: {e}"
-            ))),
+            Err(_) => Err(BetaAccessError::AuthError(
+                "Signature verification failed".to_string(),
+            )),
         }
     }
 
@@ -368,5 +367,30 @@ impl BetaAuthToken {
         }
 
         Ok(token)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_session_creation() {
+        let config = BetaAccessConfig::default();
+        let manager = BetaAccessManager::new(config);
+        let session = manager.create_session();
+
+        assert!(!session.k1.is_empty());
+        assert!(!session.is_expired());
+    }
+
+    #[test]
+    fn test_token_encoding_decoding() {
+        let token = BetaAuthToken::new("test_session".to_string(), 9999999999);
+        let encoded = token.encode();
+        let decoded = BetaAuthToken::decode(&encoded).unwrap();
+
+        assert_eq!(token.session_id, decoded.session_id);
+        assert_eq!(token.expires_at, decoded.expires_at);
     }
 }

@@ -160,7 +160,7 @@ partprobe ${BACKUP_DRIVE} 2>/dev/null || true
 sleep 3
 
 echo "===== [AIR-3][AIS-3][BPC-3][RES-3] Bitcoin Drive Preparation ====="
-echo "Automatic Bitcoin drive preparation following BDF v2.5 standards"
+echo "Automatic Bitcoin drive preparation following BIP Standards"
 echo "Formatting ${DATA_DRIVE} and ${BACKUP_DRIVE} without confirmation"
 
 # Log the start of the process
@@ -429,4 +429,4 @@ else
 fi
 
 echo ""
-echo "[AIR-3][AIS-3][BPC-3][RES-3] Bitcoin drives prepared successfully according to BDF v2.5 standards"
+echo "[AIR-3][AIS-3][BPC-3][RES-3] Bitcoin drives prepared successfully according to BIP Standards"

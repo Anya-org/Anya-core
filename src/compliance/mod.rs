@@ -2,8 +2,8 @@
 //!
 //! This module provides functionality for BIP compliance reporting and validation.
 
-use log::{error, info};
 use std::error::Error;
+use tracing::{error, info};
 
 // Re-export compliance types from types module
 pub use crate::types::compliance::{

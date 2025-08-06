@@ -119,7 +119,7 @@ The following steps are recommended to continue improving the Bitcoin module:
 
 ## Compliance Status
 
-The changes have brought the Bitcoin module into compliance with the Bitcoin Development Framework v2.5 requirements:
+The changes have brought the Bitcoin module into compliance with the Bitcoin Improvement Proposals:
 
 - ✅ Full BIP-341 (Taproot) support
 - ✅ Full BIP-342 (Tapscript) support

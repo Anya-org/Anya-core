@@ -180,11 +180,13 @@ pub struct MockFactory;
 
 impl MockFactory {
     /// Create mock secp256k1 context for testing
+    #[allow(dead_code)] // Provided for comprehensive test utility support
     pub fn create_mock_secp_context() -> Secp256k1<secp256k1::All> {
         Secp256k1::new()
     }
 
     /// Simulate a Bitcoin transaction ID for testing
+    #[allow(dead_code)] // Provided for comprehensive test utility support
     pub fn simulate_bitcoin_txid() -> String {
         let timestamp = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
@@ -195,6 +197,7 @@ impl MockFactory {
     }
 
     /// Simulate a Bitcoin address for testing
+    #[allow(dead_code)] // Provided for comprehensive test utility support
     pub fn simulate_bitcoin_address() -> String {
         let timestamp = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
@@ -205,6 +208,7 @@ impl MockFactory {
     }
 
     /// Simulate a DID (Decentralized Identifier) for testing
+    #[allow(dead_code)] // Provided for comprehensive test utility support
     pub fn simulate_did() -> String {
         let timestamp = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
@@ -215,6 +219,7 @@ impl MockFactory {
     }
 
     /// Simulate an RGB asset ID for testing
+    #[allow(dead_code)] // Provided for comprehensive test utility support
     pub fn simulate_rgb_asset_id() -> String {
         let timestamp = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
@@ -225,6 +230,7 @@ impl MockFactory {
     }
 
     /// Create mock key pair for testing
+    #[allow(dead_code)] // Provided for comprehensive test utility support
     pub fn create_mock_keypair() -> (SecretKey, PublicKey) {
         let secp = Self::create_mock_secp_context();
         let secret_key = SecretKey::from_slice(&[0x42; 32]).expect("Valid key");
@@ -233,6 +239,7 @@ impl MockFactory {
     }
 
     /// Create mock Oracle data for DLC testing
+    #[allow(dead_code)] // Provided for comprehensive test utility support
     pub fn create_mock_oracle_data(
         count: usize,
     ) -> Vec<(String, secp256k1::ecdsa::Signature, PublicKey)> {
@@ -253,15 +260,18 @@ impl MockFactory {
 }
 
 /// Common assertion helpers
+#[allow(dead_code)] // Provided for comprehensive test utility support
 pub struct TestAssertions;
 
 impl TestAssertions {
     /// Assert that a transaction is valid (placeholder for real logic)
+    #[allow(dead_code)] // Provided for comprehensive test utility support
     pub fn assert_transaction_valid(tx: &Transaction) -> bool {
         // In real tests, add actual validation logic
         !tx.input.is_empty() || !tx.output.is_empty() || tx.version == Version(2)
     }
     /// Assert that two transaction validation results match (for consensus compliance)
+    #[allow(dead_code)] // Provided for comprehensive test utility support
     pub fn assert_consensus_compliance<T, E>(
         standard_result: Result<T, E>,
         optimized_result: Result<T, E>,
@@ -280,6 +290,7 @@ impl TestAssertions {
     }
 
     /// Assert performance improvement while maintaining correctness
+    #[allow(dead_code)] // Provided for comprehensive test utility support
     pub fn assert_performance_improvement(
         baseline_duration: std::time::Duration,
         optimized_duration: std::time::Duration,

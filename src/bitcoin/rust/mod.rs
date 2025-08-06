@@ -19,7 +19,7 @@ use std::str::FromStr;
 pub use bitcoin::{Address, Block, Transaction};
 
 /// Rust implementation of the Bitcoin interface using rust-bitcoin
-/// [BPC-3] Complete real implementation as per BDF v2.5 standards
+/// [BPC-3] Complete real implementation as per BIP Standards
 #[allow(dead_code)]
 pub struct RustBitcoinImplementation {
     /// Bitcoin network configuration
@@ -106,7 +106,7 @@ impl LocalWallet {
 
 impl RustBitcoinImplementation {
     /// Create a new Rust Bitcoin implementation
-    /// [BPC-3] Complete real implementation as per BDF v2.5 standards
+    /// [BPC-3] Complete real implementation as per BIP Standards
     pub fn new(config: &BitcoinConfig) -> Result<Self, Box<dyn std::error::Error>> {
         // [AIR-3][AIS-3][BPC-3][RES-3] Get network configuration
         // This follows official Bitcoin Improvement Proposals (BIPs) standards for configuration handling

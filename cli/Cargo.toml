@@ -13,16 +13,12 @@ path = "src/main.rs"
 
 [dependencies]
 anya-core = { path = "../core", features = ["web5", "hsm"] }
-clap = { version = "4.4.0", features = ["derive"] }
-console = "0.15.8"
-indicatif = "0.17.8"
+clap = { workspace = true }
+console = { workspace = true }
+indicatif = { workspace = true }
 
 [target.'cfg(unix)'.dependencies]
-nix = "0.28.0"
+nix = { workspace = true }
 
 [build-dependencies]
-vergen = { version = "8.3.1", features = [
-    "build",
-    "git",
-    "gitcl"
-] } 
+vergen = { workspace = true } 

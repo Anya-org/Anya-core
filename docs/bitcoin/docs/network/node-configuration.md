@@ -19,6 +19,7 @@ The Anya Bitcoin node configuration system provides enterprise-grade Bitcoin net
 ## Configuration Options
 
 ### Network Selection
+
 ```toml
 [bitcoin.network]
 network = "mainnet"  # Options: mainnet, testnet, regtest
@@ -32,6 +33,7 @@ For network setup details, see [Network Setup Guide](./network-setup.md).
 ### Node Types
 
 1. **Full Node** ([Details](./node-types.md#full-node))
+
 ```toml
 [bitcoin.node]
 type = "full"
@@ -41,6 +43,7 @@ assumevalid = "0000000000000000000b9d2ec5a352ecba0592946514a92f14319dc2b367fc72"
 ```
 
 2. **Pruned Node** ([Details](./node-types.md#pruned-node))
+
 ```toml
 [bitcoin.node]
 type = "pruned"
@@ -50,6 +53,7 @@ txindex = false
 ```
 
 3. **Archive Node** ([Details](./node-types.md#archive-node))
+
 ```toml
 [bitcoin.node]
 type = "archive"
@@ -60,6 +64,7 @@ coinstatsindex = true
 ```
 
 ### Security Settings
+
 ```toml
 [bitcoin.security]
 rpcauth = "user:7d85aa47c6aba01cb2c32cecb8"
@@ -73,6 +78,7 @@ For security details, see [Security Configuration Guide](../security/network-sec
 ## Advanced Features
 
 ### Memory Pool Configuration
+
 ```toml
 [bitcoin.mempool]
 mempool_max_mb = 300
@@ -84,6 +90,7 @@ max_orphan_tx = 100
 For mempool details, see [Mempool Configuration Guide](./mempool-configuration.md).
 
 ### Block Template Configuration
+
 ```toml
 [bitcoin.mining]
 block_max_weight = 4000000
@@ -93,6 +100,7 @@ block_min_tx_fee = 1000  # satoshis/vB
 For mining details, see [Mining Configuration Guide](./mining-configuration.md).
 
 ### P2P Network Settings
+
 ```toml
 [bitcoin.p2p]
 bind = "0.0.0.0:8333"
@@ -107,6 +115,7 @@ For P2P details, see [P2P Network Guide](./p2p-configuration.md).
 ## Performance Tuning
 
 ### Database Configuration
+
 ```toml
 [bitcoin.db]
 db_cache_mb = 450
@@ -117,6 +126,7 @@ thread_pool_size = 16
 For database optimization, see [Database Tuning Guide](../performance/database-tuning.md).
 
 ### Network Optimization
+
 ```toml
 [bitcoin.network.optimization]
 max_orphan_size = 10
@@ -129,6 +139,7 @@ For network optimization, see [Network Performance Guide](../performance/network
 ## Monitoring & Logging
 
 ### Metrics Configuration
+
 ```toml
 [bitcoin.metrics]
 prometheus_port = 9332
@@ -139,6 +150,7 @@ export_network_stats = true
 For metrics details, see [Metrics Configuration Guide](../monitoring/metrics-configuration.md).
 
 ### Logging Configuration
+
 ```toml
 [bitcoin.logging]
 debug_categories = ["net", "mempool", "rpc", "estimatefee"]
@@ -171,6 +183,7 @@ For logging details, see [Logging Configuration Guide](../monitoring/logging-con
 ## Deployment Examples
 
 ### Development Environment
+
 ```toml
 [bitcoin]
 network = "regtest"
@@ -187,6 +200,7 @@ txindex = true
 For development setup, see [Development Environment Guide](../../../contributing/development-setup.md).
 
 ### Production Environment
+
 ```toml
 [bitcoin]
 network = "mainnet"
@@ -208,6 +222,7 @@ For production setup, see [Production Deployment Guide](../guides/production-dep
 ### Common Issues
 
 1. **Connection Problems** ([Guide](../troubleshooting/connection-issues.md))
+
 ```bash
 # Check network connectivity
 bitcoin-cli getnetworkinfo
@@ -217,6 +232,7 @@ bitcoin-cli getpeerinfo
 ```
 
 2. **Performance Issues** ([Guide](../troubleshooting/performance-issues.md))
+
 ```bash
 # Check memory pool
 bitcoin-cli getmempoolinfo
@@ -226,6 +242,7 @@ bitcoin-cli getnettotals
 ```
 
 3. **Synchronization Problems** ([Guide](../troubleshooting/sync-issues.md))
+
 ```bash
 # Check sync status
 bitcoin-cli getblockchaininfo
@@ -237,6 +254,7 @@ bitcoin-cli getblockcount
 ## Monitoring Scripts
 
 ### Health Check
+
 ```bash
 #!/bin/bash
 # health_check.sh
@@ -248,6 +266,7 @@ bitcoin-cli getmempoolinfo | jq .size
 For monitoring scripts, see [Monitoring Scripts Guide](../monitoring/scripts.md).
 
 ### Performance Monitor
+
 ```bash
 #!/bin/bash
 # monitor.sh
@@ -271,6 +290,7 @@ For performance monitoring, see [Performance Monitoring Guide](../monitoring/per
 ## Support
 
 For node-related support:
+
 - [Technical Support](../../../support/technical.md)
 - [Security Issues](../../../maintenance/SECURITY.md)
 - [Feature Requests](../../../dependencies/build-system/features.md)

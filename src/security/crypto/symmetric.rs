@@ -2,12 +2,10 @@
 // [AIR-2][AIS-2][BPC-2][AIT-2][RES-2]
 //
 // This module provides symmetric encryption utilities using modern algorithms.
-use aes_gcm::{aead::Aead as AesAead, Aes256Gcm};
+use aes_gcm::{aead::Aead, Aes256Gcm, KeyInit};
+use chacha20poly1305::aead::Payload;
 /// Supports AES-256 (GCM, CBC, CTR modes) and ChaCha20-Poly1305.
-use chacha20poly1305::{
-    aead::{KeyInit, Payload},
-    ChaCha20Poly1305, Key,
-};
+use chacha20poly1305::{ChaCha20Poly1305, Key};
 use thiserror::Error;
 
 use crate::security::crypto::random;
@@ -278,7 +276,7 @@ impl SymmetricCrypto {
         };
 
         cipher
-            .encrypt(nonce, payload)
+            .encrypt(nonce.into(), payload)
             .map_err(|e| SymmetricError::EncryptionError(e.to_string()))
     }
 
@@ -326,7 +324,7 @@ impl SymmetricCrypto {
         };
 
         cipher
-            .decrypt(nonce, payload)
+            .decrypt(nonce.into(), payload)
             .map_err(|e| SymmetricError::DecryptionError(e.to_string()))
     }
 }

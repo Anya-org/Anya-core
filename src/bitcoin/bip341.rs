@@ -4,18 +4,12 @@
 //! This module implements BIP-341 (Taproot) for Bitcoin Core integration.
 //! Compliant with official Bitcoin Improvement Proposals (BIPs).
 
-#[cfg(feature = "rust-bitcoin")]
 use crate::bitcoin::error::{BitcoinError, BitcoinResult};
-#[cfg(feature = "rust-bitcoin")]
 use bitcoin::{
     hashes::{sha256, Hash, HashEngine},
-    Transaction, TxOut,
-};
-#[cfg(feature = "rust-bitcoin")]
-use bitcoin::{
-    secp256k1::{Secp256k1, XOnlyPublicKey},
+    secp256k1::{All, Secp256k1, XOnlyPublicKey},
     taproot::{TaprootBuilder, TaprootSpendInfo},
-    Address, Amount, ScriptBuf,
+    Address, Amount, ScriptBuf, Transaction, TxOut,
 };
 use rand;
 use std::collections::HashMap;
@@ -350,7 +344,7 @@ pub enum TaprootSpend {
 /// Taproot implementation
 pub struct Bip341Taproot {
     /// Secp256k1 context
-    pub secp: Secp256k1<bitcoin::secp256k1::All>,
+    pub secp: Secp256k1<All>,
     /// Internal key used for spending
     pub internal_key: XOnlyPublicKey,
     /// Script tree

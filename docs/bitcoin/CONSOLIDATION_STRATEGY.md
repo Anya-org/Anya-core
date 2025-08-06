@@ -4,7 +4,7 @@
 
 ## Overview
 
-This document outlines the strategy for consolidating multiple Bitcoin implementation branches into a cohesive, hexagonal architecture-based implementation that follows the Bitcoin Development Framework v2.5 requirements.
+This document outlines the strategy for consolidating multiple Bitcoin implementation branches into a cohesive, hexagonal architecture-based implementation that follows the Bitcoin Improvement Proposals.
 
 ## Source Branches
 
@@ -80,7 +80,7 @@ anya-bitcoin/
 
 All consolidated code will be verified against:
 
-1. Bitcoin Development Framework v2.5 requirements
+1. Bitcoin Improvement Proposals
 2. AI labeling standards [AIR-3][AIS-3][BPC-3]
 3. Hexagonal architecture principles
 4. BIP implementation status documentation

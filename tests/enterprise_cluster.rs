@@ -20,7 +20,7 @@ async fn test_psbt_validation() {
 #[tokio::test]
 async fn test_taproot_validation() {
     // Create basic test environment
-    let nostr_config = NostrConfig {
+    let _nostr_config = NostrConfig {
         private_key: "test_private_key".to_string(),
         relays: vec!["relay1".to_string(), "relay2".to_string()],
         metadata: None,

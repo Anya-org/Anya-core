@@ -2,18 +2,20 @@
 // Provides unified interface for all storage operations replacing SQLite dependencies
 
 pub mod decentralized;
-pub mod memory;
 pub mod ipfs;
+pub mod memory;
+pub mod persistent; // Real persistent storage implementation
 
 pub use decentralized::{
-    AssetHistoryEntry, AssetTransfer, BalanceRecord, BitcoinAnchorService, BitcoinProof,
-    ContentId, DecentralizedStorage, DecentralizedStorageCache, RGBAsset, RGBInvoice,
-    TransferRecord, TransferStatus,
+    AssetHistoryEntry, AssetTransfer, BalanceRecord, BitcoinAnchorService, BitcoinProof, ContentId,
+    DecentralizedStorage, DecentralizedStorageCache, RGBAsset, RGBInvoice, TransferRecord,
+    TransferStatus,
 };
 pub use ipfs::{
-    IPFSStorage, IPFSConfig, IPFSFileMetadata, IPFSBatch, BatchResult, PinStatus, PinType,
-    EncryptedContent,
+    BatchResult, EncryptedContent, IPFSBatch, IPFSConfig, IPFSFileMetadata, IPFSStorage, PinStatus,
+    PinType,
 };
+pub use persistent::{AssetRecord, PersistentStorage, StorageConfig, StorageMetrics};
 
 use anyhow::Result;
 use async_trait::async_trait;
@@ -45,16 +47,25 @@ pub trait UnifiedStorage {
     async fn store_asset(&self, asset: &RGBAsset) -> anyhow::Result<String>;
     async fn query_assets(&self, owner_did: &str) -> anyhow::Result<Vec<RGBAsset>>;
     async fn get_asset_metadata(&self, asset_id: &str) -> anyhow::Result<serde_json::Value>;
-    async fn get_asset_history_with_proofs(&self, asset_id: &str) -> anyhow::Result<Vec<AssetHistoryEntry>>;
+    async fn get_asset_history_with_proofs(
+        &self,
+        asset_id: &str,
+    ) -> anyhow::Result<Vec<AssetHistoryEntry>>;
 
     // Financial Operations
     async fn get_asset_balance(&self, asset_id: &str) -> anyhow::Result<u64>;
     async fn store_invoice(&self, invoice: &RGBInvoice) -> anyhow::Result<String>;
 
     // Transaction Operations
-    async fn store_transfer_and_update_balance(&self, transfer: &AssetTransfer) -> anyhow::Result<String>;
+    async fn store_transfer_and_update_balance(
+        &self,
+        transfer: &AssetTransfer,
+    ) -> anyhow::Result<String>;
     async fn get_transfer_status(&self, transfer_id: &str) -> anyhow::Result<TransferStatus>;
-    async fn validate_transfer_with_anchoring(&self, transfer: &AssetTransfer) -> anyhow::Result<bool>;
+    async fn validate_transfer_with_anchoring(
+        &self,
+        transfer: &AssetTransfer,
+    ) -> anyhow::Result<bool>;
 }
 
 #[async_trait]
@@ -75,8 +86,13 @@ impl UnifiedStorage for DecentralizedStorage {
         self.get_asset_metadata(asset_id).await.map_err(Into::into)
     }
 
-    async fn get_asset_history_with_proofs(&self, asset_id: &str) -> anyhow::Result<Vec<AssetHistoryEntry>> {
-        self.get_asset_history_with_proofs(asset_id).await.map_err(Into::into)
+    async fn get_asset_history_with_proofs(
+        &self,
+        asset_id: &str,
+    ) -> anyhow::Result<Vec<AssetHistoryEntry>> {
+        self.get_asset_history_with_proofs(asset_id)
+            .await
+            .map_err(Into::into)
     }
 
     async fn get_asset_balance(&self, asset_id: &str) -> anyhow::Result<u64> {
@@ -87,15 +103,27 @@ impl UnifiedStorage for DecentralizedStorage {
         self.store_invoice(invoice).await.map_err(Into::into)
     }
 
-    async fn store_transfer_and_update_balance(&self, transfer: &AssetTransfer) -> anyhow::Result<String> {
-        self.store_transfer_and_update_balance(transfer).await.map_err(Into::into)
+    async fn store_transfer_and_update_balance(
+        &self,
+        transfer: &AssetTransfer,
+    ) -> anyhow::Result<String> {
+        self.store_transfer_and_update_balance(transfer)
+            .await
+            .map_err(Into::into)
     }
 
     async fn get_transfer_status(&self, transfer_id: &str) -> anyhow::Result<TransferStatus> {
-        self.get_transfer_status(transfer_id).await.map_err(Into::into)
+        self.get_transfer_status(transfer_id)
+            .await
+            .map_err(Into::into)
     }
 
-    async fn validate_transfer_with_anchoring(&self, transfer: &AssetTransfer) -> anyhow::Result<bool> {
-        self.validate_transfer_with_anchoring(transfer).await.map_err(Into::into)
+    async fn validate_transfer_with_anchoring(
+        &self,
+        transfer: &AssetTransfer,
+    ) -> anyhow::Result<bool> {
+        self.validate_transfer_with_anchoring(transfer)
+            .await
+            .map_err(Into::into)
     }
 }

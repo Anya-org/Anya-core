@@ -29,9 +29,38 @@ pub async fn generate_address() -> Result<Json<Value>, StatusCode> {
     })))
 }
 
+pub async fn get_new_address() -> Result<Json<Value>, StatusCode> {
+    Ok(Json(json!({
+        "address": "bc1qnewexample",
+        "type": "bech32"
+    })))
+}
+
 pub async fn send_transaction() -> Result<Json<Value>, StatusCode> {
     Ok(Json(json!({
-        "txid": "example_txid"
+        "txid": "example_txid",
+        "status": "sent"
+    })))
+}
+
+pub async fn get_transaction_history() -> Result<Json<Value>, StatusCode> {
+    Ok(Json(json!({
+        "transactions": [],
+        "total": 0
+    })))
+}
+
+pub async fn backup_wallet() -> Result<Json<Value>, StatusCode> {
+    Ok(Json(json!({
+        "backup_file": "wallet_backup.dat",
+        "success": true
+    })))
+}
+
+pub async fn restore_wallet() -> Result<Json<Value>, StatusCode> {
+    Ok(Json(json!({
+        "restored": true,
+        "message": "Wallet restored successfully"
     })))
 }
 

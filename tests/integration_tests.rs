@@ -1,6 +1,3 @@
-
-
-
 // Minimal stub integration tests. All legacy and failing code removed.
 #[cfg(test)]
 mod tests {

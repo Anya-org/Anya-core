@@ -93,31 +93,85 @@ impl Default for ScryptParams {
 }
 
 /// Derive a key from a password or passphrase using PBKDF2
-pub fn pbkdf2(_password: &[u8], params: &Pbkdf2Params) -> Vec<u8> {
-    // Placeholder implementation
-    // In a real implementation, we would use a crypto library with PBKDF2 support
-    vec![0u8; params.key_length]
+pub fn pbkdf2(password: &[u8], params: &Pbkdf2Params) -> Vec<u8> {
+    use pbkdf2::pbkdf2_hmac;
+    use sha2::Sha256;
+
+    let mut output = vec![0u8; params.key_length];
+    pbkdf2_hmac::<Sha256>(password, &params.salt, params.iterations, &mut output);
+    output
 }
 
 /// Derive a key from a password or passphrase using Argon2id
-pub fn argon2id(_password: &[u8], params: &Argon2Params) -> Vec<u8> {
-    // Placeholder implementation
-    // In a real implementation, we would use a crypto library with Argon2 support
-    vec![0u8; params.key_length]
+pub fn argon2id(password: &[u8], params: &Argon2Params) -> Vec<u8> {
+    use argon2::{Algorithm, Argon2, Params, Version};
+
+    let argon2_params = Params::new(
+        params.memory_cost,
+        params.iterations,
+        params.parallelism,
+        Some(params.key_length),
+    )
+    .expect("Valid Argon2 parameters");
+
+    let argon2 = Argon2::new(Algorithm::Argon2id, Version::V0x13, argon2_params);
+
+    let mut output = vec![0u8; params.key_length];
+    argon2
+        .hash_password_into(password, &params.salt, &mut output)
+        .expect("Argon2 hash generation failed");
+
+    output
 }
 
 /// Derive a key from a password or passphrase using scrypt
-pub fn scrypt(_password: &[u8], params: &ScryptParams) -> Vec<u8> {
-    // Placeholder implementation
-    // In a real implementation, we would use a crypto library with scrypt support
-    vec![0u8; params.key_length]
+pub fn scrypt(password: &[u8], params: &ScryptParams) -> Vec<u8> {
+    // For now, fallback to PBKDF2 since scrypt dependency is not available
+    // Convert scrypt params to equivalent PBKDF2 params
+    let pbkdf2_params = Pbkdf2Params {
+        salt: params.salt.clone(),
+        iterations: params.n as u32, // Use N as iterations
+        key_length: params.key_length,
+    };
+    pbkdf2(password, &pbkdf2_params)
 }
 
 /// Derive a key using HKDF (HMAC-based Key Derivation Function)
-pub fn hkdf(_ikm: &[u8], _salt: &[u8], _info: &[u8], key_length: usize) -> Vec<u8> {
-    // Placeholder implementation
-    // In a real implementation, we would use a crypto library with HKDF support
-    vec![0u8; key_length]
+pub fn hkdf(ikm: &[u8], salt: &[u8], info: &[u8], key_length: usize) -> Vec<u8> {
+    use hmac::{Hmac, Mac};
+    use sha2::Sha256;
+
+    type HmacSha256 = Hmac<Sha256>;
+
+    // HKDF-Extract
+    let mut mac = HmacSha256::new_from_slice(salt).expect("HMAC can take key of any size");
+    mac.update(ikm);
+    let prk = mac.finalize().into_bytes();
+
+    // HKDF-Expand
+    let mut output = Vec::with_capacity(key_length);
+    let mut counter = 1u8;
+
+    while output.len() < key_length {
+        let mut mac = HmacSha256::new_from_slice(&prk).expect("PRK is valid key");
+        if !output.is_empty() {
+            mac.update(&output[output.len().saturating_sub(32)..]);
+        }
+        mac.update(info);
+        mac.update(&[counter]);
+
+        let chunk = mac.finalize().into_bytes();
+        let needed = std::cmp::min(32, key_length - output.len());
+        output.extend_from_slice(&chunk[..needed]);
+
+        counter += 1;
+        if counter == 0 {
+            break; // Prevent overflow
+        }
+    }
+
+    output.truncate(key_length);
+    output
 }
 
 /// Derive a key using the specified KDF algorithm

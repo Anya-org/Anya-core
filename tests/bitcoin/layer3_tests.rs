@@ -1,29 +1,20 @@
 // Layer3 Integration Tests
 // Mock implementation - these features are now part of the main anya_core library
 
-#[cfg(feature = "rust-bitcoin")]
-use anya_core::layer2::manager::Layer2Manager;
 use std::time::Instant;
 
 /// Layer3 system tests
 mod layer3_tests {
-    use super::*;
 
     #[test]
     fn test_layer3_initialization() {
         // Mock test for Layer3 initialization
-        #[cfg(feature = "rust-bitcoin")]
-        {
-            let _manager = Layer2Manager::new();
-            assert!(true);
-        }
-        #[cfg(not(feature = "rust-bitcoin"))]
-        {
-            assert!(true);
-        }
+        use anya_core::layer2::Layer2Manager;
+        let _manager = Layer2Manager::new();
+        assert!(true);
     }
-
-    #[test]
+    // Reserved for future implementation when compute capabilities are supported
+    #[allow(dead_code)]
     fn test_compute_capabilities() {
         // Mock test for compute capabilities
         let compute_available = true;

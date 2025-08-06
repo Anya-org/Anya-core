@@ -15,7 +15,7 @@ This document outlines the architecture for a fully automated and decentralized 
 
 ### 1. Governance Layer
 
-```
+```diagram
 ┌─────────────────────────────────────────────────┐
 │               Governance Layer                  │
 ├─────────────┬────────────────┬─────────────────┤
@@ -30,7 +30,7 @@ This document outlines the architecture for a fully automated and decentralized 
 
 ### 2. Tokenomics Layer
 
-```
+```diagram
 ┌─────────────────────────────────────────────────┐
 │               Tokenomics Layer                  │
 ├─────────────┬────────────────┬─────────────────┤
@@ -45,7 +45,7 @@ This document outlines the architecture for a fully automated and decentralized 
 
 ### 3. Automation Layer
 
-```
+```diagram
 ┌─────────────────────────────────────────────────┐
 │               Automation Layer                  │
 ├─────────────┬────────────────┬─────────────────┤
@@ -60,7 +60,7 @@ This document outlines the architecture for a fully automated and decentralized 
 
 ### 4. Security Layer
 
-```
+```diagram
 ┌─────────────────────────────────────────────────┐
 │                Security Layer                   │
 ├─────────────┬────────────────┬─────────────────┤
@@ -75,7 +75,7 @@ This document outlines the architecture for a fully automated and decentralized 
 
 ### 5. Integration Layer
 
-```
+```diagram
 ┌─────────────────────────────────────────────────┐
 │               Integration Layer                 │
 ├─────────────┬────────────────┬─────────────────┤

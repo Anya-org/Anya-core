@@ -21,7 +21,7 @@ use crate::bitcoin::rpc::BitcoinRpcClient;
 use crate::blockchain::bitcoin::adapter::{BitcoinAdapter, BitcoinAdapterConfig};
 
 // Test fixture to set up a Bitcoin testnet adapter
-async fn setup_testnet_adapter() -> Option<BitcoinAdapter>  -> Result<(), Box<dyn Error>> {
+async fn setup_testnet_adapter() -> Option<BitcoinAdapter> {
     // Try to get connection details from environment variables, or use defaults for a local node
     let rpc_url = env::var("BITCOIN_TESTNET_RPC_URL").unwrap_or_else(|_| "http://localhost:18332".to_string());
     let rpc_user = env::var("BITCOIN_TESTNET_RPC_USER").unwrap_or_else(|_| "bitcoin".to_string());
@@ -58,7 +58,7 @@ async fn setup_testnet_adapter() -> Option<BitcoinAdapter>  -> Result<(), Box<dy
 }
 
 // Helper function to check if we should skip a test
-fn should_skip_test(adapter: &Option<BitcoinAdapter>) -> bool  -> Result<(), Box<dyn Error>> {
+fn should_skip_test(adapter: &Option<BitcoinAdapter>) -> bool {
     if adapter.is_none() {
         eprintln!("Skipping test as no testnet node is available");
         return true;
@@ -68,7 +68,6 @@ fn should_skip_test(adapter: &Option<BitcoinAdapter>) -> bool  -> Result<(), Box
 
 // Test the initialization of the adapter
 #[tokio::test]
-#[ignore] // Ignore by default as it requires a testnet node
 async fn test_adapter_initialization()  -> Result<(), Box<dyn Error>> {
     let adapter = setup_testnet_adapter().await;
     if should_skip_test(&adapter) {
@@ -98,7 +97,6 @@ async fn test_adapter_initialization()  -> Result<(), Box<dyn Error>> {
 
 // Test the NodePort functionality
 #[tokio::test]
-#[ignore]
 async fn test_node_port()  -> Result<(), Box<dyn Error>> {
     let adapter = setup_testnet_adapter().await;
     if should_skip_test(&adapter) {
@@ -166,7 +164,6 @@ async fn test_node_port()  -> Result<(), Box<dyn Error>> {
 // Test the WalletPort functionality
 // Note: This test only tests read-only functions as we don't have a wallet
 #[tokio::test]
-#[ignore]
 async fn test_wallet_port_readonly()  -> Result<(), Box<dyn Error>> {
     let adapter = setup_testnet_adapter().await;
     if should_skip_test(&adapter) {
@@ -231,7 +228,6 @@ async fn test_wallet_port_readonly()  -> Result<(), Box<dyn Error>> {
 
 // Test the SmartContractPort functionality
 #[tokio::test]
-#[ignore]
 async fn test_smart_contract_port()  -> Result<(), Box<dyn Error>> {
     let adapter = setup_testnet_adapter().await;
     if should_skip_test(&adapter) {
@@ -275,7 +271,6 @@ async fn test_smart_contract_port()  -> Result<(), Box<dyn Error>> {
 
 // Test the MetricsPort functionality
 #[tokio::test]
-#[ignore]
 async fn test_metrics_port()  -> Result<(), Box<dyn Error>> {
     let adapter = setup_testnet_adapter().await;
     if should_skip_test(&adapter) {
@@ -329,7 +324,6 @@ async fn test_metrics_port()  -> Result<(), Box<dyn Error>> {
 
 // Test the SecurityPort functionality
 #[tokio::test]
-#[ignore]
 async fn test_security_port()  -> Result<(), Box<dyn Error>> {
     let adapter = setup_testnet_adapter().await;
     if should_skip_test(&adapter) {
@@ -376,7 +370,6 @@ async fn test_security_port()  -> Result<(), Box<dyn Error>> {
 
 // Test monitoring functionality
 #[tokio::test]
-#[ignore]
 async fn test_monitoring()  -> Result<(), Box<dyn Error>> {
     let adapter = setup_testnet_adapter().await;
     if should_skip_test(&adapter) {
@@ -420,7 +413,6 @@ async fn test_monitoring()  -> Result<(), Box<dyn Error>> {
 
 // Test transaction creation and broadcasting (read-only version)
 #[tokio::test]
-#[ignore]
 async fn test_transaction_creation_readonly()  -> Result<(), Box<dyn Error>> {
     let adapter = setup_testnet_adapter().await;
     if should_skip_test(&adapter) {
@@ -451,7 +443,6 @@ async fn test_transaction_creation_readonly()  -> Result<(), Box<dyn Error>> {
 
 // A integration test that exercises multiple components together
 #[tokio::test]
-#[ignore]
 async fn test_integration_workflow()  -> Result<(), Box<dyn Error>> {
     let adapter = setup_testnet_adapter().await;
     if should_skip_test(&adapter) {

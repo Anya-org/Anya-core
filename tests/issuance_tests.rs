@@ -11,6 +11,7 @@ use sectional::{measure_memory_usage, Section};
 // In a real implementation, these would be actual project imports
 // For this example, we'll mock the functionality
 mod mocks {
+    #[allow(dead_code)] // Fields may be used in extended tests
     pub struct TokenSupply {
         pub initial_supply: u64,
         pub max_supply: u64,

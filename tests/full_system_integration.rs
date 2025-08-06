@@ -1,6 +1,6 @@
 // Full System Integration Tests for Anya-core
 // Tests the complete functionality from root to top - NO MOCKS, NO SIMULATIONS
-// 
+//
 // This test suite validates:
 // 1. Core Library Initialization
 // 2. Bitcoin Protocol Implementation (BIP-341, BIP-342, BIP-340)
@@ -14,10 +14,7 @@
 // 10. Cross-layer state management
 // Refactored: All tests now use only available modules and types. Disabled/empty tests are replaced with minimal working logic.
 
-use anya_core::{
-    web5,
-    dao,
-};
+// No external imports needed for these stub tests
 
 #[tokio::test]
 async fn test_web5_system() {

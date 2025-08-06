@@ -12,7 +12,7 @@ async fn test_rust_bitcoin_implementation() {
     let implementation = RustBitcoinImplementation::new(&config).unwrap();
 
     // Test address generation
-    let address = implementation
+    let _address = implementation
         .generate_address(anya_core::bitcoin::interface::AddressType::P2WPKH)
         .await
         .unwrap();

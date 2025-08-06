@@ -2,8 +2,10 @@
 // [AIR-3][AIS-3][BPC-3][AIT-3][RES-3]
 //
 // Tests the implementation of BIP-341 (Taproot) features according to
-// Bitcoin Development Framework v2.5 requirements
+// Bitcoin Improvement Proposals
 
+#[allow(dead_code)]
+// Test functions that may not be called directly but are part of test infrastructure
 use anyhow::{bail, Result};
 use bitcoin::key::{TapTweak, TweakedPublicKey, UntweakedPublicKey};
 use bitcoin::secp256k1::{Secp256k1, SecretKey, XOnlyPublicKey};
@@ -31,12 +33,10 @@ impl TaprootVerifier {
         &self,
         output_key: TweakedPublicKey,
         internal_key: &XOnlyPublicKey,
+        merkle_root: Option<TapNodeHash>,
     ) -> Result<bool> {
         // Extract internal key from control block
         let internal_key_untweaked: UntweakedPublicKey = (*internal_key).into();
-
-        // Compute tweak
-        let merkle_root = None;
 
         // Use the add_tweak method with the merkle_root option
         let (tweaked_key, _parity) = internal_key_untweaked.tap_tweak(&self.secp, merkle_root);
@@ -47,6 +47,7 @@ impl TaprootVerifier {
     }
 
     /// Compute merkle root from leaf hash and control block  
+    #[allow(dead_code)]
     fn compute_merkle_root(
         &self,
         _leaf_hash: TapLeafHash,
@@ -64,14 +65,14 @@ pub fn test_taproot_key_path_spending_simple() -> Result<()> {
     // Initialize secp context
     let secp = Secp256k1::new();
 
-    // Generate internal key
+    // Use BIP-341 test vector with script tree
     let internal_key = XOnlyPublicKey::from_str(
-        "93c7378d96518a75448821c4f7c8f4bae7ce60f804d03d1f0628dd5dd0f5de51",
+        "187791b6f712a8ea41c8ecdd0ee77fab3e85263b37e1ec18a3651926b3a6cf27",
     )?;
 
-    // Create spending conditions
+    // Use script from BIP-341 test vectors
     let script = ScriptBuf::from_hex(
-        "5121030681b3e0d62e8455f48c657bf8b2556e1c6c89be232f57f1f53a88b0a9986cc751ae",
+        "20d85a959b0290bf19bb89ed43c916be835475d013da4b362117393e25a48229b8ac",
     )?;
 
     // Create Taproot tree
@@ -86,9 +87,9 @@ pub fn test_taproot_key_path_spending_simple() -> Result<()> {
     // Get Taproot output key
     let tap_output_key = tap_tree.output_key();
 
-    // Verify tap output key matches expected value
+    // Expected output key from BIP-341 test vectors
     let expected_key = XOnlyPublicKey::from_str(
-        "ee4fe085983462a184015d1f782d6a5f8b9c2b60130aff050ce221aff7cc6b47",
+        "147c9c57132f6e7ecddba9800bb0c4449251c92a1e60371ee77557b6620f3ea3",
     )?;
 
     // Convert tap_output_key to XOnlyPublicKey for comparison
@@ -100,7 +101,9 @@ pub fn test_taproot_key_path_spending_simple() -> Result<()> {
 
     // Verify using TaprootVerifier
     let verifier = TaprootVerifier::new();
-    assert!(verifier.verify_key_path_spend(tap_output_key, &internal_key)?);
+    // For script path spending, we need to get the merkle root from the tree
+    let merkle_root = tap_tree.merkle_root();
+    assert!(verifier.verify_key_path_spend(tap_output_key, &internal_key, merkle_root)?);
 
     Ok(())
 }
@@ -129,7 +132,7 @@ mod additional_tests {
 
         // Verify key path spend directly (which doesn't need a control block)
         let key_path_result = checker
-            .verify_key_path_spend(tweaked_public_key, &x_only)
+            .verify_key_path_spend(tweaked_public_key, &x_only, merkle_root)
             .unwrap();
         assert!(key_path_result, "Key path verification should succeed");
 

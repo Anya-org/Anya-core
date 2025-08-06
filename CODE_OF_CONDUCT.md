@@ -5,6 +5,7 @@
 ### 1. Financial Sovereignty and Human Rights
 
 We are committed to developing technology that:
+
 - Empowers individual economic freedom
 - Protects financial privacy
 - Resists censorship and economic oppression
@@ -13,6 +14,7 @@ We are committed to developing technology that:
 ### 2. Ethical Technology Development
 
 #### Core Values
+
 - **Transparency**: All code is open, auditable, and reviewable
 - **Decentralization**: Minimize single points of control
 - **Privacy**: Protect user data and financial information
@@ -21,12 +23,14 @@ We are committed to developing technology that:
 ### 3. Community Interaction Guidelines
 
 #### Respectful Collaboration
+
 - Treat all contributors with dignity and respect
 - Welcome diverse perspectives and backgrounds
 - Provide constructive, kind feedback
 - Assume good intentions
 
 #### Unacceptable Behavior
+
 - Harassment or discrimination
 - Trolling or insulting comments
 - Personal attacks
@@ -47,7 +51,7 @@ We are committed to developing technology that:
 
 ### 5. Reporting Mechanisms
 
-- **Email**: conduct@anya-project.org
+- **Email**: <conduct@anya-project.org>
 - **Confidential Reporting**: Guaranteed anonymity
 - **Response Commitment**: Within 72 hours
 
@@ -60,6 +64,7 @@ We are committed to developing technology that:
 ### 7. Bitcoin Community Standards
 
 We align with the Bitcoin community's foundational principles:
+
 - Permissionless innovation
 - Voluntary participation
 - Mutual respect
@@ -74,6 +79,7 @@ We align with the Bitcoin community's foundational principles:
 ## Acknowledgments
 
 Inspired by:
+
 - Bitcoin Core's collaborative ethos
 - Rust Community Code of Conduct
 - Electronic Frontier Foundation's principles

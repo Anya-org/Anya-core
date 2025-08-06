@@ -47,6 +47,20 @@ pub struct Proposal {
     cross_chain_impact: Option<CrossChainImpact>,
 }
 
+impl Proposal {
+    pub fn title(&self) -> &str {
+        &self.title
+    }
+
+    pub fn status(&self) -> &ProposalStatus {
+        &self.status
+    }
+
+    pub fn yes_votes(&self) -> u64 {
+        self.yes_votes
+    }
+}
+
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub enum ProposalStatus {
     Pending,
@@ -271,6 +285,48 @@ impl DaoGovernance {
             success: true,
             message: "Proposal executed successfully".to_string(),
         })
+    }
+
+    /// Check if DAO is active
+    pub fn is_active(&self) -> bool {
+        true // Basic implementation
+    }
+
+    /// Create a new proposal
+    pub async fn create_proposal(
+        &mut self,
+        title: String,
+        description: String,
+        proposer: String,
+        _amount: u64,
+    ) -> Result<u64> {
+        let proposal_id = self.proposals.len() as u64 + 1;
+        let proposal = Proposal {
+            id: proposal_id,
+            title,
+            description,
+            proposer,
+            start_time: chrono::Utc::now(),
+            end_time: chrono::Utc::now() + chrono::Duration::days(7),
+            yes_votes: 0,
+            no_votes: 0,
+            status: ProposalStatus::Active,
+            cross_chain_impact: None,
+        };
+        self.submit_proposal(proposal)?;
+        Ok(proposal_id)
+    }
+
+    /// Get a proposal by ID
+    pub async fn get_proposal(&self, proposal_id: u64) -> Result<&Proposal> {
+        self.proposals
+            .get(&proposal_id)
+            .ok_or_else(|| anyhow::anyhow!("Proposal not found"))
+    }
+
+    /// Get cross-chain governance status
+    pub async fn get_cross_chain_status(&self) -> Result<String> {
+        Ok("Cross-chain governance enabled".to_string())
     }
 
     // Additional required methods

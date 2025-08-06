@@ -4,6 +4,7 @@ use bitcoin::Transaction;
 struct TestTransactionFactory;
 
 impl TestTransactionFactory {
+    #[allow(dead_code)]
     fn create_historical_batch(_era: &str) -> Vec<String> {
         vec!["mock_tx_1".to_string(), "mock_tx_2".to_string()]
     }

@@ -2,6 +2,7 @@
 mod hardware_tests {
 
     // Mock hardware profile for testing
+    #[allow(dead_code)]
     struct MockHardwareProfile {
         cpu_cores: u32,
         memory_gb: u32,

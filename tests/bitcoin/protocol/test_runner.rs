@@ -2,7 +2,7 @@
 // [AIR-3][AIS-3][BPC-3][AIT-3][RES-3]
 //
 // Test runner for Bitcoin protocol implementations according to
-// Bitcoin Development Framework v2.5 requirements
+// Bitcoin Improvement Proposals
 
 use anyhow::Result;
 use std::collections::HashMap;

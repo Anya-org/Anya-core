@@ -1,4 +1,4 @@
-# Contributing to Anya Core
+*# Contributing to Anya Core
 
 We love your input! We want to make contributing to this project as easy and transparent as possible, whether it's:
 
@@ -37,8 +37,8 @@ We use GitHub issues to track public bugs. Report a bug by [opening a new issue]
 
 -   A quick summary and/or background
 -   Steps to reproduce
-    -   Be specific!
-    -   Give sample code if you can.
+  -   Be specific!
+  -   Give sample code if you can.
 -   What you expected would happen
 -   What actually happens
 -   Notes (possibly including why you think this might be happening, or stuff you tried that didn't work)
@@ -67,11 +67,11 @@ Follow these guidelines for commit messages:
 -   Limit the first line to 72 characters or less
 -   Reference issues and pull requests liberally after the first line
 -   Consider starting the commit message with an applicable emoji:
-    -   ✨ `:sparkles:` when adding a new feature
-    -   🐛 `:bug:` when fixing a bug
-    -   📚 `:books:` when adding or updating documentation
-    -   ♻️ `:recycle:` when refactoring code
-    -   🧪 `:test_tube:` when adding tests
+  -   ✨ `:sparkles:` when adding a new feature
+  -   🐛 `:bug:` when fixing a bug
+  -   📚 `:books:` when adding or updating documentation
+  -   ♻️ `:recycle:` when refactoring code
+  -   🧪 `:test_tube:` when adding tests
 
 ### Pull Request Process
 
@@ -221,34 +221,22 @@ Contributions that touch Bitcoin-related functionality must comply with official
 We use Git worktrees to manage different features and versions of the project. Here's how to use them:
 
 1.  Create a new worktree for a feature:
-    ```bash
-    git worktree add -b feature-branch ../anya-core-feature-branch main
-    ```
 2.  Navigate to the new worktree:
+
     ```bash
     cd ../anya-core-feature-branch
     ```
-3.  Make your changes, commit them, and push to the remote branch:
-    ```bash
-    git add .
+
     git commit -m "Implement new feature"
     git push -u origin feature-branch
+
     ```
 4.  When you're done with the feature, you can remove the worktree:
-    ```bash
-    cd ..
-    git worktree remove anya-core-feature-branch
-    ```
-
 Remember to keep your worktrees in sync with the main repository by regularly pulling changes from the main branch.
 
 *Last updated: 2025-06-02*
 
 ## Active Contributors
-
-| Handle | Role | Security Clearance | Focus Areas |
-| --- | --- | --- | --- |
-| @bo_thebig | Node Security Architect | SCL-3 | P2P Encryption, SPV Validation |
 
 ## License
 
@@ -256,4 +244,4 @@ By contributing, you agree that your contributions will be licensed under its MI
 
 ## References
 
-This document was adapted from the open-source contribution guidelines for [Facebook's Draft](https://github.com/facebook/draft-js/blob/a9316a723f9e918afde44dea68b5f9f39b7d9b00/CONTRIBUTING.md)
+This document was adapted from the open-source contribution guidelines for [Facebook's Draft](https://github.com/facebook/draft-js/blob/a9316a723f9e918afde44dea68b5f9f39b7d9b00/CONTRIBUTING.md)This document was adapted from the open-source contribution guidelines for [Facebook's Draft](https://github.com/facebook/draft-js/blob/a9316a723f9e918afde44dea68b5f9f39b7d9b00/CONTRIBUTING.md)

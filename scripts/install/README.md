@@ -14,7 +14,7 @@ This directory contains the Anya Core installation system scripts. This system h
 
 ### Core Installation Scripts
 
-- **main_installer.sh** - Comprehensive installation framework following BDF v2.5 standards
+- **main_installer.sh** - Comprehensive installation framework following BIP Standards
 - **unified_install_framework.sh** - Unified installation framework with hardware detection
 - **systemd_config.sh** - Systemd service configuration and management
 - **dashboard.sh** - System monitoring and status dashboard

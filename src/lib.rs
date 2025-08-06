@@ -43,26 +43,30 @@ use std::fmt;
 
 pub mod api;
 pub mod bip;
-#[cfg(feature = "rust-bitcoin")]
+#[cfg(feature = "bitcoin")]
 pub mod bitcoin;
 pub mod compliance;
+pub mod config;
+pub mod core;
 pub mod dao;
 pub mod enterprise;
 pub mod extensions;
+pub mod handlers;
+pub mod infrastructure;
 pub mod install;
+pub mod layer2;
 pub mod ml;
+#[cfg(any(feature = "ffi", feature = "mobile"))]
+pub mod mobile;
 pub mod network;
 pub mod security;
 pub mod testing;
-pub mod types;
-pub mod web5;
-pub mod infrastructure;
-pub mod config;
-pub mod core;
-pub mod layer2;
 pub mod tokenomics;
 pub mod tools;
+pub mod types;
+pub mod utils;
 pub mod web;
+pub mod web5;
 
 // Hardware optimization module
 pub mod hardware_optimization {
@@ -198,6 +202,16 @@ pub mod hardware_optimization {
                 Ok(invalid_indices)
             }
 
+            #[cfg(not(feature = "rust-bitcoin"))]
+            pub fn verify_transaction_batch(
+                &self,
+                _transactions: &[bitcoin::Transaction],
+                _config: &BatchVerificationConfig,
+            ) -> Result<Vec<usize>, Box<dyn std::error::Error>> {
+                log::debug!("Hardware-optimized batch verification not available");
+                Ok(vec![])
+            }
+
             #[cfg(feature = "rust-bitcoin")]
             pub fn verify_taproot_transaction(
                 &self,
@@ -206,6 +220,14 @@ pub mod hardware_optimization {
                 if tx.output.is_empty() {
                     return Err("Transaction has no outputs".into());
                 }
+                Ok(())
+            }
+
+            #[cfg(not(feature = "rust-bitcoin"))]
+            pub fn verify_taproot_transaction(
+                &self,
+                _tx: &bitcoin::Transaction,
+            ) -> Result<(), Box<dyn std::error::Error>> {
                 Ok(())
             }
         }
@@ -265,7 +287,7 @@ impl fmt::Display for AnyaError {
 
 impl Error for AnyaError {}
 
-#[cfg(feature = "rust-bitcoin")]
+#[cfg(feature = "bitcoin")]
 impl From<crate::bitcoin::error::BitcoinError> for AnyaError {
     fn from(err: crate::bitcoin::error::BitcoinError) -> Self {
         AnyaError::Bitcoin(err.to_string())
@@ -312,7 +334,10 @@ pub struct AnyaCore {
 impl AnyaCore {
     pub fn new(config: AnyaConfig) -> AnyaResult<Self> {
         let ml_system = if config.ml_config.enabled {
-            Some(ml::MLSystem::new(config.ml_config)?)
+            // For now, use a blocking approach - this needs to be refactored later
+            let rt = tokio::runtime::Runtime::new()
+                .map_err(|e| AnyaError::ML(format!("Failed to create runtime: {e}")))?;
+            Some(rt.block_on(ml::MLSystem::new(config.ml_config))?)
         } else {
             None
         };
@@ -365,9 +390,11 @@ impl AnyaCore {
         };
 
         if let Some(ml_system) = &self.ml_system {
-            status
-                .metrics
-                .insert("ml".to_string(), ml_system.get_model_health_metrics());
+            // Use blocking approach for async method
+            let rt = tokio::runtime::Runtime::new()
+                .map_err(|e| AnyaError::ML(format!("Failed to create runtime: {e}")))?;
+            let health_metrics = rt.block_on(ml_system.get_model_health_metrics());
+            status.metrics.insert("ml".to_string(), health_metrics);
         }
 
         status.component_status.push(ComponentStatus {
@@ -379,7 +406,11 @@ impl AnyaCore {
         status.component_status.push(ComponentStatus {
             name: "web5".to_string(),
             operational: self.web5_manager.is_some(),
-            health_score: if self.web5_manager.is_some() { 1.0 } else { 0.0 },
+            health_score: if self.web5_manager.is_some() {
+                1.0
+            } else {
+                0.0
+            },
         });
 
         status.component_status.push(ComponentStatus {
@@ -409,21 +440,11 @@ pub struct ComponentStatus {
     pub health_score: f64,
 }
 
-pub mod utils {
-    pub fn generate_id() -> String {
-        format!("id:{:x}", rand::random::<u64>())
-    }
-
-    pub fn log(msg: &str) {
-        println!("[{}] {}", chrono::Utc::now(), msg);
-    }
-}
-
 pub fn version() -> &'static str {
     env!("CARGO_PKG_VERSION")
 }
 
-#[cfg(feature = "bitcoin_integration")]
+#[cfg(feature = "bitcoin")]
 pub mod integration {
     pub fn bitcoin_enabled() -> bool {
         true
@@ -484,9 +505,9 @@ pub const IMPLEMENTATION_YEAR: u16 = 2025;
 pub const BUILD_ID: &str = env!("CARGO_PKG_VERSION");
 
 pub mod prelude {
-    pub use crate::dao::governance::DaoGovernance;
     #[cfg(feature = "rust-bitcoin")]
     pub use crate::bitcoin::adapters::BitcoinAdapter;
+    pub use crate::dao::governance::DaoGovernance;
 }
 
 mod error;

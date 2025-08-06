@@ -1,7 +1,7 @@
 ---
 aip: 2025-01
 title: Universal Adaptive Hardware Optimization Framework
-author: Anya Core Team
+Author: Bo_theBig
 status: Draft
 type: Core Enhancement
 category: Performance

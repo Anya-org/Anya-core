@@ -12,6 +12,9 @@ pub mod constant_time;
 // Cryptographic operations module
 pub mod crypto;
 
+// Software-based HSM implementation (real cryptographic operations)
+pub mod software_hsm;
+
 // Add encryption sub-module for easier access
 pub mod encryption {
     pub use super::crypto::symmetric::*;
@@ -30,6 +33,12 @@ pub use system_hardening::ConfigStatus;
 pub use system_hardening::HardeningConfig;
 pub use system_hardening::SecurityLevel;
 pub use system_hardening::SystemHardening;
+
+// Re-export software HSM types
+pub use software_hsm::{
+    EncryptionRequest, EncryptionResponse, HSMConfig, HSMMetrics, HashAlgorithm, KeyPurpose,
+    KeyType as SoftwareKeyType, SigningRequest, SigningResponse, SoftwareHSM,
+};
 
 // Conditionally re-export HSM types based on feature flag
 #[cfg(feature = "hsm")]
@@ -90,7 +99,7 @@ pub fn create_basic_security_config(
 // Implements security features for Bitcoin operations
 // as per official Bitcoin Improvement Proposals (BIPs) requirements
 
-use log::info;
+use tracing::info;
 // [AIR-3][AIS-3][BPC-3][RES-3] Constant time module already declared above
 
 // [AIR-3][AIS-3][BPC-3][RES-3] Conditionally export HSM types when the feature is enabled

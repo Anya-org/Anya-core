@@ -5,6 +5,8 @@
 //! Source of Truth Registry standards.
 
 pub mod commit_tracker;
+pub mod doc_duplication_scanner;
+pub mod doc_duplication_scanner_cli;
 pub mod markdown;
 pub mod source_of_truth_registry;
 

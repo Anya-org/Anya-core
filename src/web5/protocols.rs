@@ -1,4 +1,3 @@
-// use std::error::Error; // Commented out as it's not being used
 // Web5 Protocols Implementation
 // Provides protocol handlers for Web5 interactions
 // [AIR-012] Operational Reliability and [AIP-002] Modular Architecture

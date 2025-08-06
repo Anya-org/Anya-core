@@ -28,7 +28,7 @@ pub struct Device {}
 
 #[allow(dead_code)]
 impl Device {
-    // [AIS-3] Use snake_case for function names as per BDF v2.5 standards
+    // [AIS-3] Use snake_case for function names as per BIP Standards
     pub fn cuda(_device_id: i64) -> Self {
         Self {}
     }
@@ -102,6 +102,7 @@ impl<T> RandomForestClassifier<T> {
 
 /// Machine Learning Service
 #[derive(Debug)]
+#[allow(dead_code)] // Legacy ML service, kept for backward compatibility
 pub struct MLService {
     device: Device,
     model: Arc<Mutex<RandomForestClassifier<f64>>>,
@@ -175,6 +176,7 @@ impl Default for MLService {
 
 impl MLService {
     /// Create a new ML service instance
+    #[allow(dead_code)] // Legacy ML service methods, kept for backward compatibility
     pub fn new() -> Self {
         // [AIR-3][AIS-3][BPC-3][RES-3] Default to CPU for now since we don't have tch in scope
         // This follows official Bitcoin Improvement Proposals (BIPs) standards for device handling
@@ -189,12 +191,13 @@ impl MLService {
         }
     }
 
-    /// Initialize the ML service with a specific model
+    /// Initialize the model
+    #[allow(dead_code)] // Legacy ML service methods, kept for backward compatibility
     pub fn initialize(&mut self, features_dim: usize, model_version: &str) -> AnyaResult<()> {
         self.features_dim = features_dim;
         self.model_version = model_version.to_string();
 
-        // [AIS-3] Handle mutex lock error explicitly as per BDF v2.5 standards
+        // [AIS-3] Handle mutex lock error explicitly as per BIP Standards
         let mut model_guard = match self.model.lock() {
             Ok(guard) => guard,
             // [AIR-3][AIS-3][BPC-3][RES-3]
@@ -212,7 +215,8 @@ impl MLService {
         Ok(())
     }
 
-    /// Analyze a DAO proposal and return metrics
+    /// Analyze a proposal and return risk metrics
+    #[allow(dead_code)] // Legacy ML service methods, kept for backward compatibility
     pub fn analyze_proposal(&self, proposal: &Proposal) -> AnyaResult<HashMap<String, f64>> {
         if !self.is_initialized {
             return Err(AnyaError::ML("ML service not initialized".to_string()));
@@ -241,6 +245,7 @@ impl MLService {
     }
 
     /// Extract features from a proposal for ML processing
+    #[allow(dead_code)] // Legacy ML service methods, kept for backward compatibility
     fn extract_features(&self, _proposal: &Proposal) -> AnyaResult<Vec<f64>> {
         // [AIR-3][AIS-3][BPC-3][RES-3] In a real implementation, this would extract relevant features from the proposal
         // This follows official Bitcoin Improvement Proposals (BIPs) standards for ML feature extraction
@@ -250,6 +255,7 @@ impl MLService {
     }
 
     /// Predict outcomes based on features
+    #[allow(dead_code)] // Legacy ML service methods, kept for backward compatibility
     fn predict(&self, features: &[f64]) -> AnyaResult<HashMap<String, f64>> {
         // In a real implementation, this would use the actual model for predictions
         let mut predictions = HashMap::new();
@@ -267,6 +273,7 @@ impl MLService {
     }
 
     /// Calculate confidence for the prediction
+    #[allow(dead_code)] // Legacy ML service methods, kept for backward compatibility
     fn calculate_confidence(&self, features: &[f64]) -> f64 {
         // In a real implementation, this would be based on model certainty
         // This is a placeholder implementation
@@ -278,6 +285,7 @@ impl MLService {
     /// Assess risks for a proposal
     // [AIR-3][AIS-3][BPC-3][RES-3] Assess risks for a proposal
     // This follows official Bitcoin Improvement Proposals (BIPs) standards for ML operations
+    #[allow(dead_code)] // Legacy ML service methods, kept for backward compatibility
     fn assess_risks(&self, _proposal: &Proposal) -> AnyaResult<RiskMetrics> {
         // In a real implementation, this would perform detailed risk analysis
 
@@ -288,7 +296,7 @@ impl MLService {
 
         let total_risk = (market_risk + security_risk + execution_risk + volatility_risk) / 4.0;
 
-        // [BPC-3] Add required fields as per BDF v2.5 standards
+        // [BPC-3] Add required fields as per BIP Standards
         Ok(RiskMetrics {
             risk_score: total_risk,
             compliance_level: if total_risk < 0.3 {
@@ -312,6 +320,7 @@ impl MLService {
     }
 
     /// Get consensus from federated model nodes
+    #[allow(dead_code)] // Legacy ML service methods, kept for backward compatibility
     fn get_federated_consensus(&self) -> AnyaResult<HashMap<String, f64>> {
         // In a real implementation, this would fetch data from federated nodes
 
@@ -325,6 +334,7 @@ impl MLService {
 
     /// Train the model with new data
     // [AIR-3][AIS-3][BPC-3][RES-3]
+    #[allow(dead_code)] // Legacy ML service methods, kept for backward compatibility
     pub async fn train(&mut self, features: Vec<f64>, labels: Vec<f64>) -> AnyaResult<()> {
         // Properly handle mutex lock error by converting to AnyaError::ML
         let mut model = match self.model.lock() {
@@ -343,6 +353,7 @@ impl MLService {
     }
 
     /// Apply federated learning update
+    #[allow(dead_code)]
     pub async fn apply_federated_update(&mut self, weights: Vec<f64>) -> AnyaResult<()> {
         // In a real implementation, this would update the model with federated weights
         // For now, just log that we received the update
@@ -356,6 +367,7 @@ impl MLService {
 
     /// [AIR-3][AIS-3][BPC-3][RES-3] Predict proposal metrics based on proposal data
     /// This follows official Bitcoin Improvement Proposals (BIPs) standards for ML predictions
+    #[allow(dead_code)]
     pub async fn predict_proposal_metrics(
         &self,
         proposal: &Proposal,
@@ -370,7 +382,7 @@ impl MLService {
         // [AIR-3][AIS-3][BPC-3][RES-3] Use assess_risks method for risk assessment
         let risk_assessment = self.assess_risks(proposal)?;
 
-        // [AIR-3][AIS-3][BPC-3][RES-3] Create proposal metrics according to BDF v2.5 standards
+        // [AIR-3][AIS-3][BPC-3][RES-3] Create proposal metrics according to BIP Standards
         // Create a new ProposalMetrics instance with all fields initialized
         let mut metrics = ProposalMetrics {
             proposal_count: 1, // Just counting the current proposal
@@ -410,6 +422,7 @@ impl MLService {
     }
 
     /// Export model to bytes for sharing
+    #[allow(dead_code)]
     pub fn export_model(&self) -> AnyaResult<Vec<u8>> {
         // In a real implementation, this would serialize the model
         // This is a simplified placeholder
@@ -418,6 +431,7 @@ impl MLService {
     }
 
     /// Import model from bytes
+    #[allow(dead_code)]
     pub fn import_model(&mut self, bytes: &[u8]) -> AnyaResult<()> {
         // In a real implementation, this would deserialize the model
         // This is a simplified placeholder

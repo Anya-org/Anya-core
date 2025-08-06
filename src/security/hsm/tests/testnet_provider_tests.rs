@@ -13,7 +13,6 @@ mod tests {
     };
     use crate::security::hsm::providers::simulator::SimulatorHsmProvider;
 
-
     #[tokio::test]
     #[ignore = "Requires AuditLogger implementation"]
     async fn test_software_provider_bitcoin_testnet() {

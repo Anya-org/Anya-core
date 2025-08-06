@@ -632,7 +632,6 @@ mod tests {
     // This test is intentionally ignored due to timing issues
     // It's added with a much shorter timeout to prevent hanging in CI
     #[tokio::test]
-    #[ignore]
     async fn test_node_management() {
         let config = create_test_config();
         // Create the load balancer within the timeout to ensure it's properly bound
