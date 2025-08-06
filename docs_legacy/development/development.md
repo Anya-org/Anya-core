@@ -1,0 +1,337 @@
+---
+title: "Development"
+description: "Documentation for Development"
+last_updated: 2025-05-30
+---
+[AIR-3][AIS-3][BPC-3][RES-3]
+
+
+<!-- markdownlint-disable MD013 line-length -->
+
+# Anya Development Guide
+
+## Overview
+
+Add a brief overview of this document here.
+
+## Table of Contents
+
+ Section 1
+ Section 2
+
+
+## Development Environment Setup
+
+### Prerequisites
+
+1. Install Rust (1.70 or higher)
+2. Install Cargo package manager
+3. Clone the repository
+4. Install development dependencies
+
+### Building the Project
+
+```bash
+## Build the project
+cargo build
+
+## Run tests
+cargo test
+
+## Run with development features
+cargo run --features "development"
+```
+
+## Core Components
+
+### 1. Web5Store
+
+The `Web5Store` is the main entry point for data operations:
+
+```rust
+// Create a new store
+let store = Web5Store::new().await?;
+
+// Basic operations
+store.create_record("users", data).await?;
+store.get_record("record_id").await?;
+store.update_record("record_id", new_data).await?;
+store.delete_record("record_id").await?;
+
+// Query records
+let results = store.query_records("users", Some(filter)).await?;
+```
+
+### 2. Read First Always Principle
+
+The Read First Always principle is a fundamental data consistency pattern implemented throughout Web5 components:
+
+```rust
+// Use the ReadFirstDwnManager instead of direct DWN operations
+let manager = ReadFirstDwnManager::new(Arc::new(web5_client));
+
+// Create operation (will automatically query similar records first)
+let record = manager.create_record(&CreateRecordOptions {
+    data: serde_json::to_string(&data)?,
+    schema: "https://schema.org/VerifiableCredential".to_string(),
+    data_format: "application/json".to_string(),
+})?;
+
+// Update operation (will automatically read the record first)
+let updated_record = manager.update_record(&record.id, &UpdateRecordOptions {
+    data: serde_json::to_string(&updated_data)?,
+    data_format: "application/json".to_string(),
+})?;
+
+// Get metrics for compliance monitoring
+let metrics = manager.get_metrics();
+println!("Read count: {}, Write count: {}, Compliance: {}%",
+    metrics.read_count, metrics.write_count, metrics.compliance_rate());
+```
+
+For detailed information, see the [Read First Always documentation](../archive/READ_FIRST_ALWAYS.md).
+
+### 3. Caching System
+
+The caching system provides performance optimization:
+
+```rust
+// Configure cache
+let config = CacheConfig {
+    max_size: NonZeroUsize::new(1000).unwrap(),
+    default_ttl: Some(Duration::from_secs(3600)),
+    notify_on_evict: true,
+};
+
+// Use cached operations
+let result = store.get_cached("key").await?;
+store.set_cached("key", value, Some(ttl)).await?;
+```
+
+### 4. Batch Operations
+
+For efficient bulk data processing:
+
+```rust
+// Batch configuration
+let options = BatchOptions {
+    max_concurrent: 10,
+    stop_on_error: false,
+    timeout: Duration::from_secs(30),
+};
+
+// Perform batch operations
+let records = vec![/* ... */];
+let results = store.bulk_create("users", records).await?;
+
+// Update multiple records
+let updates = HashMap::new();
+updates.insert("id1", json!({ "status": "active" }));
+updates.insert("id2", json!({ "status": "inactive" }));
+store.bulk_update("users", updates).await?;
+```
+
+### 5. Event System
+
+The event system enables real-time notifications:
+
+```rust
+// Create event subscriber
+let subscriber = EventSubscriber::new(&event_bus)
+    .filter_by_type(EventType::RecordCreated)
+    .filter_by_source("web5_store");
+
+// Listen for events
+while let Some(event) = subscriber.receive().await {
+    println!("Received event: {:?}", event);
+}
+
+// Publish custom events
+event_publisher.publish_event(
+    EventType::Custom("user_action"),
+    data,
+    Some("correlation_id"),
+    Some("user_id"),
+    vec!["custom_tag"],
+).await?;
+```
+
+### 6. Health Monitoring
+
+Monitor system health and performance:
+
+```rust
+// Get system health
+let health = store.get_health_status().await;
+println!("System status: {:?}", health.status);
+
+// Update component status
+health_monitor.update_component_status(
+    "cache",
+    SystemStatus::Healthy,
+    Some("Cache operating normally"),
+    None,
+).await;
+
+// Subscribe to health events
+let subscriber = EventSubscriber::new(&event_bus)
+    .filter_by_type(EventType::HealthCheck);
+```
+
+## Best Practices
+
+### 1. Error Handling
+
+```rust
+// Use custom error types
+#[derive(Error, Debug)]
+pub enum StoreError {
+    #[error("Validation error: {0}")]
+    ValidationError(String),
+    #[error("Record not found: {0}")]
+    NotFound(String),
+}
+
+// Handle errors with context
+match operation {
+    Ok(result) => process_result(result),
+    Err(e) => log_error_with_context(e, "Operation failed"),
+}
+```
+
+### 2. Async Operations
+
+```rust
+// Use async/await consistently
+async fn process_data() -> Result<(), Error> {
+    let data = fetch_data().await?;
+    process_in_background(data).await?;
+    Ok(())
+}
+
+// Handle concurrent operations
+let results = futures::future::join_all(operations).await;
+```
+
+### 3. Testing
+
+```rust
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[tokio::test]
+    async fn test_store_operations() {
+        let store = setup_test_store().await;
+        // Test operations
+    }
+}
+```
+
+## Performance Optimization
+
+### 1. Caching Strategy
+
+- Use appropriate cache sizes
+- Set reasonable TTL values
+- Monitor cache hit rates
+- Implement cache warming
+
+### 2. Batch Processing
+
+- Choose optimal batch sizes
+- Use rate limiting
+- Handle partial failures
+- Monitor batch performance
+
+### 3. Query Optimization
+
+- Use efficient filters
+- Implement pagination
+- Cache frequent queries
+- Monitor query performance
+
+## Monitoring and Debugging
+
+### 1. Logging
+
+```rust
+// Use structured logging
+log::info!("Operation completed: {}", operation_id);
+log::error!("Operation failed: {}", error);
+```
+
+### 2. Metrics
+
+```rust
+// Record custom metrics
+metrics_collector.record_performance_metric(
+    "query",
+    "user_search",
+    duration,
+).await;
+```
+
+### 3. Health Checks
+
+```rust
+// Implement custom health checks
+async fn check_component_health() -> ComponentHealth {
+    // Perform health check
+    ComponentHealth {
+        status: SystemStatus::Healthy,
+        message: Some("Component operational"),
+        details: None,
+    }
+}
+```
+
+## Security Considerations
+
+### 1. Authentication
+
+- Always validate DIDs
+- Implement proper access control
+- Use secure communication
+
+### 2. Data Validation
+
+- Validate all input data
+- Use schema validation
+- Sanitize user input
+
+### 3. Error Handling
+
+- Don't expose internal errors
+- Log security events
+- Implement rate limiting
+
+## Contributing
+
+### 1. Code Style
+
+- Follow Rust style guidelines
+- Use meaningful names
+- Document public APIs
+- Write unit tests
+
+### 2. Pull Requests
+
+- Create feature branches
+- Write clear descriptions
+- Include tests
+- Update documentation
+
+### 3. Testing
+
+- Write unit tests
+- Add integration tests
+- Test edge cases
+- Measure performance
+
+*Last updated: 2025-06-02*
+
+## See Also
+
+- [Related Document 1](../INSTALLATION.md)
+- [Related Document 2](../INSTALLATION_REVIEW.md)
