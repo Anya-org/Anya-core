@@ -6,7 +6,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 WORKSPACE_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 SRC_ROOT="$WORKSPACE_ROOT/src"
-DOCS_ROOT="$WORKSPACE_ROOT/docs_aligned"
+DOCS_ROOT="$WORKSPACE_ROOT/docs"
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -41,7 +41,7 @@ echo -e "\n${BLUE}🏚️  Checking for orphaned documentation...${NC}"
 if [[ -d "$DOCS_ROOT" ]]; then
     while IFS= read -r -d '' doc_dir; do
         module=$(basename "$doc_dir")
-        if [[ "$module" != "docs_aligned" && "$module" != "api" && "$module" != "getting-started" && -d "$doc_dir" ]]; then
+        if [[ "$module" != "docs" && "$module" != "api" && "$module" != "getting-started" && -d "$doc_dir" ]]; then
             if [[ ! -d "$SRC_ROOT/$module" ]]; then
                 echo -e "${YELLOW}⚠️  $module${NC}: Documentation exists but no source module"
             fi

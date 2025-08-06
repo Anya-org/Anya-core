@@ -30,3 +30,5 @@ init_report() {
 
 ## Summary
 
+EOF
+

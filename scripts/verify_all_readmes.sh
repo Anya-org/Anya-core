@@ -208,8 +208,8 @@ EOF
 # Main verification loop
 echo -e "${BLUE}📚 Discovering all README.md files...${NC}"
 
-# Get all README files (excluding docs_aligned as those were auto-generated)
-mapfile -t readme_files < <(find "$ANYA_ROOT" -name "README.md" -type f -not -path "*/node_modules/*" -not -path "*/.git/*" -not -path "*/docs_aligned/*" | sort)
+# Get all README files (excluding docs_legacy as those are legacy files)
+mapfile -t readme_files < <(find "$ANYA_ROOT" -name "README.md" -type f -not -path "*/node_modules/*" -not -path "*/.git/*" -not -path "*/docs_legacy/*" | sort)
 
 echo -e "${GREEN}Found ${#readme_files[@]} README.md files to verify${NC}"
 

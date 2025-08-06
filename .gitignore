@@ -68,3 +68,9 @@ node_modules/
 node_modules
 .github/instructions/work.instructions.md
 anya.code-workspace
+
+# Documentation build
+venv/
+site/
+*.pyc
+__pycache__/

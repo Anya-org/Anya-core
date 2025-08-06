@@ -1,5 +1,5 @@
-//! MobileSDK API [TEMPLATE]
-//! [AIR-3][AIS-3][BPC-3][RES-3]
+//! MobileSDK API - Mobile platform integration
+//! \[AIR-3\]\[AIS-3\]\[BPC-3\]\[RES-3\]
 
 use chrono::Utc;
 use std::sync::Arc;
