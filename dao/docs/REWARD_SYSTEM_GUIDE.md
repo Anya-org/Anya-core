@@ -7,7 +7,7 @@ This guide explains the Bitcoin-style reward system implementation for Anya Core
 The DAO reward system follows Anya Core's Bitcoin-inspired tokenomics with the following features:
 
 1. **Bitcoin-Style Supply**: 21 billion token supply with halving mechanism
-2. **Strategic Distribution**: 
+2. **Strategic Distribution**:
    - 15% allocated for community incentives (developer rewards)
    - Rewards calculated proportionally based on contribution points
 3. **Block-Based Issuance**: Rewards follow Bitcoin-style halving schedule

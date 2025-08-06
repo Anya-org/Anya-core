@@ -49,7 +49,7 @@ The Anya Governance Token (AGT) is the core utility and governance token of the 
 The AGT token is distributed according to the following model:
 
 - **35% Protocol Treasury** (7.35B AGT)
-  - Strategic Reserves (BIP-341 compliant)  
+  - Strategic Reserves (BIP-341 compliant)
   - Ecosystem Development (DAO-4 managed)
 
 - **25% Liquidity Provision** (5.25B AGT)

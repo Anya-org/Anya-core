@@ -3,6 +3,7 @@
 This document provides real-world usage examples for PSBT v2 (BIP-370) operations in the Anya Core API.
 
 ## Example: Create PSBT v2
+
 ```json
 POST /api/psbt/v2/create
 {
@@ -13,6 +14,7 @@ POST /api/psbt/v2/create
 ```
 
 ## Example: Sign PSBT v2
+
 ```json
 POST /api/psbt/v2/sign
 {
@@ -22,6 +24,7 @@ POST /api/psbt/v2/sign
 ```
 
 ## Example: Finalize PSBT v2
+
 ```json
 POST /api/psbt/v2/finalize
 {
@@ -30,4 +33,5 @@ POST /api/psbt/v2/finalize
 ```
 
 ## Migration: BIP-174 to BIP-370
+
 - Use `/api/psbt/migrate` endpoint to convert legacy PSBTs to v2 format.
