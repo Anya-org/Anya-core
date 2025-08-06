@@ -31,10 +31,11 @@ The distribution follows the principle of limited supply and decreasing inflatio
 +-------------------------------+
 | Token Supply: 21 billion     |
 +-------------------------------+
-| - DEX Allocation: 30%        |
-| - Team Allocation: 15%       |
-| - DAO/Community: 45%         |
-| - Protocol Reserve: 10%      |
+| - Protocol Treasury: 35%     |
+| - Liquidity Provision: 25%   |
+| - Team & Development: 20%    |
+| - Community Incentives: 15%  |
+| - Strategic Partners: 5%     |
 +-------------------------------+
 ```
 

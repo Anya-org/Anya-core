@@ -48,26 +48,26 @@ The Anya Governance Token (AGT) is the core utility and governance token of the 
 
 The AGT token is distributed according to the following model:
 
-- **40% Protocol Treasury** (8.4B AGT)
-  - 20% Strategic Reserves (BIP-341 compliant)
-  - 20% Ecosystem Development (DAO-4 managed)
+- **35% Protocol Treasury** (7.35B AGT)
+  - Strategic Reserves (BIP-341 compliant)  
+  - Ecosystem Development (DAO-4 managed)
 
-- **30% Liquidity Provision** (6.3B AGT)
-  - 20% Initial DEX Liquidity (Taproot-enabled)
-  - 10% Ongoing Liquidity Mining (BIP-174 PSBT)
+- **25% Liquidity Provision** (5.25B AGT)
+  - Initial DEX Liquidity (Taproot-enabled)
+  - Ongoing Liquidity Mining (BIP-174 PSBT)
 
-- **15% Team & Development** (3.15B AGT)
+- **20% Team & Development** (4.2B AGT)
   - 5-year vesting with 2-year cliff
   - Performance milestones (BPC-3 verified)
 
-- **10% Community Incentives** (2.1B AGT)
+- **15% Community Incentives** (3.15B AGT)
   - Governance participation rewards
   - Protocol usage incentives
 
 - **5% Strategic Partners** (1.05B AGT)
   - 3-year vesting schedule
 
-*For detailed tokenomics information, see [TOKENOMICS_SYSTEM.md](../archive/TOKENOMICS_SYSTEM.md)*
+*For detailed tokenomics information, see [Production Tokenomics](../../contracts/dao/tokenomics.clar)*
 
 ## Governance Framework
 
@@ -278,7 +278,7 @@ The DAO dashboard is available at [https://dao.anya-core.org](https://dao.anya-c
 ## Key Features
 
 - **Bitcoin-Style Tokenomics**: 21 billion token supply with halving mechanism
-- **Strategic Distribution**: 30% DEX, 15% development team, 55% DAO/community
+- **Strategic Distribution**: 35% Treasury, 25% Liquidity, 20% Team, 15% Community, 5% Partners
 - **Enhanced Governance**: Advanced proposal creation, voting, and execution
 - **DEX Integration**: Built-in liquidity and trading capabilities
 - **Comprehensive Logging**: Complete transparency for all operations

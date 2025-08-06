@@ -84,7 +84,7 @@ The on-chain reward system is built with a modular, secure, and scalable archite
 The reward system implements a Bitcoin-inspired token model:
 
 - **Total Supply**: 21 billion tokens (with 8 decimals precision)
-- **Halving Mechanism**: Rewards halve every 210,000 blocks
+- **Halving Mechanism**: Rewards halve every 105,000 blocks (adaptive minimum)
 - **Initial Block Reward**: 10,000 tokens per block
 - **Community Allocation**: 15% of total supply dedicated to community incentives
 

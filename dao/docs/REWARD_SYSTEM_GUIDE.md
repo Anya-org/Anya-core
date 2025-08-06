@@ -41,8 +41,9 @@ The reward calculation follows Bitcoin's model:
 
 - **Initial Block Reward**: 10,000 AGT per block
 - **Halving Schedule**:
-  - Blocks 0-210,000: 10,000 AGT per block
-  - Blocks 210,001-420,000: 5,000 AGT per block
+  - Blocks 0-105,000: 10,000 AGT per block
+  - Blocks 105,001-210,000: 5,000 AGT per block
+  - Blocks 210,001-315,000: 2,500 AGT per block
   - Blocks 420,001-630,000: 2,500 AGT per block
   - And so on...
 
