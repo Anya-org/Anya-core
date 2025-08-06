@@ -31,7 +31,7 @@ pub fn configure_routes(
     // Identity routes - require authentication
     let identity_routes = Router::new()
         .route("/identity", post(handlers::identity::create_identity))
-        .route("/identity/:id", get(handlers::identity::get_identity))
+        .route("/identity/{id}", get(handlers::identity::get_identity))
         .route(
             "/identity/resolve",
             post(handlers::identity::resolve_identity),
@@ -72,18 +72,18 @@ pub fn configure_routes(
         .route("/dwn/protocols", post(dwn::create_protocol))
         .route("/dwn/records", get(dwn::query_records))
         .route("/dwn/records", post(dwn::create_record))
-        .route("/dwn/records/:id", get(dwn::get_record))
-        .route("/dwn/records/:id", put(dwn::update_record))
-        .route("/dwn/records/:id", delete(dwn::delete_record));
+        .route("/dwn/records/{id}", get(dwn::get_record))
+        .route("/dwn/records/{id}", put(dwn::update_record))
+        .route("/dwn/records/{id}", delete(dwn::delete_record));
 
     // RGB routes - require authentication (conditional)
     #[cfg(feature = "bitcoin")]
     let rgb_routes = Router::new()
         .route("/rgb/assets", get(rgb::list_assets))
         .route("/rgb/assets", post(rgb::create_asset))
-        .route("/rgb/assets/:id", get(rgb::get_asset))
-        .route("/rgb/assets/:id/transfer", post(rgb::transfer_asset))
-        .route("/rgb/assets/:id/history", get(rgb::get_asset_history));
+        .route("/rgb/assets/{id}", get(rgb::get_asset))
+        .route("/rgb/assets/{id}/transfer", post(rgb::transfer_asset))
+        .route("/rgb/assets/{id}/history", get(rgb::get_asset_history));
 
     #[cfg(not(feature = "bitcoin"))]
     let rgb_routes = Router::new(); // Empty router when bitcoin feature is disabled
@@ -91,10 +91,10 @@ pub fn configure_routes(
     // DLC routes - require authentication
     let dlc_routes = Router::new()
         .route("/dlc", post(handlers::dlc::create_contract))
-        .route("/dlc/:id", get(handlers::dlc::get_contract))
-        .route("/dlc/:id/accept", post(handlers::dlc::accept_contract))
-        .route("/dlc/:id/finalize", post(handlers::dlc::finalize_contract))
-        .route("/dlc/:id/execute", post(handlers::dlc::execute_contract));
+        .route("/dlc/{id}", get(handlers::dlc::get_contract))
+        .route("/dlc/{id}/accept", post(handlers::dlc::accept_contract))
+        .route("/dlc/{id}/finalize", post(handlers::dlc::finalize_contract))
+        .route("/dlc/{id}/execute", post(handlers::dlc::execute_contract));
 
     // Authenticated routes
     let authenticated_api = identity_routes

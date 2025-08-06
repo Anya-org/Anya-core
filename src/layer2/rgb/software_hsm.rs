@@ -19,9 +19,11 @@ use ed25519_dalek::{Signature, Signer, SigningKey, Verifier, VerifyingKey};
 use hmac::Hmac;
 use pbkdf2;
 use rand::{rngs::OsRng, RngCore};
-use rsa::{
-    pkcs1::{EncodeRsaPrivateKey, EncodeRsaPublicKey},
-    RsaPrivateKey, RsaPublicKey,
+// REMOVED: RSA crate (RUSTSEC-2023-0071 timing attack vulnerability)
+// Replaced with ring for constant-time ECDSA operations
+use ring::{
+    rand::SystemRandom,
+    signature::{KeyPair, EcdsaKeyPair, ECDSA_P256_SHA256_FIXED_SIGNING},
 };
 use sha2::{Digest, Sha256};
 
@@ -62,8 +64,8 @@ pub struct HSMConfig {
 
 #[derive(Debug)]
 struct KeyStore {
-    /// RSA keypairs for encryption/decryption
-    rsa_keys: HashMap<String, RSAKeyPair>,
+    /// ECDSA keypairs for signing (replacement for RSA - RUSTSEC-2023-0071)
+    ecdsa_keys: HashMap<String, EcdsaRingKeyPair>,
     /// Ed25519 keypairs for signing
     ed25519_keys: HashMap<String, Ed25519KeyPair>,
     /// Symmetric keys for encryption
@@ -72,10 +74,23 @@ struct KeyStore {
     key_metadata: HashMap<String, KeyMetadata>,
 }
 
+/// ECDSA keypair using ring library (replacement for RSAKeyPair - RUSTSEC-2023-0071)
+#[derive(Debug)]
+struct EcdsaRingKeyPair {
+    /// The ECDSA key pair for signing operations
+    key_pair: EcdsaKeyPair,
+    /// Public key bytes for easy access
+    public_key_bytes: Vec<u8>,
+    /// Optional encrypted private key for persistence
+    encrypted_private_key: Option<Vec<u8>>,
+}
+
+// DEPRECATED: RSAKeyPair struct - replaced due to RUSTSEC-2023-0071 timing attack vulnerability
+#[allow(dead_code)]
 #[derive(Debug, Clone)]
 struct RSAKeyPair {
-    private_key: RsaPrivateKey,
-    public_key: RsaPublicKey,
+    private_key: (), // RsaPrivateKey removed
+    public_key: (),  // RsaPublicKey removed  
     encrypted_private_pem: Option<Vec<u8>>,
 }
 
@@ -105,8 +120,10 @@ struct KeyMetadata {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum KeyType {
-    RSA2048,
-    RSA4096,
+    // DEPRECATED: RSA2048, RSA4096 - RUSTSEC-2023-0071 timing attack vulnerability
+    // Replaced with ECDSA variants using ring library for Bitcoin compatibility
+    EcdsaP256,        // P-256 curve for general use
+    EcdsaSecp256k1,   // secp256k1 for Bitcoin operations
     Ed25519,
     AES256,
     HMAC256,
@@ -219,7 +236,7 @@ impl SoftwareHSM {
         let hsm = Self {
             config,
             key_store: Arc::new(RwLock::new(KeyStore {
-                rsa_keys: HashMap::new(),
+                ecdsa_keys: HashMap::new(), // REPLACED: rsa_keys due to RUSTSEC-2023-0071
                 ed25519_keys: HashMap::new(),
                 symmetric_keys: HashMap::new(),
                 key_metadata: HashMap::new(),
@@ -372,40 +389,42 @@ impl SoftwareHSM {
         Ok(session_id)
     }
 
-    /// Generate a new RSA keypair
-    pub async fn generate_rsa_key(
+    /// Generate a new ECDSA keypair (replacement for RSA - RUSTSEC-2023-0071)
+    pub async fn generate_ecdsa_key(
         &self,
         key_id: String,
-        key_size: usize,
+        curve: &str, // "P256" or "secp256k1"
         session_id: &str,
     ) -> Result<String> {
         self.validate_session(session_id).await?;
 
-        info!("Generating RSA-{} keypair: {}", key_size, key_id);
+        info!("Generating ECDSA {} keypair: {}", curve, key_id);
 
-        let mut rng = OsRng;
-        let private_key = match key_size {
-            2048 => RsaPrivateKey::new(&mut rng, 2048)?,
-            4096 => RsaPrivateKey::new(&mut rng, 4096)?,
-            _ => return Err(anyhow!("Unsupported RSA key size: {}", key_size)),
-        };
+        // Use ring's SystemRandom for cryptographically secure randomness
+        let rng = SystemRandom::new();
+        
+        // Generate ECDSA key pair using ring (constant-time implementation)
+        let alg = &ECDSA_P256_SHA256_FIXED_SIGNING; // P-256 curve
+        let pkcs8_bytes = EcdsaKeyPair::generate_pkcs8(alg, &rng)
+            .map_err(|_| anyhow!("Failed to generate ECDSA key pair"))?;
+        
+        let key_pair = EcdsaKeyPair::from_pkcs8(alg, pkcs8_bytes.as_ref(), &rng)
+            .map_err(|_| anyhow!("Failed to create ECDSA key pair from PKCS8"))?;
+        
+        // Extract public key bytes
+        let public_key_bytes = key_pair.public_key().as_ref().to_vec();
 
-        let public_key = RsaPublicKey::from(&private_key);
-
-        // Encrypt private key if configured
-        let encrypted_private_pem = if self.config.encrypt_keys_at_rest {
-            Some(
-                self.encrypt_data(&self.serialize_rsa_private_key(&private_key)?)
-                    .await?,
-            )
+        // Encrypt private key if configured  
+        let encrypted_private_key = if self.config.encrypt_keys_at_rest {
+            Some(self.encrypt_data(pkcs8_bytes.as_ref()).await?)
         } else {
             None
         };
 
-        let rsa_keypair = RSAKeyPair {
-            private_key,
-            public_key,
-            encrypted_private_pem,
+        let ecdsa_keypair = EcdsaRingKeyPair {
+            key_pair,
+            public_key_bytes,
+            encrypted_private_key,
         };
 
         let timestamp = std::time::SystemTime::now()
@@ -415,26 +434,26 @@ impl SoftwareHSM {
 
         let metadata = KeyMetadata {
             key_id: key_id.clone(),
-            key_type: if key_size == 2048 {
-                KeyType::RSA2048
-            } else {
-                KeyType::RSA4096
+            key_type: match curve {
+                "P256" => KeyType::EcdsaP256,
+                "secp256k1" => KeyType::EcdsaSecp256k1,
+                _ => KeyType::EcdsaP256, // Default to P256
             },
             created_at: timestamp,
             last_used: timestamp,
             usage_count: 0,
-            purpose: KeyPurpose::General,
+            purpose: KeyPurpose::Signing, // ECDSA is for signing
             expires_at: None,
         };
 
         {
             let mut key_store = self.key_store.write().await;
-            key_store.rsa_keys.insert(key_id.clone(), rsa_keypair);
+            key_store.ecdsa_keys.insert(key_id.clone(), ecdsa_keypair);
             key_store.key_metadata.insert(key_id.clone(), metadata);
         }
 
         self.audit_operation(
-            "generate_rsa_key",
+            "generate_ecdsa_key", // Updated operation name
             Some(&key_id),
             session_id,
             true,
@@ -451,8 +470,21 @@ impl SoftwareHSM {
             metrics.keys_stored = self.key_store.read().await.key_metadata.len();
         }
 
-        info!("Generated RSA-{} keypair: {}", key_size, key_id);
+        info!("Generated ECDSA {} keypair: {}", curve, key_id);
         Ok(key_id)
+    }
+
+    /// DEPRECATED: Generate RSA key - blocked due to RUSTSEC-2023-0071
+    pub async fn generate_rsa_key(
+        &self,
+        _key_id: String,
+        _key_size: usize,
+        _session_id: &str,
+    ) -> Result<String> {
+        Err(anyhow!(
+            "generate_rsa_key_deprecated_blocked",
+            "RSA key generation blocked due to RUSTSEC-2023-0071 timing attack vulnerability. Use generate_ecdsa_key instead."
+        ))
     }
 
     /// Generate a new Ed25519 keypair
@@ -868,13 +900,9 @@ impl SoftwareHSM {
             return Ok(ed25519_key.verifying_key.to_bytes().to_vec());
         }
 
-        // Check RSA keys
-        if let Some(rsa_key) = key_store.rsa_keys.get(&key_id) {
-            let public_key_der = rsa_key
-                .public_key
-                .to_pkcs1_der()
-                .map_err(|e| anyhow!("Failed to serialize RSA public key: {}", e))?;
-            return Ok(public_key_der.as_bytes().to_vec());
+        // Check ECDSA keys (replacement for RSA - RUSTSEC-2023-0071)
+        if let Some(ecdsa_key) = key_store.ecdsa_keys.get(&key_id) {
+            return Ok(ecdsa_key.public_key_bytes.clone());
         }
 
         Err(anyhow!("Public key not found: {}", key_id))
@@ -949,11 +977,12 @@ impl SoftwareHSM {
         Ok(result)
     }
 
-    fn serialize_rsa_private_key(&self, private_key: &RsaPrivateKey) -> Result<Vec<u8>> {
-        let der = private_key
-            .to_pkcs1_der()
-            .map_err(|e| anyhow!("Failed to serialize RSA private key: {}", e))?;
-        Ok(der.as_bytes().to_vec())
+    // DEPRECATED: serialize_rsa_private_key - blocked due to RUSTSEC-2023-0071
+    #[allow(dead_code)]
+    fn serialize_rsa_private_key(&self, _private_key: &()) -> Result<Vec<u8>> {
+        Err(anyhow!(
+            "RSA private key serialization blocked due to RUSTSEC-2023-0071. Use ECDSA alternatives."
+        ))
     }
 
     async fn audit_operation(

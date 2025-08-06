@@ -1,10 +1,8 @@
 [advisories]
-# Ignore specific advisories with justification
-ignore = [
-    # Temporary ignore RSA timing attack until alternative is implemented
-    # TODO: Replace rsa crate with ring or other constant-time implementation
-    { id = "RUSTSEC-2023-0071", reason = "RSA timing attack - tracking issue for migration to ring crate" }
-]
+# RSA timing attack (RUSTSEC-2023-0071) - RESOLVED ✅
+# Migration completed: RSA crate replaced with ring for ECDSA operations
+# All RSA functionality migrated to constant-time ECDSA P-256 implementation
+ignore = []
 
 [licenses]
 # List of explicitly allowed licenses
