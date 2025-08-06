@@ -96,6 +96,7 @@ Block rewards follow Bitcoin's halving model with adaptive intervals:
 
 ## Integration Points
 
+> **Note:** The following source files are required for the tokenomics module to function as described. Please ensure that these files exist in the codebase. If any are missing, they must be implemented to match the documentation.
 - `/src/tokenomics/mod.rs`: Main tokenomics implementation
 - `/src/tokenomics/engine.rs`: Tokenomics engine
 - `/src/tokenomics/models.rs`: Economic models
