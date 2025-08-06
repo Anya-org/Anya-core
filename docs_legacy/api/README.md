@@ -434,7 +434,7 @@ async def main():
 
 ## Resources
 
-- [API Changelog](../../dependencies/CHANGELOG.md)
+- [API Changelog](../../CHANGELOG.md)
 - [SDK Documentation](README.md)
 - [Authentication Guide](../integration/authentication.md)
 - [Rate Limiting Guide](../security/rate-limiting.md)
