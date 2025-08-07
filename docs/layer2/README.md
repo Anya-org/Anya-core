@@ -10,7 +10,7 @@ last_updated: 2025-08-06
 
 ## Overview
 
-Layer2 protocols module for Bitcoin scaling solutions
+! Layer2 protocols module for Bitcoin scaling solutions
 
 This module contains 19 Rust source files.
 

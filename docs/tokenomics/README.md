@@ -15,7 +15,7 @@ This module implements the complete economic models and tokenomics for the Anya 
 
 ## Production Parameters (Source of Truth)
 
-Based on `../../contracts/dao/tokenomics.clar`:
+Based on `/src/tokenomics/mod.rs` (source-aligned implementation; if `contracts/dao/tokenomics.clar` is added, update this reference):
 
 - **Total Supply**: 21,000,000,000 AGT tokens (21 billion)
 - **Decimal Precision**: 8 decimals
@@ -96,6 +96,7 @@ Block rewards follow Bitcoin's halving model with adaptive intervals:
 
 ## Integration Points
 
+> **Note:** The following source files are required for the tokenomics module to function as described. Please ensure that these files exist in the codebase. If any are missing, they must be implemented to match the documentation.
 - `/src/tokenomics/mod.rs`: Main tokenomics implementation
 - `/src/tokenomics/engine.rs`: Tokenomics engine
 - `/src/tokenomics/models.rs`: Economic models
