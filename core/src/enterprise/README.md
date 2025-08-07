@@ -48,12 +48,14 @@ This module may depend on other Anya Core modules. Check `Cargo.toml` or relevan
 ## Testing
 
 Related tests can be found in:
+
 - Unit tests: Check for `#[cfg(test)]` modules in Rust files
 - Integration tests: Look for corresponding files in `tests/` directory
 
 ## Contributing
 
 When contributing to this module:
+
 1. Ensure all public APIs are documented
 2. Add appropriate tests for new functionality
 3. Update this README when adding new public interfaces

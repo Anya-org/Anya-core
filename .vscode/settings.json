@@ -1,18 +1,19 @@
 {
     "cSpell.words": [
-        "safetensors",
+        "Anya",
+        "bip341",
+        "bitcoinjs",
+        "huggingface",
         "onnx",
         "ONNX",
-        "Safetensors",
-        "huggingface",
+        "psbt",
         "RUSTSEC",
-        "bitcoinjs",
-        "secp256k1",
-        "bip341",
-        "taproot",
+        "safetensors",
+        "Safetensors",
         "schnorr",
-        "utxo",
-        "psbt"
+        "secp256k1",
+        "taproot",
+        "utxo"
     ],
     "rust-analyzer.checkOnSave.command": "clippy",
     "rust-analyzer.checkOnSave.extraArgs": [

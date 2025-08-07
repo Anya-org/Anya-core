@@ -67,7 +67,7 @@ The AGT token is distributed according to the following model:
 - **5% Strategic Partners** (1.05B AGT)
   - 3-year vesting schedule
 
-*For detailed tokenomics information, see [Production Tokenomics](../../contracts/dao/tokenomics.clar)*
+*For detailed tokenomics information, see [Production Tokenomics](../../../contracts/dao/tokenomics.clar)*
 
 ## Governance Framework
 

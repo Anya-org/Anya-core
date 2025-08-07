@@ -34,7 +34,7 @@ impl StacksIntegration {
             endpoint: endpoint.to_string(),
         }
     }
-    
+
     // Placeholder for stacks functionality
     pub fn is_enabled(&self) -> bool {
         false
@@ -51,13 +51,13 @@ use crate::AnyaResult;
 pub enum SidechainType {
     /// RSK (Rootstock) - Smart contracts
     RSK,
-    
+
     /// Stacks - Smart contracts and apps
     Stacks,
-    
+
     /// Liquid - Asset issuance
     Liquid,
-    
+
     /// Other sidechain
     Other(String),
 }
@@ -67,16 +67,16 @@ pub enum SidechainType {
 pub enum CrossChainTxStatus {
     /// Transaction is pending on the source chain
     PendingSource,
-    
+
     /// Transaction is confirmed on the source chain
     ConfirmedSource,
-    
+
     /// Transaction is pending on the destination chain
     PendingDestination,
-    
+
     /// Transaction is confirmed on both chains
     Confirmed,
-    
+
     /// Transaction failed
     Failed(String),
 }
@@ -86,31 +86,31 @@ pub enum CrossChainTxStatus {
 pub struct CrossChainTx {
     /// Transaction ID
     pub id: String,
-    
+
     /// Source chain
     pub source_chain: SidechainType,
-    
+
     /// Destination chain
     pub destination_chain: SidechainType,
-    
+
     /// Source transaction ID
     pub source_txid: String,
-    
+
     /// Destination transaction ID (if available)
     pub destination_txid: Option<String>,
-    
+
     /// Transaction status
     pub status: CrossChainTxStatus,
-    
+
     /// Transaction amount
     pub amount: String,
-    
+
     /// Transaction fee
     pub fee: String,
-    
+
     /// Transaction timestamp
     pub timestamp: u64,
-    
+
     /// Additional metadata
     pub metadata: HashMap<String, String>,
 }
@@ -119,38 +119,38 @@ pub struct CrossChainTx {
 pub trait SidechainManager {
     /// Lists supported sidechains
     fn list_sidechains(&self) -> AnyaResult<Vec<SidechainType>>;
-    
+
     /// Gets sidechain status
     fn get_sidechain_status(&self, sidechain: &SidechainType) -> AnyaResult<SidechainStatus>;
-    
+
     /// Lists cross-chain transactions
     fn list_cross_chain_txs(&self) -> AnyaResult<Vec<CrossChainTx>>;
-    
+
     /// Gets a cross-chain transaction by ID
-    fn get_cross_chain_tx(&self, _tx_id: tx_id: &strstr) -> AnyaResult<Option<CrossChainTx>>;
-    
+    fn get_cross_chain_tx(&self, tx_id: &str) -> AnyaResult<Option<CrossChainTx>>;
+
     /// Gets the status of a cross-chain transaction
-    fn get_cross_chain_tx_status(&self, _tx_id: tx_id: &strstr) -> AnyaResult<CrossChainTxStatus>;
+    fn get_cross_chain_tx_status(&self, tx_id: &str) -> AnyaResult<CrossChainTxStatus>;
 }
 
 /// Status of a sidechain
 #[derive(Debug, Clone)]
-pub struct SidechainStatus  -> Result<(), Box<dyn Error>> {
+pub struct SidechainStatus {
     /// Sidechain type
     pub sidechain_type: SidechainType,
-    
+
     /// Is the sidechain active
     pub is_active: bool,
-    
+
     /// Current block height
     pub block_height: u64,
-    
+
     /// Latest block hash
     pub latest_block_hash: String,
-    
+
     /// Average block time in seconds
     pub average_block_time: f64,
-    
+
     /// Chain synchronization percentage
     pub sync_percentage: f64,
 }
@@ -160,7 +160,7 @@ pub struct SidechainFactory;
 
 impl SidechainFactory {
     /// Creates a new sidechain manager
-    pub fn create_manager() -> Box<dyn SidechainManager>  -> Result<(), Box<dyn Error>> {
+    pub fn create_manager() -> Box<dyn SidechainManager> {
         Box::new(DefaultSidechainManager::new())
     }
 }
@@ -172,7 +172,7 @@ struct DefaultSidechainManager {
 
 impl DefaultSidechainManager {
     /// Creates a new default sidechain manager
-    fn new() -> Self  -> Result<(), Box<dyn Error>> {
+    fn new() -> Self {
         Self {}
     }
 }
@@ -181,88 +181,90 @@ impl SidechainManager for DefaultSidechainManager {
     fn list_sidechains(&self) -> AnyaResult<Vec<SidechainType>> {
         // Real sidechain listing implementation
         log::info!("Listing available sidechains");
-        
+
         Ok(vec![
             SidechainType::RSK,
             SidechainType::Liquid,
         ])
     }
-    
+
     fn get_sidechain_status(&self, sidechain: &SidechainType) -> AnyaResult<SidechainStatus> {
         // Real sidechain status implementation
         log::info!("Querying status for sidechain: {:?}", sidechain);
-        
+
         match sidechain {
             SidechainType::RSK => {
                 // Real RSK status check
                 Ok(SidechainStatus {
-                    name: "RSK".to_string(),
+                    sidechain_type: SidechainType::RSK,
                     is_active: true,
                     block_height: 5000000,
-                    last_sync: std::time::SystemTime::now(),
-                    peer_count: 15,
-                    network_hash_rate: 150000000000000u64, // Placeholder
+                    latest_block_hash: "000000000000000000021a5c2c06b690b398736ef85c9ee2b3b63f7b94938639".to_string(),
+                    average_block_time: 30.0,
+                    sync_percentage: 99.8,
                 })
             }
             SidechainType::Liquid => {
                 // Real Liquid status check
                 Ok(SidechainStatus {
-                    name: "Liquid".to_string(),
+                    sidechain_type: SidechainType::Liquid,
                     is_active: true,
                     block_height: 2800000,
-                    last_sync: std::time::SystemTime::now(),
-                    peer_count: 8,
-                    network_hash_rate: 0, // Liquid doesn't use PoW
+                    latest_block_hash: "9908dafcd000ec2a1e6f0401a4387986f29c55c4ef5fc83fcea98f09c7c0c92d".to_string(),
+                    average_block_time: 60.0,
+                    sync_percentage: 100.0,
                 })
             }
         }
     }
-    
+
     fn list_cross_chain_txs(&self) -> AnyaResult<Vec<CrossChainTx>> {
         // Real cross-chain transaction listing
         log::info!("Listing cross-chain transactions");
-        
+
         // In production, this would query actual transaction database
         let mut transactions = Vec::new();
-        
+
         // Example cross-chain transactions
         transactions.push(CrossChainTx {
             id: "cc-tx-001".to_string(),
             source_chain: SidechainType::RSK,
             destination_chain: SidechainType::Liquid,
-            amount: 100000,
-            status: CrossChainTxStatus::Completed,
-            created_at: std::time::SystemTime::now(),
-            completed_at: Some(std::time::SystemTime::now()),
-            source_tx_id: Some("rsk-tx-123".to_string()),
-            destination_tx_id: Some("liquid-tx-456".to_string()),
+            source_txid: "rsk-tx-123".to_string(),
+            destination_txid: Some("liquid-tx-456".to_string()),
+            status: CrossChainTxStatus::Confirmed,
+            amount: "0.00100000".to_string(),
+            fee: "0.00001000".to_string(),
+            timestamp: 1629472382,
+            metadata: HashMap::new(),
         });
-        
+
         transactions.push(CrossChainTx {
             id: "cc-tx-002".to_string(),
             source_chain: SidechainType::Liquid,
             destination_chain: SidechainType::RSK,
-            amount: 50000,
-            status: CrossChainTxStatus::Pending,
-            created_at: std::time::SystemTime::now(),
-            completed_at: None,
-            source_tx_id: Some("liquid-tx-789".to_string()),
-            destination_tx_id: None,
+            source_txid: "liquid-tx-789".to_string(),
+            destination_txid: None,
+            status: CrossChainTxStatus::PendingDestination,
+            amount: "0.00050000".to_string(),
+            fee: "0.00000500".to_string(),
+            timestamp: 1629558782,
+            metadata: HashMap::new(),
         });
-        
+
         log::debug!("Found {} cross-chain transactions", transactions.len());
         Ok(transactions)
     }
-    
+
     fn get_cross_chain_tx(&self, tx_id: &str) -> AnyaResult<Option<CrossChainTx>> {
         // Real cross-chain transaction query
         log::info!("Querying cross-chain transaction: {}", tx_id);
-        
+
         // Validate transaction ID format
-        if tx_id.is_empty() || !tx_id.starts_with("cc-tx-") {
-            return Err(AnyaError::ValidationError("Invalid cross-chain transaction ID format".to_string()));
+        if tx_id.is_empty() {
+            return Err(AnyaError::ValidationError("Transaction ID cannot be empty".to_string()));
         }
-        
+
         // In production, this would query the actual database
         match tx_id {
             "cc-tx-001" => {
@@ -270,12 +272,13 @@ impl SidechainManager for DefaultSidechainManager {
                     id: tx_id.to_string(),
                     source_chain: SidechainType::RSK,
                     destination_chain: SidechainType::Liquid,
-                    amount: 100000,
-                    status: CrossChainTxStatus::Completed,
-                    created_at: std::time::SystemTime::now(),
-                    completed_at: Some(std::time::SystemTime::now()),
-                    source_tx_id: Some("rsk-tx-123".to_string()),
-                    destination_tx_id: Some("liquid-tx-456".to_string()),
+                    source_txid: "rsk-tx-123".to_string(),
+                    destination_txid: Some("liquid-tx-456".to_string()),
+                    status: CrossChainTxStatus::Confirmed,
+                    amount: "0.00100000".to_string(),
+                    fee: "0.00001000".to_string(),
+                    timestamp: 1629472382,
+                    metadata: HashMap::new(),
                 }))
             }
             "cc-tx-002" => {
@@ -283,12 +286,13 @@ impl SidechainManager for DefaultSidechainManager {
                     id: tx_id.to_string(),
                     source_chain: SidechainType::Liquid,
                     destination_chain: SidechainType::RSK,
-                    amount: 50000,
-                    status: CrossChainTxStatus::Pending,
-                    created_at: std::time::SystemTime::now(),
-                    completed_at: None,
-                    source_tx_id: Some("liquid-tx-789".to_string()),
-                    destination_tx_id: None,
+                    source_txid: "liquid-tx-789".to_string(),
+                    destination_txid: None,
+                    status: CrossChainTxStatus::PendingDestination,
+                    amount: "0.00050000".to_string(),
+                    fee: "0.00000500".to_string(),
+                    timestamp: 1629558782,
+                    metadata: HashMap::new(),
                 }))
             }
             _ => {
@@ -297,14 +301,14 @@ impl SidechainManager for DefaultSidechainManager {
             }
         }
     }
-    
+
     fn get_cross_chain_tx_status(&self, tx_id: &str) -> AnyaResult<CrossChainTxStatus> {
         // Real cross-chain transaction status query
         log::info!("Querying status for cross-chain transaction: {}", tx_id);
-        
+
         // Get the transaction first
         let tx = self.get_cross_chain_tx(tx_id)?;
-        
+
         match tx {
             Some(transaction) => {
                 log::debug!("Transaction {} status: {:?}", tx_id, transaction.status);
@@ -315,4 +319,4 @@ impl SidechainManager for DefaultSidechainManager {
             }
         }
     }
-} 
+}
