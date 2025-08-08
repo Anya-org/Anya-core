@@ -670,6 +670,9 @@ impl HsmProvider for SoftwareHsmProvider {
             SigningAlgorithm::EcdsaSha256 => {
                 // Get the private key data securely (already raw bytes)
                 let key_data = key_info.key_data.lock().await;
+                // Ensure key_data is securely zeroized after use
+                use zeroize::Zeroizing;
+                let key_data = Zeroizing::new(key_data.clone());
                 let secret_key = SecretKey::from_slice(&key_data)
                     .map_err(|e| HsmError::InvalidKeyData(format!("Invalid secret key: {}", e)))?;
 
