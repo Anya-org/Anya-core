@@ -23,6 +23,7 @@ Status: ✅ Core stable • 🔄 Production integrations in progress
 - Bitcoin Core: RPC client available; wire state/fees (height/hash/estimatesmartfee)
 - Layer2: Manager/coordinator stable; production adapters pending for LN/RGB/DLC
 - Storage: SQLite + RocksDB operational; metrics enabled
+           WEB5 Data storage : Beta
 - AI/ML: Enhanced agentic system present; integration stabilization pending
 
 ## 🚧 Gaps To Close (P1)

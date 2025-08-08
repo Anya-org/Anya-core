@@ -33,10 +33,8 @@ async fn test_rust_bitcoin_implementation() {
         .await
         .unwrap();
     // Current implementation returns an empty tx stub; just ensure we got a transaction
-    assert!(
-        tx.version.to_consensus_u32() >= 1,
-        "Transaction stub should be valid"
-    );
+    // For stubbed tx, just assert non-zero inputs/outputs are possible later; here ensure version is present
+    assert!(tx.version.0 >= 1, "Transaction stub should be valid");
 
     // Test broadcasting (mocked)
     let txid = implementation.broadcast_transaction(&tx).await.unwrap();

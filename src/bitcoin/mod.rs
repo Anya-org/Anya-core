@@ -14,6 +14,7 @@ pub mod lightning;
 pub mod manager;
 pub mod node; // Bitcoin node management
 pub mod protocol; // Bitcoin protocol compliance module
+pub mod rpc; // RPC shim re-exported for adapters/tests
 pub mod rust;
 pub mod taproot;
 pub mod validation; // Consolidated validation module
