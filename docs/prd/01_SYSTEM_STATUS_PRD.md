@@ -19,7 +19,7 @@ Status: ✅ Core stable • 🔄 Production integrations in progress
 
 ## 🧩 Components Snapshot
 
-- Security/HSM: Production-ready (software HSM; audit logging; AES-GCM/RSA/Ed25519)
+- Security/HSM: Production-ready (software HSM; audit logging; AES-GCM/RSA/Ed25519); integration tests stabilized with simulator unlock + timeouts.
 - Bitcoin Core: RPC client available; wire state/fees (height/hash/estimatesmartfee)
 - Layer2: Manager/coordinator stable; production adapters pending for LN/RGB/DLC
 - Storage: SQLite + RocksDB operational; metrics enabled
@@ -31,6 +31,11 @@ Status: ✅ Core stable • 🔄 Production integrations in progress
 2) Lightning adapter (LDK or LND gRPC) minimal operations
 3) RGB client integration for basic schema/list/query
 4) DLC oracle client wiring
+
+## 🧪 Recent Branch Outcomes
+
+- CLI health and validation succeed via default `anya-core` target (cargo core-health/core-validate).
+- HSM integration tests updated to avoid hangs; network-bound tests remain environment-sensitive.
 
 ## ✅ Verification Commands
 
