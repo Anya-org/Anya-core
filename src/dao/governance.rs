@@ -164,6 +164,16 @@ pub struct Voter {
 }
 
 impl DaoGovernance {
+    /// Register a voter for testing and basic functionality
+    pub fn register_voter(&mut self, address: &str, stake: u64, voting_power: u64) {
+        let voter = Voter {
+            address: address.to_string(),
+            stake,
+            voting_power,
+            last_vote_time: Utc::now(),
+        };
+        self.voters.insert(address.to_string(), voter);
+    }
     /// Initialize DAO governance from config
     pub async fn initialize(config: DaoConfig) -> Result<Arc<Self>> {
         // Create default dependencies

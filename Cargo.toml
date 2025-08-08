@@ -3,14 +3,12 @@
 
 [workspace]
 resolver = "2"
-members = [
-    ".",
-]
+members = ["."]
 
 [workspace.package]
 version = "1.3.0"
 edition = "2021"
-rust-version = "1.70.0"  # LTS Rust version
+rust-version = "1.70.0"                                          # LTS Rust version
 authors = ["botshelomokoka+anya-core@gmail.com"]
 license = "MIT"
 repository = "https://github.com/anya-org/anya-core"
@@ -19,8 +17,19 @@ description = "Enterprise-grade Bitcoin Infrastructure Platform"
 [workspace.dependencies]
 # === LTS Bitcoin & Cryptography Stack ===
 # Unified secp256k1 version - aligned with bitcoin ecosystem
-bitcoin = { version = "0.32.6", features = ["std", "serde", "rand", "secp-recovery", "base64", "rand-std"] }
-secp256k1 = { version = "0.29.1", features = ["global-context", "recovery", "rand"] }
+bitcoin = { version = "0.32.6", features = [
+    "std",
+    "serde",
+    "rand",
+    "secp-recovery",
+    "base64",
+    "rand-std",
+] }
+secp256k1 = { version = "0.29.1", features = [
+    "global-context",
+    "recovery",
+    "rand",
+] }
 bitcoincore-rpc = { version = "0.19.0", features = ["default"] }
 bitcoin_hashes = { version = "0.14.0", features = ["std", "serde"] }
 miniscript = { version = "12.3.5", features = ["std", "compiler"] }
@@ -33,7 +42,11 @@ async-trait = { version = "0.1.88" }
 
 # === LTS Serialization ===
 serde = { version = "1.0.219", features = ["derive", "rc"] }
-serde_json = { version = "1.0.140", features = ["std", "preserve_order", "arbitrary_precision"] }
+serde_json = { version = "1.0.140", features = [
+    "std",
+    "preserve_order",
+    "arbitrary_precision",
+] }
 humantime-serde = { version = "1.1.1" }
 
 # === LTS HTTP & Networking ===
@@ -101,7 +114,13 @@ sysinfo = { version = "0.36.1" }
 # === Enterprise Dependencies ===
 yubihsm = { version = "0.42.1" }
 sgx_urts = { version = "1.1.1" }
-sqlx = { version = "0.8.2", features = ["runtime-tokio-rustls", "postgres", "sqlite", "chrono", "uuid"] }
+sqlx = { version = "0.8.2", features = [
+    "runtime-tokio-rustls",
+    "postgres",
+    "sqlite",
+    "chrono",
+    "uuid",
+] }
 
 [package]
 name = "anya-core"
@@ -115,6 +134,7 @@ repository = { workspace = true }
 readme = "README.md"
 keywords = ["bitcoin", "cryptocurrency", "blockchain", "enterprise", "mobile"]
 categories = ["api-bindings", "cryptography::cryptocurrencies"]
+default-run = "anya-core"
 
 [lib]
 name = "anya_core"
@@ -123,15 +143,22 @@ crate-type = ["lib", "staticlib", "cdylib"]
 [features]
 default = ["std", "bitcoin", "mobile"]
 std = []
+# Development simulation feature (non-default): gates simulator code and other dev-only paths
+dev-sim = []
 # Bitcoin implementation features
 # [AIR-3][AIS-3][BPC-3] Enhanced Feature Flags with HSM Standardization
-bitcoin = ["dep:bitcoin", "dep:bitcoincore-rpc", "dep:miniscript", "dep:bdk_wallet"]
-rust-bitcoin = ["bitcoin"]  # Alias for backward compatibility
+bitcoin = [
+    "dep:bitcoin",
+    "dep:bitcoincore-rpc",
+    "dep:miniscript",
+    "dep:bdk_wallet",
+]
+rust-bitcoin = ["bitcoin"] # Alias for backward compatibility
 
 # Mobile SDK features (MIT-compliant)
 ffi = ["std"]
 mobile = ["ffi", "std", "bitcoin"]
-ndk = ["mobile", "dep:ndk"] # Android NDK support
+ndk = ["mobile", "dep:ndk"]        # Android NDK support
 
 # Bitcoin implementation features enhanced
 bdk = ["bitcoin", "dep:bdk_wallet"] # Bitcoin Development Kit support
@@ -147,23 +174,26 @@ memory_tracking = ["std"] # Memory usage tracking for tests
 enterprise = ["dep:sqlx"]
 
 # [AIS-3] HSM Features - MIT-compliant external interface
-hsm = ["hsm-software"]  # Default to software HSM (always available)
+hsm = ["hsm-software"] # Default to software HSM (always available)
 hsm-full = ["hsm-software", "hsm-bitcoin", "hsm-simulator", "hsm-external"]
-hsm-software = []  # Software HSM - no external dependencies, always available
-hsm-external = ["hsm-software"]  # External HSM interface via CLI - MIT compliant
-hsm-bitcoin = ["bitcoin", "hsm-software"]  # Bitcoin-specific HSM operations
-hsm-simulator = ["hsm-software"]  # Simulator for testing
-hsm-production = ["hsm-external", "hsm-bitcoin"]  # Production-ready HSM via external interface
+hsm-software = [] # Software HSM - no external dependencies, always available
+hsm-external = ["hsm-software"] # External HSM interface via CLI - MIT compliant
+hsm-bitcoin = ["bitcoin", "hsm-software"] # Bitcoin-specific HSM operations
+hsm-simulator = ["hsm-software"] # Simulator for testing
+hsm-production = [
+    "hsm-external",
+    "hsm-bitcoin",
+] # Production-ready HSM via external interface
 
 # Bitcoin advanced features
-taproot = ["bitcoin"]  # Taproot transaction support
+taproot = ["bitcoin"] # Taproot transaction support
 
 # API features
 api = ["std"]
 
 # ML acceleration features
-cuda = []      # CUDA GPU acceleration support
-wgpu = []      # WebGPU acceleration support
+cuda = [] # CUDA GPU acceleration support
+wgpu = [] # WebGPU acceleration support
 
 # Complete system (including all features)
 complete = ["bitcoin", "mobile", "web5", "enterprise", "hsm-full"]
@@ -217,7 +247,7 @@ jni = { version = "0.21.1", optional = true }
 regex = "1.11.1"
 hex = "0.4.3"
 semver = "1.0.26"
-ureq = { workspace = true }  # MIT-licensed HTTP client
+ureq = { workspace = true }                        # MIT-licensed HTTP client
 syn = { version = "2.0.104", features = ["full"] }
 url = "2.5.4"
 rand.workspace = true
@@ -285,7 +315,10 @@ maplit = { workspace = true }
 sysinfo = { workspace = true }
 
 # === Enterprise Dependencies (MIT-compliant) ===
-sqlx = { version = "0.8.2", features = ["runtime-tokio-rustls", "postgres"], optional = true }
+sqlx = { version = "0.8.2", features = [
+    "runtime-tokio-rustls",
+    "postgres",
+], optional = true }
 
 [dev-dependencies]
 criterion = { workspace = true }
@@ -318,7 +351,7 @@ overflow-checks = true
 # Mobile-specific profiles
 [profile.mobile-release]
 inherits = "release"
-opt-level = "z"  # Optimize for size
+opt-level = "z"      # Optimize for size
 lto = "fat"
 codegen-units = 1
 strip = true
