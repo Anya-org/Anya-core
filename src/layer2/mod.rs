@@ -17,6 +17,9 @@ pub mod liquid;
 pub mod manager;
 pub mod mock; // Kept for backward compatibility and testing
 pub mod production; // New production implementation
+                    // Dev-only simulation helpers (feature gated)
+#[cfg(feature = "dev-sim")]
+pub mod dev_sim;
 pub mod rgb;
 pub mod rsk;
 pub mod stacks;
