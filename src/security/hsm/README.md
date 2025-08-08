@@ -172,6 +172,11 @@ Comprehensive tests are included in `tests.rs`. Run the tests with:
 cargo test --package anya-core --lib -- security::hsm::tests
 ```
 
+Dev simulator notes:
+
+- The simulator starts locked by default; initialize and unlock via a custom `unlock` operation (pin "1234").
+- Use per-test timeouts to avoid hangs when running under async runtimes.
+
 ## Documentation
 
 For detailed documentation, refer to:
