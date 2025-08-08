@@ -3,7 +3,7 @@ title: "Anya Core"
 description: "Enterprise Bitcoin Infrastructure Platform with Layer2 Protocol Integration"
 ---
 
-# Anya Core [AIR-3][AIS-3][BPC-3][RES-3]
+# Anya Core `AIR-3` `AIS-3` `BPC-3` `RES-3`
 
 A modular Bitcoin infrastructure platform designed for enterprise applications, Layer2 protocol integration, and decentralized AI/ML systems.
 
@@ -31,6 +31,7 @@ Status: ✅ Build and crates.io dry-run verified; deployment readiness depends o
 - Security: docs/security/README.md
 - Bitcoin: docs/bitcoin/README.md
 - Layer2: docs/layer2/README.md
+- AI Labeling: docs_legacy/standards/AI_LABELING.md
 
 ---
 
@@ -77,11 +78,11 @@ Anya Core is an advanced integrated system combining Bitcoin/crypto functionalit
 - Modular component design
 - Production-ready security measures
 
-> **AI Labeling:** This project follows the canonical AI Labeling System with standardized compliance markers for AI readiness, security, and Bitcoin protocol compliance. See: site/standards/AI_LABELING/index.html
+> AI Labeling: This project follows an AI labeling system with standardized compliance markers for AI readiness, security, and Bitcoin protocol compliance. See: docs_legacy/standards/AI_LABELING.md
 
 **System Architecture:**
 
-```
+```text
 ┌─────────────────┐    ┌──────────────┐    ┌─────────────────┐
 │   Applications  │    │   Web APIs   │    │  External Tools │
 └─────────────────┘    └──────────────┘    └─────────────────┘
@@ -358,7 +359,7 @@ tracing = { version = "0.1.41" }
 
 ### Project Structure
 
-```
+```text
 src/
 ├── bitcoin/              # Bitcoin protocol implementation
 │   ├── consensus/        # Consensus rules and validation
@@ -413,19 +414,37 @@ cargo audit
 cargo geiger
 ```
 
+### Development Status
+
+Default behavior: if no external nodes are configured or reachable, Anya Core promotes itself to a self-node (master) for each enabled Layer2 protocol. This replaces the prior default of “pure simulation.” To run against real networks, provide real node endpoints (e.g., Lightning node URL/macaroon/cert, RGB node) using `.env` or config files. See: docs/layer2/PRODUCTION_RUNBOOK.md and `config/examples/layer2.toml`.
+
+#### Self-node (Master) fallback
+
+- When enabled (default), if real networking is disabled or the node cannot reach the minimum required peers, the system activates a loopback peer and marks the protocol as synced locally.
+- This ensures the node operates as the main node when no peer infrastructure is present, allowing local operation and testing without external dependencies.
+- Toggle via config or environment variables:
+  - `prefer_self_as_master = true` (default)
+  - `enable_self_node_fallback = true` (default)
+  - `enable_real_networking = true` (default)
+  - `ANYA_LAYER2_PREFER_SELF_AS_MASTER=true`
+  - `ANYA_LAYER2_ENABLE_SELF_NODE_FALLBACK=true`
+- The decision flow is implemented in the production Layer2 adapter: if `enable_real_networking = false` or connected peers `< min_peers`, the self-node mode is activated.
+
+See `config/examples/layer2.toml` for a reference configuration.
+
 ### Layer2 Protocol Status
 
 | Protocol | Status | Implementation | Test Coverage | Notes |
 |----------|--------|----------------|---------------|-------|
-| **Lightning Network** | ✅ **Production Ready** | Complete async implementation | 5/5 tests passing | Payment channels fully operational |
-| **RGB Protocol** | ✅ **Production Ready** | Asset management complete | 5/5 tests passing | Client-side validation working |
-| **State Channels** | ✅ **Production Ready** | Generalized framework | 5/5 tests passing | Off-chain scaling operational |
-| **DLC** | ✅ **Production Ready** | Oracle integration ready | 5/5 tests passing | Smart contracts functional |
-| **Taproot Assets** | ✅ **Production Ready** | Asset issuance complete | 5/5 tests passing | Bitcoin-native assets working |
-| **BOB Protocol** | � Framework Ready | EVM bridge foundation | Framework tests pass | Hardware integration Phase 2 |
-| **RSK** | � Framework Ready | Sidechain architecture | Framework tests pass | Full implementation Phase 3 |
-| **Stacks** | 🟡 Framework Ready | Smart contract foundation | Framework tests pass | Integration Phase 3 |
-| **Liquid Network** | 🟡 Framework Ready | Sidechain foundation | Framework tests pass | Full implementation Phase 3 |
+| **Lightning Network** | ✅ Production with real node | Async implementation + adapter | Unit/integration tests pass | Simulation by default; wire to LN node for prod |
+| **RGB Protocol** | ✅ Production with RGB core | Schemas/issuance/transfer + adapter | Unit/integration tests pass | Simulation by default; wire to RGB core for prod |
+| **Taproot Assets** | ✅ Production (lib-backed) | Asset issuance and proofs | Unit tests pass | Requires Bitcoin connectivity for live issuance |
+| **State Channels** | 🟡 Framework Ready | Generalized off-chain state | Basic tests | Needs concrete backend + conformance |
+| **DLC** | 🟡 Framework Ready | Oracle contract scaffolding | Basic tests | Needs oracle/network wiring + conformance |
+| **BOB Protocol** | 🟡 Framework Ready | EVM bridge foundation | Framework tests | Hardware integration Phase 2 |
+| **RSK** | 🟡 Framework Ready | Sidechain architecture | Framework tests | Full implementation Phase 3 |
+| **Stacks** | 🟡 Framework Ready | Smart contract foundation | Framework tests | Integration Phase 3 |
+| **Liquid Network** | 🟡 Framework Ready | Sidechain foundation | Framework tests | Full implementation Phase 3 |
 
 <!-- Historical build/test summaries removed to avoid drift. Run local commands above or consult CI dashboards for up-to-date status. -->
 
@@ -525,8 +544,8 @@ cargo test --lib
 
 **3. Development Guidelines:**
 
-- Follow [Bitcoin Development Framework](docs/bitcoin/IMPLEMENTATION_PLAN.md) patterns
-- Ensure all code follows [AI Labeling Standards](docs/standards/AI_LABELING.md)
+- Follow [Bitcoin Development Framework](docs/bitcoin/README.md) patterns
+- Ensure all code follows [AI Labeling Standards](docs_legacy/standards/AI_LABELING.md)
 - Add comprehensive tests for new features
 - Update documentation for any API changes
 
