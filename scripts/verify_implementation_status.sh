@@ -196,10 +196,11 @@ SIM_FILE_LIST=$(find src -type f -name "*.rs" \
     ! -path "*/tests/*" \
     ! -path "*/*_test.rs" \
     ! -path "*/mock/*" \
-    ! -path "*/mocks/*" 2>/dev/null)
+    ! -path "*/mocks/*" \
+    ! -name "*.toml" ! -name "*.yaml" ! -name "*.yml" ! -name "*.json" ! -name "*.conf" 2>/dev/null)
 
 # Count simulate function definitions or calls only (not config field names)
-sim_count=$(echo "$SIM_FILE_LIST" | xargs -r grep -E "(^|[^A-Za-z0-9_])(fn[[:space:]]+simulate_|simulate_[A-Za-z0-9_]*\()" 2>/dev/null | wc -l)
+sim_count=$(echo "$SIM_FILE_LIST" | xargs -r grep -E "^[[:space:]]*fn[[:space:]]+simulate_[A-Za-z0-9_]*[[:space:]]*\(|[^A-Za-z0-9_]simulate_[A-Za-z0-9_]*[[:space:]]*\(" 2>/dev/null | wc -l)
 # Count explicit mock adapter/protocol types in non-test code
 mock_proto_count=$(echo "$SIM_FILE_LIST" | xargs -r grep -E "NoopAdapter|MockProtocol" 2>/dev/null | wc -l)
 fallback_flag_count=$(echo "$SIM_FILE_LIST" | xargs -r grep -E "enable_self_node_fallback" 2>/dev/null | wc -l)
