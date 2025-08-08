@@ -81,8 +81,11 @@ impl BitcoinRpcClient {
 
     /// getblockchaininfo mapped to a minimal typed struct
     pub async fn get_blockchain_info(&self) -> Result<BlockchainInfo, RpcError> {
-        // bitcoincore_rpc is sync; use block_in_place to avoid holding async tasks
-        let res = tokio::task::block_in_place(|| self.inner.get_blockchain_info())
+        // bitcoincore_rpc is sync; use spawn_blocking to avoid holding async tasks
+        let inner = self.inner.clone();
+        let res = spawn_blocking(move || inner.get_blockchain_info())
+            .await
+            .map_err(|e| RpcError(format!("Join error: {e}")))?
             .map_err(RpcError::from)?;
         let softforks = HashMap::new();
         Ok(BlockchainInfo {
