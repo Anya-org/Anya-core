@@ -7,16 +7,11 @@ description: "Enterprise Bitcoin Infrastructure Platform with Layer2 Protocol In
 
 A modular Bitcoin infrastructure platform designed for enterprise applications, Layer2 protocol integration, and decentralized AI/ML systems.
 
-[![Build Status](https://img.shields.io/badge/Build-Passing-green)](https://github.com/Anya-org/Anya-core)
-[![Tests](https://img.shields.io/badge/Tests-97.3%25_Pass-green)](tests/)
-[![BIP-341](https://img.shields.io/badge/BIP--341-Framework_Ready-green)](https://bips.xyz/341)
-[![Layer2](https://img.shields.io/badge/Layer2-Real_Implementation-green)](docs/layer2/README.md)
-[![Production](https://img.shields.io/badge/Production-Real_Logic_Deployed-green)](docs/deployment/)
 [![Rust](https://img.shields.io/badge/Rust-1.70+-green)](https://rust-lang.org)
 
-*Last Updated: August 4, 2025*
-**Version: 1.3.0**
-**Status: ✅ Real Implementations Deployed - Production Ready**
+Last Updated: August 8, 2025
+Version: 1.3.0
+Status: ✅ Build and crates.io dry-run verified; deployment readiness depends on your environment
 
 ## 📖 Documentation Hub
 
@@ -25,7 +20,7 @@ A modular Bitcoin infrastructure platform designed for enterprise applications, 
 **Quick Navigation:**
 
 - [🚀 Getting Started](#quick-start) - Setup and basic usage
-- [⚙️ Installation Guide](#installation--configuration) - Detailed setup instructions  
+- [⚙️ Installation Guide](#installation--configuration) - Detailed setup instructions
 - [🏗️ Architecture Overview](#core-features) - System design and components
 - [🔧 Bitcoin Integration](docs/bitcoin/) - BIP compliance and Bitcoin features
 - [⚡ Layer2 Protocols](docs/layer2/) - Lightning, RGB, DLC, and more
@@ -63,7 +58,7 @@ Anya Core is an advanced integrated system combining Bitcoin/crypto functionalit
 **Core Bitcoin Features:**
 
 - Bitcoin transaction processing and validation
-- Taproot (BIP-341) and Tapscript (BIP-342) support  
+- Taproot (BIP-341) and Tapscript (BIP-342) support
 - PSBT (Partially Signed Bitcoin Transactions) implementation
 - Schnorr signatures (BIP-340) integration
 - Comprehensive Bitcoin wallet functionality
@@ -85,7 +80,7 @@ Anya Core is an advanced integrated system combining Bitcoin/crypto functionalit
 - Modular component design
 - Production-ready security measures
 
-> **AI Labeling:** This project follows the [AI Labeling System](docs/standards/AI_LABELING.md) with standardized compliance markers for AI readiness, security, and Bitcoin protocol compliance.
+> **AI Labeling:** This project follows the canonical AI Labeling System with standardized compliance markers for AI readiness, security, and Bitcoin protocol compliance. See: site/standards/AI_LABELING/index.html
 
 **System Architecture:**
 
@@ -230,7 +225,7 @@ sudo cp target/release/anya-core /usr/local/bin/
 **Configuration Files:**
 
 - Main config: `~/.config/anya-core/config.toml`
-- Bitcoin settings: `~/.config/anya-core/bitcoin.toml`  
+- Bitcoin settings: `~/.config/anya-core/bitcoin.toml`
 - Layer2 protocols: `~/.config/anya-core/layer2.toml`
 
 **Example Configuration:**
@@ -341,14 +336,15 @@ export ANYA_MONITORING_LOG_LEVEL=debug
 - **Tokio:** Async runtime for concurrent operations
 - **Bitcoin Libraries:** `bitcoin`, `secp256k1`, `bdk` for Bitcoin protocol implementation
 
-**Key Dependencies (from Cargo.toml):**
+**Key Dependencies (from Cargo.toml excerpt):**
 
 ```toml
 [dependencies]
 # Bitcoin ecosystem
-bitcoin = { version = "0.32.6", features = ["std", "serde", "rand"] }
-secp256k1 = { version = "0.29.1", features = ["rand-std", "global-context"] }
-bdk = { version = "0.30", features = ["std", "compiler"] }
+bitcoin = { version = "0.32.6", features = ["std", "serde", "rand", "secp-recovery", "base64", "rand-std" ] }
+secp256k1 = { version = "0.29.1", features = ["global-context", "recovery", "rand"] }
+miniscript = { version = "12.3.5", features = ["std", "compiler"] }
+bdk_wallet = { version = "2.0.0", features = ["std", "all-keys"], optional = true }
 
 # Async runtime and networking
 tokio = { version = "1.45.1", features = ["full"] }
@@ -356,11 +352,11 @@ hyper = { version = "1.6.0", features = ["full"] }
 
 # Serialization and data handling
 serde = { version = "1.0.219", features = ["derive", "rc"] }
-serde_json = { version = "1.0.140", features = ["preserve_order"] }
+serde_json = { version = "1.0.140", features = ["std", "preserve_order", "arbitrary_precision"] }
 
 # Error handling and logging
 anyhow = { version = "1.0.98", features = ["std", "backtrace"] }
-tracing = { version = "0.1.41", features = ["std", "attributes"] }
+tracing = { version = "0.1.41" }
 ```
 
 ### Project Structure
@@ -390,7 +386,7 @@ src/
 **Fully Implemented:**
 
 - ✅ **BIP-340:** Schnorr Signatures for secp256k1
-- ✅ **BIP-341:** Taproot: SegWit version 1 spending rules  
+- ✅ **BIP-341:** Taproot: SegWit version 1 spending rules
 - ✅ **BIP-342:** Validation of Taproot Scripts
 - ✅ **BIP-174:** Partially Signed Bitcoin Transaction Format
 
@@ -402,46 +398,28 @@ src/
 **Test Coverage:**
 
 - BIP-341: 95% test coverage
-- BIP-342: 90% test coverage  
+- BIP-342: 90% test coverage
 - BIP-174: 100% test coverage
 - Overall BIP Compliance: 92%
 
 ---
 
-## Development Status
+### Build & Test
 
-### 🎉 Current Implementation Status - **PRODUCTION READY**
-
-**✅ Phase 1 Complete (August 2, 2025):**
-
-- ✅ **99.1% Test Success Rate** (113/114 tests passing)
-- ✅ **Zero Compilation Errors** across all configurations
-- ✅ **Complete Layer2 System** with 9 protocol implementations
-- ✅ **HSM Software Fallback** with 99.9% availability
-- ✅ **Production Security** with BIP compliance standards
-- ✅ **Clean Architecture** ready for enterprise deployment
-
-**🟢 Fully Operational Components:**
-
-- **Bitcoin Core Integration:** Complete transaction processing, validation, and Taproot support
-- **Layer2 Protocol Framework:** Unified async interface with Lightning, RGB, DLC, State Channels
-- **Security Infrastructure:** HSM integration, cryptographic operations, compliance validation  
-- **Testing Framework:** Comprehensive test suite with working integration tests
-- **Configuration System:** Feature flags, environment management, hot-reload capability
-- **Documentation:** Complete API docs, deployment guides, and architectural documentation
-
-**� Phase 2 In Progress (August 5-9, 2025):**
-
-- **Hardware HSM Integration:** YubiHSM2, Intel SGX, AWS CloudHSM providers
-- **PSBT Enhancement:** Advanced Bitcoin transaction coordination
-- **Configuration Hot-Reload:** Zero-downtime provider updates
-- **Production Monitoring:** HSM-specific observability and alerting
-
-**� Upcoming Development Phases:**
-
-- **Phase 2 (Weeks 7-14):** Enterprise security infrastructure and API enhancements
+```bash
+# Build (all features)
 - **Phase 3 (Weeks 15-20):** Advanced Bitcoin protocols and mobile SDK development
+
+# Run unit tests
+cargo test --lib
+
+# Optional: run integration tests (requires local services)
 - **Phase 4 (Weeks 21-24):** Web5 integration and final optimization
+
+# Optional: security checks
+cargo audit
+cargo geiger
+```
 
 ### Layer2 Protocol Status
 
@@ -464,7 +442,7 @@ src/
 Running 114 tests... ✅ 99.1% PASSING (113/114)
 
 ✅ Core Bitcoin: 28/28 tests passing
-✅ Layer2 Integration: 5/5 tests passing  
+✅ Layer2 Integration: 5/5 tests passing
 ✅ Security Components: 15/15 tests passing
 ✅ HSM Operations: 12/12 tests passing
 ✅ Configuration: 8/8 tests passing
@@ -514,7 +492,7 @@ cargo test security::
 # Run Layer2 integration tests
 cargo test --test layer2_integration_comprehensive
 
-# Run Bitcoin protocol tests  
+# Run Bitcoin protocol tests
 cargo test --test bitcoin_integration
 ```
 
@@ -579,7 +557,7 @@ cargo test --lib
 **2. Areas for Contribution:**
 
 - 🔧 **Core Bitcoin Features:** Transaction processing, script validation, wallet functionality
-- ⚡ **Layer2 Protocols:** Lightning Network, RGB, DLC implementations  
+- ⚡ **Layer2 Protocols:** Lightning Network, RGB, DLC implementations
 - 🔒 **Security Enhancements:** HSM integration, audit frameworks, cryptographic operations
 - 📚 **Documentation:** API documentation, tutorials, architecture guides
 - 🧪 **Testing:** Unit tests, integration tests, BIP compliance validation
@@ -591,7 +569,7 @@ cargo test --lib
 - Add comprehensive tests for new features
 - Update documentation for any API changes
 
-**4. Submission Process:**
+**4. Submission Process (signed commits required):**
 
 ```bash
 # Create feature branch
@@ -650,9 +628,9 @@ See [LICENSE](LICENSE) for full license text.
 
 **Community:**
 
-- **Contributing Guide:** [CONTRIBUTING.md](docs/CONTRIBUTING.md)
-- **Code of Conduct:** [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)
-- **Security Reporting:** [docs/security/SECURITY.md](scripts/enterprise/SECURITY.md)
+- **Contributing Guide:** docs_legacy/CONTRIBUTING.md
+- **Code of Conduct:** CODE_OF_CONDUCT.md
+- **Security Policy:** scripts/enterprise/SECURITY.md
 
 ---
 
@@ -668,6 +646,6 @@ Special thanks to the following projects and communities that make Anya Core pos
 
 ---
 
-**Maintainer:** Botshelo Mokoka (<botshelomokoka+anya-core@gmail.com>)  
-**Last Updated:** July 15, 2025  
-**Version:** 1.2.1 Development Build
+Maintainer: Botshelo Mokoka (<botshelomokoka+anya-core@gmail.com>)
+Last Updated: August 8, 2025
+Version: 1.3.0

@@ -136,8 +136,9 @@ ndk = ["mobile", "dep:ndk"] # Android NDK support
 # Bitcoin implementation features enhanced
 bdk = ["bitcoin", "dep:bdk_wallet"] # Bitcoin Development Kit support
 
-# Web5 integration features
-web5 = ["dep:web5", "dep:jsonwebtoken", "dep:multibase", "dep:multihash"]
+# Web5 integration features (without external web5 crate)
+# Keep JWT and multibase/multihash as part of this feature.
+web5 = ["dep:jsonwebtoken", "dep:multibase", "dep:multihash"]
 
 # Testing and development features
 memory_tracking = ["std"] # Memory usage tracking for tests
@@ -244,8 +245,10 @@ cargo-geiger = "0.11.7"
 [target.'cfg(target_os = "android")'.dependencies]
 ndk = { version = "0.8.0", optional = true }
 
-# Web5 (optional)
-web5 = { git = "https://github.com/TBD54566975/web5-rs", rev = "310d79c9", optional = true }
+# Web5 (optional) — external crate not available on crates.io, so we do not
+# declare it as a dependency for publishing. The feature remains to gate our
+# integrations using other published crates (JWT/multibase/multihash). For
+# local development against the upstream git repo, see [patch.crates-io] below.
 jsonwebtoken = { version = "9.3.1", features = ["use_pem"], optional = true }
 multibase = { version = "0.9.1", features = ["std"], optional = true }
 multihash = { version = "0.19.3", features = ["std"], optional = true }
@@ -319,3 +322,8 @@ opt-level = "z"  # Optimize for size
 lto = "fat"
 codegen-units = 1
 strip = true
+
+# Use the upstream git version of web5 during local development.
+# This section is ignored when publishing to crates.io.
+#[patch.crates-io]
+#web5 = { git = "https://github.com/TBD54566975/web5-rs", rev = "310d79c9" }
