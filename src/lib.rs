@@ -27,7 +27,7 @@
 //!
 //! # async fn example() -> Result<(), Box<dyn std::error::Error>> {
 //! // Initialize Anya with default configuration
-//! let anya = AnyaCore::default()?;
+//! let anya = AnyaCore::with_defaults()?;
 //!
 //! // Or with custom configuration
 //! let config = AnyaConfig::default();
