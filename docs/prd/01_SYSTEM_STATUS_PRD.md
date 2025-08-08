@@ -2,7 +2,7 @@
 
 Date: August 8, 2025
 Version: 2.0.0 — Master-by-default + Productionization
-Repository: Anya-core (branch: fix/-config-and-main-README-fixes)
+Repository: Anya-core (branch: bugfix/config-and-main-readme-fixes)
 Status: ✅ Core stable • 🔄 Production integrations in progress
 
 ## 🎯 Executive Summary
@@ -36,6 +36,7 @@ Status: ✅ Core stable • 🔄 Production integrations in progress
 
 - CLI health and validation succeed via default `anya-core` target (cargo core-health/core-validate).
 - HSM integration tests updated to avoid hangs; network-bound tests remain environment-sensitive.
+- Env-honest gating added: ML and system integration tests self-skip when external CLIs/resources are absent (`anya-ml`, `anya-cli`, `web5`), preventing false failures locally.
 
 ## ✅ Verification Commands
 

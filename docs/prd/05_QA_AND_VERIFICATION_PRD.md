@@ -36,3 +36,20 @@ cargo check --all-features
 - When running inside an async context, avoid nested Tokio runtimes; prefer async tests or refactor blocking calls.
 
 Last Updated: August 8, 2025
+
+## Appendix: Minimal resource check (bash)
+
+```bash
+CPUS=$(nproc || sysctl -n hw.ncpu || echo 1)
+MEM_GB=$(awk '/MemTotal/ { printf "%.0f\n", $2/1024/1024 }' /proc/meminfo 2>/dev/null || echo 1)
+DISK_GB=$(df -Pk . | awk 'NR==2 { printf "%.0f\n", $4/1024/1024 }' 2>/dev/null || echo 1)
+
+REQ_CPUS=8
+REQ_MEM=16
+REQ_DISK=50
+
+if [ "$CPUS" -lt "$REQ_CPUS" ] || [ "$MEM_GB" -lt "$REQ_MEM" ] || [ "$DISK_GB" -lt "$REQ_DISK" ]; then
+	echo "[SKIP] ML multi-VM tests (need >=${REQ_CPUS} CPUs, >=${REQ_MEM}GB RAM, >=${REQ_DISK}GB free disk). Found: ${CPUS} CPU, ${MEM_GB}GB RAM, ${DISK_GB}GB disk."
+	exit 0
+fi
+```

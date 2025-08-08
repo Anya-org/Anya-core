@@ -31,6 +31,11 @@ Version: 2.0.0
   - btc.rpc_url, btc.rpc_user, btc.rpc_pass (or cookie)
   - min_peers, bootstrap_peers[]
 
+Environment mappings (examples):
+- ANYA_LAYER2_PREFER_SELF_AS_MASTER=true|false
+- ANYA_LAYER2_ENABLE_SELF_NODE_FALLBACK=true|false
+- ANYA_BITCOIN_RPC_URL, ANYA_BITCOIN_RPC_USER, ANYA_BITCOIN_RPC_PASS
+
 ## Observability
 
 - tracing spans for connect/sync/health; metrics for height/peers/fees.
@@ -40,6 +45,11 @@ Version: 2.0.0
 - Dev simulator is locked-by-default; tests must initialize and unlock via Custom("unlock") with pin "1234".
 - Per-test timeouts are enforced to avoid hangs under async runtime.
 - Factory fallback order: primary -> software -> simulator (debug + dev-sim feature only).
+
+## Environment-Honest Testing
+
+- Tests for ML/system integrations check for required CLIs (`anya-ml`, `anya-cli`, `web5`) and models; if missing, they log a skip and exit OK.
+- Network-bound checks use public testnet defaults when config is absent and warn if unreachable.
 
 ## CLI & Developer Ergonomics
 
