@@ -15,9 +15,9 @@ mod tests {
         let validator = NetworkValidator::new(config);
         let result = validator.validate_network().await;
 
-    // Be lenient; environment may vary
-    assert!(result.connectivity.internet_available);
-    assert!(result.bandwidth.download_mbps >= 0.0);
+        // Be lenient; environment may vary
+        assert!(result.connectivity.internet_available);
+        assert!(result.bandwidth.download_mbps >= 0.0);
     }
 
     #[tokio::test]
@@ -34,8 +34,8 @@ mod tests {
         let validator = NetworkValidator::new(config);
         let result = validator.validate_ports().await;
 
-    // Only assert if enabled environment actually has this open
-    assert!(result.open_ports.contains(&8433) || result.closed_ports.contains(&8433));
+        // Only assert if enabled environment actually has this open
+        assert!(result.open_ports.contains(&8433) || result.closed_ports.contains(&8433));
     }
 
     #[tokio::test]
@@ -52,7 +52,7 @@ mod tests {
         let validator = NetworkValidator::new(config);
         let result = validator.validate_ports().await;
 
-    // Only check we got a determination
-    assert!(result.open_ports.contains(&174) || result.closed_ports.contains(&174));
+        // Only check we got a determination
+        assert!(result.open_ports.contains(&174) || result.closed_ports.contains(&174));
     }
 }

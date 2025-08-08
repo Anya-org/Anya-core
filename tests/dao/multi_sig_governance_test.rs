@@ -28,13 +28,13 @@ fn test_multi_sig_governance_with_real_stacks_client() {
         (define-map proposals uint {proposer: principal, action: (string-ascii 256), votes: uint, threshold: uint})
         (define-data-var proposal-id uint u0)
         (define-data-var required-threshold uint u2)
-        
+
         (define-public (add-signer (signer principal))
             (begin
                 (asserts! (is-eq tx-sender contract-caller) (err u401))
                 (map-set signers signer true)
                 (ok true)))
-        
+
         (define-public (create-proposal (action (string-ascii 256)))
             (let ((new-id (+ (var-get proposal-id) u1)))
                 (map-set proposals new-id {
@@ -147,7 +147,7 @@ fn test_multi_sig_workflow() {
         r#"
         (define-data-var threshold uint u2)
         (define-map signers principal bool)
-        
+
         (define-public (add-signer (signer principal))
             (begin
                 (map-set signers signer true)
@@ -188,10 +188,10 @@ fn test_stacks_asset_integration() {
         (define-fungible-token multi-sig-token)
         (define-data-var token-name (string-ascii 32) "MultiSig Governance Token")
         (define-data-var token-symbol (string-ascii 8) "MSG")
-        
+
         (define-public (mint (amount uint) (recipient principal))
             (ft-mint? multi-sig-token amount recipient))
-        
+
         (define-public (transfer (amount uint) (sender principal) (recipient principal))
             (ft-transfer? multi-sig-token amount sender recipient))
     "#;
@@ -259,14 +259,14 @@ fn test_multi_sig_workflow_complete() {
         (define-data-var proposal-id uint u0)
         (define-data-var required-threshold uint u3)
         (define-data-var total-signers uint u0)
-        
+
         (define-public (add-signer (signer principal) (weight uint))
             (begin
                 (asserts! (is-eq tx-sender contract-caller) (err u401))
                 (map-set signers signer {active: true, weight: weight})
                 (var-set total-signers (+ (var-get total-signers) u1))
                 (ok true)))
-        
+
         (define-public (create-proposal (action (string-ascii 256)))
             (let ((new-id (+ (var-get proposal-id) u1)))
                 (map-set proposals new-id {
@@ -279,12 +279,12 @@ fn test_multi_sig_workflow_complete() {
                 })
                 (var-set proposal-id new-id)
                 (ok new-id)))
-        
+
         (define-public (vote-on-proposal (proposal-id uint))
             (let ((proposal (unwrap! (map-get? proposals proposal-id) (err u404)))
                   (signer-info (unwrap! (map-get? signers tx-sender) (err u403))))
                 (asserts! (get active signer-info) (err u403))
-                (map-set proposals proposal-id 
+                (map-set proposals proposal-id
                     (merge proposal {votes: (+ (get votes proposal) (get weight signer-info))}))
                 (ok true)))
     "#;
