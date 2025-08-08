@@ -1155,6 +1155,19 @@ impl ProductionLayer2Protocol {
         let url = url::Url::parse(endpoint).ok()?;
         let user = url.username().to_string();
         let pass = url.password().unwrap_or("").to_string();
+
+        // Warn if credentials are weak or empty (in non-dev environments)
+        let is_dev = self.active_network_label() == "dev";
+        let weak_passwords = ["", "password", "bitcoin", "1234", "test", "admin"];
+        if !is_dev {
+            if user.is_empty() {
+                warn!("Bitcoin RPC username is empty in production/test environment. Refusing to create RPC client.");
+                return None;
+            }
+            if weak_passwords.contains(&pass.as_str()) {
+                warn!("Bitcoin RPC password is empty or weak (\"{}\") in production/test environment. Please use a strong password.", pass);
+            }
+        }
         let host = format!(
             "{}://{}",
             url.scheme(),
