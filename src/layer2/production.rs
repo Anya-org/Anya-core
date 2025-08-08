@@ -160,9 +160,9 @@ impl Default for NetworkConfig {
                 "testnet-seed.bitcoin.jonasschnelli.ch:18333".to_string(),
                 "seed.tbtc.petertodd.org:18333".to_string(),
             ],
-            // Respect env override; default to docker-compose debug RPC (testnet)
+            // Respect env override; default to placeholder credentials (must be configured for production use)
             rpc_endpoints: vec![env::var("BITCOIN_RPC_URL")
-                .unwrap_or_else(|_| "http://bitcoin:password@localhost:18332".to_string())],
+                .unwrap_or_else(|_| "http://<user>:<password>@localhost:18332".to_string())],
         }
     }
 }
