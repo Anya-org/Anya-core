@@ -474,6 +474,9 @@ cargo test --test layer2_integration_comprehensive
 
 # Run Bitcoin protocol tests
 cargo test --test bitcoin_integration
+
+# HSM simulator tests (dev only)
+cargo test --features dev-sim,hsm-full --no-fail-fast -- --nocapture
 ```
 
 **BIP Compliance Testing:**
@@ -629,3 +632,14 @@ Special thanks to the following projects and communities that make Anya Core pos
 Maintainer: Botshelo Mokoka (<botshelomokoka+anya-core@gmail.com>)
 Last Updated: August 8, 2025
 Version: 1.3.0
+
+---
+
+## Developer shortcuts & environment-honest testing
+
+- CLI aliases (via `.cargo/config.toml`):
+  - `cargo core-health` – run core health check
+  - `cargo core-validate` – run configuration validation
+  - `cargo core-start` – start core binary
+- Network-bound tests: If DNS/ports aren’t reachable locally, network validation tests will fail; treat as advisory in dev environments.
+- HSM simulator: The dev simulator is locked-by-default; tests should initialize and unlock via a custom `unlock` operation (pin "1234") and use per-test timeouts to avoid hangs.
