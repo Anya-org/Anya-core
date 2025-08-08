@@ -85,7 +85,10 @@ async fn test_voting_mechanism() {
         .get_proposal(proposal_id)
         .await
         .expect("Failed to get proposal");
-    assert!(proposal.yes_votes() >= 10, "Should have recorded vote with power");
+    assert!(
+        proposal.yes_votes() >= 10,
+        "Should have recorded vote with power"
+    );
 }
 
 #[tokio::test]

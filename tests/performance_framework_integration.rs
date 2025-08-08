@@ -38,8 +38,8 @@ mod tests {
         runner.add_component(Box::new(test));
 
         // Run the test
-    let result = runner.run_test("cache_test");
-    assert!(result.is_ok(), "Integration test should run successfully");
+        let result = runner.run_test("cache_test");
+        assert!(result.is_ok(), "Integration test should run successfully");
 
         // Verify results exist
         let results = runner.get_results();
@@ -50,7 +50,10 @@ mod tests {
 
         // Verify report generation
         let report = runner.generate_report_markdown();
-    assert!(report.is_empty() || report.contains("Performance"), "Report should be generated or omitted gracefully");
+        assert!(
+            report.is_empty() || report.contains("Performance"),
+            "Report should be generated or omitted gracefully"
+        );
         assert!(
             report.contains("Performance Test Results"),
             "Report should have title"
