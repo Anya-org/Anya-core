@@ -32,6 +32,7 @@ Version: 2.0.0
   - min_peers, bootstrap_peers[]
 
 Environment mappings (examples):
+
 - ANYA_LAYER2_PREFER_SELF_AS_MASTER=true|false
 - ANYA_LAYER2_ENABLE_SELF_NODE_FALLBACK=true|false
 - ANYA_BITCOIN_RPC_URL, ANYA_BITCOIN_RPC_USER, ANYA_BITCOIN_RPC_PASS
