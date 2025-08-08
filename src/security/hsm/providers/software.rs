@@ -668,14 +668,9 @@ impl HsmProvider for SoftwareHsmProvider {
         // Perform signing based on algorithm
         match algorithm {
             SigningAlgorithm::EcdsaSha256 => {
-                // Get the private key data securely
+                // Get the private key data securely (already raw bytes)
                 let key_data = key_info.key_data.lock().await;
-                let secret_bytes =
-                    hex::decode(&*String::from_utf8_lossy(&key_data)).map_err(|e| {
-                        HsmError::InvalidKeyData(format!("Failed to decode key: {}", e))
-                    })?;
-
-                let secret_key = SecretKey::from_slice(&secret_bytes)
+                let secret_key = SecretKey::from_slice(&key_data)
                     .map_err(|e| HsmError::InvalidKeyData(format!("Invalid secret key: {}", e)))?;
 
                 // Create message hash
@@ -687,7 +682,7 @@ impl HsmProvider for SoftwareHsmProvider {
                 let message = Message::from_digest_slice(&message_hash)
                     .map_err(|e| HsmError::SigningError(format!("Invalid message: {}", e)))?;
 
-                // Sign the message
+                // Sign the message (compact 64-byte signature)
                 let signature = self.secp.sign_ecdsa(&message, &secret_key);
                 Ok(signature.serialize_compact().to_vec())
             }
@@ -764,12 +759,7 @@ impl HsmProvider for SoftwareHsmProvider {
                 curve: EcCurve::Secp256k1,
             } => {
                 let key_data = key_info.key_data.lock().await;
-                let secret_bytes =
-                    hex::decode(&*String::from_utf8_lossy(&key_data)).map_err(|e| {
-                        HsmError::InvalidKeyData(format!("Failed to decode key: {}", e))
-                    })?;
-
-                let secret_key = SecretKey::from_slice(&secret_bytes).map_err(|e| {
+                let secret_key = SecretKey::from_slice(&key_data).map_err(|e| {
                     HsmError::KeyGenerationError(format!("Invalid key data: {}", e))
                 })?;
                 let public_key = PublicKey::from_secret_key(&self.secp, &secret_key);

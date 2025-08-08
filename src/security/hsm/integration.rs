@@ -65,7 +65,7 @@ mod hsm_integration_tests {
             let sim = create_simulator_provider()
                 .await
                 .expect("Simulator provider should work");
-            // Ensure simulator is initialized and unlocked for this test
+            // Ensure initialized then unlock for this cross-provider test
             let _ = sim.initialize().await;
             let _ = sim
                 .execute_operation(HsmRequest {
@@ -80,7 +80,7 @@ mod hsm_integration_tests {
         for (i, provider) in providers.iter().enumerate() {
             println!("Testing provider {}", i);
 
-            // Test Bitcoin key generation (with timeout)
+            // Test Bitcoin key generation (with timeout to avoid hangs)
             timeout(
                 Duration::from_secs(15),
                 test_bitcoin_key_generation(&**provider),
@@ -132,7 +132,7 @@ mod hsm_integration_tests {
         #[cfg(feature = "dev-sim")]
         {
             let sim = create_simulator_provider().await.unwrap();
-            // Initialize and unlock for health checks
+            // Initialize then unlock for health checks
             let _ = sim.initialize().await;
             let _ = sim
                 .execute_operation(HsmRequest {
@@ -203,7 +203,7 @@ mod hsm_integration_tests {
             handles.push(handle);
         }
 
-        // Wait for all operations to complete (with timeout)
+        // Wait for all operations to complete
         for handle in handles {
             timeout(Duration::from_secs(20), handle)
                 .await
@@ -284,6 +284,7 @@ mod hsm_integration_tests {
             &config,
         )
         .await?;
+        // Ensure Ready state
         let _ = provider.initialize().await;
         Ok(provider)
     }
@@ -300,7 +301,7 @@ mod hsm_integration_tests {
 
         let provider =
             HsmProviderFactory::create_specific_provider(HsmProviderType::Bitcoin, &config).await?;
-        // Ensure provider is ready
+        // Ensure Ready state
         provider.initialize().await?;
         Ok(provider)
     }
@@ -324,7 +325,7 @@ mod hsm_integration_tests {
         let provider =
             HsmProviderFactory::create_specific_provider(HsmProviderType::Simulator, &config)
                 .await?;
-        // Initialize but do not unlock globally; tests decide
+        // Initialize but do not unlock globally; tests will decide
         let _ = provider.initialize().await;
         Ok(provider)
     }
