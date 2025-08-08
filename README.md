@@ -26,14 +26,11 @@ Status: ✅ Build and crates.io dry-run verified; deployment readiness depends o
 - [⚡ Layer2 Protocols](docs/layer2/) - Lightning, RGB, DLC, and more
 - [🔒 Security Guide](docs/security/) - Security policies and best practices
 
-**PRD Documentation Suite:**
+**Additional Documentation:**
 
-- [📋 PRD Master Index](docs/PRD_MASTER_INDEX.md) - Navigation hub for all PRD documents
-- [🏗️ Implementation Roadmap](docs/IMPLEMENTATION_ROADMAP_PRD.md) - Development phases and planning
-- [🎉 Implementation Success Report](docs/IMPLEMENTATION_SUCCESS_REPORT.md) - **NEW:** Real logic deployment results
-- [🔍 Missing Components Analysis](docs/MISSING_COMPONENTS_ANALYSIS_PRD.md) - Remaining development gaps
-- [📊 Current Status](docs/CURRENT_STATUS_SUMMARY.md) - System status and metrics
-- [🚀 Phase 1 Week 2 Plan](docs/PHASE1_WEEK2_EXECUTION_PLAN.md) - Hardware integration plan
+- Security: docs/security/README.md
+- Bitcoin: docs/bitcoin/README.md
+- Layer2: docs/layer2/README.md
 
 ---
 
@@ -395,12 +392,7 @@ src/
 - 🔄 **BIP-370:** PSBT Version 2 (85% complete)
 - 🔄 **BIP-322:** Generic Signed Message Format (partial)
 
-**Test Coverage:**
-
-- BIP-341: 95% test coverage
-- BIP-342: 90% test coverage
-- BIP-174: 100% test coverage
-- Overall BIP Compliance: 92%
+<!-- Test coverage varies by environment. See CI artifacts (ci_metrics.json) or the pipeline dashboard for current numbers. -->
 
 ---
 
@@ -408,13 +400,13 @@ src/
 
 ```bash
 # Build (all features)
-- **Phase 3 (Weeks 15-20):** Advanced Bitcoin protocols and mobile SDK development
+cargo build -r --all-features
 
 # Run unit tests
 cargo test --lib
 
 # Optional: run integration tests (requires local services)
-- **Phase 4 (Weeks 21-24):** Web5 integration and final optimization
+cargo test --tests -- --nocapture
 
 # Optional: security checks
 cargo audit
@@ -435,38 +427,7 @@ cargo geiger
 | **Stacks** | 🟡 Framework Ready | Smart contract foundation | Framework tests pass | Integration Phase 3 |
 | **Liquid Network** | 🟡 Framework Ready | Sidechain foundation | Framework tests pass | Full implementation Phase 3 |
 
-### Build & Test Status
-
-```bash
-# Current test results (August 2, 2025)
-Running 114 tests... ✅ 99.1% PASSING (113/114)
-
-✅ Core Bitcoin: 28/28 tests passing
-✅ Layer2 Integration: 5/5 tests passing
-✅ Security Components: 15/15 tests passing
-✅ HSM Operations: 12/12 tests passing
-✅ Configuration: 8/8 tests passing
-✅ Utility Functions: 45/45 tests passing
-⚠️  Performance Benchmarks: 0/1 skipped (timing-dependent)
-
-# Compilation Status
-cargo build --all-features --all-targets
-✅ Compiled successfully (0 errors, 0 warnings)
-
-# Production Readiness Metrics
-- Production Readiness: 65% → Target: 95% (Phase 4)
-- Security Compliance: 90% (BIP standards maintained)
-- HSM Availability: 99.9% (software + hardware fallback)
-- Documentation Coverage: 85% (comprehensive guides available)
-```
-
-- Integration Tests: 9 tests passing
-- Utility Tests: 27 tests passing
-
-Build Status: ✅ Clean compilation
-Lint Status: ⚠️ 1 warning (unused import)
-
-```
+<!-- Historical build/test summaries removed to avoid drift. Run local commands above or consult CI dashboards for up-to-date status. -->
 
 ---
 
