@@ -35,4 +35,18 @@ Version: 2.0.0
 
 - tracing spans for connect/sync/health; metrics for height/peers/fees.
 
+## HSM Integration Notes
+
+- Dev simulator is locked-by-default; tests must initialize and unlock via Custom("unlock") with pin "1234".
+- Per-test timeouts are enforced to avoid hangs under async runtime.
+- Factory fallback order: primary -> software -> simulator (debug + dev-sim feature only).
+
+## CLI & Developer Ergonomics
+
+- Default run target: `anya-core` (cargo run maps to core binary).
+- Aliases provided in `.cargo/config.toml`:
+  - `cargo core-health`, `cargo core-validate`, `cargo core-start`
+
+Branch: fix/-config-and-main-README-fixes • Last Updated: August 8, 2025
+
 Last Updated: August 8, 2025

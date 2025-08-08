@@ -15,3 +15,9 @@ Conventions:
 - Code is the source of truth; keep PRDs aligned.
 - Commands should be runnable; prefer ./scripts/*.
 - Update “Last Updated” on each edit.
+
+Handy commands:
+
+- cargo core-health
+- cargo core-validate
+- cargo test --features dev-sim,hsm-full --no-fail-fast -- --nocapture
