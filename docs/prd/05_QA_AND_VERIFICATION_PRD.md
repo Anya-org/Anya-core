@@ -4,12 +4,14 @@ Date: August 8, 2025
 Version: 2.0.0
 
 ## Quality Gates
+
 - Build: cargo check --all-features
 - Lint: warnings < 10
 - Tests: unit + layer2 + adapter smoke tests
 - Health: Self-node primary qualifies as Healthy
 
 ## Commands
+
 ```bash
 cargo check --all-features
 ./scripts/quality_gate.sh
@@ -17,6 +19,7 @@ cargo check --all-features
 ```
 
 ## Acceptance Tests
+
 - No-config boot → node primary; health OK
 - With BTC RPC env → height/hash/fees present from RPC
 - With bootstrap peers → discovery connects; primary preference logged
