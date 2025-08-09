@@ -39,7 +39,19 @@ async fn bitcoin_rpc_smoke_env_honest() {
     let info = match client.get_blockchain_info().await {
         Ok(i) => i,
         Err(e) => {
-            eprintln!("[skip] get_blockchain_info failed: {}", e);
+            let msg = e.to_string();
+            if msg.contains("unexpected HTTP code: 400")
+                || msg.contains("unexpected HTTP code: 401")
+            {
+                eprintln!("[skip] public / unauthenticated RPC endpoint rejected request ({}); treating as skip", msg);
+            } else if msg.contains("Connection refused") || msg.contains("connection refused") {
+                eprintln!(
+                    "[skip] RPC endpoint unreachable ({}); treating as skip",
+                    msg
+                );
+            } else {
+                eprintln!("[skip] get_blockchain_info failed: {}", msg);
+            }
             return;
         }
     };
