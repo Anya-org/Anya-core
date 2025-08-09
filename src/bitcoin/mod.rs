@@ -8,6 +8,7 @@ pub mod bip341;
 pub mod compat; // Compatibility module for older import patterns
 pub mod config;
 pub mod error;
+pub mod external_endpoints; // Centralized external (Electrum / explorer / Liquid) endpoints
 pub mod interface;
 pub mod layer2; // Export layer2 module for Layer2Protocol trait
 pub mod lightning;
