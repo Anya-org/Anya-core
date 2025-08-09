@@ -292,14 +292,13 @@ impl SourceOfTruthRegistry {
             "regtest" => 3,
             _ => {
                 return Err(SourceOfTruthError::BlockchainAnchoringFailed(format!(
-                    "Invalid network type: {}",
-                    network_type
+                    "Invalid network type: {network_type}"
                 )));
             }
         };
 
         self.bitcoin_network.store(network_value, Ordering::Relaxed);
-        log::info!("Bitcoin network set to: {}", network_type);
+        log::info!("Bitcoin network set to: {network_type}");
 
         Ok(())
     }
@@ -394,9 +393,7 @@ impl SourceOfTruthRegistry {
         };
 
         // 2. Validate status transition
-        if let Err(e) = self.validate_status_transition(&current_status, &new_status) {
-            return Err(e);
-        }
+        self.validate_status_transition(&current_status, &new_status)?;
 
         // 3. Generate verification hash if completing (before updating)
         let verification_hash = if matches!(new_status, WorkStatus::Completed) {
@@ -540,7 +537,7 @@ impl SourceOfTruthRegistry {
 
                 // Calculate similarity
                 let similarity =
-                    self.calculate_documentation_similarity(&normalized_content, &entry.key());
+                    self.calculate_documentation_similarity(&normalized_content, entry.key());
 
                 if similarity > highest_similarity {
                     highest_similarity = similarity;
@@ -586,7 +583,7 @@ impl SourceOfTruthRegistry {
         let mut normalized = content.to_string();
 
         // Remove headings
-        normalized = normalized.replace(|c| c == '#', "");
+        normalized = normalized.replace('#', "");
 
         // Remove inline formatting (* for bold/italic)
         normalized = normalized.replace('*', "");
@@ -913,8 +910,7 @@ impl SourceOfTruthRegistry {
     ) -> Result<bool, SourceOfTruthError> {
         let anchor = self.blockchain_anchors.get(txid).ok_or_else(|| {
             SourceOfTruthError::BlockchainVerificationFailed(format!(
-                "Anchor not found for txid: {}",
-                txid
+                "Anchor not found for txid: {txid}"
             ))
         })?;
 
@@ -922,12 +918,11 @@ impl SourceOfTruthRegistry {
         match anchor.status {
             AnchorStatus::Failed(ref reason) => {
                 return Err(SourceOfTruthError::BlockchainVerificationFailed(format!(
-                    "Anchor failed: {}",
-                    reason
+                    "Anchor failed: {reason}"
                 )));
             }
             AnchorStatus::Created | AnchorStatus::Broadcast => {
-                log::info!("Anchor {} is not yet confirmed", txid);
+                log::info!("Anchor {txid} is not yet confirmed");
                 return Ok(false);
             }
             AnchorStatus::Final => {
@@ -939,9 +934,7 @@ impl SourceOfTruthRegistry {
                     if let Some(mut anchor_mut) = self.blockchain_anchors.get_mut(txid) {
                         anchor_mut.status = AnchorStatus::Final;
                         log::info!(
-                            "Anchor {} is now final with {} confirmations",
-                            txid,
-                            confirmations
+                            "Anchor {txid} is now final with {confirmations} confirmations"
                         );
                     }
                     return Ok(true);
@@ -961,12 +954,12 @@ impl SourceOfTruthRegistry {
         // Verify Taproot-specific data if available
         if let Some(taproot_data) = &anchor.taproot_data {
             // In a real implementation, this would verify the Taproot commitment
-            log::info!("Verifying Taproot commitment for anchor {}", txid);
+            log::info!("Verifying Taproot commitment for anchor {txid}");
 
             // This would validate that the output_script corresponds to the internal_key
             // and script_tree_hashes, and that the control_block (if present) is valid
             if taproot_data.output_script.is_empty() {
-                log::warn!("Taproot output script is empty for anchor {}", txid);
+                log::warn!("Taproot output script is empty for anchor {txid}");
                 // This doesn't fail verification as the anchor might be using a different method
             }
         }
@@ -986,8 +979,7 @@ impl SourceOfTruthRegistry {
     ) -> Result<(), SourceOfTruthError> {
         let mut anchor = self.blockchain_anchors.get_mut(txid).ok_or_else(|| {
             SourceOfTruthError::BlockchainVerificationFailed(format!(
-                "Anchor not found for txid: {}",
-                txid
+                "Anchor not found for txid: {txid}"
             ))
         })?;
 
@@ -999,13 +991,11 @@ impl SourceOfTruthRegistry {
         if confirmations >= anchor.required_confirmations as u32 {
             anchor.status = AnchorStatus::Final;
             log::info!(
-                "Anchor {} is now final with {} confirmations",
-                txid,
-                confirmations
+                "Anchor {txid} is now final with {confirmations} confirmations"
             );
         } else {
             anchor.status = AnchorStatus::Confirmed(confirmations);
-            log::info!("Anchor {} now has {} confirmations", txid, confirmations);
+            log::info!("Anchor {txid} now has {confirmations} confirmations");
         }
 
         self.update_last_modified();
@@ -1018,13 +1008,12 @@ impl SourceOfTruthRegistry {
     pub async fn mark_anchor_as_broadcast(&self, txid: &str) -> Result<(), SourceOfTruthError> {
         let mut anchor = self.blockchain_anchors.get_mut(txid).ok_or_else(|| {
             SourceOfTruthError::BlockchainVerificationFailed(format!(
-                "Anchor not found for txid: {}",
-                txid
+                "Anchor not found for txid: {txid}"
             ))
         })?;
 
         anchor.status = AnchorStatus::Broadcast;
-        log::info!("Anchor {} has been broadcast to the network", txid);
+        log::info!("Anchor {txid} has been broadcast to the network");
 
         self.update_last_modified();
         self.save_to_disk().await?;
@@ -1040,13 +1029,12 @@ impl SourceOfTruthRegistry {
     ) -> Result<(), SourceOfTruthError> {
         let mut anchor = self.blockchain_anchors.get_mut(txid).ok_or_else(|| {
             SourceOfTruthError::BlockchainVerificationFailed(format!(
-                "Anchor not found for txid: {}",
-                txid
+                "Anchor not found for txid: {txid}"
             ))
         })?;
 
         anchor.status = AnchorStatus::Failed(reason.to_string());
-        log::warn!("Anchor {} has failed: {}", txid, reason);
+        log::warn!("Anchor {txid} has failed: {reason}");
 
         self.update_last_modified();
         self.save_to_disk().await?;
@@ -1421,7 +1409,7 @@ async fn find_markdown_files(
             let entry = match entry {
                 Ok(entry) => entry,
                 Err(e) => {
-                    log::warn!("Error reading directory entry: {}", e);
+                    log::warn!("Error reading directory entry: {e}");
                     continue;
                 }
             };
@@ -1471,7 +1459,7 @@ fn extract_markdown_sections(content: &str) -> Vec<(String, String)> {
 
             // Extract heading text and level
             let _heading_level = line.chars().take_while(|&c| c == '#').count();
-            let heading_text = line.trim_start_matches(|c| c == '#' || c == ' ').trim();
+            let heading_text = line.trim_start_matches(['#', ' ']).trim();
 
             // Set as current section
             current_section = heading_text.to_string();
@@ -1529,7 +1517,7 @@ pub mod web5_anchoring {
         let record_id = format!("dwn_registry_{}", hex::encode(&registry_root_hash[0..16]),);
 
         // Log the anchoring
-        log::info!("Web5 anchoring complete with record ID: {}", record_id);
+        log::info!("Web5 anchoring complete with record ID: {record_id}");
 
         Ok(record_id)
     }
@@ -1548,7 +1536,7 @@ pub mod web5_anchoring {
         // 3. Compare the stored hash with the current hash
 
         // Simulated verification - in production this would perform real verification
-        log::info!("Verifying Web5 record: {}", record_id);
+        log::info!("Verifying Web5 record: {record_id}");
 
         // Return true for simulation purposes
         Ok(true)

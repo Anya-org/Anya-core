@@ -316,7 +316,7 @@ pub mod api {
         Path(asset_id): Path<String>,
     ) -> Result<ResponseJson<Value>, StatusCode> {
         // Log that this handler was called
-        log::debug!("RGB asset history requested for asset: {}", asset_id);
+        log::debug!("RGB asset history requested for asset: {asset_id}");
 
         // Check if asset exists
         let assets = handler.assets.read().await;

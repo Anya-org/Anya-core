@@ -96,6 +96,7 @@ lazy_static = { version = "1.5.0" }
 dashmap = { version = "6.1.0", features = ["serde"] }
 rayon = { version = "1.10.0" }
 geiger = { version = "0.5.0" }
+lru = "0.12.3"                                        # For DWN/Decentralized storage caching
 
 # === Missing Dependencies ===
 hickory-resolver = { version = "0.24.1", features = ["dns-over-rustls"] }
@@ -114,13 +115,6 @@ sysinfo = { version = "0.36.1" }
 # === Enterprise Dependencies ===
 yubihsm = { version = "0.42.1" }
 sgx_urts = { version = "1.1.1" }
-sqlx = { version = "0.8.2", features = [
-    "runtime-tokio-rustls",
-    "postgres",
-    "sqlite",
-    "chrono",
-    "uuid",
-] }
 
 [package]
 name = "anya-core"
@@ -141,7 +135,11 @@ name = "anya_core"
 crate-type = ["lib", "staticlib", "cdylib"]
 
 [features]
-default = ["std", "bitcoin", "mobile"]
+default = [
+    "std",
+    "bitcoin",
+    "mobile",
+] # temporarily exclude "enterprise" until sqlx gating stabilized
 std = []
 # Development simulation feature (non-default): gates simulator code and other dev-only paths
 dev-sim = []
@@ -167,11 +165,26 @@ bdk = ["bitcoin", "dep:bdk_wallet"] # Bitcoin Development Kit support
 # Keep JWT and multibase/multihash as part of this feature.
 web5 = ["dep:jsonwebtoken", "dep:multibase", "dep:multihash"]
 
+# Decentralized Web Node (DWN) feature gates DWNManager + DecentralizedStorage integration
+dwn = ["web5"]
+
+# Hybrid storage orchestrator (Postgres + RocksDB + DWN/IPFS)
+storage-hybrid = ["enterprise", "kv-rocks", "dwn"]
+
 # Testing and development features
 memory_tracking = ["std"] # Memory usage tracking for tests
 
 # Enterprise features (MIT-compliant only)
 enterprise = ["dep:sqlx"]
+
+# Fast test profile feature to skip heavy or long-running integration/performance tests
+fast-tests = []
+
+# Optional RocksDB KV acceleration (currently always compiled but kept for clarity/future gating)
+kv-rocks = []
+
+# Legacy SQLite compatibility (will be removed) – DO NOT enable in production
+sqlite-backcompat = []
 
 # [AIS-3] HSM Features - MIT-compliant external interface
 hsm = ["hsm-software"] # Default to software HSM (always available)
@@ -196,7 +209,15 @@ cuda = [] # CUDA GPU acceleration support
 wgpu = [] # WebGPU acceleration support
 
 # Complete system (including all features)
-complete = ["bitcoin", "mobile", "web5", "enterprise", "hsm-full"]
+complete = [
+    "bitcoin",
+    "mobile",
+    "web5",
+    "dwn",
+    "enterprise",
+    "hsm-full",
+    "storage-hybrid",
+]
 
 # Testing-only features (disabled by default)
 chaos-viz = []
@@ -306,6 +327,15 @@ log = { workspace = true }
 walkdir = { workspace = true }
 rand_distr = { workspace = true }
 
+# Enterprise (optional) - minimal sqlx without MySQL/SQLite to avoid rsa advisory
+sqlx = { version = "0.8.2", default-features = false, optional = true, features = [
+    "runtime-tokio-rustls",
+    "postgres",
+    "chrono",
+    "uuid",
+    "migrate",
+] }
+
 # === CLI Dependencies ===
 clap = { workspace = true }
 dialoguer = { workspace = true }
@@ -313,11 +343,7 @@ ring = { workspace = true }
 maplit = { workspace = true }
 sysinfo = { workspace = true }
 
-# === Enterprise Dependencies (MIT-compliant) ===
-sqlx = { version = "0.8.2", features = [
-    "runtime-tokio-rustls",
-    "postgres",
-], optional = true }
+# === Enterprise Dependencies (MIT-compliant) === (consolidated above; removed duplicate sqlx entry)
 
 [dev-dependencies]
 criterion = { workspace = true }
@@ -359,3 +385,8 @@ strip = true
 # This section is ignored when publishing to crates.io.
 #[patch.crates-io]
 #web5 = { git = "https://github.com/TBD54566975/web5-rs", rev = "310d79c9" }
+
+# Patch section to override insecure optional driver crates that pull vulnerable rsa when not needed.
+[patch.crates-io]
+# Provide a local stub for sqlx-mysql so Cargo.lock does not include the real crate (which pulls rsa 0.9.8).
+sqlx-mysql = { path = "crates/dummy-sqlx-mysql" }

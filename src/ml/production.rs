@@ -244,13 +244,13 @@ impl FeatureExtractor for ProposalFeatureExtractor {
         let proposal_text = String::from_utf8_lossy(data);
 
         // Extract numerical features from proposal
-        let mut features = Vec::new();
-
-        // Text-based features
-        features.push(proposal_text.len() as f64); // Length
-        features.push(proposal_text.split_whitespace().count() as f64); // Word count
-        features.push(proposal_text.matches('?').count() as f64); // Question marks
-        features.push(proposal_text.matches('!').count() as f64); // Exclamation marks
+        // Initialize with primary text-based features to avoid push-after-new clippy lint
+        let mut features = vec![
+            proposal_text.len() as f64,                      // Length
+            proposal_text.split_whitespace().count() as f64, // Word count
+            proposal_text.matches('?').count() as f64,       // Question marks
+            proposal_text.matches('!').count() as f64,       // Exclamation marks
+        ];
 
         // Sentiment features (simplified)
         let positive_words = ["good", "great", "excellent", "improve", "benefit", "growth"];
@@ -338,7 +338,7 @@ impl ModelExecutor for LinearRegressionExecutor {
             model_version: model.version.clone(),
             inference_time_ms: inference_time,
             features_used: (0..features.len())
-                .map(|i| format!("feature_{}", i))
+                .map(|i| format!("feature_{i}"))
                 .collect(),
         })
     }
@@ -435,7 +435,7 @@ impl ModelExecutor for NeuralNetworkExecutor {
             model_version: model.version.clone(),
             inference_time_ms: inference_time,
             features_used: (0..features.len())
-                .map(|i| format!("feature_{}", i))
+                .map(|i| format!("feature_{i}"))
                 .collect(),
         })
     }
@@ -683,7 +683,7 @@ impl ProductionMLService {
         let mut model_data = Vec::new();
 
         // Create weights for a simple 10-8-4-1 neural network
-        let layers = vec![10, 8, 4, 1];
+        let layers = [10, 8, 4, 1];
         for layer_idx in 0..layers.len() - 1 {
             let input_size = layers[layer_idx];
             let output_size = layers[layer_idx + 1];
@@ -706,7 +706,7 @@ impl ProductionMLService {
                 created_at: SystemTime::now(),
                 author: "Anya Core ML Team".to_string(),
                 description: "Analyzes sentiment of proposal text".to_string(),
-                input_features: (0..10).map(|i| format!("feature_{}", i)).collect(),
+                input_features: (0..10).map(|i| format!("feature_{i}")).collect(),
                 output_labels: vec!["sentiment_score".to_string()],
                 training_data_size: 5000,
                 validation_accuracy: 0.89,
@@ -785,7 +785,7 @@ impl ProductionMLService {
     /// Register a model in the service
     async fn register_model(&self, model: LoadedModel) -> Result<()> {
         let model_id = model.id.clone();
-        info!("Registering model: {}", model_id);
+        info!("Registering model: {model_id}");
 
         // Add to models collection
         {
@@ -809,7 +809,7 @@ impl ProductionMLService {
                 .push(model_id.clone());
         }
 
-        info!("Model {} registered successfully", model_id);
+        info!("Model {model_id} registered successfully");
         Ok(())
     }
 
@@ -939,19 +939,19 @@ impl ProductionMLService {
         let analysis_result = self
             .inference("proposal_analyzer_v1", proposal_bytes)
             .await
-            .map_err(|e| AnyaError::ML(format!("Proposal analysis failed: {}", e)))?;
+            .map_err(|e| AnyaError::ML(format!("Proposal analysis failed: {e}")))?;
 
         // Get sentiment analysis
         let sentiment_result = self
             .inference("sentiment_analyzer_v1", proposal_bytes)
             .await
-            .map_err(|e| AnyaError::ML(format!("Sentiment analysis failed: {}", e)))?;
+            .map_err(|e| AnyaError::ML(format!("Sentiment analysis failed: {e}")))?;
 
         // Get risk assessment
         let risk_result = self
             .inference("risk_assessor_v1", proposal_bytes)
             .await
-            .map_err(|e| AnyaError::ML(format!("Risk assessment failed: {}", e)))?;
+            .map_err(|e| AnyaError::ML(format!("Risk assessment failed: {e}")))?;
 
         // Combine results
         let mut predictions = HashMap::new();
@@ -959,20 +959,20 @@ impl ProductionMLService {
         // Analysis results
         predictions.insert(
             "approval_probability".to_string(),
-            analysis_result.predictions.get(0).copied().unwrap_or(0.5),
+            analysis_result.predictions.first().copied().unwrap_or(0.5),
         );
         predictions.insert("confidence".to_string(), analysis_result.overall_confidence);
 
         // Sentiment results
         predictions.insert(
             "sentiment_score".to_string(),
-            sentiment_result.predictions.get(0).copied().unwrap_or(0.5),
+            sentiment_result.predictions.first().copied().unwrap_or(0.5),
         );
 
         // Risk results
         predictions.insert(
             "risk_score".to_string(),
-            risk_result.predictions.get(0).copied().unwrap_or(0.5),
+            risk_result.predictions.first().copied().unwrap_or(0.5),
         );
 
         // Additional derived metrics
@@ -989,7 +989,7 @@ impl ProductionMLService {
         if self.config.enable_federated_learning {
             let consensus = self.get_federated_consensus().await?;
             for (key, value) in consensus {
-                predictions.insert(format!("consensus_{}", key), value);
+                predictions.insert(format!("consensus_{key}"), value);
             }
         }
 
@@ -1049,9 +1049,9 @@ impl ProductionMLService {
         let risk_result = self
             .inference("risk_assessor_v1", proposal_bytes)
             .await
-            .map_err(|e| AnyaError::ML(format!("Risk assessment failed: {}", e)))?;
+            .map_err(|e| AnyaError::ML(format!("Risk assessment failed: {e}")))?;
 
-        let risk_score = risk_result.predictions.get(0).copied().unwrap_or(0.5);
+        let risk_score = risk_result.predictions.first().copied().unwrap_or(0.5);
 
         Ok(RiskMetrics {
             risk_score,

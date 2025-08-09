@@ -1,9 +1,12 @@
+#![cfg(feature = "dwn")]
 // [AIR-3][AIS-3][BPC-3][RES-3] Decentralized Storage Implementation
 // Replaces SQLite with IPFS + DWN + Bitcoin anchoring for complete data sovereignty
 // [AIR-012] Operational Reliability and [AIP-002] Modular Architecture
 
 // use Web5Adapter HTTP client instead of direct web5 imports
-use crate::storage::ipfs::{IPFSStorage, IPFSConfig};
+use crate::storage::ipfs::{IPFSConfig, IPFSStorage};
+use crate::web::web5_adapter::Web5Adapter;
+use crate::web5::dwn::{DWNManager, DWNRecord};
 use crate::{AnyaError, AnyaResult};
 use bitcoin::{Network, Txid};
 use lru::LruCache;
@@ -49,12 +52,12 @@ pub struct CacheConfig {
 impl Default for CacheConfig {
     fn default() -> Self {
         Self {
-            hot_cache_ttl_secs: 3600, // 1 hour
-            hot_cache_size: 1000,     // ~100MB
-            query_cache_ttl_secs: 300, // 5 min
-            query_cache_size: 500,    // ~50MB
+            hot_cache_ttl_secs: 3600,     // 1 hour
+            hot_cache_size: 1000,         // ~100MB
+            query_cache_ttl_secs: 300,    // 5 min
+            query_cache_size: 500,        // ~50MB
             metadata_cache_ttl_secs: 900, // 15 min
-            metadata_cache_size: 250, // ~25MB
+            metadata_cache_size: 250,     // ~25MB
         }
     }
 }
@@ -253,7 +256,12 @@ impl DecentralizedStorage {
                     if let Ok(mut metrics) = self.metrics.lock() {
                         metrics.cache_hits += 1;
                     }
-                    return Ok(cached.metadata.get("exists").unwrap_or(&serde_json::Value::Bool(false)).as_bool().unwrap_or(false));
+                    return Ok(cached
+                        .metadata
+                        .get("exists")
+                        .unwrap_or(&serde_json::Value::Bool(false))
+                        .as_bool()
+                        .unwrap_or(false));
                 }
             }
         }
@@ -264,12 +272,14 @@ impl DecentralizedStorage {
         }
 
         // Query DWN for asset record using Web5Adapter
-        let asset_records = self.web5_adapter.query_records("*", "anya/rgb/asset")
-            .map_err(|e| AnyaError::Storage(format!("DWN query error: {}", e)))?;
+        let asset_records = self
+            .web5_adapter
+            .query_records("*", "anya/rgb/asset")
+            .map_err(|e| AnyaError::Web5(format!("DWN query error: {e}")))?;
 
-        let exists = asset_records.iter().any(|record| {
-            record.metadata.get("asset_id") == Some(&asset_id.to_string())
-        });
+        let exists = asset_records
+            .iter()
+            .any(|record| record.metadata.get("asset_id") == Some(&asset_id.to_string()));
 
         // Cache the result
         if let Ok(mut cache) = self.cache.lock() {
@@ -298,9 +308,10 @@ impl DecentralizedStorage {
     pub async fn store_asset(&self, asset: &RGBAsset) -> AnyaResult<String> {
         // 1. Serialize and store asset data in IPFS
         let asset_data = serde_json::to_vec(asset)
-            .map_err(|e| AnyaError::Serialization(e.to_string()))?;
+            .map_err(|e| AnyaError::System(format!("Serialize asset: {e}")))?;
 
-        let ipfs_metadata = self.ipfs_storage
+        let ipfs_metadata = self
+            .ipfs_storage
             .store_content(&asset_data, Some(&format!("asset_{}.json", asset.id)))
             .await?;
 
@@ -330,11 +341,14 @@ impl DecentralizedStorage {
             attestations: Vec::new(),
         };
 
-        let _index_id = self.web5_adapter.store_record(index_record)
-            .map_err(|e| AnyaError::Storage(format!("DWN index error: {}", e)))?;
+        let _index_id = self
+            .web5_adapter
+            .store_record(&index_record)
+            .map_err(|e| AnyaError::Web5(format!("DWN index error: {e}")))?;
 
         // 3. Optional: Anchor to Bitcoin for critical assets
-        if asset.total_supply > 1_000_000 { // Anchor high-value assets
+        if asset.total_supply > 1_000_000 {
+            // Anchor high-value assets
             if let Some(anchor_service) = &self.bitcoin_client {
                 let asset_hash = self.compute_asset_hash(asset)?;
                 if let Ok(mut metrics) = self.metrics.lock() {
@@ -375,8 +389,10 @@ impl DecentralizedStorage {
         }
 
         // Query DWN for asset records using Web5Adapter
-        let asset_records = self.web5_adapter.query_records(owner_did, "anya/rgb/asset")
-            .map_err(|e| AnyaError::Storage(format!("DWN query error: {}", e)))?;
+        let asset_records = self
+            .web5_adapter
+            .query_records(owner_did, "anya/rgb/asset")
+            .map_err(|e| AnyaError::Web5(format!("DWN query error: {e}")))?;
 
         // Cache the query results
         if let Ok(mut cache) = self.cache.lock() {
@@ -404,8 +420,10 @@ impl DecentralizedStorage {
     /// * `Ok(u64)` balance for the asset.
     pub async fn get_asset_balance(&self, asset_id: &str) -> AnyaResult<u64> {
         // Query DWN for balance record
-        let balance_records = self.web5_adapter.query_records(&self.user_did, "anya/rgb/balance")
-            .map_err(|e| AnyaError::Storage(format!("DWN balance query error: {}", e)))?;
+        let balance_records = self
+            .web5_adapter
+            .query_records(&self.user_did, "anya/rgb/balance")
+            .map_err(|e| AnyaError::Web5(format!("DWN balance query error: {e}")))?;
 
         // Find balance for specific asset
         for record in balance_records {
@@ -433,9 +451,10 @@ impl DecentralizedStorage {
     pub async fn store_invoice(&self, invoice: &RGBInvoice) -> AnyaResult<String> {
         // Store invoice in IPFS for immutability
         let invoice_data = serde_json::to_vec(invoice)
-            .map_err(|e| AnyaError::Serialization(e.to_string()))?;
+            .map_err(|e| AnyaError::System(format!("Serialize invoice: {e}")))?;
 
-        let ipfs_metadata = self.ipfs_storage
+        let ipfs_metadata = self
+            .ipfs_storage
             .store_content(&invoice_data, Some(&format!("invoice_{}.json", invoice.id)))
             .await?;
 
@@ -447,7 +466,7 @@ impl DecentralizedStorage {
             owner: self.user_did.clone(),
             schema: "anya/rgb/invoice".to_string(),
             data: serde_json::to_value(invoice)
-                .map_err(|e| AnyaError::Serialization(e.to_string()))?,
+                .map_err(|e| AnyaError::System(format!("Serialize invoice metadata: {e}")))?,
             metadata: {
                 let mut meta = HashMap::new();
                 meta.insert("asset_id".to_string(), invoice.asset_id.clone());
@@ -459,8 +478,9 @@ impl DecentralizedStorage {
             attestations: Vec::new(),
         };
 
-        self.web5_adapter.store_record(invoice_record)
-            .map_err(|e| AnyaError::Storage(format!("DWN invoice index error: {}", e)))
+        self.web5_adapter
+            .store_record(invoice_record)
+            .map_err(|e| AnyaError::Web5(format!("DWN invoice index error: {e}")))
     }
 
     // ========================================================================
@@ -480,10 +500,14 @@ impl DecentralizedStorage {
     ) -> AnyaResult<String> {
         // 1. Store transfer in IPFS
         let transfer_data = serde_json::to_vec(transfer)
-            .map_err(|e| AnyaError::Serialization(e.to_string()))?;
+            .map_err(|e| AnyaError::System(format!("Serialize transfer: {e}")))?;
 
-        let ipfs_metadata = self.ipfs_storage
-            .store_content(&transfer_data, Some(&format!("transfer_{}.json", transfer.id)))
+        let ipfs_metadata = self
+            .ipfs_storage
+            .store_content(
+                &transfer_data,
+                Some(&format!("transfer_{}.json", transfer.id)),
+            )
             .await?;
 
         // 2. Create DWN transfer record
@@ -492,7 +516,7 @@ impl DecentralizedStorage {
             owner: transfer.from_did.clone(),
             schema: "anya/rgb/transfer".to_string(),
             data: serde_json::to_value(transfer)
-                .map_err(|e| AnyaError::Serialization(e.to_string()))?,
+                .map_err(|e| AnyaError::System(format!("Serialize transfer metadata: {e}")))?,
             metadata: {
                 let mut meta = HashMap::new();
                 meta.insert("asset_id".to_string(), transfer.asset_id.clone());
@@ -505,12 +529,19 @@ impl DecentralizedStorage {
             attestations: Vec::new(),
         };
 
-        self.web5_adapter.store_record(transfer_record)
-            .map_err(|e| AnyaError::Storage(format!("DWN transfer index error: {}", e)))?;
+        self.web5_adapter
+            .store_record(transfer_record)
+            .map_err(|e| AnyaError::Web5(format!("DWN transfer index error: {e}")))?;
 
         // 3. Update balances
-        self.update_balance(&transfer.from_did, &transfer.asset_id, -(transfer.amount as i64)).await?;
-        self.update_balance(&transfer.to_did, &transfer.asset_id, transfer.amount as i64).await?;
+        self.update_balance(
+            &transfer.from_did,
+            &transfer.asset_id,
+            -(transfer.amount as i64),
+        )
+        .await?;
+        self.update_balance(&transfer.to_did, &transfer.asset_id, transfer.amount as i64)
+            .await?;
 
         // 4. Update cache
         self.update_hot_cache(&ipfs_metadata.content_id, &transfer_data)?;
@@ -527,8 +558,10 @@ impl DecentralizedStorage {
     /// * `Ok(TransferStatus)` for the transfer.
     pub async fn get_transfer_status(&self, transfer_id: &str) -> AnyaResult<TransferStatus> {
         // Query DWN for transfer record
-        let transfer_records = self.web5_adapter.query_records("*", "anya/rgb/transfer")
-            .map_err(|e| AnyaError::Storage(format!("DWN transfer query error: {}", e)))?;
+        let transfer_records = self
+            .web5_adapter
+            .query_records("*", "anya/rgb/transfer")
+            .map_err(|e| AnyaError::Web5(format!("DWN transfer query error: {e}")))?;
 
         for record in transfer_records {
             if record.id == format!("transfer_{}", transfer_id) {
@@ -557,9 +590,12 @@ impl DecentralizedStorage {
     ///
     /// # Observability
     /// Anchoring attempts/failures are tracked in metrics.
-    pub async fn validate_transfer_with_anchoring(&self, transfer: &AssetTransfer) -> AnyaResult<bool> {
-        // 1. Check sender balance
-        let sender_balance = self.get_asset_balance(&transfer.from_did).await?;
+    pub async fn validate_transfer_with_anchoring(
+        &self,
+        transfer: &AssetTransfer,
+    ) -> AnyaResult<bool> {
+        // 1. Check sender balance for the asset
+        let sender_balance = self.get_asset_balance(&transfer.asset_id).await?;
         if sender_balance < transfer.amount {
             return Ok(false);
         }
@@ -570,7 +606,8 @@ impl DecentralizedStorage {
         }
 
         // 4. Bitcoin anchoring for high-value transfers
-        if transfer.amount > 100_000 { // Anchor high-value transfers
+        if transfer.amount > 100_000 {
+            // Anchor high-value transfers
             if let Some(anchor_service) = &self.bitcoin_client {
                 if let Ok(mut metrics) = self.metrics.lock() {
                     metrics.anchor_attempts += 1;
@@ -591,8 +628,9 @@ impl DecentralizedStorage {
                         metadata: HashMap::new(),
                         attestations: Vec::new(),
                     };
-                    self.web5_adapter.store_record(anchor_record)
-                        .map_err(|e| AnyaError::Storage(format!("Anchor record error: {}", e)))?;
+                    self.web5_adapter
+                        .store_record(anchor_record)
+                        .map_err(|e| AnyaError::Web5(format!("Anchor record error: {e}")))?;
                 } else {
                     if let Ok(mut metrics) = self.metrics.lock() {
                         metrics.anchor_failures += 1;
@@ -615,10 +653,15 @@ impl DecentralizedStorage {
     ///
     /// # Returns
     /// * `Ok(Vec<AssetHistoryEntry>)` for the asset.
-    pub async fn get_asset_history_with_proofs(&self, asset_id: &str) -> AnyaResult<Vec<AssetHistoryEntry>> {
+    pub async fn get_asset_history_with_proofs(
+        &self,
+        asset_id: &str,
+    ) -> AnyaResult<Vec<AssetHistoryEntry>> {
         // Query DWN for history entries
-        let history_records = self.web5_adapter.query_records("*", "anya/rgb/history")
-            .map_err(|e| AnyaError::Storage(format!("DWN history query error: {}", e)))?;
+        let history_records = self
+            .web5_adapter
+            .query_records("*", "anya/rgb/history")
+            .map_err(|e| AnyaError::Web5(format!("DWN history query error: {e}")))?;
 
         let mut history_entries = Vec::new();
 
@@ -626,7 +669,9 @@ impl DecentralizedStorage {
             if let Some(record_asset_id) = record.metadata.get("asset_id") {
                 if record_asset_id == asset_id {
                     // Parse history entry
-                    if let Ok(entry) = serde_json::from_value::<AssetHistoryEntry>(record.data.clone()) {
+                    if let Ok(entry) =
+                        serde_json::from_value::<AssetHistoryEntry>(record.data.clone())
+                    {
                         history_entries.push(entry);
                     }
                 }
@@ -648,8 +693,10 @@ impl DecentralizedStorage {
     /// * `Ok(serde_json::Value)` for the asset metadata.
     pub async fn get_asset_metadata(&self, asset_id: &str) -> AnyaResult<serde_json::Value> {
         // Query DWN for asset metadata
-        let asset_records = self.web5_adapter.query_records("*", "anya/rgb/asset")
-            .map_err(|e| AnyaError::Storage(format!("DWN asset query error: {}", e)))?;
+        let asset_records = self
+            .web5_adapter
+            .query_records("*", "anya/rgb/asset")
+            .map_err(|e| AnyaError::Web5(format!("DWN asset query error: {e}")))?;
 
         for record in asset_records {
             if let Some(record_asset_id) = record.metadata.get("asset_id") {
@@ -659,7 +706,9 @@ impl DecentralizedStorage {
             }
         }
 
-        Err(AnyaError::Storage(format!("Asset metadata not found: {}", asset_id)))
+        Err(AnyaError::NotFound(format!(
+            "Asset metadata not found: {asset_id}"
+        )))
     }
 
     // ========================================================================
@@ -682,8 +731,10 @@ impl DecentralizedStorage {
                 if let Ok(cache) = self.cache.lock() {
                     if let Some(cached) = cache.hot_cache.peek(ipfs_hash) {
                         if cached.timestamp.elapsed().unwrap_or(Duration::MAX) < cached.ttl {
-                            let asset: RGBAsset = serde_json::from_slice(&cached.data)
-                                .map_err(|e| AnyaError::Serialization(e.to_string()))?;
+                            let asset: RGBAsset =
+                                serde_json::from_slice(&cached.data).map_err(|e| {
+                                    AnyaError::System(format!("Deserialize cached asset: {e}"))
+                                })?;
                             assets.push(asset);
                             continue;
                         }
@@ -691,12 +742,10 @@ impl DecentralizedStorage {
                 }
 
                 // Fetch from IPFS if not cached
-                let asset_data = self.ipfs_storage
-                    .retrieve_content(ipfs_hash)
-                    .await?;
+                let asset_data = self.ipfs_storage.retrieve_content(ipfs_hash).await?;
 
                 let asset: RGBAsset = serde_json::from_slice(&asset_data)
-                    .map_err(|e| AnyaError::Serialization(e.to_string()))?;
+                    .map_err(|e| AnyaError::System(format!("Deserialize asset: {e}")))?;
 
                 // Update cache
                 self.update_hot_cache(ipfs_hash, &asset_data)?;
@@ -738,7 +787,8 @@ impl DecentralizedStorage {
                 asset_id: asset_id.to_string(),
                 amount: new_balance,
                 last_updated: current_timestamp(),
-            }).map_err(|e| AnyaError::Serialization(e.to_string()))?,
+            })
+            .map_err(|e| AnyaError::System(format!("Serialize balance record: {e}")))?,
             metadata: {
                 let mut meta = HashMap::new();
                 meta.insert("asset_id".to_string(), asset_id.to_string());
@@ -748,8 +798,9 @@ impl DecentralizedStorage {
             attestations: Vec::new(),
         };
 
-        self.web5_adapter.store_record(balance_record)
-            .map_err(|e| AnyaError::Storage(format!("Balance update error: {}", e)))?;
+        self.web5_adapter
+            .store_record(balance_record)
+            .map_err(|e| AnyaError::Web5(format!("Balance update error: {e}")))?;
 
         Ok(())
     }
@@ -805,14 +856,14 @@ impl DecentralizedStorage {
         transfer.amount.hash(&mut hasher);
         Ok(hasher.finish().to_be_bytes().to_vec())
     }
-    
+
     /// Gets IPFS storage statistics and cache sizes.
     ///
     /// # Returns
     /// * `Ok(serde_json::Value)` with stats.
     pub async fn get_storage_stats(&self) -> AnyaResult<serde_json::Value> {
         let ipfs_stats = self.ipfs_storage.get_statistics().await?;
-        
+
         Ok(serde_json::json!({
             "ipfs_stats": ipfs_stats,
             "cache_size": {
@@ -822,7 +873,7 @@ impl DecentralizedStorage {
             }
         }))
     }
-    
+
     /// Performs garbage collection and cache cleanup.
     ///
     /// # Returns
@@ -830,24 +881,24 @@ impl DecentralizedStorage {
     pub async fn perform_gc(&self) -> AnyaResult<serde_json::Value> {
         // IPFS garbage collection
         let ipfs_gc_result = self.ipfs_storage.perform_gc().await?;
-        
+
         // Cache cleanup
         if let Ok(mut cache) = self.cache.lock() {
             let mut expired_keys = Vec::new();
-            
+
             for (key, cached_data) in cache.hot_cache.iter() {
                 if cached_data.timestamp.elapsed().unwrap_or(Duration::ZERO) > cached_data.ttl {
                     expired_keys.push(key.clone());
                 }
             }
-            
+
             for key in &expired_keys {
                 cache.hot_cache.pop(key);
             }
-            
+
             // Similar for other caches...
         }
-        
+
         Ok(serde_json::json!({
             "ipfs_gc": ipfs_gc_result,
             "cache_cleanup": "completed"
@@ -899,24 +950,38 @@ use futures::TryStreamExt;
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::sync::Arc;
 
     #[tokio::test]
     async fn test_decentralized_storage_creation() {
+        let adapter = Arc::new(Web5Adapter::new("http://localhost:8080"));
         let storage = DecentralizedStorage::new(
             "http://127.0.0.1:5001",
+            adapter,
             "did:example:123".to_string(),
             Network::Testnet,
-        ).await;
-        assert!(storage.is_ok());
+            None,
+        )
+        .await;
+        assert!(
+            storage.is_ok(),
+            "storage creation failed: {:?}",
+            storage.err()
+        );
     }
 
     #[tokio::test]
     async fn test_asset_storage_and_retrieval() {
+        let adapter = Arc::new(Web5Adapter::new("http://localhost:8080"));
         let storage = DecentralizedStorage::new(
             "http://127.0.0.1:5001",
+            adapter,
             "did:example:123".to_string(),
             Network::Testnet,
-        ).await.unwrap();
+            None,
+        )
+        .await
+        .unwrap();
 
         let asset = RGBAsset {
             id: "test_asset".to_string(),

@@ -70,7 +70,7 @@ impl BitcoinHsmProvider {
         // In a real implementation, this would be securely generated and stored
         let mut master_seed = [0u8; 32];
         getrandom::fill(&mut master_seed).map_err(|e| {
-            HsmError::ProviderError(format!("Failed to generate random seed: {}", e))
+            HsmError::ProviderError(format!("Failed to generate random seed: {e}"))
         })?;
 
         let secp = Secp256k1::new();
@@ -92,7 +92,7 @@ impl BitcoinHsmProvider {
     async fn derive_key(&self, path: &str) -> Result<(SecretKey, SepcPublicKey), HsmError> {
         let derivation_path = path
             .parse::<DerivationPath>()
-            .map_err(|e| HsmError::InvalidParameters(format!("Invalid derivation path: {}", e)))?;
+            .map_err(|e| HsmError::InvalidParameters(format!("Invalid derivation path: {e}")))?;
 
         let master_xpriv_lock = self.master_xpriv.lock().await;
         let master_xpriv = master_xpriv_lock
@@ -101,14 +101,14 @@ impl BitcoinHsmProvider {
 
         let derived_xpriv = master_xpriv
             .derive_priv(&self.secp, &derivation_path)
-            .map_err(|e| HsmError::ProviderError(format!("Failed to derive private key: {}", e)))?;
+            .map_err(|e| HsmError::ProviderError(format!("Failed to derive private key: {e}")))?;
 
         // Get the private key bytes
         let secret_key = derived_xpriv.private_key;
         // Convert to a SecretKey - in newer versions of bitcoin, we need to use the secret_bytes method
         let secret_bytes = secret_key.secret_bytes();
         let secret_key = SecretKey::from_slice(&secret_bytes)
-            .map_err(|e| HsmError::ProviderError(format!("Invalid secret key: {}", e)))?;
+            .map_err(|e| HsmError::ProviderError(format!("Invalid secret key: {e}")))?;
         let public_key = secret_key.public_key(&self.secp);
 
         Ok((secret_key, public_key))
@@ -175,7 +175,7 @@ impl BitcoinHsmProvider {
         let keys = self.keys.lock().await;
         let key_info = keys
             .get(key_id)
-            .ok_or_else(|| HsmError::KeyNotFound(format!("Key not found: {}", key_id)))?;
+            .ok_or_else(|| HsmError::KeyNotFound(format!("Key not found: {key_id}")))?;
 
         // Get derivation path
         let derivation_path = key_info
@@ -191,12 +191,11 @@ impl BitcoinHsmProvider {
             SigningAlgorithm::EcdsaSha256 => {
                 let hash = sha256::Hash::hash(data);
                 Message::from_digest_slice(hash.as_ref())
-                    .map_err(|e| HsmError::ProviderError(format!("Invalid message: {}", e)))?
+                    .map_err(|e| HsmError::ProviderError(format!("Invalid message: {e}")))?
             }
             _ => {
                 return Err(HsmError::InvalidParameters(format!(
-                    "Unsupported algorithm: {:?}",
-                    algorithm
+                    "Unsupported algorithm: {algorithm:?}"
                 )))
             }
         };
@@ -219,7 +218,7 @@ impl BitcoinHsmProvider {
         let keys = self.keys.lock().await;
         let key_info = keys
             .get(key_id)
-            .ok_or_else(|| HsmError::KeyNotFound(format!("Key not found: {}", key_id)))?;
+            .ok_or_else(|| HsmError::KeyNotFound(format!("Key not found: {key_id}")))?;
 
         // Get derivation path
         let derivation_path = key_info
@@ -235,19 +234,18 @@ impl BitcoinHsmProvider {
             SigningAlgorithm::EcdsaSha256 => {
                 let hash = sha256::Hash::hash(data);
                 Message::from_digest_slice(hash.as_ref())
-                    .map_err(|e| HsmError::ProviderError(format!("Invalid message: {}", e)))?
+                    .map_err(|e| HsmError::ProviderError(format!("Invalid message: {e}")))?
             }
             _ => {
                 return Err(HsmError::InvalidParameters(format!(
-                    "Unsupported algorithm: {:?}",
-                    algorithm
+                    "Unsupported algorithm: {algorithm:?}"
                 )))
             }
         };
 
         // Parse signature
         let signature = Signature::from_der(signature)
-            .map_err(|e| HsmError::ProviderError(format!("Invalid signature: {}", e)))?;
+            .map_err(|e| HsmError::ProviderError(format!("Invalid signature: {e}")))?;
 
         // Verify signature
         let result = self
@@ -270,7 +268,7 @@ impl HsmProvider for BitcoinHsmProvider {
 
         // Initialize master keys
         let master_xpriv = ExtendedPrivKey::new_master(self.network, &self.master_seed)
-            .map_err(|e| HsmError::ProviderError(format!("Failed to create master key: {}", e)))?;
+            .map_err(|e| HsmError::ProviderError(format!("Failed to create master key: {e}")))?;
 
         let master_xpub = ExtendedPubKey::from_priv(&self.secp, &master_xpriv);
 
@@ -403,7 +401,7 @@ impl HsmProvider for BitcoinHsmProvider {
         let keys = self.keys.lock().await;
         let key_info = keys
             .get(key_id)
-            .ok_or_else(|| HsmError::KeyNotFound(format!("Key not found: {}", key_id)))?;
+            .ok_or_else(|| HsmError::KeyNotFound(format!("Key not found: {key_id}")))?;
 
         // Get derivation path
         let derivation_path = key_info
@@ -453,7 +451,7 @@ impl HsmProvider for BitcoinHsmProvider {
         // Delete key
         let mut keys = self.keys.lock().await;
         if keys.remove(key_id).is_none() {
-            return Err(HsmError::KeyNotFound(format!("Key not found: {}", key_id)));
+            return Err(HsmError::KeyNotFound(format!("Key not found: {key_id}")));
         }
 
         Ok(())
@@ -490,7 +488,7 @@ impl HsmProvider for BitcoinHsmProvider {
             HsmOperation::GenerateKey => {
                 let params: KeyGenParams = serde_json::from_value(request.parameters.clone())
                     .map_err(|e| {
-                        HsmError::InvalidParameters(format!("Invalid parameters: {}", e))
+                        HsmError::InvalidParameters(format!("Invalid parameters: {e}"))
                     })?;
 
                 let (key_pair, key_info) = self.generate_key(params).await?;
@@ -506,14 +504,14 @@ impl HsmProvider for BitcoinHsmProvider {
             HsmOperation::Sign => {
                 let params = serde_json::from_value::<SignParams>(request.parameters.clone())
                     .map_err(|e| {
-                        HsmError::InvalidParameters(format!("Invalid parameters: {}", e))
+                        HsmError::InvalidParameters(format!("Invalid parameters: {e}"))
                     })?;
 
                 // [AIR-3][AIS-3][BPC-3][RES-3] Use base64 Engine for encoding/decoding
                 // This follows official Bitcoin Improvement Proposals (BIPs) standards for secure data handling
                 let data = base64::engine::general_purpose::STANDARD
                     .decode(&params.data)
-                    .map_err(|e| HsmError::InvalidParameters(format!("Invalid data: {}", e)))?;
+                    .map_err(|e| HsmError::InvalidParameters(format!("Invalid data: {e}")))?;
 
                 let signature = self.sign(&params.key_name, params.algorithm, &data).await?;
 
@@ -527,19 +525,19 @@ impl HsmProvider for BitcoinHsmProvider {
             HsmOperation::Verify => {
                 let params = serde_json::from_value::<VerifyParams>(request.parameters.clone())
                     .map_err(|e| {
-                        HsmError::InvalidParameters(format!("Invalid parameters: {}", e))
+                        HsmError::InvalidParameters(format!("Invalid parameters: {e}"))
                     })?;
 
                 // [AIR-3][AIS-3][BPC-3][RES-3] Use base64 Engine for encoding/decoding
                 // This follows official Bitcoin Improvement Proposals (BIPs) standards for secure data handling
                 let data = base64::engine::general_purpose::STANDARD
                     .decode(&params.data)
-                    .map_err(|e| HsmError::InvalidParameters(format!("Invalid data: {}", e)))?;
+                    .map_err(|e| HsmError::InvalidParameters(format!("Invalid data: {e}")))?;
 
                 let signature = base64::engine::general_purpose::STANDARD
                     .decode(&params.signature)
                     .map_err(|e| {
-                        HsmError::InvalidParameters(format!("Invalid signature: {}", e))
+                        HsmError::InvalidParameters(format!("Invalid signature: {e}"))
                     })?;
 
                 let valid = self
@@ -556,7 +554,7 @@ impl HsmProvider for BitcoinHsmProvider {
             HsmOperation::ExportPublicKey => {
                 let params = serde_json::from_value::<GetKeyParams>(request.parameters.clone())
                     .map_err(|e| {
-                        HsmError::InvalidParameters(format!("Invalid parameters: {}", e))
+                        HsmError::InvalidParameters(format!("Invalid parameters: {e}"))
                     })?;
 
                 let public_key = self.export_public_key(&params.key_name).await?;
@@ -583,7 +581,7 @@ impl HsmProvider for BitcoinHsmProvider {
             HsmOperation::DeleteKey => {
                 let params = serde_json::from_value::<DeleteKeyParams>(request.parameters.clone())
                     .map_err(|e| {
-                        HsmError::InvalidParameters(format!("Invalid parameters: {}", e))
+                        HsmError::InvalidParameters(format!("Invalid parameters: {e}"))
                     })?;
 
                 self.delete_key(&params.key_name).await?;

@@ -170,7 +170,7 @@ impl HsmProviderFactory {
         #[cfg(feature = "dev-sim")]
         {
             let provider = SimulatorHsmProvider::new(&config.simulator)?;
-            return Ok(Arc::new(provider));
+            Ok(Arc::new(provider))
         }
         #[cfg(not(feature = "dev-sim"))]
         {
@@ -227,7 +227,7 @@ impl HsmProviderFactory {
             };
 
             let provider = SimulatorHsmProvider::new(&fallback_config)?;
-            return Ok(Arc::new(provider));
+            Ok(Arc::new(provider))
         }
         #[cfg(not(feature = "dev-sim"))]
         {
@@ -247,7 +247,7 @@ impl HsmProviderFactory {
         // Encode as base64 for configuration
         Ok(base64::Engine::encode(
             &base64::engine::general_purpose::STANDARD,
-            &key,
+            key,
         ))
     }
 
@@ -373,8 +373,10 @@ mod tests {
 
     #[tokio::test]
     async fn test_software_fallback_strategy() {
-        let mut config = HsmConfig::default();
-        config.provider_type = HsmProviderType::Hardware;
+        let mut config = HsmConfig {
+            provider_type: HsmProviderType::Hardware,
+            ..HsmConfig::default()
+        };
 
         // Force hardware failure by using invalid config
         config.hardware.connection_string = "invalid://connection".to_string();
@@ -390,8 +392,10 @@ mod tests {
 
     #[tokio::test]
     async fn test_production_config_validation() {
-        let mut config = HsmConfig::default();
-        config.provider_type = HsmProviderType::Simulator;
+        let mut config = HsmConfig {
+            provider_type: HsmProviderType::Simulator,
+            ..HsmConfig::default()
+        };
         config.bitcoin.network = BitcoinNetworkType::Mainnet;
 
         // Should fail validation

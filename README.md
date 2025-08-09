@@ -9,7 +9,7 @@ A modular Bitcoin infrastructure platform designed for enterprise applications, 
 
 [![Rust](https://img.shields.io/badge/Rust-1.70+-green)](https://rust-lang.org)
 
-Last Updated: August 9, 2025
+Last Updated: August 10, 2025
 Version: 1.3.0
 Status: ✅ Build and crates.io dry-run verified; deployment readiness depends on your environment
 
@@ -477,6 +477,12 @@ cargo test --test bitcoin_integration
 
 # HSM simulator tests (dev only)
 cargo test --features dev-sim,hsm-full --no-fail-fast -- --nocapture
+
+# Extended / Heavy HSM tests (explicit opt-in to avoid false CI failures)
+export ANYA_ENABLE_HSM_CROSS=1            # enable cross-provider ops test
+export ANYA_ENABLE_HSM_HEALTH=1           # enable provider health loop test
+export ANYA_ENABLE_HSM_CONCURRENCY=1      # enable concurrency stress test
+cargo test security::hsm::tests::integration::hsm_integration_tests:: -- --nocapture
 ```
 
 **BIP Compliance Testing:**
@@ -498,7 +504,8 @@ cargo test --test bip_tests -- --nocapture
 cargo audit
 
 # Check for unsafe code
-cargo geiger
+# (cargo-geiger removed in security remediation; use cargo deny + manual review)
+cargo deny check
 
 # Run clippy for code quality
 cargo clippy -- -D warnings
@@ -513,6 +520,90 @@ cargo bench
 # Memory usage analysis
 cargo test --release -- --nocapture | grep "memory"
 ```
+
+### Environment-Honest Test Philosophy
+
+Anya Core follows an "environment-honest" policy: tests never fabricate success when required infrastructure (bitcoind, external endpoints, hardware HSM) is absent. Instead:
+
+- Explicit feature flags or environment variables gate execution of infrastructure-dependent tests.
+- Timeouts or missing dependencies result in a logged SKIP (not a silent pass) so signal integrity is preserved.
+- Core logic is still exercised via deterministic unit tests independent of external services.
+
+Recent HSM integration gating variables:
+
+| Variable | Purpose | When to Enable |
+|----------|---------|----------------|
+| `ANYA_ENABLE_HSM_CROSS` | Cross-provider Bitcoin key/sign/health sequence | Full HSM + bitcoind integration session |
+| `ANYA_ENABLE_HSM_HEALTH` | Provider health check validation loop | Observability / reliability validation |
+| `ANYA_ENABLE_HSM_CONCURRENCY` | Concurrency stress (multi-key generate/sign/verify) | Load & race condition analysis |
+
+Unset variables cause those specific tests to emit a `SKIP:` line and exit early—preventing false negatives in minimal CI while maintaining transparency.
+
+### Minimal Feature Build Profile (Security / Compliance Baseline)
+
+To support hardened, smallest-surface deployments we validate a minimal profile that excludes Bitcoin, DWN/Web5, RocksDB, HSM, and hybrid orchestration unless explicitly enabled. This ensures: (1) no accidental linkage of cryptographic subsystems not in scope, (2) the transitive `rsa` advisory chain remains eliminated, and (3) feature gating errors fail fast.
+
+Minimal baseline compile (library + enterprise Postgres only):
+
+```bash
+cargo build --no-default-features --features "std,enterprise"
+```
+
+Properties:
+
+- Zero Bitcoin / Taproot / secp256k1 symbols compiled
+- Postgres-only `sqlx` (MySQL path stubbed out, no `rsa`)
+- Storage Router absent unless `storage-hybrid` (implies `dwn`) enabled
+- RocksDB excluded unless `kv-rocks` added
+- HSM stack fully excluded (add `hsm` or `hsm-full` to opt in)
+- API remains available if you add `api`
+
+Incremental opt-ins (compose as needed):
+
+| Feature | Adds |
+|---------|------|
+| `bitcoin` | Bitcoin protocol (Taproot, PSBT, wallet) |
+| `dwn` | Decentralized Web Node integration |
+| `storage-hybrid` | Runtime hybrid orchestrator (adds `dwn`, `kv-rocks`, `enterprise`) |
+| `kv-rocks` | Local RocksDB acceleration only |
+| `hsm` / `hsm-full` | Software / full HSM suite |
+| `api` | HTTP API layer |
+
+Runtime storage selection (when hybrid compiled) is controlled by `ANYA_STORAGE_BACKEND`:
+
+| Value | Behavior |
+|-------|----------|
+| `auto` (default) | Prefer DWN if available/reachable else persistent |
+| `dwn` | Force DWN (errors if feature not compiled) |
+| `persistent` | Force Postgres/Rocks path even if DWN present |
+
+Example forcing persistent on minimal base (no hybrid compiled; variable ignored gracefully):
+
+```bash
+ANYA_STORAGE_BACKEND=persistent cargo run --no-default-features --features "std,enterprise"
+```
+
+Verification (expect clean build, zero warnings if clippy used, advisory-clean):
+
+```bash
+cargo clean
+cargo build --no-default-features --features "std,enterprise"
+cargo test  --no-default-features --features "std,enterprise" --lib
+cargo deny check
+```
+
+Edge cases validated:
+
+- `ANYA_STORAGE_BACKEND=dwn` without `dwn` feature => controlled error
+- Router logs chosen backend under hybrid build
+- Tests skip DWN-specific assertions when not compiled
+
+Planned improvements:
+
+- Add CI matrix job for minimal profile
+- Introduce meta feature `minimal` (deferred to avoid premature coupling)
+
+Security stance: Start minimal, expand features deliberately, re-run `cargo deny` each expansion.
 
 ---
 
@@ -630,7 +721,7 @@ Special thanks to the following projects and communities that make Anya Core pos
 ---
 
 Maintainer: Botshelo Mokoka (<botshelomokoka+anya-core@gmail.com>)
-Last Updated: August 9, 2025
+Last Updated: August 10, 2025
 Version: 1.3.0
 
 ---

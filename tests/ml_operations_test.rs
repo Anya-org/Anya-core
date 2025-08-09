@@ -2,7 +2,6 @@ use anya_core::ml::agents::FederatedAgent;
 use anya_core::ml::federated_agent::FederatedAgentConfig;
 
 use std::error::Error;
-use tokio;
 
 #[tokio::test]
 async fn test_model_training() -> Result<(), Box<dyn Error>> {
@@ -29,7 +28,7 @@ async fn test_model_training() -> Result<(), Box<dyn Error>> {
     for (idx, (user, _)) in users.iter().enumerate() {
         let mut perf = std::collections::HashMap::new();
         perf.insert("accuracy".to_string(), 0.8 + (idx as f64) * 0.01);
-        fl.process_model_update(user, &format!("dummy_hash_{}", idx), &[0u8; 16], perf)
+        fl.process_model_update(user, &format!("dummy_hash_{idx}"), &[0u8; 16], perf)
             .await?;
     }
 
@@ -47,12 +46,10 @@ async fn test_model_aggregation() -> Result<(), Box<dyn Error>> {
     let _fl = setup_test_environment().await?;
 
     // Train multiple local models
-    let _test_users = vec!["user1", "user2", "user3"];
-    let _test_inputs = vec![
-        vec![0.1, 0.2, 0.3],
+    let _test_users = ["user1", "user2", "user3"];
+    let _test_inputs = [vec![0.1, 0.2, 0.3],
         vec![0.2, 0.3, 0.4],
-        vec![0.3, 0.4, 0.5],
-    ];
+        vec![0.3, 0.4, 0.5]];
 
     // This test expects train_local_model, which is missing. Commenting out for now.
     /*

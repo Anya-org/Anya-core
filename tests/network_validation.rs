@@ -9,8 +9,10 @@ mod tests {
             println!("[skip] Network tests disabled (set ANYA_NETWORK_TEST=1 to enable)");
             return;
         }
-        let mut config = NetworkValidationConfig::default();
-        config.check_ssl = false; // Disable SSL for local tests
+        let config = NetworkValidationConfig {
+            check_ssl: false,
+            ..NetworkValidationConfig::default()
+        }; // Disable SSL for local tests
 
         let validator = NetworkValidator::new(config);
         let result = validator.validate_network().await;

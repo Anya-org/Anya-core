@@ -11,13 +11,14 @@ compliance: AIR-3 AIS-3 BPC-3 RES-3
 # Technical Architecture PRD
 
 Date: August 8, 2025
-Version: 2.0.0
+Version: 2.0.1
 
 ## Overview
 
 - Runtime: tokio async; error: anyhow/thiserror; serde for config/state.
 - Self-node primary: NetworkState { is_primary: bool } + accessors prefers_self_as_master(), is_primary_node().
 - Health model: Healthy if primary self-node; Warning when peers below threshold.
+- Storage Architecture: `StorageRouter` mediates between PersistentStorage and DecentralizedStorage (feature-gated `dwn`). Autoconfig builds IPFS + Web5 adapter + optional Bitcoin anchoring network then selects backend via ANYA_STORAGE_BACKEND.
 
 ## Bitcoin Core RPC Integration
 
@@ -46,6 +47,11 @@ Environment mappings (examples):
 - ANYA_LAYER2_PREFER_SELF_AS_MASTER=true|false
 - ANYA_LAYER2_ENABLE_SELF_NODE_FALLBACK=true|false
 - ANYA_BITCOIN_RPC_URL, ANYA_BITCOIN_RPC_USER, ANYA_BITCOIN_RPC_PASS
+- ANYA_STORAGE_BACKEND=auto|dwn|persistent
+- ANYA_IPFS_ENDPOINT=<http://127.0.0.1:5001>
+- ANYA_WEB5_SERVICE_URL=<http://localhost:8080>
+- ANYA_DID=did:... (optional; generated if absent)
+- ANYA_BITCOIN_NETWORK=regtest|testnet|mainnet (anchoring)
 
 ## Observability
 
@@ -68,6 +74,6 @@ Environment mappings (examples):
 - Aliases provided in `.cargo/config.toml`:
   - `cargo core-health`, `cargo core-validate`, `cargo core-start`
 
-Branch: integration/endpoint-centralization-clean • Last Updated: August 9, 2025
+Branch: integration/endpoint-centralization-clean • Last Updated: August 9, 2025 (storage autoconfig incorporated)
 
 Last Updated: August 9, 2025

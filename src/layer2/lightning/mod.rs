@@ -342,7 +342,7 @@ impl LightningProtocol {
         self.config.alias.hash(&mut hasher);
 
         let hash = hasher.finish();
-        Ok(format!("03{:064x}", hash))
+        Ok(format!("03{hash:064x}"))
     }
 
     /// Get current block height from network
@@ -369,7 +369,7 @@ impl LightningProtocol {
 
         let mut channels = self.channels.write().await;
         if channels.remove(&channel_id).is_some() {
-            Ok(format!("Channel {} closed", channel_id))
+            Ok(format!("Channel {channel_id} closed"))
         } else {
             Err(Layer2Error::Protocol("Channel not found".to_string()))
         }
@@ -653,21 +653,13 @@ impl Default for LightningProtocol {
 
 // Legacy compatibility struct
 #[derive(Debug, Clone)]
+#[derive(Default)]
 pub struct LightningNetwork {
     pub config: LightningConfig,
     pub connected: bool,
     pub node_pubkey: Option<String>,
 }
 
-impl Default for LightningNetwork {
-    fn default() -> Self {
-        Self {
-            config: LightningConfig::default(),
-            connected: false,
-            node_pubkey: None,
-        }
-    }
-}
 
 impl LightningNetwork {
     pub fn new() -> Self {

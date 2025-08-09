@@ -4,7 +4,23 @@
 use serde::{Deserialize, Serialize};
 use std::error::Error;
 
-#[derive(Clone)]
+#[derive(Debug)]
+pub enum Web5AdapterError {
+    Http(String),
+    Serialization(String),
+}
+
+impl std::fmt::Display for Web5AdapterError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Web5AdapterError::Http(m) | Web5AdapterError::Serialization(m) => write!(f, "{m}"),
+        }
+    }
+}
+
+impl std::error::Error for Web5AdapterError {}
+
+#[derive(Clone, Debug)]
 pub struct Web5Adapter {
     pub service_url: String,
     pub agent: ureq::Agent,
@@ -29,19 +45,23 @@ impl Web5Adapter {
         }
     }
 
-    pub fn create_did(&self, method: &str) -> Result<DidDocumentResponse, Box<dyn Error + Send + Sync>> {
+    pub fn create_did(
+        &self,
+        method: &str,
+    ) -> Result<DidDocumentResponse, Box<dyn Error + Send + Sync>> {
         let req = CreateDidRequest {
             method: method.to_string(),
         };
         let url = format!("{}/did/create", self.service_url);
-        let resp = self.agent
-            .post(&url)
-            .send_json(&req)?;
+        let resp = self.agent.post(&url).send_json(&req)?;
         let did_doc: DidDocumentResponse = resp.into_json()?;
         Ok(did_doc)
     }
-    
-    pub fn resolve_did(&self, did: &str) -> Result<DidDocumentResponse, Box<dyn Error + Send + Sync>> {
+
+    pub fn resolve_did(
+        &self,
+        did: &str,
+    ) -> Result<DidDocumentResponse, Box<dyn Error + Send + Sync>> {
         let url = format!("{}/did/resolve?did={}", self.service_url, did);
         let resp = self.agent.get(&url).call()?;
         let did_doc: DidDocumentResponse = resp.into_json()?;
@@ -53,9 +73,7 @@ impl Web5Adapter {
         message: &serde_json::Value,
     ) -> Result<serde_json::Value, Box<dyn Error + Send + Sync>> {
         let url = format!("{}/dwn/send", self.service_url);
-        let resp = self.agent
-            .post(&url)
-            .send_json(message)?;
+        let resp = self.agent.post(&url).send_json(message)?;
         let result: serde_json::Value = resp.into_json()?;
         Ok(result)
     }
@@ -66,9 +84,7 @@ impl Web5Adapter {
     ) -> Result<serde_json::Value, Box<dyn Error + Send + Sync>> {
         let url = format!("{}/dwn/messages", self.service_url);
         let req = filter.unwrap_or(&serde_json::Value::Null);
-        let resp = self.agent
-            .post(&url)
-            .send_json(req)?;
+        let resp = self.agent.post(&url).send_json(req)?;
         let result: serde_json::Value = resp.into_json()?;
         Ok(result)
     }
@@ -78,9 +94,7 @@ impl Web5Adapter {
         payload: &serde_json::Value,
     ) -> Result<serde_json::Value, Box<dyn Error + Send + Sync>> {
         let url = format!("{}/vc/issue", self.service_url);
-        let resp = self.agent
-            .post(&url)
-            .send_json(payload)?;
+        let resp = self.agent.post(&url).send_json(payload)?;
         let result: serde_json::Value = resp.into_json()?;
         Ok(result)
     }
@@ -90,9 +104,7 @@ impl Web5Adapter {
         payload: &serde_json::Value,
     ) -> Result<serde_json::Value, Box<dyn Error + Send + Sync>> {
         let url = format!("{}/vc/verify", self.service_url);
-        let resp = self.agent
-            .post(&url)
-            .send_json(payload)?;
+        let resp = self.agent.post(&url).send_json(payload)?;
         let result: serde_json::Value = resp.into_json()?;
         Ok(result)
     }
@@ -102,14 +114,15 @@ impl Web5Adapter {
         payload: &serde_json::Value,
     ) -> Result<serde_json::Value, Box<dyn Error + Send + Sync>> {
         let url = format!("{}/vc/store", self.service_url);
-        let resp = self.agent
-            .post(&url)
-            .send_json(payload)?;
+        let resp = self.agent.post(&url).send_json(payload)?;
         let result: serde_json::Value = resp.into_json()?;
         Ok(result)
     }
 
-    pub fn get_credential(&self, id: &str) -> Result<serde_json::Value, Box<dyn Error + Send + Sync>> {
+    pub fn get_credential(
+        &self,
+        id: &str,
+    ) -> Result<serde_json::Value, Box<dyn Error + Send + Sync>> {
         let url = format!("{}/vc/get?id={}", self.service_url, id);
         let resp = self.agent.get(&url).call()?;
         let result: serde_json::Value = resp.into_json()?;
@@ -128,5 +141,21 @@ impl Web5Adapter {
         let url = format!("{}/health", self.service_url);
         let resp = self.agent.get(&url).call()?;
         Ok(resp.status() == 200)
+    }
+
+    // DWN record query stub (synchronous placeholder)
+    pub fn query_records(
+        &self,
+        _schema: &str,
+        _collection: &str,
+    ) -> Result<Vec<crate::web5::dwn::DWNRecord>, Web5AdapterError> {
+        Ok(vec![]) // Return empty until real DWN service integration
+    }
+
+    pub fn store_record(
+        &self,
+        record: &crate::web5::dwn::DWNRecord,
+    ) -> Result<String, Web5AdapterError> {
+        Ok(record.id.clone())
     }
 }

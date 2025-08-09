@@ -36,16 +36,21 @@ pub mod sectional {
             }
         }
 
-        #[allow(dead_code)] // May not be used in all test configurations
-        pub fn from_str(s: &str) -> Option<Self> {
+        // Use TryFrom or FromStr trait instead of custom from_str to satisfy clippy
+    }
+
+    impl std::str::FromStr for Section {
+        type Err = ();
+
+        fn from_str(s: &str) -> Result<Self, Self::Err> {
             match s {
-                "core-issuance" => Some(Section::CoreIssuance),
-                "distribution" => Some(Section::Distribution),
-                "dex-integration" => Some(Section::DexIntegration),
-                "governance" => Some(Section::Governance),
-                "security" => Some(Section::Security),
-                "memory-optimization" => Some(Section::MemoryOptimization),
-                _ => None,
+                "core-issuance" => Ok(Section::CoreIssuance),
+                "distribution" => Ok(Section::Distribution),
+                "dex-integration" => Ok(Section::DexIntegration),
+                "governance" => Ok(Section::Governance),
+                "security" => Ok(Section::Security),
+                "memory-optimization" => Ok(Section::MemoryOptimization),
+                _ => Err(()),
             }
         }
     }

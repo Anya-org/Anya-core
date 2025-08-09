@@ -2,7 +2,7 @@
 //!
 //! This module provides centralized test utilities to eliminate duplicates
 
-pub mod test_utilities;
+pub mod test_utilities; // Submodule declaration retained; parent tests/mod.rs no longer declares `mod common` directly
 
 // Re-export the most commonly used items
 

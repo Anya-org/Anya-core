@@ -106,7 +106,7 @@ pub async fn test_immutability_historical_compatibility() {
                     if let ValidationError::ConsensusError(_) = e {
                         era_errors += 1;
                         consensus_errors += 1;
-                        println!("    ❌ Consensus error: {:?}", e);
+                        println!("    ❌ Consensus error: {e:?}");
                     }
                     // Other validation errors are expected for some test transactions
                 }
@@ -122,7 +122,7 @@ pub async fn test_immutability_historical_compatibility() {
                     if let ValidationError::ConsensusError(_) = e {
                         era_errors += 1;
                         consensus_errors += 1;
-                        println!("    ❌ Historical compatibility error: {:?}", e);
+                        println!("    ❌ Historical compatibility error: {e:?}");
                     }
                 }
             }
@@ -131,7 +131,7 @@ pub async fn test_immutability_historical_compatibility() {
         }
 
         // Now try to validate them as a batch
-        match validate_historical_batch(&txs, *height) {
+        match validate_historical_batch(txs, *height) {
             Ok(batch_valid) => {
                 if batch_valid {
                     println!("    ✅ Batch validation successful for era {}", era + 1);
@@ -144,9 +144,9 @@ pub async fn test_immutability_historical_compatibility() {
                 if let ValidationError::ConsensusError(_) = e {
                     era_errors += 1;
                     consensus_errors += 1;
-                    println!("    ❌ Batch validation consensus error: {:?}", e);
+                    println!("    ❌ Batch validation consensus error: {e:?}");
                 } else {
-                    println!("    ⚠️ Batch validation non-consensus error: {:?}", e);
+                    println!("    ⚠️ Batch validation non-consensus error: {e:?}");
                 }
             }
         }
@@ -166,10 +166,10 @@ pub async fn test_immutability_historical_compatibility() {
     let (total_records, consensus_checks, global_errors) = get_global_verification_stats();
 
     println!("\n📊 Historical Verification Summary:");
-    println!("  Total transactions verified: {}", total_verifications);
-    println!("  Total verification records: {}", total_records);
-    println!("  Consensus checks performed: {}", consensus_checks);
-    println!("  Consensus errors detected: {}", global_errors);
+    println!("  Total transactions verified: {total_verifications}");
+    println!("  Total verification records: {total_records}");
+    println!("  Consensus checks performed: {consensus_checks}");
+    println!("  Consensus errors detected: {global_errors}");
 
     // Calculate immutability score with improved algorithm
     let error_percentage = if total_verifications > 0 {
@@ -213,17 +213,15 @@ pub async fn test_immutability_historical_compatibility() {
 
     let immutability_score: f64 = (base_score + consistency_bonus).min(5.0);
 
-    println!("  Error percentage: {:.2}%", error_percentage);
+    println!("  Error percentage: {error_percentage:.2}%");
     println!(
-        "  Immutability principle score: {:.1}/5.0",
-        immutability_score
+        "  Immutability principle score: {immutability_score:.1}/5.0"
     );
 
     // Assert full alignment with immutability principle
     assert!(
         immutability_score >= 4.5,
-        "Immutability score below 4.5: {}",
-        immutability_score
+        "Immutability score below 4.5: {immutability_score}"
     );
 
     if immutability_score >= 4.5 {
@@ -251,7 +249,7 @@ pub async fn test_immutability_across_hardware_paths() {
 
     // Process all transactions with all validators
     for (name, validator) in configs {
-        println!("  💻 Testing with configuration: {}", name);
+        println!("  💻 Testing with configuration: {name}");
 
         let mut validation_results = Vec::new();
 
@@ -272,7 +270,7 @@ pub async fn test_immutability_across_hardware_paths() {
     for (name, results_vec) in &results {
         if results_vec != reference {
             all_identical = false;
-            println!("  ❌ Validation results differ for configuration: {}", name);
+            println!("  ❌ Validation results differ for configuration: {name}");
 
             // Show detailed differences
             for (i, (ref_result, actual_result)) in
@@ -280,15 +278,13 @@ pub async fn test_immutability_across_hardware_paths() {
             {
                 if ref_result != actual_result {
                     println!(
-                        "    Transaction {}: Reference={}, {}={}",
-                        i, ref_result, name, actual_result
+                        "    Transaction {i}: Reference={ref_result}, {name}={actual_result}"
                     );
                 }
             }
         } else {
             println!(
-                "  ✅ Validation results identical for configuration: {}",
-                name
+                "  ✅ Validation results identical for configuration: {name}"
             );
         }
     }
@@ -326,17 +322,16 @@ pub async fn test_full_bitcoin_principles_alignment() {
     let alignment_percentage = (total_score / 20.0) * 100.0;
 
     println!("\n📊 Bitcoin Core Principles Alignment Results:");
-    println!("  Decentralization: {:.1}/5.0", decentralization_score);
-    println!("  Security: {:.1}/5.0", security_score);
-    println!("  Immutability: {:.1}/5.0", immutability_score);
-    println!("  Privacy: {:.1}/5.0", privacy_score);
-    println!("  Overall Alignment: {:.1}% complete", alignment_percentage);
+    println!("  Decentralization: {decentralization_score:.1}/5.0");
+    println!("  Security: {security_score:.1}/5.0");
+    println!("  Immutability: {immutability_score:.1}/5.0");
+    println!("  Privacy: {privacy_score:.1}/5.0");
+    println!("  Overall Alignment: {alignment_percentage:.1}% complete");
 
     // Assert full alignment
     assert!(
         alignment_percentage >= 95.0,
-        "Alignment score below 95%: {}%",
-        alignment_percentage
+        "Alignment score below 95%: {alignment_percentage}%"
     );
 
     if alignment_percentage >= 95.0 {
@@ -373,7 +368,7 @@ async fn test_security_principle(_hw_manager: &Arc<HardwareOptimizationManager>)
 
     // Verify that consensus maintenance flag exists
     let maintains_consensus = validator.maintains_consensus;
-    println!("  maintains_consensus flag: {}", maintains_consensus);
+    println!("  maintains_consensus flag: {maintains_consensus}");
 
     // Create a test transaction
     let tx = create_dummy_transaction();
@@ -381,7 +376,7 @@ async fn test_security_principle(_hw_manager: &Arc<HardwareOptimizationManager>)
     // Verify consensus compatibility
     match validator.verify_consensus_compatibility(&tx) {
         Ok(_) => println!("  ✓ Consensus compatibility verification successful"),
-        Err(e) => println!("  ✗ Consensus compatibility verification failed: {:?}", e),
+        Err(e) => println!("  ✗ Consensus compatibility verification failed: {e:?}"),
     }
 
     println!("  ✓ Deterministic verification results verified");
@@ -405,7 +400,7 @@ async fn test_immutability_principle(_hw_manager: &Arc<HardwareOptimizationManag
     // Verify historical compatibility
     match validator.verify_historical_transaction(&tx, 100) {
         Ok(_) => println!("  ✓ Historical transaction verification successful"),
-        Err(e) => println!("  ✗ Historical transaction verification failed: {:?}", e),
+        Err(e) => println!("  ✗ Historical transaction verification failed: {e:?}"),
     }
 
     println!("  ✓ Verification integrity verified");

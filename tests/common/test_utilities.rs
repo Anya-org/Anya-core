@@ -141,6 +141,12 @@ pub struct FileTestEnvironment {
     pub test_dir: std::path::PathBuf,
 }
 
+impl Default for FileTestEnvironment {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl FileTestEnvironment {
     /// Create a new file-based test environment with a temporary directory
     #[allow(dead_code)]
@@ -153,7 +159,7 @@ impl FileTestEnvironment {
             .unwrap()
             .as_secs();
 
-        let test_dir = std::env::temp_dir().join(format!("anya_test_{}", timestamp));
+        let test_dir = std::env::temp_dir().join(format!("anya_test_{timestamp}"));
 
         // Create the directory if it doesn't exist
         if !test_dir.exists() {
@@ -193,7 +199,7 @@ impl MockFactory {
             .unwrap()
             .as_secs();
 
-        format!("txid{:x}", timestamp)
+        format!("txid{timestamp:x}")
     }
 
     /// Simulate a Bitcoin address for testing
@@ -215,7 +221,7 @@ impl MockFactory {
             .unwrap()
             .as_secs();
 
-        format!("did:key:z{:x}", timestamp)
+        format!("did:key:z{timestamp:x}")
     }
 
     /// Simulate an RGB asset ID for testing
@@ -226,7 +232,7 @@ impl MockFactory {
             .unwrap()
             .as_secs();
 
-        format!("rgb1{:x}", timestamp)
+        format!("rgb1{timestamp:x}")
     }
 
     /// Create mock key pair for testing
@@ -248,7 +254,7 @@ impl MockFactory {
 
         (0..count)
             .map(|i| {
-                let outcome = format!("outcome-{}", i);
+                let outcome = format!("outcome-{i}");
                 // Use the imported BitcoinHashTrait for the .hash() method
                 let outcome_hash = bitcoin::hashes::sha256::Hash::hash(outcome.as_bytes());
                 let message = Message::from_digest_slice(&outcome_hash[..]).expect("Valid message");
@@ -303,10 +309,7 @@ impl TestAssertions {
 
         assert!(
             improvement >= min_improvement_percent,
-            "Performance improvement insufficient for {}: got {:.2}%, expected >= {:.2}%",
-            context,
-            improvement,
-            min_improvement_percent
+            "Performance improvement insufficient for {context}: got {improvement:.2}%, expected >= {min_improvement_percent:.2}%"
         );
     }
 }

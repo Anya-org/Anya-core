@@ -24,7 +24,7 @@ async fn test_system_initialization() {
             println!("✅ System initialization successful");
         }
         Err(e) => {
-            println!("⚠️ System initialization had issues: {}", e);
+            println!("⚠️ System initialization had issues: {e}");
             // Don't fail the test - just log the issue since modules might be incomplete
         }
     }
@@ -40,7 +40,7 @@ async fn test_ml_system_basic() {
             println!("✅ ML system initialization successful");
         }
         Err(e) => {
-            println!("⚠️ ML system initialization had issues: {}", e);
+            println!("⚠️ ML system initialization had issues: {e}");
         }
     }
 }
@@ -55,7 +55,7 @@ async fn test_web5_system_basic() {
             println!("✅ Web5 system initialization successful");
         }
         Err(e) => {
-            println!("⚠️ Web5 system initialization had issues: {}", e);
+            println!("⚠️ Web5 system initialization had issues: {e}");
         }
     }
 }
@@ -70,7 +70,7 @@ async fn test_dao_system_basic() {
             println!("✅ DAO system initialization successful");
         }
         Err(e) => {
-            println!("⚠️ DAO system initialization had issues: {}", e);
+            println!("⚠️ DAO system initialization had issues: {e}");
         }
     }
 }

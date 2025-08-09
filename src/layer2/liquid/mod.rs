@@ -49,7 +49,18 @@ pub struct LiquidConfig {
 
 impl Default for LiquidConfig {
     fn default() -> Self {
+        #[cfg(feature = "bitcoin")]
         let external = crate::bitcoin::external_endpoints::ExternalBitcoinEndpoints::resolve();
+        #[cfg(not(feature = "bitcoin"))]
+        struct StubExternal {
+            liquid_asset_registry: String,
+            liquid_federation_endpoint: String,
+        }
+        #[cfg(not(feature = "bitcoin"))]
+        let external = StubExternal {
+            liquid_asset_registry: String::new(),
+            liquid_federation_endpoint: String::new(),
+        };
         Self {
             network: "liquidregtest".to_string(),
             node_url: "http://127.0.0.1:18884".to_string(),

@@ -1,0 +1,25 @@
+#############################
+# Stub crate: sqlx-mysql   #
+# Purpose: Prevent pulling real sqlx-mysql (which drags rsa advisory) via [patch.crates-io]
+# Contains no code or dependencies. Version kept at 0.0.0 so audit tooling can easily ignore.
+# License: MIT
+#############################
+[package]
+name = "sqlx-mysql"
+version = "0.8.6"
+edition = "2021"
+license = "MIT"
+publish = false
+
+[lib]
+name = "sqlx_mysql"
+path = "lib.rs"
+
+[features]
+default = []
+chrono = []
+# Provide a no-op migrate feature because upstream sqlx enables `migrate` on driver crates.
+migrate = []
+uuid = []
+runtime-tokio-rustls = []
+offline = []

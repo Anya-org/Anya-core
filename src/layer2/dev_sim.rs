@@ -1,8 +1,6 @@
 //! Dev simulation helpers for Layer2, gated behind the `dev-sim` feature.
 //! Keeping simulate_* code isolated reduces simulation markers in production builds.
 
-#![cfg(feature = "dev-sim")]
-
 use super::production::{PeerConnection, ProductionLayer2Protocol, SyncStatus};
 use super::Layer2Error;
 use log::info;

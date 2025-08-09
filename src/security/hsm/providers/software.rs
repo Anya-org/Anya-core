@@ -254,7 +254,7 @@ impl SoftwareHsmProvider {
         rand::thread_rng().fill_bytes(&mut key);
 
         // Encode as base64 for configuration
-        base64::Engine::encode(&base64::engine::general_purpose::STANDARD, &key)
+        base64::Engine::encode(&base64::engine::general_purpose::STANDARD, key)
     }
 
     /// Validate software HSM configuration for security compliance
@@ -317,7 +317,7 @@ impl SoftwareHsmProvider {
             key_type: key_type.clone(),
             extractable: false, // Default to non-extractable for security
             usages: vec![KeyUsage::Sign, KeyUsage::Verify],
-            created_at: DateTime::from_timestamp(now as i64, 0).unwrap_or_else(|| Utc::now()),
+            created_at: DateTime::from_timestamp(now as i64, 0).unwrap_or_else(Utc::now),
             expires_at: None,
             attributes: HashMap::new(),
         };
@@ -341,7 +341,7 @@ impl SoftwareHsmProvider {
                 AuditEventType::KeyGeneration,
                 AuditEventResult::Success,
                 AuditEventSeverity::Info,
-                &format!("Stored new {:?} key", key_type),
+                &format!("Stored new {key_type:?} key"),
             )
             .await?;
 
@@ -433,7 +433,7 @@ impl SoftwareHsmProvider {
             SigningAlgorithm::EcdsaSha256 => {
                 let secret_bytes = &*secret_key; // secret_key is already Vec<u8>
                 let secret_key = SecretKey::from_slice(secret_bytes)
-                    .map_err(|e| HsmError::SigningError(format!("Invalid key data: {}", e)))?;
+                    .map_err(|e| HsmError::SigningError(format!("Invalid key data: {e}")))?;
 
                 // Create message hash
                 let mut hasher = Sha256::new();
@@ -442,7 +442,7 @@ impl SoftwareHsmProvider {
 
                 // Sign the hash
                 let message = bitcoin::secp256k1::Message::from_digest_slice(&message_hash)
-                    .map_err(|e| HsmError::SigningError(format!("Invalid message hash: {}", e)))?;
+                    .map_err(|e| HsmError::SigningError(format!("Invalid message hash: {e}")))?;
 
                 let signature = self.secp.sign_ecdsa(&message, &secret_key);
 
@@ -453,7 +453,7 @@ impl SoftwareHsmProvider {
                 // but note that Bitcoin typically uses SHA256d for signatures
                 let secret_bytes = &*secret_key; // secret_key is already Vec<u8>
                 let secret_key = SecretKey::from_slice(secret_bytes)
-                    .map_err(|e| HsmError::SigningError(format!("Invalid key data: {}", e)))?;
+                    .map_err(|e| HsmError::SigningError(format!("Invalid key data: {e}")))?;
 
                 // Create message hash using SHA-384
                 let mut hasher = Sha384::new();
@@ -463,15 +463,14 @@ impl SoftwareHsmProvider {
                 // Sign the hash (truncate to 32 bytes for secp256k1)
                 let truncated_hash = &message_hash[..32];
                 let message = bitcoin::secp256k1::Message::from_digest_slice(truncated_hash)
-                    .map_err(|e| HsmError::SigningError(format!("Invalid message hash: {}", e)))?;
+                    .map_err(|e| HsmError::SigningError(format!("Invalid message hash: {e}")))?;
 
                 let signature = self.secp.sign_ecdsa(&message, &secret_key);
 
                 Ok(signature.serialize_der().to_vec())
             }
             _ => Err(HsmError::UnsupportedOperation(format!(
-                "Unsupported signing algorithm: {:?}",
-                algorithm
+                "Unsupported signing algorithm: {algorithm:?}"
             ))),
         }
     }
@@ -505,21 +504,20 @@ impl SoftwareHsmProvider {
                         // Get the serialized public key from key storage or regenerate
                         let pubkey_bytes = self.export_public_key(key_id).await?;
                         let public_key = PublicKey::from_slice(&pubkey_bytes).map_err(|e| {
-                            HsmError::VerificationError(format!("Invalid public key data: {}", e))
+                            HsmError::VerificationError(format!("Invalid public key data: {e}"))
                         })?;
 
                         // Parse the signature
                         let sig = bitcoin::secp256k1::ecdsa::Signature::from_der(signature)
                             .map_err(|e| {
                                 HsmError::VerificationError(format!(
-                                    "Invalid signature format: {}",
-                                    e
+                                    "Invalid signature format: {e}"
                                 ))
                             })?;
 
                         // Verify the signature
                         let message = Message::from_digest_slice(&message_hash).map_err(|e| {
-                            HsmError::VerificationError(format!("Invalid message hash: {}", e))
+                            HsmError::VerificationError(format!("Invalid message hash: {e}"))
                         })?;
 
                         match self.secp.verify_ecdsa(&message, &sig, &public_key) {
@@ -551,8 +549,8 @@ impl SoftwareHsmProvider {
                 curve: EcCurve::Secp256k1,
             } => {
                 let secret_key = key_info.key_data.lock().await;
-                let secret_key = SecretKey::from_slice(&*secret_key).map_err(|e| {
-                    HsmError::KeyGenerationError(format!("Invalid key data: {}", e))
+                let secret_key = SecretKey::from_slice(&secret_key).map_err(|e| {
+                    HsmError::KeyGenerationError(format!("Invalid key data: {e}"))
                 })?;
                 let public_key = PublicKey::from_secret_key(&self.secp, &secret_key);
                 Ok(public_key.serialize().to_vec())
@@ -579,7 +577,7 @@ impl SoftwareHsmProvider {
                 crate::security::hsm::error::AuditEventType::KeyDeletion,
                 crate::security::hsm::error::AuditEventResult::Success,
                 crate::security::hsm::error::AuditEventSeverity::Info,
-                &format!("Key {} deleted successfully", key_id),
+                &format!("Key {key_id} deleted successfully"),
             )
             .await?;
 
@@ -674,7 +672,7 @@ impl HsmProvider for SoftwareHsmProvider {
                 use zeroize::Zeroizing;
                 let key_data = Zeroizing::new(key_data.clone());
                 let secret_key = SecretKey::from_slice(&key_data)
-                    .map_err(|e| HsmError::InvalidKeyData(format!("Invalid secret key: {}", e)))?;
+                    .map_err(|e| HsmError::InvalidKeyData(format!("Invalid secret key: {e}")))?;
 
                 // Create message hash
                 let mut hasher = Sha256::new();
@@ -683,7 +681,7 @@ impl HsmProvider for SoftwareHsmProvider {
 
                 // Create message for signing
                 let message = Message::from_digest_slice(&message_hash)
-                    .map_err(|e| HsmError::SigningError(format!("Invalid message: {}", e)))?;
+                    .map_err(|e| HsmError::SigningError(format!("Invalid message: {e}")))?;
 
                 // Sign the message (compact 64-byte signature)
                 let signature = self.secp.sign_ecdsa(&message, &secret_key);
@@ -724,18 +722,18 @@ impl HsmProvider for SoftwareHsmProvider {
                         // Get the serialized public key from key storage or regenerate
                         let pubkey_bytes = self.export_public_key(key_id).await?;
                         let public_key = PublicKey::from_slice(&pubkey_bytes).map_err(|e| {
-                            HsmError::VerificationError(format!("Invalid public key data: {}", e))
+                            HsmError::VerificationError(format!("Invalid public key data: {e}"))
                         })?;
 
                         // Parse signature
                         let sig =
                             secp256k1::ecdsa::Signature::from_compact(signature).map_err(|e| {
-                                HsmError::VerificationError(format!("Invalid signature: {}", e))
+                                HsmError::VerificationError(format!("Invalid signature: {e}"))
                             })?;
 
                         // Create message for verification
                         let message = Message::from_digest_slice(&message_hash).map_err(|e| {
-                            HsmError::VerificationError(format!("Invalid message: {}", e))
+                            HsmError::VerificationError(format!("Invalid message: {e}"))
                         })?;
 
                         // Verify the signature
@@ -763,7 +761,7 @@ impl HsmProvider for SoftwareHsmProvider {
             } => {
                 let key_data = key_info.key_data.lock().await;
                 let secret_key = SecretKey::from_slice(&key_data).map_err(|e| {
-                    HsmError::KeyGenerationError(format!("Invalid key data: {}", e))
+                    HsmError::KeyGenerationError(format!("Invalid key data: {e}"))
                 })?;
                 let public_key = PublicKey::from_secret_key(&self.secp, &secret_key);
                 Ok(public_key.serialize().to_vec())
@@ -800,8 +798,7 @@ impl HsmProvider for SoftwareHsmProvider {
                 let params: KeyGenParams =
                     serde_json::from_value(request.parameters).map_err(|e| {
                         HsmError::InvalidParameters(format!(
-                            "Invalid key generation parameters: {}",
-                            e
+                            "Invalid key generation parameters: {e}"
                         ))
                     })?;
 
@@ -818,14 +815,14 @@ impl HsmProvider for SoftwareHsmProvider {
             HsmOperation::Sign => {
                 let params: SignParams =
                     serde_json::from_value(request.parameters).map_err(|e| {
-                        HsmError::InvalidParameters(format!("Invalid sign parameters: {}", e))
+                        HsmError::InvalidParameters(format!("Invalid sign parameters: {e}"))
                     })?;
 
                 let signature = self
                     .sign(
                         &params.key_name,
                         params.algorithm.into(),
-                        &params.data.as_bytes(),
+                        params.data.as_bytes(),
                     )
                     .await?;
 
@@ -839,15 +836,15 @@ impl HsmProvider for SoftwareHsmProvider {
             HsmOperation::Verify => {
                 let params: VerifyParams =
                     serde_json::from_value(request.parameters).map_err(|e| {
-                        HsmError::InvalidParameters(format!("Invalid verify parameters: {}", e))
+                        HsmError::InvalidParameters(format!("Invalid verify parameters: {e}"))
                     })?;
 
                 let valid = self
                     .verify(
                         &params.key_name,
                         params.algorithm.into(),
-                        &params.data.as_bytes(),
-                        &params.signature.as_bytes(),
+                        params.data.as_bytes(),
+                        params.signature.as_bytes(),
                     )
                     .await?;
 
@@ -861,7 +858,7 @@ impl HsmProvider for SoftwareHsmProvider {
             HsmOperation::ExportPublicKey => {
                 let params: GetKeyParams =
                     serde_json::from_value(request.parameters).map_err(|e| {
-                        HsmError::InvalidParameters(format!("Invalid get key parameters: {}", e))
+                        HsmError::InvalidParameters(format!("Invalid get key parameters: {e}"))
                     })?;
 
                 let public_key = self.export_public_key(&params.key_name).await?;
@@ -883,7 +880,7 @@ impl HsmProvider for SoftwareHsmProvider {
             HsmOperation::DeleteKey => {
                 let params: DeleteKeyParams =
                     serde_json::from_value(request.parameters).map_err(|e| {
-                        HsmError::InvalidParameters(format!("Invalid delete key parameters: {}", e))
+                        HsmError::InvalidParameters(format!("Invalid delete key parameters: {e}"))
                     })?;
 
                 self.delete_key(&params.key_name).await?;

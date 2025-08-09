@@ -183,11 +183,8 @@ impl RgbProtocol {
     ) -> Result<String, Layer2Error> {
         // Generate deterministic schema ID based on schema content
         let mut hasher = DefaultHasher::new();
-        format!(
-            "{:?}{:?}{}{:?}{:?}",
-            asset_type, supply_policy, decimal_precision, metadata_fields, rights
-        )
-        .hash(&mut hasher);
+        format!("{asset_type:?}{supply_policy:?}{decimal_precision}{metadata_fields:?}{rights:?}")
+            .hash(&mut hasher);
         let schema_id = format!("rgb:{:016x}", hasher.finish());
 
         // Validate schema parameters against RGB standards
@@ -340,7 +337,7 @@ impl RgbProtocol {
 
         // Generate deterministic asset ID based on schema and issuer
         let mut hasher = DefaultHasher::new();
-        format!("{}{}{}", schema_id, issuer, name).hash(&mut hasher);
+        format!("{schema_id}{issuer}{name}").hash(&mut hasher);
         let asset_id = format!("asset:{:016x}", hasher.finish());
 
         let timestamp = SystemTime::now()
@@ -383,8 +380,7 @@ impl RgbProtocol {
         self.update_asset_metrics().await;
 
         info!(
-            "RGB asset issued successfully: {} ({}) with supply {} by {}",
-            name, asset_id, total_supply, issuer
+            "RGB asset issued successfully: {name} ({asset_id}) with supply {total_supply} by {issuer}"
         );
 
         Ok(asset_id)
@@ -1000,7 +996,7 @@ impl ContractManager {
         chrono::Utc::now().timestamp().hash(&mut hasher);
 
         let hash = hasher.finish();
-        Ok(format!("rgb1{:x}", hash))
+        Ok(format!("rgb1{hash:x}"))
     }
 
     /// Create a new Contract Manager
@@ -1140,7 +1136,7 @@ pub fn generate_asset_id(
     chrono::Utc::now().timestamp().hash(&mut hasher);
 
     let hash = hasher.finish();
-    Ok(format!("rgb1{:x}", hash))
+    Ok(format!("rgb1{hash:x}"))
 }
 
 // [AIR-3][AIS-3][BPC-3][RES-3] Import Layer2Protocol trait and related types - Additional imports commented out to avoid duplicates
@@ -1180,8 +1176,7 @@ impl RgbProtocol {
                 if let Some(max_supply) = max_supply {
                     if total_supply > *max_supply {
                         return Err(Layer2Error::Validation(format!(
-                            "Initial supply {} exceeds maximum supply {}",
-                            total_supply, max_supply
+                            "Initial supply {total_supply} exceeds maximum supply {max_supply}"
                         )));
                     }
                 }
@@ -1246,9 +1241,9 @@ impl RgbProtocol {
         let mut result = [0u8; 32];
         result[..8].copy_from_slice(&hash.to_be_bytes());
         // Fill remaining bytes with deterministic pattern
-        for i in 8..32 {
-            result[i] = (hash.wrapping_mul(i as u64) % 256) as u8;
-        }
+        result.iter_mut().enumerate().skip(8).for_each(|(i, b)| {
+            *b = (hash.wrapping_mul(i as u64) % 256) as u8;
+        });
 
         Ok(result)
     }
@@ -1363,10 +1358,7 @@ impl RgbProtocol {
         let assets_count = self.assets.read().await.len();
         let schemas_count = self.asset_schemas.read().await.len();
 
-        info!(
-            "RGB metrics updated - Assets: {}, Schemas: {}",
-            assets_count, schemas_count
-        );
+        info!("RGB metrics updated - Assets: {assets_count}, Schemas: {schemas_count}");
     }
 
     /// Generate deterministic transition ID
@@ -1381,7 +1373,7 @@ impl RgbProtocol {
         use std::hash::{Hash, Hasher};
 
         let mut hasher = DefaultHasher::new();
-        format!("{}{}{}{}", asset_id, from, to, amount).hash(&mut hasher);
+        format!("{asset_id}{from}{to}{amount}").hash(&mut hasher);
         format!("transition:{:016x}", hasher.finish())
     }
 
@@ -1396,7 +1388,7 @@ impl RgbProtocol {
         use std::hash::{Hash, Hasher};
 
         let mut hasher = DefaultHasher::new();
-        format!("{}{}{}", asset_id, amount, owner).hash(&mut hasher);
+        format!("{asset_id}{amount}{owner}").hash(&mut hasher);
         Ok(format!("commitment:{:016x}", hasher.finish()))
     }
 
@@ -1406,7 +1398,7 @@ impl RgbProtocol {
         use std::hash::{Hash, Hasher};
 
         let mut hasher = DefaultHasher::new();
-        format!("{}{}", owner, asset_id).hash(&mut hasher);
+        format!("{owner}{asset_id}").hash(&mut hasher);
         format!("{:016x}", hasher.finish())
     }
 
@@ -1422,7 +1414,7 @@ impl RgbProtocol {
         let pubkey_hash = hasher.finish();
 
         // P2PKH script: OP_DUP OP_HASH160 <pubkey_hash> OP_EQUALVERIFY OP_CHECKSIG
-        Ok(format!("76a914{:020x}88ac", pubkey_hash))
+        Ok(format!("76a914{pubkey_hash:020x}88ac"))
     }
 
     /// Create transfer metadata

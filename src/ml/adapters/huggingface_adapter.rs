@@ -59,7 +59,7 @@ impl HfClient {
         if let Some(ref token) = api_token {
             headers.insert(
                 reqwest::header::AUTHORIZATION,
-                reqwest::header::HeaderValue::from_str(&format!("Bearer {}", token)).unwrap(),
+                reqwest::header::HeaderValue::from_str(&format!("Bearer {token}")).unwrap(),
             );
         }
 
@@ -79,7 +79,7 @@ impl HfClient {
 
     /// Get model information from HuggingFace API
     pub async fn get_model_info(&self, model_id: &str) -> Result<ModelInfo> {
-        let url = format!("https://huggingface.co/api/models/{}", model_id);
+        let url = format!("https://huggingface.co/api/models/{model_id}");
         let response = self.client.get(&url).send().await?;
 
         if !response.status().is_success() {
@@ -97,8 +97,7 @@ impl HfClient {
         local_path: &Path,
     ) -> Result<()> {
         let url = format!(
-            "https://huggingface.co/{}/resolve/main/{}",
-            model_id, filename
+            "https://huggingface.co/{model_id}/resolve/main/{filename}"
         );
 
         let response = self.client.get(&url).send().await?;
@@ -120,7 +119,7 @@ impl HfClient {
 
     /// List model files
     pub async fn list_model_files(&self, model_id: &str) -> Result<Vec<String>> {
-        let url = format!("https://huggingface.co/api/models/{}/tree/main", model_id);
+        let url = format!("https://huggingface.co/api/models/{model_id}/tree/main");
         let response = self.client.get(&url).send().await?;
 
         if !response.status().is_success() {
@@ -137,9 +136,9 @@ impl HfClient {
         query: &str,
         filter: Option<&str>,
     ) -> Result<Vec<ModelSearchResult>> {
-        let mut url = format!("https://huggingface.co/api/models?search={}", query);
+        let mut url = format!("https://huggingface.co/api/models?search={query}");
         if let Some(filter) = filter {
-            url.push_str(&format!("&filter={}", filter));
+            url.push_str(&format!("&filter={filter}"));
         }
 
         let response = self.client.get(&url).send().await?;
@@ -230,14 +229,12 @@ impl HuggingFaceAdapter {
         fs::create_dir_all(&model_dir).await?;
 
         // Download essential files
-        let essential_files = vec![
-            "config.json",
+        let essential_files = ["config.json",
             "tokenizer.json",
             "tokenizer_config.json",
             "vocab.txt",
             "merges.txt",
-            "special_tokens_map.json",
-        ];
+            "special_tokens_map.json"];
 
         // Get all available files
         let available_files = self.client.list_model_files(model_id).await?;
@@ -255,7 +252,7 @@ impl HuggingFaceAdapter {
                     .download_file(model_id, &file, &local_path)
                     .await
                 {
-                    log::warn!("Failed to download {}: {}", file, e);
+                    log::warn!("Failed to download {file}: {e}");
                     // Continue with other files
                 }
             }
@@ -310,7 +307,7 @@ impl HuggingFaceAdapter {
         match model.model_type.as_str() {
             "text-generation" => {
                 // Simple text generation simulation
-                let generated = format!("Generated response for: {}", input);
+                let generated = format!("Generated response for: {input}");
                 Ok(generated
                     .chars()
                     .map(|c| c as u8 as f32)
@@ -402,7 +399,7 @@ impl MLModelAdapter for HuggingFaceAdapter {
 
         // Calculate confidence based on model type
         let confidence_scores = match hf_model.model_type.as_str() {
-            "text-classification" => predictions.iter().map(|&x| x).collect(),
+            "text-classification" => predictions.to_vec(),
             _ => vec![0.85], // Default confidence
         };
 

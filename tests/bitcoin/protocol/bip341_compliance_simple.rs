@@ -20,6 +20,12 @@ pub struct TaprootVerifier {
     secp: Secp256k1<bitcoin::secp256k1::All>,
 }
 
+impl Default for TaprootVerifier {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl TaprootVerifier {
     /// Create a new TaprootVerifier with a secp256k1 context
     pub fn new() -> Self {
@@ -36,7 +42,7 @@ impl TaprootVerifier {
         merkle_root: Option<TapNodeHash>,
     ) -> Result<bool> {
         // Extract internal key from control block
-        let internal_key_untweaked: UntweakedPublicKey = (*internal_key).into();
+        let internal_key_untweaked: UntweakedPublicKey = *internal_key;
 
         // Use the add_tweak method with the merkle_root option
         let (tweaked_key, _parity) = internal_key_untweaked.tap_tweak(&self.secp, merkle_root);
@@ -125,7 +131,7 @@ mod additional_tests {
         let x_only = XOnlyPublicKey::from(public_key);
 
         // Compute tweaked key with no merkle root (key-path spending)
-        let internal_key_untweaked: UntweakedPublicKey = x_only.into();
+        let internal_key_untweaked: UntweakedPublicKey = x_only;
         let merkle_root = None; // Using None for key-path spending
         let (tweaked_key, _parity) = internal_key_untweaked.tap_tweak(&secp, merkle_root);
         let tweaked_public_key = TweakedPublicKey::dangerous_assume_tweaked(tweaked_key.into());

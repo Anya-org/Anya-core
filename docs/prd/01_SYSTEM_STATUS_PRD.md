@@ -11,7 +11,7 @@ compliance: AIR-3 AIS-3 BPC-3 RES-3
 # System Status PRD
 
 Date: August 8, 2025
-Version: 2.0.0 — Master-by-default + Productionization
+ Version: 2.0.1 — Master-by-default + Storage Autoconfig Integration
 Repository: Anya-core (branch: bugfix/config-and-main-readme-fixes)
 Status: ✅ Core stable • 🔄 Production integrations in progress
 
@@ -32,15 +32,17 @@ Status: ✅ Core stable • 🔄 Production integrations in progress
 - Security/HSM: Production-ready (software HSM; audit logging; AES-GCM/RSA/Ed25519); integration tests stabilized with simulator unlock + timeouts.
 - Bitcoin Core: RPC client available; wire state/fees (height/hash/estimatesmartfee)
 - Layer2: Manager/coordinator stable; production adapters pending for LN/RGB/DLC
-- Storage: SQLite + RocksDB operational; metrics enabled
-           WEB5 Data storage : Beta
+- Storage: Persistent (Postgres/RocksDB) + Decentralized (IPFS/DWN) unified via `StorageRouter::autoconfig()` (beta)
+           - Autoconfig env: ANYA_STORAGE_BACKEND, ANYA_IPFS_ENDPOINT, ANYA_WEB5_SERVICE_URL, ANYA_DID, ANYA_BITCOIN_NETWORK
+           - Fallback order: explicit backend -> DWN if feature & init success -> persistent
+           - Error hardening: removed orphan error variants (Storage/Serialization) in favor of existing System/Web5/NotFound
 - AI/ML: Enhanced agentic system present; integration stabilization pending
 
 ## 🚧 Gaps To Close (P1)
 
 1) Bitcoin Core RPC-backed state/fees plumbed into ProductionLayer2Protocol
 2) Lightning adapter (LDK or LND gRPC) minimal operations
-3) RGB client integration for basic schema/list/query
+3) RGB client integration for basic schema/list/query (current DWN data model stub)
 4) DLC oracle client wiring
 
 ## 🧪 Recent Branch Outcomes
@@ -57,4 +59,4 @@ cargo check --all-features
 ./scripts/verify_implementation_status.sh
 ```
 
-Last Updated: August 9, 2025
+Last Updated: August 9, 2025 (storage autoconfig + error variant cleanup)

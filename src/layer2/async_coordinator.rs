@@ -99,7 +99,7 @@ impl AsyncProtocolWrapper {
         // Acquire semaphore permit
         let _permit =
             self.semaphore.acquire().await.map_err(|e| {
-                Layer2Error::Internal(format!("Failed to acquire semaphore: {}", e))
+                Layer2Error::Internal(format!("Failed to acquire semaphore: {e}"))
             })?;
 
         // Update last activity

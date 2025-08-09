@@ -11,7 +11,7 @@ async fn bitcoin_rpc_smoke_env_honest() {
 
     // Try to parse for basic auth
     let Ok(parsed) = url::Url::parse(&url) else {
-        eprintln!("[skip] BITCOIN_RPC_URL invalid; skipping: {}", url);
+        eprintln!("[skip] BITCOIN_RPC_URL invalid; skipping: {url}");
         return;
     };
     let user = parsed.username().to_string();
@@ -30,7 +30,7 @@ async fn bitcoin_rpc_smoke_env_honest() {
     ) {
         Ok(c) => c,
         Err(e) => {
-            eprintln!("[skip] Cannot create RPC client: {}", e);
+            eprintln!("[skip] Cannot create RPC client: {e}");
             return;
         }
     };
@@ -43,14 +43,13 @@ async fn bitcoin_rpc_smoke_env_honest() {
             if msg.contains("unexpected HTTP code: 400")
                 || msg.contains("unexpected HTTP code: 401")
             {
-                eprintln!("[skip] public / unauthenticated RPC endpoint rejected request ({}); treating as skip", msg);
+                eprintln!("[skip] public / unauthenticated RPC endpoint rejected request ({msg}); treating as skip");
             } else if msg.contains("Connection refused") || msg.contains("connection refused") {
                 eprintln!(
-                    "[skip] RPC endpoint unreachable ({}); treating as skip",
-                    msg
+                    "[skip] RPC endpoint unreachable ({msg}); treating as skip"
                 );
             } else {
-                eprintln!("[skip] get_blockchain_info failed: {}", msg);
+                eprintln!("[skip] get_blockchain_info failed: {msg}");
             }
             return;
         }

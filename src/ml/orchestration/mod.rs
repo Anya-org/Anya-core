@@ -155,6 +155,7 @@ pub enum StepType {
 
 /// Context shared across workflow execution
 #[derive(Debug, Clone)]
+#[derive(Default)]
 pub struct WorkflowContext {
     pub variables: HashMap<String, serde_json::Value>,
     pub agent_states: HashMap<String, serde_json::Value>,
@@ -440,7 +441,7 @@ impl WorkflowEngine {
             attempts += 1;
 
             // Convert AgentCommand to Observation
-            let observation = crate::ml::agents::Observation::Json(serde_json::to_value(&command)?);
+            let observation = crate::ml::agents::Observation::Json(serde_json::to_value(command)?);
 
             match agent.process(observation).await {
                 Ok(Some(action)) => {
@@ -723,16 +724,68 @@ impl Clone for WorkflowEngine {
     }
 }
 
-impl Default for WorkflowContext {
+/// Builder for creating workflow definitions
+pub struct WorkflowBuilder {
+    nodes: Vec<WorkflowNode>,
+    edges: Vec<WorkflowEdge>,
+    metadata: HashMap<String, String>,
+}
+
+impl Default for WorkflowBuilder {
     fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl WorkflowBuilder {
+    /// Create a new workflow builder
+    pub fn new() -> Self {
         Self {
-            variables: HashMap::new(),
-            agent_states: HashMap::new(),
-            external_data: HashMap::new(),
-            execution_metadata: HashMap::new(),
+            nodes: Vec::new(),
+            edges: Vec::new(),
+            metadata: HashMap::new(),
+        }
+    }
+
+    /// Add a node to the workflow
+    pub fn add_node(mut self, node: WorkflowNode) -> Self {
+        self.nodes.push(node);
+        self
+    }
+
+    /// Add an edge to the workflow
+    pub fn add_edge(mut self, edge: WorkflowEdge) -> Self {
+        self.edges.push(edge);
+        self
+    }
+
+    /// Add metadata to the workflow
+    pub fn add_metadata(mut self, key: String, value: String) -> Self {
+        self.metadata.insert(key, value);
+        self
+    }
+
+    /// Build the workflow definition
+    pub fn build(self) -> WorkflowDefinition {
+        // Convert Vec<WorkflowNode> to HashMap<String, WorkflowNode>
+        let mut nodes_map = HashMap::new();
+        for node in self.nodes {
+            nodes_map.insert(node.id.clone(), node);
+        }
+
+        WorkflowDefinition {
+            id: Uuid::new_v4().to_string(),
+            name: "Generated Workflow".to_string(),
+            description: "Generated using WorkflowBuilder".to_string(),
+            nodes: nodes_map,
+            edges: self.edges,
+            entry_point: "start".to_string(),
+            exit_points: vec!["end".to_string()],
+            metadata: self.metadata,
         }
     }
 }
+
 
 #[cfg(test)]
 mod tests {
@@ -804,62 +857,6 @@ mod tests {
 
         // Check status
         let status = engine.get_execution_status(&execution_id).await.unwrap();
-        println!("Execution status: {:?}", status);
-    }
-}
-
-/// Builder for creating workflow definitions
-pub struct WorkflowBuilder {
-    nodes: Vec<WorkflowNode>,
-    edges: Vec<WorkflowEdge>,
-    metadata: HashMap<String, String>,
-}
-
-impl WorkflowBuilder {
-    /// Create a new workflow builder
-    pub fn new() -> Self {
-        Self {
-            nodes: Vec::new(),
-            edges: Vec::new(),
-            metadata: HashMap::new(),
-        }
-    }
-
-    /// Add a node to the workflow
-    pub fn add_node(mut self, node: WorkflowNode) -> Self {
-        self.nodes.push(node);
-        self
-    }
-
-    /// Add an edge to the workflow
-    pub fn add_edge(mut self, edge: WorkflowEdge) -> Self {
-        self.edges.push(edge);
-        self
-    }
-
-    /// Add metadata to the workflow
-    pub fn add_metadata(mut self, key: String, value: String) -> Self {
-        self.metadata.insert(key, value);
-        self
-    }
-
-    /// Build the workflow definition
-    pub fn build(self) -> WorkflowDefinition {
-        // Convert Vec<WorkflowNode> to HashMap<String, WorkflowNode>
-        let mut nodes_map = HashMap::new();
-        for node in self.nodes {
-            nodes_map.insert(node.id.clone(), node);
-        }
-
-        WorkflowDefinition {
-            id: Uuid::new_v4().to_string(),
-            name: "Generated Workflow".to_string(),
-            description: "Generated using WorkflowBuilder".to_string(),
-            nodes: nodes_map,
-            edges: self.edges,
-            entry_point: "start".to_string(),
-            exit_points: vec!["end".to_string()],
-            metadata: self.metadata,
-        }
+        println!("Execution status: {status:?}");
     }
 }

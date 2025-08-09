@@ -10,6 +10,7 @@ use crate::layer2::{
 };
 use async_trait::async_trait;
 // Bring RPC trait into scope for Bitcoin Core RPC calls
+#[cfg(feature = "bitcoin")]
 use bitcoincore_rpc::RpcApi;
 use log::{info, warn};
 use std::collections::HashMap;
@@ -100,7 +101,7 @@ pub struct PeerConnection {
     pub bytes_received: u64,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct ProtocolSpecificState {
     pub lightning_channels: HashMap<String, LightningChannelState>,
     pub rgb_assets: HashMap<String, RgbAssetState>,
@@ -167,17 +168,6 @@ impl Default for NetworkConfig {
     }
 }
 
-impl Default for ProtocolSpecificState {
-    fn default() -> Self {
-        Self {
-            lightning_channels: HashMap::new(),
-            rgb_assets: HashMap::new(),
-            dlc_contracts: HashMap::new(),
-            custom_data: HashMap::new(),
-        }
-    }
-}
-
 impl ProductionLayer2Protocol {
     /// Create a new production Layer2 protocol instance
     pub fn new(config: NetworkConfig) -> Self {
@@ -209,79 +199,76 @@ impl ProductionLayer2Protocol {
 
     /// Create protocol for specific Layer2 type
     pub fn for_protocol_type(protocol_type: &str) -> Self {
-        let mut config = NetworkConfig::default();
-        config.protocol_type = protocol_type.to_string();
-
         // Environment-driven network selection: ANYA_NETWORK_TYPE = dev|regtest|testnet|mainnet
         let net_env = env::var("ANYA_NETWORK_TYPE").unwrap_or_else(|_| "testnet".into());
-        match net_env.as_str() {
-            "mainnet" | "main" => {
-                config.network_id = "bitcoin-mainnet".to_string();
-                config.bootstrap_peers = vec![
+        let (network_id, bootstrap_peers, rpc_endpoints) = match net_env.as_str() {
+            "mainnet" | "main" => (
+                "bitcoin-mainnet".to_string(),
+                vec![
                     "seed.bitcoin.sipa.be:8333".to_string(),
                     "dnsseed.bluematt.me:8333".to_string(),
-                ];
-                // Default mainnet RPC unless overridden
-                config.rpc_endpoints = vec![env::var("BITCOIN_RPC_URL")
-                    .unwrap_or_else(|_| "http://bitcoin:password@localhost:8332".to_string())];
-            }
-            "regtest" | "dev" => {
-                config.network_id = "bitcoin-regtest".to_string();
-                // Typically a local node only
-                config.bootstrap_peers = vec!["127.0.0.1:18444".to_string()];
-                config.rpc_endpoints = vec![env::var("BITCOIN_RPC_URL")
-                    .unwrap_or_else(|_| "http://bitcoin:password@localhost:18443".to_string())];
-            }
-            _ => {
-                // testnet (default)
-                config.network_id = "bitcoin-testnet".to_string();
-                config.bootstrap_peers = vec![
+                ],
+                vec![env::var("BITCOIN_RPC_URL")
+                    .unwrap_or_else(|_| "http://bitcoin:password@localhost:8332".to_string())],
+            ),
+            "regtest" | "dev" => (
+                "bitcoin-regtest".to_string(),
+                vec!["127.0.0.1:18444".to_string()],
+                vec![env::var("BITCOIN_RPC_URL")
+                    .unwrap_or_else(|_| "http://bitcoin:password@localhost:18443".to_string())],
+            ),
+            _ => (
+                "bitcoin-testnet".to_string(),
+                vec![
                     "testnet-seed.bitcoin.jonasschnelli.ch:18333".to_string(),
                     "seed.tbtc.petertodd.org:18333".to_string(),
-                ];
-                config.rpc_endpoints = vec![env::var("BITCOIN_RPC_URL")
-                    .unwrap_or_else(|_| "http://bitcoin:password@localhost:18332".to_string())];
-            }
-        }
+                ],
+                vec![env::var("BITCOIN_RPC_URL")
+                    .unwrap_or_else(|_| "http://bitcoin:password@localhost:18332".to_string())],
+            ),
+        };
 
-        // Configure protocol-specific settings
+        let mut config = NetworkConfig {
+            protocol_type: protocol_type.to_string(),
+            network_id,
+            bootstrap_peers,
+            rpc_endpoints,
+            ..NetworkConfig::default()
+        };
+
+        // Configure protocol-specific settings (override where needed)
         match protocol_type {
             "lightning" => {
-                if matches!(net_env.as_str(), "mainnet" | "main") {
-                    config.network_id = "lightning-mainnet".to_string();
-                } else if matches!(net_env.as_str(), "regtest" | "dev") {
-                    config.network_id = "lightning-regtest".to_string();
-                } else {
-                    config.network_id = "lightning-testnet".to_string();
+                config.network_id = match net_env.as_str() {
+                    "mainnet" | "main" => "lightning-mainnet",
+                    "regtest" | "dev" => "lightning-regtest",
+                    _ => "lightning-testnet",
                 }
+                .to_string();
                 config.bootstrap_peers = vec![
                     "lnd.lightning.community:9735".to_string(),
                     "mainnet-lnd.htlc.me:9735".to_string(),
                 ];
             }
             "rgb" => {
-                if matches!(net_env.as_str(), "mainnet" | "main") {
-                    config.network_id = "rgb-mainnet".to_string();
-                } else if matches!(net_env.as_str(), "regtest" | "dev") {
-                    config.network_id = "rgb-regtest".to_string();
-                } else {
-                    config.network_id = "rgb-testnet".to_string();
+                config.network_id = match net_env.as_str() {
+                    "mainnet" | "main" => "rgb-mainnet",
+                    "regtest" | "dev" => "rgb-regtest",
+                    _ => "rgb-testnet",
                 }
+                .to_string();
                 config.min_peers = 1; // RGB can work with fewer peers
             }
             "dlc" => {
-                if matches!(net_env.as_str(), "mainnet" | "main") {
-                    config.network_id = "dlc-mainnet".to_string();
-                } else if matches!(net_env.as_str(), "regtest" | "dev") {
-                    config.network_id = "dlc-regtest".to_string();
-                } else {
-                    config.network_id = "dlc-testnet".to_string();
+                config.network_id = match net_env.as_str() {
+                    "mainnet" | "main" => "dlc-mainnet",
+                    "regtest" | "dev" => "dlc-regtest",
+                    _ => "dlc-testnet",
                 }
+                .to_string();
                 config.bootstrap_peers = vec!["oracle.suredbits.com:9735".to_string()];
             }
-            _ => {
-                // Use default configuration
-            }
+            _ => {}
         }
 
         Self::new(config)
@@ -326,10 +313,10 @@ impl ProductionLayer2Protocol {
                     let mut peers = self.peers.write().await;
                     peers.push(peer);
                     connected_count += 1;
-                    info!("Connected to peer: {}", peer_addr);
+                    info!("Connected to peer: {peer_addr}");
                 }
                 Err(e) => {
-                    warn!("Failed to connect to peer {}: {}", peer_addr, e);
+                    warn!("Failed to connect to peer {peer_addr}: {e}");
                 }
             }
 
@@ -364,7 +351,7 @@ impl ProductionLayer2Protocol {
         state.is_primary =
             self.config.prefer_self_as_master || matches!(state.sync_status, SyncStatus::Synced);
 
-        info!("Successfully connected to {} peers", peer_count);
+        info!("Successfully connected to {peer_count} peers");
         Ok(())
     }
 
@@ -539,10 +526,11 @@ impl ProductionLayer2Protocol {
 
         // Best-effort: if RPC endpoint configured, refresh height/hash from Bitcoin Core
         if self.config.enable_real_networking {
+            #[cfg(feature = "bitcoin")]
             if let Some(client) = self.build_rpc_client() {
                 if let Ok(info) = client.get_blockchain_info() {
                     let mut s = self.network_state.write().await;
-                    s.block_height = info.blocks as u64;
+                    s.block_height = info.blocks;
                     s.latest_block_hash = info.best_block_hash.to_string();
                     s.last_update = SystemTime::now()
                         .duration_since(UNIX_EPOCH)
@@ -781,7 +769,7 @@ impl Layer2Protocol for ProductionLayer2Protocol {
 
         let is_valid = violations.is_empty();
         if !is_valid {
-            warn!("State validation failed: {:?}", violations);
+            warn!("State validation failed: {violations:?}");
         }
 
         Ok(ValidationResult {
@@ -937,11 +925,11 @@ impl Layer2Protocol for ProductionLayer2Protocol {
             }
             "lightning" => {
                 // Lightning asset (using Taproot Assets or similar)
-                info!("Lightning asset {} issued (using Taproot Assets)", asset_id);
+                info!("Lightning asset {asset_id} issued (using Taproot Assets)");
             }
             _ => {
                 // Generic asset issuance
-                info!("Generic asset {} issued", asset_id);
+                info!("Generic asset {asset_id} issued");
             }
         }
 
@@ -1051,7 +1039,7 @@ impl Layer2Protocol for ProductionLayer2Protocol {
             proof_type: format!("{}_inclusion_proof", self.config.protocol_type),
             data: transaction_id.as_bytes().to_vec(),
             block_height: Some(state.block_height),
-            witness: Some(format!("witness_{}", transaction_id).as_bytes().to_vec()),
+            witness: Some(format!("witness_{transaction_id}").as_bytes().to_vec()),
             merkle_root: state.latest_block_hash.clone(),
             merkle_proof: vec![
                 format!("proof_step_1_{}", transaction_id),
@@ -1064,14 +1052,8 @@ impl Layer2Protocol for ProductionLayer2Protocol {
     async fn get_capabilities(&self) -> Result<ProtocolCapabilities, Layer2Error> {
         Ok(ProtocolCapabilities {
             supports_assets: true,
-            supports_smart_contracts: match self.config.protocol_type.as_str() {
-                "dlc" | "rgb" => true,
-                _ => false,
-            },
-            supports_privacy: match self.config.protocol_type.as_str() {
-                "rgb" | "lightning" => true,
-                _ => false,
-            },
+            supports_smart_contracts: matches!(self.config.protocol_type.as_str(), "dlc" | "rgb"),
+            supports_privacy: matches!(self.config.protocol_type.as_str(), "rgb" | "lightning"),
             max_transaction_size: match self.config.protocol_type.as_str() {
                 "lightning" => 4_294_967, // ~4MB for Lightning
                 _ => 1_000_000,           // 1MB default
@@ -1086,6 +1068,7 @@ impl Layer2Protocol for ProductionLayer2Protocol {
         _params: &[u8],
     ) -> Result<FeeEstimate, Layer2Error> {
         // Prefer dynamic RPC-based fee estimation if available
+        #[cfg(feature = "bitcoin")]
         if let Some(client) = self.build_rpc_client() {
             let target: u16 = match operation {
                 "urgent" => 1,
@@ -1097,7 +1080,7 @@ impl Layer2Protocol for ProductionLayer2Protocol {
             // estimate_smart_fee returns fee rate in BTC/kvB; convert to sat/vB
             if let Ok(resp) = client.estimate_smart_fee(target, None) {
                 if let Some(fr) = resp.fee_rate {
-                    let sat_per_vb = (fr.to_btc() * 100_000_000.0 / 1000.0) as f64; // sats per vB
+                    let sat_per_vb = fr.to_btc() * 100_000_000.0 / 1000.0; // sats per vB
                     let fee_rate = sat_per_vb.max(1.0);
                     return Ok(FeeEstimate {
                         estimated_fee: (fee_rate * 250.0) as u64, // approx 250 vB tx
@@ -1150,8 +1133,9 @@ impl ProductionLayer2Protocol {
         }
     }
     /// Build a Bitcoin Core RPC client from the first configured endpoint (if any)
+    #[cfg(feature = "bitcoin")]
     fn build_rpc_client(&self) -> Option<bitcoincore_rpc::Client> {
-        let endpoint = self.config.rpc_endpoints.get(0)?;
+        let endpoint = self.config.rpc_endpoints.first()?;
         let url = url::Url::parse(endpoint).ok()?;
         let user = url.username().to_string();
         let pass = url.password().unwrap_or("").to_string();
@@ -1165,7 +1149,7 @@ impl ProductionLayer2Protocol {
                 return None;
             }
             if weak_passwords.contains(&pass.as_str()) {
-                warn!("Bitcoin RPC password is empty or weak (\"{}\") in production/test environment. Please use a strong password.", pass);
+                warn!("Bitcoin RPC password is empty or weak (\"{pass}\") in production/test environment. Please use a strong password.");
             }
         }
         let host = format!(
@@ -1174,7 +1158,7 @@ impl ProductionLayer2Protocol {
             url.host_str().unwrap_or("localhost")
         );
         let port = url.port().unwrap_or(8332);
-        let rpc_url = format!("{}:{}", host, port);
+        let rpc_url = format!("{host}:{port}");
         if user.is_empty() {
             return None;
         }

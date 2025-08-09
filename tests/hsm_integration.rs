@@ -18,7 +18,7 @@ async fn test_hsm_basic_functionality() {
 
     // Test that we can create config - actual HSM functionality
     // would require proper audit logger implementation
-    println!("HSM config created: {:?}", config);
+    println!("HSM config created: {config:?}");
     assert!(config.token_dir.contains("test"));
 }
 
@@ -33,7 +33,7 @@ async fn test_hsm_manager() {
     };
 
     // Simple test without complex HsmConfig
-    println!("HSM config created: {:?}", config);
+    println!("HSM config created: {config:?}");
     assert!(config.use_testnet);
 }
 
@@ -43,6 +43,10 @@ mod hsm_mock {
     #[test]
     fn mock_hsm_test() {
         // Placeholder test for non-HSM builds
-        assert!(true, "HSM feature not enabled");
+        let feature_enabled = cfg!(feature = "hsm");
+        assert!(
+            !feature_enabled,
+            "hsm feature unexpectedly enabled in mock test"
+        );
     }
 }

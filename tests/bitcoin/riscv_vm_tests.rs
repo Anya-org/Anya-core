@@ -129,6 +129,7 @@ pub struct SecurityConfig {
 }
 
 #[derive(Debug, Clone)]
+#[derive(Default)]
 pub struct VmMetrics {
     pub l1_metrics: L1VmMetrics,
     pub l2_metrics: L2VmMetrics,
@@ -164,16 +165,6 @@ pub struct ZkVmMetrics {
     pub proof_size: u64,
 }
 
-impl Default for VmMetrics {
-    fn default() -> Self {
-        Self {
-            l1_metrics: L1VmMetrics::default(),
-            l2_metrics: L2VmMetrics::default(),
-            l3_metrics: L3VmMetrics::default(),
-            zk_metrics: ZkVmMetrics::default(),
-        }
-    }
-}
 
 impl RiscVmManager {
     pub fn new() -> Result<Self> {

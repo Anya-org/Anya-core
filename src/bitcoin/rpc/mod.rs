@@ -141,7 +141,7 @@ impl BitcoinRpcClient {
     /// Convenience wrappers used by several call sites
     pub async fn get_block_hash(&self, height: u64) -> Result<String, RpcError> {
         let inner = self.inner.clone();
-        let hash = spawn_blocking(move || inner.get_block_hash(height as u64))
+        let hash = spawn_blocking(move || inner.get_block_hash(height))
             .await
             .map_err(|e| RpcError(format!("Join error: {e}")))?
             .map_err(RpcError::from)?;
