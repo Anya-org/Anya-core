@@ -131,7 +131,7 @@ fn test_system_health() -> Result<(), String> {
 
 /// Tests Bitcoin-DAO integration according to BPC-3 and DAO-4 standards
 fn test_bitcoin_dao_integration() -> Result<(), String> {
-    info!("Testing Bitcoin-DAO integration using https://bitcoin-testnet-rpc.publicnode.com...");
+    info!("Testing Bitcoin-DAO integration using resolved testnet endpoint...");
     if !binary_available("anya-cli") {
         warn!("Skipping Bitcoin-DAO integration: 'anya-cli' not found in PATH");
         return Ok(());
@@ -144,7 +144,7 @@ fn test_bitcoin_dao_integration() -> Result<(), String> {
         "action": {
             "type": "bitcoin_transaction",
             "network": "testnet",
-            "endpoint": "https://bitcoin-testnet-rpc.publicnode.com",
+            "endpoint": crate::bitcoin::endpoints::DEFAULT_TESTNET_RPC,
             "recipient": "tb1q6rhpng9evdsfnn8kz0rk6e9vlsq8we5utg3447",
             "amount": 0.001
         }
@@ -500,7 +500,7 @@ fn verify_bip_compliance() -> Result<(), String> {
         }
     } else {
         // Default to public testnet
-        "https://bitcoin-testnet-rpc.publicnode.com".to_string()
+        crate::bitcoin::endpoints::DEFAULT_TESTNET_RPC.to_string()
     };
 
     info!("Verifying BIP compliance using {}...", rpc_url);
