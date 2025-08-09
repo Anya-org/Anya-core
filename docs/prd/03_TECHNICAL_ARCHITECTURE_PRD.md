@@ -1,3 +1,13 @@
+---
+title: Technical Architecture PRD
+description: Architecture components and integration plan
+category: prd
+tags: architecture-bitcoin-layer2
+last_updated: 2025-08-09
+compliance: AIR-3 AIS-3 BPC-3 RES-3
+---
+---
+
 # Technical Architecture PRD
 
 Date: August 8, 2025
@@ -58,6 +68,6 @@ Environment mappings (examples):
 - Aliases provided in `.cargo/config.toml`:
   - `cargo core-health`, `cargo core-validate`, `cargo core-start`
 
-Branch: fix/-config-and-main-README-fixes • Last Updated: August 8, 2025
+Branch: integration/endpoint-centralization-clean • Last Updated: August 9, 2025
 
-Last Updated: August 8, 2025
+Last Updated: August 9, 2025

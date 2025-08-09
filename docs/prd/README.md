@@ -1,4 +1,15 @@
-## PRD index (August 8, 2025)
+---
+title: PRD Index
+description: Index of Product Requirement Documents
+category: prd
+tags: prd-index
+last_updated: 2025-08-09
+compliance: AIR-3 AIS-3 BPC-3 RES-3
+---
+---
+---
+
+## PRD index (August 9, 2025)
 
 Authoritative PRD set for “Self-node master-by-default + production readiness”. Legacy PRDs are retired (soft-redirects remain to avoid broken links).
 

@@ -1,3 +1,14 @@
+---
+title: QA & Verification PRD
+description: Quality gates, verification strategy, and environment-honest testing
+category: prd
+tags: qa-testing-verification
+last_updated: 2025-08-09
+compliance: AIR-3 AIS-3 BPC-3 RES-3
+---
+---
+---
+
 # QA & Verification PRD
 
 Date: August 8, 2025
@@ -35,7 +46,7 @@ cargo check --all-features
 - If DNS or required Bitcoin ports are closed locally, `tests/network_validation.rs` will fail; treat as advisory in developer environments.
 - When running inside an async context, avoid nested Tokio runtimes; prefer async tests or refactor blocking calls.
 
-Last Updated: August 8, 2025
+Last Updated: August 9, 2025
 
 ## Appendix: Minimal resource check (bash)
 
