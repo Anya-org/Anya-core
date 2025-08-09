@@ -9,7 +9,7 @@ A modular Bitcoin infrastructure platform designed for enterprise applications, 
 
 [![Rust](https://img.shields.io/badge/Rust-1.70+-green)](https://rust-lang.org)
 
-Last Updated: August 8, 2025
+Last Updated: August 9, 2025
 Version: 1.3.0
 Status: ✅ Build and crates.io dry-run verified; deployment readiness depends on your environment
 
@@ -630,7 +630,7 @@ Special thanks to the following projects and communities that make Anya Core pos
 ---
 
 Maintainer: Botshelo Mokoka (<botshelomokoka+anya-core@gmail.com>)
-Last Updated: August 8, 2025
+Last Updated: August 9, 2025
 Version: 1.3.0
 
 ---
@@ -643,3 +643,27 @@ Version: 1.3.0
   - `cargo core-start` – start core binary
 - Network-bound tests: If DNS/ports aren’t reachable locally, network validation tests will fail; treat as advisory in dev environments.
 - HSM simulator: The dev simulator is locked-by-default; tests should initialize and unlock via a custom `unlock` operation (pin "1234") and use per-test timeouts to avoid hangs.
+
+### Recent Security & Dependency Remediation (August 2025)
+
+Environment-honest principle: we do not mask missing infrastructure as passing tests. Instead, tests explicitly `skip` when required credentials, binaries, or network reachability are absent (e.g., Bitcoin RPC 400/401 unauth, connection refused, or network validation flag not set). This preserves trust in green test runs.
+
+Security hardening just applied:
+
+- Removed `cargo-geiger` runtime dependency which pulled in vulnerable `gix*` crates exposing multiple 2024 RUSTSEC advisories (RUSTSEC-2024-0335, 0348, 0349, 0351, 0352, 0353) concerning path traversal, Windows device name exploitation, and SSH username option smuggling.
+- Regenerated dependency graph (`cargo update`) updating: `bitcoin 0.32.7`, `bdk_wallet 2.1.0`, `tokio 1.47.1`, plus minor patch bumps (clap, h2, tokio-util, etc.).
+- Re-ran `cargo deny check` – all categories now pass: advisories ok, bans ok, licenses ok, sources ok.
+- Retained `.gitignore` exclusion for `Cargo.lock` to keep workspace dependency flexibility; if reproducible builds are required for deployment artifacts, either commit a frozen `Cargo.lock` on a release branch or run CI with `-Z minimal-versions` to verify forward-compat.
+
+Operational guidance:
+
+```bash
+# Security validation (current set)
+cargo deny check           # advisory, license, bans, sources
+cargo audit || true        # supplemental (advisory overlap; may duplicate deny)
+
+# Environment-honest targeted smoke (skips instead of false green):
+cargo test --test bitcoin_rpc_smoke -- --nocapture
+```
+
+Rationale: Removing the vulnerable chain avoids shipping tooling-only crates in production surfaces, keeping attack surface minimal while preserving the option to run geiger scans out-of-tree (use a separate tool invocation without adding a dependency).
