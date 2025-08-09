@@ -5,6 +5,7 @@
 use std::time::Duration;
 
 use bitcoincore_rpc::{self as core_rpc, Auth, RpcApi};
+use tokio::task::spawn_blocking;
 // Note: warnings field mapping varies across versions; we'll omit detailed mapping for now.
 use serde::{Deserialize, Serialize};
 use serde_json::{self, json, Value as JsonValue};
@@ -63,7 +64,7 @@ pub struct EstimateSmartFeeResult {
 
 /// Back-compat RPC client used across internal modules
 pub struct BitcoinRpcClient {
-    inner: core_rpc::Client,
+    inner: std::sync::Arc<core_rpc::Client>,
 }
 
 impl BitcoinRpcClient {
@@ -76,12 +77,14 @@ impl BitcoinRpcClient {
     ) -> Result<Self, RpcError> {
         let auth = Auth::UserPass(username.to_string(), password.to_string());
         let inner = core_rpc::Client::new(url, auth).map_err(RpcError::from)?;
-        Ok(Self { inner })
+        Ok(Self {
+            inner: std::sync::Arc::new(inner),
+        })
     }
 
     /// getblockchaininfo mapped to a minimal typed struct
     pub async fn get_blockchain_info(&self) -> Result<BlockchainInfo, RpcError> {
-        // bitcoincore_rpc is sync; use spawn_blocking to avoid holding async tasks
+        // Use block_in_place since call is fast and we avoid Send issues of raw pointer in spawn_blocking.
         let inner = self.inner.clone();
         let res = spawn_blocking(move || inner.get_blockchain_info())
             .await
@@ -107,7 +110,10 @@ impl BitcoinRpcClient {
 
     /// getnetworkinfo minimal mapping
     pub async fn get_network_info(&self) -> Result<NetworkInfo, RpcError> {
-        let res = tokio::task::block_in_place(|| self.inner.get_network_info())
+        let inner = self.inner.clone();
+        let res = spawn_blocking(move || inner.get_network_info())
+            .await
+            .map_err(|e| RpcError(format!("Join error: {e}")))?
             .map_err(RpcError::from)?;
         Ok(NetworkInfo {
             protocol_version: res.protocol_version as i64,
@@ -120,9 +126,11 @@ impl BitcoinRpcClient {
         &self,
         target_blocks: u16,
     ) -> Result<EstimateSmartFeeResult, RpcError> {
-        let res =
-            tokio::task::block_in_place(|| self.inner.estimate_smart_fee(target_blocks, None))
-                .map_err(RpcError::from)?;
+        let inner = self.inner.clone();
+        let res = spawn_blocking(move || inner.estimate_smart_fee(target_blocks, None))
+            .await
+            .map_err(|e| RpcError(format!("Join error: {e}")))?
+            .map_err(RpcError::from)?;
         Ok(EstimateSmartFeeResult {
             fee_rate: res.fee_rate.map(|amt| amt.to_btc()),
             errors: res.errors,
@@ -132,27 +140,30 @@ impl BitcoinRpcClient {
 
     /// Convenience wrappers used by several call sites
     pub async fn get_block_hash(&self, height: u64) -> Result<String, RpcError> {
-        let hash = tokio::task::block_in_place(|| self.inner.get_block_hash(height as u64))
+        let inner = self.inner.clone();
+        let hash = spawn_blocking(move || inner.get_block_hash(height as u64))
+            .await
+            .map_err(|e| RpcError(format!("Join error: {e}")))?
             .map_err(RpcError::from)?;
         Ok(hash.to_string())
     }
 
     /// Try to load an existing wallet by name. No-op if already loaded.
     pub async fn load_wallet(&self, name: &str) -> Result<(), RpcError> {
-        let _ = tokio::task::block_in_place(|| {
-            self.inner.call::<JsonValue>("loadwallet", &[json!(name)])
-        })
-        .map_err(RpcError::from)?;
+        // For this lightweight wrapper we perform the call synchronously; callers already gate usage.
+        let _ = self
+            .inner
+            .call::<JsonValue>("loadwallet", &[json!(name)])
+            .map_err(RpcError::from)?;
         Ok(())
     }
 
     /// Create a new wallet by name if it doesn't exist yet.
     pub async fn create_wallet(&self, name: &str) -> Result<(), RpcError> {
-        let _ = tokio::task::block_in_place(|| {
-            // Minimal signature: createwallet "wallet_name"
-            self.inner.call::<JsonValue>("createwallet", &[json!(name)])
-        })
-        .map_err(RpcError::from)?;
+        let _ = self
+            .inner
+            .call::<JsonValue>("createwallet", &[json!(name)])
+            .map_err(RpcError::from)?;
         Ok(())
     }
 
@@ -173,15 +184,20 @@ impl BitcoinRpcClient {
             }
             params.push(json!(t));
         }
-        let addr =
-            tokio::task::block_in_place(|| self.inner.call::<String>("getnewaddress", &params))
-                .map_err(RpcError::from)?;
+        let inner = self.inner.clone();
+        let addr = spawn_blocking(move || inner.call::<String>("getnewaddress", &params))
+            .await
+            .map_err(|e| RpcError(format!("Join error: {e}")))?
+            .map_err(RpcError::from)?;
         Ok(addr)
     }
 
     /// Get wallet balance (BTC)
     pub async fn get_balance(&self) -> Result<f64, RpcError> {
-        let bal = tokio::task::block_in_place(|| self.inner.call::<f64>("getbalance", &[]))
+        let inner = self.inner.clone();
+        let bal = spawn_blocking(move || inner.call::<f64>("getbalance", &[]))
+            .await
+            .map_err(|e| RpcError(format!("Join error: {e}")))?
             .map_err(RpcError::from)?;
         Ok(bal)
     }

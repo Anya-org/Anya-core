@@ -120,13 +120,19 @@ impl ExternalBitcoinEndpoints {
 
 // Backwards compatible free functions (deprecated internally – prefer the resolver instance)
 pub fn electrum_for(network: &Network) -> String {
-    ExternalBitcoinEndpoints::resolve().electrum_for(network).to_string()
+    ExternalBitcoinEndpoints::resolve()
+        .electrum_for(network)
+        .to_string()
 }
 pub fn explorer_api_for(network: &Network) -> String {
-    ExternalBitcoinEndpoints::resolve().explorer_api_for(network).to_string()
+    ExternalBitcoinEndpoints::resolve()
+        .explorer_api_for(network)
+        .to_string()
 }
 pub fn explorer_web_for(network: &Network) -> String {
-    ExternalBitcoinEndpoints::resolve().explorer_web_for(network).to_string()
+    ExternalBitcoinEndpoints::resolve()
+        .explorer_web_for(network)
+        .to_string()
 }
 
 #[cfg(test)]
