@@ -81,9 +81,7 @@ fn share_credential(
     holder_did: &str,
     recipient_did: &str,
 ) -> Result<bool, Box<dyn std::error::Error>> {
-    println!(
-        "Sharing credential from {holder_did} to {recipient_did}"
-    );
+    println!("Sharing credential from {holder_did} to {recipient_did}");
     println!("Credential shared successfully");
     Ok(true)
 }

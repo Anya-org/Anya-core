@@ -214,9 +214,7 @@ pub async fn test_immutability_historical_compatibility() {
     let immutability_score: f64 = (base_score + consistency_bonus).min(5.0);
 
     println!("  Error percentage: {error_percentage:.2}%");
-    println!(
-        "  Immutability principle score: {immutability_score:.1}/5.0"
-    );
+    println!("  Immutability principle score: {immutability_score:.1}/5.0");
 
     // Assert full alignment with immutability principle
     assert!(
@@ -277,15 +275,11 @@ pub async fn test_immutability_across_hardware_paths() {
                 reference.iter().zip(results_vec.iter()).enumerate()
             {
                 if ref_result != actual_result {
-                    println!(
-                        "    Transaction {i}: Reference={ref_result}, {name}={actual_result}"
-                    );
+                    println!("    Transaction {i}: Reference={ref_result}, {name}={actual_result}");
                 }
             }
         } else {
-            println!(
-                "  ✅ Validation results identical for configuration: {name}"
-            );
+            println!("  ✅ Validation results identical for configuration: {name}");
         }
     }
 

@@ -45,9 +45,7 @@ async fn bitcoin_rpc_smoke_env_honest() {
             {
                 eprintln!("[skip] public / unauthenticated RPC endpoint rejected request ({msg}); treating as skip");
             } else if msg.contains("Connection refused") || msg.contains("connection refused") {
-                eprintln!(
-                    "[skip] RPC endpoint unreachable ({msg}); treating as skip"
-                );
+                eprintln!("[skip] RPC endpoint unreachable ({msg}); treating as skip");
             } else {
                 eprintln!("[skip] get_blockchain_info failed: {msg}");
             }

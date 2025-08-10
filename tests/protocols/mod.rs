@@ -12,7 +12,10 @@ async fn test_protocol_compilation() {
     // Dynamic placeholder: ensure a known constant expression relating to configuration
     // Replace previous Debug formatting (manager lacks Debug impl)
     let configured_protocols = 0usize; // expected initial count until registration logic exists
-    assert_eq!(configured_protocols, 0, "expected zero configured protocols in placeholder");
+    assert_eq!(
+        configured_protocols, 0,
+        "expected zero configured protocols in placeholder"
+    );
 }
 
 #[test]

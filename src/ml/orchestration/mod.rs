@@ -154,8 +154,7 @@ pub enum StepType {
 }
 
 /// Context shared across workflow execution
-#[derive(Debug, Clone)]
-#[derive(Default)]
+#[derive(Debug, Clone, Default)]
 pub struct WorkflowContext {
     pub variables: HashMap<String, serde_json::Value>,
     pub agent_states: HashMap<String, serde_json::Value>,
@@ -785,7 +784,6 @@ impl WorkflowBuilder {
         }
     }
 }
-
 
 #[cfg(test)]
 mod tests {

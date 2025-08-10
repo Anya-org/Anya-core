@@ -652,14 +652,12 @@ impl Default for LightningProtocol {
 }
 
 // Legacy compatibility struct
-#[derive(Debug, Clone)]
-#[derive(Default)]
+#[derive(Debug, Clone, Default)]
 pub struct LightningNetwork {
     pub config: LightningConfig,
     pub connected: bool,
     pub node_pubkey: Option<String>,
 }
-
 
 impl LightningNetwork {
     pub fn new() -> Self {

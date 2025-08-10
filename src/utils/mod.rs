@@ -256,11 +256,10 @@ impl DocumentationValidator {
             }
 
             // Fix issues if requested
-            if fix_issues && !file_report.issues.is_empty()
-                && doc.fix_all()? {
-                    doc.save()?;
-                    file_report.fixed = true;
-                }
+            if fix_issues && !file_report.issues.is_empty() && doc.fix_all()? {
+                doc.save()?;
+                file_report.fixed = true;
+            }
 
             if !file_report.issues.is_empty() {
                 report.files.push(file_report);

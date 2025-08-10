@@ -224,7 +224,7 @@ impl StorageRouter {
     /// - Requires `enterprise` feature for persistent Postgres; falls back to in-memory if initialization fails.
     /// - DWN stack only built when compiled with `dwn` feature; otherwise logs and returns persistent-only router.
     pub async fn autoconfig() -> anyhow::Result<Self> {
-        use tracing::{error, info, warn};
+        use tracing::error;
         // Persistent base
         let p_cfg = persistent::StorageConfig::default();
         let persistent = match persistent::PersistentStorage::new(p_cfg.clone()).await {

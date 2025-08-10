@@ -96,9 +96,7 @@ impl HfClient {
         filename: &str,
         local_path: &Path,
     ) -> Result<()> {
-        let url = format!(
-            "https://huggingface.co/{model_id}/resolve/main/{filename}"
-        );
+        let url = format!("https://huggingface.co/{model_id}/resolve/main/{filename}");
 
         let response = self.client.get(&url).send().await?;
         if !response.status().is_success() {
@@ -229,12 +227,14 @@ impl HuggingFaceAdapter {
         fs::create_dir_all(&model_dir).await?;
 
         // Download essential files
-        let essential_files = ["config.json",
+        let essential_files = [
+            "config.json",
             "tokenizer.json",
             "tokenizer_config.json",
             "vocab.txt",
             "merges.txt",
-            "special_tokens_map.json"];
+            "special_tokens_map.json",
+        ];
 
         // Get all available files
         let available_files = self.client.list_model_files(model_id).await?;

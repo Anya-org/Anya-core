@@ -933,9 +933,7 @@ impl SourceOfTruthRegistry {
                     // Update status to final
                     if let Some(mut anchor_mut) = self.blockchain_anchors.get_mut(txid) {
                         anchor_mut.status = AnchorStatus::Final;
-                        log::info!(
-                            "Anchor {txid} is now final with {confirmations} confirmations"
-                        );
+                        log::info!("Anchor {txid} is now final with {confirmations} confirmations");
                     }
                     return Ok(true);
                 }
@@ -990,9 +988,7 @@ impl SourceOfTruthRegistry {
         // Update status based on confirmations
         if confirmations >= anchor.required_confirmations as u32 {
             anchor.status = AnchorStatus::Final;
-            log::info!(
-                "Anchor {txid} is now final with {confirmations} confirmations"
-            );
+            log::info!("Anchor {txid} is now final with {confirmations} confirmations");
         } else {
             anchor.status = AnchorStatus::Confirmed(confirmations);
             log::info!("Anchor {txid} now has {confirmations} confirmations");

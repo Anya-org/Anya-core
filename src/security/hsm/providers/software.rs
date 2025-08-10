@@ -549,9 +549,8 @@ impl SoftwareHsmProvider {
                 curve: EcCurve::Secp256k1,
             } => {
                 let secret_key = key_info.key_data.lock().await;
-                let secret_key = SecretKey::from_slice(&secret_key).map_err(|e| {
-                    HsmError::KeyGenerationError(format!("Invalid key data: {e}"))
-                })?;
+                let secret_key = SecretKey::from_slice(&secret_key)
+                    .map_err(|e| HsmError::KeyGenerationError(format!("Invalid key data: {e}")))?;
                 let public_key = PublicKey::from_secret_key(&self.secp, &secret_key);
                 Ok(public_key.serialize().to_vec())
             }
@@ -760,9 +759,8 @@ impl HsmProvider for SoftwareHsmProvider {
                 curve: EcCurve::Secp256k1,
             } => {
                 let key_data = key_info.key_data.lock().await;
-                let secret_key = SecretKey::from_slice(&key_data).map_err(|e| {
-                    HsmError::KeyGenerationError(format!("Invalid key data: {e}"))
-                })?;
+                let secret_key = SecretKey::from_slice(&key_data)
+                    .map_err(|e| HsmError::KeyGenerationError(format!("Invalid key data: {e}")))?;
                 let public_key = PublicKey::from_secret_key(&self.secp, &secret_key);
                 Ok(public_key.serialize().to_vec())
             }
