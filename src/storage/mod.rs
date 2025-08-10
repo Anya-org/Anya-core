@@ -161,15 +161,66 @@ impl UnifiedStorage for DecentralizedStorage {
     }
 }
 
-/// Runtime selectable storage backend. DWN is authoritative when enabled; otherwise persistent only.
+#[cfg(not(feature = "dwn"))]
+#[async_trait]
+impl UnifiedStorage for DecentralizedStorage {
+    async fn asset_exists(&self, _asset_id: &str) -> anyhow::Result<bool> {
+        Err(anyhow::anyhow!("Decentralized storage is not available: the `dwn` feature is disabled."))
+    }
+    async fn store_asset(&self, _asset: &RGBAsset) -> anyhow::Result<String> {
+        Err(anyhow::anyhow!("Decentralized storage is not available: the `dwn` feature is disabled."))
+    }
+    async fn query_assets(&self, _owner_did: &str) -> anyhow::Result<Vec<RGBAsset>> {
+        Err(anyhow::anyhow!("Decentralized storage is not available: the `dwn` feature is disabled."))
+    }
+    async fn get_asset_metadata(&self, _asset_id: &str) -> anyhow::Result<serde_json::Value> {
+        Err(anyhow::anyhow!("Decentralized storage is not available: the `dwn` feature is disabled."))
+    }
+    async fn get_asset_history_with_proofs(
+        &self,
+        _asset_id: &str,
+    ) -> anyhow::Result<Vec<AssetHistoryEntry>> {
+        Err(anyhow::anyhow!("Decentralized storage is not available: the `dwn` feature is disabled."))
+    }
+    async fn get_asset_balance(&self, _asset_id: &str) -> anyhow::Result<u64> {
+        Err(anyhow::anyhow!("Decentralized storage is not available: the `dwn` feature is disabled."))
+    }
+    async fn store_invoice(&self, _invoice: &RGBInvoice) -> anyhow::Result<String> {
+        Err(anyhow::anyhow!("Decentralized storage is not available: the `dwn` feature is disabled."))
+    }
+    async fn store_transfer_and_update_balance(
+        &self,
+        _transfer: &AssetTransfer,
+    ) -> anyhow::Result<String> {
+        Err(anyhow::anyhow!("Decentralized storage is not available: the `dwn` feature is disabled."))
+    }
+    async fn get_transfer_status(&self, _transfer_id: &str) -> anyhow::Result<TransferStatus> {
+        Err(anyhow::anyhow!("Decentralized storage is not available: the `dwn` feature is disabled."))
+    }
+    async fn validate_transfer_with_anchoring(
+        &self,
+        _transfer: &AssetTransfer,
+    ) -> anyhow::Result<bool> {
+        Err(anyhow::anyhow!("Decentralized storage is not available: the `dwn` feature is disabled."))
+    }
+}
+
+/// Runtime selectable storage backend.
+///
+/// - When the `dwn` feature is enabled, both `Decentralized` and `Persistent` variants are functional.
+/// - When the `dwn` feature is **not** enabled, the `Decentralized` variant exists but all operations will return an error.
 #[derive(Clone)]
 pub enum StorageRouter {
-    #[cfg(feature = "dwn")]
+    /// Decentralized storage backend (DWN). Only functional if the `dwn` feature is enabled.
     Decentralized(Arc<DecentralizedStorage>),
+    /// Persistent storage backend.
     Persistent(Arc<persistent::PersistentStorage>),
 }
 
 impl StorageRouter {
+    /// Returns true if the Decentralized backend is enabled and selected.
+    ///
+    /// When the `dwn` feature is not enabled, this will always return false.
     pub fn decentralized_enabled(&self) -> bool {
         #[cfg(feature = "dwn")]
         {
