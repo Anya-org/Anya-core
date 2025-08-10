@@ -29,12 +29,6 @@ impl TestTransactionFactory {
     }
 }
 
-impl Default for MockFactory {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl MockFactory {
     pub fn new() -> Self {
         Self

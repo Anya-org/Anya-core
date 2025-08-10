@@ -40,7 +40,7 @@ pub mod sectional {
     }
 
     impl std::str::FromStr for Section {
-        type Err = ();
+        type Err = ParseSectionError;
 
         fn from_str(s: &str) -> Result<Self, Self::Err> {
             match s {

@@ -17,16 +17,7 @@ async fn router_persistent_fallback_without_dwn_feature() {
     );
 
     env::remove_var("ANYA_STORAGE_BACKEND");
-    let router = StorageRouter::from_env(persistent.clone(), {
-        #[cfg(feature = "dwn")]
-        {
-            None
-        }
-        #[cfg(not(feature = "dwn"))]
-        {
-            None
-        }
-    });
+    let router = StorageRouter::from_env(persistent.clone(), None);
     assert!(
         !router.decentralized_enabled(),
         "Router should fallback to persistent when no decentralized instance provided"
