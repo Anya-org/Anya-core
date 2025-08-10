@@ -1,7 +1,8 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Anya Core Implementation Status Verification Script
 # Enforces adherence to verified reality over aspirational claims
 
+# shellcheck disable=SC3040
 set -euo pipefail
 
 print_usage() {
@@ -51,13 +52,51 @@ if [ -n "$OVERRIDE_NETWORK" ]; then
 fi
 
 # Check compilation status (and optionally run tests)
-echo "📋 COMPILATION STATUS:"
-echo "----------------------"
-if cargo check --all-features >/dev/null 2>&1; then
-    echo "✅ Compilation: PASSING"
+echo "📋 COMPILATION / FORMAT / LINT STATUS:"
+echo "--------------------------------------"
+# Formatting gate
+if cargo fmt -- --check >/dev/null 2>&1; then
+    echo "✅ Formatting: CLEAN"
 else
-    echo "❌ Compilation: FAILING"
-    echo "   → Must fix compilation before claiming any completeness"
+    echo "❌ Formatting: DIRTY (run cargo fmt)"
+    FORMAT_FAIL=1
+fi
+
+if cargo check --all-features >/dev/null 2>&1; then
+    echo "✅ Compilation: PASS"
+else
+    echo "❌ Compilation: FAIL"
+    COMPILATION_FAIL=1
+fi
+
+# Run clippy strict (capture output if fails)
+if cargo clippy --all-targets --all-features -- -D warnings >/dev/null 2>&1; then
+    echo "✅ Clippy (‑D warnings): PASS"
+    CLIPPY_FAIL=0
+else
+    echo "❌ Clippy (‑D warnings): FAIL"
+    CLIPPY_FAIL=1
+fi
+
+# Dependency drift (duplicate versions)
+echo ""
+echo "🌳 DEPENDENCY DRIFT:"
+echo "-------------------"
+if cargo tree -d > /tmp/dep_dups.txt 2>/dev/null; then
+    if grep -q "No duplicate dependencies" /tmp/dep_dups.txt; then
+        echo "✅ Duplicate versions: NONE"
+    else
+        if grep -E "(tokio|serde|hyper|openssl) v[0-9]+" /tmp/dep_dups.txt >/dev/null 2>&1; then
+            echo "❌ Critical duplicate dependency versions detected"
+            head -25 /tmp/dep_dups.txt
+            DEP_DRIFT_FAIL=1
+        else
+            echo "🟡 Non-critical duplicate versions present (monitor)"
+            head -15 /tmp/dep_dups.txt
+        fi
+    fi
+else
+    echo "⚠️ Unable to run cargo tree -d"
 fi
 
 if [ "$AUTO_RUN" -eq 1 ]; then
@@ -84,6 +123,49 @@ if [ "$AUTO_RUN" -eq 1 ]; then
     fi
 else
     TEST_FAIL=0
+fi
+
+# Test inventory / skip accounting (non-fatal yet)
+echo ""
+echo "🧪 TEST INVENTORY:"
+echo "------------------"
+if cargo test -- --list > /tmp/test_list.txt 2>/dev/null; then
+    TOTAL_TESTS=$(grep -c ': test' /tmp/test_list.txt || true)
+    IGNORED_TESTS=$(grep -c ': test (ignored)' /tmp/test_list.txt || true)
+    echo "Total tests discovered: $TOTAL_TESTS"
+    echo "Ignored tests: $IGNORED_TESTS"
+    if [ "$IGNORED_TESTS" -gt 0 ]; then
+        echo "(instrumentation) Expect corresponding [skip-metric] lines in future gate)"
+    fi
+else
+    echo "⚠️ Unable to list tests (cargo test -- --list failed)"
+fi
+
+# Security checks (always if AUTO_RUN or explicit enterprise env)
+echo ""
+echo "🔐 SECURITY (deny/audit):"
+echo "-------------------------"
+SEC_DENY=0
+SEC_AUDIT=0
+if command -v cargo-deny >/dev/null 2>&1; then
+    if cargo deny check >/dev/null 2>&1; then
+        echo "✅ cargo-deny: PASS"
+    else
+        echo "❌ cargo-deny: FAIL"
+        SEC_DENY=1
+    fi
+else
+    echo "⚠️ cargo-deny not installed"
+fi
+if command -v cargo-audit >/dev/null 2>&1; then
+    if cargo audit -q >/dev/null 2>&1; then
+        echo "✅ cargo-audit: PASS"
+    else
+        echo "❌ cargo-audit: FAIL"
+        SEC_AUDIT=1
+    fi
+else
+    echo "⚠️ cargo-audit not installed"
 fi
 
 # Count unimplemented macros
@@ -145,7 +227,7 @@ if [ $mock_count -gt 100 ]; then
     echo "❌ High number of mock implementations detected"
     echo "   → Network/Oracle layers may use placeholder implementations"
 else
-    echo "✅ Mock implementations: $mock_count (acceptable for network/oracle layers)"
+    echo "✅ Mock implementations: $mock_count (acceptable for system that need anya-core peers to verify)"
 fi
 
 # Detailed mock analysis
@@ -245,7 +327,7 @@ echo "📊 OVERALL ASSESSMENT:"
 echo "====================="
 
 OVERALL_FAIL=0
-if [ $unimpl_count -eq 0 ] && [ $todo_count -eq 0 ] && [ $sqlite_todo_count -eq 0 ] && [ $sim_fail -eq 0 ] && [ $TEST_FAIL -eq 0 ]; then
+if [ $unimpl_count -eq 0 ] && [ $todo_count -eq 0 ] && [ $sqlite_todo_count -eq 0 ] && [ $sim_fail -eq 0 ] && [ ${TEST_FAIL:-0} -eq 0 ] && [ ${CLIPPY_FAIL:-0} -eq 0 ] && [ ${SEC_DENY:-0} -eq 0 ] && [ ${SEC_AUDIT:-0} -eq 0 ] && [ ${FORMAT_FAIL:-0} -eq 0 ] && [ ${DEP_DRIFT_FAIL:-0} -eq 0 ]; then
     echo "✅ PRODUCTION READY: All core implementations complete"
 elif [ $sim_fail -eq 1 ]; then
     echo "❌ NOT PRODUCTION READY: Simulation/fallback paths present"
@@ -449,23 +531,28 @@ echo "• This script must be run before any major status updates"
 
 # JSON summary (optional)
 if [ "$EMIT_JSON" -eq 1 ]; then
+    # shellcheck disable=SC2015
+    warnings=$(cargo check --all-features 2>&1 | grep -c 'warning:' || echo 0)
     jq -n \
         --arg network "$NETWORK_MODE" \
-        --arg compilation "$([ $? -eq 0 ] && echo PASS || echo FAIL)" \
-        --argjson test_fail "$TEST_FAIL" \
+        --argjson compilation "${COMPILATION_FAIL:-0}" \
+        --argjson clippy "${CLIPPY_FAIL:-0}" \
+        --argjson test_fail "${TEST_FAIL:-0}" \
+        --argjson deny_fail "${SEC_DENY:-0}" \
+        --argjson audit_fail "${SEC_AUDIT:-0}" \
         --argjson sim_fail "$sim_fail" \
         --argjson unimpl "$unimpl_count" \
         --argjson todos "$todo_count" \
         --argjson sqlite_todos "$sqlite_todo_count" \
-        --argjson warnings "$(cargo check --all-features 2>&1 | grep -c 'warning:' || echo 0)" \
-        '{network: $network, test_fail: $test_fail, sim_fail: $sim_fail, unimplemented: $unimpl, todos: $todos, sqlite_todos: $sqlite_todos, warnings: $warnings}' || true
+        --argjson warnings "$warnings" \
+        '{network, compilation_fail:compilation, clippy_fail:clippy, test_fail, deny_fail, audit_fail, sim_fail, unimplemented: $unimpl, todos: $todos, sqlite_todos: $sqlite_todos, warnings}' || true
 fi
 
 # Exit rules
 if [ "$YES_ALL" -eq 1 ]; then
     exit 0
 fi
-if [ $sim_fail -eq 1 ] || [ $OVERALL_FAIL -eq 1 ]; then
+if [ $sim_fail -eq 1 ] || [ $OVERALL_FAIL -eq 1 ] || [ ${CLIPPY_FAIL:-0} -eq 1 ] || [ ${SEC_DENY:-0} -eq 1 ] || [ ${SEC_AUDIT:-0} -eq 1 ]; then
     exit 2
 fi
 exit 0

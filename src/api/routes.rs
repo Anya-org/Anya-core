@@ -76,9 +76,7 @@ pub fn configure_routes(
         .route("/dwn/protocols", post(dwn::create_protocol))
         .route("/dwn/records", get(dwn::query_records))
         .route("/dwn/records", post(dwn::create_record))
-        .route("/dwn/records/{id}", get(dwn::get_record))
-        .route("/dwn/records/{id}", put(dwn::update_record))
-        .route("/dwn/records/{id}", delete(dwn::delete_record));
+        .route("/dwn/records/{id}", get(dwn::get_record)); // update/delete stubs removed pending handler impl
     #[cfg(not(feature = "dwn"))]
     let dwn_routes = Router::new();
 

@@ -94,70 +94,52 @@ pub trait UnifiedStorage {
 #[async_trait]
 impl UnifiedStorage for DecentralizedStorage {
     async fn asset_exists(&self, asset_id: &str) -> anyhow::Result<bool> {
-        self.asset_exists(asset_id)
-            .await
-            .map_err(anyhow::Error::new)
+        self.asset_exists(asset_id).await
     }
 
     async fn store_asset(&self, asset: &RGBAsset) -> anyhow::Result<String> {
-        self.store_asset(asset).await.map_err(anyhow::Error::new)
+        self.store_asset(asset).await
     }
 
     async fn query_assets(&self, owner_did: &str) -> anyhow::Result<Vec<RGBAsset>> {
-        self.query_assets(owner_did)
-            .await
-            .map_err(anyhow::Error::new)
+        self.query_assets(owner_did).await
     }
 
     async fn get_asset_metadata(&self, asset_id: &str) -> anyhow::Result<serde_json::Value> {
-        self.get_asset_metadata(asset_id)
-            .await
-            .map_err(anyhow::Error::new)
+        self.get_asset_metadata(asset_id).await
     }
 
     async fn get_asset_history_with_proofs(
         &self,
         asset_id: &str,
     ) -> anyhow::Result<Vec<AssetHistoryEntry>> {
-        self.get_asset_history_with_proofs(asset_id)
-            .await
-            .map_err(anyhow::Error::new)
+        self.get_asset_history_with_proofs(asset_id).await
     }
 
     async fn get_asset_balance(&self, asset_id: &str) -> anyhow::Result<u64> {
-        self.get_asset_balance(asset_id)
-            .await
-            .map_err(anyhow::Error::new)
+        self.get_asset_balance(asset_id).await
     }
 
     async fn store_invoice(&self, invoice: &RGBInvoice) -> anyhow::Result<String> {
-        self.store_invoice(invoice)
-            .await
-            .map_err(anyhow::Error::new)
+        self.store_invoice(invoice).await
     }
 
     async fn store_transfer_and_update_balance(
         &self,
         transfer: &AssetTransfer,
     ) -> anyhow::Result<String> {
-        self.store_transfer_and_update_balance(transfer)
-            .await
-            .map_err(anyhow::Error::new)
+        self.store_transfer_and_update_balance(transfer).await
     }
 
     async fn get_transfer_status(&self, transfer_id: &str) -> anyhow::Result<TransferStatus> {
-        self.get_transfer_status(transfer_id)
-            .await
-            .map_err(anyhow::Error::new)
+        self.get_transfer_status(transfer_id).await
     }
 
     async fn validate_transfer_with_anchoring(
         &self,
         transfer: &AssetTransfer,
     ) -> anyhow::Result<bool> {
-        self.validate_transfer_with_anchoring(transfer)
-            .await
-            .map_err(anyhow::Error::new)
+        self.validate_transfer_with_anchoring(transfer).await
     }
 }
 
@@ -231,7 +213,7 @@ impl StorageRouter {
             Ok(p) => Arc::new(p),
             Err(e) => {
                 error!(?e, "Persistent storage init failed; aborting autoconfig");
-                return Err(e);
+                return Err(e.into());
             }
         };
 

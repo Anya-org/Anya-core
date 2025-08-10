@@ -87,6 +87,12 @@ impl IPFSBatch {
     }
 }
 
+impl Default for IPFSBatch {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Minimal IPFS storage client wrapper
 #[derive(Debug, Clone)]
 pub struct IPFSStorage {
@@ -142,7 +148,7 @@ impl IPFSStorage {
             .unwrap()
             .get(content_id)
             .cloned()
-            .ok_or_else(|| AnyaError::NotFound(format!("content {} not found", content_id)))
+            .ok_or_else(|| AnyaError::NotFound(format!("content {content_id} not found")))
     }
 
     fn detect_mime_type(&self, data: &[u8], filename: Option<&str>) -> Option<String> {

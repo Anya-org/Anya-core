@@ -1,62 +1,82 @@
----
 title: System Status PRD
 description: Current system status, gaps, and master-by-default policy
 category: prd
 tags: status-architecture-readiness
 last_updated: 2025-08-09
 compliance: AIR-3 AIS-3 BPC-3 RES-3
----
----
 
 # System Status PRD
 
-Date: August 8, 2025
- Version: 2.0.1 — Master-by-default + Storage Autoconfig Integration
-Repository: Anya-core (branch: bugfix/config-and-main-readme-fixes)
+Date: August 9, 2025
+Version: 1.3.0 (post-storage autoconfig remediation)
+Repository: Anya-core (branch: integration/endpoint-centralization-clean)
 Status: ✅ Core stable • 🔄 Production integrations in progress
 
 ## 🎯 Executive Summary
 
-- Default behavior: If no external nodes are configured or reachable, Anya Core becomes the primary (master) self-node automatically, while still auto-configuring peers when found.
-- State/health: Health is OK when self-node is primary even if peers < min_peers; warns when discovery fails while prefer_self_as_master=true.
-- Next milestone: Replace remaining simulation paths with production adapters backed by Bitcoin Core RPC.
 
 ## 📊 Compilation & Quality
 
-- cargo check: PASS (as of latest local check)
-- warnings: Target < 10 (track via scripts/quality_gate.sh)
-- tests: All Layer2 tests previously passing; re-run before release
+| Gate | Status | Notes |
+|------|--------|-------|
+| Build (all features) | PASS (warnings remain) | Warnings in storage/mod.rs to be zeroed |
+| Clippy -D warnings | FAIL (pending) | Unused params underscore pass needed |
+| Tests | PARTIAL | Need autoconfig & cache tests |
+| Security (audit/deny) | PASS (rsa removed) | Need automated script badge |
+| Docs Lint | FAIL | MD025/MD024 previously; this file cleaned |
 
 ## 🧩 Components Snapshot
 
-- Security/HSM: Production-ready (software HSM; audit logging; AES-GCM/RSA/Ed25519); integration tests stabilized with simulator unlock + timeouts.
-- Bitcoin Core: RPC client available; wire state/fees (height/hash/estimatesmartfee)
-- Layer2: Manager/coordinator stable; production adapters pending for LN/RGB/DLC
-- Storage: Persistent (Postgres/RocksDB) + Decentralized (IPFS/DWN) unified via `StorageRouter::autoconfig()` (beta)
-           - Autoconfig env: ANYA_STORAGE_BACKEND, ANYA_IPFS_ENDPOINT, ANYA_WEB5_SERVICE_URL, ANYA_DID, ANYA_BITCOIN_NETWORK
-           - Fallback order: explicit backend -> DWN if feature & init success -> persistent
-           - Error hardening: removed orphan error variants (Storage/Serialization) in favor of existing System/Web5/NotFound
-- AI/ML: Enhanced agentic system present; integration stabilization pending
 
 ## 🚧 Gaps To Close (P1)
 
-1) Bitcoin Core RPC-backed state/fees plumbed into ProductionLayer2Protocol
-2) Lightning adapter (LDK or LND gRPC) minimal operations
-3) RGB client integration for basic schema/list/query (current DWN data model stub)
-4) DLC oracle client wiring
+1. Async Web5 adapter (non-blocking HTTP, retries, timeouts)
+2. IPFS encryption + pinning + persistence layer
+3. Autoconfig tests (env matrix) & metrics instrumentation
+4. Cache TTL configurability + eviction metrics
+5. Anchoring blake3 hash test coverage (implementation complete)
+6. Zero compiler and clippy warnings
 
 ## 🧪 Recent Branch Outcomes
 
-- CLI health and validation succeed via default `anya-core` target (cargo core-health/core-validate).
-- HSM integration tests updated to avoid hangs; network-bound tests remain environment-sensitive.
-- Env-honest gating added: ML and system integration tests self-skip when external CLIs/resources are absent (`anya-ml`, `anya-cli`, `web5`), preventing false failures locally.
 
 ## ✅ Verification Commands
 
 ```bash
-cargo check --all-features
-./scripts/quality_gate.sh
-./scripts/verify_implementation_status.sh
+cargo build --all --all-features
+cargo clippy --all-targets --all-features -D warnings
+cargo test --all --all-features --no-fail-fast
+cargo deny check && cargo audit
 ```
 
-Last Updated: August 9, 2025 (storage autoconfig + error variant cleanup)
+## 📦 Environment & Feature Surface (Delta)
+
+| Variable | Purpose | Default | Notes |
+|----------|---------|---------|-------|
+| ANYA_STORAGE_BACKEND | Select backend (auto/dwn/persistent) | auto | auto→dwn if feature + init success |
+| ANYA_IPFS_ENDPOINT | IPFS API endpoint | <http://127.0.0.1:5001> | Stub client currently in-memory |
+| ANYA_WEB5_SERVICE_URL | Web5 base URL | <http://localhost:8080> | Adapter sync (TODO async) |
+| ANYA_DID | Override DID | (generated) | create_did("key") fallback |
+| ANYA_BITCOIN_NETWORK | Anchoring network | regtest | Effective with bitcoin feature |
+
+## 🛡️ TODO Tracking Tags
+
+| Tag | Summary |
+|-----|---------|
+| TODO[AIS-3] | Async Web5 adapter + timeout/retry |
+| TODO[AIR-3] | IPFS encryption & persistence |
+| TODO[RES-3] | Metrics for cache/autoconfig |
+| TODO[BPC-3] | Anchoring hash upgrade & test |
+
+## 📅 Next Review
+
+Planned after completion of async adapter & encryption tasks or before version bump to 1.3.1.
+
+Last Updated: August 9, 2025
+
+
+[AIR-3]: ../README.md "AI Readable Level 3"
+[AIS-3]: ../README.md "AI Secure Level 3"
+[BPC-3]: ../README.md "Bitcoin Protocol Compliant Level 3"
+[RES-3]: ../README.md "Resilience Level 3"
+

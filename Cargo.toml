@@ -96,7 +96,6 @@ lazy_static = { version = "1.5.0" }
 dashmap = { version = "6.1.0", features = ["serde"] }
 rayon = { version = "1.10.0" }
 geiger = { version = "0.5.0" }
-lru = "0.12.3"                                        # For DWN/Decentralized storage caching
 
 # === Missing Dependencies ===
 hickory-resolver = { version = "0.24.1", features = ["dns-over-rustls"] }
@@ -255,6 +254,7 @@ walkdir = { workspace = true }
 sha2 = { workspace = true }
 hickory-resolver = { workspace = true }
 rand_distr = { workspace = true }
+lru = "0.12.3"
 
 # CLI Dependencies
 clap = { version = "4.5.23", features = ["derive"] }

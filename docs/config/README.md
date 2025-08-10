@@ -68,13 +68,13 @@ environments.
 
 Minimal production (Bitcoin core + API + HSM external):
 
-```
+```bash
 --features "std,bitcoin,api,hsm-production"
 ```
 
 Extended enterprise (adds DB + Taproot + Web5):
 
-```
+```bash
 --features "std,bitcoin,api,enterprise,taproot,web5,hsm-production"
 ```
 
@@ -91,11 +91,11 @@ Avoid `complete` and any simulator (`hsm-simulator`, `hsm-full`, `dev-sim`, `cha
 | ANYA_ENABLE_HSM_CROSS | Test gating | 1 | Runs cross-provider tests (non-prod) |
 | ANYA_ENABLE_HSM_HEALTH | Test gating | 1 | Enables HSM health loop tests |
 | ANYA_ENABLE_HSM_CONCURRENCY | Test gating | 1 | Enables concurrency stress tests |
-| ANYA_STORAGE_BACKEND | Storage backend selection | dwn \| persistent \| auto | auto | Selects DWN when feature compiled & instance ready else persistent |
-| ANYA_IPFS_ENDPOINT | IPFS endpoint | <http://127.0.0.1:5001> | IPFS HTTP API used for decentralized layer |
+| ANYA_STORAGE_BACKEND | Storage backend selection | auto | dwn\|persistent\|auto (auto prefers DWN if available) |
+| ANYA_IPFS_ENDPOINT | IPFS endpoint | <http://127.0.0.1:5001> | IPFS HTTP API for decentralized layer |
 | ANYA_WEB5_SERVICE_URL | Web5 adapter base URL | <http://localhost:8080> | DWN & DID operations endpoint |
-| ANYA_DID | Pre-provisioned DID | did:example:123 | If unset autoconfig attempts generation (method=key) |
-| ANYA_BITCOIN_NETWORK | Bitcoin network | regtest | Only meaningful with `bitcoin` feature (regtest/testnet/mainnet) |
+| ANYA_DID | Pre-provisioned DID | did:example:123 | Generated if unset (method=key) |
+| ANYA_BITCOIN_NETWORK | Bitcoin network | regtest | regtest\|testnet\|mainnet (bitcoin feature only) |
 
 ### Risk Tagging
 

@@ -104,7 +104,7 @@ impl PersistentStorage {
     async fn init_rocksdb(&mut self) -> Result<()> {
         let rocksdb_path = self.config.base_dir.join(&self.config.rocksdb_dir);
 
-        debug!("Opening RocksDB at: {:?}", rocksdb_path);
+        debug!("Opening RocksDB at: {rocksdb_path:?}");
 
         let mut opts = rocksdb::Options::default();
         opts.create_if_missing(true);
@@ -167,7 +167,7 @@ impl PersistentStorage {
 
     /// Retrieve key-value data
     pub async fn get(&self, key: &str) -> Result<Option<Vec<u8>>> {
-        debug!("Retrieving key: {}", key);
+        debug!("Retrieving key: {key}");
 
         // Check cache first
         {
@@ -222,7 +222,7 @@ impl PersistentStorage {
 
     /// Delete key-value data
     pub async fn delete(&self, key: &str) -> Result<()> {
-        debug!("Deleting key: {}", key);
+        debug!("Deleting key: {key}");
 
         // Remove from cache
         self.cache.write().await.remove(key);

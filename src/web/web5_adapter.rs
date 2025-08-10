@@ -2,7 +2,9 @@
 // This is a scaffold. Implementations will be filled in as we refactor usages.
 
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 use std::error::Error;
+use std::sync::{Arc, Mutex};
 
 #[derive(Debug)]
 pub enum Web5AdapterError {
@@ -24,6 +26,8 @@ impl std::error::Error for Web5AdapterError {}
 pub struct Web5Adapter {
     pub service_url: String,
     pub agent: ureq::Agent,
+    // In-memory DWN record store for test/local mode
+    records: Arc<Mutex<HashMap<String, crate::web5::dwn::DWNRecord>>>,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -42,6 +46,7 @@ impl Web5Adapter {
         Self {
             service_url: service_url.to_string(),
             agent: ureq::Agent::new(),
+            records: Arc::new(Mutex::new(HashMap::new())),
         }
     }
 
@@ -146,16 +151,30 @@ impl Web5Adapter {
     // DWN record query stub (synchronous placeholder)
     pub fn query_records(
         &self,
-        _schema: &str,
-        _collection: &str,
+        owner: &str,
+        schema: &str,
     ) -> Result<Vec<crate::web5::dwn::DWNRecord>, Web5AdapterError> {
-        Ok(vec![]) // Return empty until real DWN service integration
+        let storage = self
+            .records
+            .lock()
+            .map_err(|e| Web5AdapterError::Http(format!("lock error: {e}")))?;
+        let results = storage
+            .values()
+            .filter(|r| (owner == "*" || r.owner == owner) && r.schema == schema)
+            .cloned()
+            .collect();
+        Ok(results)
     }
 
     pub fn store_record(
         &self,
         record: &crate::web5::dwn::DWNRecord,
     ) -> Result<String, Web5AdapterError> {
+        let mut storage = self
+            .records
+            .lock()
+            .map_err(|e| Web5AdapterError::Http(format!("lock error: {e}")))?;
+        storage.insert(record.id.clone(), record.clone());
         Ok(record.id.clone())
     }
 }

@@ -33,9 +33,7 @@ pub struct DecentralizedStorage {
     /// Current user DID
     user_did: String,
     /// Cache configuration (TTLs, sizes)
-    #[allow(dead_code)]
-    // TODO[RES-3]: expose dynamic cache config adjustments or remove field if static
-    _cache_config: CacheConfig,
+    cache_config: CacheConfig,
     /// Metrics for observability
     metrics: Arc<Mutex<StorageMetrics>>,
 }
@@ -108,8 +106,7 @@ struct CachedMetadata {
 /// Bitcoin anchoring service for data integrity
 #[derive(Debug)]
 pub struct BitcoinAnchorService {
-    #[allow(dead_code)] // TODO[BPC-3]: implement real network specific anchoring logic
-    _network: Network,
+    network: Network,
     // Bitcoin client would be injected here
 }
 
@@ -230,7 +227,7 @@ impl DecentralizedStorage {
             bitcoin_client,
             cache,
             user_did,
-            _cache_config: cache_config,
+            cache_config,
             metrics,
         })
     }
@@ -252,7 +249,7 @@ impl DecentralizedStorage {
     pub async fn asset_exists(&self, asset_id: &str) -> AnyaResult<bool> {
         // Check cache first
         if let Ok(cache) = self.cache.lock() {
-            let cache_key = format!("asset_exists:{asset_id}");
+            let cache_key = format!("asset_exists:{}", asset_id);
             if let Some(cached) = cache.metadata_cache.peek(&cache_key) {
                 if cached.timestamp.elapsed().unwrap_or(Duration::MAX) < cached.ttl {
                     // Metrics: cache hit
@@ -275,11 +272,9 @@ impl DecentralizedStorage {
         }
 
         // Query DWN for asset record using Web5Adapter
-        // Query DWN strictly by owner DID (wildcard not supported yet in DWNManager query)
-        // TODO[AIR-3]: add wildcard owner support in DWNManager and restore "*" query
         let asset_records = self
             .web5_adapter
-            .query_records(&self.user_did, "anya/rgb/asset")
+            .query_records("*", "anya/rgb/asset")
             .map_err(|e| AnyaError::Web5(format!("DWN query error: {e}")))?;
 
         let exists = asset_records
@@ -288,7 +283,7 @@ impl DecentralizedStorage {
 
         // Cache the result
         if let Ok(mut cache) = self.cache.lock() {
-            let cache_key = format!("asset_exists:{asset_id}");
+            let cache_key = format!("asset_exists:{}", asset_id);
             let cached_metadata = CachedMetadata {
                 metadata: serde_json::json!({"exists": exists}),
                 timestamp: SystemTime::now(),
@@ -382,26 +377,18 @@ impl DecentralizedStorage {
     /// # Returns
     /// * `Ok(Vec<RGBAsset>)` for all assets owned by the DID.
     pub async fn query_assets(&self, owner_did: &str) -> AnyaResult<Vec<RGBAsset>> {
-        let cache_key = format!("assets_query:{owner_did}");
-        // Extract cached results without holding the lock across await
-        let cached_results: Option<Vec<DWNRecord>> = {
-            if let Ok(cache) = self.cache.lock() {
-                if let Some(cached) = cache.query_cache.peek(&cache_key) {
-                    if cached.timestamp.elapsed().unwrap_or(Duration::MAX) < cached.ttl {
-                        Some(cached.results.clone())
-                    } else {
-                        None
-                    }
-                } else {
-                    None
-                }
-            } else {
-                None
-            }
-        };
+        let cache_key = format!("assets_query:{}", owner_did);
 
-        if let Some(results) = cached_results {
-            return self.records_to_assets(&results).await;
+        // Check query cache first
+        if let Ok(cache) = self.cache.lock() {
+            if let Some(cached) = cache.query_cache.peek(&cache_key) {
+                if cached.timestamp.elapsed().unwrap_or(Duration::MAX) < cached.ttl {
+                    // Clone results then drop lock before awaiting to keep Future Send
+                    let results = cached.results.clone();
+                    drop(cache);
+                    return self.records_to_assets(&results).await;
+                }
+            }
         }
 
         // Query DWN for asset records using Web5Adapter
@@ -580,7 +567,7 @@ impl DecentralizedStorage {
             .map_err(|e| AnyaError::Web5(format!("DWN transfer query error: {e}")))?;
 
         for record in transfer_records {
-            if record.id == format!("transfer_{transfer_id}") {
+            if record.id == format!("transfer_{}", transfer_id) {
                 if let Some(status_str) = record.metadata.get("status") {
                     return match status_str.as_str() {
                         "Pending" => Ok(TransferStatus::Pending),
@@ -647,8 +634,10 @@ impl DecentralizedStorage {
                     self.web5_adapter
                         .store_record(&anchor_record)
                         .map_err(|e| AnyaError::Web5(format!("Anchor record error: {e}")))?;
-                } else if let Ok(mut metrics) = self.metrics.lock() {
-                    metrics.anchor_failures += 1;
+                } else {
+                    if let Ok(mut metrics) = self.metrics.lock() {
+                        metrics.anchor_failures += 1;
+                    }
                 }
             }
         }
@@ -779,7 +768,7 @@ impl DecentralizedStorage {
     /// * `delta` - The change in balance (positive or negative).
     async fn update_balance(&self, did: &str, asset_id: &str, delta: i64) -> AnyaResult<()> {
         // Get current balance
-        let current_balance = if did == self.user_did {
+        let current_balance = if did == &self.user_did {
             self.get_asset_balance(asset_id).await?
         } else {
             // For other users, we'd need their permission to read balance
@@ -794,7 +783,7 @@ impl DecentralizedStorage {
 
         // Create/update balance record
         let balance_record = DWNRecord {
-            id: format!("balance_{did}_{asset_id}"),
+            id: format!("balance_{}_{}", did, asset_id),
             owner: did.to_string(),
             schema: "anya/rgb/balance".to_string(),
             data: serde_json::to_value(BalanceRecord {
@@ -930,7 +919,7 @@ impl DecentralizedStorageCache {
 
 impl BitcoinAnchorService {
     fn new(network: Network) -> Self {
-        Self { _network: network }
+        Self { network }
     }
 
     async fn anchor_data_hash(&self, _hash: &[u8]) -> AnyaResult<String> {
@@ -939,7 +928,6 @@ impl BitcoinAnchorService {
         Ok("mock_anchor_txid".to_string())
     }
 
-    #[allow(dead_code)] // Not yet invoked; retained for future anchoring verification flow
     async fn get_transaction_proof(&self, txid: &str) -> AnyaResult<BitcoinProof> {
         // In production, this would fetch the actual transaction and merkle proof
         Ok(BitcoinProof {
