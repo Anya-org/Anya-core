@@ -182,6 +182,14 @@ fast-tests = []
 # Optional RocksDB KV acceleration (currently always compiled but kept for clarity/future gating)
 kv-rocks = []
 
+# --- Native dependency migration placeholders (Aug 10 2025) ---
+# These inert feature flags reserve stable names for upcoming pure-Rust
+# backend experiments. Implementations will land behind these flags to allow
+# dual-run and safe rollback during evaluation.
+kv-redb = []        # Planned: redb key-value backend (pure Rust)
+kv-sled = []        # Planned: sled key-value backend (pure Rust)
+git-gix = []        # Planned: gix (git-oxide) replacement for any future libgit2 usage
+
 # Legacy SQLite compatibility (will be removed) – DO NOT enable in production
 sqlite-backcompat = []
 

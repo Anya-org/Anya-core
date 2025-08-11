@@ -29,5 +29,6 @@
         "MD033": false,
         "MD040": true,
         "MD047": true
-    }
+    },
+    "chat.mcp.autostart": "onlyNew"
 }
