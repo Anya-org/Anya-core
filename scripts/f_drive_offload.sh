@@ -41,6 +41,7 @@ Commands:
   reclaim           Run cargo cache prune (if cargo-cache) + cargo clean
   verify-signing    Show last commit SSH signing status & config
   scan-secrets      Lightweight scan for accidental private key material (no network)
+  scan-secrets-deep Extended heuristic scan (.env style tokens, AWS keys, generic secrets)
   help              Show this help
 EOF
 }
@@ -169,6 +170,39 @@ scan_secrets() {
   echo "Note: This is a heuristic scan. For deeper scanning run: gitleaks detect --no-git";
 }
 
+scan_secrets_deep() {
+  COLOR "Deep scan: private keys + common token patterns (.env, AWS, generic hex/api keys)";
+  local PATTERNS=(
+    '-----BEGIN (OPENSSH|RSA|EC|DSA) PRIVATE KEY-----'
+    'AWS_ACCESS_KEY_ID=AKIA[0-9A-Z]{16}'
+    'AKIA[0-9A-Z]{16}'
+    'AWS_SECRET_ACCESS_KEY=[A-Za-z0-9/+=]{40}'
+    '[A-Za-z0-9_]*API[_-]?KEY=[A-Za-z0-9]{24,}'
+    '[A-Za-z0-9_]*SECRET[_-]?KEY=[A-Za-z0-9/+=]{24,}'
+    'PRIVATE_KEY="?-----BEGIN'
+    'ghp_[A-Za-z0-9]{36,}'
+    'github_pat_[A-Za-z0-9_]{20,}'
+    '[A-F0-9]{64}'
+  )
+  local EXCLUDES='--exclude-dir=.git --exclude-dir=target --exclude-dir=site --exclude-dir=node_modules'
+  local findings=0
+  for p in "${PATTERNS[@]}"; do
+    local res
+    res=$(grep -ErIn $EXCLUDES -e "$p" . 2>/dev/null || true)
+    if [ -n "$res" ]; then
+      findings=1
+      ERR "Pattern match: $p";
+      echo "$res" | head -n 40
+    fi
+  done
+  if [ $findings -eq 0 ]; then
+    COLOR "No suspicious patterns detected.";
+  else
+    ERR "Review above potential secrets before committing.";
+  fi
+  echo "Tip: Run 'gitleaks detect --redact' for authoritative scan.";
+}
+
 cmd=${1:-help}
 case $cmd in
   assess) assess ;;
@@ -181,5 +215,6 @@ case $cmd in
   reclaim) reclaim ;;
   verify-signing) verify_signing ;;
   scan-secrets) scan_secrets ;;
+  scan-secrets-deep) scan_secrets_deep ;;
   help|*) usage ;;
 esac
