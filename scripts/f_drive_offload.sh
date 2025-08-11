@@ -40,6 +40,7 @@ Commands:
   move-registry     Copy ~/.cargo/registry to F, symlink back (adds latency)
   reclaim           Run cargo cache prune (if cargo-cache) + cargo clean
   verify-signing    Show last commit SSH signing status & config
+  scan-secrets      Lightweight scan for accidental private key material (no network)
   help              Show this help
 EOF
 }
@@ -151,6 +152,23 @@ verify_signing() {
   echo "If unsigned: ensure ssh-agent has key: ssh-add ~/.ssh/id_ed25519_anya";
 }
 
+scan_secrets() {
+  COLOR "Scanning workspace for private key patterns (local only)...";
+  # Patterns (kept intentionally tight). We do NOT read binary files (-I) and skip common large/irrelevant dirs.
+  local EXCLUDES='(./.git|./target|./site|./node_modules|./docs/audit|./archives)'
+  local PATTERNS='-----BEGIN (OPENSSH|RSA|EC|DSA) PRIVATE KEY-----'
+  local hits
+  hits=$(grep -ErIl --exclude-dir={.git,target,site,node_modules} --exclude=*.tar.zst --exclude=*.gz --exclude=*.zip -e "$PATTERNS" . || true)
+  if [ -z "$hits" ]; then
+    COLOR "No raw private key blocks found.";
+  else
+    ERR "Potential sensitive files detected:";
+    printf '%s\n' "$hits"
+    echo "Review and remove/redact before committing."
+  fi
+  echo "Note: This is a heuristic scan. For deeper scanning run: gitleaks detect --no-git";
+}
+
 cmd=${1:-help}
 case $cmd in
   assess) assess ;;
@@ -162,5 +180,6 @@ case $cmd in
   move-registry) move_registry ;;
   reclaim) reclaim ;;
   verify-signing) verify_signing ;;
+  scan-secrets) scan_secrets ;;
   help|*) usage ;;
 esac
