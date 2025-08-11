@@ -7,6 +7,12 @@
 #  - /mnt/f (drvfs): ~2.6 MB/s
 # Strategy: Keep hot compilation (source + incremental) on ext4. Optionally move
 # cold artifacts (release builds, old target dirs, compressed caches) to F.
+# NEVER offload active incremental debug builds unless absolutely required for space.
+#
+# Quick micro-benchmark (compare ext4 vs drvfs):
+#   dd if=/dev/zero of=/tmp/ext4_test.bin bs=1M count=64 oflag=dsync && rm /tmp/ext4_test.bin
+#   dd if=/dev/zero of=/mnt/f/drvfs_test.bin bs=1M count=64 oflag=dsync && rm /mnt/f/drvfs_test.bin
+# (Expect drvfs to be significantly slower; keep frequent rebuild paths off /mnt/f.)
 
 set -euo pipefail
 
@@ -26,13 +32,14 @@ Usage: $0 <command>
 
 Commands:
   assess            Show current sizes & performance warning
-  plan              Show recommended offload plan (safe defaults)
-  archive-old       Tar + gzip old target artifacts (debug/release) to F and delete originals
-  move-release      Move only target/release (keeping incremental debug builds local)
-  enable-target     Set CARGO_TARGET_DIR to F (NOT recommended for perf) via ~/.bashrc
-  disable-target    Remove CARGO_TARGET_DIR line from ~/.bashrc (no deletion of data)
-  move-registry     Copy ~/.cargo/registry to F, symlink back (can slow builds; optional)
-  reclaim           Run cargo cache trim & clean after archiving
+  plan              Show recommended phased offload plan
+  archive-old       Tar + zstd old target artifacts (debug+release) to F (space win)
+  move-release      Move only target/release (keep fast incremental locally)
+  enable-target     Set CARGO_TARGET_DIR to F (NOT recommended; slowdown)
+  disable-target    Remove CARGO_TARGET_DIR line from ~/.bashrc
+  move-registry     Copy ~/.cargo/registry to F, symlink back (adds latency)
+  reclaim           Run cargo cache prune (if cargo-cache) + cargo clean
+  verify-signing    Show last commit SSH signing status & config
   help              Show this help
 EOF
 }
@@ -47,10 +54,10 @@ size_line() { du -sh "$1" 2>/dev/null || true; }
 
 assess() {
   require_mount
-  COLOR "Sizes:"; 
-  size_line "$HOME/.cargo"; 
-  size_line "$HOME/.rustup"; 
-  size_line "$PWD/target"; 
+  COLOR "Sizes:";
+  size_line "$HOME/.cargo";
+  size_line "$HOME/.rustup";
+  size_line "$PWD/target";
   [ -d "$TARGET_OFFLOAD_DIR" ] && size_line "$TARGET_OFFLOAD_DIR";
   echo ""; COLOR "Filesystem performance note:"; echo "Ext4 home build path is much faster than drvfs (/mnt/f). Keep active compilation on ext4 for speed.";
 }
@@ -134,6 +141,16 @@ reclaim() {
   cargo clean || true
 }
 
+verify_signing() {
+  COLOR "Git SSH signing status (last commit):";
+  git log -1 --show-signature 2>/dev/null || echo "No commits yet or unable to show signature";
+  COLOR "Configured signing key:";
+  git config user.signingkey 2>/dev/null || echo "(none)";
+  COLOR "Allowed signers file:";
+  git config --global gpg.ssh.allowedSignersFile 2>/dev/null || echo "(not set)";
+  echo "If unsigned: ensure ssh-agent has key: ssh-add ~/.ssh/id_ed25519_anya";
+}
+
 cmd=${1:-help}
 case $cmd in
   assess) assess ;;
@@ -144,5 +161,6 @@ case $cmd in
   disable-target) disable_target ;;
   move-registry) move_registry ;;
   reclaim) reclaim ;;
+  verify-signing) verify_signing ;;
   help|*) usage ;;
 esac
