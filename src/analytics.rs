@@ -392,7 +392,18 @@ impl AnalyticsEngine {
                 .collect::<Vec<_>>();
             
             anomaly_summary.insert(metric_name.clone(), recent_anomalies);
-            let store = self.data_store.read().await; // Reacquire lock
+            // Store metric name for anomaly detection later
+            metrics_to_process.push(metric_name.clone());
+        }
+        drop(store); // Release read lock before anomaly detection
+
+        // Now, process anomaly detection for each metric outside the lock
+        for metric_name in metrics_to_process {
+            let anomalies = self.detect_anomalies(&metric_name).await?;
+            let recent_anomalies = anomalies.into_iter()
+                .filter(|a| a.timestamp >= cutoff_time)
+                .collect::<Vec<_>>();
+            anomaly_summary.insert(metric_name.clone(), recent_anomalies);
         }
 
         Ok(AnalyticsReport {
