@@ -478,7 +478,19 @@ impl SecurityMLEngine {
         let input_unique = tx.input_addresses.iter().collect::<std::collections::HashSet<_>>().len();
         let output_unique = tx.output_addresses.iter().collect::<std::collections::HashSet<_>>().len();
         features.push(input_unique as f64 / tx.input_addresses.len().max(1) as f64);
-        features.push(output_unique as f64 / tx.output_addresses.len().max(1) as f64);
+        features.push(f64::from(tx.input_count));
+        features.push(f64::from(tx.output_count));
+        features.push(tx.fee_rate);
+        features.push(f64::from(tx.total_value));
+        features.push(if tx.is_rbf { 1.0 } else { 0.0 });
+        features.push(if tx.has_witness { 1.0 } else { 0.0 });
+        features.push(f64::from(tx.size_bytes));
+
+        // Address reuse patterns
+        let input_unique = tx.input_addresses.iter().collect::<std::collections::HashSet<_>>().len();
+        let output_unique = tx.output_addresses.iter().collect::<std::collections::HashSet<_>>().len();
+        features.push(f64::from(input_unique) / f64::from(tx.input_addresses.len().max(1)));
+        features.push(f64::from(output_unique) / f64::from(tx.output_addresses.len().max(1)));
 
         // Timing features
         let current_time = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
