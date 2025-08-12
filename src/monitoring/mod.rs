@@ -3,6 +3,19 @@
 
 use std::collections::HashMap;
 
+// Include the system metrics module
+pub mod system_metrics;
+pub mod generic_metrics;
+pub mod blockchain_metrics;
+pub mod blockchain_alerts;
+pub mod metrics_service;
+pub mod server;
+pub mod service_integration;
+pub mod system;
+pub mod metrics;
+pub mod metrics_api;
+pub mod metrics_controller;
+
 pub struct MonitoringSystem;
 
 impl Default for MonitoringSystem {

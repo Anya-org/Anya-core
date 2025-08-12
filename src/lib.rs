@@ -58,6 +58,7 @@ pub mod layer2;
 pub mod ml;
 #[cfg(any(feature = "ffi", feature = "mobile"))]
 pub mod mobile;
+pub mod monitoring;
 pub mod network;
 pub mod security;
 pub mod testing;

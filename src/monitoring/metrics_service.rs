@@ -5,6 +5,7 @@ use log::{debug, error, info, warn};
 
 use crate::monitoring::blockchain_metrics;
 use crate::monitoring::blockchain_alerts;
+use crate::monitoring::system_metrics::SystemMetricsCollector;
 
 // Default interval for metrics collection (in milliseconds)
 const DEFAULT_METRICS_INTERVAL_MS: u64 = 10000; // 10 seconds
@@ -19,6 +20,9 @@ pub struct MetricsService {
     
     /// Last collection time
     last_collection: Arc<Mutex<Instant>>,
+    
+    /// System metrics collector
+    system_collector: Arc<Mutex<SystemMetricsCollector>>,
 }
 
 impl MetricsService {
@@ -28,6 +32,7 @@ impl MetricsService {
             interval_ms: interval_ms.unwrap_or(DEFAULT_METRICS_INTERVAL_MS),
             running: Arc::new(Mutex::new(false)),
             last_collection: Arc::new(Mutex::new(Instant::now())),
+            system_collector: Arc::new(Mutex::new(SystemMetricsCollector::new())),
         }
     }
     
@@ -46,13 +51,14 @@ impl MetricsService {
         // Clone the Arc references for the thread
         let running_clone = Arc::clone(&self.running);
         let last_collection_clone = Arc::clone(&self.last_collection);
+        let system_collector_clone = Arc::clone(&self.system_collector);
         let interval_ms = self.interval_ms;
         
         // Spawn collection thread
         thread::spawn(move || {
             while *running_clone.lock().unwrap() {
                 // Collect metrics
-                Self::collect_metrics();
+                Self::collect_metrics(&system_collector_clone);
                 
                 // Check alerts
                 blockchain_alerts::check_alerts();
@@ -76,16 +82,29 @@ impl MetricsService {
     }
     
     /// Collect all blockchain metrics
-    fn collect_metrics() {
-        debug!("Collecting blockchain metrics...");
+    fn collect_metrics(system_collector: &Arc<Mutex<SystemMetricsCollector>>) {
+        debug!("Collecting blockchain and system metrics...");
         
-        // In a real implementation, this would fetch data from Bitcoin Core RPC or other sources
-        // For now, we'll use simulated values to demonstrate the concept
-        Self::collect_simulated_metrics();
+        // Collect real system metrics using sysinfo
+        if let Ok(mut collector) = system_collector.lock() {
+            collector.collect_system_metrics();
+        } else {
+            error!("Failed to acquire lock on system metrics collector");
+        }
+        
+        // Keep Bitcoin-specific metrics simulation for now
+        // These should eventually be replaced with real Bitcoin Core RPC calls
+        Self::collect_simulated_bitcoin_metrics();
     }
     
-    /// Collect simulated metrics for demonstration
-    fn collect_simulated_metrics() {
+    /// Collect simulated Bitcoin blockchain metrics for demonstration
+    /// TODO: Replace these with real Bitcoin Core RPC calls in a future update
+    fn collect_simulated_bitcoin_metrics() {
+        info!("Collecting simulated Bitcoin blockchain metrics (not system metrics)");
+        
+        // NOTE: These are Bitcoin blockchain metrics that require a Bitcoin Core node connection
+        // They are kept simulated until proper Bitcoin Core RPC integration is implemented
+        
         // Simulated SegWit adoption percentage (random variation between 82-87%)
         let segwit_pct = 85.0 + (rand::random::<f64>() - 0.5) * 5.0;
         blockchain_metrics::update_segwit_percentage(segwit_pct);
@@ -102,7 +121,7 @@ impl MetricsService {
         let fee_rate = 20.0 + (rand::random::<f64>() - 0.5) * 10.0;
         blockchain_metrics::update_avg_fee_rate(fee_rate);
         
-        // Simulated error rates (usually low, but occasionally spikes)
+        // Simulated connection error rates (usually low, but occasionally spikes)
         let conn_error_rate = if rand::random::<f64>() < 0.95 {
             // Normal case: 0-2% error rate
             rand::random::<f64>() * 0.02
