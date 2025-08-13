@@ -207,9 +207,20 @@ pub mod hardware_optimization {
             }
 
             #[cfg(not(feature = "rust-bitcoin"))]
+            #[cfg(feature = "bitcoin")]
             pub fn verify_transaction_batch(
                 &self,
-                _transactions: &[bitcoin::Transaction],
+                _transactions: &[crate::bitcoin::Transaction],
+                _config: &BatchVerificationConfig,
+            ) -> Result<Vec<usize>, Box<dyn std::error::Error>> {
+                log::debug!("Hardware-optimized batch verification not available");
+                Ok(vec![])
+            }
+            
+            #[cfg(not(feature = "bitcoin"))]
+            pub fn verify_transaction_batch(
+                &self,
+                _transactions: &[u8],  // Use generic type when bitcoin feature not available
                 _config: &BatchVerificationConfig,
             ) -> Result<Vec<usize>, Box<dyn std::error::Error>> {
                 log::debug!("Hardware-optimized batch verification not available");
@@ -227,10 +238,18 @@ pub mod hardware_optimization {
                 Ok(())
             }
 
-            #[cfg(not(feature = "rust-bitcoin"))]
+            #[cfg(feature = "bitcoin")]
             pub fn verify_taproot_transaction(
                 &self,
-                _tx: &bitcoin::Transaction,
+                _tx: &crate::bitcoin::Transaction,
+            ) -> Result<(), Box<dyn std::error::Error>> {
+                Ok(())
+            }
+
+            #[cfg(not(feature = "bitcoin"))]
+            pub fn verify_taproot_transaction(
+                &self,
+                _tx: &[u8],  // Use generic type when bitcoin feature not available
             ) -> Result<(), Box<dyn std::error::Error>> {
                 Ok(())
             }
@@ -269,6 +288,8 @@ pub enum AnyaError {
     NotFound(String),
     InvalidInput(String),
     PerformanceError(String),
+    Analytics(String),
+    Security(String),
 }
 
 impl fmt::Display for AnyaError {
@@ -285,6 +306,8 @@ impl fmt::Display for AnyaError {
             AnyaError::NotFound(msg) => write!(f, "Not found error: {msg}"),
             AnyaError::InvalidInput(msg) => write!(f, "Invalid input error: {msg}"),
             AnyaError::PerformanceError(msg) => write!(f, "Performance error: {msg}"),
+            AnyaError::Analytics(msg) => write!(f, "Analytics error: {msg}"),
+            AnyaError::Security(msg) => write!(f, "Security error: {msg}"),
         }
     }
 }

@@ -30,7 +30,7 @@ pub fn sign(
     private_key: &[u8],
     algorithm: SignatureAlgorithm,
 ) -> Result<Signature, Box<dyn Error>> {
-    use secp256k1::hashes::{sha256, Hash};
+    use sha2::{Sha256, Digest};
     use secp256k1::{Keypair, Message, Secp256k1, SecretKey};
 
     log::debug!(
@@ -46,7 +46,9 @@ pub fn sign(
                 .map_err(|e| format!("Invalid private key: {}", e))?;
 
             // Hash the message using SHA256
-            let msg_hash = sha256::Hash::hash(message);
+            let mut hasher = Sha256::new();
+            hasher.update(message);
+            let msg_hash = hasher.finalize();
             let msg = Message::from_digest_slice(&msg_hash[..])
                 .map_err(|e| format!("Invalid message hash: {}", e))?;
 
@@ -66,12 +68,14 @@ pub fn sign(
             let key_pair = Keypair::from_secret_key(&secp, &secret_key);
 
             // Hash the message using SHA256
-            let msg_hash = sha256::Hash::hash(message);
+            let mut hasher = Sha256::new();
+            hasher.update(message);
+            let msg_hash = hasher.finalize();
             let msg = Message::from_digest_slice(&msg_hash[..])
                 .map_err(|e| format!("Invalid message hash: {}", e))?;
 
             // Sign with Schnorr
-            let signature = secp.sign_schnorr(&msg, &key_pair);
+            let signature = secp.sign_schnorr_with_rng(&msg, &key_pair, &mut rand::thread_rng());
 
             Ok(Signature {
                 bytes: signature.as_ref().to_vec(),
@@ -92,7 +96,7 @@ pub fn verify(
     signature: &Signature,
     public_key: &[u8],
 ) -> Result<bool, Box<dyn Error>> {
-    use secp256k1::hashes::{sha256, Hash};
+    use sha2::{Sha256, Digest};
     use secp256k1::{ecdsa, Message, PublicKey, Secp256k1, XOnlyPublicKey};
 
     match signature.algorithm {
@@ -106,7 +110,9 @@ pub fn verify(
                 .map_err(|e| format!("Invalid signature: {}", e))?;
 
             // Hash the message using SHA256
-            let msg_hash = sha256::Hash::hash(message);
+            let mut hasher = Sha256::new();
+            hasher.update(message);
+            let msg_hash = hasher.finalize();
             let msg = Message::from_digest_slice(&msg_hash[..])
                 .map_err(|e| format!("Invalid message hash: {}", e))?;
 
@@ -130,7 +136,9 @@ pub fn verify(
                 .map_err(|e| format!("Invalid Schnorr signature: {}", e))?;
 
             // Hash the message using SHA256
-            let msg_hash = sha256::Hash::hash(message);
+            let mut hasher = Sha256::new();
+            hasher.update(message);
+            let msg_hash = hasher.finalize();
             let msg = Message::from_digest_slice(&msg_hash[..])
                 .map_err(|e| format!("Invalid message hash: {}", e))?;
 
