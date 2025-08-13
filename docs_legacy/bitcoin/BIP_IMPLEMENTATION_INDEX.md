@@ -9,7 +9,7 @@ This document provides an index of all Bitcoin Improvement Proposals (BIPs) impl
 |-----|-------|----------------|--------------|--------------|
 | 341 | Taproot | `core/src/bip/bip341.rs` | Partial | In Progress |
 | 342 | Tapscript | `core/src/bip/bip342.rs` | Partial | In Progress |
-| 174 | PSBT | `src/bitcoin/protocol/psbt.rs` | Pending | Not Started |
+| 174 | PSBT | `src/bitcoin/psbt.rs` | Complete | Ready for Audit |
 | 370 | BIPScript | `src/bitcoin/protocol/script.rs` | Partial | Not Started |
 
 ## Implementation Details
@@ -39,13 +39,58 @@ Implementation of the Tapscript, which defines the semantics of the leaf version
 
 **Location:** `core/src/bip/bip342.rs`
 
+### BIP-174 (PSBT)
+
+Implementation of Partially Signed Bitcoin Transactions, which provides a standard format for constructing unsigned transactions and enables multi-party signing workflows.
+
+**Features Implemented:**
+- Complete PSBT data structures (Global, Input, Output)
+- PSBT validation and integrity checks
+- Signature management and aggregation
+- UTXO tracking (witness and non-witness)
+- PSBT Builder pattern for easy construction
+- Serialization/deserialization support
+- Comprehensive error handling
+- Support for both v1 and v2 PSBT formats
+
+**Location:** `src/bitcoin/psbt.rs`
+
+### Blockchain Metrics Enhancements
+
+Added critical missing metrics as identified in AIR001:
+
+**TPS (Transactions Per Second) Tracking:**
+- Real-time TPS calculation and monitoring
+- Historical TPS data with time series support
+- Performance trend analysis
+
+**Block Version Monitoring:**
+- Track distribution of block versions across the network
+- Detect protocol upgrade adoption
+- Monitor for potential consensus issues
+
+**51% Attack Detection:**
+- Mining pool hashrate distribution tracking
+- Automatic risk level assessment (Low/Medium/High/Critical)
+- Real-time alerts for centralization risks
+- Comprehensive attack risk reporting
+
+**Location:** `src/monitoring/blockchain_metrics.rs`
+
 ## Implementation Priorities
 
 The following BIPs are prioritized for upcoming implementation:
 
-1. BIP-174 (PSBT) - Partially Signed Bitcoin Transactions
+1. ✅ BIP-174 (PSBT) - Partially Signed Bitcoin Transactions - **COMPLETED**
 2. BIP-370 (PSBT v2) - Enhanced version of PSBT
 3. BIP-340 (Schnorr Signatures) - Foundational for later enhancements
+
+**Recently Completed (AIR001 Gap Analysis):**
+- ✅ BIP-174 (PSBT) implementation with comprehensive feature set
+- ✅ TPS (Transactions Per Second) metrics and monitoring
+- ✅ Block version monitoring and distribution tracking  
+- ✅ 51% attack detection with mining pool analysis
+- ✅ Enhanced blockchain metrics with historical data support
 
 ## Compliance Requirements
 
