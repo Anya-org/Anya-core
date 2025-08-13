@@ -4,11 +4,11 @@
 //! including fraud detection, 51% attack monitoring, and fee spike analysis.
 //! Replaces Python security analysis with high-performance Rust implementations.
 
-use crate::ml::{MLSystem, MLConfig, MLOutput, MLInput};
+use crate::ml::{MLSystem, MLConfig, MLInput};
 use crate::{AnyaError, AnyaResult};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use std::time::{Duration, SystemTime, UNIX_EPOCH};
+use std::time::{SystemTime, UNIX_EPOCH};
 use tokio::sync::RwLock;
 use std::sync::Arc;
 use tracing::{info, warn, error};
@@ -481,7 +481,7 @@ impl SecurityMLEngine {
         features.push(f64::from(tx.input_count));
         features.push(f64::from(tx.output_count));
         features.push(tx.fee_rate);
-        features.push(f64::from(tx.total_value));
+        features.push(tx.total_value as f64);
         features.push(if tx.is_rbf { 1.0 } else { 0.0 });
         features.push(if tx.has_witness { 1.0 } else { 0.0 });
         features.push(f64::from(tx.size_bytes));
@@ -489,8 +489,8 @@ impl SecurityMLEngine {
         // Address reuse patterns
         let input_unique = tx.input_addresses.iter().collect::<std::collections::HashSet<_>>().len();
         let output_unique = tx.output_addresses.iter().collect::<std::collections::HashSet<_>>().len();
-        features.push(f64::from(input_unique) / f64::from(tx.input_addresses.len().max(1)));
-        features.push(f64::from(output_unique) / f64::from(tx.output_addresses.len().max(1)));
+        features.push(input_unique as f64 / tx.input_addresses.len().max(1) as f64);
+        features.push(output_unique as f64 / tx.output_addresses.len().max(1) as f64);
 
         // Timing features
         let current_time = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
@@ -535,10 +535,11 @@ impl SecurityMLEngine {
         features.push(hashrate_volatility);
 
         // Current vs historical hashrate
-        if let (Some(current), Some(historical_avg)) = (
+        if let (Some(current), historical_sum) = (
             recent_hashrate.first().map(|h| h.estimated_hashrate),
-            hashrate.iter().map(|h| h.estimated_hashrate).sum::<f64>().checked_div(hashrate.len() as f64)
+            hashrate.iter().map(|h| h.estimated_hashrate).sum::<f64>()
         ) {
+            let historical_avg = if hashrate.is_empty() { 1.0 } else { historical_sum / hashrate.len() as f64 };
             features.push(current / historical_avg);
         } else {
             features.push(1.0);
@@ -678,7 +679,7 @@ impl SecurityMLEngine {
 
     async fn calculate_transaction_anomaly_score(&self, tx: &TransactionData) -> AnyaResult<f64> {
         // Simplified anomaly scoring based on deviations from normal patterns
-        let mut score = 0.0;
+        let mut score: f64 = 0.0;
         
         // Fee rate anomaly
         let normal_fee_range = 1.0..=50.0;
@@ -756,7 +757,8 @@ impl SecurityMLEngine {
         
         // Keep only last 1000 alerts
         if history.len() > 1000 {
-            history.drain(0..history.len() - 1000);
+            let drain_count = history.len() - 1000;
+            history.drain(0..drain_count);
         }
     }
 
