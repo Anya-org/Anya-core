@@ -10,6 +10,7 @@ use std::error::Error;
 use crate::{AnyaError, AnyaResult};
 // Re-export these types to make them public
 pub use crate::dao::{Proposal, ProposalMetrics, RiskMetrics};
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::path::Path;
 use std::sync::{Arc, Mutex};
@@ -264,7 +265,7 @@ impl MLSystem {
 pub trait MLModelPlaceholder {}
 
 /// ML model input
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MLInput {
     /// Features for the model
     pub features: Vec<f64>,
@@ -275,7 +276,7 @@ pub struct MLInput {
 }
 
 /// ML model output
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MLOutput {
     /// Model prediction
     pub prediction: f64,
