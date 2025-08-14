@@ -29,6 +29,7 @@ Status: ✅ Build and crates.io dry-run verified; deployment readiness depends o
 - [🔧 Bitcoin Integration](docs/bitcoin/) - BIP compliance and Bitcoin features
 - [⚡ Layer2 Protocols](docs/layer2/) - Lightning, RGB, DLC, and more
 - [🔒 Security Guide](docs/security/) - Security policies and best practices
+- [📄 PRD Index](docs/prd/README.md) - Canonical Product Requirements
 
 **Additional Documentation:**
 
