@@ -9,6 +9,10 @@ A modular Bitcoin infrastructure platform designed for enterprise applications, 
 
 [![Rust](https://img.shields.io/badge/Rust-1.70+-green)](https://rust-lang.org)
 
+**Dev Tooling Status:**
+
+[![Devcontainer Drift](https://github.com/Anya-org/Anya-core/actions/workflows/devcontainer-drift.yml/badge.svg)](https://github.com/Anya-org/Anya-core/actions/workflows/devcontainer-drift.yml)
+
 Last Updated: August 10, 2025
 Version: 1.3.0
 Status: ✅ Build and crates.io dry-run verified; deployment readiness depends on your environment

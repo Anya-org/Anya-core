@@ -1,0 +1,53 @@
+name: Devcontainer Drift Check
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    - cron: "0 3 * * 1" # Weekly Monday 03:00 UTC drift check
+  workflow_dispatch:
+
+jobs:
+  drift:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Ensure jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+      - name: Compare devcontainer base vs fdrive (schema drift)
+        run: |
+          set -e
+          base=.devcontainer/devcontainer.json
+          fdrive=.devcontainer/devcontainer.fdrive.json
+          if [ ! -f "$fdrive" ]; then
+            echo "No fdrive config present; skipping"; exit 0; fi
+          filter='del(.mounts) | del(.containerEnv) | del(.postCreateCommand)'
+          base_filtered=$(jq "$filter" "$base")
+          fdrive_filtered=$(jq "$filter" "$fdrive")
+          if [ "$base_filtered" != "$fdrive_filtered" ]; then
+            echo "devcontainer.fdrive.json drifts from devcontainer.json in non-mount/env keys." >&2
+            diff <(echo "$base_filtered") <(echo "$fdrive_filtered") || true
+            exit 1
+          else
+            echo "No drift detected in core schema."
+          fi
+      - name: Verify dynamic-cache-setup.sh hash
+        run: |
+          set -e
+          expected_file=.devcontainer/dynamic-cache-setup.sha256
+          script=.devcontainer/dynamic-cache-setup.sh
+          if [ ! -f "$expected_file" ]; then
+            echo "Missing expected hash file $expected_file" >&2; exit 1; fi
+          if [ ! -f "$script" ]; then
+            echo "Missing script $script" >&2; exit 1; fi
+          expected_hash=$(awk '{print $1}' "$expected_file")
+          actual_hash=$(sha256sum "$script" | awk '{print $1}')
+
+          if [ "$expected_hash" != "$actual_hash" ]; then
+            echo "Hash mismatch for $script" >&2
+            echo "Expected: $expected_hash" >&2
+            echo "Actual:   $actual_hash" >&2
+            exit 1
+          else
+            echo "dynamic-cache-setup.sh hash verified."
+          fi

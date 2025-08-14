@@ -1,4 +1,4 @@
-// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+ve // For format details, see https://aka.ms/devcontainer.json. For config options, see the
 // README at: https://github.com/devcontainers/templates/tree/main/src/rust
 {
 	"name": "Anya Core - Rust",
@@ -22,7 +22,6 @@
 		// Add Docker support for container-based testing
 		"ghcr.io/devcontainers/features/docker-in-docker:2": {
 			"version": "latest",
-
 			"dockerDashComposeVersion": "v2"
 		}
 	},
@@ -88,7 +87,7 @@
 			}
 		}
 	},
-	"postCreateCommand": "bash -c 'chmod +x ./.devcontainer/*.sh && bash ./.devcontainer/install-tools.sh || echo \"🚨 Tool installation had some errors - check logs\"'",
+	"postCreateCommand": "bash -c 'chmod +x ./.devcontainer/*.sh && bash ./.devcontainer/install-tools.sh || echo \"🚨 Tool installation had some errors - check logs\"; bash ./.devcontainer/dynamic-cache-setup.sh'",
 	// Use 'mounts' to make the cargo cache persistent in a Docker Volume.
 	"mounts": [
 		{
@@ -104,6 +103,11 @@
 		{
 			"source": "anya-core-node-modules-${devcontainerId}",
 			"target": "${containerWorkspaceFolder}/node_modules",
+			"type": "volume"
+		},
+		{
+			"source": "anya-core-sccache-${devcontainerId}",
+			"target": "/var/cache/sccache",
 			"type": "volume"
 		}
 	],
@@ -123,7 +127,10 @@
 		"CARGO_INCREMENTAL": "1",
 		"RUST_BACKTRACE": "1",
 		"RUSTFLAGS": "-C target-cpu=native",
-		"SCCACHE_CACHE_SIZE": "5G"
+		"SCCACHE_CACHE_SIZE": "4G",
+		"DYNAMIC_CACHE_MIN_FREE_GB": "8",
+		"DYNAMIC_CACHE_FORCE_ROOT": "",
+		"DYNAMIC_CACHE_VERBOSE": "1"
 	},
 	// Use connect as non-root user. More info: https://aka.ms/dev-containers-non-root.
 	"remoteUser": "vscode"

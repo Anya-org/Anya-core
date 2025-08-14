@@ -82,6 +82,12 @@ for tool in cargo-audit cargo-update cargo-outdated cargo-edit cargo-tarpaulin c
     fi
 done
 
+# Final guard to ensure sccache is present
+if ! command -v sccache &>/dev/null; then
+    echo "Attempting explicit sccache install (guard)"
+    cargo install sccache --force || echo "WARN: sccache installation failed"
+fi
+
 # Install Python ML dependencies
 echo "Installing Python ML dependencies..."
 python -m pip install --upgrade pip
@@ -150,3 +156,4 @@ git config --global fetch.prune true
 
 echo "Installation complete!"
 echo "Run ./.devcontainer/verify-setup.sh to verify the installation"
+echo "Tip: Use ./.devcontainer/prune-caches.sh to reclaim space when low."
