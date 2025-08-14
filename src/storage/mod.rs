@@ -15,6 +15,10 @@ pub use decentralized::{
 };
 #[cfg(not(feature = "dwn"))]
 #[derive(Debug, Clone)]
+/// Stub type so references compile when `dwn` is disabled.
+pub struct DecentralizedStorage;
+#[cfg(not(feature = "dwn"))]
+#[derive(Debug, Clone)]
 pub struct RGBAsset {
     pub id: String,
 }
@@ -239,11 +243,10 @@ impl StorageRouter {
     /// When "auto" and feature `dwn` enabled, selects decentralized; otherwise persistent.
     pub fn from_env(
         persistent: Arc<persistent::PersistentStorage>,
-        #[cfg(feature = "dwn")] decentralized: Option<Arc<DecentralizedStorage>>,
+        decentralized: Option<Arc<DecentralizedStorage>>,
     ) -> Self {
         let mode = std::env::var("ANYA_STORAGE_BACKEND").unwrap_or_else(|_| "auto".into());
         match mode.as_str() {
-            #[cfg(feature = "dwn")]
             "dwn" => {
                 if let Some(d) = decentralized {
                     StorageRouter::Decentralized(d)
@@ -253,11 +256,11 @@ impl StorageRouter {
             }
             "persistent" => StorageRouter::Persistent(persistent),
             _ => {
-                #[cfg(feature = "dwn")]
                 if let Some(d) = decentralized {
-                    return StorageRouter::Decentralized(d);
+                    StorageRouter::Decentralized(d)
+                } else {
+                    StorageRouter::Persistent(persistent)
                 }
-                StorageRouter::Persistent(persistent)
             }
         }
     }
@@ -275,7 +278,7 @@ impl StorageRouter {
     /// - Requires `enterprise` feature for persistent Postgres; falls back to in-memory if initialization fails.
     /// - DWN stack only built when compiled with `dwn` feature; otherwise logs and returns persistent-only router.
     pub async fn autoconfig() -> anyhow::Result<Self> {
-        use tracing::error;
+        use tracing::{error, info, warn};
         // Persistent base
         let p_cfg = persistent::StorageConfig::default();
         let persistent = match persistent::PersistentStorage::new(p_cfg.clone()).await {
@@ -285,9 +288,10 @@ impl StorageRouter {
                 return Err(e);
             }
         };
-
+        // Prepare optional decentralized backend (available only when `dwn` feature is compiled)
+        let mut decentralized: Option<Arc<DecentralizedStorage>> = None;
         #[cfg(feature = "dwn")]
-        let decentralized: Option<Arc<DecentralizedStorage>> = {
+        {
             // Build decentralized components if feature compiled
             let ipfs_endpoint = std::env::var("ANYA_IPFS_ENDPOINT")
                 .unwrap_or_else(|_| "http://127.0.0.1:5001".into());
@@ -308,41 +312,31 @@ impl StorageRouter {
                     }
                 },
             };
-            // Bitcoin network (only for anchoring; fallback regtest) - safe even if bitcoin feature absent
-            #[allow(unused)]
+            // Bitcoin network (only for anchoring; fallback regtest)
             let network_str =
                 std::env::var("ANYA_BITCOIN_NETWORK").unwrap_or_else(|_| "regtest".into());
-            #[cfg(feature = "bitcoin")]
             let network = match network_str.as_str() {
                 "mainnet" => bitcoin::Network::Bitcoin,
                 "testnet" => bitcoin::Network::Testnet,
                 "signet" => bitcoin::Network::Signet,
                 _ => bitcoin::Network::Regtest,
             };
-            #[cfg(not(feature = "bitcoin"))]
-            let network = bitcoin::Network::Regtest; // compile-time: bitcoin types behind feature; this line shouldn't compile without bitcoin feature, so guard
 
             match DecentralizedStorage::new(&ipfs_endpoint, adapter, did, network, None).await {
-                Ok(d) => Some(Arc::new(d)),
+                Ok(d) => {
+                    decentralized = Some(Arc::new(d));
+                }
                 Err(e) => {
                     warn!(
                         ?e,
                         "Decentralized storage init failed; continuing without DWN"
                     );
-                    None
                 }
             }
-        };
-
-        #[cfg(not(feature = "dwn"))]
-        let decentralized: Option<Arc<()>> = None; // placeholder type never used
+        }
 
         // Defer to existing selection logic
-        Ok(Self::from_env(
-            persistent,
-            #[cfg(feature = "dwn")]
-            decentralized,
-        ))
+        Ok(Self::from_env(persistent, decentralized))
     }
 }
 
@@ -352,6 +346,10 @@ impl UnifiedStorage for StorageRouter {
         match self {
             #[cfg(feature = "dwn")]
             StorageRouter::Decentralized(d) => d.asset_exists(asset_id).await.map_err(Into::into),
+            #[cfg(not(feature = "dwn"))]
+            StorageRouter::Decentralized(_) => Err(anyhow::anyhow!(
+                "Decentralized storage is not available: the `dwn` feature is disabled."
+            )),
             StorageRouter::Persistent(p) => Ok(p.get(asset_id).await?.is_some()),
         }
     }
@@ -359,6 +357,10 @@ impl UnifiedStorage for StorageRouter {
         match self {
             #[cfg(feature = "dwn")]
             StorageRouter::Decentralized(d) => d.store_asset(asset).await.map_err(Into::into),
+            #[cfg(not(feature = "dwn"))]
+            StorageRouter::Decentralized(_) => Err(anyhow::anyhow!(
+                "Decentralized storage is not available: the `dwn` feature is disabled."
+            )),
             StorageRouter::Persistent(_p) => Ok(asset.id.clone()),
         }
     }
@@ -366,6 +368,10 @@ impl UnifiedStorage for StorageRouter {
         match self {
             #[cfg(feature = "dwn")]
             StorageRouter::Decentralized(d) => d.query_assets(owner_did).await.map_err(Into::into),
+            #[cfg(not(feature = "dwn"))]
+            StorageRouter::Decentralized(_) => Err(anyhow::anyhow!(
+                "Decentralized storage is not available: the `dwn` feature is disabled."
+            )),
             StorageRouter::Persistent(_p) => Ok(Vec::new()),
         }
     }
@@ -375,6 +381,10 @@ impl UnifiedStorage for StorageRouter {
             StorageRouter::Decentralized(d) => {
                 d.get_asset_metadata(asset_id).await.map_err(Into::into)
             }
+            #[cfg(not(feature = "dwn"))]
+            StorageRouter::Decentralized(_) => Err(anyhow::anyhow!(
+                "Decentralized storage is not available: the `dwn` feature is disabled."
+            )),
             StorageRouter::Persistent(_p) => Ok(serde_json::json!({"asset_id": asset_id})),
         }
     }
@@ -388,6 +398,10 @@ impl UnifiedStorage for StorageRouter {
                 .get_asset_history_with_proofs(asset_id)
                 .await
                 .map_err(Into::into),
+            #[cfg(not(feature = "dwn"))]
+            StorageRouter::Decentralized(_) => Err(anyhow::anyhow!(
+                "Decentralized storage is not available: the `dwn` feature is disabled."
+            )),
             StorageRouter::Persistent(_p) => Ok(Vec::new()),
         }
     }
@@ -397,6 +411,10 @@ impl UnifiedStorage for StorageRouter {
             StorageRouter::Decentralized(d) => {
                 d.get_asset_balance(asset_id).await.map_err(Into::into)
             }
+            #[cfg(not(feature = "dwn"))]
+            StorageRouter::Decentralized(_) => Err(anyhow::anyhow!(
+                "Decentralized storage is not available: the `dwn` feature is disabled."
+            )),
             StorageRouter::Persistent(_p) => Ok(0),
         }
     }
@@ -404,6 +422,10 @@ impl UnifiedStorage for StorageRouter {
         match self {
             #[cfg(feature = "dwn")]
             StorageRouter::Decentralized(d) => d.store_invoice(invoice).await.map_err(Into::into),
+            #[cfg(not(feature = "dwn"))]
+            StorageRouter::Decentralized(_) => Err(anyhow::anyhow!(
+                "Decentralized storage is not available: the `dwn` feature is disabled."
+            )),
             StorageRouter::Persistent(_p) => Ok(invoice.id.clone()),
         }
     }
@@ -417,6 +439,10 @@ impl UnifiedStorage for StorageRouter {
                 .store_transfer_and_update_balance(transfer)
                 .await
                 .map_err(Into::into),
+            #[cfg(not(feature = "dwn"))]
+            StorageRouter::Decentralized(_) => Err(anyhow::anyhow!(
+                "Decentralized storage is not available: the `dwn` feature is disabled."
+            )),
             StorageRouter::Persistent(_p) => Ok(transfer.id.clone()),
         }
     }
@@ -426,6 +452,10 @@ impl UnifiedStorage for StorageRouter {
             StorageRouter::Decentralized(d) => {
                 d.get_transfer_status(transfer_id).await.map_err(Into::into)
             }
+            #[cfg(not(feature = "dwn"))]
+            StorageRouter::Decentralized(_) => Err(anyhow::anyhow!(
+                "Decentralized storage is not available: the `dwn` feature is disabled."
+            )),
             StorageRouter::Persistent(_p) => Ok(TransferStatus::Pending),
         }
     }
@@ -439,6 +469,10 @@ impl UnifiedStorage for StorageRouter {
                 .validate_transfer_with_anchoring(transfer)
                 .await
                 .map_err(Into::into),
+            #[cfg(not(feature = "dwn"))]
+            StorageRouter::Decentralized(_) => Err(anyhow::anyhow!(
+                "Decentralized storage is not available: the `dwn` feature is disabled."
+            )),
             StorageRouter::Persistent(_p) => Ok(true),
         }
     }
