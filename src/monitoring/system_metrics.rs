@@ -165,7 +165,13 @@ impl SystemMetricsCollector {
             .arg("-B1") // Output in bytes
             .arg("--total")
             .output() 
-        {
+        // Check if 'df' binary exists in PATH before executing
+        if std::process::Command::new("which").arg("df").output().map(|o| o.status.success()).unwrap_or(false) {
+            if let Ok(output) = std::process::Command::new("df")
+                .arg("-B1") // Output in bytes
+                .arg("--total")
+                .output() 
+            {
             if output.status.success() {
                 if let Ok(df_output) = String::from_utf8(output.stdout) {
                     // Parse the total line from df output
