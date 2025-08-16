@@ -266,7 +266,18 @@ impl SystemMetricsCollector {
             if output.status.success() {
                 debug!("Uptime command executed successfully");
                 // Just return a reasonable default since parsing uptime output is complex
-                return 3600; // 1 hour as reasonable default
+        // Fallback: try the `uptime` command, but only if it exists in a trusted location
+        let uptime_paths = ["/usr/bin/uptime", "/bin/uptime"];
+        for path in &uptime_paths {
+            if std::path::Path::new(path).exists() {
+                if let Ok(output) = std::process::Command::new(path).output() {
+                    if output.status.success() {
+                        debug!("Uptime command ({}) executed successfully", path);
+                        // Just return a reasonable default since parsing uptime output is complex
+                        return 3600; // 1 hour as reasonable default
+                    }
+                }
+                break; // Only try the first found
             }
         }
         
