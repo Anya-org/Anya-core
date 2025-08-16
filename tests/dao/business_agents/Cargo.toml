@@ -357,4 +357,6 @@ strip = true
 # Use the upstream git version of web5 during local development.
 # This section is ignored when publishing to crates.io.
 #[patch.crates-io]
+# The following line is kept as a reference for developers who need to use the upstream git version of web5 during local development.
+# Uncomment it to override the crates.io version with the specified git revision.
 #web5 = { git = "https://github.com/TBD54566975/web5-rs", rev = "310d79c9" }
