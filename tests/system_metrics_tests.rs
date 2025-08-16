@@ -57,7 +57,19 @@ mod tests {
         service.start();
         
         // Let it collect metrics a few times
-        thread::sleep(Duration::from_millis(1200));
+        // Wait until metrics are collected, up to 2 seconds
+        let start = std::time::Instant::now();
+        let timeout = std::time::Duration::from_secs(2);
+        loop {
+            let metrics = generic_metrics::get_generic_metrics();
+            if metrics.contains_key("system_cpu_usage_percent") && metrics.contains_key("system_memory_usage_percent") {
+                break;
+            }
+            if start.elapsed() > timeout {
+                panic!("Timed out waiting for system metrics to be collected");
+            }
+            std::thread::sleep(std::time::Duration::from_millis(50));
+        }
         
         // Stop the service
         service.stop();
