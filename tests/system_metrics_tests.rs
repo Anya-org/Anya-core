@@ -19,7 +19,6 @@ mod tests {
         collector.collect_system_metrics();
         
         // Give it a moment to collect
-        thread::sleep(Duration::from_millis(100));
         
         // Verify metrics were collected
         let metrics = generic_metrics::get_generic_metrics();
