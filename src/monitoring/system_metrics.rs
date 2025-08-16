@@ -282,7 +282,7 @@ impl SystemMetricsCollector {
         }
         
         // Default fallback
-        300 // 5 minutes as a reasonable default
+        FALLBACK_UPTIME_SECONDS // 5 minutes as a reasonable default
     }
     
     /// Check if system metrics collection is healthy
