@@ -74,7 +74,20 @@ impl SystemMetricsCollector {
         }
         
         // If we can't read CPU usage, use a reasonable default
-        if self.last_cpu_usage == 0.0 {
+        let mut cpu_usage_collected = false;
+        if let Ok(stat) = std::fs::read_to_string("/proc/stat") {
+            if let Some(cpu_line) = stat.lines().next() {
+                if let Some(cpu_usage) = parse_cpu_usage(cpu_line) {
+                    self.last_cpu_usage = cpu_usage;
+                    crate::monitoring::generic_metrics::register_metric("system_cpu_usage_percent", cpu_usage as f64);
+                    debug!("CPU usage from /proc/stat: {:.2}%", cpu_usage);
+                    cpu_usage_collected = true;
+                }
+            }
+        }
+        
+        // If we can't read CPU usage, use a reasonable default
+        if !cpu_usage_collected {
             let estimated_cpu = 10.0; // Conservative estimate
             self.last_cpu_usage = estimated_cpu;
             crate::monitoring::generic_metrics::register_metric("system_cpu_usage_percent", estimated_cpu as f64);
