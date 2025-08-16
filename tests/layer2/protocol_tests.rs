@@ -247,8 +247,7 @@ impl ProtocolTestSuite {
 
         if tps < 10.0 {
             return Err(AnyaError::PerformanceError(format!(
-                "Transaction throughput too low: {:.2} TPS",
-                tps
+                "Transaction throughput too low: {tps:.2} TPS"
             )));
         }
 
@@ -265,7 +264,7 @@ impl ProtocolTestSuite {
                 "Error checking".to_string(),
                 "Performance verification".to_string(),
             ],
-            reasoning: format!("{} completed successfully", operation),
+            reasoning: format!("{operation} completed successfully"),
         };
 
         // If AiVerification::verify is async, you must block here or refactor the test to be async

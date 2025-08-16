@@ -97,11 +97,11 @@ pub fn ecdh_derive_secret(
 
             // Parse private key
             let secret_key = SecretKey::from_slice(private_key)
-                .map_err(|e| format!("Invalid private key: {}", e))?;
+                .map_err(|e| format!("Invalid private key: {e}"))?;
 
             // Parse public key
             let public_key = PublicKey::from_slice(peer_public_key)
-                .map_err(|e| format!("Invalid public key: {}", e))?;
+                .map_err(|e| format!("Invalid public key: {e}"))?;
 
             // Perform ECDH
             let shared_secret = ecdh::shared_secret_point(&public_key, &secret_key);

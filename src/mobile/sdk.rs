@@ -11,6 +11,12 @@ pub struct MobileSDK {
     pub security: MobileSecurity,
 }
 
+impl Default for MobileSDK {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl MobileSDK {
     pub fn new() -> Self {
         Self {
@@ -129,7 +135,7 @@ impl MobileSDK {
     pub async fn backup_wallet(&self, destination: &str) -> Result<(), String> {
         // TODO: Implement backup logic
         let wallet = self.wallet.lock().await;
-        log::info!("Backing up wallet to {}", destination);
+        log::info!("Backing up wallet to {destination}");
 
         // In a real implementation, we would serialize the wallet and write it to the destination
         // For now, we'll just acknowledge that we have the wallet lock and would write to the destination

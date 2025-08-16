@@ -108,7 +108,7 @@ impl MLSystem {
                 models_dir: config
                     .model_path
                     .as_ref()
-                    .map(|p| std::path::PathBuf::from(p))
+                    .map(std::path::PathBuf::from)
                     .unwrap_or_else(|| std::path::PathBuf::from("./data/models")),
                 max_memory_mb: 512,
                 enable_gpu: config.use_gpu,
@@ -143,7 +143,7 @@ impl MLSystem {
             models_dir: config
                 .model_path
                 .as_ref()
-                .map(|p| std::path::PathBuf::from(p))
+                .map(std::path::PathBuf::from)
                 .unwrap_or_else(|| std::path::PathBuf::from("./data/models")),
             max_memory_mb: 1024,
             enable_gpu: config.use_gpu,

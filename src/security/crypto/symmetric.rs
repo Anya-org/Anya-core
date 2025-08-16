@@ -276,7 +276,7 @@ impl SymmetricCrypto {
         };
 
         cipher
-            .encrypt(nonce.into(), payload)
+            .encrypt(nonce, payload)
             .map_err(|e| SymmetricError::EncryptionError(e.to_string()))
     }
 
@@ -324,7 +324,7 @@ impl SymmetricCrypto {
         };
 
         cipher
-            .decrypt(nonce.into(), payload)
+            .decrypt(nonce, payload)
             .map_err(|e| SymmetricError::DecryptionError(e.to_string()))
     }
 }

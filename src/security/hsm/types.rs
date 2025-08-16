@@ -412,7 +412,7 @@ impl HsmKeyPath {
     /// Parse a key path string like "m/44'/0'/0'/0/0"
     pub fn from_string(s: &str) -> Result<Self, Box<dyn Error>> {
         if !s.starts_with("m/") {
-            return Err(format!("Invalid key path: {}", s).into());
+            return Err(format!("Invalid key path: {s}").into());
         }
 
         let s = &s[2..]; // Skip the "m/"
@@ -438,26 +438,15 @@ impl HsmKeyPath {
 
         Ok(Self::new(components, hardened))
     }
-
-    /// Format the key path as a string
-    pub fn to_string(&self) -> String {
-        let mut result = String::from("m");
-
-        for i in 0..self.components.len() {
-            result.push('/');
-            result.push_str(&self.components[i].to_string());
-            if self.hardened[i] {
-                result.push('\'');
-            }
-        }
-
-        result
-    }
 }
 
 impl fmt::Display for HsmKeyPath {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", self.to_string())
+        write!(f, "m")?;
+        for (i, comp) in self.components.iter().enumerate() {
+            write!(f, "/{}{}", comp, if self.hardened[i] { "'" } else { "" })?;
+        }
+        Ok(())
     }
 }
 

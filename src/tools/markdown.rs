@@ -231,7 +231,7 @@ impl DocumentationValidator {
             .into_iter()
             .filter_map(Result::ok)
             .filter(|e| {
-                e.file_type().is_file() && e.path().extension().map_or(false, |ext| ext == "md")
+                e.file_type().is_file() && e.path().extension().is_some_and(|ext| ext == "md")
             })
         {
             let path = entry.path();

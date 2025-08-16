@@ -50,7 +50,7 @@ impl Pkcs11HsmProvider {
                 AuditEventType::HsmOperation,
                 AuditEventResult::Failure,
                 AuditEventSeverity::Warning,
-                &format!("Attempted unsupported operation: {}", operation),
+                &format!("Attempted unsupported operation: {operation}"),
             )
             .await
     }

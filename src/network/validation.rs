@@ -949,15 +949,15 @@ impl NetworkValidator {
         let optional_warnings = results
             .ssl
             .as_ref()
-            .map_or(false, |r| r.status == ValidationStatus::Warning)
+            .is_some_and(|r| r.status == ValidationStatus::Warning)
             || results
                 .firewall
                 .as_ref()
-                .map_or(false, |r| r.status == ValidationStatus::Warning)
+                .is_some_and(|r| r.status == ValidationStatus::Warning)
             || results
                 .route
                 .as_ref()
-                .map_or(false, |r| r.status == ValidationStatus::Warning);
+                .is_some_and(|r| r.status == ValidationStatus::Warning);
 
         if has_warnings || optional_warnings {
             ValidationStatus::Warning

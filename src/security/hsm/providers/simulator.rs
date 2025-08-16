@@ -53,7 +53,7 @@ impl SimulatorHsmProvider {
     pub fn new(config: &SimulatorConfig) -> Result<Self, HsmError> {
         // Ensure storage path exists
         std::fs::create_dir_all(&config.storage_path).map_err(|e| {
-            HsmError::InitializationError(format!("Failed to create storage path: {}", e))
+            HsmError::InitializationError(format!("Failed to create storage path: {e}"))
         })?;
 
         Ok(Self {
@@ -197,7 +197,7 @@ impl SimulatorHsmProvider {
             .ok_or_else(|| HsmError::KeyNotFound(key_id.to_string()))?;
 
         let secret_key = SecretKey::from_slice(secret_data)
-            .map_err(|e| HsmError::SigningError(format!("Invalid key data: {}", e)))?;
+            .map_err(|e| HsmError::SigningError(format!("Invalid key data: {e}")))?;
 
         // Generate public key from secret key
         let public_key = PublicKey::from_secret_key(&self.secp, &secret_key);
@@ -258,7 +258,7 @@ impl HsmProvider for SimulatorHsmProvider {
     async fn initialize(&self) -> Result<(), HsmError> {
         // Ensure storage path exists
         std::fs::create_dir_all(&self.config.storage_path).map_err(|e| {
-            HsmError::InitializationError(format!("Failed to create storage path: {}", e))
+            HsmError::InitializationError(format!("Failed to create storage path: {e}"))
         })?;
 
         tracing::info!("Initialized simulator HSM for Bitcoin testnet operations");
@@ -338,7 +338,7 @@ impl HsmProvider for SimulatorHsmProvider {
         match algorithm {
             SigningAlgorithm::EcdsaSha256 => {
                 let secret_key = SecretKey::from_slice(private_key_data)
-                    .map_err(|e| HsmError::SigningError(format!("Invalid key data: {}", e)))?;
+                    .map_err(|e| HsmError::SigningError(format!("Invalid key data: {e}")))?;
 
                 // Create message hash
                 let mut hasher = Sha256::new();
@@ -347,14 +347,13 @@ impl HsmProvider for SimulatorHsmProvider {
 
                 // Sign the hash
                 let message = bitcoin::secp256k1::Message::from_digest_slice(&message_hash)
-                    .map_err(|e| HsmError::SigningError(format!("Invalid message hash: {}", e)))?;
+                    .map_err(|e| HsmError::SigningError(format!("Invalid message hash: {e}")))?;
 
                 let signature = self.secp.sign_ecdsa(&message, &secret_key);
                 Ok(signature.serialize_der().to_vec())
             }
             _ => Err(HsmError::UnsupportedOperation(format!(
-                "Unsupported signing algorithm: {:?}",
-                algorithm
+                "Unsupported signing algorithm: {algorithm:?}"
             ))),
         }
     }
@@ -385,9 +384,9 @@ impl HsmProvider for SimulatorHsmProvider {
             SigningAlgorithm::EcdsaSha256 => {
                 // Get the public key
                 match key_info.key_type {
-                    KeyType::Ec { curve }
-                        if curve == crate::security::hsm::provider::EcCurve::Secp256k1 =>
-                    {
+                    KeyType::Ec {
+                        curve: crate::security::hsm::provider::EcCurve::Secp256k1,
+                    } => {
                         // Create message hash
                         let mut hasher = Sha256::new();
                         hasher.update(data);
@@ -396,22 +395,21 @@ impl HsmProvider for SimulatorHsmProvider {
                         // Get the serialized public key from key storage or regenerate
                         let pubkey_bytes = self.export_public_key(key_id).await?;
                         let public_key = PublicKey::from_slice(&pubkey_bytes).map_err(|e| {
-                            HsmError::VerificationError(format!("Invalid public key data: {}", e))
+                            HsmError::VerificationError(format!("Invalid public key data: {e}"))
                         })?;
 
                         // Parse the signature
                         let sig = bitcoin::secp256k1::ecdsa::Signature::from_der(signature)
                             .map_err(|e| {
                                 HsmError::VerificationError(format!(
-                                    "Invalid signature format: {}",
-                                    e
+                                    "Invalid signature format: {e}"
                                 ))
                             })?;
 
                         // Verify
                         let message = bitcoin::secp256k1::Message::from_digest_slice(&message_hash)
                             .map_err(|e| {
-                                HsmError::VerificationError(format!("Invalid message hash: {}", e))
+                                HsmError::VerificationError(format!("Invalid message hash: {e}"))
                             })?;
 
                         match self.secp.verify_ecdsa(&message, &sig, &public_key) {
@@ -423,8 +421,7 @@ impl HsmProvider for SimulatorHsmProvider {
                 }
             }
             _ => Err(HsmError::UnsupportedOperation(format!(
-                "Unsupported verification algorithm: {:?}",
-                algorithm
+                "Unsupported verification algorithm: {algorithm:?}"
             ))),
         }
     }
@@ -445,12 +442,11 @@ impl HsmProvider for SimulatorHsmProvider {
             .ok_or_else(|| HsmError::KeyNotFound(key_id.to_string()))?;
 
         match key_info.key_type {
-            KeyType::Ec { curve }
-                if curve == crate::security::hsm::provider::EcCurve::Secp256k1 =>
-            {
-                let secret_key = SecretKey::from_slice(private_key_data).map_err(|e| {
-                    HsmError::KeyGenerationError(format!("Invalid key data: {}", e))
-                })?;
+            KeyType::Ec {
+                curve: crate::security::hsm::provider::EcCurve::Secp256k1,
+            } => {
+                let secret_key = SecretKey::from_slice(private_key_data)
+                    .map_err(|e| HsmError::KeyGenerationError(format!("Invalid key data: {e}")))?;
                 let public_key = PublicKey::from_secret_key(&self.secp, &secret_key);
                 Ok(public_key.serialize().to_vec())
             }
@@ -505,8 +501,7 @@ impl HsmProvider for SimulatorHsmProvider {
                 let params: KeyGenParams = serde_json::from_value(request.parameters.clone())
                     .map_err(|e| {
                         HsmError::InvalidParameters(format!(
-                            "Invalid key generation parameters: {}",
-                            e
+                            "Invalid key generation parameters: {e}"
                         ))
                     })?;
 
@@ -519,7 +514,7 @@ impl HsmProvider for SimulatorHsmProvider {
             HsmOperation::Sign => {
                 let params: SignParams = serde_json::from_value(request.parameters.clone())
                     .map_err(|e| {
-                        HsmError::InvalidParameters(format!("Invalid signing parameters: {}", e))
+                        HsmError::InvalidParameters(format!("Invalid signing parameters: {e}"))
                     })?;
 
                 // [AIR-3][AIS-3][BPC-3][RES-3] Sign data using simulator HSM
@@ -540,14 +535,13 @@ impl HsmProvider for SimulatorHsmProvider {
                 let params: BitcoinTxSignParams =
                     serde_json::from_value(request.parameters.clone()).map_err(|e| {
                         HsmError::InvalidParameters(format!(
-                            "Invalid Bitcoin TX signing parameters: {}",
-                            e
+                            "Invalid Bitcoin TX signing parameters: {e}"
                         ))
                     })?;
 
                 // Decode PSBT
                 let mut psbt = bitcoin::psbt::Psbt::from_str(&params.psbt)
-                    .map_err(|e| HsmError::InvalidParameters(format!("Invalid PSBT: {}", e)))?;
+                    .map_err(|e| HsmError::InvalidParameters(format!("Invalid PSBT: {e}")))?;
 
                 // Sign the transaction
                 self.sign_bitcoin_transaction(&params.key_id, &mut psbt)
@@ -564,7 +558,7 @@ impl HsmProvider for SimulatorHsmProvider {
             HsmOperation::Custom(op) if op == "unlock" => {
                 let params: UnlockParams = serde_json::from_value(request.parameters.clone())
                     .map_err(|e| {
-                        HsmError::InvalidParameters(format!("Invalid unlock parameters: {}", e))
+                        HsmError::InvalidParameters(format!("Invalid unlock parameters: {e}"))
                     })?;
 
                 // Unlock the device

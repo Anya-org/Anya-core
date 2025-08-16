@@ -395,7 +395,7 @@ mod tests {
         let device = TorchAdapter::detect_device();
         match device {
             TorchDevice::Cpu => println!("Using CPU"),
-            TorchDevice::Cuda(id) => println!("Using CUDA device {}", id),
+            TorchDevice::Cuda(id) => println!("Using CUDA device {id}"),
             TorchDevice::Mps => println!("Using Apple MPS"),
         }
     }

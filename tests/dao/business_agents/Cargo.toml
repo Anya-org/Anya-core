@@ -1,0 +1,362 @@
+# Anya Core - LTS-focused Dependencies
+# Using Long-Term Support versions for stability and compatibility
+
+[workspace]
+resolver = "2"
+members = ["."]
+
+[workspace.package]
+version = "1.3.0"
+edition = "2021"
+rust-version = "1.70.0"                                          # LTS Rust version
+authors = ["botshelomokoka+anya-core@gmail.com"]
+license = "MIT"
+repository = "https://github.com/anya-org/anya-core"
+description = "Enterprise-grade Bitcoin Infrastructure Platform"
+
+[workspace.dependencies]
+# === LTS Bitcoin & Cryptography Stack ===
+# Unified secp256k1 version - aligned with bitcoin ecosystem
+bitcoin = { version = "0.32.6", features = [
+    "std",
+    "serde",
+    "rand",
+    "secp-recovery",
+    "base64",
+    "rand-std",
+] }
+secp256k1 = { version = "0.29.1", features = [
+    "global-context",
+    "recovery",
+    "rand",
+] }
+bitcoincore-rpc = { version = "0.19.0", features = ["default"] }
+bitcoin_hashes = { version = "0.14.0", features = ["std", "serde"] }
+miniscript = { version = "12.3.5", features = ["std", "compiler"] }
+bdk_wallet = { version = "2.0.0", features = ["std", "all-keys"] }
+
+# === LTS Runtime & Async ===
+tokio = { version = "1.45.1", features = ["full"] }
+futures = { version = "0.3.31" }
+async-trait = { version = "0.1.88" }
+
+# === LTS Serialization ===
+serde = { version = "1.0.219", features = ["derive", "rc"] }
+serde_json = { version = "1.0.140", features = [
+    "std",
+    "preserve_order",
+    "arbitrary_precision",
+] }
+humantime-serde = { version = "1.1.1" }
+
+# === LTS HTTP & Networking ===
+axum = { version = "0.8.4" }
+tower = { version = "0.5.2" }
+tower-http = { version = "0.6.6", features = ["cors", "trace"] }
+hyper = { version = "1.6.0", features = ["full"] }
+# MIT-licensed HTTP client (replacing reqwest for license compliance)
+ureq = { version = "2.10.1", features = ["json"] }
+
+# === LTS Cryptography ===
+aes-gcm = { version = "0.10.3" }
+chacha20poly1305 = { version = "0.10.1" }
+blake3 = { version = "1.8.2" }
+rand = { version = "0.8.5" }
+rand_core = { version = "0.6.4" }
+# Additional cryptographic dependencies for real implementations
+# rsa = { version = "0.9.6" } # REMOVED: RUSTSEC-2023-0071 - migrated to ring
+ed25519-dalek = { version = "2.1.1", features = ["rand_core"] }
+hmac = { version = "0.12.1" }
+pbkdf2 = { version = "0.12.2" }
+base64 = { version = "0.22.1" }
+rocksdb = { version = "0.22.0" }
+reqwest = { version = "0.12.9", features = ["json"] }
+num_cpus = { version = "1.16.0" }
+
+# === LTS Utilities ===
+chrono = { version = "0.4.34", features = ["serde", "std"] }
+uuid = { version = "1.17.0", features = ["v4", "serde"] }
+anyhow = { version = "1.0.98", features = ["std", "backtrace"] }
+thiserror = { version = "1.0.69" }
+tracing = { version = "0.1.41" }
+tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }
+
+# === Testing ===
+criterion = { version = "0.6.0", features = ["html_reports", "async"] }
+mockall = { version = "0.13.1" }
+tempfile = { version = "3.20.0" }
+tokio-test = { version = "0.4.4" }
+tower-test = { version = "0.4.0" }
+test-log = { version = "0.2.16" }
+wiremock = { version = "0.6.2" }
+
+# === Development ===
+once_cell = { version = "1.21.3" }
+lazy_static = { version = "1.5.0" }
+dashmap = { version = "6.1.0", features = ["serde"] }
+rayon = { version = "1.10.0" }
+geiger = { version = "0.5.0" }
+
+# === Missing Dependencies ===
+hickory-resolver = { version = "0.24.1", features = ["dns-over-rustls"] }
+sha2 = { version = "0.10.8" }
+log = { version = "0.4.27" }
+walkdir = { version = "2.5.0" }
+rand_distr = { version = "0.4.3" }
+
+# === CLI Dependencies ===
+clap = { version = "4.5.23", features = ["derive"] }
+dialoguer = { version = "0.11.0" }
+ring = { version = "0.17.8" }
+maplit = { version = "1.0.2" }
+sysinfo = { version = "0.36.1" }
+
+# === Enterprise Dependencies ===
+yubihsm = { version = "0.42.1" }
+sgx_urts = { version = "1.1.1" }
+sqlx = { version = "0.8.2", default-features = false, optional = true, features = [
+    "runtime-tokio-rustls",
+    "postgres",
+    # "sqlite", # Disabled to drop sqlx-mysql/sqlite drivers and indirect rsa until needed
+    "chrono",
+    "uuid",
+] }
+
+[package]
+name = "anya-core"
+version = { workspace = true }
+edition = { workspace = true }
+rust-version = { workspace = true }
+description = { workspace = true }
+authors = { workspace = true }
+license = { workspace = true }
+repository = { workspace = true }
+readme = "README.md"
+keywords = ["bitcoin", "cryptocurrency", "blockchain", "enterprise", "mobile"]
+categories = ["api-bindings", "cryptography::cryptocurrencies"]
+default-run = "anya-core"
+
+[lib]
+name = "anya_core"
+crate-type = ["lib", "staticlib", "cdylib"]
+
+[features]
+default = ["std", "bitcoin", "mobile"]
+std = []
+# Development simulation feature (non-default): gates simulator code and other dev-only paths
+dev-sim = []
+# Bitcoin implementation features
+# [AIR-3][AIS-3][BPC-3] Enhanced Feature Flags with HSM Standardization
+bitcoin = [
+    "dep:bitcoin",
+    "dep:bitcoincore-rpc",
+    "dep:miniscript",
+    "dep:bdk_wallet",
+]
+rust-bitcoin = ["bitcoin"] # Alias for backward compatibility
+
+# Mobile SDK features (MIT-compliant)
+ffi = ["std"]
+mobile = ["ffi", "std", "bitcoin"]
+ndk = ["mobile", "dep:ndk"]        # Android NDK support
+
+# Bitcoin implementation features enhanced
+bdk = ["bitcoin", "dep:bdk_wallet"] # Bitcoin Development Kit support
+
+# Web5 integration features (without external web5 crate)
+# Keep JWT and multibase/multihash as part of this feature.
+web5 = ["dep:jsonwebtoken", "dep:multibase", "dep:multihash"]
+
+# Testing and development features
+memory_tracking = ["std"] # Memory usage tracking for tests
+
+# Enterprise features (MIT-compliant only)
+enterprise = ["dep:sqlx"]
+
+# Fast test profile feature to skip heavy or long-running integration/performance tests
+fast-tests = []
+
+# [AIS-3] HSM Features - MIT-compliant external interface
+hsm = ["hsm-software"] # Default to software HSM (always available)
+hsm-full = ["hsm-software", "hsm-bitcoin", "hsm-simulator", "hsm-external"]
+hsm-software = [] # Software HSM - no external dependencies, always available
+hsm-external = ["hsm-software"] # External HSM interface via CLI - MIT compliant
+hsm-bitcoin = ["bitcoin", "hsm-software"] # Bitcoin-specific HSM operations
+hsm-simulator = ["hsm-software"] # Simulator for testing
+hsm-production = [
+    "hsm-external",
+    "hsm-bitcoin",
+] # Production-ready HSM via external interface
+
+# Bitcoin advanced features
+taproot = ["bitcoin"] # Taproot transaction support
+
+# API features
+api = ["std"]
+
+# ML acceleration features
+cuda = [] # CUDA GPU acceleration support
+wgpu = [] # WebGPU acceleration support
+
+# Complete system (including all features)
+complete = ["bitcoin", "mobile", "web5", "enterprise", "hsm-full"]
+
+# Testing-only features (disabled by default)
+chaos-viz = []
+disabled = []
+
+[dependencies]
+# === Core Dependencies (using workspace versions) ===
+bitcoin = { workspace = true, optional = true }
+secp256k1 = { workspace = true }
+bitcoincore-rpc = { workspace = true, optional = true }
+miniscript = { workspace = true, optional = true }
+bdk_wallet = { workspace = true, optional = true }
+
+tokio = { workspace = true }
+futures = { workspace = true }
+async-trait = { workspace = true }
+
+serde = { workspace = true }
+serde_json = { workspace = true }
+humantime-serde = { workspace = true }
+
+axum = { workspace = true }
+tower = { workspace = true }
+tower-http = { workspace = true }
+hyper = { workspace = true }
+
+chrono = { workspace = true }
+uuid = { workspace = true }
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+log = { workspace = true }
+walkdir = { workspace = true }
+sha2 = { workspace = true }
+hickory-resolver = { workspace = true }
+rand_distr = { workspace = true }
+
+# CLI Dependencies
+clap = { version = "4.5.23", features = ["derive"] }
+dialoguer = { version = "0.11.0" }
+ring = { version = "0.17.8" }
+maplit = { version = "1.0.2" }
+sysinfo = { version = "0.36.1" }
+
+# Mobile & FFI (optional - MIT compliant)
+jni = { version = "0.21.1", optional = true }
+regex = "1.11.1"
+hex = "0.4.3"
+semver = "1.0.26"
+ureq = { workspace = true }                        # MIT-licensed HTTP client
+syn = { version = "2.0.104", features = ["full"] }
+url = "2.5.4"
+rand.workspace = true
+once_cell.workspace = true
+base64 = "0.22.1"
+# Cryptographic dependencies for real implementations
+# rsa = { workspace = true } # REMOVED: RUSTSEC-2023-0071 - migrated to ring
+ed25519-dalek = { workspace = true }
+hmac = { workspace = true }
+pbkdf2 = { workspace = true }
+rocksdb = { workspace = true }
+reqwest = { workspace = true }
+num_cpus = { workspace = true }
+chacha20poly1305.workspace = true
+argon2 = "0.5.3"
+zeroize = "1.8.1"
+dashmap.workspace = true
+rayon.workspace = true
+aes-gcm.workspace = true
+blake3.workspace = true
+mockall.workspace = true
+getrandom = "0.3.3"
+
+[target.'cfg(target_os = "android")'.dependencies]
+ndk = { version = "0.8.0", optional = true }
+
+# Web5 (optional) — external crate not available on crates.io, so we do not
+# declare it as a dependency for publishing. The feature remains to gate our
+# integrations using other published crates (JWT/multibase/multihash). For
+# local development against the upstream git repo, see [patch.crates-io] below.
+jsonwebtoken = { version = "9.3.1", features = ["use_pem"], optional = true }
+multibase = { version = "0.9.1", features = ["std"], optional = true }
+multihash = { version = "0.19.3", features = ["std"], optional = true }
+
+# Cryptographic and system dependencies for real implementations
+ed25519-dalek = { workspace = true }
+# rsa = { workspace = true } # REMOVED: RUSTSEC-2023-0071 - migrated to ring
+hmac = { workspace = true }
+pbkdf2 = { workspace = true }
+rocksdb = { workspace = true }
+reqwest = { workspace = true }
+num_cpus = { workspace = true }
+
+# Utilities
+once_cell = { workspace = true }
+lazy_static = { workspace = true }
+dashmap = { workspace = true }
+rand = { workspace = true }
+blake3 = { workspace = true }
+rayon = { workspace = true }
+aes-gcm = { workspace = true }
+mockall = { workspace = true }
+hickory-resolver = { workspace = true }
+sha2 = { workspace = true }
+log = { workspace = true }
+walkdir = { workspace = true }
+rand_distr = { workspace = true }
+
+# === CLI Dependencies ===
+clap = { workspace = true }
+dialoguer = { workspace = true }
+ring = { workspace = true }
+maplit = { workspace = true }
+sysinfo = { workspace = true }
+
+# === Enterprise Dependencies (MIT-compliant) === (consolidated above; removed duplicate sqlx entry)
+
+[dev-dependencies]
+criterion = { workspace = true }
+mockall = { workspace = true }
+tempfile = { workspace = true }
+tokio-test = { workspace = true }
+tower-test = { workspace = true }
+test-log = { workspace = true }
+wiremock = { workspace = true }
+
+[build-dependencies]
+# No build dependencies needed for MIT-compliant build
+
+[[bin]]
+name = "anya-core"
+path = "src/bin/main.rs"
+required-features = ["std"]
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"
+
+[profile.dev]
+opt-level = 0
+debug = true
+overflow-checks = true
+
+# Mobile-specific profiles
+[profile.mobile-release]
+inherits = "release"
+opt-level = "z"      # Optimize for size
+lto = "fat"
+codegen-units = 1
+strip = true
+
+# Use the upstream git version of web5 during local development.
+# This section is ignored when publishing to crates.io.
+#[patch.crates-io]
+# The following line is kept as a reference for developers who need to use the upstream git version of web5 during local development.
+# Uncomment it to override the crates.io version with the specified git revision.
+#web5 = { git = "https://github.com/TBD54566975/web5-rs", rev = "310d79c9" }

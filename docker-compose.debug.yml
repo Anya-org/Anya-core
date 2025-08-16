@@ -8,17 +8,18 @@ services:
       dockerfile: ./Dockerfile
     ports:
       - "8080:8080"
-      - "9229:9229"  # Debug port
+      - "9229:9229" # Debug port
     environment:
       - NODE_ENV=development
       - DEBUG=true
-      - BITCOIN_RPC_URL=http://bitcoin:8332
+      - ANYA_NETWORK_TYPE=testnet
+      - BITCOIN_RPC_URL=${ANYA_BITCOIN_RPC_URL:-http://bitcoin:password@bitcoin:18332}
       - WEB5_DWN_URL=http://dwn:3000
       - WEB5_STORAGE_PATH=/data/web5
     volumes:
       - .:/app
       - web5-data:/data/web5
-    command: ["cargo", "run", "--debug"]
+    command: [ "cargo", "run", "--debug" ]
     depends_on:
       - bitcoin
       - dwn
@@ -27,7 +28,7 @@ services:
     image: web5/dwn:latest
     ports:
       - "3000:3000"
-      - "9230:9229"  # Debug port
+      - "9230:9229" # Debug port
     volumes:
       - web5-data:/data
       - .:/app
@@ -38,10 +39,11 @@ services:
 
   bitcoin:
     image: ruimarinho/bitcoin-core:24.0
-    command: bitcoind -printtoconsole -server -rpcallowip=::/0 -rpcbind=0.0.0.0 -debug=1
+    command: >-
+      bitcoind -printtoconsole -server -rpcallowip=::/0 -rpcbind=0.0.0.0 -debug=1 -testnet=1 -rpcuser=bitcoin -rpcpassword=password -txindex=1
     ports:
-      - "8332:8332"
-      - "18443:18443"  # Testnet
+      - "18332:18332" # Testnet RPC
+      - "18333:18333" # Testnet P2P
     volumes:
       - bitcoin-data:/bitcoin
       - .:/app/bitcoin

@@ -94,3 +94,5 @@ The testing module is designed to integrate seamlessly with CI/CD pipelines:
 ## For more information
 
 See the comprehensive documentation in the [docs/](/docs/) directory.
+
+Note: Network-bound tests (e.g., DNS/Bitcoin ports) may fail on developer machines without the required services; treat them as advisory locally and rely on CI or configured environments for definitive results.

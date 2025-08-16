@@ -15,7 +15,7 @@ pub mod rgb_examples {
 
     // Example: Issue a new RGB asset
     #[allow(dead_code)]
-    pub async fn issue_rgb_asset(wallet: Arc<BitcoinWallet>) -> anyhow::Result<AssetInfo>  -> Result<(), Box<dyn Error>> {
+    pub async fn issue_rgb_asset(wallet: Arc<BitcoinWallet>) -> anyhow::Result<AssetInfo> {
         // Create RGB manager
         let data_dir = std::env::temp_dir().join("rgb_example");
         std::fs::create_dir_all(&data_dir)?;
@@ -48,7 +48,7 @@ pub mod rgb_examples {
         contract_id: &str,
         recipient_address: &str,
         amount: u64
-    ) -> anyhow::Result<String>  -> Result<(), Box<dyn Error>> {
+    ) -> anyhow::Result<String> {
         // Create RGB manager
         let data_dir = std::env::temp_dir().join("rgb_example");
         let rgb_manager = RgbManager::new(Network::Testnet, &data_dir)?;
@@ -77,7 +77,7 @@ pub mod rgb_examples {
 
     // Example: Get RGB asset information
     #[allow(dead_code)]
-    pub async fn get_asset_info(contract_id: &str) -> anyhow::Result<AssetInfo>  -> Result<(), Box<dyn Error>> {
+    pub async fn get_asset_info(contract_id: &str) -> anyhow::Result<AssetInfo> {
         // Create RGB manager
         let data_dir = std::env::temp_dir().join("rgb_example");
         let rgb_manager = RgbManager::new(Network::Testnet, &data_dir)?;
@@ -100,7 +100,7 @@ pub mod rgb_examples {
     pub async fn get_transfer_metadata(
         contract_id: &str,
         txid: &str
-    ) -> anyhow::Result<Option<AssetMetadata>>  -> Result<(), Box<dyn Error>> {
+    ) -> anyhow::Result<Option<AssetMetadata>> {
         // Create RGB manager
         let data_dir = std::env::temp_dir().join("rgb_example");
         let rgb_manager = RgbManager::new(Network::Testnet, &data_dir)?;
@@ -122,15 +122,16 @@ pub mod rgb_examples {
 
     // Helper to create a test wallet
     #[allow(dead_code)]
-    pub fn create_test_wallet() -> anyhow::Result<Arc<BitcoinWallet>>  -> Result<(), Box<dyn Error>> {
+    pub fn create_test_wallet() -> anyhow::Result<Arc<BitcoinWallet>> {
         let data_dir = std::env::temp_dir().join("wallet_example");
         std::fs::create_dir_all(&data_dir)?;
         
+        let external = crate::bitcoin::external_endpoints::ExternalBitcoinEndpoints::resolve();
         let wallet_config = WalletConfig {
             name: "test-wallet".to_string(),
             database_path: data_dir.join("wallet.db"),
             network: Network::Testnet,
-            electrum_url: Some("ssl://electrum.blockstream.info:60002".to_string()),
+            electrum_url: Some(external.electrum_testnet.clone()),
             descriptor: Some("wpkh([73c5da0a/84'/1'/0']xprv9xgqHN7yz9MwCkxsBPN5qetuNdQSUttZNKw1dcYTV4mTp8ZrKLRPXBThPxq9h3wcAAJVH5qQCk99URy2CQHEMnMKUNpUorQJpXbgJC6C1HR/0/*)".to_string()),
             change_descriptor: None,
         };

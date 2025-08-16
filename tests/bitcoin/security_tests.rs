@@ -32,9 +32,9 @@ pub fn test_cve_2010_5139_value_overflow() {
     // Check that the error correctly identifies the overflow
     if let Err(error) = result {
         assert!(
-            format!("{:?}", error).contains("overflow")
-                || format!("{:?}", error).contains("Overflow")
-                || format!("{:?}", error).contains("value"),
+            format!("{error:?}").contains("overflow")
+                || format!("{error:?}").contains("Overflow")
+                || format!("{error:?}").contains("value"),
             "Error should specifically mention value overflow"
         );
     }
@@ -307,7 +307,7 @@ fn test_invariant_violations(_checker: &()) {
         }],
         output: vec![TxOut {
             value: Amount::from_sat(1000),
-            script_pubkey: ScriptBuf::new().into(),
+            script_pubkey: ScriptBuf::new(),
         }],
     };
     // assert!(
@@ -322,7 +322,7 @@ fn test_invariant_violations(_checker: &()) {
         input: vec![], // No inputs
         output: vec![TxOut {
             value: Amount::from_sat(1000),
-            script_pubkey: ScriptBuf::new().into(),
+            script_pubkey: ScriptBuf::new(),
         }],
     };
     // assert!(
@@ -336,7 +336,7 @@ fn test_invariant_violations(_checker: &()) {
         lock_time: LockTime::ZERO,
         input: vec![TxIn {
             previous_output: OutPoint::null(),
-            script_sig: ScriptBuf::new().into(),
+            script_sig: ScriptBuf::new(),
             sequence: Sequence(0),
             witness: Witness::default(),
         }],

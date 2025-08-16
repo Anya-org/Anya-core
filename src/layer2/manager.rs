@@ -40,6 +40,9 @@ pub struct Layer2ManagerConfig {
     pub enable_event_logging: bool,
     /// Maximum concurrent operations per protocol
     pub max_concurrent_operations: usize,
+    /// Prefer running protocols via production engine (real networking) with
+    /// self-node fallback instead of pure simulation mocks
+    pub prefer_self_node_primary: bool,
 }
 
 impl Default for Layer2ManagerConfig {
@@ -55,6 +58,7 @@ impl Default for Layer2ManagerConfig {
             enable_health_monitoring: true,
             enable_event_logging: true,
             max_concurrent_operations: 100,
+            prefer_self_node_primary: true,
         }
     }
 }
@@ -127,16 +131,56 @@ impl Layer2Manager {
         &self,
         protocol_type: Layer2ProtocolType,
     ) -> Result<(), Layer2Error> {
-        let protocol: Arc<dyn Layer2Protocol> = match protocol_type {
-            Layer2ProtocolType::Lightning => Arc::new(LightningProtocol::default()),
-            Layer2ProtocolType::RGB => Arc::new(RgbProtocol::default()),
-            Layer2ProtocolType::DLC => Arc::new(DlcProtocol::default()),
-            Layer2ProtocolType::StateChannels => Arc::new(StateChannelsProtocol::default()),
-            Layer2ProtocolType::Liquid => Arc::new(LiquidProtocol::default()),
-            Layer2ProtocolType::Stacks => Arc::new(StacksProtocol::default()),
-            Layer2ProtocolType::BOB => Arc::new(BobProtocol::default()),
-            Layer2ProtocolType::RSK => Arc::new(RskProtocol::default()),
-            Layer2ProtocolType::TaprootAssets => Arc::new(TaprootAssetsProtocol::default()),
+        // If configured, instantiate the production engine with self-node fallback
+        let protocol: Arc<dyn Layer2Protocol> = if self.config.prefer_self_node_primary {
+            let prod = match protocol_type {
+                Layer2ProtocolType::Lightning => {
+                    crate::layer2::production::ProductionLayer2Protocol::for_protocol_type(
+                        "lightning",
+                    )
+                }
+                Layer2ProtocolType::RGB => {
+                    crate::layer2::production::ProductionLayer2Protocol::for_protocol_type("rgb")
+                }
+                Layer2ProtocolType::DLC => {
+                    crate::layer2::production::ProductionLayer2Protocol::for_protocol_type("dlc")
+                }
+                Layer2ProtocolType::StateChannels => {
+                    crate::layer2::production::ProductionLayer2Protocol::for_protocol_type(
+                        "state_channels",
+                    )
+                }
+                Layer2ProtocolType::Liquid => {
+                    crate::layer2::production::ProductionLayer2Protocol::for_protocol_type("liquid")
+                }
+                Layer2ProtocolType::Stacks => {
+                    crate::layer2::production::ProductionLayer2Protocol::for_protocol_type("stacks")
+                }
+                Layer2ProtocolType::BOB => {
+                    crate::layer2::production::ProductionLayer2Protocol::for_protocol_type("bob")
+                }
+                Layer2ProtocolType::RSK => {
+                    crate::layer2::production::ProductionLayer2Protocol::for_protocol_type("rsk")
+                }
+                Layer2ProtocolType::TaprootAssets => {
+                    crate::layer2::production::ProductionLayer2Protocol::for_protocol_type(
+                        "taproot_assets",
+                    )
+                }
+            };
+            Arc::new(prod)
+        } else {
+            match protocol_type {
+                Layer2ProtocolType::Lightning => Arc::new(LightningProtocol::default()),
+                Layer2ProtocolType::RGB => Arc::new(RgbProtocol::default()),
+                Layer2ProtocolType::DLC => Arc::new(DlcProtocol::default()),
+                Layer2ProtocolType::StateChannels => Arc::new(StateChannelsProtocol::default()),
+                Layer2ProtocolType::Liquid => Arc::new(LiquidProtocol::default()),
+                Layer2ProtocolType::Stacks => Arc::new(StacksProtocol::default()),
+                Layer2ProtocolType::BOB => Arc::new(BobProtocol::default()),
+                Layer2ProtocolType::RSK => Arc::new(RskProtocol::default()),
+                Layer2ProtocolType::TaprootAssets => Arc::new(TaprootAssetsProtocol::default()),
+            }
         };
 
         self.coordinator

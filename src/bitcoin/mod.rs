@@ -8,12 +8,14 @@ pub mod bip341;
 pub mod compat; // Compatibility module for older import patterns
 pub mod config;
 pub mod error;
+pub mod external_endpoints; // Centralized external (Electrum / explorer / Liquid) endpoints
 pub mod interface;
 pub mod layer2; // Export layer2 module for Layer2Protocol trait
 pub mod lightning;
 pub mod manager;
 pub mod node; // Bitcoin node management
 pub mod protocol; // Bitcoin protocol compliance module
+pub mod rpc; // RPC shim re-exported for adapters/tests
 pub mod rust;
 pub mod taproot;
 pub mod validation; // Consolidated validation module

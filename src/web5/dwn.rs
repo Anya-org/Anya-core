@@ -1368,7 +1368,7 @@ mod advanced_tests {
         // Create test records
         for i in 0..25 {
             let record = DWNRecord {
-                id: format!("record_{:02}", i),
+                id: format!("record_{i:02}"),
                 owner: "did:ion:test".to_string(),
                 schema: "test/schema".to_string(),
                 data: serde_json::json!({

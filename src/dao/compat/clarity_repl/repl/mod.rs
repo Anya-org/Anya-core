@@ -29,7 +29,7 @@ impl Session {
 
     pub fn deploy_contract(&mut self, name: &str, code: &str) -> Result<String, String> {
         self.contracts.push(format!("{name}: {code}"));
-        Ok(format!("Contract {} deployed", name))
+        Ok(format!("Contract {name} deployed"))
     }
 
     pub fn call_contract(
@@ -48,6 +48,12 @@ impl Session {
 pub struct TestEnvironment {
     pub session: Session,
     pub epoch: u32,
+}
+
+impl Default for TestEnvironment {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl TestEnvironment {

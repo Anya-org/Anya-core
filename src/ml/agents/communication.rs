@@ -350,7 +350,7 @@ impl AgentMessageBus {
                 // Direct message
                 let channels = self.agent_channels.read().await;
                 if let Some(tx) = channels.get(agent_id) {
-                    if let Err(_) = tx.send(routed_message.clone()).await {
+                    if (tx.send(routed_message.clone()).await).is_err() {
                         // Channel closed, remove it
                         drop(channels);
                         let mut channels = self.agent_channels.write().await;
@@ -397,7 +397,7 @@ impl AgentMessageBus {
         let mut failed_count = 0;
 
         for (agent_id, tx) in channels.iter() {
-            if let Err(_) = tx.send(message.clone()).await {
+            if (tx.send(message.clone()).await).is_err() {
                 // Agent channel is closed
                 failed_count += 1;
                 log::warn!(
@@ -443,6 +443,12 @@ impl AgentMessageBus {
     /// Cleanup expired messages
     pub async fn cleanup_expired_messages(&self) -> Result<u64> {
         self.message_store.cleanup_expired().await
+    }
+}
+
+impl Default for MessageRouter {
+    fn default() -> Self {
+        Self::new()
     }
 }
 

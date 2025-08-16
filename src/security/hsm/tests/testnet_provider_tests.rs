@@ -101,20 +101,27 @@ mod tests {
     #[tokio::test]
     async fn test_factory_creates_testnet_provider() {
         // Test that the provider factory creates the correct provider type
-        let mut hsm_config = HsmConfig::default();
-
         // Test software provider
-        hsm_config.provider_type = HsmProviderType::SoftwareKeyStore;
+        let mut hsm_config = HsmConfig {
+            provider_type: HsmProviderType::SoftwareKeyStore,
+            ..HsmConfig::default()
+        };
         let provider = create_hsm_provider(&hsm_config).await.unwrap();
         provider.initialize().await.unwrap();
 
         // Test simulator provider
-        hsm_config.provider_type = HsmProviderType::Simulator;
+        hsm_config = HsmConfig {
+            provider_type: HsmProviderType::Simulator,
+            ..HsmConfig::default()
+        };
         let provider = create_hsm_provider(&hsm_config).await.unwrap();
         provider.initialize().await.unwrap();
 
         // Test hardware provider
-        hsm_config.provider_type = HsmProviderType::Hardware;
+        hsm_config = HsmConfig {
+            provider_type: HsmProviderType::Hardware,
+            ..HsmConfig::default()
+        };
         let provider = create_hsm_provider(&hsm_config).await.unwrap();
         provider.initialize().await.unwrap();
     }

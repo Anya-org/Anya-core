@@ -28,6 +28,16 @@ case "${1:-help}" in
         echo "🚀 Full documentation refresh..."
         ./scripts/comprehensive_doc_refactor.sh
         ;;
+    "index")
+        echo "🔍 Generating documentation index..."
+        python3 ./scripts/generate_indexes.py
+        echo "✅ Documentation index generated"
+        ;;
+    "audit")
+        echo "🛡️ Auditing C/C++ dependencies..."
+        ./scripts/run_dependency_audit.sh
+        echo "✅ Dependency audit completed. Report at docs/audit/cpp-dependencies-audit.md"
+        ;;
     "help"|*)
         echo ""
         echo "📚 Available commands:"
@@ -35,11 +45,13 @@ case "${1:-help}" in
         echo "  ./doc-manage update    - Update docs from source changes"
         echo "  ./doc-manage sync      - Sync documentation structure"
         echo "  ./doc-manage status    - Check documentation status"
+        echo "  ./doc-manage audit     - Run a dependency audit"
         echo "  ./doc-manage full      - Complete documentation refresh"
         echo ""
         echo "💡 Examples:"
         echo "  ./doc-manage validate  # Quick validation"
         echo "  ./doc-manage update    # After code changes"
+        echo "  ./doc-manage audit     # Run dependency audit"
         echo "  ./doc-manage full      # Complete refresh"
         ;;
 esac

@@ -234,7 +234,7 @@ impl RealMLEngine {
 
         // Simple linear model: y = w*x + b
         // Weights stored as simple byte array (in real implementation, would be proper model format)
-        let weights = vec![2.5_f32, 1.0_f32]; // slope=2.5, intercept=1.0
+        let weights = [2.5_f32, 1.0_f32]; // slope=2.5, intercept=1.0
         let model_data = weights
             .iter()
             .flat_map(|&f| f.to_le_bytes().to_vec())
@@ -300,8 +300,8 @@ impl RealMLEngine {
             .as_secs();
 
         // Simple ARIMA-like model with coefficients
-        let ar_coeffs = vec![0.5, 0.3, 0.1_f32]; // Autoregressive coefficients
-        let ma_coeffs = vec![0.2, 0.1_f32]; // Moving average coefficients
+        let ar_coeffs = [0.5, 0.3, 0.1_f32]; // Autoregressive coefficients
+        let ma_coeffs = [0.2, 0.1_f32]; // Moving average coefficients
 
         let mut model_data = Vec::new();
         for coeff in ar_coeffs.iter().chain(ma_coeffs.iter()) {
@@ -336,7 +336,7 @@ impl RealMLEngine {
             metrics.models_loaded += 1;
         }
 
-        info!("Registered model: {}", model_id);
+        info!("Registered model: {model_id}");
         Ok(())
     }
 
@@ -493,7 +493,7 @@ impl RealMLEngine {
             predictions.push(prediction);
 
             // Simple confidence based on input magnitude (real models would have better confidence estimation)
-            let confidence = (1.0 / (1.0 + (input.abs() * 0.1))).min(0.95).max(0.5);
+            let confidence = (1.0 / (1.0 + (input.abs() * 0.1))).clamp(0.5, 0.95);
             confidences.push(confidence);
         }
 
@@ -516,14 +516,14 @@ impl RealMLEngine {
         let inputs = &request.input_data[..2.min(request.input_data.len())];
 
         // Hidden layer (2 inputs -> 4 hidden units)
-        let mut hidden = vec![0.0; 4];
+        let mut hidden = [0.0; 4];
         for i in 0..4 {
             hidden[i] = inputs[0] * w1[i * 2] + inputs[1] * w1[i * 2 + 1] + b1[i];
             hidden[i] = hidden[i].max(0.0); // ReLU activation
         }
 
         // Output layer (4 hidden -> 3 outputs)
-        let mut outputs = vec![0.0; 3];
+        let mut outputs = [0.0; 3];
         for i in 0..3 {
             for j in 0..4 {
                 outputs[i] += hidden[j] * w2[i * 4 + j];
@@ -578,7 +578,7 @@ impl RealMLEngine {
             .map(|&x| (x - recent_values.iter().sum::<f32>() / recent_values.len() as f32).powi(2))
             .sum::<f32>()
             / recent_values.len() as f32;
-        let confidence = (1.0 / (1.0 + variance)).min(0.9).max(0.3);
+        let confidence = (1.0 / (1.0 + variance)).clamp(0.3, 0.9);
 
         Ok((vec![final_prediction], vec![confidence]))
     }
@@ -692,7 +692,7 @@ impl RealMLEngine {
     pub async fn unload_model(&self, model_id: &str) -> Result<()> {
         let mut models = self.models.write().await;
         if models.remove(model_id).is_some() {
-            info!("Unloaded model: {}", model_id);
+            info!("Unloaded model: {model_id}");
 
             let mut metrics = self.metrics.write().await;
             if metrics.models_loaded > 0 {

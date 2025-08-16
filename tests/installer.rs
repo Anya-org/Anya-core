@@ -15,7 +15,7 @@ async fn test_full_installation() {
     let result = installer
         .install(PathBuf::from("/tmp/full_install_target"))
         .await;
-    assert!(result.is_ok(), "Installation failed: {:?}", result);
+    assert!(result.is_ok(), "Installation failed: {result:?}");
 }
 
 #[test]

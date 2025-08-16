@@ -28,6 +28,12 @@ pub struct TaprootVerifier {
     secp: Secp256k1<bitcoin::secp256k1::All>,
 }
 
+impl Default for TaprootVerifier {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl TaprootVerifier {
     /// Create a new TaprootVerifier with a secp256k1 context
     pub fn new() -> Self {
@@ -44,7 +50,7 @@ impl TaprootVerifier {
         merkle_root: Option<TapNodeHash>,
     ) -> Result<bool> {
         // Extract internal key from control block
-        let internal_key_untweaked: UntweakedPublicKey = (*internal_key).into();
+        let internal_key_untweaked: UntweakedPublicKey = *internal_key;
 
         // Use the add_tweak method with the merkle_root option
         let (tweaked_key, _parity) = internal_key_untweaked.tap_tweak(&self.secp, merkle_root);
@@ -64,7 +70,7 @@ impl TaprootVerifier {
     ) -> Result<bool> {
         // Extract internal key from control block
         let internal_key = control_block.internal_key;
-        let internal_key_untweaked: UntweakedPublicKey = internal_key.into();
+        let internal_key_untweaked: UntweakedPublicKey = internal_key;
 
         // Create leaf hash from script and version
         let leaf_hash = TapLeafHash::from_script(script, leaf_version);
@@ -87,7 +93,7 @@ impl TaprootVerifier {
         tweak: &[u8],
     ) -> Result<(XOnlyPublicKey, bool)> {
         // Convert internal_key to UntweakedPublicKey for the new API
-        let internal_key_untweaked: UntweakedPublicKey = (*internal_key).into();
+        let internal_key_untweaked: UntweakedPublicKey = *internal_key;
 
         // Create a TapNodeHash from the tweak bytes if possible, or use None
         let merkle_root = if tweak.len() == 32 {
@@ -148,7 +154,7 @@ impl TaprootVerifier {
         let mut builder = TaprootBuilder::new();
 
         // Convert internal_key to UntweakedPublicKey for the new API
-        let internal_key_untweaked: UntweakedPublicKey = (*internal_key).into();
+        let internal_key_untweaked: UntweakedPublicKey = *internal_key;
 
         // Add scripts to tree
         for (i, script) in scripts.iter().enumerate() {
@@ -230,6 +236,12 @@ pub fn test_taproot_key_path_spending() -> Result<()> {
 /// BIP341 compliance checker for Taproot
 pub struct BIP341Checker {
     secp: Secp256k1<bitcoin::secp256k1::All>,
+}
+
+impl Default for BIP341Checker {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl BIP341Checker {
@@ -395,8 +407,8 @@ impl BIP341Checker {
         let _internal_key = XOnlyPublicKey::from_str(internal_key_hex)
             .map_err(|e| anyhow::anyhow!("Failed to parse internal key: {}", e))?;
 
-        println!("Successfully parsed internal key: {}", internal_key_hex);
-        println!("Output key hex: {}", output_key_hex);
+        println!("Successfully parsed internal key: {internal_key_hex}");
+        println!("Output key hex: {output_key_hex}");
 
         // For this test, we'll simulate verification without parsing the output key
         // In a real implementation, we would do a proper comparison
@@ -575,7 +587,7 @@ fn test_bip341_test_vectors() -> Result<()> {
     let output_key = "e907831f80848d1069a5371b402410364bdf1c5f8307b0084c55f1ce2dca821525f66a4a85ea8b71e482a74f382d2ce5ebeee8fdb2172f477df4900d310536c";
 
     let result = checker.test_vector_key_path_spend(internal_key, output_key)?;
-    println!("Test Vector 1 Result: {}", result);
+    println!("Test Vector 1 Result: {result}");
 
     // Add more test vectors here...
 
@@ -600,7 +612,7 @@ pub fn test_taproot_compliance_vectors() -> Result<()> {
 
     // Build verifier and check
     let verifier = TaprootVerifier::new();
-    let internal_key_untweaked: UntweakedPublicKey = internal_pubkey.into();
+    let internal_key_untweaked: UntweakedPublicKey = internal_pubkey;
 
     // Use the tap_tweak method with None (no merkle root for key-path only)
     let (output_key, _parity) = internal_key_untweaked.tap_tweak(&verifier.secp, merkle_root);
@@ -637,7 +649,7 @@ mod additional_tests {
         let script = ScriptBuf::new();
 
         // Compute tweaked key with no merkle root (key-path spending)
-        let internal_key_untweaked: UntweakedPublicKey = x_only.into();
+        let internal_key_untweaked: UntweakedPublicKey = x_only;
         let merkle_root = None; // Using None for key-path spending
         let (tweaked_key, _parity) = internal_key_untweaked.tap_tweak(&secp, merkle_root);
         let tweaked_public_key = TweakedPublicKey::dangerous_assume_tweaked(tweaked_key.into());
@@ -646,7 +658,7 @@ mod additional_tests {
         let key_path_result = checker
             .verify_key_path_spend(tweaked_public_key, &x_only, None)
             .unwrap();
-        println!("Key path verification result: {}", key_path_result);
+        println!("Key path verification result: {key_path_result}");
         assert!(key_path_result, "Key path verification should succeed");
 
         // Also test script-path spending
@@ -677,19 +689,19 @@ mod additional_tests {
 
                                 match result {
                                     Ok(verified) => {
-                                        println!("Script path verification: {}", verified);
+                                        println!("Script path verification: {verified}");
                                         // Don't assert here since we're using minimal script
                                     }
-                                    Err(e) => println!("Script verification error: {}", e),
+                                    Err(e) => println!("Script verification error: {e}"),
                                 }
                             }
                             None => println!("Failed to get control block"),
                         }
                     }
-                    Err(e) => println!("Failed to finalize taproot: {:?}", e),
+                    Err(e) => println!("Failed to finalize taproot: {e:?}"),
                 }
             }
-            Err(e) => println!("Failed to add leaf: {}", e),
+            Err(e) => println!("Failed to add leaf: {e}"),
         }
 
         // Test the address derivation functionality

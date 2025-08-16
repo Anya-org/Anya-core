@@ -202,10 +202,7 @@ impl HsmManager {
                 }),
             )
             .await?;
-        self.provider
-            .initialize()
-            .await
-            .map_err(|e| crate::security::hsm::error::HsmError::from(e))?;
+        self.provider.initialize().await?;
         {
             let mut status = self.status.write().await;
             *status = HsmStatus::Ready;
@@ -278,7 +275,7 @@ impl HsmManager {
                 }
                 Err(e) => {
                     health_status.last_check_result = false;
-                    health_status.disabled_reason = Some(format!("Health check error: {}", e));
+                    health_status.disabled_reason = Some(format!("Health check error: {e}"));
                 }
             }
         }
@@ -548,7 +545,7 @@ impl HsmManager {
             HsmError::DeserializationError("No signature data in response".to_string())
         })?;
         let signature_str = String::from_utf8(data).map_err(|e| {
-            HsmError::DeserializationError(format!("Invalid UTF-8 in signature: {}", e))
+            HsmError::DeserializationError(format!("Invalid UTF-8 in signature: {e}"))
         })?;
         let signature = BASE64
             .decode(signature_str.trim())
@@ -616,7 +613,7 @@ impl HsmManager {
             HsmError::DeserializationError("No encrypted data in response".to_string())
         })?;
         let data_str = String::from_utf8(data_bytes).map_err(|e| {
-            HsmError::DeserializationError(format!("Invalid UTF-8 in encrypted data: {}", e))
+            HsmError::DeserializationError(format!("Invalid UTF-8 in encrypted data: {e}"))
         })?;
         let encrypted = BASE64
             .decode(data_str.trim())
@@ -647,7 +644,7 @@ impl HsmManager {
             HsmError::DeserializationError("No decrypted data in response".to_string())
         })?;
         let data_str = String::from_utf8(data_bytes).map_err(|e| {
-            HsmError::DeserializationError(format!("Invalid UTF-8 in decrypted data: {}", e))
+            HsmError::DeserializationError(format!("Invalid UTF-8 in decrypted data: {e}"))
         })?;
         let decrypted = BASE64
             .decode(data_str.trim())
@@ -774,6 +771,12 @@ pub struct AtomicSwap {
 
 pub struct NetworkManager;
 
+impl Default for NetworkManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl NetworkManager {
     pub fn new() -> Self {
         Self {}
@@ -798,7 +801,7 @@ impl NetworkManager {
 
         let preimage = [0u8; 32];
         let mut hasher = Sha256::new();
-        hasher.update(&preimage);
+        hasher.update(preimage);
         let hash = hasher.finalize();
         let hash_array: [u8; 32] = hash
             .as_slice()
@@ -808,7 +811,7 @@ impl NetworkManager {
 
         let mut builder = Builder::new()
             .push_opcode(opcodes::all::OP_IF)
-            .push_slice(&hash_wrapper.hash)
+            .push_slice(hash_wrapper.hash)
             .push_opcode(opcodes::all::OP_EQUALVERIFY)
             .push_opcode(opcodes::all::OP_ELSE)
             .push_int(0)
@@ -816,7 +819,7 @@ impl NetworkManager {
 
         let counterparty_key = [0u8; 33];
         builder = builder
-            .push_slice(&counterparty_key)
+            .push_slice(counterparty_key)
             .push_opcode(opcodes::all::OP_ENDIF)
             .push_opcode(opcodes::all::OP_CHECKSIG);
 

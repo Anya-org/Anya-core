@@ -1,6 +1,6 @@
 use axum::{
     middleware,
-    routing::{delete, get, post, put},
+    routing::{get, post},
     Router,
 };
 use std::sync::Arc;
@@ -8,7 +8,10 @@ use tower_http::trace::TraceLayer;
 
 use super::handlers::auth::auth_middleware;
 use crate::api::handlers;
-use crate::handlers::{dwn, rgb};
+#[cfg(feature = "dwn")]
+use crate::handlers::dwn;
+#[cfg(feature = "bitcoin")]
+use crate::handlers::rgb;
 use crate::web::web5_adapter::Web5Adapter;
 
 #[cfg(feature = "bitcoin")]
@@ -67,14 +70,15 @@ pub fn configure_routes(
     let bitcoin_routes = Router::new(); // Empty router when bitcoin feature is disabled
 
     // DWN (Decentralized Web Node) routes - require authentication
+    #[cfg(feature = "dwn")]
     let dwn_routes = Router::new()
         .route("/dwn/protocols", get(dwn::list_protocols))
         .route("/dwn/protocols", post(dwn::create_protocol))
         .route("/dwn/records", get(dwn::query_records))
         .route("/dwn/records", post(dwn::create_record))
-        .route("/dwn/records/{id}", get(dwn::get_record))
-        .route("/dwn/records/{id}", put(dwn::update_record))
-        .route("/dwn/records/{id}", delete(dwn::delete_record));
+        .route("/dwn/records/{id}", get(dwn::get_record)); // update/delete stubs removed pending handler impl
+    #[cfg(not(feature = "dwn"))]
+    let dwn_routes = Router::new();
 
     // RGB routes - require authentication (conditional)
     #[cfg(feature = "bitcoin")]

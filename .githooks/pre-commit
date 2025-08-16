@@ -14,3 +14,27 @@ if [ $RESULT -ne 0 ]; then
   exit 1
 fi
 exit 0
+
+# Pre-commit hook: lightweight secret scanning & deny quickly
+# Configure with: git config core.hooksPath .githooks
+# Optional: export GITLEAKS_LICENSE in env for enterprise rules
+
+RED="\033[1;31m"; NC="\033[0m";
+
+if [ -f scripts/f_drive_offload.sh ]; then
+  bash scripts/f_drive_offload.sh scan-secrets >/dev/null || true
+  bash scripts/f_drive_offload.sh scan-secrets-deep >/dev/null || true
+fi
+
+if command -v gitleaks >/dev/null 2>&1; then
+  if ! gitleaks protect --staged --redact >/dev/null 2>&1; then
+    echo -e "${RED}Potential secret detected by gitleaks; aborting commit.${NC}" >&2
+    exit 1
+  fi
+fi
+
+if command -v cargo-deny >/dev/null 2>&1; then
+  cargo deny check licenses >/dev/null 2>&1 || echo "(cargo-deny license scan non-blocking)"
+fi
+
+exit 0

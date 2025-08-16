@@ -307,7 +307,7 @@ impl SoftwareHSM {
             );
 
             // For simplicity, just save the derived key
-            std::fs::write(&master_key_path, &encryption_key)
+            std::fs::write(&master_key_path, encryption_key)
                 .context("Failed to save master key")?;
 
             info!("Generated new master key");
@@ -329,8 +329,8 @@ impl SoftwareHSM {
             {
                 if let Some(file_name) = path.file_stem().and_then(|s| s.to_str()) {
                     match self.load_key_from_file(&path, file_name).await {
-                        Ok(_) => debug!("Loaded key: {}", file_name),
-                        Err(e) => warn!("Failed to load key {}: {}", file_name, e),
+                        Ok(_) => debug!("Loaded key: {file_name}"),
+                        Err(e) => warn!("Failed to load key {file_name}: {e}"),
                     }
                 }
             }
@@ -397,10 +397,7 @@ impl SoftwareHSM {
             metrics.active_sessions = self.sessions.read().await.len();
         }
 
-        info!(
-            "Created security session: {} for user: {}",
-            session_id, user_id
-        );
+        info!("Created security session: {session_id} for user: {user_id}");
         Ok(session_id)
     }
 
@@ -409,7 +406,7 @@ impl SoftwareHSM {
     pub async fn generate_ecdsa_key(&self, key_id: String, session_id: &str) -> Result<String> {
         self.validate_session(session_id).await?;
 
-        info!("Generating ECDSA P-256 keypair: {}", key_id);
+        info!("Generating ECDSA P-256 keypair: {key_id}");
 
         // Generate ECDSA P-256 key pair using ring for constant-time operations
         let rng = ring::rand::SystemRandom::new();
@@ -481,7 +478,7 @@ impl SoftwareHSM {
             metrics.keys_stored = self.key_store.read().await.key_metadata.len();
         }
 
-        info!("Generated ECDSA P-256 keypair: {}", key_id);
+        info!("Generated ECDSA P-256 keypair: {key_id}");
         Ok(key_id)
     }
 
@@ -494,8 +491,7 @@ impl SoftwareHSM {
         session_id: &str,
     ) -> Result<String> {
         warn!(
-            "⚠️  DEPRECATED: RSA key generation requested for '{}' - REJECTED due to RUSTSEC-2023-0071 timing attack vulnerability",
-            key_id
+            "⚠️  DEPRECATED: RSA key generation requested for '{key_id}' - REJECTED due to RUSTSEC-2023-0071 timing attack vulnerability"
         );
         warn!("🔐 SECURITY: Use generate_ecdsa_key() or generate_ed25519_key() instead");
 
@@ -523,7 +519,7 @@ impl SoftwareHSM {
     pub async fn generate_ed25519_key(&self, key_id: String, session_id: &str) -> Result<String> {
         self.validate_session(session_id).await?;
 
-        info!("Generating Ed25519 keypair: {}", key_id);
+        info!("Generating Ed25519 keypair: {key_id}");
 
         let mut rng = OsRng;
         let signing_key = SigningKey::generate(&mut rng);
@@ -583,7 +579,7 @@ impl SoftwareHSM {
             metrics.keys_stored = self.key_store.read().await.key_metadata.len();
         }
 
-        info!("Generated Ed25519 keypair: {}", key_id);
+        info!("Generated Ed25519 keypair: {key_id}");
         Ok(key_id)
     }
 
@@ -591,7 +587,7 @@ impl SoftwareHSM {
     pub async fn generate_symmetric_key(&self, key_id: String, session_id: &str) -> Result<String> {
         self.validate_session(session_id).await?;
 
-        info!("Generating AES-256 symmetric key: {}", key_id);
+        info!("Generating AES-256 symmetric key: {key_id}");
 
         let mut key = [0u8; 32];
         OsRng.fill_bytes(&mut key);
@@ -646,7 +642,7 @@ impl SoftwareHSM {
             metrics.keys_stored = self.key_store.read().await.key_metadata.len();
         }
 
-        info!("Generated AES-256 symmetric key: {}", key_id);
+        info!("Generated AES-256 symmetric key: {key_id}");
         Ok(key_id)
     }
 
@@ -740,7 +736,7 @@ impl SoftwareHSM {
     ) -> Result<Vec<u8>> {
         self.validate_session(session_id).await?;
 
-        debug!("Decrypting data with key: {}", key_id);
+        debug!("Decrypting data with key: {key_id}");
 
         let key_store = self.key_store.read().await;
         let symmetric_key = key_store
@@ -868,7 +864,7 @@ impl SoftwareHSM {
     ) -> Result<bool> {
         self.validate_session(session_id).await?;
 
-        debug!("Verifying signature with key: {}", key_id);
+        debug!("Verifying signature with key: {key_id}");
 
         let key_store = self.key_store.read().await;
         let ed25519_key = key_store

@@ -12,3 +12,18 @@
 opt-level = 3
 lto = true
 codegen-units = 11
+
+[alias]
+# Default binary is anya-core (set in Cargo.toml: default-run = "anya-core")
+core = "run --"
+core-start = "run -- start"
+core-health = "run -- health"
+core-validate = "run -- validate"
+
+# Other workspace binaries
+installer = "run --bin anya_installer --"
+validator = "run --bin anya_validator --"
+bip-health = "run --bin bip_health --"
+doc-scanner = "run --bin doc_scanner --"
+lightning-demo = "run --bin lightning_demo --"
+verify-bip = "run --bin verify_bip_modules --"

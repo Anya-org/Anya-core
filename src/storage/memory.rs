@@ -22,6 +22,12 @@ impl MemoryStorage {
     }
 }
 
+impl Default for MemoryStorage {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[async_trait]
 impl KeyValueStorage for MemoryStorage {
     async fn set(&self, key: &str, value: &str) -> Result<()> {

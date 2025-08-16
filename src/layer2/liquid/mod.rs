@@ -49,6 +49,18 @@ pub struct LiquidConfig {
 
 impl Default for LiquidConfig {
     fn default() -> Self {
+        #[cfg(feature = "bitcoin")]
+        let external = crate::bitcoin::external_endpoints::ExternalBitcoinEndpoints::resolve();
+        #[cfg(not(feature = "bitcoin"))]
+        struct StubExternal {
+            liquid_asset_registry: String,
+            liquid_federation_endpoint: String,
+        }
+        #[cfg(not(feature = "bitcoin"))]
+        let external = StubExternal {
+            liquid_asset_registry: String::new(),
+            liquid_federation_endpoint: String::new(),
+        };
         Self {
             network: "liquidregtest".to_string(),
             node_url: "http://127.0.0.1:18884".to_string(),
@@ -57,9 +69,9 @@ impl Default for LiquidConfig {
             wallet_name: "anya_liquid_wallet".to_string(),
             enable_confidential_transactions: true,
             block_time_seconds: 60, // 1 minute blocks
-            asset_registry_url: Some("https://assets.blockstream.info".to_string()),
+            asset_registry_url: Some(external.liquid_asset_registry.clone()),
             // Enhanced federation defaults
-            federation_endpoint: Some("https://blockstream.info/liquid/api".to_string()),
+            federation_endpoint: Some(external.liquid_federation_endpoint.clone()),
             federation_id: Some("liquid_federation".to_string()),
             api_key: None,
             enable_coinjoin: true,

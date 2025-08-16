@@ -253,7 +253,7 @@ pub async fn create_taproot_asset(
 
     let key_params = hsm::provider::KeyGenParams {
         id: Some("asset".to_string()),
-        label: Some(format!("Asset key for {}", metadata)),
+        label: Some(format!("Asset key for {metadata}")),
         key_type: hsm::provider::KeyType::Ec {
             curve: hsm::provider::EcCurve::Secp256k1,
         },

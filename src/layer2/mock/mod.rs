@@ -12,6 +12,12 @@ pub struct MockLayer2Protocol {
     pub connected: bool,
 }
 
+impl Default for MockLayer2Protocol {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl MockLayer2Protocol {
     pub fn new() -> Self {
         Self { connected: false }

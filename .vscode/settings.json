@@ -2,10 +2,12 @@
     "cSpell.words": [
         "Anya",
         "bip341",
+        "bitcoincore",
         "bitcoinjs",
         "huggingface",
         "onnx",
         "ONNX",
+        "PKCS",
         "psbt",
         "RUSTSEC",
         "safetensors",
@@ -27,5 +29,6 @@
         "MD033": false,
         "MD040": true,
         "MD047": true
-    }
+    },
+    "chat.mcp.autostart": "onlyNew"
 }

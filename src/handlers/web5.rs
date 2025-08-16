@@ -185,7 +185,7 @@ impl Web5Handler {
             if let Some(credential) = credentials.get(&credential_id) {
                 verifiable_credentials.push(credential.clone());
             } else {
-                return Err(format!("Credential {} not found", credential_id));
+                return Err(format!("Credential {credential_id} not found"));
             }
         }
 

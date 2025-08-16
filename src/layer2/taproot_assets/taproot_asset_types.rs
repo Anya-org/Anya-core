@@ -56,7 +56,7 @@ pub async fn create_taproot_asset_mobile(
 ) -> Result<String, String> {
     // Parse the JSON metadata (in a real impl this would use serde)
     // For test purposes, we'll just simulate it
-    println!("Creating Taproot Asset from JSON: {}", metadata_json);
+    println!("Creating Taproot Asset from JSON: {metadata_json}");
 
     // Convert network string to enum
     let network_enum = match network {
@@ -64,7 +64,7 @@ pub async fn create_taproot_asset_mobile(
         "testnet" => Network::Testnet,
         "signet" => Network::Signet,
         "regtest" => Network::Regtest,
-        _ => return Err(format!("Invalid network: {}", network)),
+        _ => return Err(format!("Invalid network: {network}")),
     };
 
     // Create a fake metadata struct for testing

@@ -566,6 +566,12 @@ pub enum ReasoningType {
     Probabilistic,
 }
 
+impl Default for PlanningEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl PlanningEngine {
     /// Create new planning engine
     pub fn new() -> Self {
@@ -724,7 +730,7 @@ impl PlanningEngine {
             successful_executions,
             failed_executions: total_executions - successful_executions,
             average_execution_time_ms: avg_execution_time,
-            goal_completion_rate: if goals.len() > 0 {
+            goal_completion_rate: if !goals.is_empty() {
                 goals
                     .values()
                     .filter(|g| matches!(g.status, GoalStatus::Completed))
@@ -751,6 +757,12 @@ pub struct PlanningStatistics {
 /// Default hierarchical task network planner
 pub struct HTNPlanner {
     info: PlannerInfo,
+}
+
+impl Default for HTNPlanner {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl HTNPlanner {
@@ -882,6 +894,12 @@ impl Planner for HTNPlanner {
 /// Default first-order logic reasoner
 pub struct FOLReasoner {
     info: ReasonerInfo,
+}
+
+impl Default for FOLReasoner {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl FOLReasoner {

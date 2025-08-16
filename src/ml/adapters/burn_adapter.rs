@@ -223,11 +223,10 @@ impl MLModelAdapter for BurnAdapter {
         };
 
         // Calculate confidence (placeholder)
-        let confidence_scores = vec![predictions
+        let confidence_scores = vec![*predictions
             .iter()
             .max_by(|a, b| a.partial_cmp(b).unwrap())
-            .unwrap_or(&0.0)
-            .clone()];
+            .unwrap_or(&0.0)];
         let overall_confidence =
             confidence_scores.iter().sum::<f32>() / confidence_scores.len() as f32;
 

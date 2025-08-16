@@ -136,7 +136,7 @@ impl HsmProvider for TpmHsmProvider {
 
         if !found_key {
             self.log_operation("sign", key_id, false).await;
-            return Err(HsmError::KeyNotFound(format!("Key {} not found", key_id)));
+            return Err(HsmError::KeyNotFound(format!("Key {key_id} not found")));
         }
 
         // In real implementation, this would use TPM for signing
@@ -159,7 +159,7 @@ impl HsmProvider for TpmHsmProvider {
             .map_err(|_| HsmError::InternalError("Failed to lock key store".to_string()))?;
 
         if !key_store.contains_key(key_id) {
-            return Err(HsmError::KeyNotFound(format!("Key {} not found", key_id)));
+            return Err(HsmError::KeyNotFound(format!("Key {key_id} not found")));
         }
 
         // In real implementation, this would use TPM for verification
@@ -174,7 +174,7 @@ impl HsmProvider for TpmHsmProvider {
             .map_err(|_| HsmError::InternalError("Failed to lock key store".to_string()))?;
 
         if !key_store.contains_key(key_id) {
-            return Err(HsmError::KeyNotFound(format!("Key {} not found", key_id)));
+            return Err(HsmError::KeyNotFound(format!("Key {key_id} not found")));
         }
 
         // In real implementation, this would derive public key from TPM
@@ -214,7 +214,7 @@ impl HsmProvider for TpmHsmProvider {
             Ok(())
         } else {
             self.log_operation("delete_key", key_id, false).await;
-            Err(HsmError::KeyNotFound(format!("Key {} not found", key_id)))
+            Err(HsmError::KeyNotFound(format!("Key {key_id} not found")))
         }
     }
 

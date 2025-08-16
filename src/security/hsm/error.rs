@@ -232,7 +232,7 @@ impl From<std::io::Error> for HsmError {
 // Implement From<bitcoin::sighash::P2wpkhError> for HsmError
 impl From<bitcoin::sighash::P2wpkhError> for HsmError {
     fn from(error: bitcoin::sighash::P2wpkhError) -> Self {
-        HsmError::BitcoinError(format!("P2WPKH sighash error: {}", error))
+        HsmError::BitcoinError(format!("P2WPKH sighash error: {error}"))
     }
 }
 
@@ -346,7 +346,7 @@ impl fmt::Display for AuditEventType {
             AuditEventType::OperationResponse => write!(f, "operation.response"),
             AuditEventType::HsmOperation => write!(f, "hsm.operation"),
             AuditEventType::HealthCheck => write!(f, "hsm.health_check"),
-            AuditEventType::Custom(name) => write!(f, "custom.{}", name),
+            AuditEventType::Custom(name) => write!(f, "custom.{name}"),
         }
     }
 }
@@ -386,8 +386,7 @@ impl std::str::FromStr for AuditEventType {
                     Ok(AuditEventType::Custom(custom_name.to_string()))
                 } else {
                     Err(HsmError::HsmAuditEventError(format!(
-                        "Unknown audit event type: {}",
-                        s
+                        "Unknown audit event type: {s}"
                     )))
                 }
             }
@@ -446,8 +445,7 @@ impl std::str::FromStr for AuditEventResult {
             "rejected" => Ok(AuditEventResult::Rejected),
             "timeout" => Ok(AuditEventResult::Timeout),
             _ => Err(HsmError::HsmAuditEventError(format!(
-                "Unknown audit event result: {}",
-                s
+                "Unknown audit event result: {s}"
             ))),
         }
     }
@@ -505,8 +503,7 @@ impl std::str::FromStr for AuditEventSeverity {
             "alert" => Ok(AuditEventSeverity::Alert),
             "emergency" => Ok(AuditEventSeverity::Emergency),
             _ => Err(HsmError::HsmAuditEventError(format!(
-                "Unknown audit event severity: {}",
-                s
+                "Unknown audit event severity: {s}"
             ))),
         }
     }
@@ -602,7 +599,7 @@ impl HsmAuditEvent {
     /// Set parameters
     pub fn with_parameters<T: Serialize>(mut self, parameters: &T) -> Result<Self, HsmError> {
         self.parameters = Some(serde_json::to_value(parameters).map_err(|e| {
-            HsmError::SerializationError(format!("Failed to serialize parameters: {}", e))
+            HsmError::SerializationError(format!("Failed to serialize parameters: {e}"))
         })?);
         Ok(self)
     }
@@ -610,7 +607,7 @@ impl HsmAuditEvent {
     /// Set metadata
     pub fn with_metadata<T: Serialize>(mut self, metadata: &T) -> Result<Self, HsmError> {
         self.metadata = Some(serde_json::to_value(metadata).map_err(|e| {
-            HsmError::SerializationError(format!("Failed to serialize metadata: {}", e))
+            HsmError::SerializationError(format!("Failed to serialize metadata: {e}"))
         })?);
         Ok(self)
     }
@@ -654,7 +651,7 @@ impl fmt::Display for HsmKeyType {
             HsmKeyType::Hmac => write!(f, "hmac"),
             HsmKeyType::Symmetric => write!(f, "symmetric"),
             HsmKeyType::Asymmetric => write!(f, "asymmetric"),
-            HsmKeyType::Custom(id) => write!(f, "custom-{}", id),
+            HsmKeyType::Custom(id) => write!(f, "custom-{id}"),
         }
     }
 }
@@ -717,7 +714,7 @@ impl fmt::Display for HsmOperationType {
             HsmOperationType::ImportKey => write!(f, "import_key"),
             HsmOperationType::DeleteKey => write!(f, "delete_key"),
             HsmOperationType::ListKeys => write!(f, "list_keys"),
-            HsmOperationType::Custom(id) => write!(f, "custom-{}", id),
+            HsmOperationType::Custom(id) => write!(f, "custom-{id}"),
         }
     }
 }

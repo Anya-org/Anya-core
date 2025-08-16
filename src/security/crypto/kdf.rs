@@ -130,7 +130,7 @@ pub fn scrypt(password: &[u8], params: &ScryptParams) -> Vec<u8> {
     // Convert scrypt params to equivalent PBKDF2 params
     let pbkdf2_params = Pbkdf2Params {
         salt: params.salt.clone(),
-        iterations: params.n as u32, // Use N as iterations
+        iterations: params.n, // Use N as iterations
         key_length: params.key_length,
     };
     pbkdf2(password, &pbkdf2_params)
