@@ -320,7 +320,7 @@ impl StorageRouter {
                 _ => bitcoin::Network::Regtest,
             };
             #[cfg(not(feature = "bitcoin"))]
-            let network = bitcoin::Network::Regtest; // compile-time: bitcoin types behind feature; this line shouldn't compile without bitcoin feature, so guard
+            let network = (); // Placeholder value when bitcoin feature is disabled
 
             match DecentralizedStorage::new(&ipfs_endpoint, adapter, did, network, None).await {
                 Ok(d) => Some(Arc::new(d)),
