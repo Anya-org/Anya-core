@@ -537,7 +537,8 @@ pub fn get_latest_block_version() -> i32 {
 /// Get block version distribution
 pub fn get_block_version_distribution() -> HashMap<i32, u64> {
     let metrics = BLOCKCHAIN_METRICS.lock().unwrap();
-    metrics.block_versions.clone()
+pub fn get_block_version_distribution() -> std::sync::MutexGuard<'static, BlockchainMetrics> {
+    BLOCKCHAIN_METRICS.lock().unwrap()
 }
 
 #[cfg(test)]
