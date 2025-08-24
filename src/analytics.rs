@@ -392,7 +392,6 @@ impl AnalyticsEngine {
                 .collect::<Vec<_>>();
             
             anomaly_summary.insert(metric_name.clone(), recent_anomalies);
-            let store = self.data_store.read().await; // Re-acquire read lock
         }
 
         Ok(AnalyticsReport {
