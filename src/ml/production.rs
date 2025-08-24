@@ -1108,7 +1108,8 @@ impl ProductionMLService {
                 
                 // Clamp to 0-1 range
                 let clamped_score = anomaly_score.min(1.0).max(0.0);
-                result.output = serde_json::to_vec(&clamped_score)?;
+                result.output = serde_json::to_vec(&clamped_score)
+                    .map_err(|e| AnyaError::ML(format!("Failed to serialize anomaly score: {}", e)))?;
                 result.predictions = vec![clamped_score];
                 result.confidence_scores = vec![0.8]; // Fixed confidence for simplicity
                 result.overall_confidence = 0.8;
