@@ -308,7 +308,15 @@ impl PartiallySignedTransaction {
     
     /// Deserialize PSBT from bytes (simplified implementation)
     pub fn deserialize(data: &[u8]) -> Result<Self, PsbtError> {
-        serde_json::from_slice(data)
+    /// Serialize the PSBT to bytes (BIP-174 binary format)
+    pub fn serialize(&self) -> Result<Vec<u8>, PsbtError> {
+        bitcoin::consensus::encode::serialize(self)
+            .map_err(|e| PsbtError::SerializationError(e.to_string()))
+    }
+    
+    /// Deserialize PSBT from bytes (BIP-174 binary format)
+    pub fn deserialize(data: &[u8]) -> Result<Self, PsbtError> {
+        bitcoin::consensus::encode::deserialize(data)
             .map_err(|e| PsbtError::SerializationError(e.to_string()))
     }
     
