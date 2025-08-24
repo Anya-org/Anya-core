@@ -432,7 +432,7 @@ impl ModelExecutor for NeuralNetworkExecutor {
         let inference_time = start_time.elapsed().as_millis() as f64;
 
         Ok(InferenceResult {
-            predictions: predictions.clone(),
+            predictions,
             confidence_scores,
             overall_confidence,
             model_version: model.version.clone(),
