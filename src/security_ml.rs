@@ -770,9 +770,8 @@ impl SecurityMLEngine {
         history.push(alert);
         
         // Keep only last 1000 alerts
-        let history_len = history.len();
-        if history_len > 1000 {
-            history.drain(0..history_len - 1000);
+        if history.len() > 1000 {
+            history.drain(0..history.len() - 1000);
         }
     }
 
