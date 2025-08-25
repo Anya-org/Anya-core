@@ -392,8 +392,8 @@ impl Psbt {
             .collect();
         
         let unsigned_tx = Transaction {
-            version: 2,
-            lock_time: 0,
+            version: DEFAULT_TX_VERSION,
+            lock_time: DEFAULT_TX_LOCK_TIME,
             input: tx_inputs,
             output: outputs,
         };
