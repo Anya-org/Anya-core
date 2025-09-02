@@ -69,9 +69,8 @@ impl BitcoinHsmProvider {
         // Create a dummy seed for development/testing
         // In a real implementation, this would be securely generated and stored
         let mut master_seed = [0u8; 32];
-        getrandom::fill(&mut master_seed).map_err(|e| {
-            HsmError::ProviderError(format!("Failed to generate random seed: {e}"))
-        })?;
+        getrandom::fill(&mut master_seed)
+            .map_err(|e| HsmError::ProviderError(format!("Failed to generate random seed: {e}")))?;
 
         let secp = Secp256k1::new();
 
@@ -487,9 +486,7 @@ impl HsmProvider for BitcoinHsmProvider {
         match request.operation {
             HsmOperation::GenerateKey => {
                 let params: KeyGenParams = serde_json::from_value(request.parameters.clone())
-                    .map_err(|e| {
-                        HsmError::InvalidParameters(format!("Invalid parameters: {e}"))
-                    })?;
+                    .map_err(|e| HsmError::InvalidParameters(format!("Invalid parameters: {e}")))?;
 
                 let (key_pair, key_info) = self.generate_key(params).await?;
 
@@ -503,9 +500,7 @@ impl HsmProvider for BitcoinHsmProvider {
             }
             HsmOperation::Sign => {
                 let params = serde_json::from_value::<SignParams>(request.parameters.clone())
-                    .map_err(|e| {
-                        HsmError::InvalidParameters(format!("Invalid parameters: {e}"))
-                    })?;
+                    .map_err(|e| HsmError::InvalidParameters(format!("Invalid parameters: {e}")))?;
 
                 // [AIR-3][AIS-3][BPC-3][RES-3] Use base64 Engine for encoding/decoding
                 // This follows official Bitcoin Improvement Proposals (BIPs) standards for secure data handling
@@ -524,9 +519,7 @@ impl HsmProvider for BitcoinHsmProvider {
             }
             HsmOperation::Verify => {
                 let params = serde_json::from_value::<VerifyParams>(request.parameters.clone())
-                    .map_err(|e| {
-                        HsmError::InvalidParameters(format!("Invalid parameters: {e}"))
-                    })?;
+                    .map_err(|e| HsmError::InvalidParameters(format!("Invalid parameters: {e}")))?;
 
                 // [AIR-3][AIS-3][BPC-3][RES-3] Use base64 Engine for encoding/decoding
                 // This follows official Bitcoin Improvement Proposals (BIPs) standards for secure data handling
@@ -536,9 +529,7 @@ impl HsmProvider for BitcoinHsmProvider {
 
                 let signature = base64::engine::general_purpose::STANDARD
                     .decode(&params.signature)
-                    .map_err(|e| {
-                        HsmError::InvalidParameters(format!("Invalid signature: {e}"))
-                    })?;
+                    .map_err(|e| HsmError::InvalidParameters(format!("Invalid signature: {e}")))?;
 
                 let valid = self
                     .verify(&params.key_name, params.algorithm, &data, &signature)
@@ -553,9 +544,7 @@ impl HsmProvider for BitcoinHsmProvider {
             }
             HsmOperation::ExportPublicKey => {
                 let params = serde_json::from_value::<GetKeyParams>(request.parameters.clone())
-                    .map_err(|e| {
-                        HsmError::InvalidParameters(format!("Invalid parameters: {e}"))
-                    })?;
+                    .map_err(|e| HsmError::InvalidParameters(format!("Invalid parameters: {e}")))?;
 
                 let public_key = self.export_public_key(&params.key_name).await?;
 
@@ -580,9 +569,7 @@ impl HsmProvider for BitcoinHsmProvider {
             }
             HsmOperation::DeleteKey => {
                 let params = serde_json::from_value::<DeleteKeyParams>(request.parameters.clone())
-                    .map_err(|e| {
-                        HsmError::InvalidParameters(format!("Invalid parameters: {e}"))
-                    })?;
+                    .map_err(|e| HsmError::InvalidParameters(format!("Invalid parameters: {e}")))?;
 
                 self.delete_key(&params.key_name).await?;
 

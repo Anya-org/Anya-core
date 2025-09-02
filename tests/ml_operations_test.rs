@@ -47,9 +47,11 @@ async fn test_model_aggregation() -> Result<(), Box<dyn Error>> {
 
     // Train multiple local models
     let _test_users = ["user1", "user2", "user3"];
-    let _test_inputs = [vec![0.1, 0.2, 0.3],
+    let _test_inputs = [
+        vec![0.1, 0.2, 0.3],
         vec![0.2, 0.3, 0.4],
-        vec![0.3, 0.4, 0.5]];
+        vec![0.3, 0.4, 0.5],
+    ];
 
     // This test expects train_local_model, which is missing. Commenting out for now.
     /*

@@ -397,9 +397,7 @@ impl SoftwareHSM {
             metrics.active_sessions = self.sessions.read().await.len();
         }
 
-        info!(
-            "Created security session: {session_id} for user: {user_id}"
-        );
+        info!("Created security session: {session_id} for user: {user_id}");
         Ok(session_id)
     }
 

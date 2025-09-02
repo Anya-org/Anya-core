@@ -202,9 +202,7 @@ impl HsmManager {
                 }),
             )
             .await?;
-        self.provider
-            .initialize()
-            .await?;
+        self.provider.initialize().await?;
         {
             let mut status = self.status.write().await;
             *status = HsmStatus::Ready;

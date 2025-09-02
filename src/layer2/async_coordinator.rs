@@ -97,10 +97,11 @@ impl AsyncProtocolWrapper {
         F: std::future::Future<Output = Result<T, Layer2Error>>,
     {
         // Acquire semaphore permit
-        let _permit =
-            self.semaphore.acquire().await.map_err(|e| {
-                Layer2Error::Internal(format!("Failed to acquire semaphore: {e}"))
-            })?;
+        let _permit = self
+            .semaphore
+            .acquire()
+            .await
+            .map_err(|e| Layer2Error::Internal(format!("Failed to acquire semaphore: {e}")))?;
 
         // Update last activity
         {

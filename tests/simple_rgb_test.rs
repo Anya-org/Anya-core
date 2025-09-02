@@ -84,9 +84,7 @@ mod web5_simple_tests {
 
         // Simulate a Bitcoin anchoring transaction
         let anchoring_txid = "f2cea539af4dcfe68f63c01d9982fc60ec4ae74997c644866c5e47b7d4a84683";
-        println!(
-            "Simulated Bitcoin anchoring transaction: {anchoring_txid}"
-        );
+        println!("Simulated Bitcoin anchoring transaction: {anchoring_txid}");
 
         // Verify the test passes
         assert!(issuer_did.starts_with("did:key:"));

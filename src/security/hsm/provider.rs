@@ -615,9 +615,7 @@ impl HsmProvider for SoftHsmProvider {
             HsmOperation::GenerateKey => {
                 // Parse the parameters
                 let params: KeyGenParams = serde_json::from_value(request.parameters.clone())
-                    .map_err(|e| {
-                        HsmError::InvalidParameters(format!("Invalid parameters: {e}"))
-                    })?;
+                    .map_err(|e| HsmError::InvalidParameters(format!("Invalid parameters: {e}")))?;
 
                 // Generate the key
                 let key_id = params.id.unwrap_or_else(|| Uuid::new_v4().to_string());

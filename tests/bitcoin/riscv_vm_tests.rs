@@ -128,8 +128,7 @@ pub struct SecurityConfig {
     pub encryption: bool,
 }
 
-#[derive(Debug, Clone)]
-#[derive(Default)]
+#[derive(Debug, Clone, Default)]
 pub struct VmMetrics {
     pub l1_metrics: L1VmMetrics,
     pub l2_metrics: L2VmMetrics,
@@ -164,7 +163,6 @@ pub struct ZkVmMetrics {
     pub circuit_complexity: u64,
     pub proof_size: u64,
 }
-
 
 impl RiscVmManager {
     pub fn new() -> Result<Self> {
