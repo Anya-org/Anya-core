@@ -2,34 +2,39 @@ use anya_core::ml::agents::FederatedAgent;
 use anya_core::ml::federated_agent::FederatedAgentConfig;
 
 use std::error::Error;
-use tokio;
 
 #[tokio::test]
 async fn test_model_training() -> Result<(), Box<dyn Error>> {
     // Setup test environment
     let fl = setup_test_environment().await?;
 
-    // Test data
-    let user_id = "test_user";
-    let test_input = vec![0.1, 0.2, 0.3, 0.4, 0.5];
+    // Test data and participants (min_participants default is 3)
+    let users = vec![
+        ("user_a", vec![0.1, 0.2, 0.3, 0.4, 0.5]),
+        ("user_b", vec![0.2, 0.3, 0.4, 0.5, 0.6]),
+        ("user_c", vec![0.3, 0.4, 0.5, 0.6, 0.7]),
+    ];
 
-    // Register participant
-    fl.register_participant(user_id, 1.0, test_input.len() as u64)
-        .await?;
-    // Start federation round
+    // Register required participants
+    for (user, input) in &users {
+        fl.register_participant(user, 1.0, input.len() as u64)
+            .await?;
+    }
+
+    // Start federation round (should succeed now that we have >=3 participants)
     let round_id = fl.start_federation_round().await?;
-    // Simulate model update
-    fl.process_model_update(
-        user_id,
-        "dummy_hash",
-        &[0u8; 10],
-        std::collections::HashMap::new(),
-    )
-    .await?;
-    // Aggregate models - No longer takes round_id directly based on FederatedAgent implementation
-    // Assuming aggregate_models now internally handles the current round or this needs to be called on FederatedLearningManager
-    // For now, let's assume the agent handles it or this test needs a deeper refactor if methods moved to manager.
-    let _ = fl.aggregate_models(&round_id).await?; // Pass round_id as it's expected by the method signature
+
+    // Submit model updates for each participant to transition to ReadingModels and allow aggregation
+    for (idx, (user, _)) in users.iter().enumerate() {
+        let mut perf = std::collections::HashMap::new();
+        perf.insert("accuracy".to_string(), 0.8 + (idx as f64) * 0.01);
+        fl.process_model_update(user, &format!("dummy_hash_{idx}"), &[0u8; 16], perf)
+            .await?;
+    }
+
+    // Aggregate models for the active round
+    let aggregated = fl.aggregate_models(&round_id).await?;
+    assert!(!aggregated.is_empty());
 
     // No direct accuracy/loss, so just check round_id is non-empty
     assert!(!round_id.is_empty());
@@ -41,8 +46,8 @@ async fn test_model_aggregation() -> Result<(), Box<dyn Error>> {
     let _fl = setup_test_environment().await?;
 
     // Train multiple local models
-    let _test_users = vec!["user1", "user2", "user3"];
-    let _test_inputs = vec![
+    let _test_users = ["user1", "user2", "user3"];
+    let _test_inputs = [
         vec![0.1, 0.2, 0.3],
         vec![0.2, 0.3, 0.4],
         vec![0.3, 0.4, 0.5],

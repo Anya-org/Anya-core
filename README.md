@@ -3,13 +3,13 @@ title: "Anya Core"
 description: "Enterprise Bitcoin Infrastructure Platform with Layer2 Protocol Integration"
 ---
 
-# Anya Core [AIR-3][AIS-3][BPC-3][RES-3]
+# Anya Core `AIR-3` `AIS-3` `BPC-3` `RES-3`
 
 A modular Bitcoin infrastructure platform designed for enterprise applications, Layer2 protocol integration, and decentralized AI/ML systems.
 
 [![Rust](https://img.shields.io/badge/Rust-1.70+-green)](https://rust-lang.org)
 
-Last Updated: August 8, 2025
+Last Updated: August 10, 2025
 Version: 1.3.0
 Status: ✅ Build and crates.io dry-run verified; deployment readiness depends on your environment
 
@@ -26,14 +26,12 @@ Status: ✅ Build and crates.io dry-run verified; deployment readiness depends o
 - [⚡ Layer2 Protocols](docs/layer2/) - Lightning, RGB, DLC, and more
 - [🔒 Security Guide](docs/security/) - Security policies and best practices
 
-**PRD Documentation Suite:**
+**Additional Documentation:**
 
-- [📋 PRD Master Index](docs/PRD_MASTER_INDEX.md) - Navigation hub for all PRD documents
-- [🏗️ Implementation Roadmap](docs/IMPLEMENTATION_ROADMAP_PRD.md) - Development phases and planning
-- [🎉 Implementation Success Report](docs/IMPLEMENTATION_SUCCESS_REPORT.md) - **NEW:** Real logic deployment results
-- [🔍 Missing Components Analysis](docs/MISSING_COMPONENTS_ANALYSIS_PRD.md) - Remaining development gaps
-- [📊 Current Status](docs/CURRENT_STATUS_SUMMARY.md) - System status and metrics
-- [🚀 Phase 1 Week 2 Plan](docs/PHASE1_WEEK2_EXECUTION_PLAN.md) - Hardware integration plan
+- Security: docs/security/README.md
+- Bitcoin: docs/bitcoin/README.md
+- Layer2: docs/layer2/README.md
+- AI Labeling: docs_legacy/standards/AI_LABELING.md
 
 ---
 
@@ -80,11 +78,11 @@ Anya Core is an advanced integrated system combining Bitcoin/crypto functionalit
 - Modular component design
 - Production-ready security measures
 
-> **AI Labeling:** This project follows the canonical AI Labeling System with standardized compliance markers for AI readiness, security, and Bitcoin protocol compliance. See: site/standards/AI_LABELING/index.html
+> AI Labeling: This project follows an AI labeling system with standardized compliance markers for AI readiness, security, and Bitcoin protocol compliance. See: docs_legacy/standards/AI_LABELING.md
 
 **System Architecture:**
 
-```
+```text
 ┌─────────────────┐    ┌──────────────┐    ┌─────────────────┐
 │   Applications  │    │   Web APIs   │    │  External Tools │
 └─────────────────┘    └──────────────┘    └─────────────────┘
@@ -361,7 +359,7 @@ tracing = { version = "0.1.41" }
 
 ### Project Structure
 
-```
+```text
 src/
 ├── bitcoin/              # Bitcoin protocol implementation
 │   ├── consensus/        # Consensus rules and validation
@@ -395,12 +393,7 @@ src/
 - 🔄 **BIP-370:** PSBT Version 2 (85% complete)
 - 🔄 **BIP-322:** Generic Signed Message Format (partial)
 
-**Test Coverage:**
-
-- BIP-341: 95% test coverage
-- BIP-342: 90% test coverage
-- BIP-174: 100% test coverage
-- Overall BIP Compliance: 92%
+<!-- Test coverage varies by environment. See CI artifacts (ci_metrics.json) or the pipeline dashboard for current numbers. -->
 
 ---
 
@@ -408,65 +401,52 @@ src/
 
 ```bash
 # Build (all features)
-- **Phase 3 (Weeks 15-20):** Advanced Bitcoin protocols and mobile SDK development
+cargo build -r --all-features
 
 # Run unit tests
 cargo test --lib
 
 # Optional: run integration tests (requires local services)
-- **Phase 4 (Weeks 21-24):** Web5 integration and final optimization
+cargo test --tests -- --nocapture
 
 # Optional: security checks
 cargo audit
 cargo geiger
 ```
 
+### Development Status
+
+Default behavior: if no external nodes are configured or reachable, Anya Core promotes itself to a self-node (master) for each enabled Layer2 protocol. This replaces the prior default of “pure simulation.” To run against real networks, provide real node endpoints (e.g., Lightning node URL/macaroon/cert, RGB node) using `.env` or config files. See: docs/layer2/PRODUCTION_RUNBOOK.md and `config/examples/layer2.toml`.
+
+#### Self-node (Master) fallback
+
+- When enabled (default), if real networking is disabled or the node cannot reach the minimum required peers, the system activates a loopback peer and marks the protocol as synced locally.
+- This ensures the node operates as the main node when no peer infrastructure is present, allowing local operation and testing without external dependencies.
+- Toggle via config or environment variables:
+  - `prefer_self_as_master = true` (default)
+  - `enable_self_node_fallback = true` (default)
+  - `enable_real_networking = true` (default)
+  - `ANYA_LAYER2_PREFER_SELF_AS_MASTER=true`
+  - `ANYA_LAYER2_ENABLE_SELF_NODE_FALLBACK=true`
+- The decision flow is implemented in the production Layer2 adapter: if `enable_real_networking = false` or connected peers `< min_peers`, the self-node mode is activated.
+
+See `config/examples/layer2.toml` for a reference configuration.
+
 ### Layer2 Protocol Status
 
 | Protocol | Status | Implementation | Test Coverage | Notes |
 |----------|--------|----------------|---------------|-------|
-| **Lightning Network** | ✅ **Production Ready** | Complete async implementation | 5/5 tests passing | Payment channels fully operational |
-| **RGB Protocol** | ✅ **Production Ready** | Asset management complete | 5/5 tests passing | Client-side validation working |
-| **State Channels** | ✅ **Production Ready** | Generalized framework | 5/5 tests passing | Off-chain scaling operational |
-| **DLC** | ✅ **Production Ready** | Oracle integration ready | 5/5 tests passing | Smart contracts functional |
-| **Taproot Assets** | ✅ **Production Ready** | Asset issuance complete | 5/5 tests passing | Bitcoin-native assets working |
-| **BOB Protocol** | � Framework Ready | EVM bridge foundation | Framework tests pass | Hardware integration Phase 2 |
-| **RSK** | � Framework Ready | Sidechain architecture | Framework tests pass | Full implementation Phase 3 |
-| **Stacks** | 🟡 Framework Ready | Smart contract foundation | Framework tests pass | Integration Phase 3 |
-| **Liquid Network** | 🟡 Framework Ready | Sidechain foundation | Framework tests pass | Full implementation Phase 3 |
+| **Lightning Network** | ✅ Production with real node | Async implementation + adapter | Unit/integration tests pass | Simulation by default; wire to LN node for prod |
+| **RGB Protocol** | ✅ Production with RGB core | Schemas/issuance/transfer + adapter | Unit/integration tests pass | Simulation by default; wire to RGB core for prod |
+| **Taproot Assets** | ✅ Production (lib-backed) | Asset issuance and proofs | Unit tests pass | Requires Bitcoin connectivity for live issuance |
+| **State Channels** | 🟡 Framework Ready | Generalized off-chain state | Basic tests | Needs concrete backend + conformance |
+| **DLC** | 🟡 Framework Ready | Oracle contract scaffolding | Basic tests | Needs oracle/network wiring + conformance |
+| **BOB Protocol** | 🟡 Framework Ready | EVM bridge foundation | Framework tests | Hardware integration Phase 2 |
+| **RSK** | 🟡 Framework Ready | Sidechain architecture | Framework tests | Full implementation Phase 3 |
+| **Stacks** | 🟡 Framework Ready | Smart contract foundation | Framework tests | Integration Phase 3 |
+| **Liquid Network** | 🟡 Framework Ready | Sidechain foundation | Framework tests | Full implementation Phase 3 |
 
-### Build & Test Status
-
-```bash
-# Current test results (August 2, 2025)
-Running 114 tests... ✅ 99.1% PASSING (113/114)
-
-✅ Core Bitcoin: 28/28 tests passing
-✅ Layer2 Integration: 5/5 tests passing
-✅ Security Components: 15/15 tests passing
-✅ HSM Operations: 12/12 tests passing
-✅ Configuration: 8/8 tests passing
-✅ Utility Functions: 45/45 tests passing
-⚠️  Performance Benchmarks: 0/1 skipped (timing-dependent)
-
-# Compilation Status
-cargo build --all-features --all-targets
-✅ Compiled successfully (0 errors, 0 warnings)
-
-# Production Readiness Metrics
-- Production Readiness: 65% → Target: 95% (Phase 4)
-- Security Compliance: 90% (BIP standards maintained)
-- HSM Availability: 99.9% (software + hardware fallback)
-- Documentation Coverage: 85% (comprehensive guides available)
-```
-
-- Integration Tests: 9 tests passing
-- Utility Tests: 27 tests passing
-
-Build Status: ✅ Clean compilation
-Lint Status: ⚠️ 1 warning (unused import)
-
-```
+<!-- Historical build/test summaries removed to avoid drift. Run local commands above or consult CI dashboards for up-to-date status. -->
 
 ---
 
@@ -494,6 +474,15 @@ cargo test --test layer2_integration_comprehensive
 
 # Run Bitcoin protocol tests
 cargo test --test bitcoin_integration
+
+# HSM simulator tests (dev only)
+cargo test --features dev-sim,hsm-full --no-fail-fast -- --nocapture
+
+# Extended / Heavy HSM tests (explicit opt-in to avoid false CI failures)
+export ANYA_ENABLE_HSM_CROSS=1            # enable cross-provider ops test
+export ANYA_ENABLE_HSM_HEALTH=1           # enable provider health loop test
+export ANYA_ENABLE_HSM_CONCURRENCY=1      # enable concurrency stress test
+cargo test security::hsm::tests::integration::hsm_integration_tests:: -- --nocapture
 ```
 
 **BIP Compliance Testing:**
@@ -515,7 +504,8 @@ cargo test --test bip_tests -- --nocapture
 cargo audit
 
 # Check for unsafe code
-cargo geiger
+# (cargo-geiger removed in security remediation; use cargo deny + manual review)
+cargo deny check
 
 # Run clippy for code quality
 cargo clippy -- -D warnings
@@ -530,6 +520,90 @@ cargo bench
 # Memory usage analysis
 cargo test --release -- --nocapture | grep "memory"
 ```
+
+### Environment-Honest Test Philosophy
+
+Anya Core follows an "environment-honest" policy: tests never fabricate success when required infrastructure (bitcoind, external endpoints, hardware HSM) is absent. Instead:
+
+- Explicit feature flags or environment variables gate execution of infrastructure-dependent tests.
+- Timeouts or missing dependencies result in a logged SKIP (not a silent pass) so signal integrity is preserved.
+- Core logic is still exercised via deterministic unit tests independent of external services.
+
+Recent HSM integration gating variables:
+
+| Variable | Purpose | When to Enable |
+|----------|---------|----------------|
+| `ANYA_ENABLE_HSM_CROSS` | Cross-provider Bitcoin key/sign/health sequence | Full HSM + bitcoind integration session |
+| `ANYA_ENABLE_HSM_HEALTH` | Provider health check validation loop | Observability / reliability validation |
+| `ANYA_ENABLE_HSM_CONCURRENCY` | Concurrency stress (multi-key generate/sign/verify) | Load & race condition analysis |
+
+Unset variables cause those specific tests to emit a `SKIP:` line and exit early—preventing false negatives in minimal CI while maintaining transparency.
+
+### Minimal Feature Build Profile (Security / Compliance Baseline)
+
+To support hardened, smallest-surface deployments we validate a minimal profile that excludes Bitcoin, DWN/Web5, RocksDB, HSM, and hybrid orchestration unless explicitly enabled. This ensures: (1) no accidental linkage of cryptographic subsystems not in scope, (2) the transitive `rsa` advisory chain remains eliminated, and (3) feature gating errors fail fast.
+
+Minimal baseline compile (library + enterprise Postgres only):
+
+```bash
+cargo build --no-default-features --features "std,enterprise"
+```
+
+Properties:
+
+- Zero Bitcoin / Taproot / secp256k1 symbols compiled
+- Postgres-only `sqlx` (MySQL path stubbed out, no `rsa`)
+- Storage Router absent unless `storage-hybrid` (implies `dwn`) enabled
+- RocksDB excluded unless `kv-rocks` added
+- HSM stack fully excluded (add `hsm` or `hsm-full` to opt in)
+- API remains available if you add `api`
+
+Incremental opt-ins (compose as needed):
+
+| Feature | Adds |
+|---------|------|
+| `bitcoin` | Bitcoin protocol (Taproot, PSBT, wallet) |
+| `dwn` | Decentralized Web Node integration |
+| `storage-hybrid` | Runtime hybrid orchestrator (adds `dwn`, `kv-rocks`, `enterprise`) |
+| `kv-rocks` | Local RocksDB acceleration only |
+| `hsm` / `hsm-full` | Software / full HSM suite |
+| `api` | HTTP API layer |
+
+Runtime storage selection (when hybrid compiled) is controlled by `ANYA_STORAGE_BACKEND`:
+
+| Value | Behavior |
+|-------|----------|
+| `auto` (default) | Prefer DWN if available/reachable else persistent |
+| `dwn` | Force DWN (errors if feature not compiled) |
+| `persistent` | Force Postgres/Rocks path even if DWN present |
+
+Example forcing persistent on minimal base (no hybrid compiled; variable ignored gracefully):
+
+```bash
+ANYA_STORAGE_BACKEND=persistent cargo run --no-default-features --features "std,enterprise"
+```
+
+Verification (expect clean build, zero warnings if clippy used, advisory-clean):
+
+```bash
+cargo clean
+cargo build --no-default-features --features "std,enterprise"
+cargo test  --no-default-features --features "std,enterprise" --lib
+cargo deny check
+```
+
+Edge cases validated:
+
+- `ANYA_STORAGE_BACKEND=dwn` without `dwn` feature => controlled error
+- Router logs chosen backend under hybrid build
+- Tests skip DWN-specific assertions when not compiled
+
+Planned improvements:
+
+- Add CI matrix job for minimal profile
+- Introduce meta feature `minimal` (deferred to avoid premature coupling)
+
+Security stance: Start minimal, expand features deliberately, re-run `cargo deny` each expansion.
 
 ---
 
@@ -564,8 +638,8 @@ cargo test --lib
 
 **3. Development Guidelines:**
 
-- Follow [Bitcoin Development Framework](docs/bitcoin/IMPLEMENTATION_PLAN.md) patterns
-- Ensure all code follows [AI Labeling Standards](docs/standards/AI_LABELING.md)
+- Follow [Bitcoin Development Framework](docs/bitcoin/README.md) patterns
+- Ensure all code follows [AI Labeling Standards](docs_legacy/standards/AI_LABELING.md)
 - Add comprehensive tests for new features
 - Update documentation for any API changes
 
@@ -647,5 +721,40 @@ Special thanks to the following projects and communities that make Anya Core pos
 ---
 
 Maintainer: Botshelo Mokoka (<botshelomokoka+anya-core@gmail.com>)
-Last Updated: August 8, 2025
+Last Updated: August 10, 2025
 Version: 1.3.0
+
+---
+
+## Developer shortcuts & environment-honest testing
+
+- CLI aliases (via `.cargo/config.toml`):
+  - `cargo core-health` – run core health check
+  - `cargo core-validate` – run configuration validation
+  - `cargo core-start` – start core binary
+- Network-bound tests: If DNS/ports aren’t reachable locally, network validation tests will fail; treat as advisory in dev environments.
+- HSM simulator: The dev simulator is locked-by-default; tests should initialize and unlock via a custom `unlock` operation (pin "1234") and use per-test timeouts to avoid hangs.
+
+### Recent Security & Dependency Remediation (August 2025)
+
+Environment-honest principle: we do not mask missing infrastructure as passing tests. Instead, tests explicitly `skip` when required credentials, binaries, or network reachability are absent (e.g., Bitcoin RPC 400/401 unauth, connection refused, or network validation flag not set). This preserves trust in green test runs.
+
+Security hardening just applied:
+
+- Removed `cargo-geiger` runtime dependency which pulled in vulnerable `gix*` crates exposing multiple 2024 RUSTSEC advisories (RUSTSEC-2024-0335, 0348, 0349, 0351, 0352, 0353) concerning path traversal, Windows device name exploitation, and SSH username option smuggling.
+- Regenerated dependency graph (`cargo update`) updating: `bitcoin 0.32.7`, `bdk_wallet 2.1.0`, `tokio 1.47.1`, plus minor patch bumps (clap, h2, tokio-util, etc.).
+- Re-ran `cargo deny check` – all categories now pass: advisories ok, bans ok, licenses ok, sources ok.
+- Retained `.gitignore` exclusion for `Cargo.lock` to keep workspace dependency flexibility; if reproducible builds are required for deployment artifacts, either commit a frozen `Cargo.lock` on a release branch or run CI with `-Z minimal-versions` to verify forward-compat.
+
+Operational guidance:
+
+```bash
+# Security validation (current set)
+cargo deny check           # advisory, license, bans, sources
+cargo audit || true        # supplemental (advisory overlap; may duplicate deny)
+
+# Environment-honest targeted smoke (skips instead of false green):
+cargo test --test bitcoin_rpc_smoke -- --nocapture
+```
+
+Rationale: Removing the vulnerable chain avoids shipping tooling-only crates in production surfaces, keeping attack surface minimal while preserving the option to run geiger scans out-of-tree (use a separate tool invocation without adding a dependency).

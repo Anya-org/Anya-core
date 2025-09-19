@@ -2,6 +2,9 @@ use crate::security::hsm::error::HsmError;
 use crate::security::hsm::types::*;
 use std::collections::HashMap;
 
+// Type alias to simplify the supported operation handler signature (reduces type complexity)
+type OperationHandler = fn(Vec<u8>) -> Result<Vec<u8>, HsmError>;
+
 /// Operation Response struct for HSM operations
 #[derive(Debug, Clone)]
 pub struct OperationResponse {
@@ -27,7 +30,13 @@ pub enum OperationStatus {
 /// HSM Operation processor
 pub struct OperationProcessor {
     /// Supported operations
-    supported_operations: HashMap<String, fn(Vec<u8>) -> Result<Vec<u8>, HsmError>>,
+    supported_operations: HashMap<String, OperationHandler>,
+}
+
+impl Default for OperationProcessor {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl OperationProcessor {
@@ -39,11 +48,7 @@ impl OperationProcessor {
     }
 
     /// Register a new operation
-    pub fn register_operation(
-        &mut self,
-        name: &str,
-        handler: fn(Vec<u8>) -> Result<Vec<u8>, HsmError>,
-    ) {
+    pub fn register_operation(&mut self, name: &str, handler: OperationHandler) {
         self.supported_operations.insert(name.to_string(), handler);
     }
 

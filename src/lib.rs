@@ -27,7 +27,7 @@
 //!
 //! # async fn example() -> Result<(), Box<dyn std::error::Error>> {
 //! // Initialize Anya with default configuration
-//! let anya = AnyaCore::default()?;
+//! let anya = AnyaCore::with_defaults()?;
 //!
 //! // Or with custom configuration
 //! let config = AnyaConfig::default();
@@ -60,13 +60,14 @@ pub mod ml;
 pub mod mobile;
 pub mod network;
 pub mod security;
+pub mod storage;
 pub mod testing;
 pub mod tokenomics;
 pub mod tools;
 pub mod types;
 pub mod utils;
 pub mod web;
-pub mod web5;
+pub mod web5; // Export storage (persistent, decentralized, router)
 
 // New analytics and security ML modules (replaces Python implementations)
 pub mod analytics;
@@ -190,7 +191,7 @@ pub mod hardware_optimization {
                 &self.capabilities
             }
 
-            #[cfg(feature = "rust-bitcoin")]
+            #[cfg(feature = "bitcoin")]
             pub fn verify_transaction_batch(
                 &self,
                 transactions: &[bitcoin::Transaction],
@@ -206,17 +207,17 @@ pub mod hardware_optimization {
                 Ok(invalid_indices)
             }
 
-            #[cfg(not(feature = "rust-bitcoin"))]
+            #[cfg(not(feature = "bitcoin"))]
             pub fn verify_transaction_batch(
                 &self,
-                _transactions: &[bitcoin::Transaction],
+                _transactions: &[()],
                 _config: &BatchVerificationConfig,
             ) -> Result<Vec<usize>, Box<dyn std::error::Error>> {
                 log::debug!("Hardware-optimized batch verification not available");
                 Ok(vec![])
             }
 
-            #[cfg(feature = "rust-bitcoin")]
+            #[cfg(feature = "bitcoin")]
             pub fn verify_taproot_transaction(
                 &self,
                 tx: &bitcoin::Transaction,
@@ -227,10 +228,10 @@ pub mod hardware_optimization {
                 Ok(())
             }
 
-            #[cfg(not(feature = "rust-bitcoin"))]
+            #[cfg(not(feature = "bitcoin"))]
             pub fn verify_taproot_transaction(
                 &self,
-                _tx: &bitcoin::Transaction,
+                _tx: &(),
             ) -> Result<(), Box<dyn std::error::Error>> {
                 Ok(())
             }

@@ -3,6 +3,8 @@ use async_trait::async_trait;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+// Type alias to simplify complex nested type for operation tracking
+type OperationTracker = HashMap<String, (DateTime<Utc>, String)>;
 use std::fs;
 use std::fs::{File, OpenOptions};
 use std::io::Write;
@@ -82,7 +84,7 @@ pub struct AuditLogger {
     storage: Arc<Mutex<Box<dyn AuditStorage + Send + Sync>>>,
 
     /// Operation tracker for tracking related operations
-    operation_tracker: Arc<Mutex<HashMap<String, (DateTime<Utc>, String)>>>,
+    operation_tracker: Arc<Mutex<OperationTracker>>,
 }
 
 impl AuditLogger {
@@ -99,7 +101,7 @@ impl AuditLogger {
         let logger = Self {
             config: config.clone(),
             storage: Arc::new(Mutex::new(storage)),
-            operation_tracker: Arc::new(Mutex::new(HashMap::new())),
+            operation_tracker: Arc::new(Mutex::new(OperationTracker::new())),
         };
 
         // Initialize the storage
@@ -605,6 +607,12 @@ pub struct MemoryAuditStorage {
     events: Mutex<Vec<AuditEvent>>,
 }
 
+impl Default for MemoryAuditStorage {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl MemoryAuditStorage {
     pub fn new() -> Self {
         Self {
@@ -740,7 +748,7 @@ impl FileAuditStorage {
 
         // Read file contents
         let contents = fs::read_to_string(path).map_err(|e| {
-            HsmError::AuditStorageError(format!("Failed to read audit log file: {}", e))
+            HsmError::AuditStorageError(format!("Failed to read audit log file: {e}"))
         })?;
 
         // Parse events (each line is a JSON object)
@@ -771,7 +779,7 @@ impl AuditStorage for FileAuditStorage {
         if let Some(dir) = dir_path {
             if !dir.exists() {
                 fs::create_dir_all(dir).map_err(|e| {
-                    HsmError::AuditStorageError(format!("Failed to create directory: {}", e))
+                    HsmError::AuditStorageError(format!("Failed to create directory: {e}"))
                 })?;
             }
         }
@@ -779,7 +787,7 @@ impl AuditStorage for FileAuditStorage {
         // Create the file if it doesn't exist
         if !Path::new(file_path).exists() {
             File::create(file_path).map_err(|e| {
-                HsmError::AuditStorageError(format!("Failed to create audit log file: {}", e))
+                HsmError::AuditStorageError(format!("Failed to create audit log file: {e}"))
             })?;
         }
 
@@ -797,12 +805,12 @@ impl AuditStorage for FileAuditStorage {
             .append(true)
             .open(&self.file_path)
             .map_err(|e| {
-                HsmError::AuditStorageError(format!("Failed to open audit log file: {}", e))
+                HsmError::AuditStorageError(format!("Failed to open audit log file: {e}"))
             })?;
 
         // Write the event with a newline
-        writeln!(file, "{}", json).map_err(|e| {
-            HsmError::AuditStorageError(format!("Failed to write to audit log file: {}", e))
+        writeln!(file, "{json}").map_err(|e| {
+            HsmError::AuditStorageError(format!("Failed to write to audit log file: {e}"))
         })?;
 
         Ok(())
@@ -898,7 +906,7 @@ impl AuditStorage for FileAuditStorage {
                 .truncate(true)
                 .open(&self.file_path)
                 .map_err(|e| {
-                    HsmError::AuditStorageError(format!("Failed to open audit log file: {}", e))
+                    HsmError::AuditStorageError(format!("Failed to open audit log file: {e}"))
                 })?;
 
             // Write each event
@@ -906,8 +914,8 @@ impl AuditStorage for FileAuditStorage {
                 let json = serde_json::to_string(event)
                     .map_err(|e| HsmError::SerializationError(e.to_string()))?;
 
-                writeln!(file, "{}", json).map_err(|e| {
-                    HsmError::AuditStorageError(format!("Failed to write to audit log file: {}", e))
+                writeln!(file, "{json}").map_err(|e| {
+                    HsmError::AuditStorageError(format!("Failed to write to audit log file: {e}"))
                 })?;
             }
         }

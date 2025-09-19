@@ -165,7 +165,7 @@ impl HardwareHsmProvider {
             &bitcoin::PrivateKey::new(secret_key, self.network),
         )
         .map_err(|e| {
-            HsmError::KeyGenerationError(format!("Failed to create compressed public key: {}", e))
+            HsmError::KeyGenerationError(format!("Failed to create compressed public key: {e}"))
         })?;
 
         // Generate testnet address
@@ -406,8 +406,7 @@ impl HsmProvider for HardwareHsmProvider {
                 let params: KeyGenParams = serde_json::from_value(request.parameters.clone())
                     .map_err(|e| {
                         HsmError::InvalidParameters(format!(
-                            "Invalid key generation parameters: {}",
-                            e
+                            "Invalid key generation parameters: {e}"
                         ))
                     })?;
 
@@ -420,7 +419,7 @@ impl HsmProvider for HardwareHsmProvider {
             HsmOperation::Sign => {
                 let params: SignParams = serde_json::from_value(request.parameters.clone())
                     .map_err(|e| {
-                        HsmError::InvalidParameters(format!("Invalid signing parameters: {}", e))
+                        HsmError::InvalidParameters(format!("Invalid signing parameters: {e}"))
                     })?;
 
                 // [AIR-3][AIS-3][BPC-3][RES-3] Sign data using hardware HSM
@@ -441,14 +440,13 @@ impl HsmProvider for HardwareHsmProvider {
                 let params: BitcoinTxSignParams =
                     serde_json::from_value(request.parameters.clone()).map_err(|e| {
                         HsmError::InvalidParameters(format!(
-                            "Invalid Bitcoin TX signing parameters: {}",
-                            e
+                            "Invalid Bitcoin TX signing parameters: {e}"
                         ))
                     })?;
 
                 // Decode PSBT
                 let mut psbt = bitcoin::psbt::Psbt::from_str(&params.psbt)
-                    .map_err(|e| HsmError::InvalidParameters(format!("Invalid PSBT: {}", e)))?;
+                    .map_err(|e| HsmError::InvalidParameters(format!("Invalid PSBT: {e}")))?;
 
                 // Sign the transaction
                 self.sign_bitcoin_transaction(&params.key_id, &mut psbt)

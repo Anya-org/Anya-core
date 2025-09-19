@@ -140,7 +140,9 @@ impl Default for RGBConfig {
         Self {
             data_dir: PathBuf::from("./rgb_data"),
             network: "testnet".to_string(),
-            electrum_url: "electrum.blockstream.info:60002".to_string(),
+            electrum_url: crate::bitcoin::external_endpoints::ExternalBitcoinEndpoints::resolve()
+                .electrum_testnet
+                .to_string(),
             storage_type: "sqlite".to_string(),
             fee_rate: 1.0,
         }

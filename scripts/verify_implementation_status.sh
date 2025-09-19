@@ -1,6 +1,43 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Anya Core Implementation Status Verification Script
 # Enforces adherence to verified reality over aspirational claims
+
+# shellcheck disable=SC3040
+set -euo pipefail
+
+print_usage() {
+    cat <<'USAGE'
+Usage: scripts/verify_implementation_status.sh [options]
+
+Options:
+    --auto-run           Run builds and tests as part of verification
+    --yes-all            Do not fail the script; convert failures into warnings (exit 0)
+    --network <mode>     Override network mode: regtest | testnet | mainnet
+    --json               Emit a compact JSON summary to stdout at the end
+    -h, --help           Show this help
+
+Behavior:
+    - Defaults to ANYA_NETWORK_TYPE env or 'testnet' if not set
+    - In regtest: mocks/simulations allowed; in testnet/mainnet: disallowed
+    - With --yes-all: never exit non-zero; useful for auto pipelines
+USAGE
+}
+
+AUTO_RUN=0
+YES_ALL=0
+EMIT_JSON=0
+OVERRIDE_NETWORK=""
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --auto-run) AUTO_RUN=1; shift ;;
+        --yes-all) YES_ALL=1; shift ;;
+        --network) OVERRIDE_NETWORK="${2:-}"; shift 2 ;;
+        --json) EMIT_JSON=1; shift ;;
+        -h|--help) print_usage; exit 0 ;;
+        *) echo "Unknown option: $1"; print_usage; exit 2 ;;
+    esac
+done
 
 echo "🔍 ANYA CORE IMPLEMENTATION STATUS VERIFICATION"
 echo "================================================"
@@ -8,14 +45,127 @@ echo "Date: $(date)"
 echo "Purpose: Verify actual implementation status against claims"
 echo ""
 
-# Check compilation status
-echo "📋 COMPILATION STATUS:"
-echo "----------------------"
-if cargo check --all-features >/dev/null 2>&1; then
-    echo "✅ Compilation: PASSING"
+# Determine network mode early (env -> override)
+NETWORK_MODE=${ANYA_NETWORK_TYPE:-${NETWORK_MODE:-testnet}}
+if [ -n "$OVERRIDE_NETWORK" ]; then
+    NETWORK_MODE="$OVERRIDE_NETWORK"
+fi
+
+# Check compilation status (and optionally run tests)
+echo "📋 COMPILATION / FORMAT / LINT STATUS:"
+echo "--------------------------------------"
+# Formatting gate
+if cargo fmt -- --check >/dev/null 2>&1; then
+    echo "✅ Formatting: CLEAN"
 else
-    echo "❌ Compilation: FAILING"
-    echo "   → Must fix compilation before claiming any completeness"
+    echo "❌ Formatting: DIRTY (run cargo fmt)"
+    FORMAT_FAIL=1
+fi
+
+if cargo check --all-features >/dev/null 2>&1; then
+    echo "✅ Compilation: PASS"
+else
+    echo "❌ Compilation: FAIL"
+    COMPILATION_FAIL=1
+fi
+
+# Run clippy strict (capture output if fails)
+if cargo clippy --all-targets --all-features -- -D warnings >/dev/null 2>&1; then
+    echo "✅ Clippy (‑D warnings): PASS"
+    CLIPPY_FAIL=0
+else
+    echo "❌ Clippy (‑D warnings): FAIL"
+    CLIPPY_FAIL=1
+fi
+
+# Dependency drift (duplicate versions)
+echo ""
+echo "🌳 DEPENDENCY DRIFT:"
+echo "-------------------"
+if cargo tree -d > /tmp/dep_dups.txt 2>/dev/null; then
+    if grep -q "No duplicate dependencies" /tmp/dep_dups.txt; then
+        echo "✅ Duplicate versions: NONE"
+    else
+        if grep -E "(tokio|serde|hyper|openssl) v[0-9]+" /tmp/dep_dups.txt >/dev/null 2>&1; then
+            echo "❌ Critical duplicate dependency versions detected"
+            head -25 /tmp/dep_dups.txt
+            DEP_DRIFT_FAIL=1
+        else
+            echo "🟡 Non-critical duplicate versions present (monitor)"
+            head -15 /tmp/dep_dups.txt
+        fi
+    fi
+else
+    echo "⚠️ Unable to run cargo tree -d"
+fi
+
+if [ "$AUTO_RUN" -eq 1 ]; then
+    echo ""
+    echo "🧪 TEST EXECUTION:"
+    echo "------------------"
+    TEST_TIMEOUT_SECS=${TEST_TIMEOUT_SECS:-600}
+    if command -v timeout >/dev/null 2>&1; then
+        if timeout "${TEST_TIMEOUT_SECS}s" cargo test --all-features -- --nocapture >/dev/null 2>&1; then
+            echo "✅ Unit tests: PASSING"
+            TEST_FAIL=0
+        else
+            echo "❌ Unit tests: FAILING or TIMED OUT (${TEST_TIMEOUT_SECS}s)"
+            TEST_FAIL=1
+        fi
+    else
+        if cargo test --all-features -- --nocapture >/dev/null 2>&1; then
+        echo "✅ Unit tests: PASSING"
+        TEST_FAIL=0
+    else
+        echo "❌ Unit tests: FAILING"
+        TEST_FAIL=1
+        fi
+    fi
+else
+    TEST_FAIL=0
+fi
+
+# Test inventory / skip accounting (non-fatal yet)
+echo ""
+echo "🧪 TEST INVENTORY:"
+echo "------------------"
+if cargo test -- --list > /tmp/test_list.txt 2>/dev/null; then
+    TOTAL_TESTS=$(grep -c ': test' /tmp/test_list.txt || true)
+    IGNORED_TESTS=$(grep -c ': test (ignored)' /tmp/test_list.txt || true)
+    echo "Total tests discovered: $TOTAL_TESTS"
+    echo "Ignored tests: $IGNORED_TESTS"
+    if [ "$IGNORED_TESTS" -gt 0 ]; then
+        echo "(instrumentation) Expect corresponding [skip-metric] lines in future gate)"
+    fi
+else
+    echo "⚠️ Unable to list tests (cargo test -- --list failed)"
+fi
+
+# Security checks (always if AUTO_RUN or explicit enterprise env)
+echo ""
+echo "🔐 SECURITY (deny/audit):"
+echo "-------------------------"
+SEC_DENY=0
+SEC_AUDIT=0
+if command -v cargo-deny >/dev/null 2>&1; then
+    if cargo deny check >/dev/null 2>&1; then
+        echo "✅ cargo-deny: PASS"
+    else
+        echo "❌ cargo-deny: FAIL"
+        SEC_DENY=1
+    fi
+else
+    echo "⚠️ cargo-deny not installed"
+fi
+if command -v cargo-audit >/dev/null 2>&1; then
+    if cargo audit -q >/dev/null 2>&1; then
+        echo "✅ cargo-audit: PASS"
+    else
+        echo "❌ cargo-audit: FAIL"
+        SEC_AUDIT=1
+    fi
+else
+    echo "⚠️ cargo-audit not installed"
 fi
 
 # Count unimplemented macros
@@ -77,7 +227,7 @@ if [ $mock_count -gt 100 ]; then
     echo "❌ High number of mock implementations detected"
     echo "   → Network/Oracle layers may use placeholder implementations"
 else
-    echo "✅ Mock implementations: $mock_count (acceptable for network/oracle layers)"
+    echo "✅ Mock implementations: $mock_count (acceptable for system that need anya-core peers to verify)"
 fi
 
 # Detailed mock analysis
@@ -115,22 +265,90 @@ else
     echo "   → Code quality needs improvement"
 fi
 
+# Simulation/fallback detection
+echo ""
+echo "🧪 SIMULATION/FALLBACK DETECTION (env-aware):"
+echo "-------------------------------------------"
+echo "Network mode: $NETWORK_MODE"
+
+# Build candidate file list excluding dev-sim and test/mock paths
+SIM_FILE_LIST=$(find src -type f -name "*.rs" \
+    ! -path "*/providers/simulator.rs" \
+    ! -path "*/layer2/dev_sim.rs" \
+    ! -path "*/tests/*" \
+    ! -path "*/*_test.rs" \
+    ! -path "*/mock/*" \
+    ! -path "*/mocks/*" \
+    ! -name "*.toml" ! -name "*.yaml" ! -name "*.yml" ! -name "*.json" ! -name "*.conf" 2>/dev/null)
+
+# Count simulate function definitions or calls only (not config field names)
+sim_count=$(echo "$SIM_FILE_LIST" | xargs -r grep -E "^[[:space:]]*fn[[:space:]]+simulate_[A-Za-z0-9_]*[[:space:]]*\(|[^A-Za-z0-9_]simulate_[A-Za-z0-9_]*[[:space:]]*\(" 2>/dev/null | wc -l)
+# Count explicit mock adapter/protocol types in non-test code
+mock_proto_count=$(echo "$SIM_FILE_LIST" | xargs -r grep -E "NoopAdapter|MockProtocol" 2>/dev/null | wc -l)
+fallback_flag_count=$(echo "$SIM_FILE_LIST" | xargs -r grep -E "enable_self_node_fallback" 2>/dev/null | wc -l)
+echo "Simulation fns/calls: $sim_count"
+echo "Mock protocol refs: $mock_proto_count"
+echo "Fallback flags (enable_self_node_fallback): $fallback_flag_count"
+
+sim_fail=0
+sim_fail=0
+if [ "$NETWORK_MODE" = "regtest" ]; then
+    # Regtest allows simulation/mocks for rapid iteration
+    if [ "$sim_count" -gt 0 ] || [ "$mock_proto_count" -gt 0 ]; then
+        echo "🟡 Simulation/mocks present (allowed in regtest)"
+    else
+        echo "✅ No simulation/mocks detected"
+    fi
+elif [ "$sim_count" -gt 0 ] || [ "$mock_proto_count" -gt 0 ]; then
+    if [ "${ALLOW_SIMULATION:-0}" -eq 1 ]; then
+        echo "🟡 Simulation/mocks detected but allowed via ALLOW_SIMULATION=1"
+    else
+        echo "❌ Simulation/mocks detected in production mode (testnet/mainnet). Set ALLOW_SIMULATION=1 to temporarily bypass."
+        sim_fail=1
+    fi
+else
+    echo "✅ No simulation/mocks detected in production code paths"
+fi
+
+# List offenders (top 10) to speed up remediation
+if [ $sim_fail -eq 1 ]; then
+    echo ""
+    echo "🔎 Offending simulation/mock references (top 10):"
+    echo "$SIM_FILE_LIST" | xargs -r grep -nE "(^|[^A-Za-z0-9_])(fn[[:space:]]+simulate_|simulate_[A-Za-z0-9_]*\(|NoopAdapter|MockProtocol)" 2>/dev/null | head -10 || true
+fi
+
+# Dev-sim gating visibility
+DEV_SIM_GATES=$(grep -R "cfg(feature=\"dev-sim\")" --include "*.rs" src 2>/dev/null | wc -l)
+echo "Dev-sim feature gates present: $DEV_SIM_GATES"
+
 # Overall assessment
 echo ""
 echo "📊 OVERALL ASSESSMENT:"
 echo "====================="
 
-if [ $unimpl_count -eq 0 ] && [ $todo_count -eq 0 ] && [ $sqlite_todo_count -eq 0 ]; then
+OVERALL_FAIL=0
+if [ $unimpl_count -eq 0 ] && [ $todo_count -eq 0 ] && [ $sqlite_todo_count -eq 0 ] && [ $sim_fail -eq 0 ] && [ ${TEST_FAIL:-0} -eq 0 ] && [ ${CLIPPY_FAIL:-0} -eq 0 ] && [ ${SEC_DENY:-0} -eq 0 ] && [ ${SEC_AUDIT:-0} -eq 0 ] && [ ${FORMAT_FAIL:-0} -eq 0 ] && [ ${DEP_DRIFT_FAIL:-0} -eq 0 ]; then
     echo "✅ PRODUCTION READY: All core implementations complete"
+elif [ $sim_fail -eq 1 ]; then
+    echo "❌ NOT PRODUCTION READY: Simulation/fallback paths present"
+    echo "   Priority: Replace simulate_* and NoopAdapter/MockProtocol with real adapters"
+    OVERALL_FAIL=1
 elif [ $unimpl_count -gt 0 ]; then
     echo "❌ NOT PRODUCTION READY: $unimpl_count unimplemented!() functions"
     echo "   Priority: Complete RGB/DLC core functions first"
+    OVERALL_FAIL=1
 elif [ $sqlite_todo_count -gt 0 ]; then
     echo "🟡 PARTIAL IMPLEMENTATION: Storage layer has $sqlite_todo_count TODOs"
     echo "   Priority: Complete storage implementation"
+    OVERALL_FAIL=1
+elif [ $TEST_FAIL -ne 0 ]; then
+    echo "❌ TEST FAILURES detected"
+    echo "   Priority: Fix failing tests"
+    OVERALL_FAIL=1
 else
     echo "🟡 PARTIAL IMPLEMENTATION: $todo_count todo!() stubs remaining"
     echo "   Priority: Complete Web5/DID implementation"
+    OVERALL_FAIL=1
 fi
 
 # Available systems inventory
@@ -199,6 +417,64 @@ else
     echo "🤖 ML/AI System: ❌ Not found"
 fi
 
+    # Docs check: Multiple H1 headings in PRDs (MD025 heuristic)
+    echo ""
+    echo "📚 DOCUMENTATION HEALTH:"
+    echo "------------------------"
+    PRD_DIR="docs/prd"
+    if [ -d "$PRD_DIR" ]; then
+        md025_issues=0
+        while IFS= read -r -d '' file; do
+            h1_count=$(grep -c '^# ' "$file" || true)
+            if [ "$h1_count" -gt 1 ]; then
+                echo "⚠️  Multiple H1 headings: $file ($h1_count)"
+                md025_issues=$((md025_issues+1))
+            fi
+        done < <(find "$PRD_DIR" -maxdepth 1 -type f -name "*.md" -print0 2>/dev/null)
+        if [ "$md025_issues" -eq 0 ]; then
+            echo "✅ PRD files: single H1 heading per document"
+        fi
+    else
+        echo "ℹ️ PRD directory not found at $PRD_DIR"
+    fi
+
+    # Docker Compose sanity (optional)
+    echo ""
+    echo "🐳 DOCKER COMPOSE CONFIG:"
+    echo "-------------------------"
+    if command -v docker >/dev/null 2>&1; then
+        if docker compose config -q >/dev/null 2>&1; then
+            echo "✅ docker-compose.*: valid configuration"
+        else
+            echo "⚠️ docker-compose config failed (check YAML/indentation)"
+            OVERALL_FAIL=1
+        fi
+    else
+        echo "(docker not available) skipping docker compose validation"
+    fi
+
+    # RPC wiring checks
+    echo ""
+    echo "🔌 BITCOIN RPC WIRING:"
+    echo "----------------------"
+    RPC_INFO=$(grep -R "get_blockchain_info\|estimate_smart_fee" --include "*.rs" src 2>/dev/null | wc -l)
+    if [ "$RPC_INFO" -gt 0 ]; then
+        echo "✅ RPC integration symbols present (height/hash/fees)"
+    else
+        echo "❌ RPC integration symbols missing"
+        OVERALL_FAIL=1
+    fi
+
+    # Default network is testnet check (alignment)
+    echo ""
+    echo "🌐 DEFAULT NETWORK ALIGNMENT:"
+    echo "-----------------------------"
+    if grep -R "network_id:\s*\"bitcoin-testnet\"" src/layer2/production.rs >/dev/null 2>&1; then
+        echo "✅ Default network: testnet"
+    else
+        echo "⚠️ Default network not testnet"
+    fi
+
 echo ""
 echo "📋 VERIFICATION COMMANDS FOR DOCUMENTATION:"
 echo "==========================================="
@@ -207,6 +483,7 @@ echo "Unimplemented: grep -r \"unimplemented!\" --include=\"*.rs\" . | wc -l"
 echo "Todo stubs: grep -r \"todo!\" --include=\"*.rs\" . | wc -l"
 echo "SQLite TODOs: grep -r \"TODO.*SQLite\" --include=\"*.rs\" . | wc -l"
 echo "Warnings: cargo check --all-features 2>&1 | grep \"warning:\" | wc -l"
+echo "Simulation/fallback: find src -name '*.rs' -print0 | xargs -0 grep -E 'simulate_|NoopAdapter|MockProtocol|enable_self_node_fallback' | wc -l"
 
 echo ""
 echo "🎯 NEXT ACTIONS BASED ON VERIFICATION:"
@@ -251,3 +528,31 @@ echo "• No '100% complete' claims without unimplemented!() verification"
 echo "• All documentation must include verification command evidence"
 echo "• Progress tracked by macro reduction, not aspirational statements"
 echo "• This script must be run before any major status updates"
+
+# JSON summary (optional)
+if [ "$EMIT_JSON" -eq 1 ]; then
+    # shellcheck disable=SC2015
+    warnings=$(cargo check --all-features 2>&1 | grep -c 'warning:' || echo 0)
+    jq -n \
+        --arg network "$NETWORK_MODE" \
+        --argjson compilation "${COMPILATION_FAIL:-0}" \
+        --argjson clippy "${CLIPPY_FAIL:-0}" \
+        --argjson test_fail "${TEST_FAIL:-0}" \
+        --argjson deny_fail "${SEC_DENY:-0}" \
+        --argjson audit_fail "${SEC_AUDIT:-0}" \
+        --argjson sim_fail "$sim_fail" \
+        --argjson unimpl "$unimpl_count" \
+        --argjson todos "$todo_count" \
+        --argjson sqlite_todos "$sqlite_todo_count" \
+        --argjson warnings "$warnings" \
+        '{network, compilation_fail:compilation, clippy_fail:clippy, test_fail, deny_fail, audit_fail, sim_fail, unimplemented: $unimpl, todos: $todos, sqlite_todos: $sqlite_todos, warnings}' || true
+fi
+
+# Exit rules
+if [ "$YES_ALL" -eq 1 ]; then
+    exit 0
+fi
+if [ $sim_fail -eq 1 ] || [ $OVERALL_FAIL -eq 1 ] || [ ${CLIPPY_FAIL:-0} -eq 1 ] || [ ${SEC_DENY:-0} -eq 1 ] || [ ${SEC_AUDIT:-0} -eq 1 ]; then
+    exit 2
+fi
+exit 0
