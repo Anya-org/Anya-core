@@ -4,11 +4,11 @@
 //! including anomaly detection, pattern recognition, and performance analysis.
 //! This replaces the Python monitoring scripts with high-performance Rust implementations.
 
-use crate::ml::{MLSystem, MLConfig, MLOutput, MLInput};
+use crate::ml::{MLSystem, MLConfig, MLInput};
 use crate::{AnyaError, AnyaResult};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use std::time::{Duration, SystemTime, UNIX_EPOCH};
+use std::time::{SystemTime, UNIX_EPOCH};
 use tokio::sync::RwLock;
 use std::sync::Arc;
 
@@ -227,7 +227,7 @@ impl AnalyticsEngine {
                     metric_name: metric_name.to_string(),
                     anomaly_score,
                     is_anomaly,
-                    confidence: inference_result.confidence,
+                    confidence: inference_result.overall_confidence,
                     expected_range,
                     actual_value: series[i].value,
                 });
@@ -383,27 +383,21 @@ impl AnalyticsEngine {
                 max,
                 trend: calculate_trend(&values),
             });
-
-            // Detect anomalies for this metric
-            drop(store); // Release read lock temporarily
-            let anomalies = self.detect_anomalies(metric_name).await?;
-            let recent_anomalies = anomalies.into_iter()
-                .filter(|a| a.timestamp >= cutoff_time)
-                .collect::<Vec<_>>();
-            
-            anomaly_summary.insert(metric_name.clone(), recent_anomalies);
-            // Store metric name for anomaly detection later
-            metrics_to_process.push(metric_name.clone());
         }
-        drop(store); // Release read lock before anomaly detection
+        
+        // Release read lock before anomaly detection
+        drop(store);
 
-        // Now, process anomaly detection for each metric outside the lock
-        for metric_name in metrics_to_process {
+        // Collect metric names for anomaly detection
+        let metric_names: Vec<_> = metric_summary.keys().cloned().collect();
+        
+        // Process anomaly detection for each metric outside the lock
+        for metric_name in metric_names {
             let anomalies = self.detect_anomalies(&metric_name).await?;
             let recent_anomalies = anomalies.into_iter()
                 .filter(|a| a.timestamp >= cutoff_time)
                 .collect::<Vec<_>>();
-            anomaly_summary.insert(metric_name.clone(), recent_anomalies);
+            anomaly_summary.insert(metric_name, recent_anomalies);
         }
 
         Ok(AnalyticsReport {
@@ -413,22 +407,33 @@ impl AnalyticsEngine {
                 .unwrap()
                 .as_secs(),
             metric_summary,
-            anomaly_summary,
             recommendations: self.generate_recommendations(&anomaly_summary).await,
+            anomaly_summary,
         })
     }
 
     /// Perform real-time analysis on incoming data
     async fn analyze_real_time(&self, metric_name: &str, value: f64) -> AnyaResult<()> {
-        // Record metric for real-time analysis
+        // Record metric for real-time analysis (avoid recursion)
         let mut metadata = HashMap::new();
         metadata.insert("analysis_type".to_string(), "real_time".to_string());
         
-        self.record_metric(
-            &format!("{}_realtime", metric_name), 
-            value, 
-            Some(metadata)
-        ).await?;
+        // Direct storage update to avoid recursion
+        let realtime_metric = format!("{}_realtime", metric_name);
+        let data_point = DataPoint {
+            timestamp: SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .unwrap()
+                .as_secs(),
+            metric_name: realtime_metric.clone(),
+            value,
+            metadata,
+        };
+        
+        {
+            let mut store = self.data_store.write().await;
+            store.entry(realtime_metric).or_default().push(data_point);
+        }
 
         // Trigger immediate anomaly check if significant deviation
         // This is a simplified check - in production, you'd use more sophisticated methods

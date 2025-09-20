@@ -202,6 +202,8 @@ pub struct InferenceResult {
     pub model_version: String,
     pub inference_time_ms: f64,
     pub features_used: Vec<String>,
+    /// Raw output bytes for generic inference
+    pub output: Vec<u8>,
 }
 
 #[derive(Debug)]
@@ -340,6 +342,7 @@ impl ModelExecutor for LinearRegressionExecutor {
             features_used: (0..features.len())
                 .map(|i| format!("feature_{i}"))
                 .collect(),
+            output: serde_json::to_vec(&prediction).unwrap_or_default(),
         })
     }
 
@@ -437,6 +440,7 @@ impl ModelExecutor for NeuralNetworkExecutor {
             features_used: (0..features.len())
                 .map(|i| format!("feature_{i}"))
                 .collect(),
+            output: serde_json::to_vec(&predictions).unwrap_or_default(),
         })
     }
 
@@ -1076,6 +1080,43 @@ impl ProductionMLService {
             ],
             last_updated: Utc::now(),
         })
+    }
+
+    /// Generic predict method for compatibility with analytics module
+    pub async fn predict(&self, model_name: &str, input: &[u8]) -> AnyaResult<InferenceResult> {
+        // Run inference with the specified model
+        let mut result = self.inference(model_name, input).await
+            .map_err(|e| AnyaError::ML(format!("Inference failed: {}", e)))?;
+        
+        // For anomaly detection, return a simple score in the output field
+        if model_name == "anomaly_detector" {
+            // Parse input as MLInput if possible
+            if let Ok(ml_input) = serde_json::from_slice::<super::MLInput>(input) {
+                // Simple anomaly detection: check for outliers in features
+                let mean = ml_input.features.iter().sum::<f64>() / ml_input.features.len() as f64;
+                let variance = ml_input.features.iter()
+                    .map(|x| (x - mean).powi(2))
+                    .sum::<f64>() / ml_input.features.len() as f64;
+                let std_dev = variance.sqrt();
+                
+                // Simple anomaly score based on distance from mean
+                let anomaly_score = if std_dev > 0.0 {
+                    (ml_input.label - mean).abs() / std_dev / 3.0 // Normalize to 0-1 range
+                } else {
+                    0.0
+                };
+                
+                // Clamp to 0-1 range
+                let clamped_score = anomaly_score.min(1.0).max(0.0);
+                result.output = serde_json::to_vec(&clamped_score)
+                    .map_err(|e| AnyaError::ML(format!("Failed to serialize anomaly score: {}", e)))?;
+                result.predictions = vec![clamped_score];
+                result.confidence_scores = vec![0.8]; // Fixed confidence for simplicity
+                result.overall_confidence = 0.8;
+            }
+        }
+        
+        Ok(result)
     }
 
     /// Get federated consensus (placeholder for federated learning)
