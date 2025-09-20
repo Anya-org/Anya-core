@@ -270,6 +270,8 @@ pub enum AnyaError {
     NotFound(String),
     InvalidInput(String),
     PerformanceError(String),
+    Analytics(String),
+    Security(String),
 }
 
 impl fmt::Display for AnyaError {
@@ -286,6 +288,8 @@ impl fmt::Display for AnyaError {
             AnyaError::NotFound(msg) => write!(f, "Not found error: {msg}"),
             AnyaError::InvalidInput(msg) => write!(f, "Invalid input error: {msg}"),
             AnyaError::PerformanceError(msg) => write!(f, "Performance error: {msg}"),
+            AnyaError::Analytics(msg) => write!(f, "Analytics error: {msg}"),
+            AnyaError::Security(msg) => write!(f, "Security error: {msg}"),
         }
     }
 }
