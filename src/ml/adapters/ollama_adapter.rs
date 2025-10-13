@@ -60,7 +60,7 @@ impl OllamaClient {
     pub async fn health_check(&self) -> Result<bool> {
         let response = self
             .client
-            .get(&format!("{}/api/tags", self.base_url))
+            .get(format!("{}/api/tags", self.base_url))
             .send()
             .await?;
         Ok(response.status().is_success())
@@ -70,7 +70,7 @@ impl OllamaClient {
     pub async fn generate(&self, request: &OllamaGenerateRequest) -> Result<OllamaResponse> {
         let response = self
             .client
-            .post(&format!("{}/api/generate", self.base_url))
+            .post(format!("{}/api/generate", self.base_url))
             .json(request)
             .send()
             .await?;
@@ -86,7 +86,7 @@ impl OllamaClient {
     pub async fn list_models(&self) -> Result<Vec<String>> {
         let response = self
             .client
-            .get(&format!("{}/api/tags", self.base_url))
+            .get(format!("{}/api/tags", self.base_url))
             .send()
             .await?;
 
@@ -389,7 +389,7 @@ mod tests {
         // In CI, this would be skipped or use a mock server
         if let Ok(true) = client.health_check().await {
             let models = client.list_models().await.unwrap();
-            println!("Available models: {:?}", models);
+            println!("Available models: {models:?}");
         }
     }
 }

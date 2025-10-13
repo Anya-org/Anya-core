@@ -119,7 +119,7 @@ impl CandleAdapter {
         // 4. Decode tokens back to text
 
         // Placeholder implementation
-        Ok(format!("Generated response for: {}", prompt))
+        Ok(format!("Generated response for: {prompt}"))
     }
 
     /// Extract embeddings from text

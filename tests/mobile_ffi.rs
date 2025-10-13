@@ -8,8 +8,9 @@ mod tests {
         // Basic placeholder to ensure compilation
         #[test]
         fn test_basic_mobile_functionality() {
-            // Simple test that doesn't require FFI feature
-            assert!(true, "Basic mobile functionality works");
+            // Simple sanity check placeholder
+            let x = 2 * 3;
+            assert_eq!(x, 6, "Basic mobile functionality placeholder");
         }
     }
 

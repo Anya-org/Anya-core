@@ -130,7 +130,7 @@ mod web5_tests {
         // wallet.enhance_psbt_for_hardware(&mut enhanced_psbt).await?;
 
         // Check if the PSBT was properly enhanced with BDK 0.30.0
-        assert!(enhanced_psbt.input.len() > 0);
+        assert!(!enhanced_psbt.input.is_empty());
 
         println!("Multi-output PSBT created and enhanced successfully");
 

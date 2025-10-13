@@ -113,8 +113,7 @@ fn should_ignore(path: &Path, ignore_patterns: &[String]) -> bool {
 
     for pattern in ignore_patterns {
         // Simple wildcard matching
-        if pattern.starts_with("**/") {
-            let suffix = &pattern[3..];
+        if let Some(suffix) = pattern.strip_prefix("**/") {
             if path_str.ends_with(suffix) {
                 return true;
             }
@@ -460,7 +459,7 @@ async fn find_duplications(
     for section in sections {
         exact_matches
             .entry(section.normalized_hash)
-            .or_insert_with(Vec::new)
+            .or_default()
             .push(section);
     }
 

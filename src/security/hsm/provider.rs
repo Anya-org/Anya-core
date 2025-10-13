@@ -112,8 +112,7 @@ impl FromStr for EcCurve {
             "p-384" | "p384" => Ok(EcCurve::P384),
             "p-521" | "p521" => Ok(EcCurve::P521),
             _ => Err(HsmError::InvalidParameters(format!(
-                "Unsupported curve: {}",
-                s
+                "Unsupported curve: {s}"
             ))),
         }
     }
@@ -616,9 +615,7 @@ impl HsmProvider for SoftHsmProvider {
             HsmOperation::GenerateKey => {
                 // Parse the parameters
                 let params: KeyGenParams = serde_json::from_value(request.parameters.clone())
-                    .map_err(|e| {
-                        HsmError::InvalidParameters(format!("Invalid parameters: {}", e))
-                    })?;
+                    .map_err(|e| HsmError::InvalidParameters(format!("Invalid parameters: {e}")))?;
 
                 // Generate the key
                 let key_id = params.id.unwrap_or_else(|| Uuid::new_v4().to_string());
@@ -648,7 +645,7 @@ impl HsmProvider for SoftHsmProvider {
 
                 // Return the response
                 let response_data = serde_json::to_value(key_info).map_err(|e| {
-                    HsmError::SerializationError(format!("Failed to serialize key info: {}", e))
+                    HsmError::SerializationError(format!("Failed to serialize key info: {e}"))
                 })?;
 
                 Ok(HsmResponse::success(request.id, Some(response_data)))
@@ -685,7 +682,7 @@ impl HsmProvider for SoftHsmProvider {
 
                 // Decode the data
                 let _data = BASE64.decode(&data_base64).map_err(|e| {
-                    HsmError::InvalidParameters(format!("Invalid base64 data: {}", e))
+                    HsmError::InvalidParameters(format!("Invalid base64 data: {e}"))
                 })?;
 
                 // Check if the key exists
@@ -774,7 +771,7 @@ impl HsmProvider for SoftHsmProvider {
 
                 // Return the response
                 let response_data = serde_json::to_value(key_list).map_err(|e| {
-                    HsmError::SerializationError(format!("Failed to serialize key list: {}", e))
+                    HsmError::SerializationError(format!("Failed to serialize key list: {e}"))
                 })?;
 
                 Ok(HsmResponse::success(request.id, Some(response_data)))
@@ -814,7 +811,7 @@ impl HsmProvider for SoftHsmProvider {
                 let status = HsmProviderStatus::Ready;
 
                 let response_data = serde_json::to_value(status).map_err(|e| {
-                    HsmError::SerializationError(format!("Failed to serialize status: {}", e))
+                    HsmError::SerializationError(format!("Failed to serialize status: {e}"))
                 })?;
 
                 Ok(HsmResponse::success(request.id, Some(response_data)))
@@ -822,8 +819,7 @@ impl HsmProvider for SoftHsmProvider {
             HsmOperation::Custom(op) => {
                 // Handle custom operations
                 Err(HsmError::OperationNotSupported(format!(
-                    "Custom operation not supported: {}",
-                    op
+                    "Custom operation not supported: {op}"
                 )))
             }
         }

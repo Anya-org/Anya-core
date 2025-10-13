@@ -39,6 +39,12 @@ impl MockFactory {
     }
 }
 
+impl Default for TestAssertions {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl TestAssertions {
     pub fn new() -> Self {
         Self
@@ -46,6 +52,12 @@ impl TestAssertions {
 
     pub fn assert_valid_transaction(&self, _tx: &bitcoin::Transaction) -> bool {
         true
+    }
+}
+
+impl Default for TestEnvironmentFactory {
+    fn default() -> Self {
+        Self::new()
     }
 }
 

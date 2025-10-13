@@ -25,6 +25,7 @@ pub struct Signature {
 }
 
 /// Sign a message with the provided private key
+#[cfg(feature = "bitcoin")]
 pub fn sign(
     message: &[u8],
     private_key: &[u8],
@@ -43,12 +44,12 @@ pub fn sign(
         SignatureAlgorithm::EcdsaSecp256k1 => {
             let secp = Secp256k1::new();
             let secret_key = SecretKey::from_slice(private_key)
-                .map_err(|e| format!("Invalid private key: {}", e))?;
+                .map_err(|e| format!("Invalid private key: {e}"))?;
 
             // Hash the message using SHA256
             let msg_hash = sha256::Hash::hash(message);
             let msg = Message::from_digest_slice(&msg_hash[..])
-                .map_err(|e| format!("Invalid message hash: {}", e))?;
+                .map_err(|e| format!("Invalid message hash: {e}"))?;
 
             // Sign with ECDSA
             let signature = secp.sign_ecdsa(&msg, &secret_key);
@@ -61,14 +62,14 @@ pub fn sign(
         SignatureAlgorithm::SchnorrSecp256k1 => {
             let secp = Secp256k1::new();
             let secret_key = SecretKey::from_slice(private_key)
-                .map_err(|e| format!("Invalid private key: {}", e))?;
+                .map_err(|e| format!("Invalid private key: {e}"))?;
 
             let key_pair = Keypair::from_secret_key(&secp, &secret_key);
 
             // Hash the message using SHA256
             let msg_hash = sha256::Hash::hash(message);
             let msg = Message::from_digest_slice(&msg_hash[..])
-                .map_err(|e| format!("Invalid message hash: {}", e))?;
+                .map_err(|e| format!("Invalid message hash: {e}"))?;
 
             // Sign with Schnorr
             let signature = secp.sign_schnorr(&msg, &key_pair);
@@ -86,7 +87,17 @@ pub fn sign(
     }
 }
 
+#[cfg(not(feature = "bitcoin"))]
+pub fn sign(
+    _message: &[u8],
+    _private_key: &[u8],
+    _algorithm: SignatureAlgorithm,
+) -> Result<Signature, Box<dyn Error>> {
+    Err("signing requires 'bitcoin' feature".into())
+}
+
 /// Verify a signature against a message and public key
+#[cfg(feature = "bitcoin")]
 pub fn verify(
     message: &[u8],
     signature: &Signature,
@@ -100,15 +111,15 @@ pub fn verify(
             let secp = Secp256k1::verification_only();
 
             let public_key = PublicKey::from_slice(public_key)
-                .map_err(|e| format!("Invalid public key: {}", e))?;
+                .map_err(|e| format!("Invalid public key: {e}"))?;
 
             let signature = ecdsa::Signature::from_compact(&signature.bytes)
-                .map_err(|e| format!("Invalid signature: {}", e))?;
+                .map_err(|e| format!("Invalid signature: {e}"))?;
 
             // Hash the message using SHA256
             let msg_hash = sha256::Hash::hash(message);
             let msg = Message::from_digest_slice(&msg_hash[..])
-                .map_err(|e| format!("Invalid message hash: {}", e))?;
+                .map_err(|e| format!("Invalid message hash: {e}"))?;
 
             Ok(secp.verify_ecdsa(&msg, &signature, &public_key).is_ok())
         }
@@ -118,21 +129,21 @@ pub fn verify(
             // For Schnorr, public key should be x-only (32 bytes)
             let xonly_pk = if public_key.len() == 32 {
                 XOnlyPublicKey::from_slice(public_key)
-                    .map_err(|e| format!("Invalid x-only public key: {}", e))?
+                    .map_err(|e| format!("Invalid x-only public key: {e}"))?
             } else {
                 // If it's a full public key, extract x-only part
                 let full_pk = PublicKey::from_slice(public_key)
-                    .map_err(|e| format!("Invalid public key: {}", e))?;
+                    .map_err(|e| format!("Invalid public key: {e}"))?;
                 full_pk.x_only_public_key().0
             };
 
             let signature = secp256k1::schnorr::Signature::from_slice(&signature.bytes)
-                .map_err(|e| format!("Invalid Schnorr signature: {}", e))?;
+                .map_err(|e| format!("Invalid Schnorr signature: {e}"))?;
 
             // Hash the message using SHA256
             let msg_hash = sha256::Hash::hash(message);
             let msg = Message::from_digest_slice(&msg_hash[..])
-                .map_err(|e| format!("Invalid message hash: {}", e))?;
+                .map_err(|e| format!("Invalid message hash: {e}"))?;
 
             Ok(secp.verify_schnorr(&signature, &msg, &xonly_pk).is_ok())
         }
@@ -146,7 +157,17 @@ pub fn verify(
     }
 }
 
+#[cfg(not(feature = "bitcoin"))]
+pub fn verify(
+    _message: &[u8],
+    _signature: &Signature,
+    _public_key: &[u8],
+) -> Result<bool, Box<dyn Error>> {
+    Err("verification requires 'bitcoin' feature".into())
+}
+
 /// Sign a message with ECDSA using the secp256k1 curve (Bitcoin standard)
+#[cfg(feature = "bitcoin")]
 pub fn ecdsa_sign_secp256k1(
     message: &[u8],
     private_key: &[u8],
@@ -155,6 +176,7 @@ pub fn ecdsa_sign_secp256k1(
 }
 
 /// Verify an ECDSA signature using the secp256k1 curve (Bitcoin standard)
+#[cfg(feature = "bitcoin")]
 pub fn ecdsa_verify_secp256k1(
     message: &[u8],
     signature: &[u8],
@@ -168,6 +190,7 @@ pub fn ecdsa_verify_secp256k1(
 }
 
 /// Sign a message with Schnorr using the secp256k1 curve (Bitcoin Taproot)
+#[cfg(feature = "bitcoin")]
 pub fn schnorr_sign_secp256k1(
     message: &[u8],
     private_key: &[u8],
@@ -176,6 +199,7 @@ pub fn schnorr_sign_secp256k1(
 }
 
 /// Verify a Schnorr signature using the secp256k1 curve (Bitcoin Taproot)
+#[cfg(feature = "bitcoin")]
 pub fn schnorr_verify_secp256k1(
     message: &[u8],
     signature: &[u8],

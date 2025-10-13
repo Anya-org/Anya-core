@@ -74,4 +74,17 @@
 
 ---
 
+### Recent Maintenance (Cleanup)
+
+- Removed transitional / duplicate files: `taproot/mod.rs.fix`, `api/routes_new.rs`, `compliance/mod_new.rs`, `security/crypto/random_new.rs`, `web/web5_adapter_new.rs`, `bitcoin/layer2/rgb/mod_new.rs`.
+ 	- Rationale: superseded by canonical implementations (`taproot/mod.rs`, existing compliance module, existing random.rs, existing web5_adapter.rs) or empty placeholders with no references (verified by repository search).
+ 	- Action: Updated system map; no functional code paths depended on removed files (grep confirmed zero references).
+ 	- Compliance: Aligns with Non‑Deviation & Change Control (removal of orphaned modules) in enterprise enforcement profile.
+
 *This map will be updated as each module is reviewed.*
+
+---
+<!-- AI Labeling Reference Definitions -->
+[AIS-3]: ../docs_legacy/standards/AI_LABELING.md
+[AIP-3]: ../docs_legacy/standards/AI_LABELING.md
+[RES-3]: ../docs_legacy/standards/AI_LABELING.md
