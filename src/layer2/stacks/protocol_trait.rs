@@ -31,7 +31,7 @@ impl StacksClient {
             "Deploying contract {} with name {} to {}",
             contract, name, self.config.network
         );
-        Ok(format!("Contract {} deployed", name))
+        Ok(format!("Contract {name} deployed"))
     }
 
     /// Call a contract function
@@ -42,7 +42,7 @@ impl StacksClient {
         args: &[crate::dao::compat::clarity_repl::vm::Value],
     ) -> Result<String, Layer2Error> {
         // Mock implementation for testing
-        println!("Calling {}.{} with args: {:?}", contract, function, args);
+        println!("Calling {contract}.{function} with args: {args:?}");
         Ok("Function called successfully".to_string())
     }
 

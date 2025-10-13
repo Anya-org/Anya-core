@@ -12,10 +12,11 @@ use crate::security::hsm::{
     config::{HsmConfig, SoftHsmConfig},
     error::HsmError,
     provider::{HsmProvider, HsmProviderStatus, HsmProviderType},
-    providers::{
-        BitcoinHsmProvider, HardwareHsmProvider, SimulatorHsmProvider, SoftwareHsmProvider,
-    },
+    providers::{BitcoinHsmProvider, HardwareHsmProvider, SoftwareHsmProvider},
 };
+
+#[cfg(feature = "dev-sim")]
+use crate::security::hsm::providers::SimulatorHsmProvider;
 
 /// [AIR-3][AIS-3][BPC-3][RES-3] HSM Provider Factory with Fallback Strategy
 ///
@@ -78,17 +79,20 @@ impl HsmProviderFactory {
             }
         }
 
-        // Final fallback to simulator (development only)
-        if cfg!(debug_assertions) {
+        // Final fallback to simulator (development only + feature)
+        #[cfg(all(debug_assertions, feature = "dev-sim"))]
+        {
             warn!(
                 "Using simulator HSM as final fallback - DEVELOPMENT ONLY. \
                  This should never happen in production!"
             );
-            Self::create_simulator_fallback(config).await
-        } else {
-            Err(HsmError::InitializationError(
-                "All HSM providers failed and simulator is disabled in release builds".into(),
-            ))
+            return Self::create_simulator_fallback(config).await;
+        }
+        #[cfg(not(all(debug_assertions, feature = "dev-sim")))]
+        {
+            return Err(HsmError::InitializationError(
+                "All HSM providers failed and simulator is not available (enable 'dev-sim')".into(),
+            ));
         }
     }
 
@@ -163,8 +167,17 @@ impl HsmProviderFactory {
     async fn create_simulator_provider(
         config: &HsmConfig,
     ) -> Result<Arc<dyn HsmProvider>, HsmError> {
-        let provider = SimulatorHsmProvider::new(&config.simulator)?;
-        Ok(Arc::new(provider))
+        #[cfg(feature = "dev-sim")]
+        {
+            let provider = SimulatorHsmProvider::new(&config.simulator)?;
+            Ok(Arc::new(provider))
+        }
+        #[cfg(not(feature = "dev-sim"))]
+        {
+            return Err(HsmError::ProviderNotSupported(
+                "Simulator provider gated behind 'dev-sim' feature".into(),
+            ));
+        }
     }
 
     /// Software fallback provider - always available
@@ -199,20 +212,29 @@ impl HsmProviderFactory {
     async fn create_simulator_fallback(
         config: &HsmConfig,
     ) -> Result<Arc<dyn HsmProvider>, HsmError> {
-        let fallback_config = crate::security::hsm::config::SimulatorConfig {
-            storage_path: ".anya-hsm-sim".into(),
-            simulate_latency: false, // Disable for fallback
-            latency_ms: 0,
-            simulate_failures: false, // Disable for fallback
-            failure_rate: 0.0,
-            pin_timeout_seconds: 300,
-            max_pin_attempts: 3,
-            use_testnet: config.bitcoin.network
-                != crate::security::hsm::config::BitcoinNetworkType::Mainnet,
-        };
+        #[cfg(feature = "dev-sim")]
+        {
+            let fallback_config = crate::security::hsm::config::SimulatorConfig {
+                storage_path: ".anya-hsm-sim".into(),
+                simulate_latency: false, // Disable for fallback
+                latency_ms: 0,
+                simulate_failures: false, // Disable for fallback
+                failure_rate: 0.0,
+                pin_timeout_seconds: 300,
+                max_pin_attempts: 3,
+                use_testnet: config.bitcoin.network
+                    != crate::security::hsm::config::BitcoinNetworkType::Mainnet,
+            };
 
-        let provider = SimulatorHsmProvider::new(&fallback_config)?;
-        Ok(Arc::new(provider))
+            let provider = SimulatorHsmProvider::new(&fallback_config)?;
+            Ok(Arc::new(provider))
+        }
+        #[cfg(not(feature = "dev-sim"))]
+        {
+            return Err(HsmError::ProviderNotSupported(
+                "Simulator fallback gated behind 'dev-sim' feature".into(),
+            ));
+        }
     }
 
     /// Generate secure encryption key for fallback software HSM
@@ -225,7 +247,7 @@ impl HsmProviderFactory {
         // Encode as base64 for configuration
         Ok(base64::Engine::encode(
             &base64::engine::general_purpose::STANDARD,
-            &key,
+            key,
         ))
     }
 
@@ -351,8 +373,10 @@ mod tests {
 
     #[tokio::test]
     async fn test_software_fallback_strategy() {
-        let mut config = HsmConfig::default();
-        config.provider_type = HsmProviderType::Hardware;
+        let mut config = HsmConfig {
+            provider_type: HsmProviderType::Hardware,
+            ..HsmConfig::default()
+        };
 
         // Force hardware failure by using invalid config
         config.hardware.connection_string = "invalid://connection".to_string();
@@ -368,8 +392,10 @@ mod tests {
 
     #[tokio::test]
     async fn test_production_config_validation() {
-        let mut config = HsmConfig::default();
-        config.provider_type = HsmProviderType::Simulator;
+        let mut config = HsmConfig {
+            provider_type: HsmProviderType::Simulator,
+            ..HsmConfig::default()
+        };
         config.bitcoin.network = BitcoinNetworkType::Mainnet;
 
         // Should fail validation

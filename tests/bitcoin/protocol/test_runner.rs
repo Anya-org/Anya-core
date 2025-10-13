@@ -22,6 +22,12 @@ pub struct ProtocolTestSuite {
     results: Vec<TestResult>,
 }
 
+impl Default for ProtocolTestSuite {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl ProtocolTestSuite {
     /// Create a new test suite
     pub fn new() -> Self {
@@ -35,14 +41,14 @@ impl ProtocolTestSuite {
     where
         F: FnOnce() -> Result<()>,
     {
-        println!("Running test: {}", name);
+        println!("Running test: {name}");
 
         let start = Instant::now();
         let result = test_fn();
         let duration = start.elapsed();
 
         let success = result.is_ok();
-        let error = result.err().map(|e| format!("{:#}", e));
+        let error = result.err().map(|e| format!("{e:#}"));
 
         let test_result = TestResult {
             name: name.to_string(),
@@ -54,11 +60,11 @@ impl ProtocolTestSuite {
         self.results.push(test_result);
 
         if success {
-            println!("  SUCCESS ({:.2?})", duration);
+            println!("  SUCCESS ({duration:.2?})");
         } else {
-            println!("  FAILED ({:.2?})", duration);
+            println!("  FAILED ({duration:.2?})");
             if let Some(err) = &self.results.last().unwrap().error {
-                println!("  Error: {}", err);
+                println!("  Error: {err}");
             }
         }
     }
@@ -71,23 +77,23 @@ impl ProtocolTestSuite {
 
         println!("\n{}", "=".repeat(50));
         println!("Test Summary:");
-        println!("  Total: {}", total);
-        println!("  Passed: {}", passed);
+        println!("  Total: {total}");
+        println!("  Passed: {passed}");
 
         if failed > 0 {
-            println!("  Failed: {}", failed);
+            println!("  Failed: {failed}");
 
             println!("\nFailed tests:");
             for result in &self.results {
                 if !result.success {
                     println!("  - {} ({:.2?})", result.name, result.duration);
                     if let Some(err) = &result.error {
-                        println!("    Error: {}", err);
+                        println!("    Error: {err}");
                     }
                 }
             }
         } else {
-            println!("  Failed: {}", "0");
+            println!("  Failed: 0");
         }
         println!("{}", "=".repeat(50));
     }
@@ -154,16 +160,16 @@ pub fn run_all_tests() -> Result<HashMap<String, bool>> {
 
 /// Main entry point for running tests
 pub fn main() -> Result<()> {
-    println!("{}", "Running Bitcoin Protocol Tests");
+    println!("Running Bitcoin Protocol Tests");
     println!("{}", "=".repeat(50));
 
     let results = run_all_tests()?;
 
     let all_passed = results.values().all(|&success| success);
     if all_passed {
-        println!("\n{}", "All tests passed!");
+        println!("\nAll tests passed!");
     } else {
-        println!("\n{}", "Some tests failed!");
+        println!("\nSome tests failed!");
         std::process::exit(1);
     }
 

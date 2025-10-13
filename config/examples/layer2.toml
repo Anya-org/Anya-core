@@ -1,0 +1,64 @@
+# Example Layer2 configuration for production deployments
+# Copy to ~/.config/anya-core/layer2.toml or set ANYA_* env vars accordingly
+
+[global]
+# Prefer operating as a self-node (master) when no external nodes are reachable or configured
+enable_self_node_fallback = true
+# Enable real networking globally (can be overridden per protocol)
+enable_real_networking = true
+# Minimum peers considered healthy; if not met and fallback is enabled, self-node mode will activate
+min_peers = 2
+# Prefer self as master node
+prefer_self_as_master = true
+
+# Optional environment overrides:
+#   ANYA_LAYER2_ENABLE_SELF_NODE_FALLBACK=true
+#   ANYA_LAYER2_ENABLE_REAL_NETWORKING=true
+#   ANYA_LAYER2_MIN_PEERS=2
+
+[lightning]
+# Node reachable from your environment
+node_url = "https://your-lnd.example.com:8080"
+# Hex macaroon string or path to file
+macaroon = ""
+# Base64-encoded TLS cert or path to file
+cert = ""
+# Alias for display
+alias = "anya-core-ln-node"
+network = "mainnet" # mainnet|testnet|regtest
+# Optional overrides for fallback/real networking
+# enable_real_networking = true
+# enable_self_node_fallback = true
+# bootstrap_peers = ["lnd.lightning.community:9735", "mainnet-lnd.htlc.me:9735"]
+
+[rgb]
+# Endpoint to your RGB node/core service
+endpoint = "http://localhost:8080"
+network = "mainnet"
+# RGB can operate with fewer peers; override if desired
+# min_peers = 1
+# enable_real_networking = true
+# enable_self_node_fallback = true
+
+[state_channels]
+# Backend service implementing state channels
+endpoint = "http://localhost:7000"
+# enable_real_networking = true
+# enable_self_node_fallback = true
+
+[dlc]
+# Oracle and DLC infra endpoints
+oracle_endpoint = "https://oracle.example.com"
+network = "mainnet"
+# bootstrap_peers = ["oracle.suredbits.com:9735"]
+# enable_real_networking = true
+# enable_self_node_fallback = true
+
+[taproot_assets]
+# Bitcoin connectivity for live issuance
+bitcoin_rpc_url = "http://localhost:8332"
+bitcoin_rpc_user = "user"
+bitcoin_rpc_pass = "pass"
+network = "mainnet"
+# enable_real_networking = true
+# enable_self_node_fallback = true

@@ -62,6 +62,9 @@ async fn test_proposal_lifecycle() {
 async fn test_voting_mechanism() {
     let mut dao = create_test_dao();
 
+    // Register a voter so vote() doesn't fail due to missing registration
+    dao.register_voter("test_voter", 100, 10);
+
     // Create a proposal to vote on
     let proposal_id = dao
         .create_proposal(
@@ -82,7 +85,10 @@ async fn test_voting_mechanism() {
         .get_proposal(proposal_id)
         .await
         .expect("Failed to get proposal");
-    assert!(proposal.yes_votes() > 0, "Should have recorded vote");
+    assert!(
+        proposal.yes_votes() >= 10,
+        "Should have recorded vote with power"
+    );
 }
 
 #[tokio::test]

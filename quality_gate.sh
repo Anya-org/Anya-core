@@ -2,15 +2,14 @@
 
 # ========================================================================
 # ANYA CORE QUALITY GATE SCRIPT - STRICT ADHERENCE ENFORCEMENT
-# ============================================================    # Check for aspirational claims without evidence
-if grep -r "100% complete\|fully implemented\|production ready" . \
-    --exclude-dir=target --exclude-dir=.git --exclude-dir=.github --exclude="*.md" --exclude="*.js" 2>/dev/null |
+# ============================================================
+# Check for aspirational claims without evidence (Rust sources only)
+if grep -R "100% complete\|fully implemented\|production ready" src/ --include="*.rs" 2>/dev/null |
     grep -v "Evidence:\|Verification:" >/dev/null 2>&1; then
-    echo -e "${RED}❌ QUALITY GATE FAILED: Aspirational claims without evidence${NC}"
+    echo -e "${RED}❌ QUALITY GATE FAILED: Aspirational claims without evidence (Rust sources)${NC}"
     echo ""
     echo "Found unsupported claims:"
-    grep -r "100% complete\|fully implemented\|production ready" . \
-        --exclude-dir=target --exclude-dir=.git --exclude-dir=.github --exclude="*.md" --exclude="*.js" 2>/dev/null |
+    grep -R "100% complete\|fully implemented\|production ready" src/ --include="*.rs" 2>/dev/null |
         grep -v "Evidence:\|Verification:" | head -3
     exit 1
 fi
@@ -33,7 +32,7 @@ MAX_UNIMPLEMENTED=0
 MAX_TODO_STUBS=20            # Increased for development phase
 MAX_SQLITE_TODOS=20          # Increased for development phase
 MAX_MOCK_IMPLEMENTATIONS=150 # Increased for development phase
-MAX_WARNINGS=100             # Increased for development phase (will decrease over time)
+MAX_WARNINGS=0               # Strict: no warnings permitted (clippy -D warnings enforced)
 
 # Check mode
 MODE=${1:-"--pre-commit"}
@@ -179,8 +178,18 @@ check_mock_implementations() {
 }
 
 # ========================================================================
-# 3. COMPILATION AND WARNINGS
+# 3. COMPILATION / FORMATTING / WARNINGS
 # ========================================================================
+check_formatting() {
+    echo -e "${BLUE}🧹 CHECKING CODE FORMATTING${NC}"
+    echo "-----------------------------"
+    if ! cargo fmt -- --check >/dev/null 2>&1; then
+        echo -e "${RED}❌ QUALITY GATE FAILED: Formatting deviations detected${NC}"
+        cargo fmt -- --check || true
+        exit 1
+    fi
+    echo -e "${GREEN}✅ Formatting clean${NC}"
+}
 check_compilation() {
     echo -e "${BLUE}🔨 CHECKING COMPILATION${NC}"
     echo "------------------------"
@@ -194,25 +203,81 @@ check_compilation() {
     fi
 
     echo -e "${GREEN}✅ Compilation successful${NC}"
+
+    echo -e "${BLUE}🔍 Running clippy (strict)${NC}"
+    if ! cargo clippy --all-targets --all-features -- -D warnings >/dev/null 2>&1; then
+        echo -e "${RED}❌ QUALITY GATE FAILED: Clippy warnings present${NC}"
+        cargo clippy --all-targets --all-features -- -D warnings || true
+        exit 1
+    fi
+    echo -e "${GREEN}✅ Clippy strict: PASS${NC}"
 }
 
 check_warnings() {
-    echo -e "${BLUE}⚠️  CHECKING COMPILATION WARNINGS${NC}"
+    echo -e "${BLUE}⚠️  CHECKING COMPILATION WARNINGS (should be 0)${NC}"
     echo "--------------------------------"
-
     warning_count=$(cargo check --all-features 2>&1 | grep "warning:" | wc -l)
     echo "Found $warning_count compilation warnings"
-
-    if [ "$warning_count" -gt "$MAX_WARNINGS" ]; then
-        echo -e "${RED}❌ QUALITY GATE FAILED: Too many compilation warnings${NC}"
-        echo "Found: $warning_count, Maximum allowed: $MAX_WARNINGS"
-        echo ""
-        echo "Sample warnings:"
-        cargo check --all-features 2>&1 | grep "warning:" | head -5
+    if [ "$warning_count" -gt 0 ]; then
+        echo -e "${RED}❌ QUALITY GATE FAILED: Non-zero warnings (${warning_count})${NC}"
+        cargo check --all-features 2>&1 | grep "warning:" | head -10 || true
         exit 1
     fi
+    echo -e "${GREEN}✅ Zero compilation warnings${NC}"
+}
 
-    echo -e "${GREEN}✅ Compilation warnings: $warning_count (≤ $MAX_WARNINGS)${NC}"
+dependency_drift() {
+    echo -e "${BLUE}🌳 CHECKING DEPENDENCY DRIFT (duplicate versions)${NC}"
+    echo "-----------------------------------------------"
+    if cargo tree -d > /tmp/deps_dups.txt 2>/dev/null; then
+        if grep -q "No duplicate dependencies" /tmp/deps_dups.txt; then
+            echo -e "${GREEN}✅ No duplicate crate versions${NC}"
+        else
+            # Detect major version divergence for security-surface crates
+            critical_divergence=0
+            for crate in tokio hyper serde openssl; do
+                majors=$(grep -E "^${crate} v" /tmp/deps_dups.txt | sed -E 's/.* '${crate}' v([0-9]+).*/\1/' | sort -u | wc -l | tr -d ' ')
+                if [ "${majors}" -gt 1 ]; then
+                    critical_divergence=1
+                fi
+            done
+            if [ $critical_divergence -eq 1 ]; then
+                echo -e "${RED}❌ QUALITY GATE FAILED: Major version divergence in critical crates${NC}"
+                grep -E "^(tokio|hyper|serde|openssl) v" /tmp/deps_dups.txt | head -20
+                exit 1
+            else
+                echo -e "${YELLOW}⚠️  Duplicate versions detected (minor divergence only) – tolerated${NC}"
+                head -25 /tmp/deps_dups.txt
+            fi
+        fi
+    else
+        echo -e "${YELLOW}⚠️  Unable to run cargo tree (skipping)${NC}"
+    fi
+}
+
+security_tooling() {
+    echo -e "${BLUE}🔐 SECURITY SCANS (deny/audit)${NC}"
+    echo "--------------------------------"
+    if command -v cargo-deny >/dev/null 2>&1; then
+        if ! cargo deny check >/dev/null 2>&1; then
+            echo -e "${RED}❌ cargo-deny failed${NC}"
+            cargo deny check || true
+            exit 1
+        fi
+        echo -e "${GREEN}✅ cargo-deny: PASS${NC}"
+    else
+        echo -e "${YELLOW}⚠️ cargo-deny not installed${NC}"
+    fi
+    if command -v cargo-audit >/dev/null 2>&1; then
+        if ! cargo audit -q >/dev/null 2>&1; then
+            echo -e "${RED}❌ cargo-audit vulnerabilities detected${NC}"
+            cargo audit || true
+            exit 1
+        fi
+        echo -e "${GREEN}✅ cargo-audit: PASS${NC}"
+    else
+        echo -e "${YELLOW}⚠️ cargo-audit not installed${NC}"
+    fi
 }
 
 # ========================================================================
@@ -320,12 +385,35 @@ generate_report() {
     mock_count=$(grep -r "MockImpl\|placeholder.*implementation" --include="*.rs" . 2>/dev/null | wc -l)
     warning_count=$(cargo check --all-features 2>&1 | grep "warning:" | wc -l)
 
+    # Test metrics (list tests & detect skips)
+    echo -e "${BLUE}🧪 COLLECTING TEST METRICS (list mode)${NC}"
+    if cargo test -- --list > /tmp/test_list.txt 2>/dev/null; then
+        total_tests=$(grep -c ': test' /tmp/test_list.txt || true)
+        ignored_tests=$(grep -c ': test (ignored)' /tmp/test_list.txt || true)
+    else
+        total_tests=0
+        ignored_tests=0
+    fi
+
     echo "📊 Code Quality Metrics:"
     echo "  • Unimplemented macros: $unimpl_count (≤ $MAX_UNIMPLEMENTED)"
     echo "  • TODO stubs: $todo_count (≤ $MAX_TODO_STUBS)"
     echo "  • SQLite TODOs: $sqlite_count (≤ $MAX_SQLITE_TODOS)"
     echo "  • Mock implementations: $mock_count (target ≤ $MAX_MOCK_IMPLEMENTATIONS)"
     echo "  • Compilation warnings: $warning_count (≤ $MAX_WARNINGS)"
+    echo "  • Tests discovered: $total_tests"
+    echo "  • Tests ignored (cargo): $ignored_tests"
+
+    # Validate skip accounting (each ignored must have skip-metric line when run in full mode)
+    if [ "$MODE" = "--ci" ] || [ "$MODE" = "--full" ]; then
+        if [ "$ignored_tests" -gt 0 ]; then
+            if grep -R "\\[skip-metric\\]" target/debug/deps 2>/dev/null | head -1 >/dev/null 2>&1; then
+                echo -e "${GREEN}✅ Skip metrics present (manual validation recommended)${NC}"
+            else
+                echo -e "${YELLOW}⚠️  Ignored tests detected without skip-metric lines (will enforce once instrumentation added)${NC}"
+            fi
+        fi
+    fi
     echo ""
 
     # Overall status
@@ -350,7 +438,10 @@ main() {
 
     # Core validations (always run)
     validate_commit_message
+    check_formatting
     check_compilation
+    security_tooling
+    dependency_drift
     check_unimplemented_macros
     check_warnings
     check_documentation

@@ -147,6 +147,12 @@ pub struct ToolRegistry {
     safety_policies: RwLock<HashMap<SafetyLevel, Vec<String>>>,
 }
 
+impl Default for ToolRegistry {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl ToolRegistry {
     /// Create new tool registry
     pub fn new() -> Self {
@@ -309,6 +315,12 @@ pub struct FileSystemTool {
     definition: ToolDefinition,
 }
 
+impl Default for FileSystemTool {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl FileSystemTool {
     pub fn new() -> Self {
         let definition = ToolDefinition {
@@ -406,7 +418,7 @@ impl Tool for FileSystemTool {
                         tool_id: self.definition.id.clone(),
                         execution_id,
                         success: true,
-                        output: format!("Successfully wrote to {}", path),
+                        output: format!("Successfully wrote to {path}"),
                         error: None,
                         execution_time_ms: 0,
                         metadata: HashMap::new(),
@@ -453,7 +465,7 @@ impl Tool for FileSystemTool {
                     tool_id: self.definition.id.clone(),
                     execution_id,
                     success: true,
-                    output: format!("Successfully created directory {}", path),
+                    output: format!("Successfully created directory {path}"),
                     error: None,
                     execution_time_ms: 0,
                     metadata: HashMap::new(),
@@ -473,7 +485,7 @@ impl Tool for FileSystemTool {
                 execution_id,
                 success: false,
                 output: String::new(),
-                error: Some(format!("Unknown operation: {}", operation)),
+                error: Some(format!("Unknown operation: {operation}")),
                 execution_time_ms: 0,
                 metadata: HashMap::new(),
             },
@@ -526,6 +538,12 @@ Examples:
 /// Command execution tool
 pub struct CommandTool {
     definition: ToolDefinition,
+}
+
+impl Default for CommandTool {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl CommandTool {
@@ -621,7 +639,7 @@ impl Tool for CommandTool {
                 let combined_output = if stderr.is_empty() {
                     stdout
                 } else {
-                    format!("STDOUT:\n{}\n\nSTDERR:\n{}", stdout, stderr)
+                    format!("STDOUT:\n{stdout}\n\nSTDERR:\n{stderr}")
                 };
 
                 Ok(ToolResult {

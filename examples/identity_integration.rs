@@ -1,6 +1,5 @@
 use anya_core::web5::identity::{IdentityManager, DID};
 use chrono::Duration;
-use serde_json;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -23,7 +22,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Verify the credential (simulated)
     let verification_result = verify_credential(&credential, &verifier)?;
 
-    println!("Credential verification result: {}", verification_result);
+    println!("Credential verification result: {verification_result}");
 
     // Example of credential sharing (simulated)
     share_credential(&credential, &holder.id, "did:web5:recipient")?;
@@ -82,10 +81,7 @@ fn share_credential(
     holder_did: &str,
     recipient_did: &str,
 ) -> Result<bool, Box<dyn std::error::Error>> {
-    println!(
-        "Sharing credential from {} to {}",
-        holder_did, recipient_did
-    );
+    println!("Sharing credential from {holder_did} to {recipient_did}");
     println!("Credential shared successfully");
     Ok(true)
 }

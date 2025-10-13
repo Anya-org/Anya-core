@@ -40,19 +40,19 @@ mod standalone_tests {
 
         // Log the asset details
         println!("RGB Asset created:");
-        println!("  Name: {}", asset_name);
-        println!("  Ticker: {}", asset_ticker);
-        println!("  Total Supply: {}", asset_total_supply);
-        println!("  Description: {}", asset_description);
-        println!("  Asset ID: {}", asset_id);
+        println!("  Name: {asset_name}");
+        println!("  Ticker: {asset_ticker}");
+        println!("  Total Supply: {asset_total_supply}");
+        println!("  Description: {asset_description}");
+        println!("  Asset ID: {asset_id}");
 
         // Simulate a transfer of the asset
         let recipient_address = "bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq";
         let transfer_amount = 5_000;
 
         println!("Simulating asset transfer:");
-        println!("  Recipient: {}", recipient_address);
-        println!("  Amount: {}", transfer_amount);
+        println!("  Recipient: {recipient_address}");
+        println!("  Amount: {transfer_amount}");
 
         // Create metadata for the transfer
         let mut metadata = HashMap::new();
@@ -60,12 +60,12 @@ mod standalone_tests {
         metadata.insert("timestamp".to_string(), timestamp.to_string());
 
         // Simulate a transaction ID for the transfer
-        let txid = format!("tx{}", timestamp);
-        println!("  Transfer transaction: {}", txid);
+        let txid = format!("tx{timestamp}");
+        println!("  Transfer transaction: {txid}");
 
         // Record the updated balance after transfer
         let remaining_balance = asset_total_supply - transfer_amount;
-        println!("  Remaining balance: {}", remaining_balance);
+        println!("  Remaining balance: {remaining_balance}");
 
         // Test assertions
         assert_eq!(remaining_balance, 995_000);
@@ -89,12 +89,12 @@ mod standalone_tests {
             .unwrap()
             .as_secs();
 
-        let issuer_did = format!("did:key:z{}a", timestamp);
-        let subject_did = format!("did:key:z{}b", timestamp);
+        let issuer_did = format!("did:key:z{timestamp}a");
+        let subject_did = format!("did:key:z{timestamp}b");
 
         println!("DIDs created:");
-        println!("  Issuer: {}", issuer_did);
-        println!("  Subject: {}", subject_did);
+        println!("  Issuer: {issuer_did}");
+        println!("  Subject: {subject_did}");
 
         // Create a simulated credential
         println!("Creating verifiable credential...");
@@ -107,13 +107,13 @@ mod standalone_tests {
         // Display the credential data
         println!("Credential claims:");
         for (key, value) in &claims {
-            println!("  {}: {}", key, value);
+            println!("  {key}: {value}");
         }
 
         // Simulate Bitcoin anchoring for the credential
-        let anchor_txid = format!("btc{}", timestamp);
+        let anchor_txid = format!("btc{timestamp}");
         println!("Anchoring credential to Bitcoin:");
-        println!("  Transaction ID: {}", anchor_txid);
+        println!("  Transaction ID: {anchor_txid}");
 
         // Simulate verification of the anchored credential
         println!("Verifying anchored credential...");

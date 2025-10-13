@@ -7,7 +7,6 @@ use anya_core::layer2::{
     AssetParams, AssetTransfer, BobProtocol, DlcProtocol, Layer2Protocol, LightningProtocol,
     RgbProtocol, StateChannelsProtocol, TransactionStatus,
 };
-use tokio;
 
 /// Test all Layer 2 protocols basic functionality
 #[tokio::test]
