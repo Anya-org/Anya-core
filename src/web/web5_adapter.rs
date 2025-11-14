@@ -175,8 +175,6 @@ impl Web5Adapter {
             .lock()
             .map_err(|e| Web5AdapterError::Http(format!("lock error: {e}")))?;
         storage.insert(record.id.clone(), record.clone());
-        let id = record.id.clone();
-        storage.insert(id.clone(), record.clone());
-        Ok(id)
+        Ok(record.id.clone())
     }
 }

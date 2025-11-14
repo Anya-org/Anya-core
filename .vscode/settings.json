@@ -30,5 +30,7 @@
         "MD040": true,
         "MD047": true
     },
-    "chat.mcp.autostart": "onlyNew"
+    "chat.mcp.autostart": "onlyNew",
+    "terminal.integrated.stickyScroll.enabled": true,
+    "terminal.integrated.suggest.enabled": true
 }
