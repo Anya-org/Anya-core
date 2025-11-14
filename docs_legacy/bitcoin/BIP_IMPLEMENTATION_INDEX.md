@@ -9,7 +9,7 @@ This document provides an index of all Bitcoin Improvement Proposals (BIPs) impl
 |-----|-------|----------------|--------------|--------------|
 | 341 | Taproot | `core/src/bip/bip341.rs` | Partial | In Progress |
 | 342 | Tapscript | `core/src/bip/bip342.rs` | Partial | In Progress |
-| 174 | PSBT | `src/bitcoin/protocol/psbt.rs` | Pending | Not Started |
+| 174 | PSBT | `src/bitcoin/psbt.rs` | Complete | Ready for Audit |
 | 370 | BIPScript | `src/bitcoin/protocol/script.rs` | Partial | Not Started |
 
 ## Implementation Details
@@ -38,6 +38,21 @@ Implementation of the Tapscript, which defines the semantics of the leaf version
 - Size limits and resource constraints
 
 **Location:** `core/src/bip/bip342.rs`
+
+### BIP-174 (PSBT)
+
+Implementation of Partially Signed Bitcoin Transactions (PSBT) according to BIP174 specification.
+
+**Features Implemented:**
+- Complete PSBT structure with Global, Input, and Output maps
+- BIP174-compliant serialization and deserialization
+- PSBT validation according to specification requirements
+- Partial signature support for multi-party transactions
+- PSBT utility functions and statistics
+- P2PKH PSBT creation helpers
+- Attack-resistant validation and error handling
+
+**Location:** `src/bitcoin/psbt.rs`
 
 ## Implementation Priorities
 

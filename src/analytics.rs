@@ -200,11 +200,15 @@ impl AnalyticsEngine {
 
             // Use ML service for anomaly detection
             let inference_result = ml_system.service()
-                .predict("anomaly_detector", &serde_json::to_vec(&input)?)
+                .inference("anomaly_detector", &serde_json::to_vec(&input)?)
                 .await
                 .map_err(|e| AnyaError::Analytics(format!("ML inference failed: {}", e)))?;
 
-            let anomaly_score: f64 = serde_json::from_slice(&inference_result.output)?;
+            let anomaly_score = if inference_result.predictions.is_empty() {
+                0.0
+            } else {
+                inference_result.predictions[0]
+            };
             let is_anomaly = anomaly_score > self.config.anomaly_threshold;
 
             if is_anomaly {
@@ -359,6 +363,7 @@ impl AnalyticsEngine {
         let store = self.data_store.read().await;
         let mut anomaly_summary = HashMap::new();
         let mut metric_summary = HashMap::new();
+        let mut metrics_to_process = Vec::new();
 
         for (metric_name, series) in store.iter() {
             // Filter data points within time range
@@ -383,6 +388,9 @@ impl AnalyticsEngine {
                 max,
                 trend: calculate_trend(&values),
             });
+
+            // Store metric name for anomaly detection later
+            metrics_to_process.push(metric_name.clone());
         }
         
         // Release read lock before anomaly detection
@@ -407,6 +415,7 @@ impl AnalyticsEngine {
                 .unwrap()
                 .as_secs(),
             metric_summary,
+            anomaly_summary: anomaly_summary.clone(),
             recommendations: self.generate_recommendations(&anomaly_summary).await,
             anomaly_summary,
         })
@@ -414,26 +423,7 @@ impl AnalyticsEngine {
 
     /// Perform real-time analysis on incoming data
     async fn analyze_real_time(&self, metric_name: &str, value: f64) -> AnyaResult<()> {
-        // Record metric for real-time analysis (avoid recursion)
-        let mut metadata = HashMap::new();
-        metadata.insert("analysis_type".to_string(), "real_time".to_string());
-        
-        // Direct storage update to avoid recursion
-        let realtime_metric = format!("{}_realtime", metric_name);
-        let data_point = DataPoint {
-            timestamp: SystemTime::now()
-                .duration_since(UNIX_EPOCH)
-                .unwrap()
-                .as_secs(),
-            metric_name: realtime_metric.clone(),
-            value,
-            metadata,
-        };
-        
-        {
-            let mut store = self.data_store.write().await;
-            store.entry(realtime_metric).or_default().push(data_point);
-        }
+        // Skip recording to avoid recursion - just perform analysis
 
         // Trigger immediate anomaly check if significant deviation
         // This is a simplified check - in production, you'd use more sophisticated methods
