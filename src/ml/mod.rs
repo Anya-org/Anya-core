@@ -10,6 +10,7 @@ use std::error::Error;
 use crate::{AnyaError, AnyaResult};
 // Re-export these types to make them public
 pub use crate::dao::{Proposal, ProposalMetrics, RiskMetrics};
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::path::Path;
 use std::sync::{Arc, Mutex};

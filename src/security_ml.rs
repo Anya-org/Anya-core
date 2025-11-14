@@ -4,11 +4,11 @@
 //! including fraud detection, 51% attack monitoring, and fee spike analysis.
 //! Replaces Python security analysis with high-performance Rust implementations.
 
-use crate::ml::{MLSystem, MLConfig, MLOutput, MLInput};
+use crate::ml::{MLSystem, MLConfig, MLInput};
 use crate::{AnyaError, AnyaResult};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use std::time::{Duration, SystemTime, UNIX_EPOCH};
+use std::time::{SystemTime, UNIX_EPOCH};
 use tokio::sync::RwLock;
 use std::sync::Arc;
 use tracing::{info, warn, error};
@@ -771,7 +771,8 @@ impl SecurityMLEngine {
         
         // Keep only last 1000 alerts
         if history.len() > 1000 {
-            history.drain(0..history.len() - 1000);
+            let drain_count = history.len() - 1000;
+            history.drain(0..drain_count);
         }
     }
 
