@@ -14,10 +14,8 @@ use anya_core::{
 async fn test_system_initialization() {
     // Test basic system initialization
     let config = AnyaConfig::default();
-    // Avoid nested runtime issues in async context by using with_defaults in a blocking task
-    let result = tokio::task::spawn_blocking(move || AnyaCore::new(config))
-        .await
-        .unwrap_or_else(|e| Err(anya_core::AnyaError::System(format!("Join error: {e}"))));
+    // Directly await the async AnyaCore::new to avoid spawn_blocking complexity
+    let result = AnyaCore::new(config).await;
     // This should not panic - we're testing that the system can initialize
     match result {
         Ok(_anya_core) => {

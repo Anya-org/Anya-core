@@ -1,9 +1,9 @@
 ---
 title: Technical Architecture PRD
-description: Architecture components and integration plan
+description: Architecture components and integration plan (updated with native dependency migration strategy)
 category: prd
 tags: architecture-bitcoin-layer2
-last_updated: 2025-08-09
+last_updated: 2025-08-10
 compliance: AIR-3 AIS-3 BPC-3 RES-3
 ---
 ---
@@ -76,4 +76,42 @@ Environment mappings (examples):
 
 Branch: integration/endpoint-centralization-clean • Last Updated: August 9, 2025 (storage autoconfig incorporated)
 
-Last Updated: August 9, 2025
+Last Updated: August 10, 2025
+
+## Native Dependency Migration Strategy (Added Aug 10, 2025)
+
+Objective: Reduce build complexity, security exposure, and toolchain friction by phasing out high-risk C/C++ system dependencies in favor of pure Rust crates.
+
+Targets & Rationale:
+- OpenSSL (via reqwest default TLS) → rustls (DONE: quick-fix script prepared)
+- zstd-sys (C wrapper) → pure Rust zstd crate with `pure_rust` (Phase 1 follow-up)
+- RocksDB (librocksdb-sys) → Evaluate `redb` vs `sled` (Phase 2 experiment)
+- libgit2-sys (if introduced) → `gix` (git-oxide) (Phase 3 if Git integration expands)
+- secp256k1-sys → retain (audited domain-specific; revisit only if parity alternative emerges)
+
+Feature Flag Placeholders (Cargo.toml): `kv-redb`, `kv-sled`, `git-gix`.
+
+Integration Pattern:
+1. Introduce trait abstraction (StorageEngine) wrapping current RocksDB calls.
+2. Prototype alternative engines behind feature flags + runtime selector (ANYA_STORAGE_BACKEND).
+3. Dual-write shadow mode with consistency assertions before cutover.
+4. Benchmark dimensions: init latency, write throughput, p95 get latency, compaction overhead, binary size delta.
+
+Security & Compliance:
+- Pure Rust reduces FFI/unsafe surface (geiger delta tracked per PR).
+- Removes OpenSSL CVE churn from critical path (rustls memory-safe).
+- Supply chain simplification for SBOM & license scanning.
+
+Instrumentation:
+- tracing spans: storage.init, storage.put, storage.get, storage.batch.
+- metrics: storage_engine_active{engine}, storage_op_latency_seconds_bucket.
+
+Rollback:
+- Single feature flag toggle; retain RocksDB state untouched until migration complete.
+- Export/import tool with checksums for irreversible engine transitions.
+
+Next Actions:
+1. Add StorageEngine trait + RocksDbEngine wrapper.
+2. Add redb prototype behind `kv-redb`.
+3. Criterion benchmarks harness.
+4. Integrate geiger report into quality gate.

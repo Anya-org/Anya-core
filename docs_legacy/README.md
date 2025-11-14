@@ -1,5 +1,7 @@
 # Anya-Core Documentation
 
+> Note: Canonical PRDs live in `docs/prd/`. This `docs_legacy/` folder is archived for historical reference. Use the canonical PRDs for all status, planning, and roadmap work.
+
 **🎉 Production-Ready Bitcoin Infrastructure Platform**  
 **Status:** ✅ Real Implementations Deployed - All 5 Critical Areas Operational  
 **Last Updated:** August 3, 2025
@@ -8,12 +10,12 @@
 
 **New to Anya-Core?** Start here:
 
-1. **[System Overview](PRD_MASTER_INDEX.md)** - Current status and capabilities
-2. **[High-Level Roadmap](ROADMAP.md)** - Strategic direction and milestones  
-3. **[Implementation Success](IMPLEMENTATION_SUCCESS_REPORT.md)** - Real implementation achievements
+1. **[System Overview & PRD Index](../docs/prd/README.md)** - Canonical PRDs and status
+2. **[High-Level Roadmap](../docs/prd/04_IMPLEMENTATION_ROADMAP_PRD.md)** - Strategic direction and milestones  
+3. **[QA & Verification](../docs/prd/05_QA_AND_VERIFICATION_PRD.md)** - Quality gates, scripts, and exit criteria
 
 **Planning Development?** Continue here:
-4. **[Development Roadmap](IMPLEMENTATION_ROADMAP_PRD.md)** - Detailed roadmap (Phases 2-4)
+4. **[Development Roadmap](../docs/prd/04_IMPLEMENTATION_ROADMAP_PRD.md)** - Detailed roadmap (Phases 2-4)
 5. **[Enhancement Opportunities](ENHANCEMENT_OPPORTUNITIES_PRD.md)** - Optimization opportunities
 6. **[Current Week Plan](PHASE1_WEEK2_EXECUTION_PLAN.md)** - Immediate execution plan
 
@@ -63,18 +65,18 @@
 | **Layer2 Protocols** | ✅ **9/9** | Complete solution |
 | **Real Implementations** | ✅ **95%** | All critical areas |
 
-## 📂 **Archive Structure**
+## 📂 Archive Structure
 
 Historical documents preserved for reference:
 
-```
+```text
 docs/archive/
 ├── historical_analysis/           # Mock reduction strategies (obsolete)
 ├── implementation_phases/         # Phase-specific documents (completed)
 └── status_reports/               # Historical status reports (consolidated)
 ```
 
-## 🧹 **Documentation Best Practices Applied**
+## 🧹 Documentation Best Practices Applied
 
 - ✅ **Single Source of Truth:** Each topic has one authoritative document
 - ✅ **Clear Ownership:** Each document has designated owner and update schedule  
@@ -85,7 +87,7 @@ docs/archive/
 - **ML Agents:** Real inference operational (RealMLEngine)
 - **Security HSM:** Real cryptography operational (SoftwareHSM)
 
-### **📊 Key Metrics**
+### 📊 Additional Metrics
 
 - ✅ **Compilation:** Zero errors, warnings only
 - ✅ **Unimplemented Functions:** 0 (all real logic implemented)

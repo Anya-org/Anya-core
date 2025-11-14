@@ -28,4 +28,38 @@ Success Criteria
 - Warnings < 10
 - Docs in docs/prd kept current
 
-Last Updated: August 8, 2025
+Last Updated: August 10, 2025
+
+## Cross-Cutting: Native Dependency Migration (Added Aug 10, 2025)
+
+Phase 0 (Complete / In Progress)
+- Audit & migration guide committed (docs/audit/*)
+- Quick-fix script scaffolds rustls + pure zstd path (pending execution)
+- Placeholder feature flags added: kv-redb, kv-sled, git-gix
+
+Phase 1
+- Implement StorageEngine trait + RocksDbEngine wrapper (no behavior change)
+- Capture baseline: build time, binary size, geiger unsafe/FFI metrics
+- Apply rustls TLS switch; verify OpenSSL absence via ldd
+
+Phase 2
+- Prototype RedbEngine behind `kv-redb` (CRUD + iteration)
+- Bench: rocksdb vs redb (ops/sec, p95 lat, size) with criterion
+- Decision gate: adopt if perf within ±15% and complexity reduction meaningful
+
+Phase 3
+- (Optional) SledEngine if redb inconclusive
+- Dual-write shadow mode + export/import + checksum verifier
+
+Phase 4
+- Git abstraction + gix exploration if git features expand
+
+Success Metrics
+- ≥15% build time reduction vs baseline
+- Net decrease in unsafe/FFI lines (geiger)
+- No data consistency diffs across 7 CI runs in shadow mode
+
+Risks / Mitigations
+- Perf regression → benchmark gates
+- Data divergence → dual-write + checksum validation
+- Complexity creep → minimal trait surface, progressive rollout

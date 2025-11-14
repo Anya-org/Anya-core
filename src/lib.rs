@@ -69,6 +69,10 @@ pub mod utils;
 pub mod web;
 pub mod web5; // Export storage (persistent, decentralized, router)
 
+// New analytics and security ML modules (replaces Python implementations)
+pub mod analytics;
+pub mod security_ml;
+
 // Hardware optimization module
 pub mod hardware_optimization {
     use std::collections::HashMap;

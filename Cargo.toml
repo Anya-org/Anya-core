@@ -165,7 +165,8 @@ bdk = ["bitcoin", "dep:bdk_wallet"] # Bitcoin Development Kit support
 web5 = ["dep:jsonwebtoken", "dep:multibase", "dep:multihash"]
 
 # Decentralized Web Node (DWN) feature gates DWNManager + DecentralizedStorage integration
-dwn = ["web5"]
+# Depend on `bitcoin` to ensure `bitcoin::Network` is available wherever DWN is compiled
+dwn = ["web5", "bitcoin"]
 
 # Hybrid storage orchestrator (Postgres + RocksDB + DWN/IPFS)
 storage-hybrid = ["enterprise", "kv-rocks", "dwn"]
@@ -181,6 +182,14 @@ fast-tests = []
 
 # Optional RocksDB KV acceleration (currently always compiled but kept for clarity/future gating)
 kv-rocks = []
+
+# --- Native dependency migration placeholders (Aug 10 2025) ---
+# These inert feature flags reserve stable names for upcoming pure-Rust
+# backend experiments. Implementations will land behind these flags to allow
+# dual-run and safe rollback during evaluation.
+kv-redb = []        # Planned: redb key-value backend (pure Rust)
+kv-sled = []        # Planned: sled key-value backend (pure Rust)
+git-gix = []        # Planned: gix (git-oxide) replacement for any future libgit2 usage
 
 # Legacy SQLite compatibility (will be removed) – DO NOT enable in production
 sqlite-backcompat = []

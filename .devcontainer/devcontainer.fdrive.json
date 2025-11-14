@@ -1,0 +1,31 @@
+{
+    "name": "Anya Core - Rust (F: Drive Bind)",
+    "extends": "./devcontainer.json",
+    "mounts": [
+        {
+            "source": "F:\\anya-rust-target",
+            "target": "${containerWorkspaceFolder}/target",
+            "type": "bind"
+        },
+        {
+            "source": "F:\\anya-cargo-registry",
+            "target": "/usr/local/cargo/registry",
+            "type": "bind"
+        },
+        {
+            "source": "F:\\anya-cargo-git",
+            "target": "/usr/local/cargo/git",
+            "type": "bind"
+        },
+        {
+            "source": "F:\\anya-sccache",
+            "target": "/var/cache/sccache",
+            "type": "bind"
+        }
+    ],
+    "containerEnv": {
+        "DYNAMIC_CACHE_FORCE_ROOT": "",
+        "DYNAMIC_CACHE_VERBOSE": "1"
+    },
+    "postCreateCommand": "bash -c 'chmod +x ./.devcontainer/*.sh; bash ./.devcontainer/dynamic-cache-setup.sh'"
+}
