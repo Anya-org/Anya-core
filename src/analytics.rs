@@ -4,11 +4,11 @@
 //! including anomaly detection, pattern recognition, and performance analysis.
 //! This replaces the Python monitoring scripts with high-performance Rust implementations.
 
-use crate::ml::{MLSystem, MLConfig, MLOutput, MLInput};
+use crate::ml::{MLSystem, MLConfig, MLInput};
 use crate::{AnyaError, AnyaResult};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use std::time::{Duration, SystemTime, UNIX_EPOCH};
+use std::time::{SystemTime, UNIX_EPOCH};
 use tokio::sync::RwLock;
 use std::sync::Arc;
 
@@ -200,11 +200,15 @@ impl AnalyticsEngine {
 
             // Use ML service for anomaly detection
             let inference_result = ml_system.service()
-                .predict("anomaly_detector", &serde_json::to_vec(&input)?)
+                .inference("anomaly_detector", &serde_json::to_vec(&input)?)
                 .await
                 .map_err(|e| AnyaError::Analytics(format!("ML inference failed: {}", e)))?;
 
-            let anomaly_score: f64 = serde_json::from_slice(&inference_result.output)?;
+            let anomaly_score = if inference_result.predictions.is_empty() {
+                0.0
+            } else {
+                inference_result.predictions[0]
+            };
             let is_anomaly = anomaly_score > self.config.anomaly_threshold;
 
             if is_anomaly {
@@ -227,7 +231,7 @@ impl AnalyticsEngine {
                     metric_name: metric_name.to_string(),
                     anomaly_score,
                     is_anomaly,
-                    confidence: inference_result.confidence,
+                    confidence: inference_result.overall_confidence,
                     expected_range,
                     actual_value: series[i].value,
                 });
@@ -359,6 +363,7 @@ impl AnalyticsEngine {
         let store = self.data_store.read().await;
         let mut anomaly_summary = HashMap::new();
         let mut metric_summary = HashMap::new();
+        let mut metrics_to_process = Vec::new();
 
         for (metric_name, series) in store.iter() {
             // Filter data points within time range
@@ -384,26 +389,23 @@ impl AnalyticsEngine {
                 trend: calculate_trend(&values),
             });
 
-            // Detect anomalies for this metric
-            drop(store); // Release read lock temporarily
-            let anomalies = self.detect_anomalies(metric_name).await?;
-            let recent_anomalies = anomalies.into_iter()
-                .filter(|a| a.timestamp >= cutoff_time)
-                .collect::<Vec<_>>();
-            
-            anomaly_summary.insert(metric_name.clone(), recent_anomalies);
             // Store metric name for anomaly detection later
             metrics_to_process.push(metric_name.clone());
         }
-        drop(store); // Release read lock before anomaly detection
+        
+        // Release read lock before anomaly detection
+        drop(store);
 
-        // Now, process anomaly detection for each metric outside the lock
-        for metric_name in metrics_to_process {
+        // Collect metric names for anomaly detection
+        let metric_names: Vec<_> = metric_summary.keys().cloned().collect();
+        
+        // Process anomaly detection for each metric outside the lock
+        for metric_name in metric_names {
             let anomalies = self.detect_anomalies(&metric_name).await?;
             let recent_anomalies = anomalies.into_iter()
                 .filter(|a| a.timestamp >= cutoff_time)
                 .collect::<Vec<_>>();
-            anomaly_summary.insert(metric_name.clone(), recent_anomalies);
+            anomaly_summary.insert(metric_name, recent_anomalies);
         }
 
         Ok(AnalyticsReport {
@@ -413,22 +415,15 @@ impl AnalyticsEngine {
                 .unwrap()
                 .as_secs(),
             metric_summary,
-            anomaly_summary,
+            anomaly_summary: anomaly_summary.clone(),
             recommendations: self.generate_recommendations(&anomaly_summary).await,
+            anomaly_summary,
         })
     }
 
     /// Perform real-time analysis on incoming data
     async fn analyze_real_time(&self, metric_name: &str, value: f64) -> AnyaResult<()> {
-        // Record metric for real-time analysis
-        let mut metadata = HashMap::new();
-        metadata.insert("analysis_type".to_string(), "real_time".to_string());
-        
-        self.record_metric(
-            &format!("{}_realtime", metric_name), 
-            value, 
-            Some(metadata)
-        ).await?;
+        // Skip recording to avoid recursion - just perform analysis
 
         // Trigger immediate anomaly check if significant deviation
         // This is a simplified check - in production, you'd use more sophisticated methods

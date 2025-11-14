@@ -26,6 +26,7 @@ use thiserror::Error;
 
 pub mod bip32;
 pub mod transactions;
+pub mod advanced_features;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum WalletType {
@@ -1094,6 +1095,13 @@ pub enum CoinSelectionStrategy {
     /// Branch and bound algorithm
     BranchAndBound,
 }
+
+// Re-export advanced wallet features
+pub use advanced_features::{
+    AdvancedWalletManager, HardwareWalletInterface, HardwareWalletType, HardwareWalletInfo,
+    MultisigConfig, MultisigScriptType, MultisigSigner, WatchOnlyConfig, WatchOnlyWallet,
+    MockHardwareWallet, HWFeatures, HWConnectionStatus,
+};
 
 // Copyright (C) 2023-2025 Anya Project Contributors
 // Last Modified: 2025-05-30

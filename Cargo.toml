@@ -165,8 +165,7 @@ bdk = ["bitcoin", "dep:bdk_wallet"] # Bitcoin Development Kit support
 web5 = ["dep:jsonwebtoken", "dep:multibase", "dep:multihash"]
 
 # Decentralized Web Node (DWN) feature gates DWNManager + DecentralizedStorage integration
-# Depend on `bitcoin` to ensure `bitcoin::Network` is available wherever DWN is compiled
-dwn = ["web5", "bitcoin"]
+dwn = ["web5"]
 
 # Hybrid storage orchestrator (Postgres + RocksDB + DWN/IPFS)
 storage-hybrid = ["enterprise", "kv-rocks", "dwn"]
