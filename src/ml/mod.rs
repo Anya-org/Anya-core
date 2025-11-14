@@ -264,7 +264,7 @@ impl MLSystem {
 pub trait MLModelPlaceholder {}
 
 /// ML model input
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct MLInput {
     /// Features for the model
     pub features: Vec<f64>,
@@ -275,7 +275,7 @@ pub struct MLInput {
 }
 
 /// ML model output
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct MLOutput {
     /// Model prediction
     pub prediction: f64,

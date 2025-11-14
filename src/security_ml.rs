@@ -206,11 +206,15 @@ impl SecurityMLEngine {
 
         let ml_system = self.ml_system.read().await;
         let inference_result = ml_system.service()
-            .predict("fraud_detector", &serde_json::to_vec(&input)?)
+            .inference("fraud_detector", &serde_json::to_vec(&input)?)
             .await
             .map_err(|e| AnyaError::Security(format!("Fraud detection inference failed: {}", e)))?;
 
-        let fraud_probability: f64 = serde_json::from_slice(&inference_result.output)?;
+        let fraud_probability = if inference_result.predictions.is_empty() {
+            0.5
+        } else {
+            inference_result.predictions[0]
+        };
         let risk_factors = self.identify_risk_factors(tx).await;
         let anomaly_score = self.calculate_transaction_anomaly_score(tx).await?;
 
@@ -312,10 +316,13 @@ impl SecurityMLEngine {
 
         let ml_system = self.ml_system.read().await;
         if let Ok(inference_result) = ml_system.service()
-            .predict("attack_detector", &serde_json::to_vec(&input)?)
+            .inference("attack_detector", &serde_json::to_vec(&input)?)
             .await {
-            let ml_probability: f64 = serde_json::from_slice(&inference_result.output)
-                .unwrap_or(0.0);
+            let ml_probability = if inference_result.predictions.is_empty() {
+                0.0
+            } else {
+                inference_result.predictions[0]
+            };
             attack_probability = (attack_probability + ml_probability) / 2.0;
         }
 
@@ -394,10 +401,13 @@ impl SecurityMLEngine {
         let mut cause_analysis = Vec::new();
 
         if let Ok(inference_result) = ml_system.service()
-            .predict("fee_spike_analyzer", &serde_json::to_vec(&input)?)
+            .inference("fee_spike_analyzer", &serde_json::to_vec(&input)?)
             .await {
-            predicted_duration_minutes = serde_json::from_slice(&inference_result.output)
-                .unwrap_or(0.0);
+            predicted_duration_minutes = if inference_result.predictions.is_empty() {
+                0.0
+            } else {
+                inference_result.predictions[0]
+            };
         }
 
         // Analyze potential causes
@@ -481,7 +491,7 @@ impl SecurityMLEngine {
         features.push(f64::from(tx.input_count));
         features.push(f64::from(tx.output_count));
         features.push(tx.fee_rate);
-        features.push(f64::from(tx.total_value));
+        features.push(tx.total_value as f64);
         features.push(if tx.is_rbf { 1.0 } else { 0.0 });
         features.push(if tx.has_witness { 1.0 } else { 0.0 });
         features.push(f64::from(tx.size_bytes));
@@ -489,8 +499,8 @@ impl SecurityMLEngine {
         // Address reuse patterns
         let input_unique = tx.input_addresses.iter().collect::<std::collections::HashSet<_>>().len();
         let output_unique = tx.output_addresses.iter().collect::<std::collections::HashSet<_>>().len();
-        features.push(f64::from(input_unique) / f64::from(tx.input_addresses.len().max(1)));
-        features.push(f64::from(output_unique) / f64::from(tx.output_addresses.len().max(1)));
+        features.push(input_unique as f64 / tx.input_addresses.len().max(1) as f64);
+        features.push(output_unique as f64 / tx.output_addresses.len().max(1) as f64);
 
         // Timing features
         let current_time = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
@@ -535,10 +545,15 @@ impl SecurityMLEngine {
         features.push(hashrate_volatility);
 
         // Current vs historical hashrate
-        if let (Some(current), Some(historical_avg)) = (
+        if let (Some(current), hashrate_sum) = (
             recent_hashrate.first().map(|h| h.estimated_hashrate),
-            hashrate.iter().map(|h| h.estimated_hashrate).sum::<f64>().checked_div(hashrate.len() as f64)
+            hashrate.iter().map(|h| h.estimated_hashrate).sum::<f64>()
         ) {
+            let historical_avg = if hashrate.len() > 0 { 
+                hashrate_sum / hashrate.len() as f64 
+            } else { 
+                1.0 
+            };
             features.push(current / historical_avg);
         } else {
             features.push(1.0);
@@ -678,7 +693,7 @@ impl SecurityMLEngine {
 
     async fn calculate_transaction_anomaly_score(&self, tx: &TransactionData) -> AnyaResult<f64> {
         // Simplified anomaly scoring based on deviations from normal patterns
-        let mut score = 0.0;
+        let mut score: f64 = 0.0;
         
         // Fee rate anomaly
         let normal_fee_range = 1.0..=50.0;
